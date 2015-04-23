@@ -5,4 +5,3 @@ class MSFT_xDNSServerAddress : OMI_BaseResource
   [Key] string InterfaceAlias;
   [Write,ValueMap{"IPv4", "IPv6"},Values{"IPv4", "IPv6"}] string AddressFamily;
 };
-

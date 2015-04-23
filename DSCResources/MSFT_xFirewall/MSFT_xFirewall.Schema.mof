@@ -16,4 +16,3 @@ class MSFT_xFirewall : OMI_BaseResource
   [Write, Description("Path and file name of the program for which the rule is applied")] String ApplicationPath;
   [Write, Description("Specifies the short name of a Windows service to which the firewall rule applies")] String Service;
 };
-
