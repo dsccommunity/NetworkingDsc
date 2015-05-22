@@ -1,5 +1,7 @@
 ﻿Remove-Module -Name MSFT_xIPAddress -Force -ErrorAction SilentlyContinue
+Remove-Module -Name  xDSCResourceDesigner -Force -ErrorAction SilentlyContinue
 Import-Module -Name $PSScriptRoot\..\DSCResources\MSFT_xIPAddress -Force -DisableNameChecking
+Import-Module -Name  xDSCResourceDesigner -ErrorAction SilentlyContinue
 
 InModuleScope MSFT_xIPAddress {
 
@@ -23,6 +25,18 @@ InModuleScope MSFT_xIPAddress {
                 }
                 $Result = Get-TargetResource @Splat
                 $Result.IPAddress | Should Be $Splat.IPAddress
+            }
+        }
+
+        Context 'Subnet Mask' {
+            It 'should fail if passed a negative number' {
+                $Splat = @{
+                    IPAddress = '192.168.0.1'
+                    InterfaceAlias = 'Ethernet'
+                    Subnet = -16
+                }
+
+                { Get-TargetResource @Splat } | Should throw
             }
         }
     }
@@ -86,6 +100,13 @@ InModuleScope MSFT_xIPAddress {
                 $Result = ValidateProperties @Splat -Apply
                 $Result | Should BeNullOrEmpty
             }
+        }
+    }
+
+    Describe 'Schema Validation MSFT_xIPAddress' {
+        $result = Test-xDscResource MSFT_xIPAddress
+        It 'should pass Test-xDscResource' {
+            $result | Should Be $true
         }
     }
 }
