@@ -84,7 +84,6 @@ function Set-TargetResource
         [String]$State = "Enabled",
 
         # Specifies one or more profiles to which the rule is assigned
-        # [ValidateSet("Any", "Public", "Private", "Domain")]
         [String[]]$Profile = ("Any"),
 
         # Direction of the connection
@@ -240,7 +239,6 @@ function Test-TargetResource
         [String]$State,
 
         # Specifies one or more profiles to which the rule is assigned
-        # [ValidateSet("Any", "Public", "Private", "Domain")]
         [String[]]$Profile,
 
         # Direction of the connection
