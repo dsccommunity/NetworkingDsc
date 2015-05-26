@@ -2,7 +2,7 @@ install:
     - cinst -y pester
     - git clone https://github.com/PowerShell/DscResource.Tests
     - ps: Get-PackageProvider -name nuget -ForceBootStrap -Force
-    - ps: Install-Module xDSCResourceDesigner
+    - ps: Install-NugetPackage -package xDscResourceDesigner
 
 build: false
 
