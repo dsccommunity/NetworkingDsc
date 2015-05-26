@@ -1,7 +1,10 @@
 ﻿Remove-Module -Name MSFT_xIPAddress -Force -ErrorAction SilentlyContinue
-Remove-Module -Name  xDSCResourceDesigner -Force -ErrorAction SilentlyContinue
 Import-Module -Name $PSScriptRoot\..\DSCResources\MSFT_xIPAddress -Force -DisableNameChecking
-Import-Module -Name  xDSCResourceDesigner -ErrorAction SilentlyContinue
+
+if (! (Get-Module xDSCResourceDesigner))
+{
+    Import-Module -Name xDSCResourceDesigner -ErrorAction SilentlyContinue
+}
 
 InModuleScope MSFT_xIPAddress {
 
