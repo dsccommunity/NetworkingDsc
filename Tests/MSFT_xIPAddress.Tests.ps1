@@ -6,6 +6,14 @@ if (! (Get-Module xDSCResourceDesigner))
     Import-Module -Name xDSCResourceDesigner -ErrorAction SilentlyContinue
 }
 
+Describe 'Schema Validation MSFT_xIPAddress' {
+    Copy-Item -Path ((get-item .).parent.FullName) -Destination $(Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules\') -Force -Recurse
+    $result = Test-xDscResource MSFT_xIPAddress
+    It 'should pass Test-xDscResource' {
+        $result | Should Be $true
+    }
+}
+
 InModuleScope MSFT_xIPAddress {
 
     Describe 'Get-TargetResource' {
@@ -103,13 +111,6 @@ InModuleScope MSFT_xIPAddress {
                 $Result = ValidateProperties @Splat -Apply
                 $Result | Should BeNullOrEmpty
             }
-        }
-    }
-
-    Describe 'Schema Validation MSFT_xIPAddress' {
-        $result = Test-xDscResource MSFT_xIPAddress
-        It 'should pass Test-xDscResource' {
-            $result | Should Be $true
         }
     }
 }
