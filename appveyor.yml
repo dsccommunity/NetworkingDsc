@@ -1,6 +1,8 @@
-install: 
+install:
     - cinst -y pester
     - git clone https://github.com/PowerShell/DscResource.Tests
+    - ps: Get-PackageProvider -name nuget -ForceBootStrap -Force
+    - ps: nuget.exe install xDscResourceDesigner -source 'https://www.powershellgallery.com/api/v2' -outputDirectory "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\" -ExcludeVersion
 
 build: false
 
@@ -9,7 +11,7 @@ test_script:
         $testResultsFile = ".\TestsResults.xml"
         $res = Invoke-Pester -OutputFormat NUnitXml -OutputFile $testResultsFile -PassThru
         (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $testResultsFile))
-        if ($res.FailedCount -gt 0) { 
+        if ($res.FailedCount -gt 0) {
             throw "$($res.FailedCount) tests failed."
         }
 on_finish:
@@ -23,3 +25,4 @@ on_finish:
             (ls $zipFile)
         ) | % { Push-AppveyorArtifact $_.FullName }
 
+os: Unstable

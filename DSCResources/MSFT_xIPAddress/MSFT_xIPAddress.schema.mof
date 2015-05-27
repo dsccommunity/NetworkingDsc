@@ -1,4 +1,4 @@
-[ClassVersion("1.0.0"), FriendlyName("xIPAddress")] 
+[ClassVersion("1.0.0"), FriendlyName("xIPAddress")]
 class MSFT_xIPAddress : OMI_BaseResource
 {
   [Key] string IPAddress;
@@ -7,4 +7,3 @@ class MSFT_xIPAddress : OMI_BaseResource
   [Write] uint32 SubnetMask;
   [Write,ValueMap{"IPv4", "IPv6"},Values{"IPv4", "IPv6"}] string AddressFamily;
 };
-
