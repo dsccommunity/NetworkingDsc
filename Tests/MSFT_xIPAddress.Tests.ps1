@@ -1,9 +1,6 @@
-﻿Remove-Module -Name MSFT_xIPAddress -Force -ErrorAction SilentlyContinue
-Import-Module -Name $PSScriptRoot\..\DSCResources\MSFT_xIPAddress -Force -DisableNameChecking
-
-if (! (Get-Module xDSCResourceDesigner))
+﻿if (! (Get-Module xDSCResourceDesigner))
 {
-    Import-Module -Name xDSCResourceDesigner -ErrorAction SilentlyContinue
+    Import-Module -Name xDSCResourceDesigner
 }
 
 Describe 'Schema Validation MSFT_xIPAddress' {
@@ -13,6 +10,9 @@ Describe 'Schema Validation MSFT_xIPAddress' {
         $result | Should Be $true
     }
 }
+
+Get-Module MSFT_xIPAddress -All | Remove-Module -Force -ErrorAction:SilentlyContinue
+Import-Module -Name $PSScriptRoot\..\DSCResources\MSFT_xIPAddress -Force -DisableNameChecking
 
 InModuleScope MSFT_xIPAddress {
 
