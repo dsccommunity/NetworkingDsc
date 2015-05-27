@@ -5,12 +5,15 @@
 
 Describe 'Schema Validation MSFT_xIPAddress' {
     Copy-Item -Path ((get-item .).parent.FullName) -Destination $(Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules\') -Force -Recurse
-    $result = Test-xDscResource MSFT_xIPAddress
+
     It 'should pass Test-xDscResource' {
+        $result = Test-xDscResource MSFT_xIPAddress
         $result | Should Be $true
     }
 }
 
+# This is here due to an occasional error in Pester where it believes multiple versions
+# of the Module has been loaded.
 Get-Module MSFT_xIPAddress -All | Remove-Module -Force -ErrorAction:SilentlyContinue
 Import-Module -Name $PSScriptRoot\..\DSCResources\MSFT_xIPAddress -Force -DisableNameChecking
 
@@ -47,7 +50,7 @@ InModuleScope MSFT_xIPAddress {
                     Subnet = -16
                 }
 
-                { Get-TargetResource @Splat } | Should throw
+                 { Get-TargetResource @Splat } | Should Throw "Value was either too large or too small for a UInt32."
             }
         }
     }
