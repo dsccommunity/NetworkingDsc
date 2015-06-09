@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+﻿[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
 
 # xNetworking
 
@@ -48,6 +48,9 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 
 ## Versions
+
+### 2.2.0.0
+* Changes in xFirewall resources to meet Test-xDscResource criteria
 
 ### 2.1.1.1
 
