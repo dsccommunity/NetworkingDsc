@@ -1,8 +1,8 @@
 <#######################################################################################
- #  MSDSCPack_IPAddress : DSC Resource that will set/test/get the current IP 
+ #  MSDSCPack_IPAddress : DSC Resource that will set/test/get the current IP
  #  Address, by accepting values among those given in MSDSCPack_IPAddress.schema.mof
  #######################################################################################>
- 
+
 
 
 ######################################################################################
@@ -11,8 +11,9 @@
 ######################################################################################
 function Get-TargetResource
 {
+    [OutputType([System.Collections.Hashtable])]
     param
-    (        
+    (
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String]$IPAddress,
@@ -21,16 +22,16 @@ function Get-TargetResource
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
-        [Int]$SubnetMask = 16,
+        [uInt32]$SubnetMask = 16,
 
         [ValidateNotNullOrEmpty()]
         [String]$DefaultGateway,
-        
+
         [ValidateSet("IPv4", "IPv6")]
         [String]$AddressFamily = "IPv4"
     )
-    
-    
+
+
     $returnValue = @{
         IPAddress = [System.String]::Join(", ",(Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily $AddressFamily).IPAddress)
         SubnetMask = $SubnetMask
@@ -49,8 +50,8 @@ function Get-TargetResource
 function Set-TargetResource
 {
     param
-    (    
-        #IP Address that has to be set    
+    (
+        #IP Address that has to be set
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String]$IPAddress,
@@ -59,7 +60,7 @@ function Set-TargetResource
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
-        [Int]$SubnetMask,
+        [uInt32]$SubnetMask,
 
         [ValidateNotNullOrEmpty()]
         [String]$DefaultGateway,
@@ -68,7 +69,7 @@ function Set-TargetResource
         [String]$AddressFamily = "IPv4"
     )
 
-    
+
     ValidateProperties @PSBoundParameters -Apply
 }
 
@@ -78,8 +79,9 @@ function Set-TargetResource
 ######################################################################################
 function Test-TargetResource
 {
+    [OutputType([System.Boolean])]
     param
-    (        
+    (
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String]$IPAddress,
@@ -88,7 +90,7 @@ function Test-TargetResource
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
-        [Int]$SubnetMask,
+        [uInt32]$SubnetMask,
 
         [ValidateNotNullOrEmpty()]
         [String]$DefaultGateway,
@@ -120,20 +122,23 @@ function ValidateProperties
         [ValidateNotNullOrEmpty()]
         [String]$DefaultGateway,
 
-        [Int]$SubnetMask = 16,
+        [uInt32]$SubnetMask = 16,
 
-    [ValidateSet("IPv4", "IPv6")]
+        [ValidateSet("IPv4", "IPv6")]
         [String]$AddressFamily = "IPv4",
 
         [Switch]$Apply
     )
-    $ip=$IPAddress
+
+    $ip = $IPAddress
+
     if(!([System.Net.Ipaddress]::TryParse($ip, [ref]0)))
     {
        throw "IP Address *$IPAddress* is not in the correct format. Please correct the ipaddress in the configuration and try again"
     }
+
     try
-    {        
+    {
         Write-Verbose -Message "Checking the IPAddress ..."
         #Get the current IP Address based on the parameters given.
         $currentIP = Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily $AddressFamily -ErrorAction Stop
@@ -174,7 +179,5 @@ function ValidateProperties
     }
 }
 
-
-
-#  FUNCTIONS TO BE EXPORTED 
+#  FUNCTIONS TO BE EXPORTED
 Export-ModuleMember -function Get-TargetResource, Set-TargetResource, Test-TargetResource
