@@ -143,32 +143,104 @@ function ValidateProperties
         #Get the current IP Address based on the parameters given.
         $currentIP = Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily $AddressFamily -ErrorAction Stop
 
+        # Build hash table of current settings
+        $currentSettings = @{}
+        $currentSettings['IPAddress'] = $currentIP.IPAddress
+        $currentSettings['PrefixLength'] = $currentIP.PrefixLength
+        $currentSettings['InterfaceAlias'] = $currentIP.InterfaceAlias
+
+        # Flag to signal whether settings are correct
+        $requiresChanges = $false
+
         #Test if the IP Address passed is equal to the current ip address
-        if(!$currentIP.IPAddress.Contains($IPAddress))
+        if(!$currentSettings['IPAddress'].Equals($IPAddress))
         {
-            Write-Verbose -Message "IPAddress not correct. Expected $IPAddress, actual $($currentIP.IPAddress)"
-            $Parameters = @{}
-
-            #Apply is true in the case of set - target resource - in which case, it will set the new IP Address
-            if($Apply)
-            {
-                Write-Verbose -Message "Setting IPAddress ..."
-                $Parameters["IPAddress"] = $IPAddress
-                $Parameters["PrefixLength"] = $SubnetMask
-                $Parameters["InterfaceAlias"] = $currentIP[0].InterfaceAlias
-
-                if($DefaultGateway){ $Parameters["DefaultGateWay"] = $DefaultGateway }
-                $null = New-NetIPAddress @Parameters -ErrorAction Stop
-
-                # Make the connection profile private
-                Get-NetConnectionProfile -InterfaceAlias $InterfaceAlias | Set-NetConnectionProfile -NetworkCategory Private -ErrorAction SilentlyContinue
-                Write-Verbose -Message "IPAddress is set to $IPAddress."
-            }
-            else {return $false}
+            Write-Verbose -Message "IPAddress does NOT match desired state. Expected $IPAddress, actual $($currentSettings['IPAddress'])."
+            $requiresChanges = $true
         }
         else
         {
             Write-Verbose -Message "IPAddress is correct."
+        }
+
+        #Test if the Subnet Mask passed is equal to the current subnet mask
+        if(!$currentSettings['PrefixLength'].Equals([byte]$SubnetMask))
+        {
+            Write-Verbose -Message "Subnet mask does NOT match desired state. Expected $SubnetMask, actual $($currentSettings['PrefixLength'])."
+            $requiresChanges = $true
+        }
+        else
+        {
+            Write-Verbose -Message "Subnet mask is correct."
+        }
+
+        #Test if the Default Gateway passed is equal to the current default gateway
+        if($DefaultGateway)
+        {
+            $gateway = $DefaultGateway
+            if(!([System.Net.Ipaddress]::TryParse($gateway, [ref]0)))
+            {
+               throw "Default Gateway *$DefaultGateway* is NOT in the correct format. Please correct the gateway ipaddress in the configuration and try again"
+            }
+
+            $netIpConf = Get-NetIPConfiguration -InterfaceAlias $InterfaceAlias -ErrorAction Stop
+            $currentSettings['DefaultGateway'] = ($netIpConf."$($AddressFamily)DefaultGateway").NextHop
+
+            if(!$currentSettings['DefaultGateway'].Equals($DefaultGateway))
+            {
+                Write-Verbose -Message "Default gateway does NOT match desired state. Expected $DefaultGateway, actual $($currentSettings['DefaultGateway'])."
+                $requiresChanges = $true
+            }
+            else
+            {
+                Write-Verbose -Message "Default gateway is correct."
+            }
+        }
+
+        #Test if DHCP is already disabled
+        if(!(Get-NetIPInterface -InterfaceAlias $InterfaceAlias -AddressFamily $AddressFamily).Dhcp.ToString().Equals('Disabled'))
+        {
+            Write-Verbose -Message "DHCP is NOT disabled."
+            $requiresChanges = $true
+        }
+        else
+        {
+            Write-Verbose -Message "DHCP is already disabled."
+        }
+
+        if($requiresChanges)
+        {
+            #Apply is true in the case of set - target resource - in which case, it will apply the required IP configuration
+            if($Apply)
+            {
+                Write-Verbose -Message "At least one setting differs from the passed parameters. Applying configuration..."
+
+                # Build parameter hash table
+                $Parameters = @{}
+                $Parameters["IPAddress"] = $IPAddress
+                $Parameters["PrefixLength"] = $SubnetMask
+                $Parameters["InterfaceAlias"] = $currentIP[0].InterfaceAlias
+                if($DefaultGateway){ $Parameters["DefaultGateway"] = $DefaultGateway }
+
+                # If null, remove the gateway from the current settings hash table
+                if($currentSettings['DefaultGateway'] -eq $null){ $currentSettings.remove('DefaultGateway') }
+
+                # Remove IP address first; required if the IP is correct but other settings are not
+                Remove-NetIPAddress @currentSettings -confirm:$false -ErrorAction Stop
+
+                # Apply the specified IP configuration
+                $null = New-NetIPAddress @Parameters -ErrorAction Stop
+
+                # Make the connection profile private
+                Get-NetConnectionProfile -InterfaceAlias $InterfaceAlias | Set-NetConnectionProfile -NetworkCategory Private -ErrorAction SilentlyContinue
+                Write-Verbose -Message "IP Interface was set to the desired state."
+            }
+            else
+            {return $false}
+        }
+        else
+        {
+            Write-Verbose -Message "IP Interface is in the desired state."
             return $true
         }
     }
