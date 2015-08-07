@@ -3,8 +3,6 @@
  #  Address, by accepting values among those given in MSDSCPack_IPAddress.schema.mof
  #######################################################################################>
 
-
-
 ######################################################################################
 # The Get-TargetResource cmdlet.
 # This function will get the present list of IP Address DSC Resource schema variables on the system
@@ -31,9 +29,9 @@ function Get-TargetResource
         [String]$AddressFamily = "IPv4"
     )
 
-
     $returnValue = @{
-        IPAddress = [System.String]::Join(", ",(Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily $AddressFamily).IPAddress)
+        IPAddress = [System.String]::Join(", ",(Get-NetIPAddress -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily).IPAddress)
         SubnetMask = $SubnetMask
         DefaultGateway = $DefaultGateway
         AddressFamily = $AddressFamily
@@ -69,7 +67,6 @@ function Set-TargetResource
         [String]$AddressFamily = "IPv4"
     )
 
-
     ValidateProperties @PSBoundParameters -Apply
 }
 
@@ -102,7 +99,6 @@ function Test-TargetResource
     ValidateProperties @PSBoundParameters
 }
 
-
 #######################################################################################
 #  Helper function that validates the IP Address properties. If the switch parameter
 # "Apply" is set, then it will set the properties after a test
@@ -134,14 +130,19 @@ function ValidateProperties
 
     if(!([System.Net.Ipaddress]::TryParse($ip, [ref]0)))
     {
-       throw "IP Address *$IPAddress* is not in the correct format. Please correct the ipaddress in the configuration and try again"
+        throw ( @(
+            "IP Address *$IPAddress* is not in the correct format. Please correct the ipaddress "
+            "in the configuration and try again"
+            ) -join "" | Out-String
+        )
     }
 
     try
     {
         Write-Verbose -Message "Checking the IPAddress ..."
         #Get the current IP Address based on the parameters given.
-        $currentIP = Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily $AddressFamily -ErrorAction Stop
+        $currentIP = Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily `
+            $AddressFamily -ErrorAction Stop
 
         # Build hash table of current settings
         $currentSettings = @{}
@@ -155,7 +156,11 @@ function ValidateProperties
         #Test if the IP Address passed is equal to the current ip address
         if(!$currentSettings['IPAddress'].Equals($IPAddress))
         {
-            Write-Verbose -Message "IPAddress does NOT match desired state. Expected $IPAddress, actual $($currentSettings['IPAddress'])."
+            Write-Verbose -Message ( @(
+                "IPAddress does NOT match desired state. Expected $IPAddress, actual "
+                "$($currentSettings['IPAddress'])."
+                ) -join "" | Out-String
+            )
             $requiresChanges = $true
         }
         else
@@ -166,7 +171,11 @@ function ValidateProperties
         #Test if the Subnet Mask passed is equal to the current subnet mask
         if(!$currentSettings['PrefixLength'].Equals([byte]$SubnetMask))
         {
-            Write-Verbose -Message "Subnet mask does NOT match desired state. Expected $SubnetMask, actual $($currentSettings['PrefixLength'])."
+            Write-Verbose -Message ( @(
+                "Subnet mask does NOT match desired state. Expected $SubnetMask, actual "
+                "$($currentSettings['PrefixLength'])."
+                ) -join "" | Out-String
+            )
             $requiresChanges = $true
         }
         else
@@ -180,15 +189,25 @@ function ValidateProperties
             $gateway = $DefaultGateway
             if(!([System.Net.Ipaddress]::TryParse($gateway, [ref]0)))
             {
-               throw "Default Gateway *$DefaultGateway* is NOT in the correct format. Please correct the gateway ipaddress in the configuration and try again"
+                throw ( @(
+                    "Default Gateway *$DefaultGateway* is NOT in the correct format. Please "
+                    "correct the gateway ipaddress in the configuration and try again"
+                    ) -join "" | Out-String
+                )
             }
 
             $netIpConf = Get-NetIPConfiguration -InterfaceAlias $InterfaceAlias -ErrorAction Stop
-            $currentSettings['DefaultGateway'] = ($netIpConf."$($AddressFamily)DefaultGateway").NextHop
+            $currentSettings['DefaultGateway'] = (
+                $netIpConf."$($AddressFamily)DefaultGateway"
+                ).NextHop
 
             if(!$currentSettings['DefaultGateway'].Equals($DefaultGateway))
             {
-                Write-Verbose -Message "Default gateway does NOT match desired state. Expected $DefaultGateway, actual $($currentSettings['DefaultGateway'])."
+                Write-Verbose -Message ( @(
+                    "Default gateway does NOT match desired state. Expected $DefaultGateway, "
+                    "actual $($currentSettings['DefaultGateway'])."
+                    ) -join "" | Out-String
+                )
                 $requiresChanges = $true
             }
             else
@@ -198,7 +217,8 @@ function ValidateProperties
         }
 
         #Test if DHCP is already disabled
-        if(!(Get-NetIPInterface -InterfaceAlias $InterfaceAlias -AddressFamily $AddressFamily).Dhcp.ToString().Equals('Disabled'))
+        if(!(Get-NetIPInterface -InterfaceAlias $InterfaceAlias -AddressFamily `
+            $AddressFamily).Dhcp.ToString().Equals('Disabled'))
         {
             Write-Verbose -Message "DHCP is NOT disabled."
             $requiresChanges = $true
@@ -210,20 +230,31 @@ function ValidateProperties
 
         if($requiresChanges)
         {
-            #Apply is true in the case of set - target resource - in which case, it will apply the required IP configuration
+            # Apply is true in the case of set - target resource - in which case, it will apply the
+            # required IP configuration
             if($Apply)
             {
-                Write-Verbose -Message "At least one setting differs from the passed parameters. Applying configuration..."
+                Write-Verbose -Message ( @(
+                    "At least one setting differs from the passed parameters. Applying "
+                    "configuration..."
+                    ) -join "" | Out-String
+                )
 
                 # Build parameter hash table
                 $Parameters = @{}
                 $Parameters["IPAddress"] = $IPAddress
                 $Parameters["PrefixLength"] = $SubnetMask
                 $Parameters["InterfaceAlias"] = $currentIP[0].InterfaceAlias
-                if($DefaultGateway){ $Parameters["DefaultGateway"] = $DefaultGateway }
+                if($DefaultGateway)
+                {
+                    $Parameters["DefaultGateway"] = $DefaultGateway
+                }
 
                 # If null, remove the gateway from the current settings hash table
-                if($currentSettings['DefaultGateway'] -eq $null){ $currentSettings.remove('DefaultGateway') }
+                if($currentSettings['DefaultGateway'] -eq $null)
+                {
+                    $currentSettings.remove('DefaultGateway')
+                }
 
                 # Remove IP address first; required if the IP is correct but other settings are not
                 Remove-NetIPAddress @currentSettings -confirm:$false -ErrorAction Stop
@@ -232,11 +263,14 @@ function ValidateProperties
                 $null = New-NetIPAddress @Parameters -ErrorAction Stop
 
                 # Make the connection profile private
-                Get-NetConnectionProfile -InterfaceAlias $InterfaceAlias | Set-NetConnectionProfile -NetworkCategory Private -ErrorAction SilentlyContinue
+                Get-NetConnectionProfile -InterfaceAlias $InterfaceAlias | `
+                    Set-NetConnectionProfile -NetworkCategory Private -ErrorAction SilentlyContinue
                 Write-Verbose -Message "IP Interface was set to the desired state."
             }
             else
-            {return $false}
+            {
+                return $false
+            }
         }
         else
         {
@@ -246,8 +280,12 @@ function ValidateProperties
     }
     catch
     {
-       Write-Verbose -Message $_
-       throw "Can not set or find valid IPAddress using InterfaceAlias $InterfaceAlias and AddressFamily $AddressFamily"
+        Write-Verbose -Message $_
+        throw ( @(
+            "Can not set or find valid IPAddress using InterfaceAlias $InterfaceAlias and "
+            "AddressFamily $AddressFamily"
+            ) -join "" | Out-String
+        )
     }
 }
 
