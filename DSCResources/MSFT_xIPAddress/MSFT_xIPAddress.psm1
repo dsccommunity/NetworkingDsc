@@ -126,14 +126,12 @@ function ValidateProperties
         [Switch]$Apply
     )
 
-    $ip = $IPAddress
-
-    if(!([System.Net.Ipaddress]::TryParse($ip, [ref]0)))
+    if(-not ([System.Net.Ipaddress]::TryParse($IPAddress, [ref]0)))
     {
         throw ( @(
-            "IP Address *$IPAddress* is not in the correct format. Please correct the ipaddress "
-            "in the configuration and try again"
-            ) -join "" | Out-String
+            "IP Address *$IPAddress* is not in the correct format. Please correct the IPAddress "
+            "parameter in the configuration and try again."
+            ) -join ""
         )
     }
 
@@ -145,21 +143,22 @@ function ValidateProperties
             $AddressFamily -ErrorAction Stop
 
         # Build hash table of current settings
-        $currentSettings = @{}
-        $currentSettings['IPAddress'] = $currentIP.IPAddress
-        $currentSettings['PrefixLength'] = $currentIP.PrefixLength
-        $currentSettings['InterfaceAlias'] = $currentIP.InterfaceAlias
+        $currentSettings = @{
+            IPAddress = $currentIP.IPAddress
+            PrefixLength = $currentIP.PrefixLength
+            InterfaceAlias = $currentIP.InterfaceAlias
+        }
 
         # Flag to signal whether settings are correct
         $requiresChanges = $false
 
         #Test if the IP Address passed is equal to the current ip address
-        if(!$currentSettings['IPAddress'].Equals($IPAddress))
+        if(-not $currentSettings['IPAddress'].Contains($IPAddress))
         {
             Write-Verbose -Message ( @(
                 "IPAddress does NOT match desired state. Expected $IPAddress, actual "
                 "$($currentSettings['IPAddress'])."
-                ) -join "" | Out-String
+                ) -join ""
             )
             $requiresChanges = $true
         }
@@ -169,12 +168,12 @@ function ValidateProperties
         }
 
         #Test if the Subnet Mask passed is equal to the current subnet mask
-        if(!$currentSettings['PrefixLength'].Equals([byte]$SubnetMask))
+        if(-not $currentSettings['PrefixLength'].Equals([byte]$SubnetMask))
         {
             Write-Verbose -Message ( @(
                 "Subnet mask does NOT match desired state. Expected $SubnetMask, actual "
                 "$($currentSettings['PrefixLength'])."
-                ) -join "" | Out-String
+                ) -join ""
             )
             $requiresChanges = $true
         }
@@ -186,27 +185,28 @@ function ValidateProperties
         #Test if the Default Gateway passed is equal to the current default gateway
         if($DefaultGateway)
         {
-            $gateway = $DefaultGateway
-            if(!([System.Net.Ipaddress]::TryParse($gateway, [ref]0)))
+            if(-not ([System.Net.Ipaddress]::TryParse($DefaultGateway, [ref]0)))
             {
                 throw ( @(
                     "Default Gateway *$DefaultGateway* is NOT in the correct format. Please "
-                    "correct the gateway ipaddress in the configuration and try again"
-                    ) -join "" | Out-String
+                    "correct the DefaultGateway parameter in the configuration and try again."
+                    ) -join ""
                 )
             }
 
             $netIpConf = Get-NetIPConfiguration -InterfaceAlias $InterfaceAlias -ErrorAction Stop
-            $currentSettings['DefaultGateway'] = (
-                $netIpConf."$($AddressFamily)DefaultGateway"
-                ).NextHop
 
-            if(!$currentSettings['DefaultGateway'].Equals($DefaultGateway))
+            # Use the $AddressFamily parameter to get the NextHop value from either the
+            # "IPv4Gateway" or "IPv6Gateway" property.
+            $defaultGatewayProperty = "$($AddressFamily)DefaultGateway"
+            $currentSettings['DefaultGateway'] = ($netIpConf."$defaultGatewayProperty").NextHop
+
+            if(-not ($currentSettings['DefaultGateway'] -eq $DefaultGateway))
             {
                 Write-Verbose -Message ( @(
                     "Default gateway does NOT match desired state. Expected $DefaultGateway, "
                     "actual $($currentSettings['DefaultGateway'])."
-                    ) -join "" | Out-String
+                    ) -join ""
                 )
                 $requiresChanges = $true
             }
@@ -217,7 +217,7 @@ function ValidateProperties
         }
 
         #Test if DHCP is already disabled
-        if(!(Get-NetIPInterface -InterfaceAlias $InterfaceAlias -AddressFamily `
+        if(-not (Get-NetIPInterface -InterfaceAlias $InterfaceAlias -AddressFamily `
             $AddressFamily).Dhcp.ToString().Equals('Disabled'))
         {
             Write-Verbose -Message "DHCP is NOT disabled."
@@ -237,17 +237,18 @@ function ValidateProperties
                 Write-Verbose -Message ( @(
                     "At least one setting differs from the passed parameters. Applying "
                     "configuration..."
-                    ) -join "" | Out-String
+                    ) -join ""
                 )
 
                 # Build parameter hash table
-                $Parameters = @{}
-                $Parameters["IPAddress"] = $IPAddress
-                $Parameters["PrefixLength"] = $SubnetMask
-                $Parameters["InterfaceAlias"] = $currentIP[0].InterfaceAlias
+                $Parameters = @{
+                    IPAddress = $IPAddress
+                    PrefixLength = $SubnetMask
+                    InterfaceAlias = $currentIP[0].InterfaceAlias
+                }
                 if($DefaultGateway)
                 {
-                    $Parameters["DefaultGateway"] = $DefaultGateway
+                    $Parameters['DefaultGateway'] = $DefaultGateway
                 }
 
                 # If null, remove the gateway from the current settings hash table
@@ -280,12 +281,12 @@ function ValidateProperties
     }
     catch
     {
-        Write-Verbose -Message $_
-        throw ( @(
+        Write-Error -Message ( @(
             "Can not set or find valid IPAddress using InterfaceAlias $InterfaceAlias and "
             "AddressFamily $AddressFamily"
-            ) -join "" | Out-String
+            ) -join ""
         )
+        throw $_.Exception
     }
 }
 
