@@ -134,6 +134,18 @@ InModuleScope MSFT_xIPAddress {
                 $Result = ValidateProperties @Splat
                 $Result | Should Be $true
             }
+
+            It 'should call Get-NetIPAddress once' {
+                Assert-MockCalled -commandName Get-NetIPAddress
+            }
+
+            It 'should call Get-NetRoute once' {
+                Assert-MockCalled -commandName Get-NetRoute
+            }
+
+            It 'should call Get-NetIPInterface once' {
+                Assert-MockCalled -commandName Get-NetIPInterface
+            }
         }
 
         Context 'invoking with -Apply switch' {
@@ -145,6 +157,17 @@ InModuleScope MSFT_xIPAddress {
                 }
                 $Result = ValidateProperties @Splat -Apply
                 $Result | Should BeNullOrEmpty
+            }
+
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-NetIPAddress
+                Assert-MockCalled -commandName Get-NetConnectionProfile
+                Assert-MockCalled -commandName Get-NetRoute
+                Assert-MockCalled -commandName Get-NetIPInterface
+                Assert-MockCalled -commandName Remove-NetRoute
+                Assert-MockCalled -commandName Remove-NetIPAddress
+                Assert-MockCalled -commandName New-NetIPAddress
+                Assert-MockCalled -commandName Set-NetConnectionProfile
             }
         }
     }
