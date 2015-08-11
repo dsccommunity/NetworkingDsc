@@ -90,13 +90,12 @@ InModuleScope MSFT_xIPAddress {
             }
         }
 
-        Mock Get-NetIPConfiguration {
+        Mock Get-NetRoute {
             [PSCustomObject]@{
                 InterfaceAlias = 'Ethernet'
-                InterfaceIndex = 1
-                IPv4DefaultGateway = [PSCustomObject]@{
-                    NextHop = '192.168.0.254'
-                }
+                AddressFamily = 'IPv4'
+                NextHop = '192.168.0.254'
+                DestinationPrefix = '0.0.0.0/0'
             }
         }
 
@@ -112,6 +111,8 @@ InModuleScope MSFT_xIPAddress {
         Mock Set-NetConnectionProfile {}
 
         Mock Remove-NetIPAddress {}
+
+        Mock Remove-NetRoute {}
         #endregion
 
         Context 'invoking without -Apply switch' {

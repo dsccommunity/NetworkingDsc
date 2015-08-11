@@ -123,6 +123,8 @@ function ValidateProperties
         [ValidateSet("IPv4", "IPv6")]
         [String]$AddressFamily = "IPv4",
 
+        [Switch]$NoReset,
+
         [Switch]$Apply
     )
 
@@ -137,27 +139,20 @@ function ValidateProperties
 
     try
     {
-        Write-Verbose -Message "Checking the IPAddress ..."
-        #Get the current IP Address based on the parameters given.
-        $currentIP = Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily `
-            $AddressFamily -ErrorAction Stop
-
-        # Build hash table of current settings
-        $currentSettings = @{
-            IPAddress = $currentIP.IPAddress
-            PrefixLength = $currentIP.PrefixLength
-            InterfaceAlias = $currentIP.InterfaceAlias
-        }
-
         # Flag to signal whether settings are correct
         $requiresChanges = $false
 
-        #Test if the IP Address passed is equal to the current ip address
-        if(-not $currentSettings['IPAddress'].Contains($IPAddress))
+        Write-Verbose -Message "Checking the IPAddress ..."
+        # Get the current IP Address based on the parameters given.
+        $currentIP = Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily `
+            $AddressFamily -ErrorAction Stop
+
+        # Test if the IP Address passed is present
+        if(-not $currentIP.IPAddress.Contains($IPAddress))
         {
             Write-Verbose -Message ( @(
                 "IPAddress does NOT match desired state. Expected $IPAddress, actual "
-                "$($currentSettings['IPAddress'])."
+                "$($currentIP.IPAddress)."
                 ) -join ""
             )
             $requiresChanges = $true
@@ -165,24 +160,39 @@ function ValidateProperties
         else
         {
             Write-Verbose -Message "IPAddress is correct."
+
+            # Filter the IP addresses for the IP address to check
+            $filterIP = $currentIP | where { $_.IPAddress -eq $IPAddress }
+
+            # Only test the Subnet Mask if the IP address is present
+            if(-not $filterIP.PrefixLength.Equals([byte]$SubnetMask))
+            {
+                Write-Verbose -Message ( @(
+                    "Subnet mask does NOT match desired state. Expected $SubnetMask, actual "
+                    "$($filterIP.PrefixLength)."
+                    ) -join ""
+                )
+                $requiresChanges = $true
+            }
+            else
+            {
+                Write-Verbose -Message "Subnet mask is correct."
+            }
         }
 
-        #Test if the Subnet Mask passed is equal to the current subnet mask
-        if(-not $currentSettings['PrefixLength'].Equals([byte]$SubnetMask))
+        # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
+        $DestinationPrefix = "0.0.0.0/0"
+        if($AddressFamily -eq "IPv6")
         {
-            Write-Verbose -Message ( @(
-                "Subnet mask does NOT match desired state. Expected $SubnetMask, actual "
-                "$($currentSettings['PrefixLength'])."
-                ) -join ""
-            )
-            $requiresChanges = $true
-        }
-        else
-        {
-            Write-Verbose -Message "Subnet mask is correct."
+            $DestinationPrefix = "::/0"
         }
 
-        #Test if the Default Gateway passed is equal to the current default gateway
+        # Get all the default routes
+        $defaultRoutes = Get-NetRoute -InterfaceAlias $InterfaceAlias -AddressFamily `
+            $AddressFamily -ErrorAction Stop | `
+            where { $_.DestinationPrefix -eq $DestinationPrefix }
+
+        # Test if the Default Gateway passed is equal to the current default gateway
         if($DefaultGateway)
         {
             if(-not ([System.Net.Ipaddress]::TryParse($DefaultGateway, [ref]0)))
@@ -194,18 +204,14 @@ function ValidateProperties
                 )
             }
 
-            $netIpConf = Get-NetIPConfiguration -InterfaceAlias $InterfaceAlias -ErrorAction Stop
+            # Filter for the specified $DefaultGateway
+            $filterGateway = $defaultRoutes | where { $_.NextHop -eq $DefaultGateway }
 
-            # Use the $AddressFamily parameter to get the NextHop value from either the
-            # "IPv4Gateway" or "IPv6Gateway" property.
-            $defaultGatewayProperty = "$($AddressFamily)DefaultGateway"
-            $currentSettings['DefaultGateway'] = ($netIpConf."$defaultGatewayProperty").NextHop
-
-            if(-not ($currentSettings['DefaultGateway'] -eq $DefaultGateway))
+            if(-not $filterGateway)
             {
                 Write-Verbose -Message ( @(
                     "Default gateway does NOT match desired state. Expected $DefaultGateway, "
-                    "actual $($currentSettings['DefaultGateway'])."
+                    "actual $($defaultRoutes.NextHop)."
                     ) -join ""
                 )
                 $requiresChanges = $true
@@ -216,7 +222,7 @@ function ValidateProperties
             }
         }
 
-        #Test if DHCP is already disabled
+        # Test if DHCP is already disabled
         if(-not (Get-NetIPInterface -InterfaceAlias $InterfaceAlias -AddressFamily `
             $AddressFamily).Dhcp.ToString().Equals('Disabled'))
         {
@@ -244,21 +250,47 @@ function ValidateProperties
                 $Parameters = @{
                     IPAddress = $IPAddress
                     PrefixLength = $SubnetMask
-                    InterfaceAlias = $currentIP[0].InterfaceAlias
+                    InterfaceAlias = $InterfaceAlias
                 }
                 if($DefaultGateway)
                 {
                     $Parameters['DefaultGateway'] = $DefaultGateway
                 }
 
-                # If null, remove the gateway from the current settings hash table
-                if($currentSettings['DefaultGateway'] -eq $null)
+                if(-not $NoReset)
                 {
-                    $currentSettings.remove('DefaultGateway')
-                }
+                    Write-Verbose -Message "Catch1"
+                    # Remove any default routes on the specified interface -- it is important to do
+                    # this *before* removing the IP address, particularly in the case where the IP
+                    # address was auto-configured by DHCP
+                    if($defaultRoutes)
+                    {
+                        $defaultRoutes | Remove-NetRoute -confirm:$false -ErrorAction Stop
+                    }
+                    Write-Verbose -Message "Catch2"
 
-                # Remove IP address first; required if the IP is correct but other settings are not
-                Remove-NetIPAddress @currentSettings -confirm:$false -ErrorAction Stop
+                    # Remove any IP addresses on the specified interface
+                    if($currentIP)
+                    {
+                        $currentIP | Remove-NetIPAddress -confirm:$false -ErrorAction Stop
+                    }
+                    Write-Verbose -Message "Catch3"
+                }
+                else
+                {
+                    # If the desired IP or default gateway is present, remove it even if NoReset
+                    # was requested; this is required if one of the settings is correct but others
+                    # are not -- otherwise, New-NetIPAddress will throw an error.
+                    if($filterGateway)
+                    {
+                        $filterGateway | Remove-NetRoute -Confirm:$false
+                    }
+
+                    if($filterIP)
+                    {
+                        $filterIP | Remove-NetIPAddress -confirm:$false -ErrorAction Stop
+                    }
+                }
 
                 # Apply the specified IP configuration
                 $null = New-NetIPAddress @Parameters -ErrorAction Stop
@@ -275,7 +307,7 @@ function ValidateProperties
         }
         else
         {
-            Write-Verbose -Message "IP Interface is in the desired state."
+            Write-Verbose -Message "IP interface is in the desired state."
             return $true
         }
     }
