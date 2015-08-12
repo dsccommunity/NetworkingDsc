@@ -5,7 +5,7 @@ if (! (Get-Module xDSCResourceDesigner))
     Import-Module -Name xDSCResourceDesigner
 }
 
-Describe 'Schema Validation HostsFule' {
+Describe 'Schema Validation HostsFile' {
     It 'should pass Test-xDscResource' {
         $path = Join-Path -Path $((Get-Item $here).parent.FullName) -ChildPath 'DSCResources\HostsFile'
         $result = Test-xDscResource $path
