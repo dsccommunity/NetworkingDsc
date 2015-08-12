@@ -1,4 +1,4 @@
-﻿[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
 
 # xNetworking
 
@@ -14,6 +14,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **xFirewall** sets a node's firewall rules.
 * **xIPAddress** sets a node's IP address.
 * **xDnsServerAddress** sets a node's DNS server.
+* **HostsFile** manages hosts file entries.
 
 ### xIPAddress
 
@@ -46,6 +47,11 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **ApplicationPath**: Path and filename of the program for which the rule is applied.
 * **Service**: Specifies the short name of a Windows service to which the firewall rule applies.
 
+### HostsFile
+
+* **IPAddress**: IPv4 or IPv6 address that needs to be added to Hosts file.
+* **HostName**: Corresponsing hostname for the IPv4 or IPv6 address.
+* **Ensure**: Ensure that the hosts file entry is Present or Absent.
 
 ## Versions
 
@@ -70,6 +76,8 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
     - xIPAddress
     - xDnsServerAddress
 
+### Unreleased
+- Added HostsFile DSC resource. This closes issue #8.
 
 ## Examples
 
@@ -295,4 +303,51 @@ Configuration Sample_xFirewall
  
 Sample_xFirewall 
 Start-DscConfiguration -Path Sample_xFirewall -Wait -Verbose -Force
+```
+
+### Add a hosts file entry with fixed values in the script
+```powershell
+configuration Sample_HostsFile
+{
+    Import-DscResource -Module xNetworking
+
+    HostsFile HostsFileExample
+    {
+        IPAddress      = $IPAddress
+        HostName       = $HostName
+    }
+}
+
+Sample_HostsFile
+```
+
+### Add a hosts file entry with a parameterized configuration script
+```powershell
+configuration Sample_HostsFile_Parameterized
+{
+    param
+    (
+
+        [string[]]$NodeName = 'localhost',
+
+        [Parameter(Mandatory)]
+        [string]$IPAddress,
+
+        [Parameter(Mandatory)]
+        [string]$HostName
+    )
+
+    Import-DscResource -Module xNetworking
+
+    Node $NodeName
+    {
+        HostsFile HostsFileExample
+        {
+            IPAddress      = $IPAddress
+            HostName       = $HostName
+        }
+    }
+}
+
+Sample_HostsFile_Parameterized
 ```
