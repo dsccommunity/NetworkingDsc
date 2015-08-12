@@ -24,7 +24,7 @@ ConvertFrom-StringData @'
 }
 
 if (Test-Path "${PSScriptRoot}\${PSCulture}") {
-    Import-LocalizedData LocalizedData -filename "${PSScriptRoot}\${PSCulture}\HostsFileMessages.psd1"
+    Import-LocalizedData LocalizedData -filename "HostsFileMessages.psd1" -BaseDirectory "${PSScriptRoot}\${PSCulture}"
 }
 
 function Get-TargetResource {
