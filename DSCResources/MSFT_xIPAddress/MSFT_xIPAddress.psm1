@@ -3,8 +3,6 @@
  #  Address, by accepting values among those given in MSDSCPack_IPAddress.schema.mof
  #######################################################################################>
 
-
-
 ######################################################################################
 # The Get-TargetResource cmdlet.
 # This function will get the present list of IP Address DSC Resource schema variables on the system
@@ -31,9 +29,9 @@ function Get-TargetResource
         [String]$AddressFamily = "IPv4"
     )
 
-
     $returnValue = @{
-        IPAddress = [System.String]::Join(", ",(Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily $AddressFamily).IPAddress)
+        IPAddress = [System.String]::Join(", ",(Get-NetIPAddress -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily).IPAddress)
         SubnetMask = $SubnetMask
         DefaultGateway = $DefaultGateway
         AddressFamily = $AddressFamily
@@ -69,7 +67,6 @@ function Set-TargetResource
         [String]$AddressFamily = "IPv4"
     )
 
-
     ValidateProperties @PSBoundParameters -Apply
 }
 
@@ -102,7 +99,6 @@ function Test-TargetResource
     ValidateProperties @PSBoundParameters
 }
 
-
 #######################################################################################
 #  Helper function that validates the IP Address properties. If the switch parameter
 # "Apply" is set, then it will set the properties after a test
@@ -127,55 +123,199 @@ function ValidateProperties
         [ValidateSet("IPv4", "IPv6")]
         [String]$AddressFamily = "IPv4",
 
+        [Switch]$NoReset,
+
         [Switch]$Apply
     )
 
-    $ip = $IPAddress
-
-    if(!([System.Net.Ipaddress]::TryParse($ip, [ref]0)))
+    if(-not ([System.Net.Ipaddress]::TryParse($IPAddress, [ref]0)))
     {
-       throw "IP Address *$IPAddress* is not in the correct format. Please correct the ipaddress in the configuration and try again"
+        throw ( @(
+            "IP Address *$IPAddress* is not in the correct format. Please correct the IPAddress "
+            "parameter in the configuration and try again."
+            ) -join ""
+        )
     }
 
     try
     {
+        # Flag to signal whether settings are correct
+        $requiresChanges = $false
+
         Write-Verbose -Message "Checking the IPAddress ..."
-        #Get the current IP Address based on the parameters given.
-        $currentIP = Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily $AddressFamily -ErrorAction Stop
+        # Get the current IP Address based on the parameters given.
+        $currentIP = Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily `
+            $AddressFamily -ErrorAction Stop
 
-        #Test if the IP Address passed is equal to the current ip address
-        if(!$currentIP.IPAddress.Contains($IPAddress))
+        # Test if the IP Address passed is present
+        if(-not $currentIP.IPAddress.Contains($IPAddress))
         {
-            Write-Verbose -Message "IPAddress not correct. Expected $IPAddress, actual $($currentIP.IPAddress)"
-            $Parameters = @{}
-
-            #Apply is true in the case of set - target resource - in which case, it will set the new IP Address
-            if($Apply)
-            {
-                Write-Verbose -Message "Setting IPAddress ..."
-                $Parameters["IPAddress"] = $IPAddress
-                $Parameters["PrefixLength"] = $SubnetMask
-                $Parameters["InterfaceAlias"] = $currentIP[0].InterfaceAlias
-
-                if($DefaultGateway){ $Parameters["DefaultGateWay"] = $DefaultGateway }
-                $null = New-NetIPAddress @Parameters -ErrorAction Stop
-
-                # Make the connection profile private
-                Get-NetConnectionProfile -InterfaceAlias $InterfaceAlias | Set-NetConnectionProfile -NetworkCategory Private -ErrorAction SilentlyContinue
-                Write-Verbose -Message "IPAddress is set to $IPAddress."
-            }
-            else {return $false}
+            Write-Verbose -Message ( @(
+                "IPAddress does NOT match desired state. Expected $IPAddress, actual "
+                "$($currentIP.IPAddress)."
+                ) -join ""
+            )
+            $requiresChanges = $true
         }
         else
         {
             Write-Verbose -Message "IPAddress is correct."
+
+            # Filter the IP addresses for the IP address to check
+            $filterIP = $currentIP | where { $_.IPAddress -eq $IPAddress }
+
+            # Only test the Subnet Mask if the IP address is present
+            if(-not $filterIP.PrefixLength.Equals([byte]$SubnetMask))
+            {
+                Write-Verbose -Message ( @(
+                    "Subnet mask does NOT match desired state. Expected $SubnetMask, actual "
+                    "$($filterIP.PrefixLength)."
+                    ) -join ""
+                )
+                $requiresChanges = $true
+            }
+            else
+            {
+                Write-Verbose -Message "Subnet mask is correct."
+            }
+        }
+
+        # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
+        $DestinationPrefix = "0.0.0.0/0"
+        if($AddressFamily -eq "IPv6")
+        {
+            $DestinationPrefix = "::/0"
+        }
+
+        # Get all the default routes
+        $defaultRoutes = Get-NetRoute -InterfaceAlias $InterfaceAlias -AddressFamily `
+            $AddressFamily -ErrorAction Stop | `
+            where { $_.DestinationPrefix -eq $DestinationPrefix }
+
+        # Test if the Default Gateway passed is equal to the current default gateway
+        if($DefaultGateway)
+        {
+            if(-not ([System.Net.Ipaddress]::TryParse($DefaultGateway, [ref]0)))
+            {
+                throw ( @(
+                    "Default Gateway *$DefaultGateway* is NOT in the correct format. Please "
+                    "correct the DefaultGateway parameter in the configuration and try again."
+                    ) -join ""
+                )
+            }
+
+            # Filter for the specified $DefaultGateway
+            $filterGateway = $defaultRoutes | where { $_.NextHop -eq $DefaultGateway }
+
+            if(-not $filterGateway)
+            {
+                Write-Verbose -Message ( @(
+                    "Default gateway does NOT match desired state. Expected $DefaultGateway, "
+                    "actual $($defaultRoutes.NextHop)."
+                    ) -join ""
+                )
+                $requiresChanges = $true
+            }
+            else
+            {
+                Write-Verbose -Message "Default gateway is correct."
+            }
+        }
+
+        # Test if DHCP is already disabled
+        if(-not (Get-NetIPInterface -InterfaceAlias $InterfaceAlias -AddressFamily `
+            $AddressFamily).Dhcp.ToString().Equals('Disabled'))
+        {
+            Write-Verbose -Message "DHCP is NOT disabled."
+            $requiresChanges = $true
+        }
+        else
+        {
+            Write-Verbose -Message "DHCP is already disabled."
+        }
+
+        if($requiresChanges)
+        {
+            # Apply is true in the case of set - target resource - in which case, it will apply the
+            # required IP configuration
+            if($Apply)
+            {
+                Write-Verbose -Message ( @(
+                    "At least one setting differs from the passed parameters. Applying "
+                    "configuration..."
+                    ) -join ""
+                )
+
+                # Build parameter hash table
+                $Parameters = @{
+                    IPAddress = $IPAddress
+                    PrefixLength = $SubnetMask
+                    InterfaceAlias = $InterfaceAlias
+                }
+                if($DefaultGateway)
+                {
+                    $Parameters['DefaultGateway'] = $DefaultGateway
+                }
+
+                if(-not $NoReset)
+                {
+                    # Remove any default routes on the specified interface -- it is important to do
+                    # this *before* removing the IP address, particularly in the case where the IP
+                    # address was auto-configured by DHCP
+                    if($defaultRoutes)
+                    {
+                        $defaultRoutes | Remove-NetRoute -confirm:$false -ErrorAction Stop
+                    }
+
+                    # Remove any IP addresses on the specified interface
+                    if($currentIP)
+                    {
+                        $currentIP | Remove-NetIPAddress -confirm:$false -ErrorAction Stop
+                    }
+                }
+                else
+                {
+                    # If the desired IP or default gateway is present, remove it even if NoReset
+                    # was requested; this is required if one of the settings is correct but others
+                    # are not -- otherwise, New-NetIPAddress will throw an error.
+                    if($filterGateway)
+                    {
+                        $filterGateway | Remove-NetRoute -Confirm:$false
+                    }
+
+                    if($filterIP)
+                    {
+                        $filterIP | Remove-NetIPAddress -confirm:$false -ErrorAction Stop
+                    }
+                }
+
+                # Apply the specified IP configuration
+                $null = New-NetIPAddress @Parameters -ErrorAction Stop
+
+                # Make the connection profile private
+                Get-NetConnectionProfile -InterfaceAlias $InterfaceAlias | `
+                    Set-NetConnectionProfile -NetworkCategory Private -ErrorAction SilentlyContinue
+                Write-Verbose -Message "IP Interface was set to the desired state."
+            }
+            else
+            {
+                return $false
+            }
+        }
+        else
+        {
+            Write-Verbose -Message "IP interface is in the desired state."
             return $true
         }
     }
     catch
     {
-       Write-Verbose -Message $_
-       throw "Can not set or find valid IPAddress using InterfaceAlias $InterfaceAlias and AddressFamily $AddressFamily"
+        Write-Error -Message ( @(
+            "Can not set or find valid IPAddress using InterfaceAlias $InterfaceAlias and "
+            "AddressFamily $AddressFamily"
+            ) -join ""
+        )
+        throw $_.Exception
     }
 }
 

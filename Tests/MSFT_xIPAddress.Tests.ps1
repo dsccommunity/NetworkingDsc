@@ -73,6 +73,7 @@ InModuleScope MSFT_xIPAddress {
             [PSCustomObject]@{
                 IPAddress = '192.168.0.1'
                 InterfaceAlias = 'Ethernet'
+                PrefixLength = [byte]16
             }
         }
 
@@ -89,14 +90,36 @@ InModuleScope MSFT_xIPAddress {
             }
         }
 
+        Mock Get-NetRoute {
+            [PSCustomObject]@{
+                InterfaceAlias = 'Ethernet'
+                AddressFamily = 'IPv4'
+                NextHop = '192.168.0.254'
+                DestinationPrefix = '0.0.0.0/0'
+            }
+        }
+
+        Mock Get-NetIPInterface {
+            [PSCustomObject]@{
+                InterfaceAlias = 'Ethernet'
+                InterfaceIndex = 1
+                AddressFamily = 'IPv4'
+                Dhcp = 'Disabled'
+            }
+        }
+
         Mock Set-NetConnectionProfile {}
+
+        Mock Remove-NetIPAddress {}
+
+        Mock Remove-NetRoute {}
         #endregion
 
         Context 'invoking without -Apply switch' {
 
             It 'should be $false' {
                 $Splat = @{
-                    IPAddres = '10.0.0.2'
+                    IPAddress = '10.0.0.2'
                     InterfaceAlias = 'Ethernet'
                 }
                 $Result = ValidateProperties @Splat
@@ -105,11 +128,23 @@ InModuleScope MSFT_xIPAddress {
 
             It 'should be $true' {
                 $Splat = @{
-                    IPAddres = '192.168.0.1'
+                    IPAddress = '192.168.0.1'
                     InterfaceAlias = 'Ethernet'
                 }
                 $Result = ValidateProperties @Splat
                 $Result | Should Be $true
+            }
+
+            It 'should call Get-NetIPAddress once' {
+                Assert-MockCalled -commandName Get-NetIPAddress
+            }
+
+            It 'should call Get-NetRoute once' {
+                Assert-MockCalled -commandName Get-NetRoute
+            }
+
+            It 'should call Get-NetIPInterface once' {
+                Assert-MockCalled -commandName Get-NetIPInterface
             }
         }
 
@@ -117,11 +152,22 @@ InModuleScope MSFT_xIPAddress {
 
             It 'should be $null' {
                 $Splat = @{
-                    IPAddres = '10.0.0.2'
+                    IPAddress = '10.0.0.2'
                     InterfaceAlias = 'Ethernet'
                 }
                 $Result = ValidateProperties @Splat -Apply
                 $Result | Should BeNullOrEmpty
+            }
+
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-NetIPAddress
+                Assert-MockCalled -commandName Get-NetConnectionProfile
+                Assert-MockCalled -commandName Get-NetRoute
+                Assert-MockCalled -commandName Get-NetIPInterface
+                Assert-MockCalled -commandName Remove-NetRoute
+                Assert-MockCalled -commandName Remove-NetIPAddress
+                Assert-MockCalled -commandName New-NetIPAddress
+                Assert-MockCalled -commandName Set-NetConnectionProfile
             }
         }
     }
