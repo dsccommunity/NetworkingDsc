@@ -259,7 +259,6 @@ function ValidateProperties
 
                 if(-not $NoReset)
                 {
-                    Write-Verbose -Message "Catch1"
                     # Remove any default routes on the specified interface -- it is important to do
                     # this *before* removing the IP address, particularly in the case where the IP
                     # address was auto-configured by DHCP
@@ -267,14 +266,12 @@ function ValidateProperties
                     {
                         $defaultRoutes | Remove-NetRoute -confirm:$false -ErrorAction Stop
                     }
-                    Write-Verbose -Message "Catch2"
 
                     # Remove any IP addresses on the specified interface
                     if($currentIP)
                     {
                         $currentIP | Remove-NetIPAddress -confirm:$false -ErrorAction Stop
                     }
-                    Write-Verbose -Message "Catch3"
                 }
                 else
                 {
