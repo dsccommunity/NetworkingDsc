@@ -2,7 +2,7 @@
 #      environment configuration  # 
 #---------------------------------# 
 os: Unstable
-version: 2.2.0.{build}
+version: 2.2.{build}.0
 install: 
   - cinst -y pester
   - git clone https://github.com/PowerShell/DscResource.Tests
