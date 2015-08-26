@@ -55,11 +55,6 @@ InModuleScope $DSCResourceName {
                 $result.DisplayGroup.GetType() | Should Be $firewall.DisplayGroup.GetType()
             }
 
-            # It 'Should have the correct State and type' {
-            #     $result.State | Should Be $firewall.Enabled
-            #     $result.State.GetType() | Should Be $firewall.Enabled.GetType()
-            # }
-
             It 'Should have the correct Profile' {
                 $result.Profile | Should Be $firewall.Profile
                 # $result.Profile.GetType() | Should Be $firewall.Profile.GetType()
@@ -175,15 +170,6 @@ InModuleScope $DSCResourceName {
             }
         }
     }
-
-    # Describe 'Set-FirewallRule' {
-    #     $firewall = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} | Select-Object -First 1
-    #     It 'Should call all the mocks' {
-    #         Mock New-NetFirewallRule
-    #         $result = Set-FirewallRule -Name $firewall.Name -DisplayName $firewall.DisplayName
-    #         Assert-MockCalled New-NetFirewallRule -Exactly 1
-    #     }
-    # }
 
     Describe 'Get-FirewallRuleProperty' {
         $firewall = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} | Select-Object -First 1
