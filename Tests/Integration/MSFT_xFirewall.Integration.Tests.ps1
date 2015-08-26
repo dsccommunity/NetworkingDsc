@@ -1,18 +1,6 @@
-$DSCResourceName = 'MSFT_xFirewall'
-
-if (Get-Module $DSCResourceName -All)
-{
-    Get-Module $DSCResourceName -All | Remove-Module
-}
-
-Import-Module -Name $PSScriptRoot\..\..\DSCResources\$DSCResourceName -Force -DisableNameChecking
-
-InModuleScope $DSCResourceName {
 Describe 'xFirewall_Integration' {
     $firewall = Get-NetFirewallRule | select -first 1
-
-    try {
-        It 'Should compile without throwing' {
+    It 'Should compile without throwing' {
         {
             [System.Environment]::SetEnvironmentVariable('PSModulePath',$env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
             Configuration Firewall {
@@ -39,13 +27,7 @@ Describe 'xFirewall_Integration' {
         } | Should not throw
     }
 
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            {Get-DscConfiguration} | Should Not throw
-        }
+    It 'should be able to call Get-DscConfiguration without throwing' {
+        {Get-DscConfiguration} | Should Not throw
     }
-    finally {
-
-    }
-}
-
 }
