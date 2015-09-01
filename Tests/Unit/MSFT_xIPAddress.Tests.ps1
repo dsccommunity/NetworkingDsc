@@ -1,30 +1,36 @@
-﻿$here = Split-Path -Parent $MyInvocation.MyCommand.Path
+﻿$DSCResourceName = 'MSFT_xIPAddress'
+$DSCModuleName   = 'xNetworking'
 
-if (! (Get-Module xDSCResourceDesigner))
+$Splat = @{
+    Path = $PSScriptRoot
+    ChildPath = "..\..\DSCResources\$DSCResourceName\$DSCResourceName.psm1"
+    Resolve = $true
+    ErrorAction = 'Stop'
+}
+
+$DSCResourceModuleFile = Get-Item -Path (Join-Path @Splat)
+
+# should check for the server OS
+if($env:APPVEYOR_BUILD_VERSION)
 {
-    Import-Module -Name xDSCResourceDesigner
+  Add-WindowsFeature Web-Server -Verbose
 }
 
-Describe 'Schema Validation MSFT_xIPAddress' {
-    It 'should pass Test-xDscResource' {
-        $path = Join-Path -Path $((Get-Item -Path $here).parent.FullName) -ChildPath 'DSCResources\MSFT_xIPAddress'
-        $result = Test-xDscResource -Name $path
-        $result | Should Be $true
-    }
-
-    It 'should pass Test-xDscResource' {
-        $path = Join-Path -Path $((Get-Item -Path $here).parent.FullName) -ChildPath 'DSCResources\MSFT_xIPAddress\MSFT_xIPAddress.schema.mof'
-        $result = Test-xDscSchema -Path $path
-        $result | Should Be $true
-    }
-}
-
-if (Get-Module MSFT_xIPAddress -All)
+if (Get-Module -Name $DSCResourceName)
 {
-    Get-Module MSFT_xIPAddress -All | Remove-Module
+    Remove-Module -Name $DSCResourceName
 }
 
-Import-Module -Name $PSScriptRoot\..\DSCResources\MSFT_xIPAddress -Force -DisableNameChecking
+Import-Module -Name $DSCResourceModuleFile.FullName -Force
+
+$moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
+
+if(-not (Test-Path -Path $moduleRoot))
+{
+    $null = New-Item -Path $moduleRoot -ItemType Directory
+}
+
+Copy-Item -Path $PSScriptRoot\..\..\* -Destination $moduleRoot -Recurse -Force -Exclude '.git'
 
 InModuleScope MSFT_xIPAddress {
 

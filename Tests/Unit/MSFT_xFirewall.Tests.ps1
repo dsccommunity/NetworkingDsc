@@ -1,31 +1,35 @@
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $DSCResourceName = 'MSFT_xFirewall'
+$DSCModuleName   = 'xNetworking'
 
-if (! (Get-Module xDSCResourceDesigner))
+$Splat = @{
+    Path = $PSScriptRoot
+    ChildPath = "..\..\DSCResources\$DSCResourceName\$DSCResourceName.psm1"
+    Resolve = $true
+    ErrorAction = 'Stop'
+}
+$DSCResourceModuleFile = Get-Item -Path (Join-Path @Splat)
+
+# should check for the server OS
+if($env:APPVEYOR_BUILD_VERSION)
 {
-    Import-Module -Name xDSCResourceDesigner
+  Add-WindowsFeature Web-Server -Verbose
 }
 
-Describe 'Schema Validation MSFT_xFirewall' {
-    It 'should pass Test-xDscResource' {
-        $path = Join-Path -Path $((Get-Item $here).Parent.FullName) -ChildPath "DSCResources\$DSCResourceName"
-        $result = Test-xDscResource $path
-        $result | Should Be $true
-    }
-
-    It 'should pass Test-xDscResource' {
-        $path = Join-Path -Path $((Get-Item $here).Parent.FullName) -ChildPath "DSCResources\$DSCResourceName\$DSCResourceName.schema.mof"
-        $result = Test-xDscSchema $path
-        $result | Should Be $true
-    }
-}
-
-if (Get-Module $DSCResourceName -All)
+if (Get-Module -Name $DSCResourceName)
 {
-    Get-Module $DSCResourceName -All | Remove-Module
+    Remove-Module -Name $DSCResourceName
 }
 
-Import-Module -Name $PSScriptRoot\..\DSCResources\$DSCResourceName -Force -DisableNameChecking
+Import-Module -Name $DSCResourceModuleFile.FullName -Force
+
+$moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
+
+if(-not (Test-Path -Path $moduleRoot))
+{
+    $null = New-Item -Path $moduleRoot -ItemType Directory
+}
+
+Copy-Item -Path $PSScriptRoot\..\..\* -Destination $moduleRoot -Recurse -Force -Exclude '.git'
 
 InModuleScope $DSCResourceName {
     Describe 'Get-TargetResource' {
@@ -57,7 +61,6 @@ InModuleScope $DSCResourceName {
 
             It 'Should have the correct Profile' {
                 $result.Profile | Should Be $firewall.Profile
-                # $result.Profile.GetType() | Should Be $firewall.Profile.GetType()
             }
 
             It 'Should have the correct Direction and type' {
@@ -72,27 +75,22 @@ InModuleScope $DSCResourceName {
 
             It 'Should have the correct RemotePort and type' {
                 $result.RemotePort | Should Be $ruleProperties.PortFilters.RemotePort
-                #$result.RemotePort.GetType() | Should Be $ruleProperties.PortFilters.RemotePort.GetType()
             }
 
             It 'Should have the correct LocalPort and type' {
                 $result.LocalPort | Should Be $ruleProperties.PortFilters.LocalPort
-                #$result.LocalPort.GetType() | Should Be $ruleProperties.PortFilters.LocalPort.GetType()
             }
 
             It 'Should have the correct Protocol and type' {
                 $result.Protocol | Should Be $ruleProperties.PortFilters.Protocol
-                $result.Protocol.GetType() | Should Be $ruleProperties.PortFilters.Protocol.GetType()
             }
 
             It 'Should have the correct ApplicationPath and type' {
                 $result.ApplicationPath | Should Be $ruleProperties.ApplicationFilters.Program
-                $result.ApplicationPath.GetType() | Should Be $ruleProperties.ApplicationFilters.Program.GetType()
             }
 
             It 'Should have the correct Service and type' {
                 $result.Service | Should Be $ruleProperties.ServiceFilters.Service
-                $result.Service.GetType() | Should Be $ruleProperties.ServiceFilters.Service.GetType()
             }
         }
     }
