@@ -10,12 +10,6 @@ $Splat = @{
 
 $DSCResourceModuleFile = Get-Item -Path (Join-Path @Splat)
 
-# should check for the server OS
-if($env:APPVEYOR_BUILD_VERSION)
-{
-  Add-WindowsFeature Web-Server -Verbose
-}
-
 if (Get-Module -Name $DSCResourceName)
 {
     Remove-Module -Name $DSCResourceName
