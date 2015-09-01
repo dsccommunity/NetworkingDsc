@@ -13,10 +13,8 @@ Describe 'xFirewall_Integration' {
     It 'Should compile without throwing' {
         {
             [System.Environment]::SetEnvironmentVariable('PSModulePath',$env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
-            Firewall -OutputPath $env:Temp
-
             . $PSScriptRoot\Firewall.ps1
-
+            Firewall -OutputPath $env:Temp
             Start-DscConfiguration -Path $env:Temp -ComputerName localhost -Wait -Verbose
         } | Should not throw
     }
