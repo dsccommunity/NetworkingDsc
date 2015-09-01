@@ -25,8 +25,6 @@ build: false
 test_script:
     - ps: |
         $testResultsFile = ".\TestsResults.xml"
-        $tempModulePath = (Resolve-Path (Join-Path $PWD '..')).ProviderPath
-        $env:PSModulePath = "$env:PSModulePath;$tempModulePath"
         $res = Invoke-Pester -OutputFormat NUnitXml -OutputFile $testResultsFile -PassThru
         (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $testResultsFile))
         if ($res.FailedCount -gt 0) {
