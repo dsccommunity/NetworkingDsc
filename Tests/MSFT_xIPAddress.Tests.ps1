@@ -1,24 +1,5 @@
 ﻿$here = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-if (! (Get-Module xDSCResourceDesigner))
-{
-    Import-Module -Name xDSCResourceDesigner
-}
-
-Describe 'Schema Validation MSFT_xIPAddress' {
-    It 'should pass Test-xDscResource' {
-        $path = Join-Path -Path $((Get-Item -Path $here).parent.FullName) -ChildPath 'DSCResources\MSFT_xIPAddress'
-        $result = Test-xDscResource -Name $path
-        $result | Should Be $true
-    }
-
-    It 'should pass Test-xDscResource' {
-        $path = Join-Path -Path $((Get-Item -Path $here).parent.FullName) -ChildPath 'DSCResources\MSFT_xIPAddress\MSFT_xIPAddress.schema.mof'
-        $result = Test-xDscSchema -Path $path
-        $result | Should Be $true
-    }
-}
-
 if (Get-Module MSFT_xIPAddress -All)
 {
     Get-Module MSFT_xIPAddress -All | Remove-Module

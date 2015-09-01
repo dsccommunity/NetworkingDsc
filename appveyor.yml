@@ -11,7 +11,6 @@ install:
   - ps: Import-Module .\TestHelper.psm1 -force
   - ps: Pop-Location
   - ps: Get-PackageProvider -name nuget -ForceBootStrap -Force
-  - ps: nuget.exe install xDscResourceDesigner -source 'https://www.powershellgallery.com/api/v2' -outputDirectory "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\" -ExcludeVersion
 
 #---------------------------------# 
 #      build configuration        # 
