@@ -7,6 +7,7 @@ $Splat = @{
     Resolve = $true
     ErrorAction = 'Stop'
 }
+
 $DSCResourceModuleFile = Get-Item -Path (Join-Path @Splat)
 
 if (Get-Module -Name $DSCResourceName)
@@ -20,6 +21,15 @@ $moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
 
 if(-not (Test-Path -Path $moduleRoot))
 {
+    $null = New-Item -Path $moduleRoot -ItemType Directory
+}
+else
+{
+    # Copy the existing folder out to the temp directory to hold until the end of the run
+    # Delete the folder to remove the old files.
+    $tempLocation = Join-Path -Path $env:Temp -ChildPath $DSCModuleName
+    Copy-Item -Path $moduleRoot -Destination $tempLocation -Recurse -Force
+    Remove-Item -Path $moduleRoot -Recurse -Force
     $null = New-Item -Path $moduleRoot -ItemType Directory
 }
 
@@ -218,3 +228,11 @@ InModuleScope $DSCResourceName {
 
 # Clean up after the test completes.
 Remove-Item -Path $moduleRoot -Recurse -Force
+
+# Restore previous versions, if it exists.
+if ($tempLocation)
+{
+    $null = New-Item -Path $moduleRoot -ItemType Directory
+    Copy-Item -Path $tempLocation -Destination "${env:ProgramFiles}\WindowsPowerShell\Modules" -Recurse -Force
+    Remove-Item -Path $tempLocation -Recurse -Force
+}
