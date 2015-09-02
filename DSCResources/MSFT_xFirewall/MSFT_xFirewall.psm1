@@ -10,11 +10,11 @@ function Get-TargetResource
     )
 
     # Populate the properties for get target resource
-    Write-Verbose "GET: Get Rules for the specified Name[$Name]"
+    Write-Verbose "$($($MyInvocation.MyCommand)): Get Rules for the specified Name[$Name]"
     $firewallRule = Get-NetFirewallRule -Name $Name -ErrorAction SilentlyContinue
     if (-not $firewallRule)
     {
-        Write-Verbose "GET: Firewall Rule does not exist, there is nothing interesting to do"
+        Write-Verbose "$($MyInvocation.MyCommand): Firewall Rule does not exist, there is nothing interesting to do"
         return @{
             Name   = $Name
             Ensure = 'Absent'
@@ -102,23 +102,23 @@ function Set-TargetResource
         $null = $PSBoundParameters.Add('DisplayName', $Name)
     }
 
-    Write-Verbose "SET: Find firewall rules with specified parameters for Name = $Name, DisplayGroup = $DisplayGroup"
+    Write-Verbose "$($MyInvocation.MyCommand): Find firewall rules with specified parameters for Name = $Name, DisplayGroup = $DisplayGroup"
     $firewallRules = Get-FirewallRule -Name $Name -DisplayGroup $DisplayGroup
 
     $exists = ($firewallRules -ne $null)
 
     if ($Ensure -eq "Present")
     {
-        Write-Verbose "SET: We want the firewall rule to exist since Ensure is set to $Ensure"
+        Write-Verbose "$($MyInvocation.MyCommand): We want the firewall rule to exist since Ensure is set to $Ensure"
         if ($exists)
         {
-            Write-Verbose "SET: We want the firewall rule to exist and it does exist. Check for valid properties"
+            Write-Verbose "$($MyInvocation.MyCommand): We want the firewall rule to exist and it does exist. Check for valid properties"
             foreach ($firewallRule in $firewallRules)
             {
-                Write-Verbose "SET: Check each defined parameter against the existing firewall rule - $($firewallRule.Name)"
-                if ( -not (Test-RuleProperties -FirewallRule $firewallRule @PSBoundParameters) )
+                Write-Verbose "$($MyInvocation.MyCommand): Check each defined parameter against the existing firewall rule - $($firewallRule.Name)"
+                if (-not (Test-RuleProperties -FirewallRule $firewallRule @PSBoundParameters))
                 {
-                    Write-Verbose "SET: Removing existing firewall rule [$Name] to recreate one based on desired configuration"
+                    Write-Verbose "$($MyInvocation.MyCommand): Removing existing firewall rule [$Name] to recreate one based on desired configuration"
                     Remove-NetFirewallRule -Name $Name
 
                     # Set the Firewall rule based on specified parameters
@@ -129,16 +129,16 @@ function Set-TargetResource
         else
         {
             # Set the Firewall rule based on specified parameters
-            Write-Verbose "SET: We want the firewall rule [$Name] to exist, but it does not"
+            Write-Verbose "$($MyInvocation.MyCommand): We want the firewall rule [$Name] to exist, but it does not"
             New-NetFirewallRule @PSBoundParameters
         }
     }
     else
     {
-        Write-Verbose "SET: We do not want the firewall rule to exist"
+        Write-Verbose "$($MyInvocation.MyCommand): We do not want the firewall rule to exist"
         if ($exists)
         {
-            Write-Verbose "SET: We do not want the firewall rule to exist, but it does. Removing the Rule(s)"
+            Write-Verbose "$($MyInvocation.MyCommand): We do not want the firewall rule to exist, but it does. Removing the Rule(s)"
             foreach ($firewallRule in $firewallRules)
             {
                 Remove-NetFirewallRule -Name $firewallRule.Name
@@ -146,7 +146,7 @@ function Set-TargetResource
         }
         else
         {
-            Write-Verbose "SET: We do not want the firewall rule to exist, and it does not"
+            Write-Verbose "$($MyInvocation.MyCommand): We do not want the firewall rule to exist, and it does not"
             # Do Nothing
         }
     }
@@ -212,17 +212,17 @@ function Test-TargetResource
 
     $null = $PSBoundParameters.Remove('Ensure')
 
-    Write-Verbose "TEST: Find rules with specified parameters"
+    Write-Verbose "$($MyInvocation.MyCommand): Find rules with specified parameters"
     $firewallRules = Get-FirewallRule -Name $Name -DisplayGroup $DisplayGroup
 
     if (-not $firewallRules)
     {
-        Write-Verbose "TEST: Get-FirewallRule returned NULL"
+        Write-Verbose "$($MyInvocation.MyCommand): There are no firewall rules matching $Name"
 
         # Returns whether complies with $Ensure
         $returnValue = ($false -eq ($Ensure -eq "Present"))
 
-        Write-Verbose "TEST: Returning $returnValue"
+        Write-Verbose "$($MyInvocation.MyCommand): Returning $returnValue"
 
         return $returnValue
     }
@@ -231,7 +231,7 @@ function Test-TargetResource
     $valid = $true
     foreach ($firewallRule in $firewallRules)
     {
-        Write-Verbose "TEST: Check each defined parameter against the existing Firewall Rule - $($firewallRule.Name)"
+        Write-Verbose "$($MyInvocation.MyCommand): Check each defined parameter against the existing Firewall Rule - $($firewallRule.Name)"
         if (-not (Test-RuleProperties -FirewallRule $firewallRule @PSBoundParameters ) )
         {
             $valid = $false
@@ -241,7 +241,7 @@ function Test-TargetResource
     # Returns whether or not $exists complies with $Ensure
     $returnValue = ($valid -and $exists -eq ($Ensure -eq "Present"))
 
-    Write-Verbose "TEST: Returning $returnValue"
+    Write-Verbose "$($MyInvocation.MyCommand): Returning $returnValue"
 
     return $returnValue
 }
@@ -278,19 +278,19 @@ function Test-RuleProperties
 
     if ($Name -and ($FirewallRule.Name -ne $Name))
     {
-        Write-Verbose "Test-RuleProperties: Name property value - $FirewallRule.Name does not match desired state - $Name"
+        Write-Verbose "$($MyInvocation.MyCommand): Name property value - $FirewallRule.Name does not match desired state - $Name"
         $desiredConfigurationMatch = $false
     }
 
     if ($Enabled -and ($FirewallRule.Enabled.ToString() -eq ("Enabled" -ne $Enabled)))
     {
-        Write-Verbose "Test-RuleProperties: State property value - $FirewallRule.Enabled.ToString() does not match desired state - $State"
+        Write-Verbose "$($MyInvocation.MyCommand): State property value - $FirewallRule.Enabled.ToString() does not match desired state - $State"
         $desiredConfigurationMatch = $false
     }
 
     if ($Profile)
     {
-        [String[]]$networkProfileinRule = $FirewallRule.Profile.ToString() -replace(" ", "") -split(",")
+        [String[]] $networkProfileinRule = $FirewallRule.Profile.ToString() -replace(" ", "") -split(",")
 
         if ($networkProfileinRule.Count -eq $Profile.Count)
         {
@@ -298,21 +298,21 @@ function Test-RuleProperties
             {
                 if (-not ($networkProfileinRule -contains($networkProfile)))
                 {
-                    Write-Verbose "Test-RuleProperties: Profile property value - '$networkProfileinRule' does not match desired state - '$Profile'"
+                    Write-Verbose "$($MyInvocation.MyCommand): Profile property value - '$networkProfileinRule' does not match desired state - '$Profile'"
                     $desiredConfigurationMatch = $false
                 }
             }
         }
         else
         {
-            Write-Verbose "Test-RuleProperties: Profile property value - '$networkProfileinRule' does not match desired state - '$Profile'"
+            Write-Verbose "$($MyInvocation.MyCommand): Profile property value - '$networkProfileinRule' does not match desired state - '$Profile'"
             $desiredConfigurationMatch = $false
         }
     }
 
     if ($Direction -and ($FirewallRule.Direction -ne $Direction))
     {
-        Write-Verbose "Test-RuleProperties: Direction property value - $FirewallRule.Direction does not match desired state - $Direction"
+        Write-Verbose "$($MyInvocation.MyCommand): Direction property value - $FirewallRule.Direction does not match desired state - $Direction"
         $desiredConfigurationMatch = $false
     }
 
@@ -326,7 +326,7 @@ function Test-RuleProperties
             {
                 if (-not ($remotePortInRule -contains($port)))
                 {
-                    Write-Verbose "Test-RuleProperties: RemotePort property value - '$remotePortInRule' does not match desired state - '$RemotePort'"
+                    Write-Verbose "$($MyInvocation.MyCommand): RemotePort property value - '$remotePortInRule' does not match desired state - '$RemotePort'"
 
                     $desiredConfigurationMatch = $false
                 }
@@ -334,7 +334,7 @@ function Test-RuleProperties
         }
         else
         {
-            Write-Verbose "Test-RuleProperties: RemotePort property value - '$remotePortInRule' does not match desired state - '$RemotePort'"
+            Write-Verbose "$($MyInvocation.MyCommand): RemotePort property value - '$remotePortInRule' does not match desired state - '$RemotePort'"
 
             $desiredConfigurationMatch = $false
         }
@@ -350,39 +350,39 @@ function Test-RuleProperties
             {
                 if (-not ($localPortInRule -contains($port)))
                 {
-                    Write-Verbose "Test-RuleProperties: LocalPort property value - '$localPortInRule' does not match desired state - '$LocalPort'"
+                    Write-Verbose "$($MyInvocation.MyCommand): LocalPort property value - '$localPortInRule' does not match desired state - '$LocalPort'"
                     $desiredConfigurationMatch = $false
                 }
             }
         }
         else
         {
-            Write-Verbose "Test-RuleProperties: LocalPort property value - '$localPortInRule' does not match desired state - '$LocalPort'"
+            Write-Verbose "$($MyInvocation.MyCommand): LocalPort property value - '$localPortInRule' does not match desired state - '$LocalPort'"
             $desiredConfigurationMatch = $false
         }
     }
 
     if ($Protocol -and ($properties.PortFilters.Protocol -ne $Protocol))
     {
-        Write-Verbose "Test-RuleProperties: Protocol property value - $properties.PortFilters.Protocol does not match desired state - $Protocol"
+        Write-Verbose "$($MyInvocation.MyCommand): Protocol property value - $properties.PortFilters.Protocol does not match desired state - $Protocol"
         $desiredConfigurationMatch = $false
     }
 
     if ($Description -and ($FirewallRule.Description -ne $Description))
     {
-        Write-Verbose "Test-RuleProperties: Description property value - $FirewallRule.Description does not match desired state - $Description"
+        Write-Verbose "$($MyInvocation.MyCommand): Description property value - $FirewallRule.Description does not match desired state - $Description"
         $desiredConfigurationMatch = $false
     }
 
     if ($ApplicationPath -and ($properties.ApplicationFilters.Program -ne $ApplicationPath))
     {
-        Write-Verbose "Test-RuleProperties: ApplicationPath property value - $properties.ApplicationFilters.Program does not match desired state - $ApplicationPath"
+        Write-Verbose "$($MyInvocation.MyCommand): ApplicationPath property value - $properties.ApplicationFilters.Program does not match desired state - $ApplicationPath"
         $desiredConfigurationMatch = $false
     }
 
     if ($Service -and ($properties.ServiceFilters.Service -ne $Service))
     {
-        Write-Verbose "Test-RuleProperties: Service property value - $properties.ServiceFilters.Service  does not match desired state - $Service"
+        Write-Verbose "$($MyInvocation.MyCommand): Service property value - $properties.ServiceFilters.Service  does not match desired state - $Service"
         $desiredConfigurationMatch = $false
     }
 
@@ -405,7 +405,7 @@ function Get-FirewallRule
 
     if (-not $firewallRules)
     {
-        Write-Verbose "Get-FirewallRule: No Firewall Rules found for [$Name]"
+        Write-Verbose "$($MyInvocation.MyCommand): No Firewall Rules found for [$Name]"
         return $null
     }
     else
@@ -416,7 +416,7 @@ function Get-FirewallRule
             {
                 if ($firewallRule.DisplayGroup -eq $DisplayGroup)
                 {
-                    Write-Verbose "Get-FirewallRule: Found a Firewall Rule for Name: [$Name] and DisplayGroup [$DisplayGroup]"
+                    Write-Verbose "$($MyInvocation.MyCommand): Found a Firewall Rule for Name: [$Name] and DisplayGroup [$DisplayGroup]"
                     return $firewallRule
                 }
             }
@@ -434,8 +434,8 @@ function Get-FirewallRuleProperty
         $FirewallRule
      )
 
-    Write-Verbose "Get-FirewallRuleProperty:  Get all the properties"
-    Write-Verbose "Get-FirewallRuleProperty: Add filter info to rule map"
+    Write-Verbose "$($MyInvocation.MyCommand): Get all the properties"
+    Write-Verbose "$($MyInvocation.MyCommand): Add filter info to rule map"
     return @{
         AddressFilters       = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
         ApplicationFilters   = @(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $FirewallRule)

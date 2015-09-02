@@ -215,3 +215,6 @@ InModuleScope $DSCResourceName {
         }
     }
 }
+
+# Clean up after the test completes.
+Remove-Item -Path $moduleRoot -Recurse -Force

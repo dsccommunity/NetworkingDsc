@@ -172,3 +172,6 @@ InModuleScope MSFT_xIPAddress {
         }
     }
 }
+
+# Cleanup after the test
+Remove-Item -Path $moduleRoot -Recurse -Force
