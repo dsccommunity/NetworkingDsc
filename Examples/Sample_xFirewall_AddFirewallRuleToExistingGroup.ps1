@@ -27,7 +27,7 @@ configuration Sample_xFirewall_AddFirewallRuleToExistingGroup
             DisplayGroup          = "My Firewall Rule Group"
             Ensure                = "Present"
             Access                = "Allow"
-            State                 = "Enabled"
+            Enabled               = "True"
             Profile               = ("Domain", "Private")
         }
     }

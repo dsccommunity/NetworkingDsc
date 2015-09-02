@@ -1,4 +1,4 @@
-﻿[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
 
 # xNetworking
 
@@ -36,7 +36,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **DisplayGroup**: Name of the firewall group where we want to put the firewall rules.
 * **Ensure**: Ensure that the firewall rule is Present or Absent.
 * **Access**: Permit or Block the supplied configuration.
-* **State**: Enable or Disable the supplied configuration.
+* **Enabled**: Enable or Disable the supplied configuration.
 * **Profile**: Specifies one or more profiles to which the rule is assigned.
 * **Direction**: Direction of the connection.
 * **RemotePort**: Specific port used for filter. Specified by port number, range, or keyword.
@@ -48,6 +48,12 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 
 ## Versions
+
+### Unreleased
+* Changes to xFirewall causes Get-DSCConfiguration to no longer crash
+	* Modified Schema to reduce needed functions.
+	* General re-factoring and clean up of xFirewall.
+	* Added Unit and Integration tests to resource.
 
 ### 2.2.0.0
 * Changes in xFirewall resources to meet Test-xDscResource criteria
@@ -102,7 +108,7 @@ Configuration Sample_xIPAddress_FixedValue
 
 This configuration will set the IP Address and default gateway on a network interface that is identified by its alias.
 
-```powershell
+``` powershell
 Configuration Sample_xIPAddress_Parameterized
 {
     param
@@ -221,7 +227,7 @@ Configuration Add_FirewallRuleToExistingGroup
             DisplayGroup          = "My Firewall Rule Group" 
             Ensure                = "Present" 
             Access                = "Allow" 
-            State                 = "Enabled" 
+            Enabled               = "True" 
             Profile               = ("Domain", "Private") 
         } 
     } 
@@ -280,7 +286,7 @@ Configuration Sample_xFirewall
             DisplayGroup          = "NotePad Firewall Rule Group" 
             Ensure                = "Present" 
             Access                = "Allow" 
-            State                 = "Enabled" 
+            Enabled               = "True" 
             Profile               = ("Domain", "Private") 
             Direction             = "OutBound" 
             RemotePort            = ("8080", "8081") 

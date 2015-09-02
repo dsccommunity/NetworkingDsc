@@ -63,7 +63,7 @@ function Set-TargetResource
 
         # Enable or disable the supplied configuration
         [ValidateSet("True", "False")]
-        [String] $Enabled = "Enabled",
+        [String] $Enabled,
 
         # Specifies one or more profiles to which the rule is assigned
         [String[]] $Profile = ("Any"),
@@ -282,9 +282,9 @@ function Test-RuleProperties
         $desiredConfigurationMatch = $false
     }
 
-    if ($Enabled -and ($FirewallRule.Enabled.ToString() -eq ("Enabled" -ne $Enabled)))
+    if ($Enabled -and ($FirewallRule.Enabled.ToString() -eq $Enabled))
     {
-        Write-Verbose "$($MyInvocation.MyCommand): State property value - $FirewallRule.Enabled.ToString() does not match desired state - $State"
+        Write-Verbose "$($MyInvocation.MyCommand): State property value - $FirewallRule.Enabled.ToString() does not match desired state - $Enabled"
         $desiredConfigurationMatch = $false
     }
 
