@@ -21,6 +21,7 @@ function Get-TargetResource
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
+        [Parameter(Mandatory)]
         [ValidateSet("IPv4", "IPv6")]
         [String]$AddressFamily = "IPv4"
     )
@@ -52,8 +53,9 @@ function Set-TargetResource
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
+        [Parameter(Mandatory)]
         [ValidateSet("IPv4", "IPv6")]
-        [String]$AddressFamily = "IPv4"
+        [String]$AddressFamily
     )
 
     ValidateProperties @PSBoundParameters -Apply
@@ -75,8 +77,9 @@ function Test-TargetResource
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
+        [Parameter(Mandatory)]
         [ValidateSet("IPv4", "IPv6")]
-        [String]$AddressFamily = "IPv4"
+        [String]$AddressFamily
     )
 
     ValidateProperties @PSBoundParameters
@@ -99,6 +102,7 @@ function ValidateProperties
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
+        [Parameter(Mandatory)]
         [ValidateSet("IPv4", "IPv6")]
         [String]$AddressFamily,
 
