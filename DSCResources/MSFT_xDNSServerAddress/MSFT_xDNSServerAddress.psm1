@@ -11,6 +11,7 @@
 ######################################################################################
 function Get-TargetResource
 {
+    [OutputType([System.Collections.Hashtable])]
     param
     (        
         [Parameter(Mandatory)]
@@ -67,6 +68,7 @@ function Set-TargetResource
 ######################################################################################
 function Test-TargetResource
 {
+    [OutputType([System.Boolean])]
     param
     (        
         [Parameter(Mandatory)]
