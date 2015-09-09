@@ -23,7 +23,7 @@ function Get-TargetResource
 
         [Parameter(Mandatory)]
         [ValidateSet("IPv4", "IPv6")]
-        [String]$AddressFamily = "IPv4"
+        [String]$AddressFamily
     )
     
     
