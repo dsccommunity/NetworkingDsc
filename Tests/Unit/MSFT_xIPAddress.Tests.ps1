@@ -68,7 +68,8 @@ InModuleScope MSFT_xIPAddress {
                     Subnet = -16
                 }
 
-                 { Get-TargetResource @Splat } | Should Throw "Value was either too large or too small for a UInt32."
+                 { Get-TargetResource @Splat } |
+                    Should Throw "Value was either too large or too small for a UInt32."
             }
         }
     }
@@ -78,7 +79,6 @@ InModuleScope MSFT_xIPAddress {
 
         #region Mocks
         Mock Get-NetIPAddress -MockWith {
-
             [PSCustomObject]@{
                 IPAddress = '192.168.0.1'
                 InterfaceAlias = 'Ethernet'
@@ -125,7 +125,6 @@ InModuleScope MSFT_xIPAddress {
         #endregion
 
         Context 'invoking without -Apply switch' {
-
             It 'should be $false' {
                 $Splat = @{
                     IPAddress = '10.0.0.2'
@@ -145,15 +144,15 @@ InModuleScope MSFT_xIPAddress {
             }
 
             It 'should call Get-NetIPAddress once' {
-                Assert-MockCalled -commandName Get-NetIPAddress
+                Assert-MockCalled -CommandName Get-NetIPAddress
             }
 
             It 'should call Get-NetRoute once' {
-                Assert-MockCalled -commandName Get-NetRoute
+                Assert-MockCalled -CommandName Get-NetRoute
             }
 
             It 'should call Get-NetIPInterface once' {
-                Assert-MockCalled -commandName Get-NetIPInterface
+                Assert-MockCalled -CommandName Get-NetIPInterface
             }
         }
 
@@ -169,14 +168,14 @@ InModuleScope MSFT_xIPAddress {
             }
 
             It 'should call all the mocks' {
-                Assert-MockCalled -commandName Get-NetIPAddress
-                Assert-MockCalled -commandName Get-NetConnectionProfile
-                Assert-MockCalled -commandName Get-NetRoute
-                Assert-MockCalled -commandName Get-NetIPInterface
-                Assert-MockCalled -commandName Remove-NetRoute
-                Assert-MockCalled -commandName Remove-NetIPAddress
-                Assert-MockCalled -commandName New-NetIPAddress
-                Assert-MockCalled -commandName Set-NetConnectionProfile
+                Assert-MockCalled -CommandName Get-NetIPAddress
+                Assert-MockCalled -CommandName Get-NetConnectionProfile
+                Assert-MockCalled -CommandName Get-NetRoute
+                Assert-MockCalled -CommandName Get-NetIPInterface
+                Assert-MockCalled -CommandName Remove-NetRoute
+                Assert-MockCalled -CommandName Remove-NetIPAddress
+                Assert-MockCalled -CommandName New-NetIPAddress
+                Assert-MockCalled -CommandName Set-NetConnectionProfile
             }
         }
     }
@@ -189,6 +188,7 @@ Remove-Item -Path $moduleRoot -Recurse -Force
 if ($tempLocation)
 {
     $null = New-Item -Path $moduleRoot -ItemType Directory
-    Copy-Item -Path $tempLocation -Destination "${env:ProgramFiles}\WindowsPowerShell\Modules" -Recurse -Force
+    $script:Destination = "${env:ProgramFiles}\WindowsPowerShell\Modules"
+    Copy-Item -Path $tempLocation -Destination $script:Destination -Recurse -Force
     Remove-Item -Path $tempLocation -Recurse -Force
 }

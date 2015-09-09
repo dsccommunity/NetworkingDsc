@@ -48,33 +48,33 @@ InModuleScope $DSCResourceName {
         }
 
         Context 'Present should return correctly' {
-            $firewall = Get-NetFirewallRule | select -first 1
-            $ruleProperties = Get-FirewallRuleProperty $firewall
+            $rule = Get-NetFirewallRule | select -first 1
+            $ruleProperties = Get-FirewallRuleProperty $rule
 
-            $result = Get-TargetResource -Name $firewall.Name
+            $result = Get-TargetResource -Name $rule.Name
 
             It 'should have the correct DisplayName and type' {
-                $result.DisplayName | Should Be $firewall.DisplayName
-                $result.DisplayName.GetType() | Should Be $firewall.DisplayName.GetType()
+                $result.DisplayName | Should Be $rule.DisplayName
+                $result.DisplayName.GetType() | Should Be $rule.DisplayName.GetType()
             }
 
             It 'Should have the correct DisplayGroup and type' {
-                $result.DisplayGroup | Should Be $firewall.DisplayGroup
-                $result.DisplayGroup.GetType() | Should Be $firewall.DisplayGroup.GetType()
+                $result.DisplayGroup | Should Be $rule.DisplayGroup
+                $result.DisplayGroup.GetType() | Should Be $rule.DisplayGroup.GetType()
             }
 
             It 'Should have the correct Profile' {
-                $result.Profile | Should Be $firewall.Profile
+                $result.Profile | Should Be $rule.Profile
             }
 
             It 'Should have the correct Direction and type' {
-                $result.Direction | Should Be $firewall.Direction
-                $result.Direction.GetType() | Should Be $firewall.Direction.GetType()
+                $result.Direction | Should Be $rule.Direction
+                $result.Direction.GetType() | Should Be $rule.Direction.GetType()
             }
 
             It 'Should have the correct Description and type' {
-                $result.Description | Should Be $firewall.Description
-                $result.Description.GetType() | Should Be $firewall.Description.GetType()
+                $result.Description | Should Be $rule.Description
+                $result.Description.GetType() | Should Be $rule.Description.GetType()
             }
 
             It 'Should have the correct RemotePort and type' {
@@ -100,72 +100,88 @@ InModuleScope $DSCResourceName {
     }
 
     Describe 'Test-TargetResource' {
+        $rule = Get-NetFirewallRule | `
+            Where-Object {$_.DisplayName -ne $null} | `
+            Select-Object -first 1
+
         Context 'Ensure is Absent and the Firewall is not Present' {
             It 'should return $true' {
                 Mock Get-FirewallRule
                 $result = Test-TargetResource -Name 'FirewallRule' -Ensure 'Absent'
-                $result | should be $true
+                $result | Should Be $true
             }
         }
         Context 'Ensure is Absent and the Firewall is Present' {
             It 'should return $false' {
-                $firewall = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} | select -first 1
                 Mock Test-RuleProperties
 
-                $result = Test-TargetResource -Name $firewall.Name -DisplayName $firewall.DisplayName -Ensure 'Absent'
-                $result | should be $false
+                $result = Test-TargetResource -Name $rule.Name `
+                    -DisplayName $rule.DisplayName `
+                    -Ensure 'Absent'
+
+                $result | Should Be $false
             }
         }
         Context 'Ensure is Present and the Firewall is Present' {
             It 'should return $true' {
-                $firewall = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} | select -first 1
-                $result = Test-TargetResource -Name $firewall.Name -DisplayName $firewall.DisplayName
-                $result | should be $true
+                $result = Test-TargetResource `
+                    -Name $rule.Name `
+                    -DisplayName $rule.DisplayName
+
+                $result | Should Be $true
             }
         }
         Context 'Ensure is Present and the Firewall is Absent' {
             It 'should return $false' {
-                $firewall = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} | select -first 1
                 Mock Test-RuleProperties
-                $result = Test-TargetResource -Name $firewall.Name -DisplayName $firewall.DisplayName -Ensure 'Absent'
-                $result | should be $false
+                $result = Test-TargetResource `
+                    -Name $rule.Name `
+                    -DisplayName $rule.DisplayName -Ensure 'Absent'
+
+                $result | Should Be $false
             }
         }
     }
 
     Describe 'Set-TargetResource' {
-        $firewall = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} | Select-Object -First 1
+        $rule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
+            Select-Object -First 1
+
         Context 'Ensure is Absent and Firewall Exists' {
-            It "should call all the mocks on firewall rule $($firewall.Name)" {
+            It "should call all the mocks on firewall rule $($rule.Name)" {
                 Mock Remove-NetFirewallRule
-                $result = Set-TargetResource -Name $firewall.Name -Ensure 'Absent'
+                $result = Set-TargetResource -Name $rule.Name -Ensure 'Absent'
+
                 Assert-MockCalled Remove-NetFirewallRule -Exactly 1
             }
         }
         Context 'Ensure is Absent and the Firewall Does Not Exists' {
-            It "should call all the mocks on firewall rule $($firewall.Name)" {
+            It "should call all the mocks on firewall rule $($rule.Name)" {
                 Mock Get-FirewallRule
                 Mock Remove-NetFirewallRule
-                $result = Set-TargetResource -Name $firewall.Name -Ensure 'Absent'
+                $result = Set-TargetResource -Name $rule.Name -Ensure 'Absent'
+
                 Assert-MockCalled Remove-NetFirewallRule -Exactly 0
             }
         }
         Context 'Ensure is Present and the Firewall Does Not Exists' {
-            It "should call all the mocks on firewall rule $($firewall.Name)" {
+            It "should call all the mocks on firewall rule $($rule.Name)" {
                 Mock Get-FirewallRule
                 Mock New-NetFirewallRule
-                $result = Set-TargetResource -Name $firewall.Name -Ensure 'Present' #-DisplayName $firewall.Name
+                $result = Set-TargetResource -Name $rule.Name -Ensure 'Present'
+
                 Assert-MockCalled New-NetFirewallRule -Exactly 1
                 Assert-MockCalled Get-FirewallRule -Exactly 1
 
             }
         }
         Context 'Ensure is Present and the Firewall Does Exists' {
-            It "should call all the mocks on firewall rule $($firewall.Name)" {
+            It "should call all the mocks on firewall rule $($rule.Name)" {
                 Mock Remove-NetFirewallRule
                 Mock New-NetFirewallRule
                 Mock Test-RuleProperties {return $false}
-                $result = Set-TargetResource -Name $firewall.Name -Ensure 'Present' #-DisplayName $firewall.Name
+                $result = Set-TargetResource -Name $rule.Name -Ensure 'Present'
+
                 Assert-MockCalled New-NetFirewallRule -Exactly 1
                 Assert-MockCalled Remove-NetFirewallRule -Exactly 1
                 Assert-MockCalled Test-RuleProperties -Exactly 1
@@ -174,53 +190,66 @@ InModuleScope $DSCResourceName {
     }
 
     Describe 'Get-FirewallRuleProperty' {
-        $firewall = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} | Select-Object -First 1
+        $rule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
+            Select-Object -First 1
 
         Context 'All Properties' {
-            $result = Get-FirewallRuleProperty -FirewallRule $firewall
+            $result = Get-FirewallRuleProperty -FirewallRule $rule
             It 'Should return the right address filter' {
-                $expected = Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $firewall
-                $($result.AddressFilters | out-string -stream) | Should Be $($expected | out-string -stream)
+                $expected = Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $rule
+
+                $($result.AddressFilters | Out-String -Stream) |
+                    Should Be $($expected | Out-String -Stream)
             }
 
             It 'Should return the right application filter' {
-                $expected = Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $firewall
-                $($result.ApplicationFilters | out-string -stream) | Should Be $($expected | out-string -stream)
+                $expected = Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $rule
+
+                $($result.ApplicationFilters | Out-String -Stream) |
+                    Should Be $($expected | Out-String -Stream)
             }
 
             It 'Should return the right interface filter' {
-                $expected = Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $firewall
-                $($result.InterfaceFilters | out-string -stream) | Should Be $($expected | out-string -stream)
+                $expected = Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $rule
+
+                $($result.InterfaceFilters | Out-String -Stream) |
+                    Should Be $($expected | Out-String -Stream)
             }
 
             It 'Should return the right interface type filter' {
-                $expected = Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $firewall
-                $($result.InterfaceTypeFilters | out-string -stream) | Should Be $($expected | out-string -stream)
+                $expected = Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $rule
+                $($result.InterfaceTypeFilters | Out-String -Stream) |
+                    Should Be $($expected | Out-String -Stream)
             }
 
             It 'Should return the right port filter' {
-                $expected = Get-NetFirewallPortFilter -AssociatedNetFirewallRule $firewall
-                $($result.PortFilters | out-string -stream) | Should Be $($expected | out-string -stream)
+                $expected = Get-NetFirewallPortFilter -AssociatedNetFirewallRule $rule
+                $($result.PortFilters | Out-String -Stream) |
+                    Should Be $($expected | Out-String -Stream)
             }
 
             It 'Should return the right Profile' {
-                $expected = Get-NetFirewallProfile -AssociatedNetFirewallRule $firewall
-                $($result.Profile | out-string -stream) | Should Be $($expected | out-string -stream)
+                $expected = Get-NetFirewallProfile -AssociatedNetFirewallRule $rule
+                $($result.Profile | Out-String -Stream) |
+                    Should Be $($expected | Out-String -Stream)
             }
 
             It 'Should return the right Profile' {
-                $expected = Get-NetFirewallProfile -AssociatedNetFirewallRule $firewall
-                $($result.Profile | out-string -stream) | Should Be $($expected | out-string -stream)
+                $expected = Get-NetFirewallProfile -AssociatedNetFirewallRule $rule
+                $($result.Profile | Out-String -Stream) |
+                    Should Be $($expected | Out-String -Stream)
             }
 
             It 'Should return the right Security Filters' {
-                $expected = Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $firewall
-                $($result.SecurityFilters | out-string -stream) | Should Be $($expected | out-string -stream)
+                $expected = Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $rule
+                $($result.SecurityFilters | Out-String -Stream) |
+                    Should Be $($expected | Out-String -Stream)
             }
 
             It 'Should return the right Service Filters' {
-                $expected = Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $firewall
-                $($result.ServiceFilters | out-string -stream) | Should Be $($expected | out-string -stream)
+                $expected = Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $rule
+                $($result.ServiceFilters | Out-String -Stream) |
+                    Should Be $($expected | Out-String -Stream)
             }
         }
     }
@@ -233,6 +262,7 @@ Remove-Item -Path $moduleRoot -Recurse -Force
 if ($tempLocation)
 {
     $null = New-Item -Path $moduleRoot -ItemType Directory
-    Copy-Item -Path $tempLocation -Destination "${env:ProgramFiles}\WindowsPowerShell\Modules" -Recurse -Force
+    $script:Destination = "${env:ProgramFiles}\WindowsPowerShell\Modules"
+    Copy-Item -Path $tempLocation -Destination $script:Destination -Recurse -Force
     Remove-Item -Path $tempLocation -Recurse -Force
 }
