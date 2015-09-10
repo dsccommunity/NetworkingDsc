@@ -17,14 +17,21 @@ else
 
 Copy-Item -Path $PSScriptRoot\..\..\* -Destination $moduleRoot -Recurse -Force -Exclude '.git'
 
+if (Get-Module -Name $DSCModuleName)
+{
+    Remove-Module -Name $DSCModuleName
+}
+
+Import-Module -Name $DSCModuleName -Force
+
 Describe 'xFirewall_Integration' {
-    $firewall = Get-NetFirewallRule | select -first 1
     It 'Should compile without throwing' {
         {
-            [System.Environment]::SetEnvironmentVariable('PSModulePath', $env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
+            [System.Environment]::SetEnvironmentVariable('PSModulePath',
+                $env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
             . $PSScriptRoot\Firewall.ps1
             Firewall -OutputPath $env:Temp\Firewall
-            Start-DscConfiguration -Path $env:Temp\Firewall -ComputerName localhost -Wait -Verbose
+            Start-DscConfiguration -Path $env:Temp\Firewall -ComputerName localhost -Wait -Verbose -Force
         } | Should not throw
 
         # Cleanup DSC Configuration

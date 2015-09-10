@@ -48,7 +48,7 @@ InModuleScope $DSCResourceName {
         }
 
         Context 'Present should return correctly' {
-            $rule = Get-NetFirewallRule | select -first 1
+            $rule = Get-NetFirewallRule | Select-Object -first 1
             $ruleProperties = Get-FirewallRuleProperty $rule
 
             $result = Get-TargetResource -Name $rule.Name
@@ -64,7 +64,7 @@ InModuleScope $DSCResourceName {
             }
 
             It 'Should have the correct Profile' {
-                $result.Profile | Should Be $rule.Profile
+                $result.Profile[0] | Should Be ($rule.Profile.ToString() -replace(" ", "") -split(","))[0]
             }
 
             It 'Should have the correct Direction and type' {
@@ -172,7 +172,6 @@ InModuleScope $DSCResourceName {
 
                 Assert-MockCalled New-NetFirewallRule -Exactly 1
                 Assert-MockCalled Get-FirewallRule -Exactly 1
-
             }
         }
         Context 'Ensure is Present and the Firewall Does Exists' {

@@ -3,20 +3,22 @@
   the $env:PSModulePath. Otherwise PowerShell will throw an error when reading the Pester File
 #>
 
+$rule = Get-NetFirewallRule | Sort-Object Name | Select-Object -first 1
+
 Configuration Firewall {
     Import-DscResource -ModuleName xNetworking
     node localhost {
        xFirewall Integration_Test {
-            Name = $firewall.Name
-            DisplayGroup = $firewall.DisplayGroup
+            Name = $rule.Name
+            DisplayGroup = $rule.DisplayGroup
             Ensure = 'Present'
-            Enabled = $firewall.Enabled
-            Profile = ($firewall.Profile).toString()
-            Description = $firewall.Description
-            LocalPort = $firewall.LocalPort
-            Protocol = $firewall.Protocol
-            Direction = $firewall.Direction
-            ApplicationPath = $firewall.ApplicationPath
+            Enabled = $rule.Enabled
+            Profile = ($rule.Profile).toString()
+            Description = $rule.Description
+            LocalPort = $rule.LocalPort
+            Protocol = $rule.Protocol
+            Direction = $rule.Direction
+            ApplicationPath = $rule.ApplicationPath
         }
     }
 }

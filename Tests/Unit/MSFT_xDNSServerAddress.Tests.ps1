@@ -5,12 +5,11 @@ if (Get-Module MSFT_xDNSServerAddress -All)
     Get-Module MSFT_xDNSServerAddress -All | Remove-Module
 }
 
-Import-Module -Name $PSScriptRoot\..\DSCResources\MSFT_xDNSServerAddress -Force -DisableNameChecking
+Import-Module -Name $PSScriptRoot\..\..\DSCResources\MSFT_xDNSServerAddress -Force -DisableNameChecking
 
 InModuleScope MSFT_xDNSServerAddress {
 
     Describe 'Get-TargetResource' {
-
         #region Mocks
         Mock Get-DnsClientServerAddress -MockWith {
 
@@ -38,7 +37,6 @@ InModuleScope MSFT_xDNSServerAddress {
 
 
     Describe 'ValidateProperties' {
-
         #region Mocks
         Mock Get-DnsClientServerAddress -MockWith {
 
@@ -53,7 +51,6 @@ InModuleScope MSFT_xDNSServerAddress {
         #endregion
 
         Context 'invoking without -Apply switch' {
-
             It 'should be $false' {
                 $Splat = @{
                     Address = '10.0.0.2'
@@ -80,7 +77,6 @@ InModuleScope MSFT_xDNSServerAddress {
         }
 
         Context 'invoking with -Apply switch' {
-
             It 'should be $null' {
                 $Splat = @{
                     Address = '10.0.0.2'
