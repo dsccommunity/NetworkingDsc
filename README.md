@@ -2,7 +2,7 @@
 
 # xNetworking
 
-The **xNetworking** module contains the **xFirewall, xIPAddress** and **xDnsServerAddress** DSC resources for configuring a node’s IP address, DNS server address, and firewall rules. 
+The **xNetworking** module contains the **xFirewall, xIPAddress** and **xDnsServerAddress** DSC resources for configuring a node’s IP address, DNS server address, and firewall rules.
 
 
 ## Contributing
@@ -31,7 +31,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ### xFirewall
 
-* **Name**: Name of the firewall rule 
+* **Name**: Name of the firewall rule
 * **DisplayName**: Localized, user-facing name of the firewall rule being created .
 * **DisplayGroup**: Name of the firewall group where we want to put the firewall rules.
 * **Ensure**: Ensure that the firewall rule is Present or Absent.
@@ -50,10 +50,13 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 ## Versions
 
 ### Unreleased
+* Update to xDNSServerAddress to allow both IPv4 and IPv6 DNS addresses to be assigned to an
+  interface. xDNSServerAddress AddressFamily parameter has been changed to mandatory.
+
 * Changes to xFirewall causes Get-DSCConfiguration to no longer crash
-	* Modified Schema to reduce needed functions.
-	* General re-factoring and clean up of xFirewall.
-	* Added Unit and Integration tests to resource.
+    * Modified Schema to reduce needed functions.
+    * General re-factoring and clean up of xFirewall.
+    * Added Unit and Integration tests to resource.
 
 ### 2.2.0.0
 * Changes in xFirewall resources to meet Test-xDscResource criteria
@@ -141,7 +144,7 @@ Configuration Sample_xIPAddress_Parameterized
 
 ### Set DNS server address
 
-This configuration will set the DNS server address on a network interface that is identified by its alias. 
+This configuration will set the DNS server address on a network interface that is identified by its alias.
 
 ```powershell
 Configuration Sample_xDnsServerAddress
@@ -174,25 +177,25 @@ Configuration Sample_xDnsServerAddress
 This configuration will ensure that a firewall rule is present.
 
 ```powershell
-# DSC configuration for Firewall 
-Configuration Add_FirewallRule 
+# DSC configuration for Firewall
+Configuration Add_FirewallRule
 {
-    param  
-    ( 
-        [string[]]$NodeName = 'localhost' 
-    ) 
- 
-    Import-DSCResource -ModuleName xNetworking 
- 
-    Node $NodeName 
-    { 
-        xFirewall Firewall 
-        { 
-            Name                  = "MyAppFirewallRule"             
-            ApplicationPath       = "c:\windows\system32\MyApp.exe" 
-            Access                = "Allow" 
-        } 
-    } 
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xFirewall Firewall
+        {
+            Name                  = "MyAppFirewallRule"
+            ApplicationPath       = "c:\windows\system32\MyApp.exe"
+            Access                = "Allow"
+        }
+    }
 }
 ```
 
@@ -201,36 +204,36 @@ Configuration Add_FirewallRule
 This configuration ensures that two firewall rules are present on the target node, both within the same group.
 
 ```powershell
-Configuration Add_FirewallRuleToExistingGroup 
-{ 
-    param  
-    ( 
-        [string[]]$NodeName = 'localhost' 
-    ) 
- 
-    Import-DSCResource -ModuleName xNetworking 
- 
-    Node $NodeName 
-    { 
-        xFirewall Firewall 
-        { 
-            Name                  = "MyFirewallRule" 
-            DisplayName           = "My Firewall Rule" 
-            DisplayGroup          = "My Firewall Rule Group" 
-            Access                = "Allow" 
-        } 
- 
-        xFirewall Firewall1 
-        { 
-            Name                  = "MyFirewallRule1" 
-            DisplayName           = "My Firewall Rule" 
-            DisplayGroup          = "My Firewall Rule Group" 
-            Ensure                = "Present" 
-            Access                = "Allow" 
-            Enabled               = "True" 
-            Profile               = ("Domain", "Private") 
-        } 
-    } 
+Configuration Add_FirewallRuleToExistingGroup
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xFirewall Firewall
+        {
+            Name                  = "MyFirewallRule"
+            DisplayName           = "My Firewall Rule"
+            DisplayGroup          = "My Firewall Rule Group"
+            Access                = "Allow"
+        }
+
+        xFirewall Firewall1
+        {
+            Name                  = "MyFirewallRule1"
+            DisplayName           = "My Firewall Rule"
+            DisplayGroup          = "My Firewall Rule Group"
+            Ensure                = "Present"
+            Access                = "Allow"
+            Enabled               = "True"
+            Profile               = ("Domain", "Private")
+        }
+    }
 }
 ```
 
@@ -238,28 +241,28 @@ Configuration Add_FirewallRuleToExistingGroup
 
 This example ensures that notepad.exe is blocked by the firewall.
 ```powershell
-Configuration Disable_AccessToApplication 
-{ 
-    param  
-    ( 
-        [string[]]$NodeName = 'localhost' 
-    ) 
- 
-    Import-DSCResource -ModuleName xNetworking 
- 
-    Node $NodeName 
-    { 
-        xFirewall Firewall 
-        { 
-            Name                  = "NotePadFirewallRule" 
-            DisplayName           = "Firewall Rule for Notepad.exe" 
-            DisplayGroup          = "NotePad Firewall Rule Group" 
-            Ensure                = "Present" 
-            Access                = "Block" 
-            Description           = "Firewall Rule for Notepad.exe"   
-            ApplicationPath       = "c:\windows\system32\notepad.exe" 
-        } 
-    } 
+Configuration Disable_AccessToApplication
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xFirewall Firewall
+        {
+            Name                  = "NotePadFirewallRule"
+            DisplayName           = "Firewall Rule for Notepad.exe"
+            DisplayGroup          = "NotePad Firewall Rule Group"
+            Ensure                = "Present"
+            Access                = "Block"
+            Description           = "Firewall Rule for Notepad.exe"
+            ApplicationPath       = "c:\windows\system32\notepad.exe"
+        }
+    }
 }
 ```
 
@@ -268,37 +271,37 @@ Configuration Disable_AccessToApplication
 This example will disable notepad.exe's outbound access.
 
 ```powershell
-Configuration Sample_xFirewall 
-{ 
-    param  
-    ( 
-        [string[]]$NodeName = 'localhost' 
-    ) 
- 
-    Import-DSCResource -ModuleName xNetworking 
- 
-    Node $NodeName 
-    { 
-        xFirewall Firewall 
-        { 
-            Name                  = "NotePadFirewallRule" 
-            DisplayName           = "Firewall Rule for Notepad.exe" 
-            DisplayGroup          = "NotePad Firewall Rule Group" 
-            Ensure                = "Present" 
-            Access                = "Allow" 
-            Enabled               = "True" 
-            Profile               = ("Domain", "Private") 
-            Direction             = "OutBound" 
-            RemotePort            = ("8080", "8081") 
-            LocalPort             = ("9080", "9081")          
-            Protocol              = "TCP" 
-            Description           = "Firewall Rule for Notepad.exe"   
-            ApplicationPath       = "c:\windows\system32\notepad.exe" 
-            Service               =  "WinRM" 
-        } 
-    } 
- } 
- 
-Sample_xFirewall 
+Configuration Sample_xFirewall
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xFirewall Firewall
+        {
+            Name                  = "NotePadFirewallRule"
+            DisplayName           = "Firewall Rule for Notepad.exe"
+            DisplayGroup          = "NotePad Firewall Rule Group"
+            Ensure                = "Present"
+            Access                = "Allow"
+            Enabled               = "True"
+            Profile               = ("Domain", "Private")
+            Direction             = "OutBound"
+            RemotePort            = ("8080", "8081")
+            LocalPort             = ("9080", "9081")
+            Protocol              = "TCP"
+            Description           = "Firewall Rule for Notepad.exe"
+            ApplicationPath       = "c:\windows\system32\notepad.exe"
+            Service               =  "WinRM"
+        }
+    }
+ }
+
+Sample_xFirewall
 Start-DscConfiguration -Path Sample_xFirewall -Wait -Verbose -Force
 ```
