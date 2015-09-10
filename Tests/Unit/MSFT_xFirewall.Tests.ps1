@@ -10,13 +10,6 @@ $Splat = @{
 
 $DSCResourceModuleFile = Get-Item -Path (Join-Path @Splat)
 
-if (Get-Module -Name $DSCResourceName)
-{
-    Remove-Module -Name $DSCResourceName
-}
-
-Import-Module -Name $DSCResourceModuleFile.FullName -Force
-
 $moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
 
 if(-not (Test-Path -Path $moduleRoot))
@@ -34,6 +27,13 @@ else
 }
 
 Copy-Item -Path $PSScriptRoot\..\..\* -Destination $moduleRoot -Recurse -Force -Exclude '.git'
+
+if (Get-Module -Name $DSCResourceName)
+{
+    Remove-Module -Name $DSCResourceName
+}
+
+Import-Module -Name $DSCResourceModuleFile.FullName -Force
 
 InModuleScope $DSCResourceName {
     Describe 'Get-TargetResource' {

@@ -1,11 +1,39 @@
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
+$DSCResourceName = 'MSFT_xDNSServerAddress'
+$DSCModuleName   = 'xNetworking'
 
-if (Get-Module MSFT_xDNSServerAddress -All)
-{
-    Get-Module MSFT_xDNSServerAddress -All | Remove-Module
+$Splat = @{
+    Path = $PSScriptRoot
+    ChildPath = "..\..\DSCResources\$DSCResourceName\$DSCResourceName.psm1"
+    Resolve = $true
+    ErrorAction = 'Stop'
 }
 
-Import-Module -Name $PSScriptRoot\..\..\DSCResources\MSFT_xDNSServerAddress -Force -DisableNameChecking
+$DSCResourceModuleFile = Get-Item -Path (Join-Path @Splat)
+
+$moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
+
+if(-not (Test-Path -Path $moduleRoot))
+{
+    $null = New-Item -Path $moduleRoot -ItemType Directory
+}
+else
+{
+    # Copy the existing folder out to the temp directory to hold until the end of the run
+    # Delete the folder to remove the old files.
+    $tempLocation = Join-Path -Path $env:Temp -ChildPath $DSCModuleName
+    Copy-Item -Path $moduleRoot -Destination $tempLocation -Recurse -Force
+    Remove-Item -Path $moduleRoot -Recurse -Force
+    $null = New-Item -Path $moduleRoot -ItemType Directory
+}
+
+Copy-Item -Path $PSScriptRoot\..\..\* -Destination $moduleRoot -Recurse -Force -Exclude '.git'
+
+if (Get-Module -Name $DSCResourceName)
+{
+    Remove-Module -Name $DSCResourceName
+}
+
+Import-Module -Name $DSCResourceModuleFile.FullName -Force
 
 InModuleScope MSFT_xDNSServerAddress {
 
