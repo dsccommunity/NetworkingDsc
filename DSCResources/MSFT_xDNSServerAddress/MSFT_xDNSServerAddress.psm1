@@ -11,6 +11,7 @@
 ######################################################################################
 function Get-TargetResource
 {
+    [OutputType([System.Collections.Hashtable])]
     param
     (        
         [Parameter(Mandatory)]
@@ -21,8 +22,9 @@ function Get-TargetResource
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
+        [Parameter(Mandatory)]
         [ValidateSet("IPv4", "IPv6")]
-        [String]$AddressFamily = "IPv4"
+        [String]$AddressFamily
     )
     
     
@@ -52,8 +54,9 @@ function Set-TargetResource
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
+        [Parameter(Mandatory)]
         [ValidateSet("IPv4", "IPv6")]
-        [String]$AddressFamily = "IPv4"
+        [String]$AddressFamily
     )
 
     ValidateProperties @PSBoundParameters -Apply
@@ -65,6 +68,7 @@ function Set-TargetResource
 ######################################################################################
 function Test-TargetResource
 {
+    [OutputType([System.Boolean])]
     param
     (        
         [Parameter(Mandatory)]
@@ -75,8 +79,9 @@ function Test-TargetResource
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
+        [Parameter(Mandatory)]
         [ValidateSet("IPv4", "IPv6")]
-        [String]$AddressFamily = "IPv4"
+        [String]$AddressFamily
     )
 
     ValidateProperties @PSBoundParameters
@@ -99,6 +104,7 @@ function ValidateProperties
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
+        [Parameter(Mandatory)]
         [ValidateSet("IPv4", "IPv6")]
         [String]$AddressFamily,
 
