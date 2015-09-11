@@ -49,11 +49,16 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ## Versions
 
-### Unreleased
-* Update to xDNSServerAddress to allow both IPv4 and IPv6 DNS addresses to be assigned to an
-  interface. xDNSServerAddress AddressFamily parameter has been changed to mandatory.
+### 2.3.0.0
+
+* MSFT_xDNSServerAddress: Added support for setting DNS for both IPv4 and IPv6 on the same Interface
+* MSFT_xDNSServerAddress: AddressFamily parameter has been changed to mandatory.
+* Removed xDscResourceDesigner tests (moved to common tests)
+* Fixed Test-TargetResource to test against all provided parameters
+* Modified tests to not copy file to Program Files
 
 ### 2.2.0.0
+
 * Changes in xFirewall resources to meet Test-xDscResource criteria
 
 ### 2.1.1.1
