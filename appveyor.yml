@@ -2,7 +2,7 @@
 #      environment configuration  # 
 #---------------------------------# 
 os: Unstable
-version: 2.2.{build}.0
+version: 2.3.{build}.0
 install: 
   - cinst -y pester
   - git clone https://github.com/PowerShell/DscResource.Tests
@@ -41,7 +41,7 @@ before_deploy:
       # Creating project artifact
       $stagingDirectory = (Resolve-Path ..).Path
       $manifest = Join-Path $pwd "xNetworking.psd1"
-      (Get-Content $manifest -Raw).Replace("2.2.0.0", $env:APPVEYOR_BUILD_VERSION) | Out-File $manifest
+      (Get-Content $manifest -Raw).Replace("2.3.0.0", $env:APPVEYOR_BUILD_VERSION) | Out-File $manifest
       $zipFilePath = Join-Path $stagingDirectory "$(Split-Path $pwd -Leaf).zip"
       Add-Type -assemblyname System.IO.Compression.FileSystem
       [System.IO.Compression.ZipFile]::CreateFromDirectory($pwd, $zipFilePath)
