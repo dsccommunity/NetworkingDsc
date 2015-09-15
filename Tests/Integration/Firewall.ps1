@@ -3,7 +3,7 @@
   the $env:PSModulePath. Otherwise PowerShell will throw an error when reading the Pester File
 #>
 
-$rule = Get-NetFirewallRule | Sort-Object Name | Select-Object -first 1
+$rule = Get-NetFirewallRule | Sort-Object Name | Where-Object {$_.DisplayGroup -ne $null} | Select-Object -first 1
 
 Configuration Firewall {
     Import-DscResource -ModuleName xNetworking

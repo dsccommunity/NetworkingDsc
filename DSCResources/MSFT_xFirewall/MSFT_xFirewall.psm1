@@ -102,6 +102,10 @@ function Set-TargetResource
         $null = $PSBoundParameters.Add('DisplayName', $Name)
     }
 
+    # Effectively renaming DisplayGroup to Group
+    $null = $PSBoundParameters.Add('Group', $DisplayGroup)
+    $null = $PSBoundParameters.Remove('DisplayGroup')
+
     Write-Verbose "$($MyInvocation.MyCommand): Find firewall rules with specified parameters for Name = $Name, DisplayGroup = $DisplayGroup"
     $firewallRules = Get-FirewallRule -Name $Name -DisplayGroup $DisplayGroup
 
@@ -110,10 +114,6 @@ function Set-TargetResource
     if ($Ensure -eq "Present")
     {
         Write-Verbose "$($MyInvocation.MyCommand): We want the firewall rule to exist since Ensure is set to $Ensure"
-
-        # Effectively renaming DisplayGroup to Group
-        $null = $PSBoundParameters.Add('Group', $DisplayGroup)
-        $null = $PSBoundParameters.Remove('DisplayGroup')
 
         if ($exists)
         {
@@ -265,6 +265,7 @@ function Test-RuleProperties
         $FirewallRule,
         [String] $Name,
         [String] $DisplayName = $Name,
+        [String] $DisplayGroup,
         [String] $Group,
         [String] $Enabled,
         [String[]] $Profile,

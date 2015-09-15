@@ -35,10 +35,14 @@ if (Get-Module -Name $DSCResourceName)
 
 Import-Module -Name $DSCResourceModuleFile.FullName -Force
 
+$breakvar = $True
+
 InModuleScope $DSCResourceName {
     Describe 'Get-TargetResource' {
         Context 'Absent should return correctly' {
             Mock Get-NetFirewallRule
+
+                $breakvar = $true;
 
             It 'Should return absent' {
                 $result = Get-TargetResource -Name 'FirewallRule'
@@ -48,7 +52,7 @@ InModuleScope $DSCResourceName {
         }
 
         Context 'Present should return correctly' {
-            $rule = Get-NetFirewallRule | Select-Object -first 1
+            $rule = Get-NetFirewallRule | Sort-Object Name | Where-Object {$_.DisplayGroup -ne $null} | Select-Object -first 1
             $ruleProperties = Get-FirewallRuleProperty $rule
 
             $result = Get-TargetResource -Name $rule.Name
