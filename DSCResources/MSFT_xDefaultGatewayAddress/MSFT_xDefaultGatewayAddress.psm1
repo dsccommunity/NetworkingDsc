@@ -2,7 +2,7 @@
  #  xDefaultGatewayAddress : DSC Resource that will set/test/get the current default gateway
  #  Address, by accepting values among those given in xDefaultGatewayAddress.schema.mof
  #######################################################################################>
- 
+
 
 
 ######################################################################################
