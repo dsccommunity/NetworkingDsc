@@ -59,7 +59,7 @@ function Set-TargetResource
         [String]$AddressFamily
     )
 
-    ValidateProperties @PSBoundParameters -Apply
+    Test-Properties @PSBoundParameters -Apply
 }
 
 ######################################################################################
@@ -84,7 +84,7 @@ function Test-TargetResource
         [String]$AddressFamily
     )
 
-    ValidateProperties @PSBoundParameters
+    Test-Properties @PSBoundParameters
 }
 
 
@@ -92,7 +92,7 @@ function Test-TargetResource
 #  Helper function that validates the Server Address properties. If the switch parameter
 # "Apply" is set, then it will set the properties after a test
 #######################################################################################
-function ValidateProperties
+function Test-Properties
 {
     param
     (
@@ -111,7 +111,7 @@ function ValidateProperties
         [Switch]$Apply
     )
     $sa =$Address
-    $sa | %{
+    $sa | Foreach-Object {
              if(!([System.Net.Ipaddress]::TryParse($_, [ref]0)))
              {
                  throw "Server Address *$_* is not in the correct format. Please correct the Address in the configuration and try again"

@@ -34,7 +34,7 @@ function Get-TargetResource
     # Get all the default routes
     $defaultRoutes = Get-NetRoute -InterfaceAlias $InterfaceAlias -AddressFamily `
         $AddressFamily -ErrorAction Stop | `
-        where { $_.DestinationPrefix -eq $DestinationPrefix }
+        where-Object { $_.DestinationPrefix -eq $DestinationPrefix }
 
     $returnValue = @{
         AddressFamily = $AddressFamily
@@ -69,7 +69,7 @@ function Set-TargetResource
         [String]$AddressFamily
     )
 
-    ValidateProperties @PSBoundParameters -Apply
+    Test-Properties @PSBoundParameters -Apply
 }
 
 ######################################################################################
@@ -93,7 +93,7 @@ function Test-TargetResource
         [String]$AddressFamily
     )
 
-    ValidateProperties @PSBoundParameters
+    Test-Properties @PSBoundParameters
 }
 
 
@@ -101,7 +101,7 @@ function Test-TargetResource
 #  Helper function that validates the Gateway Address property. If the switch parameter
 # "Apply" is set, then it will set the properties after a test
 #######################################################################################
-function ValidateProperties
+function Test-Properties
 {
     param
     (
@@ -153,28 +153,33 @@ function ValidateProperties
             $DestinationPrefix = "::/0"
         }
         # Get all the default routes
-        $defaultRoutes = Get-NetRoute -InterfaceAlias $InterfaceAlias -AddressFamily `
-            $AddressFamily -ErrorAction Stop | `
-            where { $_.DestinationPrefix -eq $DestinationPrefix }
+        $defaultRoutes = @(Get-NetRoute `
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily `
+            -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
 
         # Test if the Default Gateway passed is equal to the current default gateway
         if($Address)
         {
-            # Filter for the specified $DefaultGateway
-            $filterGateway = $defaultRoutes | where { $_.NextHop -eq $Address }
-
-            if(-not $filterGateway)
-            {
-                Write-Verbose -Message ( @(
-                    "Default gateway does NOT match desired state. Expected $Address, "
-                    "actual $($defaultRoutes.NextHop)."
-                    ) -join ""
-                )
-                $requiresChanges = $true
+            if($defaultRoutes) {
+                if(-not $defaultRoutes.Where( { $_.NextHop -eq $Address } ))
+                {
+                    Write-Verbose -Message ( @(
+                        "Default gateway does NOT match desired state. Expected $Address, "
+                        "actual $($defaultRoutes.NextHop)."
+                        ) -join ""
+                    )
+                    $requiresChanges = $true
+                }
+                else
+                {
+                    Write-Verbose -Message "Default gateway is correct."
+                }
             }
             else
             {
-                Write-Verbose -Message "Default gateway is correct."
+                Write-Verbose -Message "Default gateway does not exist. Expected $Address ."
+                $requiresChanges = $true
             }
         }
         else
@@ -204,18 +209,25 @@ function ValidateProperties
                 )
 
                 # Remove any existing default route
-                $defaultRoutes | Remove-NetRoute -confirm:$false -ErrorAction Stop
-                if ($address)
+                foreach ($defaultRoute in $defaultRoutes) {
+                    Remove-NetRoute `
+                        -DestinationPrefix $defaultRoute.DestinationPrefix `
+                        -NextHop $defaultRoute.NextHop `
+                        -InterfaceIndex $defaultRoute.InterfaceIndex `
+                        -AddressFamily $defaultRoute.AddressFamily `
+                        -Confirm:$false -ErrorAction Stop
+                }
+
+                if ($Address)
                 {
                     # Set the correct Default Route
                     # Build parameter hash table
-                    $Parameters = @{
+                    $parameters = @{
                         DestinationPrefix = $DestinationPrefix
                         InterfaceAlias = $InterfaceAlias
                         AddressFamily = $AddressFamily
                         NextHop = $Address
                     }
-
                     New-NetRoute @Parameters
                 }
 
@@ -236,8 +248,12 @@ function ValidateProperties
     }
     catch
     {
-       Write-Verbose -Message $_
-       throw "Can not set or find valid Default Gateway address using InterfaceAlias $InterfaceAlias and AddressFamily $AddressFamily"
+        Write-Verbose -Message ( @(
+            "Can not set or find valid Default Gateway address using InterfaceAlias $InterfaceAlias and "
+            "AddressFamily $AddressFamily"
+            ) -join ""
+        )
+        throw $_.Exception
     }
 }
 

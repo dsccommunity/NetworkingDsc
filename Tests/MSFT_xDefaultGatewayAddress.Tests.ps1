@@ -17,6 +17,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                 NextHop = '192.168.0.1'
                 DestinationPrefix = '0.0.0.0/0'
                 InterfaceAlias = 'Ethernet'
+                InterfaceIndex = 1
                 AddressFamily = 'IPv4'
             }
         }
@@ -52,9 +53,9 @@ InModuleScope MSFT_xDefaultGatewayAddress {
 
     }
 
-    Describe 'ValidateProperties' {
+    Describe 'Test-Properties' {
 
-        Context 'invoking without -Apply switch and default gateway is set' {
+        Context 'invoking without -Apply switch and default gateway is exists' {
 
             #region Mocks
             Mock Get-NetRoute -MockWith {
@@ -62,6 +63,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     NextHop = '192.168.0.1'
                     DestinationPrefix = '0.0.0.0/0'
                     InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
                     AddressFamily = 'IPv4'
                 }
             }
@@ -73,7 +75,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = ValidateProperties @Splat
+                $Result = Test-Properties @Splat
                 $Result | Should Be $false
             }
 
@@ -83,7 +85,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = ValidateProperties @Splat
+                $Result = Test-Properties @Splat
                 $Result | Should Be $true
             }
 
@@ -92,7 +94,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = ValidateProperties @Splat
+                $Result = Test-Properties @Splat
                 $Result | Should Be $false
             }
 
@@ -101,38 +103,28 @@ InModuleScope MSFT_xDefaultGatewayAddress {
             }
         }
 
-        Context 'invoking without -Apply switch and default gateway is not set' {
-
-            #region Mocks
-            Mock Get-NetRoute -MockWith {
-                [PSCustomObject]@{
-                    NextHop = '192.168.0.1'
-                    DestinationPrefix = '0.0.0.0/0'
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-            }
-            #endregion
-
-            It 'when default gateway exists should be $false' {
-                $Splat = @{
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-                $Result = ValidateProperties @Splat
-                $Result | Should Be $false
-            }
+        Context 'invoking without -Apply switch and default gateway does not exist' {
 
             #region Mocks
             Mock Get-NetRoute
             #endregion
+
+            It 'when default gateway exists should be $false' {
+                $Splat = @{
+                    Address = '192.168.0.1'
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv4'
+                }
+                $Result = Test-Properties @Splat
+                $Result | Should Be $false
+            }
 
             It 'when default gateway does not exist should be $true' {
                 $Splat = @{
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = ValidateProperties @Splat
+                $Result = Test-Properties @Splat
                 $Result | Should Be $true
             }
 
@@ -141,7 +133,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
             }
         }
 
-        Context 'invoking with -Apply switch and default gateway is set' {
+        Context 'invoking with -Apply switch and default gateway exists' {
 
             #region Mocks
             Mock Get-NetRoute -MockWith {
@@ -149,6 +141,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     NextHop = '192.168.0.1'
                     DestinationPrefix = '0.0.0.0/0'
                     InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
                     AddressFamily = 'IPv4'
                 }
             }
@@ -163,7 +156,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = ValidateProperties @Splat
+                $Result = Test-Properties @Splat
                 $Result | Should Be $true
             }
 
@@ -174,7 +167,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = ValidateProperties @Splat
+                $Result = Test-Properties @Splat
                 $Result | Should Be $true
             }
 
@@ -184,7 +177,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = ValidateProperties @Splat
+                $Result = Test-Properties @Splat
                 $Result | Should Be $true
             }
 
@@ -199,7 +192,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
             }
         }
 
-        Context 'invoking with -Apply switch and default gateway is not set' {
+        Context 'invoking with -Apply switch and default gateway does not exist' {
 
             #region Mocks
             Mock Get-NetRoute -MockWith {
@@ -207,6 +200,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     NextHop = '192.168.0.1'
                     DestinationPrefix = '0.0.0.0/0'
                     InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
                     AddressFamily = 'IPv4'
                 }
             }
@@ -220,7 +214,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = ValidateProperties @Splat
+                $Result = Test-Properties @Splat
                 $Result | Should Be $true
             }
 
@@ -230,7 +224,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = ValidateProperties @Splat
+                $Result = Test-Properties @Splat
                 $Result | Should Be $true
             }
 

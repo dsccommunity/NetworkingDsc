@@ -60,7 +60,7 @@ function Set-TargetResource
         [String]$AddressFamily = "IPv4"
     )
 
-    ValidateProperties @PSBoundParameters -Apply
+    Test-Properties @PSBoundParameters -Apply
 }
 
 ######################################################################################
@@ -86,14 +86,14 @@ function Test-TargetResource
         [String]$AddressFamily = "IPv4"
     )
 
-    ValidateProperties @PSBoundParameters
+    Test-Properties @PSBoundParameters
 }
 
 #######################################################################################
 #  Helper function that validates the IP Address properties. If the switch parameter
 # "Apply" is set, then it will set the properties after a test
 #######################################################################################
-function ValidateProperties
+function Test-Properties
 {
     param
     (
@@ -143,15 +143,17 @@ function ValidateProperties
 
         Write-Verbose -Message "Checking the IPAddress ..."
         # Get the current IP Address based on the parameters given.
-        $currentIP = Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily `
-            $AddressFamily -ErrorAction Stop
+        $currentIPs = @(Get-NetIPAddress `
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily `
+            -ErrorAction Stop)
 
         # Test if the IP Address passed is present
-        if(-not $currentIP.IPAddress.Contains($IPAddress))
+        if(-not $currentIPs.IPAddress.Contains($IPAddress))
         {
             Write-Verbose -Message ( @(
                 "IPAddress does NOT match desired state. Expected $IPAddress, actual "
-                "$($currentIP.IPAddress)."
+                "$($currentIPs.IPAddress)."
                 ) -join ""
             )
             $requiresChanges = $true
@@ -161,7 +163,7 @@ function ValidateProperties
             Write-Verbose -Message "IPAddress is correct."
 
             # Filter the IP addresses for the IP address to check
-            $filterIP = $currentIP | where { $_.IPAddress -eq $IPAddress }
+            $filterIP = $currentIPs.Where( { $_.IPAddress -eq $IPAddress } )
 
             # Only test the Subnet Mask if the IP address is present
             if(-not $filterIP.PrefixLength.Equals([byte]$SubnetMask))
@@ -219,22 +221,35 @@ function ValidateProperties
 
                 # Get all the default routes - this has to be done in case the IP Address is
                 # beng Removed
-                $defaultRoutes = Get-NetRoute -InterfaceAlias $InterfaceAlias -AddressFamily `
-                    $AddressFamily -ErrorAction Stop | `
-                    where { $_.DestinationPrefix -eq $DestinationPrefix }
+                $defaultRoutes = @(Get-NetRoute -InterfaceAlias `
+                    $InterfaceAlias -AddressFamily `
+                    $AddressFamily -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
 
                 # Remove any default routes on the specified interface -- it is important to do
                 # this *before* removing the IP address, particularly in the case where the IP
                 # address was auto-configured by DHCP
                 if($defaultRoutes)
                 {
-                    $defaultRoutes | Remove-NetRoute -confirm:$false -ErrorAction Stop
+                    foreach ($defaultRoute in $defaultRoutes) {
+                        Remove-NetRoute `
+                            -DestinationPrefix $defaultRoute.DestinationPrefix `
+                            -NextHop $defaultRoute.NextHop `
+                            -InterfaceIndex $defaultRoute.InterfaceIndex `
+                            -AddressFamily $defaultRoute.AddressFamily `
+                            -Confirm:$false -ErrorAction Stop
+                    }
                 }
 
                 # Remove any IP addresses on the specified interface
-                if($currentIP)
+                if($currentIPs)
                 {
-                    $currentIP | Remove-NetIPAddress -confirm:$false -ErrorAction Stop
+                    foreach ($CurrentIP in $CurrentIPs) {
+                        Remove-NetIPAddress `
+                            -IPAddress $CurrentIP.IPAddress `
+                            -InterfaceIndex $CurrentIP.InterfaceIndex `
+                            -AddressFamily $CurrentIP.AddressFamily `
+                            -Confirm:$false -ErrorAction Stop
+                    }
                 }
 
                 # Apply the specified IP configuration
@@ -258,7 +273,7 @@ function ValidateProperties
     }
     catch
     {
-        Write-Error -Message ( @(
+        Write-Verbose -Message ( @(
             "Can not set or find valid IPAddress using InterfaceAlias $InterfaceAlias and "
             "AddressFamily $AddressFamily"
             ) -join ""

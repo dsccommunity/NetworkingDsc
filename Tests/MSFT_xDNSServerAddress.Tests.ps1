@@ -37,7 +37,7 @@ InModuleScope MSFT_xDNSServerAddress {
     }
 
 
-    Describe 'ValidateProperties' {
+    Describe 'Test-Properties' {
 
         #region Mocks
         Mock Get-DnsClientServerAddress -MockWith {
@@ -60,7 +60,7 @@ InModuleScope MSFT_xDNSServerAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = ValidateProperties @Splat
+                $Result = Test-Properties @Splat
                 $Result | Should Be $false
             }
 
@@ -70,7 +70,7 @@ InModuleScope MSFT_xDNSServerAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = ValidateProperties @Splat
+                $Result = Test-Properties @Splat
                 $Result | Should Be $true
             }
 
@@ -87,7 +87,7 @@ InModuleScope MSFT_xDNSServerAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = ValidateProperties @Splat -Apply
+                $Result = Test-Properties @Splat -Apply
                 $Result | Should BeNullOrEmpty
             }
 
