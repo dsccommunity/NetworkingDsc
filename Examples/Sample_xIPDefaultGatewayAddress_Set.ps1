@@ -15,7 +15,7 @@ Configuration Sample_xDefaultGatewayAddress
     {
         xDefaultGatewayAddress SetDefaultGateway
         {
-			Address        = $DefaultGateway
+            Address        = $DefaultGateway
             InterfaceAlias = $InterfaceAlias
             AddressFamily  = $AddressFamily
         }
