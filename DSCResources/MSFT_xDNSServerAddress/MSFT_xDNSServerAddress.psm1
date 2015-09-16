@@ -120,14 +120,14 @@ function ValidateProperties
              {
                 if ($AddressFamily -ne "IPv4")
                 {
-                    throw "Server address $Address is in IPv4 format, which does not match server address family $AddressFamily. Please correct either of them in the configuration and try again"
+                    throw "Server address *$_* is in IPv4 format, which does not match server address family $AddressFamily. Please correct either of them in the configuration and try again"
                 }
              }
              else
              {
                 if ($AddressFamily -ne "IPv6")
                 {
-                    throw "Server address $Address is in IPv6 format, which does not match server address family $AddressFamily. Please correct either of them in the configuration and try again"
+                    throw "Server address *$_* is in IPv6 format, which does not match server address family $AddressFamily. Please correct either of them in the configuration and try again"
                 }
              }
          }

@@ -1,4 +1,4 @@
-﻿[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
 
 # xNetworking
 
@@ -14,12 +14,12 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **xFirewall** sets a node's firewall rules.
 * **xIPAddress** sets a node's IP address.
 * **xDnsServerAddress** sets a node's DNS server.
+* **xDefaultGatewayAddress** sets a node's default gateway address.
 
 ### xIPAddress
 
 * **IPAddress**: The desired IP address.
 * **InterfaceAlias**: Alias of the network interface for which the IP address should be set.
-* **DefaultGateway**: Specifies the IP address of the default gateway for the host.
 * **SubnetMask**: Local subnet size.
 * **AddressFamily**: IP address family: { IPv4 | IPv6 }
 
@@ -27,6 +27,12 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 * **Address**: The desired DNS Server address(es)
 * **InterfaceAlias**: Alias of the network interface for which the DNS server address is set.
+* **AddressFamily**: IP address family: { IPv4 | IPv6 }
+
+### xDefaultGatewayAddress
+
+* **Address**: The desired default gateway address - if not provided default gateway will be removed.
+* **InterfaceAlias**: Alias of the network interface for which the default gateway address is set.
 * **AddressFamily**: IP address family: { IPv4 | IPv6 }
 
 ### xFirewall
@@ -48,6 +54,12 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 
 ## Versions
+
+### Unreleased
+* MSFT_xDefaultGatewayAddress: Added
+* MSFT_xIPAddress: Removed default gateway parameter - use xDefaultGatewayAddress resource.
+* MSFT_xIPAddress: Added check for IP address format not matching address family.
+* MSFT_xDNSServerAddress: Corrected error message when address format doesn't match address family.
 
 ### 2.3.0.0
 
@@ -109,7 +121,7 @@ Configuration Sample_xIPAddress_FixedValue
 
 ### Set IP Address with parameterized values
 
-This configuration will set the IP Address and default gateway on a network interface that is identified by its alias.
+This configuration will set the IP Address on a network interface that is identified by its alias.
 
 ```powershell
 Configuration Sample_xIPAddress_Parameterized
@@ -121,8 +133,6 @@ Configuration Sample_xIPAddress_Parameterized
         [string]$IPAddress,
         [Parameter(Mandatory)]
         [string]$InterfaceAlias,
-        [Parameter(Mandatory)]
-        [string]$DefaultGateway,
         [int]$SubnetMask = 16,
         [ValidateSet("IPv4","IPv6")]
         [string]$AddressFamily = 'IPv4'
@@ -134,7 +144,6 @@ Configuration Sample_xIPAddress_Parameterized
         {
             IPAddress      = $IPAddress
             InterfaceAlias = $InterfaceAlias
-            DefaultGateway = $DefaultGateway
             SubnetMask     = $SubnetMask
             AddressFamily  = $AddressFamily
         }
@@ -165,6 +174,63 @@ Configuration Sample_xDnsServerAddress
         xDnsServerAddress DnsServerAddress
         {
             Address        = $DnsServerAddress
+            InterfaceAlias = $InterfaceAlias
+            AddressFamily  = $AddressFamily
+        }
+    }
+}
+```
+
+### Set Default Gateway server address
+
+This configuration will set the default gateway address on a network interface that is identified by its alias. 
+
+```powershell
+Configuration Sample_xDefaultGatewayAddress_Set
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost',
+        [Parameter(Mandatory)]
+        [string]$DefaultGateway,
+        [Parameter(Mandatory)]
+        [string]$InterfaceAlias,
+        [ValidateSet("IPv4","IPv6")]
+        [string]$AddressFamily = 'IPv4'
+    )
+    Import-DscResource -Module xNetworking
+    Node $NodeName
+    {
+        xDefaultGatewayAddress SetDefaultGateway
+        {
+			Address        = $DefaultGateway
+            InterfaceAlias = $InterfaceAlias
+            AddressFamily  = $AddressFamily
+        }
+    }
+}
+```
+
+### Remove Default Gateway server address
+
+This configuration will remove the default gateway address on a network interface that is identified by its alias. 
+
+```powershell
+Configuration Sample_xDefaultGatewayAddress_Remove
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost',
+        [Parameter(Mandatory)]
+        [string]$InterfaceAlias,
+        [ValidateSet("IPv4","IPv6")]
+        [string]$AddressFamily = 'IPv4'
+    )
+    Import-DscResource -Module xNetworking
+    Node $NodeName
+    {
+        xDefaultGatewayAddress RemoveDefaultGateway
+        {
             InterfaceAlias = $InterfaceAlias
             AddressFamily  = $AddressFamily
         }

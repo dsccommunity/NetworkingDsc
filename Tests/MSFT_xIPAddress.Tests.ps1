@@ -21,7 +21,7 @@ InModuleScope MSFT_xIPAddress {
         #endregion
 
         Context 'comparing IPAddress' {
-            It 'should return true' {
+            It 'should return correct IP' {
 
                 $Splat = @{
                     IPAddress = '192.168.0.1'
@@ -96,6 +96,29 @@ InModuleScope MSFT_xIPAddress {
         Mock Remove-NetRoute {}
         #endregion
 
+        Context 'invoking with invalid IPAddress' {
+
+            It 'should throw an error' {
+                $Splat = @{
+                    IPAddress = 'NotReal'
+                    InterfaceAlias = 'Ethernet'
+                }
+                { ValidateProperties @Splat } | Should Throw
+            }
+        }
+
+        Context 'invoking with IPAddress mismatch' {
+
+            It 'should be throw an error' {
+                $Splat = @{
+                    IPAddress = '192.168.0.1'
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                { ValidateProperties @Splat } | Should Throw
+            }
+        }
+
         Context 'invoking without -Apply switch' {
 
             It 'should be $false' {
@@ -120,8 +143,8 @@ InModuleScope MSFT_xIPAddress {
                 Assert-MockCalled -commandName Get-NetIPAddress
             }
 
-            It 'should call Get-NetRoute once' {
-                Assert-MockCalled -commandName Get-NetRoute
+            It 'should not call Get-NetRoute' {
+                Assert-MockCalled -commandName Get-NetRoute -Exactly 0
             }
 
             It 'should call Get-NetIPInterface once' {

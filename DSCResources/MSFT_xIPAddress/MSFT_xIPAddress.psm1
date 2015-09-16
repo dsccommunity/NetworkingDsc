@@ -22,9 +22,6 @@ function Get-TargetResource
 
         [uInt32]$SubnetMask = 16,
 
-        [ValidateNotNullOrEmpty()]
-        [String]$DefaultGateway,
-
         [ValidateSet("IPv4", "IPv6")]
         [String]$AddressFamily = "IPv4"
     )
@@ -33,7 +30,6 @@ function Get-TargetResource
         IPAddress = [System.String]::Join(", ",(Get-NetIPAddress -InterfaceAlias $InterfaceAlias `
             -AddressFamily $AddressFamily).IPAddress)
         SubnetMask = $SubnetMask
-        DefaultGateway = $DefaultGateway
         AddressFamily = $AddressFamily
         InterfaceAlias=$InterfaceAlias
     }
@@ -59,9 +55,6 @@ function Set-TargetResource
         [String]$InterfaceAlias,
 
         [uInt32]$SubnetMask,
-
-        [ValidateNotNullOrEmpty()]
-        [String]$DefaultGateway,
 
         [ValidateSet("IPv4", "IPv6")]
         [String]$AddressFamily = "IPv4"
@@ -89,9 +82,6 @@ function Test-TargetResource
 
         [uInt32]$SubnetMask,
 
-        [ValidateNotNullOrEmpty()]
-        [String]$DefaultGateway,
-
         [ValidateSet("IPv4", "IPv6")]
         [String]$AddressFamily = "IPv4"
     )
@@ -115,15 +105,10 @@ function ValidateProperties
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
-        [ValidateNotNullOrEmpty()]
-        [String]$DefaultGateway,
-
         [uInt32]$SubnetMask = 16,
 
         [ValidateSet("IPv4", "IPv6")]
         [String]$AddressFamily = "IPv4",
-
-        [Switch]$NoReset,
 
         [Switch]$Apply
     )
@@ -135,6 +120,20 @@ function ValidateProperties
             "parameter in the configuration and try again."
             ) -join ""
         )
+    }
+    if (([System.Net.IPAddress]$IPAddress).AddressFamily.ToString() -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString())
+    {
+        if ($AddressFamily -ne "IPv4")
+        {
+            throw "Server address $IPAddress is in IPv4 format, which does not match server address family $AddressFamily. Please correct either of them in the configuration and try again"
+        }
+    }
+    else
+    {
+        if ($AddressFamily -ne "IPv6")
+        {
+            throw "Server address $IPAddress is in IPv6 format, which does not match server address family $AddressFamily. Please correct either of them in the configuration and try again"
+        }
     }
 
     try
@@ -180,48 +179,6 @@ function ValidateProperties
             }
         }
 
-        # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
-        $DestinationPrefix = "0.0.0.0/0"
-        if($AddressFamily -eq "IPv6")
-        {
-            $DestinationPrefix = "::/0"
-        }
-
-        # Get all the default routes
-        $defaultRoutes = Get-NetRoute -InterfaceAlias $InterfaceAlias -AddressFamily `
-            $AddressFamily -ErrorAction Stop | `
-            where { $_.DestinationPrefix -eq $DestinationPrefix }
-
-        # Test if the Default Gateway passed is equal to the current default gateway
-        if($DefaultGateway)
-        {
-            if(-not ([System.Net.Ipaddress]::TryParse($DefaultGateway, [ref]0)))
-            {
-                throw ( @(
-                    "Default Gateway *$DefaultGateway* is NOT in the correct format. Please "
-                    "correct the DefaultGateway parameter in the configuration and try again."
-                    ) -join ""
-                )
-            }
-
-            # Filter for the specified $DefaultGateway
-            $filterGateway = $defaultRoutes | where { $_.NextHop -eq $DefaultGateway }
-
-            if(-not $filterGateway)
-            {
-                Write-Verbose -Message ( @(
-                    "Default gateway does NOT match desired state. Expected $DefaultGateway, "
-                    "actual $($defaultRoutes.NextHop)."
-                    ) -join ""
-                )
-                $requiresChanges = $true
-            }
-            else
-            {
-                Write-Verbose -Message "Default gateway is correct."
-            }
-        }
-
         # Test if DHCP is already disabled
         if(-not (Get-NetIPInterface -InterfaceAlias $InterfaceAlias -AddressFamily `
             $AddressFamily).Dhcp.ToString().Equals('Disabled'))
@@ -252,41 +209,32 @@ function ValidateProperties
                     PrefixLength = $SubnetMask
                     InterfaceAlias = $InterfaceAlias
                 }
-                if($DefaultGateway)
+
+                # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
+                $DestinationPrefix = "0.0.0.0/0"
+                if($AddressFamily -eq "IPv6")
                 {
-                    $Parameters['DefaultGateway'] = $DefaultGateway
+                    $DestinationPrefix = "::/0"
                 }
 
-                if(-not $NoReset)
-                {
-                    # Remove any default routes on the specified interface -- it is important to do
-                    # this *before* removing the IP address, particularly in the case where the IP
-                    # address was auto-configured by DHCP
-                    if($defaultRoutes)
-                    {
-                        $defaultRoutes | Remove-NetRoute -confirm:$false -ErrorAction Stop
-                    }
+                # Get all the default routes - this has to be done in case the IP Address is
+                # beng Removed
+                $defaultRoutes = Get-NetRoute -InterfaceAlias $InterfaceAlias -AddressFamily `
+                    $AddressFamily -ErrorAction Stop | `
+                    where { $_.DestinationPrefix -eq $DestinationPrefix }
 
-                    # Remove any IP addresses on the specified interface
-                    if($currentIP)
-                    {
-                        $currentIP | Remove-NetIPAddress -confirm:$false -ErrorAction Stop
-                    }
+                # Remove any default routes on the specified interface -- it is important to do
+                # this *before* removing the IP address, particularly in the case where the IP
+                # address was auto-configured by DHCP
+                if($defaultRoutes)
+                {
+                    $defaultRoutes | Remove-NetRoute -confirm:$false -ErrorAction Stop
                 }
-                else
-                {
-                    # If the desired IP or default gateway is present, remove it even if NoReset
-                    # was requested; this is required if one of the settings is correct but others
-                    # are not -- otherwise, New-NetIPAddress will throw an error.
-                    if($filterGateway)
-                    {
-                        $filterGateway | Remove-NetRoute -Confirm:$false
-                    }
 
-                    if($filterIP)
-                    {
-                        $filterIP | Remove-NetIPAddress -confirm:$false -ErrorAction Stop
-                    }
+                # Remove any IP addresses on the specified interface
+                if($currentIP)
+                {
+                    $currentIP | Remove-NetIPAddress -confirm:$false -ErrorAction Stop
                 }
 
                 # Apply the specified IP configuration
