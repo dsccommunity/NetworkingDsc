@@ -1,31 +1,22 @@
-configuration Sample_xIPAddress_Parameterized
+Configuration Sample_xDefaultGatewayAddress
 {
     param
     (
-
         [string[]]$NodeName = 'localhost',
-
         [Parameter(Mandatory)]
-        [string]$IPAddress,
-
+        [string]$DefaultGateway,
         [Parameter(Mandatory)]
         [string]$InterfaceAlias,
-
-        [int]$SubnetMask = 16,
-
         [ValidateSet("IPv4","IPv6")]
         [string]$AddressFamily = 'IPv4'
     )
-
     Import-DscResource -Module xNetworking
-
     Node $NodeName
     {
-        xIPAddress NewIPAddress
+        xDefaultGatewayAddress SetDefaultGateway
         {
-            IPAddress      = $IPAddress
+            Address        = $DefaultGateway
             InterfaceAlias = $InterfaceAlias
-            SubnetMask     = $SubnetMask
             AddressFamily  = $AddressFamily
         }
     }

@@ -21,7 +21,7 @@ InModuleScope MSFT_xIPAddress {
         #endregion
 
         Context 'comparing IPAddress' {
-            It 'should return true' {
+            It 'should return correct IP' {
 
                 $Splat = @{
                     IPAddress = '192.168.0.1'
@@ -46,7 +46,7 @@ InModuleScope MSFT_xIPAddress {
     }
 
 
-    Describe 'ValidateProperties' {
+    Describe 'Test-Properties' {
 
         #region Mocks
         Mock Get-NetIPAddress -MockWith {
@@ -54,7 +54,9 @@ InModuleScope MSFT_xIPAddress {
             [PSCustomObject]@{
                 IPAddress = '192.168.0.1'
                 InterfaceAlias = 'Ethernet'
+                InterfaceIndex = 1
                 PrefixLength = [byte]16
+                AddressFamily = 'IPv4'
             }
         }
 
@@ -74,6 +76,7 @@ InModuleScope MSFT_xIPAddress {
         Mock Get-NetRoute {
             [PSCustomObject]@{
                 InterfaceAlias = 'Ethernet'
+                InterfaceIndex = 1
                 AddressFamily = 'IPv4'
                 NextHop = '192.168.0.254'
                 DestinationPrefix = '0.0.0.0/0'
@@ -96,6 +99,29 @@ InModuleScope MSFT_xIPAddress {
         Mock Remove-NetRoute {}
         #endregion
 
+        Context 'invoking with invalid IPAddress' {
+
+            It 'should throw an error' {
+                $Splat = @{
+                    IPAddress = 'NotReal'
+                    InterfaceAlias = 'Ethernet'
+                }
+                { Test-Properties @Splat } | Should Throw
+            }
+        }
+
+        Context 'invoking with IPAddress mismatch' {
+
+            It 'should be throw an error' {
+                $Splat = @{
+                    IPAddress = '192.168.0.1'
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                { Test-Properties @Splat } | Should Throw
+            }
+        }
+
         Context 'invoking without -Apply switch' {
 
             It 'should be $false' {
@@ -103,7 +129,7 @@ InModuleScope MSFT_xIPAddress {
                     IPAddress = '10.0.0.2'
                     InterfaceAlias = 'Ethernet'
                 }
-                $Result = ValidateProperties @Splat
+                $Result = Test-Properties @Splat
                 $Result | Should Be $false
             }
 
@@ -112,7 +138,7 @@ InModuleScope MSFT_xIPAddress {
                     IPAddress = '192.168.0.1'
                     InterfaceAlias = 'Ethernet'
                 }
-                $Result = ValidateProperties @Splat
+                $Result = Test-Properties @Splat
                 $Result | Should Be $true
             }
 
@@ -120,8 +146,8 @@ InModuleScope MSFT_xIPAddress {
                 Assert-MockCalled -commandName Get-NetIPAddress
             }
 
-            It 'should call Get-NetRoute once' {
-                Assert-MockCalled -commandName Get-NetRoute
+            It 'should not call Get-NetRoute' {
+                Assert-MockCalled -commandName Get-NetRoute -Exactly 0
             }
 
             It 'should call Get-NetIPInterface once' {
@@ -136,7 +162,7 @@ InModuleScope MSFT_xIPAddress {
                     IPAddress = '10.0.0.2'
                     InterfaceAlias = 'Ethernet'
                 }
-                $Result = ValidateProperties @Splat -Apply
+                $Result = Test-Properties @Splat -Apply
                 $Result | Should BeNullOrEmpty
             }
 

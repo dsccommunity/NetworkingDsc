@@ -59,7 +59,7 @@ function Set-TargetResource
         [String]$AddressFamily
     )
 
-    ValidateProperties @PSBoundParameters -Apply
+    Test-Properties @PSBoundParameters -Apply
 }
 
 ######################################################################################
@@ -84,7 +84,7 @@ function Test-TargetResource
         [String]$AddressFamily
     )
 
-    ValidateProperties @PSBoundParameters
+    Test-Properties @PSBoundParameters
 }
 
 
@@ -92,7 +92,7 @@ function Test-TargetResource
 #  Helper function that validates the Server Address properties. If the switch parameter
 # "Apply" is set, then it will set the properties after a test
 #######################################################################################
-function ValidateProperties
+function Test-Properties
 {
     param
     (
@@ -111,7 +111,7 @@ function ValidateProperties
         [Switch]$Apply
     )
     $sa =$Address
-    $sa | %{
+    $sa | Foreach-Object {
              if(!([System.Net.Ipaddress]::TryParse($_, [ref]0)))
              {
                  throw "Server Address *$_* is not in the correct format. Please correct the Address in the configuration and try again"
@@ -120,14 +120,14 @@ function ValidateProperties
              {
                 if ($AddressFamily -ne "IPv4")
                 {
-                    throw "Server address $Address is in IPv4 format, which does not match server address family $AddressFamily. Please correct either of them in the configuration and try again"
+                    throw "Server address *$_* is in IPv4 format, which does not match server address family $AddressFamily. Please correct either of them in the configuration and try again"
                 }
              }
              else
              {
                 if ($AddressFamily -ne "IPv6")
                 {
-                    throw "Server address $Address is in IPv6 format, which does not match server address family $AddressFamily. Please correct either of them in the configuration and try again"
+                    throw "Server address *$_* is in IPv6 format, which does not match server address family $AddressFamily. Please correct either of them in the configuration and try again"
                 }
              }
          }
