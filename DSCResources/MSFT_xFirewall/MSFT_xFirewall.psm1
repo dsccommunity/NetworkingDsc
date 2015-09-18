@@ -463,7 +463,11 @@ function Test-RuleHasProperties
         $desiredConfigurationMatch = $false
     }
 
-    if ($State -and ($FirewallRule.Enabled.ToString() -eq ("Enabled" -ne $State)))
+    # Note: The Enabled property of an object returned by Get-NetFirewallRule is NOT a boolean.
+    # It is type Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetSecurity.Enabled
+    # As can be seen by (Get-NetFirewallRule | Select-Object -First 1).Enabled | gm
+    $FirewallState = if ($FirewallRule.Enabled.ToString() -eq 'True') { 'Enabled' } else { 'Disabled' }
+    if ($State -and ($FirewallState -ne $State))
     {
         Write-Verbose "Test-RuleHasProperties: State property value - $FirewallRule.Enabled.ToString() does not match desired state - $State"
 
