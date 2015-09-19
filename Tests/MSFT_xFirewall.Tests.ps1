@@ -34,31 +34,265 @@ InModuleScope MSFT_xFirewall {
     }
 
     Describe 'Set-TargetResource' {
-        $TestRule = @{
-            Name = 'Test Rule'
-            DisplayName = 'Test Display Name'
-            DisplayGroup = 'Test Group'
-            Ensure = 'Present'
-            State = 'Enabled'
-            Profile = 'Private'
-            Direction = 'Inbound'
-            Access = 'Block'
-            RemotePort = 1234
-            LocalPort = 5678
-            Protocol = 'TCP'
-            Description = 'Test Description'
-            ApplicationPath = 'Test Program'
-            Service = 'Test Service'
+        # Get a firewall rule that will be used to test with - any will do
+        $FirewallRule = Get-FirewallRules -Name ((Get-NetFirewallRule | Select-Object -First 1).Name)
+        $Properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule -Property All
+
+        # Make an object that can be splatted onto the function
+        $Splat = @{
+            Ensure = "Absent"
+            Name = $FirewallRule.Name
+            DisplayGroup = $FirewallRule.DisplayGroup
+            State = if ($FirewallRule.Enabled.ToString() -eq 'True') { 'Enabled' } else { 'Disabled' }
+            Profile = $FirewallRule.Profile.ToString() -replace(" ", "") -split(",")
+            Direction = $FirewallRule.Direction
+            Access = $FirewallRule.Action
+            RemotePort = $Properties.PortFilters.RemotePort
+            LocalPort = $Properties.PortFilters.LocalPort
+            Protocol = $Properties.PortFilters.Protocol
+            Description = $FirewallRule.Description
+            ApplicationPath = $Properties.ApplicationFilters.Program
+            Service = $Properties.ServiceFilters.Service
         }
 
-        Context 'testing with a rule that already exists' {
-            It 'should return Ensure Present with Object properties' {
+        # To speed up all these tests create Mocks so that these functions are not repeatedly called
+        Mock Get-FirewallRules -MockWith { $FirewallRule }
+        Mock Get-FirewallRuleProperty -MockWith { $Properties }
+        Mock Remove-NetFirewallRule
+        Mock Set-FirewallRule
+
+        # Check removing a rule
+        Context 'testing with a rule that exists but should not' {
+            $SetRule = $Splat.Clone()
+            It 'should call appropraite mocks' {
+                { Set-TargetResource @SetRule } | Should Not Throw
+                Assert-MockCalled -commandName Remove-NetFirewallRule -Exactly 1
+                Assert-MockCalled -commandName Set-FirewallRule -Exactly 0
             }
         }
-        
+
+        # Now test changing existing rules
+        $Splat.Ensure = "Present"
+
+        Context 'testing with a rule that already exists with no changes' {
+            $SetRule = $Splat.Clone()
+            It 'should not call mocks' {
+                { Set-TargetResource @SetRule } | Should Not Throw
+                Assert-MockCalled -commandName Remove-NetFirewallRule -Exactly 0
+                Assert-MockCalled -commandName Set-FirewallRule -Exactly 0
+            }
+        }
+        Context 'testing with a rule that already exists with changed state' {
+            $SetRule = $Splat.Clone()
+            $SetRule.State = if ($SetRule.State -eq 'Enabled') { 'Disabled' } else { 'Enabled' }
+            It 'should not call mocks' {
+                { Set-TargetResource @SetRule } | Should Not Throw
+                Assert-MockCalled -commandName Remove-NetFirewallRule -Exactly 1
+                Assert-MockCalled -commandName Set-FirewallRule -Exactly 1
+            }
+        }
+        Context 'testing with a rule that already exists with changed profile' {
+            $SetRule = $Splat.Clone()
+            $SetRule.Profile = 'Different'
+            It 'should not call mocks' {
+                { Set-TargetResource @SetRule } | Should Not Throw
+                Assert-MockCalled -commandName Remove-NetFirewallRule -Exactly 1
+                Assert-MockCalled -commandName Set-FirewallRule -Exactly 1
+            }
+        }
+        Context 'testing with a rule that already exists with changed direction' {
+            $SetRule = $Splat.Clone()
+            $SetRule.Direction = if ($SetRule.Direction -eq 'Inbound') {'Outbound'} else {'Inbound'}
+            It 'should not call mocks' {
+                { Set-TargetResource @SetRule } | Should Not Throw
+                Assert-MockCalled -commandName Remove-NetFirewallRule -Exactly 1
+                Assert-MockCalled -commandName Set-FirewallRule -Exactly 1
+            }
+        }
+        Context 'testing with a rule that already exists with changed remote port' {
+            $SetRule = $Splat.Clone()
+            $SetRule.RemotePort = 1
+            It 'should not call mocks' {
+                { Set-TargetResource @SetRule } | Should Not Throw
+                Assert-MockCalled -commandName Remove-NetFirewallRule -Exactly 1
+                Assert-MockCalled -commandName Set-FirewallRule -Exactly 1
+            }
+        }
+        Context 'testing with a rule that already exists with changed local port' {
+            $SetRule = $Splat.Clone()
+            $SetRule.LocalPort = 1
+            It 'should not call mocks' {
+                { Set-TargetResource @SetRule } | Should Not Throw
+                Assert-MockCalled -commandName Remove-NetFirewallRule -Exactly 1
+                Assert-MockCalled -commandName Set-FirewallRule -Exactly 1
+            }
+        }
+        Context 'testing with a rule that already exists with changed protocol' {
+            $SetRule = $Splat.Clone()
+            $SetRule.Protocol = "Different"
+            It 'should not call mocks' {
+                { Set-TargetResource @SetRule } | Should Not Throw
+                Assert-MockCalled -commandName Remove-NetFirewallRule -Exactly 1
+                Assert-MockCalled -commandName Set-FirewallRule -Exactly 1
+            }
+        }
+        Context 'testing with a rule that already exists with changed description' {
+            $SetRule = $Splat.Clone()
+            $SetRule.Description = "Different"
+            It 'should not call mocks' {
+                { Set-TargetResource @SetRule } | Should Not Throw
+                Assert-MockCalled -commandName Remove-NetFirewallRule -Exactly 1
+                Assert-MockCalled -commandName Set-FirewallRule -Exactly 1
+            }
+        }
+        Context 'testing with a rule that already exists with changed application path' {
+            $SetRule = $Splat.Clone()
+            $SetRule.ApplicationPath = "Different"
+            It 'should not call mocks' {
+                { Set-TargetResource @SetRule } | Should Not Throw
+                Assert-MockCalled -commandName Remove-NetFirewallRule -Exactly 1
+                Assert-MockCalled -commandName Set-FirewallRule -Exactly 1
+            }
+        }
+        Context 'testing with a rule that already exists with changed description' {
+            $SetRule = $Splat.Clone()
+            $SetRule.Service = "Different"
+            It 'should not call mocks' {
+                { Set-TargetResource @SetRule } | Should Not Throw
+                Assert-MockCalled -commandName Remove-NetFirewallRule -Exactly 1
+                Assert-MockCalled -commandName Set-FirewallRule -Exactly 1
+            }
+        }
+
+        # Update the mocks so that they don't return a rule
+        Mock Get-FirewallRules -MockWith { $Null }
+        Mock Get-FirewallRuleProperty -MockWith { $Null }
+        Context 'testing with a rule that does not exist' {
+            $SetRule = $Splat.Clone()
+            It 'should call appropraite mocks' {
+                { Set-TargetResource @SetRule } | Should Not Throw
+                Assert-MockCalled -commandName Remove-NetFirewallRule -Exactly 0
+                Assert-MockCalled -commandName Set-FirewallRule -Exactly 1
+            }
+        }
     }
 
     Describe 'Test-TargetResource' {
+        # Get a firewall rule that will be used to test with - any will do
+        $FirewallRule = Get-FirewallRules -Name ((Get-NetFirewallRule | Select-Object -First 1).Name)
+        $Properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule -Property All
+
+        # Make an object that can be splatted onto the function
+        $Splat = @{
+            Ensure = "Absent"
+            Name = $FirewallRule.Name
+            DisplayGroup = $FirewallRule.DisplayGroup
+            State = if ($FirewallRule.Enabled.ToString() -eq 'True') { 'Enabled' } else { 'Disabled' }
+            Profile = $FirewallRule.Profile.ToString() -replace(" ", "") -split(",")
+            Direction = $FirewallRule.Direction
+            Access = $FirewallRule.Action
+            RemotePort = $Properties.PortFilters.RemotePort
+            LocalPort = $Properties.PortFilters.LocalPort
+            Protocol = $Properties.PortFilters.Protocol
+            Description = $FirewallRule.Description
+            ApplicationPath = $Properties.ApplicationFilters.Program
+            Service = $Properties.ServiceFilters.Service
+        }
+
+        # To speed up all these tests create Mocks so that these functions are not repeatedly called
+        Mock Get-FirewallRules -MockWith { $FirewallRule }
+        Mock Get-FirewallRuleProperty -MockWith { $Properties }
+
+        # Check a rule that exists but should not
+        Context 'testing with a rule that exists but should not' {
+            $TestRule = $Splat.Clone()
+            It 'should return false' {
+                Test-TargetResource @TestRule | Should Be $False
+            }
+        }
+
+        # Now test existing rules
+        $Splat.Ensure = "Present"
+
+        Context 'testing with a rule that already exists with no changes' {
+            $TestRule = $Splat.Clone()
+            It 'should return true' {
+                Test-TargetResource @TestRule | Should Be $True
+            }
+        }
+        Context 'testing with a rule that already exists with changed state' {
+            $TestRule = $Splat.Clone()
+            $TestRule.State = if ($TestRule.State -eq 'Enabled') { 'Disabled' } else { 'Enabled' }
+            It 'should return false' {
+                Test-TargetResource @TestRule | Should Be $False
+            }
+        }
+        Context 'testing with a rule that already exists with changed profile' {
+            $TestRule = $Splat.Clone()
+            $TestRule.Profile = 'Different'
+            It 'should return false' {
+                Test-TargetResource @TestRule | Should Be $False
+            }
+        }
+        Context 'testing with a rule that already exists with changed direction' {
+            $TestRule = $Splat.Clone()
+            $TestRule.Direction = if ($TestRule.Direction -eq 'Inbound') {'Outbound'} else {'Inbound'}
+            It 'should return false' {
+                Test-TargetResource @TestRule | Should Be $False
+            }
+        }
+        Context 'testing with a rule that already exists with changed remote port' {
+            $TestRule = $Splat.Clone()
+            $TestRule.RemotePort = 1
+            It 'should return false' {
+                Test-TargetResource @TestRule | Should Be $False
+            }
+        }
+        Context 'testing with a rule that already exists with changed local port' {
+            $TestRule = $Splat.Clone()
+            $TestRule.LocalPort = 1
+            It 'should return false' {
+                Test-TargetResource @TestRule | Should Be $False
+            }
+        }
+        Context 'testing with a rule that already exists with changed protocol' {
+            $TestRule = $Splat.Clone()
+            $TestRule.Protocol = "Different"
+            It 'should return false' {
+                Test-TargetResource @TestRule | Should Be $False
+            }
+        }
+        Context 'testing with a rule that already exists with changed description' {
+            $TestRule = $Splat.Clone()
+            $TestRule.Description = "Different"
+            It 'should return false' {
+                Test-TargetResource @TestRule | Should Be $False
+            }
+        }
+        Context 'testing with a rule that already exists with changed application path' {
+            $TestRule = $Splat.Clone()
+            $TestRule.ApplicationPath = "Different"
+            It 'should return false' {
+                Test-TargetResource @TestRule | Should Be $False
+            }
+        }
+        Context 'testing with a rule that already exists with changed description' {
+            $TestRule = $Splat.Clone()
+            $TestRule.Service = "Different"
+            It 'should return false' {
+                Test-TargetResource @TestRule | Should Be $False
+            }
+        }
+
+        # Update the mocks so that they don't return a rule
+        Mock Get-FirewallRules -MockWith { $Null }
+        Mock Get-FirewallRuleProperty -MockWith { $Null }
+        Context 'testing with a rule that does not exist but should' {
+            $TestRule = $Splat.Clone()
+            It 'should return false' {
+                Test-TargetResource @TestRule | Should Be $False
+            }
+        }
     }
 
     Describe 'Set-FirewallRule' {
@@ -95,9 +329,6 @@ InModuleScope MSFT_xFirewall {
         # Get a firewall rule that will be used to test with - any will do
         $FirewallRule = Get-FirewallRules -Name ((Get-NetFirewallRule | Select-Object -First 1).Name)
         $Properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule -Property All
-        # To speed up all these tests create Mocks so that these functions are not repeatedly called
-        Mock Get-FirewallRules -MockWith { $FirewallRule }
-        Mock Get-FirewallRuleProperty -MockWith { $Properties }
 
         # Make an object that can be splatted onto the function
         $Splat = @{
@@ -111,9 +342,14 @@ InModuleScope MSFT_xFirewall {
             LocalPort = $Properties.PortFilters.LocalPort
             Protocol = $Properties.PortFilters.Protocol
             Description = $FirewallRule.Description
-            ApplicationPath = $FirewallRule.ApplicationFilters.Program
-            Service = $FirewallRule.ServiceFilters.Service
+            ApplicationPath = $Properties.ApplicationFilters.Program
+            Service = $Properties.ServiceFilters.Service
         }
+
+        # To speed up all these tests create Mocks so that these functions are not repeatedly called
+        Mock Get-FirewallRules -MockWith { $FirewallRule }
+        Mock Get-FirewallRuleProperty -MockWith { $Properties }
+
         Context 'testing with a rule with no property differences' {
             $CompareRule = $Splat.Clone()
             It 'should return True' {
@@ -147,7 +383,7 @@ InModuleScope MSFT_xFirewall {
         }
         Context 'testing with a rule with a different direction' {
             $CompareRule = $Splat.Clone()
-            $CompareRule.Direction = 'Different'
+            $CompareRule.Direction = if ($CompareRule.Direction -eq 'Inbound') {'Outbound'} else {'Inbound'}
             It 'should return False' {
                 $Result = Test-RuleHasProperties -FirewallRule $FirewallRule @CompareRule
                 $Result | Should be $False
