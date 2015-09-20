@@ -9,7 +9,6 @@
 ######################################################################################
 function Get-TargetResource
 {
-    [CmdLetBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
@@ -26,6 +25,8 @@ function Get-TargetResource
         [ValidateSet("IPv4", "IPv6")]
         [String]$AddressFamily = "IPv4"
     )
+
+    Write-Verbose -Message "GET: Applying the IP Address..."
 
     $CurrentIPAddress = Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily $AddressFamily
 
@@ -45,7 +46,6 @@ function Get-TargetResource
 ######################################################################################
 function Set-TargetResource
 {
-    [CmdLetBinding()]
     param
     (
         #IP Address that has to be set
@@ -133,7 +133,7 @@ function Set-TargetResource
     catch
     {
         Write-Verbose -Message ( @(
-            "SET: Error setting IPAddress using InterfaceAlias $InterfaceAlias and "
+            "SET: Error setting IP Address using InterfaceAlias $InterfaceAlias and "
             "AddressFamily $AddressFamily"
             ) -join ""
         )
@@ -147,7 +147,6 @@ function Set-TargetResource
 ######################################################################################
 function Test-TargetResource
 {
-    [CmdLetBinding()]
     [OutputType([System.Boolean])]
     param
     (
@@ -239,7 +238,8 @@ function Test-TargetResource
 #######################################################################################
 function Validate-IPAddress {
 # Function will check the IP Address details are valid and do not conflict with
-# Address family. If any problems are detected an exception will be thrown.
+# Address family. Also checks the subnet mask and ensures the interface exists.
+# If any problems are detected an exception will be thrown.
     [CmdLetBinding()]
     param
     (
@@ -254,25 +254,37 @@ function Validate-IPAddress {
         [uInt32]$SubnetMask = 16,
 
         [ValidateSet("IPv4", "IPv6")]
-        [String]$AddressFamily = "IPv4",
-
-        [Switch]$Apply
+        [String]$AddressFamily = "IPv4"
     )
 
+    if ((($AddressFamily -eq "IPv4") -and ($SubnetMask -lt 0) -or ($SubnetMask -gt 32)) -or 
+        (($AddressFamily -eq "IPv6") -and ($SubnetMask -lt 0) -or ($SubnetMask -gt 128))
+        )
+    {
+            throw  ( @(
+                "A Subnet Mask of $SubnetMask is not valid for $AddressFamily addresses. "
+                "Please correct the subnet mask and try again."
+                ) -join ""
+            )
+    }
+    if(-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
+    {
+            throw "Interface $InterfaceAlias is not available. Please select a valid interface and try again"
+    }
     if(-not ([System.Net.Ipaddress]::TryParse($IPAddress, [ref]0)))
     {
-        throw ( @(
-            "IP Address *$IPAddress* is not in the correct format. Please correct the IPAddress "
-            "parameter in the configuration and try again."
-            ) -join ""
-        )
+            throw ( @(
+                "IP Address *$IPAddress* is not in the correct format. Please correct the IPAddress "
+                "parameter in the configuration and try again."
+                ) -join ""
+            )
     }
     if (([System.Net.IPAddress]$IPAddress).AddressFamily.ToString() -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString())
     {
         if ($AddressFamily -ne "IPv4")
         {
             throw ( @(
-                "Server address $IPAddress is in IPv4 format, which does not match server "
+                "Address $IPAddress is in IPv4 format, which does not match server "
                 "address family $AddressFamily. Please correct either of them in the configuration and try again."
                 ) -join ""
             )
@@ -283,7 +295,7 @@ function Validate-IPAddress {
         if ($AddressFamily -ne "IPv6")
         {
             throw ( @(
-                "Server address $IPAddress is in IPv6 format, which does not match server address family $AddressFamily. "
+                "Address $IPAddress is in IPv6 format, which does not match server address family $AddressFamily. "
                 "Please correct either of them in the configuration and try again"
                 ) -join ""
             )

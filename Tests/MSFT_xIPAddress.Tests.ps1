@@ -56,6 +56,8 @@ InModuleScope MSFT_xIPAddress {
     Describe 'Set-TargetResource' {
 
         #region Mocks
+        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+
         Mock Get-NetIPAddress -MockWith {
             [PSCustomObject]@{
                 IPAddress = '192.168.0.1'
@@ -126,6 +128,8 @@ InModuleScope MSFT_xIPAddress {
 
 
         #region Mocks
+        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+
         Mock Get-NetIPAddress -MockWith {
 
             [PSCustomObject]@{
@@ -254,7 +258,33 @@ InModuleScope MSFT_xIPAddress {
 
     Describe 'Validate-IPAddress' {
 
-        Context 'invoking with invalid IPv Address' {
+        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+
+        Context 'invoking with bad interface alias' {
+
+            It 'should throw an error' {
+                $Splat = @{
+                    IPAddress = '192.168.0.1'
+                    InterfaceAlias = 'NotReal'
+                    AddressFamily = 'IPv4'
+                }
+                { Validate-IPAddress @Splat } | Should Throw
+            }
+        }
+
+        Context 'invoking with invalid IP Address' {
+
+            It 'should throw an error' {
+                $Splat = @{
+                    IPAddress = 'NotReal'
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv4'
+                }
+                { Validate-IPAddress @Splat } | Should Throw
+            }
+        }
+
+        Context 'invoking with invalid IP Address' {
 
             It 'should throw an error' {
                 $Splat = @{
@@ -299,6 +329,50 @@ InModuleScope MSFT_xIPAddress {
                     AddressFamily = 'IPv6'
                 }
                 { Validate-IPAddress @Splat } | Should Not Throw
+            }
+        }
+
+        Context 'invoking with invalid IPv4 subnet mask' {
+
+            It 'should throw an error when greater than 32' {
+                $Splat = @{
+                    IPAddress = '192.168.0.1'
+                    InterfaceAlias = 'Ethernet'
+                    SubnetMask = 33
+                    AddressFamily = 'IPv4'
+                }
+                { Validate-IPAddress @Splat } | Should Throw
+            }
+            It 'should throw an error when less than 0' {
+                $Splat = @{
+                    IPAddress = '192.168.0.1'
+                    InterfaceAlias = 'Ethernet'
+                    SubnetMask = -1
+                    AddressFamily = 'IPv4'
+                }
+                { Validate-IPAddress @Splat } | Should Throw
+            }
+        }
+
+        Context 'invoking with invalid IPv6 subnet mask' {
+
+            It 'should throw an error when greater than 128' {
+                $Splat = @{
+                    IPAddress = 'fe80::1'
+                    InterfaceAlias = 'Ethernet'
+                    SubnetMask = 129
+                    AddressFamily = 'IPv6'
+                }
+                { Validate-IPAddress @Splat } | Should Throw
+            }
+            It 'should throw an error when less than 0' {
+                $Splat = @{
+                    IPAddress = 'fe80::1'
+                    InterfaceAlias = 'Ethernet'
+                    SubnetMask = -1
+                    AddressFamily = 'IPv6'
+                }
+                { Validate-IPAddress @Splat } | Should Throw
             }
         }
 
