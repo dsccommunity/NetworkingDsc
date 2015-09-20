@@ -9,6 +9,7 @@
 ######################################################################################
 function Get-TargetResource
 {
+    [CmdLetBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
@@ -26,12 +27,13 @@ function Get-TargetResource
         [String]$AddressFamily = "IPv4"
     )
 
+    $CurrentIPAddress = Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily $AddressFamily
+
     $returnValue = @{
-        IPAddress = [System.String]::Join(", ",(Get-NetIPAddress -InterfaceAlias $InterfaceAlias `
-            -AddressFamily $AddressFamily).IPAddress)
-        SubnetMask = $SubnetMask
-        AddressFamily = $AddressFamily
-        InterfaceAlias=$InterfaceAlias
+        IPAddress      = [System.String]::Join(", ",$CurrentIPAddress.IPAddress)
+        SubnetMask     = [System.String]::Join(", ",$CurrentIPAddress.PrefixLength)
+        AddressFamily  = $AddressFamily
+        InterfaceAlias = $InterfaceAlias
     }
 
     $returnValue
@@ -43,6 +45,7 @@ function Get-TargetResource
 ######################################################################################
 function Set-TargetResource
 {
+    [CmdLetBinding()]
     param
     (
         #IP Address that has to be set
@@ -60,8 +63,83 @@ function Set-TargetResource
         [String]$AddressFamily = "IPv4"
     )
 
-    Test-Properties @PSBoundParameters -Apply
-}
+    try
+    {
+        Validate-IPAddress @PSBoundParameters
+
+        Write-Verbose -Message "SET: Applying the IP Address..."
+
+        # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
+        $DestinationPrefix = "0.0.0.0/0"
+        if($AddressFamily -eq "IPv6")
+        {
+            $DestinationPrefix = "::/0"
+        }
+
+        # Get all the default routes - this has to be done in case the IP Address is
+        # beng Removed
+        $defaultRoutes = @(Get-NetRoute -InterfaceAlias `
+            $InterfaceAlias -AddressFamily `
+            $AddressFamily -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
+
+        # Remove any default routes on the specified interface -- it is important to do
+        # this *before* removing the IP address, particularly in the case where the IP
+        # address was auto-configured by DHCP
+        if($defaultRoutes)
+        {
+            foreach ($defaultRoute in $defaultRoutes) {
+                Remove-NetRoute `
+                    -DestinationPrefix $defaultRoute.DestinationPrefix `
+                    -NextHop $defaultRoute.NextHop `
+                    -InterfaceIndex $defaultRoute.InterfaceIndex `
+                    -AddressFamily $defaultRoute.AddressFamily `
+                    -Confirm:$false -ErrorAction Stop
+            }
+        }
+
+        # Get the current IP Address based on the parameters given.
+        $currentIPs = @(Get-NetIPAddress `
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily `
+            -ErrorAction Stop)
+
+        # Remove any IP addresses on the specified interface
+        if($currentIPs)
+        {
+            foreach ($CurrentIP in $CurrentIPs) {
+                Remove-NetIPAddress `
+                    -IPAddress $CurrentIP.IPAddress `
+                    -InterfaceIndex $CurrentIP.InterfaceIndex `
+                    -AddressFamily $CurrentIP.AddressFamily `
+                    -Confirm:$false -ErrorAction Stop
+            }
+        }
+
+        # Build parameter hash table
+        $Parameters = @{
+            IPAddress = $IPAddress
+            PrefixLength = $SubnetMask
+            InterfaceAlias = $InterfaceAlias
+        }
+
+        # Apply the specified IP configuration
+        $null = New-NetIPAddress @Parameters -ErrorAction Stop
+
+        # Make the connection profile private
+        Get-NetConnectionProfile -InterfaceAlias $InterfaceAlias | `
+            Set-NetConnectionProfile -NetworkCategory Private -ErrorAction SilentlyContinue
+        Write-Verbose -Message "SET: IP Interface was set to the desired state."
+    }
+    catch
+    {
+        Write-Verbose -Message ( @(
+            "SET: Error setting IPAddress using InterfaceAlias $InterfaceAlias and "
+            "AddressFamily $AddressFamily"
+            ) -join ""
+        )
+        throw $_.Exception
+    }
+} # Set-TargetResource
 
 ######################################################################################
 # The Test-TargetResource cmdlet.
@@ -69,6 +147,7 @@ function Set-TargetResource
 ######################################################################################
 function Test-TargetResource
 {
+    [CmdLetBinding()]
     [OutputType([System.Boolean])]
     param
     (
@@ -86,15 +165,82 @@ function Test-TargetResource
         [String]$AddressFamily = "IPv4"
     )
 
-    Test-Properties @PSBoundParameters
-}
+    # Flag to signal whether settings are correct
+    [Boolean]$requiresChanges = $false
+    try
+    {
+        Write-Verbose -Message "TEST: Checking the IP Address ..."
+
+        Validate-IPAddress @PSBoundParameters
+
+        # Get the current IP Address based on the parameters given.
+        $currentIPs = @(Get-NetIPAddress `
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily `
+            -ErrorAction Stop)
+
+        # Test if the IP Address passed is present
+        if(-not $currentIPs.IPAddress.Contains($IPAddress))
+        {
+            Write-Verbose -Message ( @(
+                "TEST: IP Address does NOT match desired state. Expected $IPAddress, "
+                "actual $($currentIPs.IPAddress)."
+                ) -join ""
+            )
+            $requiresChanges = $true
+        }
+        else
+        {
+            Write-Verbose -Message "TEST: IP Address is correct."
+
+            # Filter the IP addresses for the IP address to check
+            $filterIP = $currentIPs.Where( { $_.IPAddress -eq $IPAddress } )
+
+            # Only test the Subnet Mask if the IP address is present
+            if(-not $filterIP.PrefixLength.Equals([byte]$SubnetMask))
+            {
+                Write-Verbose -Message ( @(
+                    "TEST: Subnet mask does NOT match desired state. Expected $SubnetMask, "
+                    "actual $($filterIP.PrefixLength)."
+                    ) -join ""
+                )
+                $requiresChanges = $true
+            }
+            else
+            {
+                Write-Verbose -Message "TEST: Subnet mask is correct."
+            }
+        }
+
+        # Test if DHCP is already disabled
+        if(-not (Get-NetIPInterface -InterfaceAlias $InterfaceAlias -AddressFamily `
+            $AddressFamily).Dhcp.ToString().Equals('Disabled'))
+        {
+            Write-Verbose -Message "TEST: DHCP is NOT disabled."
+            $requiresChanges = $true
+        }
+        else
+        {
+            Write-Verbose -Message "TEST: DHCP is already disabled."
+        }
+    } catch {
+        Write-Verbose -Message ( @(
+            "TEST: Error testing valid IPAddress using InterfaceAlias $InterfaceAlias "
+            "and AddressFamily $AddressFamily"
+            ) -join ""
+        )
+        throw $_.Exception
+    }
+    return -not $requiresChanges
+} # Test-TargetResource
 
 #######################################################################################
-#  Helper function that validates the IP Address properties. If the switch parameter
-# "Apply" is set, then it will set the properties after a test
+#  Helper functions
 #######################################################################################
-function Test-Properties
-{
+function Validate-IPAddress {
+# Function will check the IP Address details are valid and do not conflict with
+# Address family. If any problems are detected an exception will be thrown.
+    [CmdLetBinding()]
     param
     (
         [Parameter(Mandatory)]
@@ -125,162 +271,26 @@ function Test-Properties
     {
         if ($AddressFamily -ne "IPv4")
         {
-            throw "Server address $IPAddress is in IPv4 format, which does not match server address family $AddressFamily. Please correct either of them in the configuration and try again"
+            throw ( @(
+                "Server address $IPAddress is in IPv4 format, which does not match server "
+                "address family $AddressFamily. Please correct either of them in the configuration and try again."
+                ) -join ""
+            )
         }
     }
     else
     {
         if ($AddressFamily -ne "IPv6")
         {
-            throw "Server address $IPAddress is in IPv6 format, which does not match server address family $AddressFamily. Please correct either of them in the configuration and try again"
-        }
-    }
-
-    try
-    {
-        # Flag to signal whether settings are correct
-        $requiresChanges = $false
-
-        Write-Verbose -Message "Checking the IPAddress ..."
-        # Get the current IP Address based on the parameters given.
-        $currentIPs = @(Get-NetIPAddress `
-            -InterfaceAlias $InterfaceAlias `
-            -AddressFamily $AddressFamily `
-            -ErrorAction Stop)
-
-        # Test if the IP Address passed is present
-        if(-not $currentIPs.IPAddress.Contains($IPAddress))
-        {
-            Write-Verbose -Message ( @(
-                "IPAddress does NOT match desired state. Expected $IPAddress, actual "
-                "$($currentIPs.IPAddress)."
+            throw ( @(
+                "Server address $IPAddress is in IPv6 format, which does not match server address family $AddressFamily. "
+                "Please correct either of them in the configuration and try again"
                 ) -join ""
             )
-            $requiresChanges = $true
-        }
-        else
-        {
-            Write-Verbose -Message "IPAddress is correct."
-
-            # Filter the IP addresses for the IP address to check
-            $filterIP = $currentIPs.Where( { $_.IPAddress -eq $IPAddress } )
-
-            # Only test the Subnet Mask if the IP address is present
-            if(-not $filterIP.PrefixLength.Equals([byte]$SubnetMask))
-            {
-                Write-Verbose -Message ( @(
-                    "Subnet mask does NOT match desired state. Expected $SubnetMask, actual "
-                    "$($filterIP.PrefixLength)."
-                    ) -join ""
-                )
-                $requiresChanges = $true
-            }
-            else
-            {
-                Write-Verbose -Message "Subnet mask is correct."
-            }
-        }
-
-        # Test if DHCP is already disabled
-        if(-not (Get-NetIPInterface -InterfaceAlias $InterfaceAlias -AddressFamily `
-            $AddressFamily).Dhcp.ToString().Equals('Disabled'))
-        {
-            Write-Verbose -Message "DHCP is NOT disabled."
-            $requiresChanges = $true
-        }
-        else
-        {
-            Write-Verbose -Message "DHCP is already disabled."
-        }
-
-        if($requiresChanges)
-        {
-            # Apply is true in the case of set - target resource - in which case, it will apply the
-            # required IP configuration
-            if($Apply)
-            {
-                Write-Verbose -Message ( @(
-                    "At least one setting differs from the passed parameters. Applying "
-                    "configuration..."
-                    ) -join ""
-                )
-
-                # Build parameter hash table
-                $Parameters = @{
-                    IPAddress = $IPAddress
-                    PrefixLength = $SubnetMask
-                    InterfaceAlias = $InterfaceAlias
-                }
-
-                # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
-                $DestinationPrefix = "0.0.0.0/0"
-                if($AddressFamily -eq "IPv6")
-                {
-                    $DestinationPrefix = "::/0"
-                }
-
-                # Get all the default routes - this has to be done in case the IP Address is
-                # beng Removed
-                $defaultRoutes = @(Get-NetRoute -InterfaceAlias `
-                    $InterfaceAlias -AddressFamily `
-                    $AddressFamily -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
-
-                # Remove any default routes on the specified interface -- it is important to do
-                # this *before* removing the IP address, particularly in the case where the IP
-                # address was auto-configured by DHCP
-                if($defaultRoutes)
-                {
-                    foreach ($defaultRoute in $defaultRoutes) {
-                        Remove-NetRoute `
-                            -DestinationPrefix $defaultRoute.DestinationPrefix `
-                            -NextHop $defaultRoute.NextHop `
-                            -InterfaceIndex $defaultRoute.InterfaceIndex `
-                            -AddressFamily $defaultRoute.AddressFamily `
-                            -Confirm:$false -ErrorAction Stop
-                    }
-                }
-
-                # Remove any IP addresses on the specified interface
-                if($currentIPs)
-                {
-                    foreach ($CurrentIP in $CurrentIPs) {
-                        Remove-NetIPAddress `
-                            -IPAddress $CurrentIP.IPAddress `
-                            -InterfaceIndex $CurrentIP.InterfaceIndex `
-                            -AddressFamily $CurrentIP.AddressFamily `
-                            -Confirm:$false -ErrorAction Stop
-                    }
-                }
-
-                # Apply the specified IP configuration
-                $null = New-NetIPAddress @Parameters -ErrorAction Stop
-
-                # Make the connection profile private
-                Get-NetConnectionProfile -InterfaceAlias $InterfaceAlias | `
-                    Set-NetConnectionProfile -NetworkCategory Private -ErrorAction SilentlyContinue
-                Write-Verbose -Message "IP Interface was set to the desired state."
-            }
-            else
-            {
-                return $false
-            }
-        }
-        else
-        {
-            Write-Verbose -Message "IP interface is in the desired state."
-            return $true
         }
     }
-    catch
-    {
-        Write-Verbose -Message ( @(
-            "Can not set or find valid IPAddress using InterfaceAlias $InterfaceAlias and "
-            "AddressFamily $AddressFamily"
-            ) -join ""
-        )
-        throw $_.Exception
-    }
-}
+} # Validate-IPAddress
+#######################################################################################
 
 #  FUNCTIONS TO BE EXPORTED
 Export-ModuleMember -function Get-TargetResource, Set-TargetResource, Test-TargetResource
