@@ -284,8 +284,8 @@ function Validate-IPAddress {
         if ($AddressFamily -ne "IPv4")
         {
             throw ( @(
-                "Address $IPAddress is in IPv4 format, which does not match server "
-                "address family $AddressFamily. Please correct either of them in the configuration and try again."
+                "Address $IPAddress is in IPv4 format, which does not match server address family $AddressFamily. "
+                "Please correct either of them in the configuration and try again."
                 ) -join ""
             )
         }

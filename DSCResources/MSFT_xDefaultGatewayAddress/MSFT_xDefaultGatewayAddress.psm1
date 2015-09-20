@@ -248,7 +248,7 @@ function Validate-DefaultGatewayAddress {
 
     if(-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
-            throw "Interface $InterfaceAlias is not available. Please select a valid interface and try again"
+                throw "Interface $InterfaceAlias is not available. Please select a valid interface and try again"
     }
     if ($Address)
     {
@@ -265,8 +265,8 @@ function Validate-DefaultGatewayAddress {
             if ($AddressFamily -ne "IPv4")
             {
                 throw ( @(
-                    "Address $Address is in IPv4 format, which does not match server "
-                    "address family $AddressFamily. Please correct either of them in the configuration and try again."
+                    "Address $Address is in IPv4 format, which does not match server address family $AddressFamily. "
+                    "Please correct either of them in the configuration and try again."
                     ) -join ""
                 )
             }
