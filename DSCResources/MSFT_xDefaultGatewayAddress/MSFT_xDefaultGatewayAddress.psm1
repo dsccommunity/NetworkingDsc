@@ -76,7 +76,7 @@ function Set-TargetResource
     
     try
     {        
-        Validate-DefaultGatewayAddress @PSBoundParameters
+        Validate-ResourceProperty @PSBoundParameters
         
         Write-Verbose -Message "SET: Applying the Default Gateway Address ..."
 
@@ -161,7 +161,7 @@ function Test-TargetResource
     {        
         Write-Verbose -Message "TEST: Checking the Default Gateway Address ..."
 
-        Validate-DefaultGatewayAddress @PSBoundParameters
+        Validate-ResourceProperty @PSBoundParameters
 
         # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
         $DestinationPrefix = "0.0.0.0/0"
@@ -229,7 +229,7 @@ function Test-TargetResource
 #######################################################################################
 #  Helper functions
 #######################################################################################
-function Validate-DefaultGatewayAddress {
+function Validate-ResourceProperty {
 # Function will check the Address details are valid and do not conflict with
 # Address family. Ensures interface exists.
 # If any problems are detected an exception will be thrown.
@@ -283,7 +283,7 @@ function Validate-DefaultGatewayAddress {
             }
         }
     }
-} # Validate-DefaultGatewayAddress
+} # Validate-ResourceProperty
 #######################################################################################
 
 #  FUNCTIONS TO BE EXPORTED 

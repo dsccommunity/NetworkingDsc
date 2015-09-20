@@ -66,7 +66,7 @@ function Set-TargetResource
 
         #Validate the Settings passed
         Foreach ($ServerAddress in $Address) {       
-            Validate-DNSServerAddress -Address $ServerAddress -AddressFamily $AddressFamily -InterfaceAlias $InterfaceAlias
+            Validate-ResourceProperty -Address $ServerAddress -AddressFamily $AddressFamily -InterfaceAlias $InterfaceAlias
         }
 
         #Get the current DNS Server Addresses based on the parameters given.
@@ -126,7 +126,7 @@ function Test-TargetResource
 
         #Validate the Settings passed
         Foreach ($ServerAddress in $Address) {       
-            Validate-DNSServerAddress -Address $ServerAddress -AddressFamily $AddressFamily -InterfaceAlias $InterfaceAlias
+            Validate-ResourceProperty -Address $ServerAddress -AddressFamily $AddressFamily -InterfaceAlias $InterfaceAlias
         }
 
         #Get the current DNS Server Addresses based on the parameters given.
@@ -159,7 +159,7 @@ function Test-TargetResource
 #######################################################################################
 #  Helper functions
 #######################################################################################
-function Validate-DNSServerAddress {
+function Validate-ResourceProperty {
 # Function will check the Address details are valid and do not conflict with
 # Address family. Ensures interface exists.
 # If any problems are detected an exception will be thrown.
@@ -212,7 +212,7 @@ function Validate-DNSServerAddress {
             }
         }
     }
-} # Validate-DNSServerAddress
+} # Validate-ResourceProperty
 #######################################################################################
 
 #  FUNCTIONS TO BE EXPORTED 

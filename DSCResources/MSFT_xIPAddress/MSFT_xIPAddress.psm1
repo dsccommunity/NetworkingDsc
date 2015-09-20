@@ -65,7 +65,7 @@ function Set-TargetResource
 
     try
     {
-        Validate-IPAddress @PSBoundParameters
+        Validate-ResourceProperty @PSBoundParameters
 
         Write-Verbose -Message "SET: Applying the IP Address..."
 
@@ -170,7 +170,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message "TEST: Checking the IP Address ..."
 
-        Validate-IPAddress @PSBoundParameters
+        Validate-ResourceProperty @PSBoundParameters
 
         # Get the current IP Address based on the parameters given.
         $currentIPs = @(Get-NetIPAddress `
@@ -236,7 +236,7 @@ function Test-TargetResource
 #######################################################################################
 #  Helper functions
 #######################################################################################
-function Validate-IPAddress {
+function Validate-ResourceProperty {
 # Function will check the IP Address details are valid and do not conflict with
 # Address family. Also checks the subnet mask and ensures the interface exists.
 # If any problems are detected an exception will be thrown.
@@ -301,7 +301,7 @@ function Validate-IPAddress {
             )
         }
     }
-} # Validate-IPAddress
+} # Validate-ResourceProperty
 #######################################################################################
 
 #  FUNCTIONS TO BE EXPORTED

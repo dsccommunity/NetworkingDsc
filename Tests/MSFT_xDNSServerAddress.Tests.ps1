@@ -164,7 +164,7 @@ InModuleScope MSFT_xDNSServerAddress {
 
 #######################################################################################
 
-    Describe 'Validate-DNSServerAddress' {
+    Describe 'Validate-ResourceProperty' {
 
         Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
 
@@ -176,7 +176,7 @@ InModuleScope MSFT_xDNSServerAddress {
                     InterfaceAlias = 'NotReal'
                     AddressFamily = 'IPv4'
                 }
-                { Validate-DNSServerAddress @Splat } | Should Throw
+                { Validate-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -188,7 +188,7 @@ InModuleScope MSFT_xDNSServerAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                { Validate-DNSServerAddress @Splat } | Should Throw
+                { Validate-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -200,7 +200,7 @@ InModuleScope MSFT_xDNSServerAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                { Validate-DNSServerAddress @Splat } | Should Throw
+                { Validate-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -212,7 +212,7 @@ InModuleScope MSFT_xDNSServerAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv6'
                 }
-                { Validate-DNSServerAddress @Splat } | Should Throw
+                { Validate-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -224,7 +224,7 @@ InModuleScope MSFT_xDNSServerAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                { Validate-DNSServerAddress @Splat } | Should Not Throw
+                { Validate-ResourceProperty @Splat } | Should Not Throw
             }
         }
 
@@ -236,7 +236,7 @@ InModuleScope MSFT_xDNSServerAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv6'
                 }
-                { Validate-DNSServerAddress @Splat } | Should Not Throw
+                { Validate-ResourceProperty @Splat } | Should Not Throw
             }
         }
     }
