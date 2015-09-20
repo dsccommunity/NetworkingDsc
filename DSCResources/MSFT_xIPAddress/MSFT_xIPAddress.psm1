@@ -258,8 +258,8 @@ function Validate-ResourceProperty {
     )
 
     if (
-        (($AddressFamily -eq "IPv4") -and (([int]$SubnetMask -lt 0) -or ([int]$SubnetMask -gt 32))) -or 
-        (($AddressFamily -eq "IPv6") -and (([int]$SubnetMask -lt 0) -or ([int]$SubnetMask -gt 128)))
+        (($AddressFamily -eq "IPv4") -and (($SubnetMask -lt [uint32]0) -or ($SubnetMask -gt [uint32]32))) -or 
+        (($AddressFamily -eq "IPv6") -and (($SubnetMask -lt [uint32]0) -or ($SubnetMask -gt [uint32]128)))
         )
     {
             throw  ( @(
