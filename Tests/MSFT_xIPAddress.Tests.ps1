@@ -376,6 +376,18 @@ InModuleScope MSFT_xIPAddress {
             }
         }
 
+        Context 'invoking with valid string IPv6 subnet mask' {
+
+            It 'should not throw an error' {
+                $Splat = @{
+                    IPAddress = 'fe80::1'
+                    InterfaceAlias = 'Ethernet'
+                    SubnetMask = '64'
+                    AddressFamily = 'IPv6'
+                }
+                { Validate-ResourceProperty @Splat } | Should Not Throw
+            }
+        }
     }
 }
 
