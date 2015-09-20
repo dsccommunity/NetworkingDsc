@@ -68,9 +68,7 @@ function Set-TargetResource
 
         [Parameter(Mandatory)]
         [ValidateSet("IPv4", "IPv6")]
-        [String]$AddressFamily,
-
-        [Switch]$Apply
+        [String]$AddressFamily
     )
     # Validate the parameters
     
@@ -150,9 +148,7 @@ function Test-TargetResource
 
         [Parameter(Mandatory)]
         [ValidateSet("IPv4", "IPv6")]
-        [String]$AddressFamily,
-
-        [Switch]$Apply
+        [String]$AddressFamily
     )
     # Flag to signal whether settings are correct
     [Boolean]$requiresChanges = $false
