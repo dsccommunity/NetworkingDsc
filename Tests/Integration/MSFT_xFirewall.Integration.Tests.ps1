@@ -53,3 +53,4 @@ if ($tempLocation)
     Copy-Item -Path $tempLocation -Destination "${env:ProgramFiles}\WindowsPowerShell\Modules" -Recurse -Force
     Remove-Item -Path $tempLocation -Recurse -Force
 }
+
