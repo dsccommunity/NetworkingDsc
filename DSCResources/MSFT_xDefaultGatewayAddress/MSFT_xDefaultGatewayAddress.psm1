@@ -21,17 +21,17 @@ function Get-TargetResource
         [String]$InterfaceAlias,
 
         [Parameter(Mandatory)]
-        [ValidateSet("IPv4", "IPv6")]
+        [ValidateSet('IPv4', 'IPv6')]
         [String]$AddressFamily
     )
     
-    Write-Verbose -Message "GET: Getting the Default Gateway Address ..."
+    Write-Verbose -Message "$($($MyInvocation.MyCommand)): Getting the Default Gateway Address ..."
     
     # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
-    $DestinationPrefix = "0.0.0.0/0"
-    if($AddressFamily -eq "IPv6")
+    $DestinationPrefix = '0.0.0.0/0'
+    if($AddressFamily -eq 'IPv6')
     {
-        $DestinationPrefix = "::/0"
+        $DestinationPrefix = '::/0'
     }
     # Get all the default routes
     $defaultRoutes = Get-NetRoute -InterfaceAlias $InterfaceAlias -AddressFamily `
@@ -67,22 +67,22 @@ function Set-TargetResource
         [String]$InterfaceAlias,
 
         [Parameter(Mandatory)]
-        [ValidateSet("IPv4", "IPv6")]
+        [ValidateSet('IPv4', 'IPv6')]
         [String]$AddressFamily
     )
     # Validate the parameters
     
     try
     {        
-        Validate-ResourceProperty @PSBoundParameters
+        Test-ResourceProperty @PSBoundParameters
         
-        Write-Verbose -Message "SET: Applying the Default Gateway Address ..."
+        Write-Verbose -Message "$($($MyInvocation.MyCommand)): Applying the Default Gateway Address ..."
 
         # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
-        $DestinationPrefix = "0.0.0.0/0"
-        if($AddressFamily -eq "IPv6")
+        $DestinationPrefix = '0.0.0.0/0'
+        if($AddressFamily -eq 'IPv6')
         {
-            $DestinationPrefix = "::/0"
+            $DestinationPrefix = '::/0'
         }
 
         # Get all the default routes
@@ -112,19 +112,19 @@ function Set-TargetResource
                 NextHop = $Address
             }
             New-NetRoute @Parameters
-            Write-Verbose -Message "SET: Default Gateway address was set to the desired state."
+            Write-Verbose -Message "$($($MyInvocation.MyCommand)): Default Gateway address was set to the desired state."
         }
         else
         {
-            Write-Verbose -Message "SET: Default Gateway address has been removed."
+            Write-Verbose -Message "$($($MyInvocation.MyCommand)): Default Gateway address has been removed."
         }
     }
     catch
     {
         Write-Verbose -Message ( @(
-            "SET: Error setting valid Default Gateway address using InterfaceAlias $InterfaceAlias and "
+            "$($($MyInvocation.MyCommand)): Error setting valid Default Gateway address using InterfaceAlias $InterfaceAlias and "
             "AddressFamily $AddressFamily"
-            ) -join ""
+            ) -join ''
         )
         throw $_.Exception
     }
@@ -147,7 +147,7 @@ function Test-TargetResource
         [String]$InterfaceAlias,
 
         [Parameter(Mandatory)]
-        [ValidateSet("IPv4", "IPv6")]
+        [ValidateSet('IPv4', 'IPv6')]
         [String]$AddressFamily
     )
     # Flag to signal whether settings are correct
@@ -155,15 +155,15 @@ function Test-TargetResource
 
     try
     {        
-        Write-Verbose -Message "TEST: Checking the Default Gateway Address ..."
+        Write-Verbose -Message "$($($MyInvocation.MyCommand)): Checking the Default Gateway Address ..."
 
-        Validate-ResourceProperty @PSBoundParameters
+        Test-ResourceProperty @PSBoundParameters
 
         # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
-        $DestinationPrefix = "0.0.0.0/0"
-        if($AddressFamily -eq "IPv6")
+        $DestinationPrefix = '0.0.0.0/0'
+        if($AddressFamily -eq 'IPv6')
         {
-            $DestinationPrefix = "::/0"
+            $DestinationPrefix = '::/0'
         }
         # Get all the default routes
         $defaultRoutes = @(Get-NetRoute `
@@ -178,20 +178,20 @@ function Test-TargetResource
                 if(-not $defaultRoutes.Where( { $_.NextHop -eq $Address } ))
                 {
                     Write-Verbose -Message ( @(
-                        "TEST: Default gateway does NOT match desired state. Expected $Address, "
+                        "$($($MyInvocation.MyCommand)): Default gateway does NOT match desired state. Expected $Address, "
                         "actual $($defaultRoutes.NextHop)."
-                        ) -join ""
+                        ) -join ''
                     )
                     $requiresChanges = $true
                 }
                 else
                 {
-                    Write-Verbose -Message "TEST: Default gateway is correct."
+                    Write-Verbose -Message "$($($MyInvocation.MyCommand)): Default gateway is correct."
                 }
             }
             else
             {
-                Write-Verbose -Message "TEST: Default gateway does not exist. Expected $Address ."
+                Write-Verbose -Message "$($($MyInvocation.MyCommand)): Default gateway does not exist. Expected $Address ."
                 $requiresChanges = $true
             }
         }
@@ -200,21 +200,21 @@ function Test-TargetResource
             # Is a default gateway address set?
             if ($defaultRoutes)
             {
-                Write-Verbose -Message "TEST: Default gateway exists but it should not."
+                Write-Verbose -Message "$($($MyInvocation.MyCommand)): Default gateway exists but it should not."
                 $requiresChanges = $true
             }
             else
             {
-                Write-Verbose -Message "TEST: Default Gateway does not exist which is correct."
+                Write-Verbose -Message "$($($MyInvocation.MyCommand)): Default Gateway does not exist which is correct."
             }
         }
     }
     catch
     {
         Write-Verbose -Message ( @(
-            "TEST: Error testing valid Default Gateway address using InterfaceAlias $InterfaceAlias and "
+            "$($($MyInvocation.MyCommand)): Error testing valid Default Gateway address using InterfaceAlias $InterfaceAlias and "
             "AddressFamily $AddressFamily"
-            ) -join ""
+            ) -join ''
         )
         throw $_.Exception
     }
@@ -225,7 +225,7 @@ function Test-TargetResource
 #######################################################################################
 #  Helper functions
 #######################################################################################
-function Validate-ResourceProperty {
+function Test-ResourceProperty {
 # Function will check the Address details are valid and do not conflict with
 # Address family. Ensures interface exists.
 # If any problems are detected an exception will be thrown.
@@ -238,8 +238,8 @@ function Validate-ResourceProperty {
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
-        [ValidateSet("IPv4", "IPv6")]
-        [String]$AddressFamily = "IPv4"
+        [ValidateSet('IPv4', 'IPv6')]
+        [String]$AddressFamily = 'IPv4'
     )
 
     if(-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
@@ -252,34 +252,34 @@ function Validate-ResourceProperty {
         {
                 throw ( @(
                     "Address *$Address* is not in the correct format. Please correct the Address "
-                    "parameter in the configuration and try again."
-                    ) -join ""
+                    'parameter in the configuration and try again.'
+                    ) -join ''
                 )
         }
         if (([System.Net.IPAddress]$Address).AddressFamily.ToString() -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString())
         {
-            if ($AddressFamily -ne "IPv4")
+            if ($AddressFamily -ne 'IPv4')
             {
                 throw ( @(
                     "Address $Address is in IPv4 format, which does not match server address family $AddressFamily. "
-                    "Please correct either of them in the configuration and try again."
-                    ) -join ""
+                    'Please correct either of them in the configuration and try again.'
+                    ) -join ''
                 )
             }
         }
         else
         {
-            if ($AddressFamily -ne "IPv6")
+            if ($AddressFamily -ne 'IPv6')
             {
                 throw ( @(
                     "Address $Address is in IPv6 format, which does not match server address family $AddressFamily. "
-                    "Please correct either of them in the configuration and try again"
-                    ) -join ""
+                    'Please correct either of them in the configuration and try again'
+                    ) -join ''
                 )
             }
         }
     }
-} # Validate-ResourceProperty
+} # Test-ResourceProperty
 #######################################################################################
 
 #  FUNCTIONS TO BE EXPORTED 

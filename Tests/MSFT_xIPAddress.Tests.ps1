@@ -46,7 +46,7 @@ InModuleScope MSFT_xIPAddress {
                     Subnet = -16
                 }
 
-                { Get-TargetResource @Splat } | Should Throw "Value was either too large or too small for a UInt32."
+                { Get-TargetResource @Splat } | Should Throw 'Value was either too large or too small for a UInt32.'
             }
         }
     }
@@ -256,7 +256,7 @@ InModuleScope MSFT_xIPAddress {
 
 #######################################################################################
 
-    Describe 'Validate-ResourceProperty' {
+    Describe 'Test-ResourceProperty' {
 
         Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
 
@@ -268,7 +268,7 @@ InModuleScope MSFT_xIPAddress {
                     InterfaceAlias = 'NotReal'
                     AddressFamily = 'IPv4'
                 }
-                { Validate-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -280,7 +280,7 @@ InModuleScope MSFT_xIPAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                { Validate-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -292,7 +292,7 @@ InModuleScope MSFT_xIPAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                { Validate-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -304,7 +304,7 @@ InModuleScope MSFT_xIPAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv6'
                 }
-                { Validate-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -316,7 +316,7 @@ InModuleScope MSFT_xIPAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                { Validate-ResourceProperty @Splat } | Should Not Throw
+                { Test-ResourceProperty @Splat } | Should Not Throw
             }
         }
 
@@ -328,7 +328,7 @@ InModuleScope MSFT_xIPAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv6'
                 }
-                { Validate-ResourceProperty @Splat } | Should Not Throw
+                { Test-ResourceProperty @Splat } | Should Not Throw
             }
         }
 
@@ -341,7 +341,7 @@ InModuleScope MSFT_xIPAddress {
                     SubnetMask = 33
                     AddressFamily = 'IPv4'
                 }
-                { Validate-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } | Should Throw
             }
             It 'should throw an error when less than 0' {
                 $Splat = @{
@@ -350,7 +350,7 @@ InModuleScope MSFT_xIPAddress {
                     SubnetMask = -1
                     AddressFamily = 'IPv4'
                 }
-                { Validate-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -363,7 +363,7 @@ InModuleScope MSFT_xIPAddress {
                     SubnetMask = 129
                     AddressFamily = 'IPv6'
                 }
-                { Validate-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } | Should Throw
             }
             It 'should throw an error when less than 0' {
                 $Splat = @{
@@ -372,7 +372,7 @@ InModuleScope MSFT_xIPAddress {
                     SubnetMask = -1
                     AddressFamily = 'IPv6'
                 }
-                { Validate-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -385,7 +385,7 @@ InModuleScope MSFT_xIPAddress {
                     SubnetMask = '64'
                     AddressFamily = 'IPv6'
                 }
-                { Validate-ResourceProperty @Splat } | Should Not Throw
+                { Test-ResourceProperty @Splat } | Should Not Throw
             }
         }
     }

@@ -23,11 +23,11 @@ function Get-TargetResource
         [String]$InterfaceAlias,
 
         [Parameter(Mandatory)]
-        [ValidateSet("IPv4", "IPv6")]
+        [ValidateSet('IPv4', 'IPv6')]
         [String]$AddressFamily
     )
     
-    Write-Verbose -Message "GET: Getting the DNS Server Addresses ..."
+    Write-Verbose -Message "$($($MyInvocation.MyCommand)): Getting the DNS Server Addresses ..."
 
     $returnValue = @{
         Address = (Get-DnsClientServerAddress -InterfaceAlias $InterfaceAlias -AddressFamily $AddressFamily).ServerAddresses
@@ -56,17 +56,17 @@ function Set-TargetResource
         [String]$InterfaceAlias,
 
         [Parameter(Mandatory)]
-        [ValidateSet("IPv4", "IPv6")]
+        [ValidateSet('IPv4', 'IPv6')]
         [String]$AddressFamily
     )
 
     try
     {        
-        Write-Verbose -Message "SET: Applying the DNS Server Address ..."
+        Write-Verbose -Message "$($($MyInvocation.MyCommand)): Applying the DNS Server Address ..."
 
         #Validate the Settings passed
         Foreach ($ServerAddress in $Address) {       
-            Validate-ResourceProperty -Address $ServerAddress -AddressFamily $AddressFamily -InterfaceAlias $InterfaceAlias
+            Test-ResourceProperty -Address $ServerAddress -AddressFamily $AddressFamily -InterfaceAlias $InterfaceAlias
         }
 
         #Get the current DNS Server Addresses based on the parameters given.
@@ -77,20 +77,20 @@ function Set-TargetResource
         {
             # Set the DNS settings as well
             Set-DnsClientServerAddress -InterfaceAlias $InterfaceAlias -ServerAddresses $Address
-            Write-Verbose -Message "SET: DNS Servers have been set correctly."
+            Write-Verbose -Message "$($($MyInvocation.MyCommand)): DNS Servers have been set correctly."
         }
         else 
         { 
             #Test will return true in this case
-            Write-Verbose -Message "SET: DNS Servers are already set correctly."
+            Write-Verbose -Message "$($($MyInvocation.MyCommand)): DNS Servers are already set correctly."
         }
     }
     catch
     {
         Write-Verbose -Message ( @(
-            "SET: Error setting valid DNS Server addresses using InterfaceAlias $InterfaceAlias and "
+            "$($($MyInvocation.MyCommand)): Error setting valid DNS Server addresses using InterfaceAlias $InterfaceAlias and "
             "AddressFamily $AddressFamily"
-            ) -join ""
+            ) -join ''
         )
         throw $_.Exception
     }
@@ -114,7 +114,7 @@ function Test-TargetResource
         [String]$InterfaceAlias,
 
         [Parameter(Mandatory)]
-        [ValidateSet("IPv4", "IPv6")]
+        [ValidateSet('IPv4', 'IPv6')]
         [String]$AddressFamily
     )
     # Flag to signal whether settings are correct
@@ -122,11 +122,11 @@ function Test-TargetResource
 
     try
     {        
-        Write-Verbose -Message "TEST: Checking the DNS Server Address ..."
+        Write-Verbose -Message "$($($MyInvocation.MyCommand)): Checking the DNS Server Address ..."
 
         #Validate the Settings passed
         Foreach ($ServerAddress in $Address) {       
-            Validate-ResourceProperty -Address $ServerAddress -AddressFamily $AddressFamily -InterfaceAlias $InterfaceAlias
+            Test-ResourceProperty -Address $ServerAddress -AddressFamily $AddressFamily -InterfaceAlias $InterfaceAlias
         }
 
         #Get the current DNS Server Addresses based on the parameters given.
@@ -136,20 +136,20 @@ function Test-TargetResource
         if(@(Compare-Object -ReferenceObject $currentAddress -DifferenceObject $Address -SyncWindow 0).Length -gt 0)
         {
             $requiresChanges = $true
-            Write-Verbose -Message "TEST: DNS Servers are not correct. Expected $Address, actual $currentAddress"
+            Write-Verbose -Message "$($($MyInvocation.MyCommand)): DNS Servers are not correct. Expected $Address, actual $currentAddress"
         }
         else 
         { 
             #Test will return true in this case
-            Write-Verbose -Message "TEST: DNS Servers are set correctly."
+            Write-Verbose -Message "$($($MyInvocation.MyCommand)): DNS Servers are set correctly."
         }
     }
     catch
     {
         Write-Verbose -Message ( @(
-            "TEST: Error testing valid DNS Server addresses using InterfaceAlias $InterfaceAlias and "
+            "$($($MyInvocation.MyCommand)): Error testing valid DNS Server addresses using InterfaceAlias $InterfaceAlias and "
             "AddressFamily $AddressFamily"
-            ) -join ""
+            ) -join ''
         )
         throw $_.Exception
     }
@@ -159,7 +159,7 @@ function Test-TargetResource
 #######################################################################################
 #  Helper functions
 #######################################################################################
-function Validate-ResourceProperty {
+function Test-ResourceProperty {
 # Function will check the Address details are valid and do not conflict with
 # Address family. Ensures interface exists.
 # If any problems are detected an exception will be thrown.
@@ -172,8 +172,8 @@ function Validate-ResourceProperty {
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
-        [ValidateSet("IPv4", "IPv6")]
-        [String]$AddressFamily = "IPv4"
+        [ValidateSet('IPv4', 'IPv6')]
+        [String]$AddressFamily = 'IPv4'
     )
     if(-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
@@ -185,34 +185,34 @@ function Validate-ResourceProperty {
         {
                 throw ( @(
                     "Address *$Address* is not in the correct format. Please correct the Address "
-                    "parameter in the configuration and try again."
-                    ) -join ""
+                    'parameter in the configuration and try again.'
+                    ) -join ''
                 )
         }
         if (([System.Net.IPAddress]$Address).AddressFamily.ToString() -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString())
         {
-            if ($AddressFamily -ne "IPv4")
+            if ($AddressFamily -ne 'IPv4')
             {
                 throw ( @(
                     "Address $Address is in IPv4 format, which does not match server address family $AddressFamily. "
-                    "Please correct either of them in the configuration and try again."
-                    ) -join ""
+                    'Please correct either of them in the configuration and try again.'
+                    ) -join ''
                 )
             }
         }
         else
         {
-            if ($AddressFamily -ne "IPv6")
+            if ($AddressFamily -ne 'IPv6')
             {
                 throw ( @(
                     "Address $Address is in IPv6 format, which does not match server address family $AddressFamily. "
-                    "Please correct either of them in the configuration and try again"
-                    ) -join ""
+                    'Please correct either of them in the configuration and try again'
+                    ) -join ''
                 )
             }
         }
     }
-} # Validate-ResourceProperty
+} # Test-ResourceProperty
 #######################################################################################
 
 #  FUNCTIONS TO BE EXPORTED 

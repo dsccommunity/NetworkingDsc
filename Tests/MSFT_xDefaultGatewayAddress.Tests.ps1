@@ -185,7 +185,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
 
 #######################################################################################
 
-    Describe 'Validate-ResourceProperty' {
+    Describe 'Test-ResourceProperty' {
 
         Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
 
@@ -197,7 +197,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'NotReal'
                     AddressFamily = 'IPv4'
                 }
-                { Validate-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -209,7 +209,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                { Validate-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -221,7 +221,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                { Validate-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -233,7 +233,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv6'
                 }
-                { Validate-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } | Should Throw
             }
         }
 
@@ -245,7 +245,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                { Validate-ResourceProperty @Splat } | Should Not Throw
+                { Test-ResourceProperty @Splat } | Should Not Throw
             }
         }
 
@@ -257,7 +257,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv6'
                 }
-                { Validate-ResourceProperty @Splat } | Should Not Throw
+                { Test-ResourceProperty @Splat } | Should Not Throw
             }
         }
     }
