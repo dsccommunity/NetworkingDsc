@@ -9,7 +9,7 @@ Import-Module -Name $PSScriptRoot\..\DSCResources\MSFT_xIPAddress -Force -Disabl
 
 InModuleScope MSFT_xIPAddress {
 
-#######################################################################################
+    #######################################################################################
 
     Describe 'Get-TargetResource' {
 
@@ -46,12 +46,13 @@ InModuleScope MSFT_xIPAddress {
                     Subnet = -16
                 }
 
-                { Get-TargetResource @Splat } | Should Throw 'Value was either too large or too small for a UInt32.'
+                { Get-TargetResource @Splat } `
+                    | Should Throw 'Value was either too large or too small for a UInt32.'
             }
         }
     }
 
-#######################################################################################
+    #######################################################################################
 
     Describe 'Set-TargetResource' {
 
@@ -122,7 +123,7 @@ InModuleScope MSFT_xIPAddress {
         }
     }
 
-#######################################################################################
+    #######################################################################################
 
     Describe 'Test-TargetResource' {
 
@@ -254,7 +255,7 @@ InModuleScope MSFT_xIPAddress {
         }
     }
 
-#######################################################################################
+    #######################################################################################
 
     Describe 'Test-ResourceProperty' {
 

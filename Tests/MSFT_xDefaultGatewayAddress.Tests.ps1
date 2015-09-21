@@ -9,7 +9,7 @@ Import-Module -Name $PSScriptRoot\..\DSCResources\MSFT_xDefaultGatewayAddress -F
 
 InModuleScope MSFT_xDefaultGatewayAddress {
 
-#######################################################################################
+    #######################################################################################
 
     Describe 'Get-TargetResource' {
 
@@ -54,7 +54,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
         }
     }
 
-#######################################################################################
+    #######################################################################################
 
     Describe 'Set-TargetResource' {
 
@@ -88,7 +88,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
             }
 
             It 'should call all the mocks' {
-                Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
+                Assert-MockCalled -commandName Get-NetAdapter -Exactly 0
                 Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                 Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
             }
@@ -106,7 +106,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
             }
 
             It 'should call all the mocks' {
-                Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
+                Assert-MockCalled -commandName Get-NetAdapter -Exactly 0
                 Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                 Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
                 Assert-MockCalled -commandName New-NetRoute -Exactly 1
@@ -114,7 +114,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
         }
     }
 
-#######################################################################################
+    #######################################################################################
 
     Describe 'Test-TargetResource' {
 
@@ -183,7 +183,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
         }
     }
 
-#######################################################################################
+    #######################################################################################
 
     Describe 'Test-ResourceProperty' {
 

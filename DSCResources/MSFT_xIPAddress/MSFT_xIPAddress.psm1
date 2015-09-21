@@ -1,7 +1,7 @@
-<#######################################################################################
- #  MSDSCPack_IPAddress : DSC Resource that will set/test/get the current IP
- #  Address, by accepting values among those given in MSDSCPack_IPAddress.schema.mof
- #######################################################################################>
+#######################################################################################
+#  MSDSCPack_IPAddress : DSC Resource that will set/test/get the current IP
+#  Address, by accepting values among those given in MSDSCPack_IPAddress.schema.mof
+#######################################################################################
 
 ######################################################################################
 # The Get-TargetResource cmdlet.
@@ -28,7 +28,9 @@ function Get-TargetResource
 
     Write-Verbose -Message "$($($MyInvocation.MyCommand)): Applying the IP Address..."
 
-    $CurrentIPAddress = Get-NetIPAddress -InterfaceAlias $InterfaceAlias -AddressFamily $AddressFamily
+    $CurrentIPAddress = Get-NetIPAddress `
+        -InterfaceAlias $InterfaceAlias `
+        -AddressFamily $AddressFamily
 
     $returnValue = @{
         IPAddress      = [System.String]::Join(', ',$CurrentIPAddress.IPAddress)
@@ -65,9 +67,11 @@ function Set-TargetResource
 
     try
     {
-        Test-ResourceProperty @PSBoundParameters
+        Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+            'Applying the IP Address...'
+            ) -join '' )
 
-        Write-Verbose -Message "$($($MyInvocation.MyCommand)): Applying the IP Address..."
+        #Should not need to validate the settings because Test-TargetResource already did this
 
         # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
         $DestinationPrefix = '0.0.0.0/0'
@@ -78,9 +82,10 @@ function Set-TargetResource
 
         # Get all the default routes - this has to be done in case the IP Address is
         # beng Removed
-        $defaultRoutes = @(Get-NetRoute -InterfaceAlias `
-            $InterfaceAlias -AddressFamily `
-            $AddressFamily -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
+        $defaultRoutes = @(Get-NetRoute `
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily `
+            -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
 
         # Remove any default routes on the specified interface -- it is important to do
         # this *before* removing the IP address, particularly in the case where the IP
@@ -128,15 +133,17 @@ function Set-TargetResource
         # Make the connection profile private
         Get-NetConnectionProfile -InterfaceAlias $InterfaceAlias | `
             Set-NetConnectionProfile -NetworkCategory Private -ErrorAction SilentlyContinue
-        Write-Verbose -Message "$($($MyInvocation.MyCommand)): IP Interface was set to the desired state."
+        Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+            'IP Interface was set to the desired state.'
+            ) -join '' )
     }
     catch
     {
         Write-Verbose -Message ( @(
-            "$($($MyInvocation.MyCommand)): Error setting IP Address using InterfaceAlias $InterfaceAlias and "
-            "AddressFamily $AddressFamily"
-            ) -join ''
-        )
+                "$($($MyInvocation.MyCommand)): "
+                "Error setting IP Address using InterfaceAlias $InterfaceAlias "
+                "and AddressFamily $AddressFamily"
+            ) -join '' )
         throw $_.Exception
     }
 } # Set-TargetResource
@@ -168,7 +175,9 @@ function Test-TargetResource
     [Boolean]$requiresChanges = $false
     try
     {
-        Write-Verbose -Message "$($($MyInvocation.MyCommand)): Checking the IP Address ..."
+        Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+            'Checking the IP Address ...'
+            ) -join '')
 
         Test-ResourceProperty @PSBoundParameters
 
@@ -182,15 +191,17 @@ function Test-TargetResource
         if(-not $currentIPs.IPAddress.Contains($IPAddress))
         {
             Write-Verbose -Message ( @(
-                "$($($MyInvocation.MyCommand)): IP Address does NOT match desired state. Expected $IPAddress, "
-                "actual $($currentIPs.IPAddress)."
-                ) -join ''
-            )
+                    "$($($MyInvocation.MyCommand)): "
+                    " IP Address does NOT match desired state. Expected $IPAddress, "
+                    "actual $($currentIPs.IPAddress)."
+                ) -join '' )
             $requiresChanges = $true
         }
         else
         {
-            Write-Verbose -Message "$($($MyInvocation.MyCommand)): IP Address is correct."
+            Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+                'IP Address is correct.'
+                ) -join '')
 
             # Filter the IP addresses for the IP address to check
             $filterIP = $currentIPs.Where( { $_.IPAddress -eq $IPAddress } )
@@ -199,15 +210,17 @@ function Test-TargetResource
             if(-not $filterIP.PrefixLength.Equals([byte]$SubnetMask))
             {
                 Write-Verbose -Message ( @(
-                    "$($($MyInvocation.MyCommand)): Subnet mask does NOT match desired state. Expected $SubnetMask, "
-                    "actual $($filterIP.PrefixLength)."
-                    ) -join ''
-                )
+                        "$($($MyInvocation.MyCommand)): "
+                        "Subnet mask does NOT match desired state. Expected $SubnetMask, "
+                        "actual $($filterIP.PrefixLength)."
+                    ) -join '' )
                 $requiresChanges = $true
             }
             else
             {
-                Write-Verbose -Message "$($($MyInvocation.MyCommand)): Subnet mask is correct."
+                Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+                    'Subnet mask is correct.'
+                    ) -join '' )
             }
         }
 
@@ -215,19 +228,22 @@ function Test-TargetResource
         if(-not (Get-NetIPInterface -InterfaceAlias $InterfaceAlias -AddressFamily `
             $AddressFamily).Dhcp.ToString().Equals('Disabled'))
         {
-            Write-Verbose -Message "$($($MyInvocation.MyCommand)): DHCP is NOT disabled."
+            Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+                'DHCP is NOT disabled.'
+                ) -join '' )
             $requiresChanges = $true
         }
         else
         {
-            Write-Verbose -Message "$($($MyInvocation.MyCommand)): DHCP is already disabled."
+            Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+                'DHCP is already disabled.'
+                ) -join '' )
         }
     } catch {
-        Write-Verbose -Message ( @(
-            "$($($MyInvocation.MyCommand)): Error testing valid IPAddress using InterfaceAlias $InterfaceAlias "
+        Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+            "Error testing valid IPAddress using InterfaceAlias $InterfaceAlias "
             "and AddressFamily $AddressFamily"
-            ) -join ''
-        )
+            ) -join '' )
         throw $_.Exception
     }
     return -not $requiresChanges
@@ -237,9 +253,9 @@ function Test-TargetResource
 #  Helper functions
 #######################################################################################
 function Test-ResourceProperty {
-# Function will check the IP Address details are valid and do not conflict with
-# Address family. Also checks the subnet mask and ensures the interface exists.
-# If any problems are detected an exception will be thrown.
+    # Function will check the IP Address details are valid and do not conflict with
+    # Address family. Also checks the subnet mask and ensures the interface exists.
+    # If any problems are detected an exception will be thrown.
     [CmdLetBinding()]
     param
     (
@@ -258,34 +274,43 @@ function Test-ResourceProperty {
     )
 
     if (
-        (($AddressFamily -eq 'IPv4') -and (($SubnetMask -lt [uint32]0) -or ($SubnetMask -gt [uint32]32))) -or 
-        (($AddressFamily -eq 'IPv6') -and (($SubnetMask -lt [uint32]0) -or ($SubnetMask -gt [uint32]128)))
+            (
+                ($AddressFamily -eq 'IPv4') `
+                    -and (($SubnetMask -lt [uint32]0) -or ($SubnetMask -gt [uint32]32))
+            ) -or (
+                ($AddressFamily -eq 'IPv6') `
+                    -and (($SubnetMask -lt [uint32]0) -or ($SubnetMask -gt [uint32]128))
+            )
         )
     {
             throw  ( @(
                 "A Subnet Mask of $SubnetMask is not valid for $AddressFamily addresses. "
                 'Please correct the subnet mask and try again.'
-                ) -join ''
-            )
+                ) -join '' )
     }
     if(-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
-            throw "Interface $InterfaceAlias is not available. Please select a valid interface and try again"
+            throw ( @(
+                "Interface $InterfaceAlias is not available. "
+                'Please select a valid interface and try again.'
+                ) -join '' )
     }
     if(-not ([System.Net.Ipaddress]::TryParse($IPAddress, [ref]0)))
     {
             throw ( @(
-                "IP Address *$IPAddress* is not in the correct format. Please correct the IPAddress "
-                'parameter in the configuration and try again.'
+                "IP Address $IPAddress is not in the correct format. "
+                'Please correct the IPAddress parameter in the configuration and try again.'
                 ) -join ''
             )
     }
-    if (([System.Net.IPAddress]$IPAddress).AddressFamily.ToString() -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString())
+    if (([System.Net.IPAddress]$IPAddress).AddressFamily.ToString() `
+        -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString())
     {
         if ($AddressFamily -ne 'IPv4')
         {
             throw ( @(
-                "Address $IPAddress is in IPv4 format, which does not match server address family $AddressFamily. "
+                "Address $IPAddress is in IPv4 format, which does not match "
+                "server address family $AddressFamily. "
                 'Please correct either of them in the configuration and try again.'
                 ) -join ''
             )
@@ -296,8 +321,9 @@ function Test-ResourceProperty {
         if ($AddressFamily -ne 'IPv6')
         {
             throw ( @(
-                "Address $IPAddress is in IPv6 format, which does not match server address family $AddressFamily. "
-                'Please correct either of them in the configuration and try again'
+                "Address $IPAddress is in IPv6 format, which does not match "
+                "server address family $AddressFamily. "
+                'Please correct either of them in the configuration and try again.'
                 ) -join ''
             )
         }
