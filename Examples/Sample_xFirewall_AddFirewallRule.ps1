@@ -18,7 +18,7 @@ configuration Sample_xFirewall_AddFirewallRule
             DisplayGroup          = "NotePad Firewall Rule Group"
             Ensure                = "Present"
             Access                = "Allow"
-            State                 = "Enabled"
+            Enabled               = "True"
             Profile               = ("Domain", "Private")
             Direction             = "OutBound"
             RemotePort            = ("8080", "8081")
