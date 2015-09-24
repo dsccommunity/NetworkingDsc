@@ -384,7 +384,7 @@ function Test-RuleProperties
 
     if ($Protocol -and ($properties.PortFilters.Protocol -ne $Protocol))
     {
-        Write-Verbose "$($MyInvocation.MyCommand): Protocol property value - $properties.PortFilters.Protocol does not match desired state - $Protocol"
+        Write-Verbose "$($MyInvocation.MyCommand): Protocol property value - $($properties.PortFilters.Protocol) does not match desired state - $Protocol"
         $desiredConfigurationMatch = $false
     }
 
