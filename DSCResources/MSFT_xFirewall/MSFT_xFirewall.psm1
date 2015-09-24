@@ -284,13 +284,13 @@ function Test-RuleProperties
 
     if ($Name -and ($FirewallRule.Name -ne $Name))
     {
-        Write-Verbose "$($MyInvocation.MyCommand): Name property value - $FirewallRule.Name does not match desired state - $Name"
+        Write-Verbose "$($MyInvocation.MyCommand): Name property value - $($FirewallRule.Name) does not match desired state - $Name"
         $desiredConfigurationMatch = $false
     }
 
     if ($Enabled -and ($FirewallRule.Enabled.ToString() -eq $Enabled))
     {
-        Write-Verbose "$($MyInvocation.MyCommand): State property value - $FirewallRule.Enabled.ToString() does not match desired state - $Enabled"
+        Write-Verbose "$($MyInvocation.MyCommand): State property value - $($FirewallRule.Enabled.ToString()) does not match desired state - $Enabled"
         $desiredConfigurationMatch = $false
     }
 
@@ -318,7 +318,7 @@ function Test-RuleProperties
 
     if ($Direction -and ($FirewallRule.Direction -ne $Direction))
     {
-        Write-Verbose "$($MyInvocation.MyCommand): Direction property value - $FirewallRule.Direction does not match desired state - $Direction"
+        Write-Verbose "$($MyInvocation.MyCommand): Direction property value - $($FirewallRule.Direction) does not match desired state - $Direction"
         $desiredConfigurationMatch = $false
     }
 
@@ -376,19 +376,19 @@ function Test-RuleProperties
 
     if ($Description -and ($FirewallRule.Description -ne $Description))
     {
-        Write-Verbose "$($MyInvocation.MyCommand): Description property value - $FirewallRule.Description does not match desired state - $Description"
+        Write-Verbose "$($MyInvocation.MyCommand): Description property value - $($FirewallRule.Description) does not match desired state - $Description"
         $desiredConfigurationMatch = $false
     }
 
     if ($ApplicationPath -and ($properties.ApplicationFilters.Program -ne $ApplicationPath))
     {
-        Write-Verbose "$($MyInvocation.MyCommand): ApplicationPath property value - $properties.ApplicationFilters.Program does not match desired state - $ApplicationPath"
+        Write-Verbose "$($MyInvocation.MyCommand): ApplicationPath property value - $($properties.ApplicationFilters.Program) does not match desired state - $ApplicationPath"
         $desiredConfigurationMatch = $false
     }
 
     if ($Service -and ($properties.ServiceFilters.Service -ne $Service))
     {
-        Write-Verbose "$($MyInvocation.MyCommand): Service property value - $properties.ServiceFilters.Service  does not match desired state - $Service"
+        Write-Verbose "$($MyInvocation.MyCommand): Service property value - $($properties.ServiceFilters.Service) does not match desired state - $Service"
         $desiredConfigurationMatch = $false
     }
 

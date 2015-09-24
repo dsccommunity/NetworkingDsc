@@ -41,7 +41,6 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **DisplayName**: Localized, user-facing name of the firewall rule being created .
 * **DisplayGroup**: Name of the firewall group where we want to put the firewall rules.
 * **Ensure**: Ensure that the firewall rule is Present or Absent.
-* **Access**: Permit or Block the supplied configuration.
 * **Enabled**: Enable or Disable the supplied configuration.
 * **Profile**: Specifies one or more profiles to which the rule is assigned.
 * **Direction**: Direction of the connection.
@@ -56,6 +55,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 ## Versions
 
 ### Unreleased
+* MSFT_xFirewall: Refactored to add more unit tests and cleanup logic
 * MSFT_xDefaultGatewayAddress: Added
 * MSFT_xIPAddress: Removed default gateway parameter - use xDefaultGatewayAddress resource.
 * MSFT_xIPAddress: Added check for IP address format not matching address family.
@@ -188,7 +188,7 @@ Configuration Sample_xDnsServerAddress
 
 ### Set Default Gateway server address
 
-This configuration will set the default gateway address on a network interface that is identified by its alias. 
+This configuration will set the default gateway address on a network interface that is identified by its alias.
 
 ```powershell
 Configuration Sample_xDefaultGatewayAddress_Set
@@ -218,7 +218,7 @@ Configuration Sample_xDefaultGatewayAddress_Set
 
 ### Remove Default Gateway server address
 
-This configuration will remove the default gateway address on a network interface that is identified by its alias. 
+This configuration will remove the default gateway address on a network interface that is identified by its alias.
 
 ```powershell
 Configuration Sample_xDefaultGatewayAddress_Remove
@@ -264,7 +264,6 @@ Configuration Add_FirewallRule
         {
             Name                  = "MyAppFirewallRule"
             ApplicationPath       = "c:\windows\system32\MyApp.exe"
-            Access                = "Allow"
         }
     }
 }
@@ -291,7 +290,6 @@ Configuration Add_FirewallRuleToExistingGroup
             Name                  = "MyFirewallRule"
             DisplayName           = "My Firewall Rule"
             DisplayGroup          = "My Firewall Rule Group"
-            Access                = "Allow"
         }
 
         xFirewall Firewall1
@@ -300,7 +298,6 @@ Configuration Add_FirewallRuleToExistingGroup
             DisplayName           = "My Firewall Rule"
             DisplayGroup          = "My Firewall Rule Group"
             Ensure                = "Present"
-            Access                = "Allow"
             Enabled               = "True"
             Profile               = ("Domain", "Private")
         }
@@ -329,7 +326,6 @@ Configuration Disable_AccessToApplication
             DisplayName           = "Firewall Rule for Notepad.exe"
             DisplayGroup          = "NotePad Firewall Rule Group"
             Ensure                = "Present"
-            Access                = "Block"
             Description           = "Firewall Rule for Notepad.exe"
             ApplicationPath       = "c:\windows\system32\notepad.exe"
         }
@@ -359,7 +355,6 @@ Configuration Sample_xFirewall
             DisplayName           = "Firewall Rule for Notepad.exe"
             DisplayGroup          = "NotePad Firewall Rule Group"
             Ensure                = "Present"
-            Access                = "Allow"
             Enabled               = "True"
             Profile               = ("Domain", "Private")
             Direction             = "OutBound"
