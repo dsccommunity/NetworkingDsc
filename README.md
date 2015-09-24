@@ -42,6 +42,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **DisplayGroup**: Name of the firewall group where we want to put the firewall rules.
 * **Ensure**: Ensure that the firewall rule is Present or Absent.
 * **Enabled**: Enable or Disable the supplied configuration.
+* **Action**: Permit or Block the supplied configuration
 * **Profile**: Specifies one or more profiles to which the rule is assigned.
 * **Direction**: Direction of the connection.
 * **RemotePort**: Specific port used for filter. Specified by port number, range, or keyword.
