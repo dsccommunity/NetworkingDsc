@@ -326,6 +326,7 @@ Configuration Disable_AccessToApplication
             DisplayName           = "Firewall Rule for Notepad.exe"
             DisplayGroup          = "NotePad Firewall Rule Group"
             Ensure                = "Present"
+            Action                = 'Blocked'
             Description           = "Firewall Rule for Notepad.exe"
             ApplicationPath       = "c:\windows\system32\notepad.exe"
         }
@@ -356,6 +357,7 @@ Configuration Sample_xFirewall
             DisplayGroup          = "NotePad Firewall Rule Group"
             Ensure                = "Present"
             Enabled               = "True"
+            Action                = 'Allow'
             Profile               = ("Domain", "Private")
             Direction             = "OutBound"
             RemotePort            = ("8080", "8081")

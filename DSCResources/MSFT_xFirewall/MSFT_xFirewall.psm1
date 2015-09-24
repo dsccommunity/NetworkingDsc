@@ -29,6 +29,7 @@ function Get-TargetResource
         DisplayName     = $firewallRule.DisplayName
         DisplayGroup    = $firewallRule.DisplayGroup
         Enabled         = $firewallRule.Enabled
+        Action          = $firewallRule.Action
         Profile         = $firewallRule.Profile.ToString() -replace(" ", "") -split(",")
         Direction       = $firewallRule.Direction
         Description     = $firewallRule.Description
@@ -64,6 +65,9 @@ function Set-TargetResource
         # Enable or disable the supplied configuration
         [ValidateSet("True", "False")]
         [String] $Enabled,
+
+        [ValidateSet("NotConfigured", "Allow", "Block")]
+        [String] $Action = 'Allow',
 
         # Specifies one or more profiles to which the rule is assigned
         [String[]] $Profile = ("Any"),
@@ -184,6 +188,9 @@ function Test-TargetResource
         [ValidateSet("True", "False")]
         [String] $Enabled,
 
+        [ValidateSet("NotConfigured", "Allow", "Block")]
+        [String] $Action = 'Allow',
+
         # Specifies one or more profiles to which the rule is assigned
         [String[]] $Profile,
 
@@ -268,6 +275,7 @@ function Test-RuleProperties
         [String] $DisplayGroup,
         [String] $Group,
         [String] $Enabled,
+        [string] $Action,
         [String[]] $Profile,
         [String] $Direction,
         [String[]] $RemotePort,
@@ -291,6 +299,12 @@ function Test-RuleProperties
     if ($Enabled -and ($FirewallRule.Enabled.ToString() -eq $Enabled))
     {
         Write-Verbose "$($MyInvocation.MyCommand): State property value - $($FirewallRule.Enabled.ToString()) does not match desired state - $Enabled"
+        $desiredConfigurationMatch = $false
+    }
+
+    if ($Action -and ($FirewallRule.Action -eq $Action))
+    {
+        Write-Verbose "$($MyInvocation.MyCommand): State property value - $($FirewallRule.Action) does not match desired state - $Action"
         $desiredConfigurationMatch = $false
     }
 

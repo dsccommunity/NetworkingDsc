@@ -85,6 +85,10 @@ InModuleScope $DSCResourceName {
                 $result.RemotePort | Should Be $ruleProperties.PortFilters.RemotePort
             }
 
+            It 'Should have the correct Action' {
+                $result.Action | Should Be $rule.Action
+            }
+
             It 'Should have the correct LocalPort and type' {
                 $result.LocalPort | Should Be $ruleProperties.PortFilters.LocalPort
             }
