@@ -2,7 +2,7 @@
 
 configuration Sample_xFirewall_AddFirewallRule
 {
-    param 
+    param
     (
         [string[]]$NodeName = 'localhost'
     )
@@ -17,14 +17,13 @@ configuration Sample_xFirewall_AddFirewallRule
             DisplayName           = "Firewall Rule for Notepad.exe"
             DisplayGroup          = "NotePad Firewall Rule Group"
             Ensure                = "Present"
-            Access                = "Allow"
-            State                 = "Enabled"
+            Enabled               = "True"
             Profile               = ("Domain", "Private")
             Direction             = "OutBound"
             RemotePort            = ("8080", "8081")
-            LocalPort             = ("9080", "9081")         
+            LocalPort             = ("9080", "9081")
             Protocol              = "TCP"
-            Description           = "Firewall Rule for Notepad.exe"  
+            Description           = "Firewall Rule for Notepad.exe"
             ApplicationPath       = "c:\windows\system32\notepad.exe"
             Service               =  "WinRM"
         }
