@@ -5,7 +5,7 @@ if (Get-Module MSFT_xDefaultGatewayAddress -All)
     Get-Module MSFT_xDefaultGatewayAddress -All | Remove-Module
 }
 
-Import-Module -Name $PSScriptRoot\..\DSCResources\MSFT_xDefaultGatewayAddress -Force -DisableNameChecking
+Import-Module -Name $PSScriptRoot\..\..\DSCResources\MSFT_xDefaultGatewayAddress -Force -DisableNameChecking
 
 InModuleScope MSFT_xDefaultGatewayAddress {
 
