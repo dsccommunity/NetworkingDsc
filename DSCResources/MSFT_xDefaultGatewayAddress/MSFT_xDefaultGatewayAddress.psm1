@@ -25,7 +25,7 @@ function Get-TargetResource
         [String]$AddressFamily
     )
     
-    Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+    Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
         'Getting the Default Gateway Address ...'
         ) -join '' )
     
@@ -76,7 +76,7 @@ function Set-TargetResource
     
     try
     {        
-        Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             'Applying the Default Gateway Address ...'
             ) -join '' )
 
@@ -116,20 +116,20 @@ function Set-TargetResource
                 NextHop = $Address
             }
             New-NetRoute @Parameters
-            Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+            Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                 'Default Gateway address was set to the desired state.'
                 ) -join '' )
         }
         else
         {
-            Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+            Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                 'Default Gateway address has been removed.'
                 ) -join '' )
         }
     }
     catch
     {
-        Write-Verbose -Message (@("$($($MyInvocation.MyCommand)): "
+        Write-Verbose -Message (@("$($MyInvocation.MyCommand): "
             'Error setting valid Default Gateway address using InterfaceAlias $InterfaceAlias and '
             'AddressFamily $AddressFamily'
             ) -join '')
@@ -162,7 +162,7 @@ function Test-TargetResource
 
     try
     {        
-        Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             'Checking the Default Gateway Address ...'
             ) -join '' )
 
@@ -186,7 +186,7 @@ function Test-TargetResource
             if($defaultRoutes) {
                 if(-not $defaultRoutes.Where( { $_.NextHop -eq $Address } ))
                 {
-                    Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+                    Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                         "Default gateway does NOT match desired state. Expected $Address, "
                         "actual $($defaultRoutes.NextHop)."
                         ) -join '' )
@@ -194,14 +194,14 @@ function Test-TargetResource
                 }
                 else
                 {
-                    Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+                    Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                         'Default gateway is correct.'
                         ) -join '' )
                 }
             }
             else
             {
-                Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+                Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                     "Default gateway does not exist. Expected $Address."
                     ) -join '' )
                 $requiresChanges = $true
@@ -212,14 +212,14 @@ function Test-TargetResource
             # Is a default gateway address set?
             if ($defaultRoutes)
             {
-                Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+                Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                     'Default gateway exists but it should not.'
                     ) -join '' )
                 $requiresChanges = $true
             }
             else
             {
-                Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+                Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                     'Default Gateway does not exist which is correct.'
                     ) -join '' )
             }
@@ -227,7 +227,7 @@ function Test-TargetResource
     }
     catch
     {
-        Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             'Error testing valid Default Gateway address using InterfaceAlias $InterfaceAlias '
             "and AddressFamily $AddressFamily"
             ) -join '' )

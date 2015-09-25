@@ -26,7 +26,7 @@ function Get-TargetResource
         [String]$AddressFamily = 'IPv4'
     )
 
-    Write-Verbose -Message "$($($MyInvocation.MyCommand)): Applying the IP Address..."
+    Write-Verbose -Message "$($MyInvocation.MyCommand): Applying the IP Address..."
 
     $CurrentIPAddress = Get-NetIPAddress `
         -InterfaceAlias $InterfaceAlias `
@@ -67,7 +67,7 @@ function Set-TargetResource
 
     try
     {
-        Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             'Applying the IP Address...'
             ) -join '' )
 
@@ -133,14 +133,14 @@ function Set-TargetResource
         # Make the connection profile private
         Get-NetConnectionProfile -InterfaceAlias $InterfaceAlias | `
             Set-NetConnectionProfile -NetworkCategory Private -ErrorAction SilentlyContinue
-        Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             'IP Interface was set to the desired state.'
             ) -join '' )
     }
     catch
     {
         Write-Verbose -Message ( @(
-                "$($($MyInvocation.MyCommand)): "
+                "$($MyInvocation.MyCommand): "
                 "Error setting IP Address using InterfaceAlias $InterfaceAlias "
                 "and AddressFamily $AddressFamily"
             ) -join '' )
@@ -175,7 +175,7 @@ function Test-TargetResource
     [Boolean]$requiresChanges = $false
     try
     {
-        Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             'Checking the IP Address ...'
             ) -join '')
 
@@ -191,7 +191,7 @@ function Test-TargetResource
         if(-not $currentIPs.IPAddress.Contains($IPAddress))
         {
             Write-Verbose -Message ( @(
-                    "$($($MyInvocation.MyCommand)): "
+                    "$($MyInvocation.MyCommand): "
                     " IP Address does NOT match desired state. Expected $IPAddress, "
                     "actual $($currentIPs.IPAddress)."
                 ) -join '' )
@@ -199,7 +199,7 @@ function Test-TargetResource
         }
         else
         {
-            Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+            Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                 'IP Address is correct.'
                 ) -join '')
 
@@ -210,7 +210,7 @@ function Test-TargetResource
             if(-not $filterIP.PrefixLength.Equals([byte]$SubnetMask))
             {
                 Write-Verbose -Message ( @(
-                        "$($($MyInvocation.MyCommand)): "
+                        "$($MyInvocation.MyCommand): "
                         "Subnet mask does NOT match desired state. Expected $SubnetMask, "
                         "actual $($filterIP.PrefixLength)."
                     ) -join '' )
@@ -218,7 +218,7 @@ function Test-TargetResource
             }
             else
             {
-                Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+                Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                     'Subnet mask is correct.'
                     ) -join '' )
             }
@@ -228,19 +228,19 @@ function Test-TargetResource
         if(-not (Get-NetIPInterface -InterfaceAlias $InterfaceAlias -AddressFamily `
             $AddressFamily).Dhcp.ToString().Equals('Disabled'))
         {
-            Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                 'DHCP is NOT disabled.'
                 ) -join '' )
             $requiresChanges = $true
         }
         else
         {
-            Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                 'DHCP is already disabled.'
                 ) -join '' )
         }
     } catch {
-        Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             "Error testing valid IPAddress using InterfaceAlias $InterfaceAlias "
             "and AddressFamily $AddressFamily"
             ) -join '' )

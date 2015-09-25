@@ -28,7 +28,7 @@ function Get-TargetResource
         [String]$AddressFamily
     )
     
-    Write-Verbose -Message "$($($MyInvocation.MyCommand)): Getting the DNS Server Addresses ..."
+    Write-Verbose -Message "$($MyInvocation.MyCommand): Getting the DNS Server Addresses ..."
 
     $returnValue = @{
         Address = (Get-DnsClientServerAddress `
@@ -65,7 +65,7 @@ function Set-TargetResource
 
     try
     {        
-        Write-Verbose -Message ( @("$($($MyInvocation.MyCommand)): "
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             'Applying the DNS Server Address ...'
             ) -join '')
 
@@ -85,21 +85,21 @@ function Set-TargetResource
         {
             # Set the DNS settings as well
             Set-DnsClientServerAddress -InterfaceAlias $InterfaceAlias -ServerAddresses $Address
-            Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                 'DNS Servers have been set correctly.'
                 ) -join '' )
         }
         else 
         { 
             #Test will return true in this case
-            Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                 'DNS Servers are already set correctly.'
                 ) -join '' )
         }
     }
     catch
     {
-        Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             "Error setting valid DNS Server addresses using InterfaceAlias $InterfaceAlias "
             "and AddressFamily $AddressFamily"
             ) -join '' )
@@ -133,7 +133,7 @@ function Test-TargetResource
 
     try
     {        
-        Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             'Checking the DNS Server Address ...' 
             ) -join '' )
 
@@ -158,21 +158,21 @@ function Test-TargetResource
             -SyncWindow 0).Length -gt 0)
         {
             $requiresChanges = $true
-            Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                 "DNS Servers are not correct. Expected $Address, actual $currentAddress." 
                 ) -join '' )
         }
         else 
         { 
             #Test will return true in this case
-            Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                 'DNS Servers are set correctly.' 
                 ) -join '' )
         }
     }
     catch
     {
-        Write-Verbose -Message ( @( "$($($MyInvocation.MyCommand)): "
+        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             "Error testing valid DNS Server addresses using InterfaceAlias $InterfaceAlias " 
             "and AddressFamily $AddressFamily"
             ) -join '' )
