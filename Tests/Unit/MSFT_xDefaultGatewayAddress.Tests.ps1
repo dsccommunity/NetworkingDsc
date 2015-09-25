@@ -1,13 +1,43 @@
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
+$DSCResourceName = 'MSFT_xDefaultGatewayAddress'
+$DSCModuleName   = 'xNetworking'
 
-if (Get-Module MSFT_xDefaultGatewayAddress -All)
-{
-    Get-Module MSFT_xDefaultGatewayAddress -All | Remove-Module
+$Splat = @{
+    Path = $PSScriptRoot
+    ChildPath = "..\..\DSCResources\$DSCResourceName\$DSCResourceName.psm1"
+    Resolve = $true
+    ErrorAction = 'Stop'
 }
 
-Import-Module -Name $PSScriptRoot\..\..\DSCResources\MSFT_xDefaultGatewayAddress -Force -DisableNameChecking
+$DSCResourceModuleFile = Get-Item -Path (Join-Path @Splat)
+
+$moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
+
+if(-not (Test-Path -Path $moduleRoot))
+{
+    $null = New-Item -Path $moduleRoot -ItemType Directory
+}
+else
+{
+    # Copy the existing folder out to the temp directory to hold until the end of the run
+    # Delete the folder to remove the old files.
+    $tempLocation = Join-Path -Path $env:Temp -ChildPath $DSCModuleName
+    Copy-Item -Path $moduleRoot -Destination $tempLocation -Recurse -Force
+    Remove-Item -Path $moduleRoot -Recurse -Force
+    $null = New-Item -Path $moduleRoot -ItemType Directory
+}
+
+Copy-Item -Path $PSScriptRoot\..\..\* -Destination $moduleRoot -Recurse -Force -Exclude '.git'
+
+if (Get-Module -Name $DSCResourceName)
+{
+    Remove-Module -Name $DSCResourceName
+}
+
+Import-Module -Name $DSCResourceModuleFile.FullName -Force
 
 InModuleScope MSFT_xDefaultGatewayAddress {
+
+    #######################################################################################
 
     Describe 'Get-TargetResource' {
 
@@ -50,193 +80,215 @@ InModuleScope MSFT_xDefaultGatewayAddress {
                 $Result.Address | Should BeNullOrEmpty
             }
         }
-
     }
 
-    Describe 'Test-Properties' {
+    #######################################################################################
 
-        Context 'invoking without -Apply switch and default gateway is exists' {
+    Describe 'Set-TargetResource' {
 
-            #region Mocks
-            Mock Get-NetRoute -MockWith {
-                [PSCustomObject]@{
-                    NextHop = '192.168.0.1'
-                    DestinationPrefix = '0.0.0.0/0'
-                    InterfaceAlias = 'Ethernet'
-                    InterfaceIndex = 1
-                    AddressFamily = 'IPv4'
-                }
-            }
-            #endregion
+        #region Mocks
+        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
 
-            It 'when default gateway does not match should be $false' {
-                $Splat = @{
-                    Address = '10.0.0.2'
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-                $Result = Test-Properties @Splat
-                $Result | Should Be $false
-            }
-
-            It 'when default gateway matches should be $true' {
-                $Splat = @{
-                    Address = '192.168.0.1'
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-                $Result = Test-Properties @Splat
-                $Result | Should Be $true
-            }
-
-            It 'when default gateway is not passed should be $false' {
-                $Splat = @{
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-                $Result = Test-Properties @Splat
-                $Result | Should Be $false
-            }
-
-            It 'should call Get-NetRoute three times' {
-                Assert-MockCalled -commandName Get-NetRoute -Exactly 3
+        Mock Get-NetRoute -MockWith {
+            [PSCustomObject]@{
+                NextHop = '192.168.0.1'
+                DestinationPrefix = '0.0.0.0/0'
+                InterfaceAlias = 'Ethernet'
+                InterfaceIndex = 1
+                AddressFamily = 'IPv4'
             }
         }
 
-        Context 'invoking without -Apply switch and default gateway does not exist' {
+        Mock Remove-NetRoute
 
-            #region Mocks
-            Mock Get-NetRoute
-            #endregion
+        Mock New-NetRoute
 
-            It 'when default gateway exists should be $false' {
-                $Splat = @{
-                    Address = '192.168.0.1'
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-                $Result = Test-Properties @Splat
-                $Result | Should Be $false
-            }
+        #endregion
 
-            It 'when default gateway does not exist should be $true' {
+        Context 'invoking with no Default Gateway Address' {
+            It 'should rerturn $null' {
                 $Splat = @{
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = Test-Properties @Splat
-                $Result | Should Be $true
+                { $Result = Set-TargetResource @Splat } | Should Not Throw
+                $Result | Should BeNullOrEmpty
             }
 
-            It 'should call Get-NetRoute twice' {
-                Assert-MockCalled -commandName Get-NetRoute -Exactly 2
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-NetAdapter -Exactly 0
+                Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
             }
         }
 
-        Context 'invoking with -Apply switch and default gateway exists' {
-
-            #region Mocks
-            Mock Get-NetRoute -MockWith {
-                [PSCustomObject]@{
-                    NextHop = '192.168.0.1'
-                    DestinationPrefix = '0.0.0.0/0'
-                    InterfaceAlias = 'Ethernet'
-                    InterfaceIndex = 1
-                    AddressFamily = 'IPv4'
-                }
-            }
-            Mock New-NetRoute
-            Mock Remove-NetRoute
-            #endregion
-
-            It 'when default gateway does not match should be $true' {
+        Context 'invoking with valid Default Gateway Address' {
+            It 'should rerturn $null' {
                 $Splat = @{
-                    Apply = $true
-                    Address = '10.0.0.2'
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-                $Result = Test-Properties @Splat
-                $Result | Should Be $true
-            }
-
-            It 'when default gateway matches should be $true' {
-                $Splat = @{
-                    Apply = $true
                     Address = '192.168.0.1'
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = Test-Properties @Splat
-                $Result | Should Be $true
+                { $Result = Set-TargetResource @Splat } | Should Not Throw
+                $Result | Should BeNullOrEmpty
             }
 
-            It 'when default gateway is not passed should be $true' {
-                $Splat = @{
-                    Apply = $true
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-                $Result = Test-Properties @Splat
-                $Result | Should Be $true
-            }
-
-            It 'should call Get-NetRoute three times' {
-                Assert-MockCalled -commandName Get-NetRoute -Exactly 3
-            }
-            It 'should call Remove-NetRoute two times' {
-                Assert-MockCalled -commandName Remove-NetRoute -Exactly 2
-            }
-            It 'should call New-NetRoute once' {
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-NetAdapter -Exactly 0
+                Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
                 Assert-MockCalled -commandName New-NetRoute -Exactly 1
             }
         }
+    }
 
-        Context 'invoking with -Apply switch and default gateway does not exist' {
+    #######################################################################################
 
-            #region Mocks
-            Mock Get-NetRoute -MockWith {
-                [PSCustomObject]@{
-                    NextHop = '192.168.0.1'
-                    DestinationPrefix = '0.0.0.0/0'
-                    InterfaceAlias = 'Ethernet'
-                    InterfaceIndex = 1
-                    AddressFamily = 'IPv4'
-                }
+    Describe 'Test-TargetResource' {
+
+        #region Mocks
+        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+
+        Mock Get-NetRoute -MockWith {
+            [PSCustomObject]@{
+                NextHop = '192.168.0.1'
+                DestinationPrefix = '0.0.0.0/0'
+                InterfaceAlias = 'Ethernet'
+                InterfaceIndex = 1
+                AddressFamily = 'IPv4'
             }
-            Mock New-NetRoute
-            Mock Remove-NetRoute
-            #endregion
+        }
+        #endregion
 
-            It 'when default gateway exists should be $true' {
+        Context 'checking return with default gateway that matches currently set one' {
+            It 'should return true' {
+
                 $Splat = @{
-                    Apply = $True
+                    Address = '192.168.0.1'
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = Test-Properties @Splat
-                $Result | Should Be $true
+                Test-TargetResource @Splat | Should Be $True
             }
+        }
 
-            It 'when default gateway does not exist should be $true' {
+        Context 'checking return with no gateway but one is currently set' {
+            It 'should return false' {
+
                 $Splat = @{
-                    Apply = $True
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                $Result = Test-Properties @Splat
-                $Result | Should Be $true
+                Test-TargetResource @Splat | Should Be $False
             }
+        }
 
-            It 'should call Get-NetRoute two times' {
-                Assert-MockCalled -commandName Get-NetRoute -Exactly 2
+        #region Mocks
+        Mock Get-NetRoute -MockWith {}
+        #endregion
+
+        Context 'checking return with default gateway but none are currently set' {
+            It 'should return false' {
+
+                $Splat = @{
+                    Address = '192.168.0.1'
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv4'
+                }
+                Test-TargetResource @Splat | Should Be $False
             }
-            It 'should call Remove-NetRoute once' {
-                Assert-MockCalled -commandName Remove-NetRoute -Exactly 2
+        }
+
+        Context 'checking return with no gateway and none are currently set' {
+            It 'should return true' {
+
+                $Splat = @{
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv4'
+                }
+                Test-TargetResource @Splat | Should Be $True
             }
-            It 'should not call New-NetRoute' {
-                Assert-MockCalled -commandName New-NetRoute -Exactly 0
+        }
+    }
+
+    #######################################################################################
+
+    Describe 'Test-ResourceProperty' {
+
+        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+
+        Context 'invoking with bad interface alias' {
+
+            It 'should throw an error' {
+                $Splat = @{
+                    Address = '192.168.0.1'
+                    InterfaceAlias = 'NotReal'
+                    AddressFamily = 'IPv4'
+                }
+                { Test-ResourceProperty @Splat } | Should Throw
+            }
+        }
+
+        Context 'invoking with invalid IP Address' {
+
+            It 'should throw an error' {
+                $Splat = @{
+                    Address = 'NotReal'
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv4'
+                }
+                { Test-ResourceProperty @Splat } | Should Throw
+            }
+        }
+
+        Context 'invoking with invalid IP Address' {
+
+            It 'should throw an error' {
+                $Splat = @{
+                    Address = 'NotReal'
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv4'
+                }
+                { Test-ResourceProperty @Splat } | Should Throw
+            }
+        }
+
+        Context 'invoking with IP Address and family mismatch' {
+
+            It 'should throw an error' {
+                $Splat = @{
+                    Address = '192.168.0.1'
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                { Test-ResourceProperty @Splat } | Should Throw
+            }
+        }
+
+        Context 'invoking with valid IPv4 Address' {
+
+            It 'should not throw an error' {
+                $Splat = @{
+                    Address = '192.168.0.1'
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv4'
+                }
+                { Test-ResourceProperty @Splat } | Should Not Throw
+            }
+        }
+
+        Context 'invoking with valid IPv6 Address' {
+
+            It 'should not throw an error' {
+                $Splat = @{
+                    Address = 'fe80:ab04:30F5:002b::1'
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                { Test-ResourceProperty @Splat } | Should Not Throw
             }
         }
     }
 }
+
+#######################################################################################
