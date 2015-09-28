@@ -296,15 +296,15 @@ function Test-RuleProperties
         $desiredConfigurationMatch = $false
     }
 
-    if ($Enabled -and ($FirewallRule.Enabled.ToString() -eq $Enabled))
+    if ($Enabled -and ($FirewallRule.Enabled.ToString() -ne $Enabled))
     {
-        Write-Verbose "$($MyInvocation.MyCommand): State property value - $($FirewallRule.Enabled.ToString()) does not match desired state - $Enabled"
+        Write-Verbose "$($MyInvocation.MyCommand): Enabled property value - $($FirewallRule.Enabled.ToString()) does not match desired state - $Enabled"
         $desiredConfigurationMatch = $false
     }
 
-    if ($Action -and ($FirewallRule.Action -eq $Action))
+    if ($Action -and ($FirewallRule.Action -ne $Action))
     {
-        Write-Verbose "$($MyInvocation.MyCommand): State property value - $($FirewallRule.Action) does not match desired state - $Action"
+        Write-Verbose "$($MyInvocation.MyCommand): Action property value - $($FirewallRule.Action) does not match desired state - $Action"
         $desiredConfigurationMatch = $false
     }
 
