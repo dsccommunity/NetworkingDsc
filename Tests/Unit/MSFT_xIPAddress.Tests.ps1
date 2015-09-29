@@ -421,3 +421,15 @@ InModuleScope MSFT_xIPAddress {
 }
 
 #######################################################################################
+
+# Clean up after the test completes.
+Remove-Item -Path $moduleRoot -Recurse -Force
+
+# Restore previous versions, if it exists.
+if ($tempLocation)
+{
+    $null = New-Item -Path $moduleRoot -ItemType Directory
+    $script:Destination = "${env:ProgramFiles}\WindowsPowerShell\Modules"
+    Copy-Item -Path $tempLocation -Destination $script:Destination -Recurse -Force
+    Remove-Item -Path $tempLocation -Recurse -Force
+}
