@@ -68,7 +68,7 @@ InModuleScope $DSCResourceName {
             }
 
             It 'Should have the correct Profile' {
-                $result.Profile[0] | Should Be ($rule.Profile.ToString() -replace(" ", "") -split(","))[0]
+                $result.Profile[0] | Should Be ($rule.Profile.ToString() -replace(' ', '') -split(','))[0]
             }
 
             It 'Should have the correct Direction and type' {
@@ -83,6 +83,10 @@ InModuleScope $DSCResourceName {
 
             It 'Should have the correct RemotePort and type' {
                 $result.RemotePort | Should Be $ruleProperties.PortFilters.RemotePort
+            }
+
+            It 'Should have the correct Action' {
+                $result.Action | Should Be $rule.Action
             }
 
             It 'Should have the correct LocalPort and type' {
@@ -188,6 +192,151 @@ InModuleScope $DSCResourceName {
                 Assert-MockCalled New-NetFirewallRule -Exactly 1
                 Assert-MockCalled Remove-NetFirewallRule -Exactly 1
                 Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+    }
+
+    Describe 'Test-RuleProperties' {
+        $rule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
+                    Select-Object -First 1
+        $FirewallRule = Get-FirewallRule -Name $($rule.name)
+        $Properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
+
+        # Make an object that can be splatted onto the function
+        $Splat = @{
+            Name = $FirewallRule.Name
+            DisplayGroup = $FirewallRule.DisplayGroup
+            Enabled = $FirewallRule.Enabled
+            Profile = $FirewallRule.Profile.ToString() -replace(' ', '') -split(',')
+            Direction = $FirewallRule.Direction
+            Action = $FirewallRule.Action
+            RemotePort = $Properties.PortFilters.RemotePort
+            LocalPort = $Properties.PortFilters.LocalPort
+            Protocol = $Properties.PortFilters.Protocol
+            Description = $FirewallRule.Description
+            ApplicationPath = $Properties.ApplicationFilters.Program
+            Service = $Properties.ServiceFilters.Service
+        }
+
+        # To speed up all these tests create Mocks so that these functions are not repeatedly called
+        Mock Get-FirewallRule -MockWith { $FirewallRule }
+        Mock Get-FirewallRuleProperty -MockWith { $Properties }
+
+        Context 'testing with a rule with no property differences' {
+            $CompareRule = $Splat.Clone()
+            It 'should return True' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $True
+            }
+        }
+        Context 'testing with a rule with a different name' {
+            $CompareRule = $Splat.Clone()
+            $CompareRule.Name = 'Different'
+            It 'should return False' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $False
+            }
+        }
+        Context 'testing with a rule with a different enabled' {
+            $CompareRule = $Splat.Clone()
+            $CompareRule.Enabled = if( $CompareRule.Enabled -eq 'True' ) {'False'} Else {'True'}
+            It 'should return False' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $False
+            }
+        }
+        Context 'testing with a rule with a different action' {
+            $CompareRule = $Splat.Clone()
+            $CompareRule.Action = if ($CompareRule.Action -eq 'Allow') {'Block'} else {'Allow'}
+            It 'should return False' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $False
+            }
+        }
+        Context 'testing with a rule with a different profile' {
+            $CompareRule = $Splat.Clone()
+            $CompareRule.Profile = 'Different'
+            It 'should return False' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $False
+            }
+        }
+        Context 'testing with a rule with a different direction' {
+            $CompareRule = $Splat.Clone()
+            $CompareRule.Direction = if ($CompareRule.Direction -eq 'Inbound') {'Outbound'} else {'Inbound'}
+            It 'should return False' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $False
+            }
+        }
+        Context 'testing with a rule with a different remote port' {
+            $CompareRule = $Splat.Clone()
+            $CompareRule.RemotePort = 1
+            It 'should return False' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $False
+            }
+        }
+        Context 'testing with a rule with a different local port' {
+            $CompareRule = $Splat.Clone()
+            $CompareRule.LocalPort = 1
+            It 'should return False' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $False
+            }
+        }
+        Context 'testing with a rule with a different protocol' {
+            $CompareRule = $Splat.Clone()
+            $CompareRule.Protocol = 'Different'
+            It 'should return False' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $False
+            }
+        }
+        Context 'testing with a rule with a different description' {
+            $CompareRule = $Splat.Clone()
+            $CompareRule.Description = 'Different'
+            It 'should return False' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $False
+            }
+        }
+        Context 'testing with a rule with a different application path' {
+            $CompareRule = $Splat.Clone()
+            $CompareRule.ApplicationPath = 'Different'
+            It 'should return False' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $False
+            }
+        }
+        Context 'testing with a rule with a different description' {
+            $CompareRule = $Splat.Clone()
+            $CompareRule.Service = 'Different'
+            It 'should return False' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $False
+            }
+        }
+    }
+
+    Describe ' Get-FirewallRule' {
+        $rule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
+            Select-Object -First 1
+
+        Context 'testing with firewall that exists' {
+            It 'should return a firewall rule when name is passed' {
+                $Result = Get-FirewallRule -Name $rule.Name
+                $Result | Should Not BeNullOrEmpty
+            }
+            It 'should return a firewall rule when name and display group is passed' {
+                $Result = Get-FirewallRule -Name $rule.Name -DisplayGroup $rule.Group
+                $Result | Should Not BeNullOrEmpty
+            }
+        }
+        Context 'testing with firewall that does not exist' {
+            It 'should not return anything' {
+                $Result = Get-FirewallRule -Name 'Does not exist'
+                $Result | Should BeNullOrEmpty
             }
         }
     }
