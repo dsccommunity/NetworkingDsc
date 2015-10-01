@@ -99,17 +99,6 @@ InModuleScope MSFT_xIPAddress {
 
         Mock New-NetIPAddress
 
-        Mock Get-NetConnectionProfile {
-            [PSCustomObject]@{
-                Name = 'MSFT'
-                InterfaceAlias = 'Ethernet'
-                InterfaceIndex = 1
-                NetworkCategory = 'Public'
-                IPV4Connectivity = 'Internet'
-                IPV6Connectivity = 'NoTraffic'
-            }
-        }
-
         Mock Get-NetRoute {
             [PSCustomObject]@{
                 InterfaceAlias = 'Ethernet'
@@ -119,8 +108,6 @@ InModuleScope MSFT_xIPAddress {
                 DestinationPrefix = '0.0.0.0/0'
             }
         }
-
-        Mock Set-NetConnectionProfile
 
         Mock Remove-NetIPAddress
 
@@ -141,12 +128,10 @@ InModuleScope MSFT_xIPAddress {
 
             It 'should call all the mocks' {
                 Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
-                Assert-MockCalled -commandName Get-NetConnectionProfile -Exactly 1
                 Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                 Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
                 Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
                 Assert-MockCalled -commandName New-NetIPAddress -Exactly 1
-                Assert-MockCalled -commandName Set-NetConnectionProfile -Exactly 1
             }
         }
     }
@@ -211,14 +196,14 @@ InModuleScope MSFT_xIPAddress {
          
         Context 'invoking with the same IPv4 Address' {
 
-            It 'should be $false' {
+            It 'should be $true' {
                 $Splat = @{
                     IPAddress = '192.168.0.1'
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
                 $Result = Test-TargetResource @Splat
-                $Result | Should Be $false
+                $Result | Should Be $true
             }
             It 'should call appropriate mocks' {
                 Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
@@ -232,7 +217,7 @@ InModuleScope MSFT_xIPAddress {
                 IPAddress = 'fe80::1'
                 InterfaceAlias = 'Ethernet'
                 InterfaceIndex = 1
-                PrefixLength = [byte]16
+                PrefixLength = [byte]64
                 AddressFamily = 'IPv6'
             }
         }
@@ -242,6 +227,7 @@ InModuleScope MSFT_xIPAddress {
                 $Splat = @{
                     IPAddress = 'BadAddress'
                     InterfaceAlias = 'Ethernet'
+                    SubnetMask = 64
                     AddressFamily = 'IPv6'
                 }
                 { $Result = Test-TargetResource @Splat } | Should Throw
@@ -254,6 +240,7 @@ InModuleScope MSFT_xIPAddress {
                 $Splat = @{
                     IPAddress = 'fe80::2'
                     InterfaceAlias = 'Ethernet'
+                    SubnetMask = 64
                     AddressFamily = 'IPv6'
                 }
                 $Result = Test-TargetResource @Splat
@@ -267,14 +254,15 @@ InModuleScope MSFT_xIPAddress {
          
         Context 'invoking with the same IPv6 Address' {
 
-            It 'should be $false' {
+            It 'should be $true' {
                 $Splat = @{
                     IPAddress = 'fe80::1'
                     InterfaceAlias = 'Ethernet'
+                    SubnetMask = 64
                     AddressFamily = 'IPv6'
                 }
                 $Result = Test-TargetResource @Splat
-                $Result | Should Be $false
+                $Result | Should Be $true
             }
             It 'should call appropriate mocks' {
                 Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
@@ -355,6 +343,7 @@ InModuleScope MSFT_xIPAddress {
                 $Splat = @{
                     IPAddress = 'fe80:ab04:30F5:002b::1'
                     InterfaceAlias = 'Ethernet'
+                    SubnetMask = 64
                     AddressFamily = 'IPv6'
                 }
                 { Test-ResourceProperty @Splat } | Should Not Throw
