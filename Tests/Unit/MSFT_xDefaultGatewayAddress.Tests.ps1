@@ -215,7 +215,7 @@ InModuleScope MSFT_xDefaultGatewayAddress {
 
         Context 'invoking with bad interface alias' {
 
-            It 'should throw InterfaceNotAvailable error' {
+            It 'should throw an InterfaceNotAvailable error' {
                 $Splat = @{
                     Address = '192.168.0.1'
                     InterfaceAlias = 'NotReal'

@@ -336,7 +336,7 @@ function Test-ResourceProperty {
     }
     if ($Address)
     {
-        if (-not ([System.Net.Ipaddress]::TryParse($Address, [ref]0)))
+        if (-not ([System.Net.IPAddress]::TryParse($Address, [ref]0)))
         {
             $errorId = 'AddressFormatError'
             $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
@@ -348,6 +348,7 @@ function Test-ResourceProperty {
 
             $PSCmdlet.ThrowTerminatingError($errorRecord)
         }
+
         $detectedAddressFamily = ([System.Net.IPAddress]$Address).AddressFamily.ToString()
         if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
             -and ($AddressFamily -ne 'IPv4'))

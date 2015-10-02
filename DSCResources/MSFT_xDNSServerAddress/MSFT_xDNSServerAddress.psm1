@@ -7,6 +7,17 @@ data LocalizedData
 {
     # culture="en-US"
     ConvertFrom-StringData -StringData @'
+GettingDNSServerAddressesMessage=Getting the DNS Server Addresses.
+ApplyingDNSServerAddressesMessage=Applying the DNS Server Addresses.
+DNSServersSetCorrectlyMessage=DNS Servers are set correctly.
+DNSServerSetError=Error setting valid DNS Server addresses using InterfaceAlias {0} and AddressFamily {1}.
+DNSServersAlreadySetMessage=DNS Servers are already set correctly.
+CheckingDNSServerAddressesMessage=Checking the DNS Server Addresses.
+DNSServersNotCorrectMessage=DNS Servers are not correct. Expected "{0}", actual "{1}".
+InterfaceNotAvailableError=Interface "{0}" is not available. Please select a valid interface and try again.
+AddressFormatError=Address "{0}" is not in the correct format. Please correct the Address parameter in the configuration and try again.
+AddressIPv4MismatchError=Address "{0}" is in IPv4 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
+AddressIPv6MismatchError=Address "{0}" is in IPv6 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
 '@
 }
 
@@ -33,7 +44,9 @@ function Get-TargetResource
         [String]$AddressFamily
     )
     
-    Write-Verbose -Message "$($MyInvocation.MyCommand): Getting the DNS Server Addresses ..."
+    Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+        $($LocalizedData.GettingDNSServerAddressesMessage)
+        ) -join '')
 
     $returnValue = @{
         Address = (Get-DnsClientServerAddress `
@@ -69,7 +82,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        'Applying the DNS Server Address ...'
+        $($LocalizedData.ApplyingDNSServerAddressesMessage)
         ) -join '')
 
     #Get the current DNS Server Addresses based on the parameters given.
@@ -93,23 +106,29 @@ function Set-TargetResource
                 -ServerAddresses $Address `
                 -Validate
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                'DNS Servers have been set correctly.'
+                $($LocalizedData.DNSServersSetCorrectlyMessage)
                 ) -join '' )
         }
         catch
         {
-            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                "Error setting valid DNS Server addresses using InterfaceAlias $InterfaceAlias "
-                "and AddressFamily $AddressFamily"
-                ) -join '' )
-            throw $_.Exception
+            $errorId = 'DefaultRouteGetFailure'
+            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+            $errorMessage = "$($MyInvocation.MyCommand): "
+            $errorMessage += $($LocalizedData.DNSServerSetError) -f $InterfaceAlias,$AddressFamily
+            $errorMessage += $_.Exception.Message
+            $exception = New-Object -TypeName System.InvalidOperationException `
+                -ArgumentList $errorMessage
+            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                -ArgumentList $exception, $errorId, $errorCategory, $null
+
+            $PSCmdlet.ThrowTerminatingError($errorRecord)
         }
     }
     else 
     { 
         #Test will return true in this case
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            'DNS Servers are already set correctly.'
+            $($LocalizedData.DNSServersAlreadySetMessage)
             ) -join '' )
     }
 }
@@ -139,7 +158,7 @@ function Test-TargetResource
     [Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        'Checking the DNS Server Address ...' 
+        $($LocalizedData.CheckingDNSServerAddressesMessage)
         ) -join '' )
 
     #Validate the Settings passed
@@ -164,14 +183,14 @@ function Test-TargetResource
     {
         $desiredConfigurationMatch = $false
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            "DNS Servers are not correct. Expected $Address, actual $currentAddress." 
+            $($LocalizedData.DNSServersNotCorrectMessage) -f $Address,$currentAddress
             ) -join '' )
     }
     else 
     { 
         #Test will return true in this case
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            'DNS Servers are set correctly.' 
+            $($LocalizedData.DNSServersSetCorrectlyMessage)
             ) -join '' )
     }
     return $desiredConfigurationMatch
@@ -200,39 +219,57 @@ function Test-ResourceProperty
 
     if ( -not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
-        throw ( @(
-            "Interface $InterfaceAlias is not available. "
-            'Please select a valid interface and try again'
-            ) -join '' )
+        $errorId = 'InterfaceNotAvailable'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
+        $errorMessage = $($LocalizedData.InterfaceNotAvailableError) -f $InterfaceAlias
+        $exception = New-Object -TypeName System.InvalidOperationException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
 
-    if ( -not ([System.Net.Ipaddress]::TryParse($Address, [ref]0)))
+    if ( -not ([System.Net.IPAddress]::TryParse($Address, [ref]0)))
     {
-        throw ( @(
-            "Address $Address is not in the correct format. "
-            'Please correct the Address parameter in the configuration and try again.'
-            ) -join '' )
+        $errorId = 'AddressFormatError'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+        $errorMessage = $($LocalizedData.AddressFormatError) -f $Address
+        $exception = New-Object -TypeName System.InvalidOperationException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
 
     $detectedAddressFamily = ([System.Net.IPAddress]$Address).AddressFamily.ToString()
     if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
         -and ($AddressFamily -ne 'IPv4'))
     {
-        throw ( @(
-            "Address $Address is in IPv4 format, which does not match "
-            "server address family $AddressFamily. "
-            'Please correct either of them in the configuration and try again.'
-            ) -join '' )
+        $errorId = 'AddressMismatchError'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+        $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f $Address,$AddressFamily
+        $exception = New-Object -TypeName System.InvalidOperationException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
 
     if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6.ToString()) `
         -and ($AddressFamily -ne 'IPv6'))
     {
-        throw ( @(
-            "Address $Address is in IPv6 format, which does not match "
-            "server address family $AddressFamily. "
-            'Please correct either of them in the configuration and try again'
-            ) -join '' )
+        $errorId = 'AddressMismatchError'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+        $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f $Address,$AddressFamily
+        $exception = New-Object -TypeName System.InvalidOperationException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
 } # Test-ResourceProperty
 #######################################################################################

@@ -85,8 +85,6 @@ InModuleScope MSFT_xIPAddress {
     Describe 'Set-TargetResource' {
 
         #region Mocks
-        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
-
         Mock Get-NetIPAddress -MockWith {
             [PSCustomObject]@{
                 IPAddress = '192.168.0.1'
@@ -167,13 +165,21 @@ InModuleScope MSFT_xIPAddress {
 
         Context 'invoking with invalid IPv4 Address' {
 
-            It 'should throw exception' {
+            It 'should throw an AddressFormatError error' {
                 $Splat = @{
                     IPAddress = 'BadAddress'
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                { $Result = Test-TargetResource @Splat } | Should Throw
+                $errorId = 'AddressFormatError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                $errorMessage = $($LocalizedData.AddressFormatError) -f $Splat.IPAddress
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { $Result = Test-TargetResource @Splat } | Should Throw $errorRecord
             }
         }
 
@@ -223,14 +229,22 @@ InModuleScope MSFT_xIPAddress {
         }
         Context 'invoking with invalid IPv6 Address' {
 
-            It 'should throw exception' {
+            It 'should throw an AddressFormatError error' {
                 $Splat = @{
                     IPAddress = 'BadAddress'
                     InterfaceAlias = 'Ethernet'
                     SubnetMask = 64
                     AddressFamily = 'IPv6'
                 }
-                { $Result = Test-TargetResource @Splat } | Should Throw
+                $errorId = 'AddressFormatError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                $errorMessage = $($LocalizedData.AddressFormatError) -f $Splat.IPAddress
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { $Result = Test-TargetResource @Splat } | Should Throw $errorRecord
             }
         }
 
@@ -279,49 +293,61 @@ InModuleScope MSFT_xIPAddress {
 
         Context 'invoking with bad interface alias' {
 
-            It 'should throw an error' {
+            It 'should throw an InterfaceNotAvailable error' {
                 $Splat = @{
                     IPAddress = '192.168.0.1'
                     InterfaceAlias = 'NotReal'
                     AddressFamily = 'IPv4'
                 }
-                { Test-ResourceProperty @Splat } | Should Throw
+                $errorId = 'InterfaceNotAvailable'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
+                $errorMessage = $($LocalizedData.InterfaceNotAvailableError) -f $Splat.InterfaceAlias
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { Test-ResourceProperty @Splat } | Should Throw $errorRecord
             }
         }
 
         Context 'invoking with invalid IP Address' {
 
-            It 'should throw an error' {
+            It 'should throw an AddressFormatError error' {
                 $Splat = @{
                     IPAddress = 'NotReal'
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                { Test-ResourceProperty @Splat } | Should Throw
-            }
-        }
+                $errorId = 'AddressFormatError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                $errorMessage = $($LocalizedData.AddressFormatError) -f $Splat.IPAddress
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
 
-        Context 'invoking with invalid IP Address' {
-
-            It 'should throw an error' {
-                $Splat = @{
-                    IPAddress = 'NotReal'
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-                { Test-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } | Should Throw $errorRecord
             }
         }
 
         Context 'invoking with IP Address and family mismatch' {
 
-            It 'should throw an error' {
+            It 'should throw an AddressMismatchError error' {
                 $Splat = @{
                     IPAddress = '192.168.0.1'
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv6'
                 }
-                { Test-ResourceProperty @Splat } | Should Throw
+                $errorId = 'AddressMismatchError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f $Splat.IPAddress,$Splat.AddressFamily
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { Test-ResourceProperty @Splat } | Should Throw $errorRecord
             }
         }
 
@@ -352,45 +378,65 @@ InModuleScope MSFT_xIPAddress {
 
         Context 'invoking with invalid IPv4 subnet mask' {
 
-            It 'should throw an error when greater than 32' {
+            It 'should throw a SubnetMaskError when greater than 32' {
                 $Splat = @{
                     IPAddress = '192.168.0.1'
                     InterfaceAlias = 'Ethernet'
                     SubnetMask = 33
                     AddressFamily = 'IPv4'
                 }
-                { Test-ResourceProperty @Splat } | Should Throw
+                $errorId = 'SubnetMaskError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                $errorMessage = $($LocalizedData.SubnetMaskError) -f $Splat.SubnetMask,$Splat.AddressFamily
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { Test-ResourceProperty @Splat } | Should Throw $errorRecord
             }
-            It 'should throw an error when less than 0' {
+            It 'should throw an Argument error when less than 0' {
                 $Splat = @{
                     IPAddress = '192.168.0.1'
                     InterfaceAlias = 'Ethernet'
                     SubnetMask = -1
                     AddressFamily = 'IPv4'
                 }
-                { Test-ResourceProperty @Splat } | Should Throw
+                { Test-ResourceProperty @Splat } `
+                    | Should Throw 'Value was either too large or too small for a UInt32.'
             }
         }
 
         Context 'invoking with invalid IPv6 subnet mask' {
 
-            It 'should throw an error when greater than 128' {
+            It 'should throw a SubnetMaskError error when greater than 128' {
                 $Splat = @{
                     IPAddress = 'fe80::1'
                     InterfaceAlias = 'Ethernet'
                     SubnetMask = 129
                     AddressFamily = 'IPv6'
                 }
-                { Test-ResourceProperty @Splat } | Should Throw
+
+                $errorId = 'SubnetMaskError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                $errorMessage = $($LocalizedData.SubnetMaskError) -f $Splat.SubnetMask,$Splat.AddressFamily
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { Test-ResourceProperty @Splat } | Should Throw $errorRecord
             }
-            It 'should throw an error when less than 0' {
+            It 'should throw an Argument error when less than 0' {
                 $Splat = @{
                     IPAddress = 'fe80::1'
                     InterfaceAlias = 'Ethernet'
                     SubnetMask = -1
                     AddressFamily = 'IPv6'
                 }
-                { Test-ResourceProperty @Splat } | Should Throw
+
+                { Test-ResourceProperty @Splat } `
+                    | Should Throw 'Value was either too large or too small for a UInt32.'
             }
         }
 

@@ -7,6 +7,26 @@ data LocalizedData
 {
     # culture="en-US"
     ConvertFrom-StringData -StringData @'
+GettingIPAddressMessage=Getting the IP Address.
+ApplyingIPAddressMessage=Applying the IP Address.
+DefaultGatewayGetError=Error getting Default Gateway address using InterfaceAlias "{0}" and AddressFamily {1}.
+DefaultGatewayRemoveError=Error removing Default Gateway address using InterfaceAlias "{0}" and AddressFamily {1}.
+IPAddressGetError=Error getting IP Address using InterfaceAlias "{0}" and AddressFamily {1}.
+IPAddressRemoveError=Error removing IP Address using InterfaceAlias "{0}" and AddressFamily {1}.
+IPAddressSetError=Error setting IP Address using InterfaceAlias "{0}" and AddressFamily {1}.
+IPAddressSetStateMessage=IP Interface was set to the desired state.
+CheckingIPAddressMessage=Checking the IP Address.
+IPAddressDoesNotMatchMessage=IP Address does NOT match desired state. Expected {0}, actual {1}.
+IPAddressMatchMessage=IP Address is in desired state.
+SubnetMaskDoesNotMatchMessage=Subnet mask does NOT match desired state. Expected {0}, actual {1}.
+SubnetMaskMatchMessage=Subnet mask is in desired state.
+DHCPIsNotDisabledMessage=DHCP is NOT disabled.
+DHCPIsAlreadyDisabledMessage=DHCP is already disabled.
+InterfaceNotAvailableError=Interface "{0}" is not available. Please select a valid interface and try again.
+AddressFormatError=Address "{0}" is not in the correct format. Please correct the Address parameter in the configuration and try again.
+AddressIPv4MismatchError=Address "{0}" is in IPv4 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
+AddressIPv6MismatchError=Address "{0}" is in IPv6 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
+SubnetMaskError=A Subnet Mask of {0} is not valid for {1} addresses. Please correct the subnet mask and try again.
 '@
 }
 
@@ -33,7 +53,9 @@ function Get-TargetResource
         [String]$AddressFamily = 'IPv4'
     )
 
-    Write-Verbose -Message "$($MyInvocation.MyCommand): Applying the IP Address..."
+    Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+        $($LocalizedData.GettingIPAddressMessage)
+        ) -join '')
 
     $CurrentIPAddress = Get-NetIPAddress `
         -InterfaceAlias $InterfaceAlias `
@@ -72,32 +94,48 @@ function Set-TargetResource
         [String]$AddressFamily = 'IPv4'
     )
 
+    Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+        $($LocalizedData.ApplyingIPAddressMessage)
+        ) -join '')
+
+    # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
+    $DestinationPrefix = '0.0.0.0/0'
+    if ($AddressFamily -eq 'IPv6')
+    {
+        $DestinationPrefix = '::/0'
+    }
+
+    # Get all the default routes - this has to be done in case the IP Address is
+    # beng Removed
     try
     {
-        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            'Applying the IP Address...'
-            ) -join '' )
-
-        # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
-        $DestinationPrefix = '0.0.0.0/0'
-        if ($AddressFamily -eq 'IPv6')
-        {
-            $DestinationPrefix = '::/0'
-        }
-
-        # Get all the default routes - this has to be done in case the IP Address is
-        # beng Removed
         $defaultRoutes = @(Get-NetRoute `
             -InterfaceAlias $InterfaceAlias `
             -AddressFamily $AddressFamily `
             -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
+    }
+    catch
+    {
+        $errorId = 'DefaultRouteGetFailure'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+        $errorMessage = "$($MyInvocation.MyCommand): "
+        $errorMessage += $($LocalizedData.DefaultGatewayGetError) -f $InterfaceAlias,$AddressFamily
+        $errorMessage += $_.Exception.Message
+        $exception = New-Object -TypeName System.InvalidOperationException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
 
-        # Remove any default routes on the specified interface -- it is important to do
-        # this *before* removing the IP address, particularly in the case where the IP
-        # address was auto-configured by DHCP
-        if ($defaultRoutes)
-        {
-            foreach ($defaultRoute in $defaultRoutes) {
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
+    }
+
+    # Remove any default routes on the specified interface -- it is important to do
+    # this *before* removing the IP address, particularly in the case where the IP
+    # address was auto-configured by DHCP
+    if ($defaultRoutes)
+    {
+        foreach ($defaultRoute in $defaultRoutes) {
+            try {
                 Remove-NetRoute `
                     -DestinationPrefix $defaultRoute.DestinationPrefix `
                     -NextHop $defaultRoute.NextHop `
@@ -105,49 +143,102 @@ function Set-TargetResource
                     -AddressFamily $defaultRoute.AddressFamily `
                     -Confirm:$false -ErrorAction Stop
             }
-        }
+            catch
+            {
+                $errorId = 'DefaultRouteRemoveFailure'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+                $errorMessage = "$($MyInvocation.MyCommand): "
+                $errorMessage += $($LocalizedData.DefaultGatewayRemoveError) -f $InterfaceAlias,$AddressFamily
+                $errorMessage += $_.Exception.Message
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
 
-        # Get the current IP Address based on the parameters given.
+                $PSCmdlet.ThrowTerminatingError($errorRecord)
+            }
+        }
+    }
+
+    # Get the current IP Address based on the parameters given.
+    try {
         $currentIPs = @(Get-NetIPAddress `
             -InterfaceAlias $InterfaceAlias `
             -AddressFamily $AddressFamily `
             -ErrorAction Stop)
+    }
+    catch
+    {
+        $errorId = 'GetIPAddressFailure'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+        $errorMessage = "$($MyInvocation.MyCommand): "
+        $errorMessage += $($LocalizedData.IPAddressGetError) -f $InterfaceAlias,$AddressFamily
+        $errorMessage += $_.Exception.Message
+        $exception = New-Object -TypeName System.InvalidOperationException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
 
-        # Remove any IP addresses on the specified interface
-        if ($currentIPs)
-        {
-            foreach ($CurrentIP in $CurrentIPs) {
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
+    }
+
+    # Remove any IP addresses on the specified interface
+    if ($currentIPs)
+    {
+        foreach ($CurrentIP in $CurrentIPs) {
+            try {
                 Remove-NetIPAddress `
                     -IPAddress $CurrentIP.IPAddress `
                     -InterfaceIndex $CurrentIP.InterfaceIndex `
                     -AddressFamily $CurrentIP.AddressFamily `
                     -Confirm:$false -ErrorAction Stop
             }
-        }
+            catch
+            {
+                $errorId = 'RemoveIPAddressFailure'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+                $errorMessage = "$($MyInvocation.MyCommand): "
+                $errorMessage += $($LocalizedData.IPAddressRemoveError) -f $InterfaceAlias,$AddressFamily
+                $errorMessage += $_.Exception.Message
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
 
-        # Build parameter hash table
-        $Parameters = @{
-            IPAddress = $IPAddress
-            PrefixLength = $SubnetMask
-            InterfaceAlias = $InterfaceAlias
+                $PSCmdlet.ThrowTerminatingError($errorRecord)
+            }
         }
+    }
 
-        # Apply the specified IP configuration
+    # Build parameter hash table
+    $Parameters = @{
+        IPAddress = $IPAddress
+        PrefixLength = $SubnetMask
+        InterfaceAlias = $InterfaceAlias
+    }
+
+    # Apply the specified IP configuration
+    try {
         $null = New-NetIPAddress @Parameters -ErrorAction Stop
-
-        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            'IP Interface was set to the desired state.'
-            ) -join '' )
     }
     catch
     {
-        Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                "Error setting IP Address using InterfaceAlias $InterfaceAlias "
-                "and AddressFamily $AddressFamily"
-            ) -join '' )
-        throw $_.Exception
+        $errorId = 'NewIPAddressFailure'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+        $errorMessage = "$($MyInvocation.MyCommand): "
+        $errorMessage += $($LocalizedData.IPAddressSetError) -f $InterfaceAlias,$AddressFamily
+        $errorMessage += $_.Exception.Message
+        $exception = New-Object -TypeName System.InvalidOperationException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
+
+    Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+        $($LocalizedData.IPAddressSetStateMessage)
+        ) -join '' )
 } # Set-TargetResource
 
 ######################################################################################
@@ -177,31 +268,46 @@ function Test-TargetResource
     [Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        'Checking the IP Address ...'
+        $($LocalizedData.CheckingIPAddressMessage)
         ) -join '')
 
     Test-ResourceProperty @PSBoundParameters
 
     # Get the current IP Address based on the parameters given.
-    $currentIPs = @(Get-NetIPAddress `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily `
-        -ErrorAction Stop)
+    try {
+        $currentIPs = @(Get-NetIPAddress `
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily `
+            -ErrorAction Stop)
+    }
+    catch
+    {
+        $errorId = 'GetIPAddressFailure'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+        $errorMessage = "$($MyInvocation.MyCommand): "
+        $errorMessage += $($LocalizedData.IPAddressGetError) -f $InterfaceAlias,$AddressFamily
+        $errorMessage += $_.Exception.Message
+        $exception = New-Object -TypeName System.InvalidOperationException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
+    }
 
     # Test if the IP Address passed is present
     if (-not $currentIPs.IPAddress.Contains($IPAddress))
     {
         Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                " IP Address does NOT match desired state. Expected $IPAddress, "
-                "actual $($currentIPs.IPAddress)."
+            "$($MyInvocation.MyCommand): "
+            $($LocalizedData.IPAddressDoesNotMatchMessage) -f $IPAddress,$currentIPs.IPAddress
             ) -join '' )
         $desiredConfigurationMatch = $false
     }
     else
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            'IP Address is correct.'
+            $($LocalizedData.IPAddressMatchMessage)
             ) -join '')
 
         # Filter the IP addresses for the IP address to check
@@ -211,33 +317,33 @@ function Test-TargetResource
         if (-not $filterIP.PrefixLength.Equals([byte]$SubnetMask))
         {
             Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    "Subnet mask does NOT match desired state. Expected $SubnetMask, "
-                    "actual $($filterIP.PrefixLength)."
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.SubnetMaskDoesNotMatchMessage) -f $SubnetMask,$currentIPs.PrefixLength
                 ) -join '' )
             $desiredConfigurationMatch = $false
         }
         else
         {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                'Subnet mask is correct.'
+                $($LocalizedData.SubnetMaskMatchMessage)
                 ) -join '' )
         }
     }
 
     # Test if DHCP is already disabled
-    if (-not (Get-NetIPInterface -InterfaceAlias $InterfaceAlias -AddressFamily `
-        $AddressFamily).Dhcp.ToString().Equals('Disabled'))
+    if (-not (Get-NetIPInterface `
+        -InterfaceAlias $InterfaceAlias `
+        -AddressFamily $AddressFamily).Dhcp.ToString().Equals('Disabled'))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            'DHCP is NOT disabled.'
+            $($LocalizedData.DHCPIsNotDisabledMessage)
             ) -join '' )
         $desiredConfigurationMatch = $false
     }
     else
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            'DHCP is already disabled.'
+            $($LocalizedData.DHCPIsAlreadyDisabledMessage)
             ) -join '' )
     }
     return $desiredConfigurationMatch
@@ -269,38 +375,56 @@ function Test-ResourceProperty {
 
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
-        throw ( @(
-            "Interface $InterfaceAlias is not available. "
-            'Please select a valid interface and try again.'
-            ) -join '' )
+        $errorId = 'InterfaceNotAvailable'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
+        $errorMessage = $($LocalizedData.InterfaceNotAvailableError) -f $InterfaceAlias
+        $exception = New-Object -TypeName System.InvalidOperationException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
     if (-not ([System.Net.Ipaddress]::TryParse($IPAddress, [ref]0)))
     {
-        throw ( @(
-            "IP Address $IPAddress is not in the correct format. "
-            'Please correct the IPAddress parameter in the configuration and try again.'
-            ) -join '' )
+        $errorId = 'AddressFormatError'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+        $errorMessage = $($LocalizedData.AddressFormatError) -f $IPAddress
+        $exception = New-Object -TypeName System.InvalidOperationException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
 
     $detectedAddressFamily = ([System.Net.IPAddress]$IPAddress).AddressFamily.ToString()
     if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
         -and ($AddressFamily -ne 'IPv4'))
     {
-        throw ( @(
-            "IP Address $IPAddress is in IPv4 format, which does not match "
-            "IP address family $AddressFamily. "
-            'Please correct the IPAddress parameter in the configuration and try again.'
-        ) -join '' )
+        $errorId = 'AddressMismatchError'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+        $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f $IPAddress,$AddressFamily
+        $exception = New-Object -TypeName System.InvalidOperationException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
 
     if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6.ToString()) `
         -and ($AddressFamily -ne 'IPv6'))
     {
-        throw ( @(
-            "IP Address $IPAddress is in IPv6 format, which does not match "
-            "IP address family $AddressFamily. "
-            'Please correct the IPAddress parameter in the configuration and try again.'
-        ) -join '' )
+        $errorId = 'AddressMismatchError'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+        $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f $IPAddress,$AddressFamily
+        $exception = New-Object -TypeName System.InvalidOperationException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
 
     if ((
@@ -311,10 +435,15 @@ function Test-ResourceProperty {
                 -and (($SubnetMask -lt [uint32]0) -or ($SubnetMask -gt [uint32]128))
         ))
     {
-        throw  ( @(
-            "A Subnet Mask of $SubnetMask is not valid for $AddressFamily addresses. "
-            'Please correct the subnet mask and try again.'
-            ) -join '' )
+        $errorId = 'SubnetMaskError'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+        $errorMessage = $($LocalizedData.SubnetMaskError) -f $SubnetMask,$AddressFamily
+        $exception = New-Object -TypeName System.InvalidOperationException `
+            -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+            -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
 
 } # Test-ResourceProperty

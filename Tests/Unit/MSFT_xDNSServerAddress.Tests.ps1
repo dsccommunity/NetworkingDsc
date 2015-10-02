@@ -71,7 +71,6 @@ InModuleScope MSFT_xDNSServerAddress {
     Describe 'Set-TargetResource' {
 
         #region Mocks
-        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
         Mock Get-DnsClientServerAddress -MockWith {
 
             [PSCustomObject]@{
@@ -198,49 +197,81 @@ InModuleScope MSFT_xDNSServerAddress {
 
         Context 'invoking with bad interface alias' {
 
-            It 'should throw an error' {
+            It 'should throw an InterfaceNotAvailable error' {
                 $Splat = @{
                     Address = '192.168.0.1'
                     InterfaceAlias = 'NotReal'
                     AddressFamily = 'IPv4'
                 }
-                { Test-ResourceProperty @Splat } | Should Throw
+                $errorId = 'InterfaceNotAvailable'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
+                $errorMessage = $($LocalizedData.InterfaceNotAvailableError) -f $Splat.InterfaceAlias
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
             }
         }
 
         Context 'invoking with invalid IP Address' {
 
-            It 'should throw an error' {
+            It 'should throw an AddressFormatError error' {
                 $Splat = @{
                     Address = 'NotReal'
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
                 }
-                { Test-ResourceProperty @Splat } | Should Throw
+                $errorId = 'AddressFormatError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                $errorMessage = $($LocalizedData.AddressFormatError) -f $Splat.Address
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
             }
         }
 
-        Context 'invoking with invalid IP Address' {
+        Context 'invoking with IPv4 Address and family mismatch' {
 
-            It 'should throw an error' {
-                $Splat = @{
-                    Address = 'NotReal'
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-                { Test-ResourceProperty @Splat } | Should Throw
-            }
-        }
-
-        Context 'invoking with IP Address and family mismatch' {
-
-            It 'should throw an error' {
+            It 'should throw an AddressMismatchError error' {
                 $Splat = @{
                     Address = '192.168.0.1'
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv6'
                 }
-                { Test-ResourceProperty @Splat } | Should Throw
+                $errorId = 'AddressMismatchError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f $Splat.Address,$Splat.AddressFamily
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+            }
+        }
+
+        Context 'invoking with IPv6 Address and family mismatch' {
+
+            It 'should throw an AddressMismatchError error' {
+                $Splat = @{
+                    Address = 'fe80::'
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv4'
+                }
+                $errorId = 'AddressMismatchError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f $Splat.Address,$Splat.AddressFamily
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
             }
         }
 
