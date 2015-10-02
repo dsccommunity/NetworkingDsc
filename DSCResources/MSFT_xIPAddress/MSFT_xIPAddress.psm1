@@ -1,7 +1,14 @@
 #######################################################################################
-#  MSDSCPack_IPAddress : DSC Resource that will set/test/get the current IP
-#  Address, by accepting values among those given in MSDSCPack_IPAddress.schema.mof
+#  xIPAddress : DSC Resource that will set/test/get the current IP
+#  Address, by accepting values among those given in xIPAddress.schema.mof
 #######################################################################################
+
+data LocalizedData
+{
+    # culture="en-US"
+    ConvertFrom-StringData -StringData @'
+'@
+}
 
 ######################################################################################
 # The Get-TargetResource cmdlet.

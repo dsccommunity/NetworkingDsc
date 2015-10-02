@@ -2,8 +2,13 @@
 #  xDNSServerAddress : DSC Resource that will set/test/get the current DNS Server
 #  Address, by accepting values among those given in xDNSServerAddress.schema.mof
 #######################################################################################
- 
 
+data LocalizedData
+{
+    # culture="en-US"
+    ConvertFrom-StringData -StringData @'
+'@
+}
 
 ######################################################################################
 # The Get-TargetResource cmdlet.
