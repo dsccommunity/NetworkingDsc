@@ -70,6 +70,8 @@ function Get-TargetResource
     # to the return value.
     if ($defaultRoutes) {
         $returnValue += @{ Address = $DefaultRoutes.NextHop }
+    } else {
+        $returnValue += @{ Address = $null }
     }
 
     $returnValue

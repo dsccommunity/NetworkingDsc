@@ -87,8 +87,6 @@ InModuleScope MSFT_xDefaultGatewayAddress {
     Describe 'Set-TargetResource' {
 
         #region Mocks
-        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
-
         Mock Get-NetRoute -MockWith {
             [PSCustomObject]@{
                 NextHop = '192.168.0.1'
@@ -102,11 +100,10 @@ InModuleScope MSFT_xDefaultGatewayAddress {
         Mock Remove-NetRoute
 
         Mock New-NetRoute
-
         #endregion
 
         Context 'invoking with no Default Gateway Address' {
-            It 'should rerturn $null' {
+            It 'should return $null' {
                 $Splat = @{
                     InterfaceAlias = 'Ethernet'
                     AddressFamily = 'IPv4'
@@ -116,14 +113,14 @@ InModuleScope MSFT_xDefaultGatewayAddress {
             }
 
             It 'should call all the mocks' {
-                Assert-MockCalled -commandName Get-NetAdapter -Exactly 0
                 Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                 Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                Assert-MockCalled -commandName New-NetRoute -Exactly 0
             }
         }
 
         Context 'invoking with valid Default Gateway Address' {
-            It 'should rerturn $null' {
+            It 'should return $null' {
                 $Splat = @{
                     Address = '192.168.0.1'
                     InterfaceAlias = 'Ethernet'
@@ -134,7 +131,6 @@ InModuleScope MSFT_xDefaultGatewayAddress {
             }
 
             It 'should call all the mocks' {
-                Assert-MockCalled -commandName Get-NetAdapter -Exactly 0
                 Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                 Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
                 Assert-MockCalled -commandName New-NetRoute -Exactly 1
