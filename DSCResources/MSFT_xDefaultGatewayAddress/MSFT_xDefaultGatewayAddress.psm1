@@ -60,7 +60,7 @@ function Get-TargetResource
     # Get all the default routes
     $defaultRoutes = Get-NetRoute -InterfaceAlias $InterfaceAlias -AddressFamily `
         $AddressFamily -ErrorAction Stop | `
-        where-Object { $_.DestinationPrefix -eq $DestinationPrefix }
+        Where-Object { $_.DestinationPrefix -eq $DestinationPrefix }
 
     $returnValue = @{
         AddressFamily = $AddressFamily
