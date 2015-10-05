@@ -11,9 +11,6 @@ GettingDefaultGatewayAddressMessage=Getting the Default Gateway Address.
 ApplyingDefaultGatewayAddressMessage=Applying the Default Gateway Address.
 DefaultGatewayAddressSetToDesiredStateMessage=Default Gateway address was set to the desired state.
 DefaultGatewayRemovedMessage=Default Gateway address has been removed.
-DefaultGatewayGetError=Error getting Default Gateway address using InterfaceAlias "{0}" and AddressFamily {1}.
-DefaultGatewayRemoveError=Error removing Default Gateway address using InterfaceAlias "{0}" and AddressFamily {1}.
-DefaultGatewaySetError=Error setting Default Gateway address using InterfaceAlias "{0}" and AddressFamily {1}.
 CheckingDefaultGatewayAddressMessage=Checking the Default Gateway Address.
 DefaultGatewayNotMatchMessage=Default gateway does NOT match desired state. Expected "{0}", actual "{1}".
 DefaultGatewayCorrectMessage=Default gateway is correct.
@@ -110,51 +107,19 @@ function Set-TargetResource
     }
 
     # Get all the default routes
-    try {
-        $defaultRoutes = @(Get-NetRoute `
-            -InterfaceAlias $InterfaceAlias `
-            -AddressFamily $AddressFamily `
-            -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
-    }
-    catch
-    {
-        $errorId = 'DefaultRouteGetFailure'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-        $errorMessage = "$($MyInvocation.MyCommand): "
-        $errorMessage += $($LocalizedData.DefaultGatewayGetError) -f $InterfaceAlias,$AddressFamily
-        $errorMessage += $_.Exception.Message
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
-    }
+    $defaultRoutes = @(Get-NetRoute `
+        -InterfaceAlias $InterfaceAlias `
+        -AddressFamily $AddressFamily `
+        -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
 
     # Remove any existing default route
     foreach ($defaultRoute in $defaultRoutes) {
-        try {
-            Remove-NetRoute `
-                -DestinationPrefix $defaultRoute.DestinationPrefix `
-                -NextHop $defaultRoute.NextHop `
-                -InterfaceIndex $defaultRoute.InterfaceIndex `
-                -AddressFamily $defaultRoute.AddressFamily `
-                -Confirm:$false -ErrorAction Stop
-        }
-        catch
-        {
-            $errorId = 'DefaultRouteRemoveFailure'
-            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-            $errorMessage = "$($MyInvocation.MyCommand): "
-            $errorMessage += $($LocalizedData.DefaultGatewayRemoveError) -f $InterfaceAlias,$AddressFamily
-            $errorMessage += $_.Exception.Message
-            $exception = New-Object -TypeName System.InvalidOperationException `
-                -ArgumentList $errorMessage
-            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                -ArgumentList $exception, $errorId, $errorCategory, $null
-
-            $PSCmdlet.ThrowTerminatingError($errorRecord)
-        }
+        Remove-NetRoute `
+            -DestinationPrefix $defaultRoute.DestinationPrefix `
+            -NextHop $defaultRoute.NextHop `
+            -InterfaceIndex $defaultRoute.InterfaceIndex `
+            -AddressFamily $defaultRoute.AddressFamily `
+            -Confirm:$false -ErrorAction Stop
     }
 
     if ($Address)
@@ -167,23 +132,8 @@ function Set-TargetResource
             AddressFamily = $AddressFamily
             NextHop = $Address
         }
-        try {
-            New-NetRoute @Parameters
-        }
-        catch
-        {
-            $errorId = 'DefaultRouteSetFailure'
-            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-            $errorMessage = "$($MyInvocation.MyCommand): "
-            $errorMessage += $($LocalizedData.DefaultGatewaySetError) -f $InterfaceAlias,$AddressFamily
-            $errorMessage += $_.Exception.Message
-            $exception = New-Object -TypeName System.InvalidOperationException `
-                -ArgumentList $errorMessage
-            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                -ArgumentList $exception, $errorId, $errorCategory, $null
 
-            $PSCmdlet.ThrowTerminatingError($errorRecord)
-        }
+        New-NetRoute @Parameters -ErrorAction Stop
 
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             $($LocalizedData.DefaultGatewayAddressSetToDesiredStateMessage)
@@ -233,26 +183,10 @@ function Test-TargetResource
         $DestinationPrefix = '::/0'
     }
     # Get all the default routes
-    try {
-        $defaultRoutes = @(Get-NetRoute `
-            -InterfaceAlias $InterfaceAlias `
-            -AddressFamily $AddressFamily `
-            -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
-    }
-    catch
-    {
-        $errorId = 'DefaultRouteGetFailure'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-        $errorMessage = "$($MyInvocation.MyCommand): "
-        $errorMessage += $($LocalizedData.DefaultGatewayGetError) -f $InterfaceAlias,$AddressFamily
-        $errorMessage += $_.Exception.Message
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
-    }
+    $defaultRoutes = @(Get-NetRoute `
+        -InterfaceAlias $InterfaceAlias `
+        -AddressFamily $AddressFamily `
+        -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
 
     # Test if the Default Gateway passed is equal to the current default gateway
     if ($Address)

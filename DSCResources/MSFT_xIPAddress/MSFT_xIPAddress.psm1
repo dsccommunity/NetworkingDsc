@@ -9,11 +9,6 @@ data LocalizedData
     ConvertFrom-StringData -StringData @'
 GettingIPAddressMessage=Getting the IP Address.
 ApplyingIPAddressMessage=Applying the IP Address.
-DefaultGatewayGetError=Error getting Default Gateway address using InterfaceAlias "{0}" and AddressFamily {1}.
-DefaultGatewayRemoveError=Error removing Default Gateway address using InterfaceAlias "{0}" and AddressFamily {1}.
-IPAddressGetError=Error getting IP Address using InterfaceAlias "{0}" and AddressFamily {1}.
-IPAddressRemoveError=Error removing IP Address using InterfaceAlias "{0}" and AddressFamily {1}.
-IPAddressSetError=Error setting IP Address using InterfaceAlias "{0}" and AddressFamily {1}.
 IPAddressSetStateMessage=IP Interface was set to the desired state.
 CheckingIPAddressMessage=Checking the IP Address.
 IPAddressDoesNotMatchMessage=IP Address does NOT match desired state. Expected {0}, actual {1}.
@@ -107,27 +102,10 @@ function Set-TargetResource
 
     # Get all the default routes - this has to be done in case the IP Address is
     # beng Removed
-    try
-    {
-        $defaultRoutes = @(Get-NetRoute `
-            -InterfaceAlias $InterfaceAlias `
-            -AddressFamily $AddressFamily `
-            -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
-    }
-    catch
-    {
-        $errorId = 'DefaultRouteGetFailure'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-        $errorMessage = "$($MyInvocation.MyCommand): "
-        $errorMessage += $($LocalizedData.DefaultGatewayGetError) -f $InterfaceAlias,$AddressFamily
-        $errorMessage += $_.Exception.Message
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
-    }
+    $defaultRoutes = @(Get-NetRoute `
+        -InterfaceAlias $InterfaceAlias `
+        -AddressFamily $AddressFamily `
+        -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
 
     # Remove any default routes on the specified interface -- it is important to do
     # this *before* removing the IP address, particularly in the case where the IP
@@ -135,78 +113,32 @@ function Set-TargetResource
     if ($defaultRoutes)
     {
         foreach ($defaultRoute in $defaultRoutes) {
-            try {
-                Remove-NetRoute `
-                    -DestinationPrefix $defaultRoute.DestinationPrefix `
-                    -NextHop $defaultRoute.NextHop `
-                    -InterfaceIndex $defaultRoute.InterfaceIndex `
-                    -AddressFamily $defaultRoute.AddressFamily `
-                    -Confirm:$false -ErrorAction Stop
-            }
-            catch
-            {
-                $errorId = 'DefaultRouteRemoveFailure'
-                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-                $errorMessage = "$($MyInvocation.MyCommand): "
-                $errorMessage += $($LocalizedData.DefaultGatewayRemoveError) -f $InterfaceAlias,$AddressFamily
-                $errorMessage += $_.Exception.Message
-                $exception = New-Object -TypeName System.InvalidOperationException `
-                    -ArgumentList $errorMessage
-                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                    -ArgumentList $exception, $errorId, $errorCategory, $null
-
-                $PSCmdlet.ThrowTerminatingError($errorRecord)
-            }
+            Remove-NetRoute `
+                -DestinationPrefix $defaultRoute.DestinationPrefix `
+                -NextHop $defaultRoute.NextHop `
+                -InterfaceIndex $defaultRoute.InterfaceIndex `
+                -AddressFamily $defaultRoute.AddressFamily `
+                -Confirm:$false `
+                -ErrorAction Stop
         }
     }
 
     # Get the current IP Address based on the parameters given.
-    try {
-        $currentIPs = @(Get-NetIPAddress `
-            -InterfaceAlias $InterfaceAlias `
-            -AddressFamily $AddressFamily `
-            -ErrorAction Stop)
-    }
-    catch
-    {
-        $errorId = 'GetIPAddressFailure'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-        $errorMessage = "$($MyInvocation.MyCommand): "
-        $errorMessage += $($LocalizedData.IPAddressGetError) -f $InterfaceAlias,$AddressFamily
-        $errorMessage += $_.Exception.Message
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
-    }
+    $currentIPs = @(Get-NetIPAddress `
+        -InterfaceAlias $InterfaceAlias `
+        -AddressFamily $AddressFamily `
+        -ErrorAction Stop)
 
     # Remove any IP addresses on the specified interface
     if ($currentIPs)
     {
         foreach ($CurrentIP in $CurrentIPs) {
-            try {
-                Remove-NetIPAddress `
-                    -IPAddress $CurrentIP.IPAddress `
-                    -InterfaceIndex $CurrentIP.InterfaceIndex `
-                    -AddressFamily $CurrentIP.AddressFamily `
-                    -Confirm:$false -ErrorAction Stop
-            }
-            catch
-            {
-                $errorId = 'RemoveIPAddressFailure'
-                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-                $errorMessage = "$($MyInvocation.MyCommand): "
-                $errorMessage += $($LocalizedData.IPAddressRemoveError) -f $InterfaceAlias,$AddressFamily
-                $errorMessage += $_.Exception.Message
-                $exception = New-Object -TypeName System.InvalidOperationException `
-                    -ArgumentList $errorMessage
-                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                    -ArgumentList $exception, $errorId, $errorCategory, $null
-
-                $PSCmdlet.ThrowTerminatingError($errorRecord)
-            }
+            Remove-NetIPAddress `
+                -IPAddress $CurrentIP.IPAddress `
+                -InterfaceIndex $CurrentIP.InterfaceIndex `
+                -AddressFamily $CurrentIP.AddressFamily `
+                -Confirm:$false `
+                -ErrorAction Stop
         }
     }
 
@@ -218,23 +150,7 @@ function Set-TargetResource
     }
 
     # Apply the specified IP configuration
-    try {
-        $null = New-NetIPAddress @Parameters -ErrorAction Stop
-    }
-    catch
-    {
-        $errorId = 'NewIPAddressFailure'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-        $errorMessage = "$($MyInvocation.MyCommand): "
-        $errorMessage += $($LocalizedData.IPAddressSetError) -f $InterfaceAlias,$AddressFamily
-        $errorMessage += $_.Exception.Message
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
-    }
+    $null = New-NetIPAddress @Parameters -ErrorAction Stop
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
         $($LocalizedData.IPAddressSetStateMessage)
@@ -274,26 +190,10 @@ function Test-TargetResource
     Test-ResourceProperty @PSBoundParameters
 
     # Get the current IP Address based on the parameters given.
-    try {
-        $currentIPs = @(Get-NetIPAddress `
-            -InterfaceAlias $InterfaceAlias `
-            -AddressFamily $AddressFamily `
-            -ErrorAction Stop)
-    }
-    catch
-    {
-        $errorId = 'GetIPAddressFailure'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-        $errorMessage = "$($MyInvocation.MyCommand): "
-        $errorMessage += $($LocalizedData.IPAddressGetError) -f $InterfaceAlias,$AddressFamily
-        $errorMessage += $_.Exception.Message
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
-    }
+    $currentIPs = @(Get-NetIPAddress `
+        -InterfaceAlias $InterfaceAlias `
+        -AddressFamily $AddressFamily `
+        -ErrorAction Stop)
 
     # Test if the IP Address passed is present
     if (-not $currentIPs.IPAddress.Contains($IPAddress))

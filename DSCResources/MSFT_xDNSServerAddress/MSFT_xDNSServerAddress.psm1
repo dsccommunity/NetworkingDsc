@@ -10,7 +10,6 @@ data LocalizedData
 GettingDNSServerAddressesMessage=Getting the DNS Server Addresses.
 ApplyingDNSServerAddressesMessage=Applying the DNS Server Addresses.
 DNSServersSetCorrectlyMessage=DNS Servers are set correctly.
-DNSServerSetError=Error setting valid DNS Server addresses using InterfaceAlias {0} and AddressFamily {1}.
 DNSServersAlreadySetMessage=DNS Servers are already set correctly.
 CheckingDNSServerAddressesMessage=Checking the DNS Server Addresses.
 DNSServersNotCorrectMessage=DNS Servers are not correct. Expected "{0}", actual "{1}".
@@ -98,31 +97,14 @@ function Set-TargetResource
 
     if ($addressCompare)
     {
-        try
-        {        
-            # Set the DNS settings as well
-            Set-DnsClientServerAddress `
-                -InterfaceAlias $InterfaceAlias `
-                -ServerAddresses $Address `
-                -Validate
-            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.DNSServersSetCorrectlyMessage)
-                ) -join '' )
-        }
-        catch
-        {
-            $errorId = 'DefaultRouteGetFailure'
-            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-            $errorMessage = "$($MyInvocation.MyCommand): "
-            $errorMessage += $($LocalizedData.DNSServerSetError) -f $InterfaceAlias,$AddressFamily
-            $errorMessage += $_.Exception.Message
-            $exception = New-Object -TypeName System.InvalidOperationException `
-                -ArgumentList $errorMessage
-            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                -ArgumentList $exception, $errorId, $errorCategory, $null
-
-            $PSCmdlet.ThrowTerminatingError($errorRecord)
-        }
+        # Set the DNS settings as well
+        Set-DnsClientServerAddress `
+            -InterfaceAlias $InterfaceAlias `
+            -ServerAddresses $Address `
+            -Validate
+        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+            $($LocalizedData.DNSServersSetCorrectlyMessage)
+            ) -join '' )
     }
     else 
     { 
