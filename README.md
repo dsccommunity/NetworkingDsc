@@ -56,7 +56,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 ## Versions
 
 ### Unreleased
-* MSFT_xDefaultGatewayAddress: Refactored to add more unit tests and cleanup logic.
+* MSFT_xDefaultGatewayAddress: Refactored to add more unit tests and cleanup logic. 
 * MSFT_xIPAddress: Network Connection Profile no longer forced to Private when IP address changed.
 * MSFT_xIPAddress: Refactored to add more unit tests and cleanup logic.
 * MSFT_xDNSServerAddress: Refactored to add more unit tests and cleanup logic.
