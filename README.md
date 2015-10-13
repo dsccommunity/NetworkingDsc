@@ -56,6 +56,9 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 ## Versions
 
 ### Unreleased
+* MSFT_xDefaultGatewayAddress: Removed unessesary try/catch logic from around networking cmdlets.
+* MSFT_xIPAddress: Removed unessesary try/catch logic from around networking cmdlets.
+* MSFT_xDNSServerAddress: Removed unessesary try/catch logic from around networking cmdlets.
 * MSFT_xDefaultGatewayAddress: Refactored to add more unit tests and cleanup logic. 
 * MSFT_xIPAddress: Network Connection Profile no longer forced to Private when IP address changed.
 * MSFT_xIPAddress: Refactored to add more unit tests and cleanup logic.
