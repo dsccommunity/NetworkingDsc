@@ -56,8 +56,15 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 ## Versions
 
 ### Unreleased
-* MSFT_xFirewall: Refactored to add more unit tests and cleanup logic
-* MSFT_xDefaultGatewayAddress: Added
+* MSFT_xDefaultGatewayAddress: Removed unessesary try/catch logic from around networking cmdlets.
+* MSFT_xIPAddress: Removed unessesary try/catch logic from around networking cmdlets.
+* MSFT_xDNSServerAddress: Removed unessesary try/catch logic from around networking cmdlets.
+* MSFT_xDefaultGatewayAddress: Refactored to add more unit tests and cleanup logic. 
+* MSFT_xIPAddress: Network Connection Profile no longer forced to Private when IP address changed.
+* MSFT_xIPAddress: Refactored to add more unit tests and cleanup logic.
+* MSFT_xDNSServerAddress: Refactored to add more unit tests and cleanup logic.
+* MSFT_xFirewall: Refactored to add more unit tests and cleanup logic.
+* MSFT_xDefaultGatewayAddress: Added.
 * MSFT_xIPAddress: Removed default gateway parameter - use xDefaultGatewayAddress resource.
 * MSFT_xIPAddress: Added check for IP address format not matching address family.
 * MSFT_xDNSServerAddress: Corrected error message when address format doesn't match address family.
