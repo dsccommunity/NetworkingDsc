@@ -56,6 +56,9 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 ## Versions
 
 ### Unreleased
+* MSFT_xFirewall: Set-TargetResource now updates firewall rules instead of recreating them.
+* MSFT_xFirewall: Added message localization support.
+* MSFT_xFirewall: Removed unessesary code for handling multiple rules with same name.
 * MSFT_xDefaultGatewayAddress: Removed unessesary try/catch logic from around networking cmdlets.
 * MSFT_xIPAddress: Removed unessesary try/catch logic from around networking cmdlets.
 * MSFT_xDNSServerAddress: Removed unessesary try/catch logic from around networking cmdlets.

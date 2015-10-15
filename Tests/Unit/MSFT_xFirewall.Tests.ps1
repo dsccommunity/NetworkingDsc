@@ -38,6 +38,9 @@ Import-Module -Name $DSCResourceModuleFile.FullName -Force
 $breakvar = $True
 
 InModuleScope $DSCResourceName {
+
+######################################################################################
+
     Describe 'Get-TargetResource' {
         Context 'Absent should return correctly' {
             Mock Get-NetFirewallRule
@@ -60,6 +63,11 @@ InModuleScope $DSCResourceName {
             It 'should have the correct DisplayName and type' {
                 $result.DisplayName | Should Be $rule.DisplayName
                 $result.DisplayName.GetType() | Should Be $rule.DisplayName.GetType()
+            }
+
+            It 'Should have the correct Group and type' {
+                $result.Group | Should Be $rule.Group
+                $result.Group.GetType() | Should Be $rule.Group.GetType()
             }
 
             It 'Should have the correct DisplayGroup and type' {
@@ -107,64 +115,69 @@ InModuleScope $DSCResourceName {
         }
     }
 
+######################################################################################
+
     Describe 'Test-TargetResource' {
         $rule = Get-NetFirewallRule | `
             Where-Object {$_.DisplayName -ne $null} | `
             Select-Object -first 1
 
         Context 'Ensure is Absent and the Firewall is not Present' {
+            Mock Get-FirewallRule
+
             It 'should return $true' {
-                Mock Get-FirewallRule
                 $result = Test-TargetResource -Name 'FirewallRule' -Ensure 'Absent'
                 $result | Should Be $true
             }
         }
         Context 'Ensure is Absent and the Firewall is Present' {
+            Mock Test-RuleProperties
+
             It 'should return $false' {
-                Mock Test-RuleProperties
-
-                $result = Test-TargetResource -Name $rule.Name `
-                    -DisplayName $rule.DisplayName `
-                    -Ensure 'Absent'
-
+                $result = Test-TargetResource -Name $rule.Name -Ensure 'Absent'
                 $result | Should Be $false
             }
         }
-        Context 'Ensure is Present and the Firewall is Present' {
-            It 'should return $true' {
-                $result = Test-TargetResource `
-                    -Name $rule.Name `
-                    -DisplayName $rule.DisplayName
+        Context 'Ensure is Present and the Firewall is Present and properties match' {
+            Mock Test-RuleProperties -MockWith { return $true }
 
+            It 'should return $true' {
+                $result = Test-TargetResource -Name $rule.Name
                 $result | Should Be $true
+            }
+        }
+        Context 'Ensure is Present and the Firewall is Present and properties are different' {
+            Mock Test-RuleProperties -MockWith { return $false }
+
+            It 'should return $false' {
+                $result = Test-TargetResource -Name $rule.Name
+                $result | Should Be $false
             }
         }
         Context 'Ensure is Present and the Firewall is Absent' {
             It 'should return $false' {
-                Mock Test-RuleProperties
-                $result = Test-TargetResource `
-                    -Name $rule.Name `
-                    -DisplayName $rule.DisplayName -Ensure 'Absent'
-
+                $result = Test-TargetResource -Name $rule.Name
                 $result | Should Be $false
             }
         }
     }
 
+######################################################################################
+
     Describe 'Set-TargetResource' {
         $rule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
             Select-Object -First 1
 
-        Context 'Ensure is Absent and Firewall Exists' {
-            It "should call all the mocks on firewall rule $($rule.Name)" {
+        Context 'Ensure is Absent and Firewall Exist' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
                 Mock Remove-NetFirewallRule
                 $result = Set-TargetResource -Name $rule.Name -Ensure 'Absent'
 
                 Assert-MockCalled Remove-NetFirewallRule -Exactly 1
             }
         }
-        Context 'Ensure is Absent and the Firewall Does Not Exists' {
-            It "should call all the mocks on firewall rule $($rule.Name)" {
+        Context 'Ensure is Absent and the Firewall Does Not Exist' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
                 Mock Get-FirewallRule
                 Mock Remove-NetFirewallRule
                 $result = Set-TargetResource -Name $rule.Name -Ensure 'Absent'
@@ -172,8 +185,8 @@ InModuleScope $DSCResourceName {
                 Assert-MockCalled Remove-NetFirewallRule -Exactly 0
             }
         }
-        Context 'Ensure is Present and the Firewall Does Not Exists' {
-            It "should call all the mocks on firewall rule $($rule.Name)" {
+        Context 'Ensure is Present and the Firewall Does Not Exist' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
                 Mock Get-FirewallRule
                 Mock New-NetFirewallRule
                 $result = Set-TargetResource -Name $rule.Name -Ensure 'Present'
@@ -182,24 +195,35 @@ InModuleScope $DSCResourceName {
                 Assert-MockCalled Get-FirewallRule -Exactly 1
             }
         }
-        Context 'Ensure is Present and the Firewall Does Exists' {
-            It "should call all the mocks on firewall rule $($rule.Name)" {
-                Mock Remove-NetFirewallRule
-                Mock New-NetFirewallRule
+        Context 'Ensure is Present and the Firewall Does Exist but is different' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
                 Mock Test-RuleProperties {return $false}
                 $result = Set-TargetResource -Name $rule.Name -Ensure 'Present'
 
-                Assert-MockCalled New-NetFirewallRule -Exactly 1
-                Assert-MockCalled Remove-NetFirewallRule -Exactly 1
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
                 Assert-MockCalled Test-RuleProperties -Exactly 1
             }
         }
+        Context 'Ensure is Present and the Firewall Does Exist and is the same' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $true}
+                $result = Set-TargetResource -Name $rule.Name -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 0
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+
     }
+
+######################################################################################
 
     Describe 'Test-RuleProperties' {
         $rule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
                     Select-Object -First 1
-        $FirewallRule = Get-FirewallRule -Name $($rule.name)
+        $FirewallRule = Get-FirewallRule -Name $rule.name
         $Properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
 
         # Make an object that can be splatted onto the function
@@ -319,17 +343,15 @@ InModuleScope $DSCResourceName {
         }
     }
 
+######################################################################################
+
     Describe ' Get-FirewallRule' {
-        $rule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
-            Select-Object -First 1
+        $rule = Get-NetFirewallRule | Select-Object -First 1
+        $rules = Get-NetFirewallRule | Select-Object -First 2
 
         Context 'testing with firewall that exists' {
             It 'should return a firewall rule when name is passed' {
                 $Result = Get-FirewallRule -Name $rule.Name
-                $Result | Should Not BeNullOrEmpty
-            }
-            It 'should return a firewall rule when name and display group is passed' {
-                $Result = Get-FirewallRule -Name $rule.Name -DisplayGroup $rule.Group
                 $Result | Should Not BeNullOrEmpty
             }
         }
@@ -339,7 +361,24 @@ InModuleScope $DSCResourceName {
                 $Result | Should BeNullOrEmpty
             }
         }
+        Context 'testing with firewall that somehow occurs more than once' {
+            Mock Get-NetFirewallRule -MockWith { $rules }
+
+            $errorId = 'RuleNotUnique'
+            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+            $errorMessage = $($LocalizedData.RuleNotUniqueError) -f 2,$rule.Name
+            $exception = New-Object -TypeName System.InvalidOperationException `
+                -ArgumentList $errorMessage
+            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                -ArgumentList $exception, $errorId, $errorCategory, $null
+
+            It 'should throw RuleNotUnique exception' {
+                { $Result = Get-FirewallRule -Name $rule.Name } | Should Throw $errorRecord
+            }
+        }
     }
+
+######################################################################################
 
     Describe 'Get-FirewallRuleProperty' {
         $rule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
@@ -405,6 +444,9 @@ InModuleScope $DSCResourceName {
             }
         }
     }
+
+######################################################################################
+
 }
 
 # Clean up after the test completes.
