@@ -35,8 +35,6 @@ if (Get-Module -Name $DSCResourceName)
 
 Import-Module -Name $DSCResourceModuleFile.FullName -Force
 
-$breakvar = $True
-
 InModuleScope $DSCResourceName {
 
 ######################################################################################
