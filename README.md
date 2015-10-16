@@ -52,7 +52,6 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **ApplicationPath**: Path and filename of the program for which the rule is applied.
 * **Service**: Specifies the short name of a Windows service to which the firewall rule applies.
 
-
 ## Versions
 
 ### Unreleased
