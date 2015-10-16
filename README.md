@@ -386,3 +386,28 @@ Sample_xFirewall
 Start-DscConfiguration -Path Sample_xFirewall -Wait -Verbose -Force
 ```
 
+### Enable a built-in Firewall Rule
+
+This example enables the built-in Firewall Rule 'World Wide Web Services (HTTP Traffic-In)'.
+```powershell
+configuration Sample_xFirewall_EnableBuiltInFirewallRule
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xFirewall Firewall
+        {
+            Name                  = "IIS-WebServerRole-HTTP-In-TCP"
+            Ensure                = "Present"
+            Enabled               = "True"
+        }
+    }
+ }
+```
+
