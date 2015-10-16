@@ -45,8 +45,6 @@ InModuleScope $DSCResourceName {
         Context 'Absent should return correctly' {
             Mock Get-NetFirewallRule
 
-                $breakvar = $true;
-
             It 'Should return absent' {
                 $result = Get-TargetResource -Name 'FirewallRule'
                 $result.Name | Should Be 'FirewallRule'
