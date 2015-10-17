@@ -52,10 +52,13 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **ApplicationPath**: Path and filename of the program for which the rule is applied.
 * **Service**: Specifies the short name of a Windows service to which the firewall rule applies.
 
-
 ## Versions
 
 ### Unreleased
+* MSFT_xFirewall: Removed code using DisplayGroup to lookup Firewall Rule because it was redundant.
+* MSFT_xFirewall: Set-TargetResource now updates firewall rules instead of recreating them.
+* MSFT_xFirewall: Added message localization support.
+* MSFT_xFirewall: Removed unessesary code for handling multiple rules with same name.
 * MSFT_xDefaultGatewayAddress: Removed unessesary try/catch logic from around networking cmdlets.
 * MSFT_xIPAddress: Removed unessesary try/catch logic from around networking cmdlets.
 * MSFT_xDNSServerAddress: Removed unessesary try/catch logic from around networking cmdlets.
@@ -382,3 +385,27 @@ Sample_xFirewall
 Start-DscConfiguration -Path Sample_xFirewall -Wait -Verbose -Force
 ```
 
+### Enable a built-in Firewall Rule
+
+This example enables the built-in Firewall Rule 'World Wide Web Services (HTTP Traffic-In)'.
+```powershell
+configuration Sample_xFirewall_EnableBuiltInFirewallRule
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xFirewall Firewall
+        {
+            Name                  = "IIS-WebServerRole-HTTP-In-TCP"
+            Ensure                = "Present"
+            Enabled               = "True"
+        }
+    }
+ }
+```
