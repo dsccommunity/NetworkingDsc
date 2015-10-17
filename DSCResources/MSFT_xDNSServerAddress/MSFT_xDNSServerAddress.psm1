@@ -102,8 +102,8 @@ function Set-TargetResource
         Set-DnsClientServerAddress `
             -InterfaceAlias $InterfaceAlias `
             -ServerAddresses $Address `
-            -Validate
-
+            -Validate `
+            -ErrorAction Stop
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($LocalizedData.DNSServersHaveBeenSetCorrectlyMessage)
             ) -join '' )
