@@ -1,9 +1,8 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+﻿[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
 
 # xNetworking
 
 The **xNetworking** module contains the **xFirewall, xIPAddress** and **xDnsServerAddress** DSC resources for configuring a node’s IP address, DNS server address, and firewall rules.
-
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -54,7 +53,9 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ## Versions
 
-### Unreleased
+### 2.4.0.0
+* Added following resources:
+  * MSFT_xDefaultGatewayAddress
 * MSFT_xFirewall: Removed code using DisplayGroup to lookup Firewall Rule because it was redundant.
 * MSFT_xFirewall: Set-TargetResource now updates firewall rules instead of recreating them.
 * MSFT_xFirewall: Added message localization support.
@@ -67,7 +68,6 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * MSFT_xIPAddress: Refactored to add more unit tests and cleanup logic.
 * MSFT_xDNSServerAddress: Refactored to add more unit tests and cleanup logic.
 * MSFT_xFirewall: Refactored to add more unit tests and cleanup logic.
-* MSFT_xDefaultGatewayAddress: Added.
 * MSFT_xIPAddress: Removed default gateway parameter - use xDefaultGatewayAddress resource.
 * MSFT_xIPAddress: Added check for IP address format not matching address family.
 * MSFT_xDNSServerAddress: Corrected error message when address format doesn't match address family.
