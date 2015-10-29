@@ -191,11 +191,53 @@ InModuleScope $DSCResourceName {
                 Assert-MockCalled Get-FirewallRule -Exactly 1
             }
         }
-        Context 'Ensure is Present and the Firewall Does Exist but is different' {
+        Context 'Ensure is Present and the Firewall Does Exist but has different DisplayName' {
             It "should call expected mocks on firewall rule $($rule.Name)" {
                 Mock Set-NetFirewallRule
                 Mock Test-RuleProperties {return $false}
-                $result = Set-TargetResource -Name $rule.Name -Ensure 'Present'
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -DisplayName 'Different' `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has different DisplayGroup' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -DisplayGroup 'Different' `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has different Enabled' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -Enabled 'False' `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has different Action' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -Action 'Allow' `
+                    -Ensure 'Present'
 
                 Assert-MockCalled Set-NetFirewallRule -Exactly 1
                 Assert-MockCalled Test-RuleProperties -Exactly 1
