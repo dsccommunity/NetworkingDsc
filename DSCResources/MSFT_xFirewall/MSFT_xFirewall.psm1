@@ -416,7 +416,8 @@ function Test-RuleProperties
                 if (-not ($networkProfileinRule -contains $networkProfile))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.PropertyNoMatchMessage) -f 'Profile',$networkProfileinRule,$Profile
+                        $($LocalizedData.PropertyNoMatchMessage) `
+                            -f 'Profile',($networkProfileinRule -join ','),($Profile -join ',')
                         ) -join '')
                     $desiredConfigurationMatch = $false
                     break
@@ -426,7 +427,8 @@ function Test-RuleProperties
         else
         {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.PropertyNoMatchMessage) -f 'Profile',$networkProfileinRule,$Profile
+                $($LocalizedData.PropertyNoMatchMessage) `
+                    -f 'Profile',($networkProfileinRule -join ','),($Profile -join ',')
                 ) -join '')
             $desiredConfigurationMatch = $false
         }
@@ -435,7 +437,8 @@ function Test-RuleProperties
     if ($Direction -and ($FirewallRule.Direction -ne $Direction))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) -f 'Direction',$FirewallRule.Direction,$Direction
+            $($LocalizedData.PropertyNoMatchMessage) `
+                -f 'Direction',$FirewallRule.Direction,$Direction
             ) -join '')
         $desiredConfigurationMatch = $false
     }
@@ -451,7 +454,8 @@ function Test-RuleProperties
                 if (-not ($remotePortInRule -contains($port)))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.PropertyNoMatchMessage) -f 'RemotePort',$remotePortInRule,$RemotePort
+                        $($LocalizedData.PropertyNoMatchMessage) `
+                            -f 'RemotePort',($remotePortInRule -join ','),($RemotePort -join ',')
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
@@ -460,7 +464,8 @@ function Test-RuleProperties
         else
         {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.PropertyNoMatchMessage) -f 'RemotePort',$remotePortInRule,$RemotePort
+                $($LocalizedData.PropertyNoMatchMessage) `
+                    -f 'RemotePort',($remotePortInRule -join ','),($RemotePort -join ',')
                 ) -join '')
             $desiredConfigurationMatch = $false
         }
@@ -477,7 +482,8 @@ function Test-RuleProperties
                 if (-not ($localPortInRule -contains($port)))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.PropertyNoMatchMessage) -f 'LocalPort',$localPortInRule,$LocalPort
+                        $($LocalizedData.PropertyNoMatchMessage) `
+                            -f 'LocalPort',($localPortInRule -join ','),($LocalPort -join ',')
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
@@ -486,7 +492,8 @@ function Test-RuleProperties
         else
         {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.PropertyNoMatchMessage) -f 'LocalPort',$localPortInRule,$LocalPort
+                $($LocalizedData.PropertyNoMatchMessage) `
+                    -f 'LocalPort',($localPortInRule -join ','),($LocalPort -join ',')
                 ) -join '')
             $desiredConfigurationMatch = $false
         }
@@ -495,7 +502,8 @@ function Test-RuleProperties
     if ($Protocol -and ($properties.PortFilters.Protocol -ne $Protocol))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) -f 'Protocol',$properties.PortFilters.Protocol,$Protocol
+            $($LocalizedData.PropertyNoMatchMessage) `
+                -f 'Protocol',$properties.PortFilters.Protocol,$Protocol
             ) -join '')
         $desiredConfigurationMatch = $false
     }
@@ -503,7 +511,8 @@ function Test-RuleProperties
     if ($Description -and ($FirewallRule.Description -ne $Description))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) -f 'Description',$FirewallRule.Description,$Description
+            $($LocalizedData.PropertyNoMatchMessage) `
+                -f 'Description',$FirewallRule.Description,$Description
             ) -join '')
         $desiredConfigurationMatch = $false
     }
@@ -511,7 +520,8 @@ function Test-RuleProperties
     if ($ApplicationPath -and ($properties.ApplicationFilters.Program -ne $ApplicationPath))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) -f 'ApplicationPath',$properties.ApplicationFilters.Program,$ApplicationPath
+            $($LocalizedData.PropertyNoMatchMessage) `
+                -f 'ApplicationPath',$properties.ApplicationFilters.Program,$ApplicationPath
             ) -join '')
         $desiredConfigurationMatch = $false
     }
@@ -519,7 +529,8 @@ function Test-RuleProperties
     if ($Service -and ($properties.ServiceFilters.Service -ne $Service))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) -f 'Service',$properties.ServiceFilters.Service,$Service
+            $($LocalizedData.PropertyNoMatchMessage) `
+                -f 'Service',$properties.ServiceFilters.Service,$Service
             ) -join '')
         $desiredConfigurationMatch = $false
     }
