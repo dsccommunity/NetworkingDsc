@@ -188,6 +188,15 @@ function Set-TargetResource
                     $($LocalizedData.UpdatingExistingFirewallMessage) -f $Name
                     ) -join '')
 
+                # If the DisplayName is provided then need to remove it
+                # And change it to NewDisplayName if it is different
+                if ($PSBoundParameters.ContainsKey('DisplayName')) {
+                    $null = $PSBoundParameters.Remove('DisplayName')
+                    if ($DisplayName -ne $FirewallRule.DisplayName) {
+                        $null = $PSBoundParameters.Add('NewDisplayName',$Name)
+                    }
+                }
+
                 # Set the existing Firewall rule based on specified parameters
                 Set-NetFirewallRule @PSBoundParameters
             }
