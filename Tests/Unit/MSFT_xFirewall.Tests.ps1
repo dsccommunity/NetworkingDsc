@@ -208,12 +208,21 @@ InModuleScope $DSCResourceName {
             It "should call expected mocks on firewall rule $($rule.Name)" {
                 Mock Set-NetFirewallRule
                 Mock Test-RuleProperties {return $false}
-                $result = Set-TargetResource `
+
+                $errorId = 'CantChangeDisplayGroupError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+                $errorMessage = $($LocalizedData.CantChangeDisplayGroupError) -f $Name
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { $result = Set-TargetResource `
                     -Name $rule.Name `
                     -DisplayGroup 'Different' `
-                    -Ensure 'Present'
+                    -Ensure 'Present' } | Should Throw $errorRecord
 
-                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Set-NetFirewallRule -Exactly 0
                 Assert-MockCalled Test-RuleProperties -Exactly 1
             }
         }

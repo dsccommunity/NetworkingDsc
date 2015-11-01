@@ -51,6 +51,12 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **ApplicationPath**: Path and filename of the program for which the rule is applied.
 * **Service**: Specifies the short name of a Windows service to which the firewall rule applies.
 
+## Known Invalid Configurations
+
+### xFirewall
+* The exception 'One of the port keywords is invalid' will be thrown if a rule is created with the LocalPort set to PlayToDiscovery and the Protocol is not set to UDP. This is not an unexpected error, but because the New-NetFirewallRule documentation is ambiguous.
+* The exception 'The DisplayGroup of an existing Firewall Rule can not be changed' will be thrown if a configuration tries to change DisplayGroup property of an existing rule. This is because the Set-NetFirewallRule cmdlet does not support this function. Delete and re-create this rule instead. 
+
 ## Versions
 
 ### 2.4.0.0

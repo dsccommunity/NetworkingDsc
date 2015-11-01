@@ -26,6 +26,7 @@ TestFirewallRuleReturningMessage=Test Firewall rule with Name '{0}' returning {1
 FirewallRuleNotFoundMessage=No Firewall Rule found with Name '{0}'.
 GetAllPropertiesMessage=Get all the properties and add filter info to rule map.
 RuleNotUniqueError={0} Firewall Rules with the Name '{1}' were found. Only one expected.
+CantChangeDisplayGroupError=The DisplayGroup of an existing Firewall Rule can not be changed. Delete and recreate this rule instead.
 '@
 }
 
@@ -188,17 +189,38 @@ function Set-TargetResource
                     $($LocalizedData.UpdatingExistingFirewallMessage) -f $Name
                     ) -join '')
 
-                # If the DisplayName is provided then need to remove it
-                # And change it to NewDisplayName if it is different
-                if ($PSBoundParameters.ContainsKey('DisplayName')) {
-                    $null = $PSBoundParameters.Remove('DisplayName')
-                    if ($DisplayName -ne $FirewallRule.DisplayName) {
-                        $null = $PSBoundParameters.Add('NewDisplayName',$Name)
-                    }
-                }
+                # If the DisplayGroup is being changed then the rule
+                # Has to be removed and recreated because that is the
+                # Only way the DisplayGroup can be changed unfortunately.
+                # A change to the set-netfirewallrule has been requested:
+                # https://connect.microsoft.com/PowerShell/feedbackdetail/view/1970765/add-ability-to-change-firewall-displaygroup-in-set-netfirewallrule-cmdlet
+                if ($PSBoundParameters.ContainsKey('Group') `
+                    -and ($Group -ne $FirewallRule.Group)) {
+                    # Although it is possible to automatically remove and recreate
+                    # this rule, it introduces more problems than it solves.
+                    # So for now this will throw an error with the suggested solution.
+                    $errorId = 'CantChangeDisplayGroupError'
+                    $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+                    $errorMessage = $($LocalizedData.CantChangeDisplayGroupError) -f $Name
+                    $exception = New-Object -TypeName System.InvalidOperationException `
+                        -ArgumentList $errorMessage
+                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                        -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                # Set the existing Firewall rule based on specified parameters
-                Set-NetFirewallRule @PSBoundParameters
+                    $PSCmdlet.ThrowTerminatingError($errorRecord)
+                } else {
+                    # If the DisplayName is provided then need to remove it
+                    # And change it to NewDisplayName if it is different.
+                    if ($PSBoundParameters.ContainsKey('DisplayName')) {
+                        $null = $PSBoundParameters.Remove('DisplayName')
+                        if ($DisplayName -ne $FirewallRule.DisplayName) {
+                            $null = $PSBoundParameters.Add('NewDisplayName',$Name)
+                        }
+                    }
+               
+                    # Set the existing Firewall rule based on specified parameters
+                    Set-NetFirewallRule @PSBoundParameters
+                }
             }
         }
         else
