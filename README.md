@@ -61,6 +61,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ### Unreleaed
 * MSFT_xFirewall: ApplicationPath Parameter renamed to Program for consistency with Cmdlets.
+* MSFT_xFirewall: Fix to prevent error when DisplayName parameter is set on an existing rule.
 
 ### 2.4.0.0
 * Added following resources:
