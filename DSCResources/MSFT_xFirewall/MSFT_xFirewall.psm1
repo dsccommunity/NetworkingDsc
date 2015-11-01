@@ -81,7 +81,7 @@ function Get-TargetResource
         RemotePort      = @($properties.PortFilters.RemotePort)
         LocalPort       = @($properties.PortFilters.LocalPort)
         Protocol        = $properties.PortFilters.Protocol
-        ApplicationPath = $properties.ApplicationFilters.Program
+        Program         = $properties.ApplicationFilters.Program
         Service         = $properties.ServiceFilters.Service
     }
 }
@@ -141,7 +141,7 @@ function Set-TargetResource
 
         # Path and file name of the program for which the rule is applied
         [ValidateNotNullOrEmpty()]
-        [String] $ApplicationPath,
+        [String] $Program,
 
         # Specifies the short name of a Windows service to which the firewall rule applies
         [ValidateNotNullOrEmpty()]
@@ -326,7 +326,7 @@ function Test-TargetResource
 
         # Path and file name of the program for which the rule is applied
         [ValidateNotNullOrEmpty()]
-        [String] $ApplicationPath,
+        [String] $Program,
 
         # Specifies the short name of a Windows service to which the firewall rule applies
         [ValidateNotNullOrEmpty()]
@@ -404,7 +404,7 @@ function Test-RuleProperties
         [String[]] $LocalPort,
         [String] $Protocol,
         [String] $Description,
-        [String] $ApplicationPath,
+        [String] $Program,
         [String] $Service
     )
 
@@ -548,11 +548,11 @@ function Test-RuleProperties
         $desiredConfigurationMatch = $false
     }
 
-    if ($ApplicationPath -and ($properties.ApplicationFilters.Program -ne $ApplicationPath))
+    if ($Program -and ($properties.ApplicationFilters.Program -ne $Program))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($LocalizedData.PropertyNoMatchMessage) `
-                -f 'ApplicationPath',$properties.ApplicationFilters.Program,$ApplicationPath
+                -f 'Program',$properties.ApplicationFilters.Program,$Program
             ) -join '')
         $desiredConfigurationMatch = $false
     }
@@ -606,7 +606,8 @@ function Get-FirewallRule
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
 
-    return $firewallRule
+    # The array will only contain a single rule so only return the first one (not the array)
+    return $firewallRule[0]
 }
 
 ######################################################################################

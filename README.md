@@ -48,7 +48,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **LocalPort**: Local port used for the filter.
 * **Protocol**: Specific protocol for filter. Specified by name, number, or range.
 * **Description**: Documentation for the rule.
-* **ApplicationPath**: Path and filename of the program for which the rule is applied.
+* **Program**: Path and filename of the program for which the rule is applied.
 * **Service**: Specifies the short name of a Windows service to which the firewall rule applies.
 
 ## Known Invalid Configurations
@@ -58,6 +58,9 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * The exception 'The DisplayGroup of an existing Firewall Rule can not be changed' will be thrown if a configuration tries to change DisplayGroup property of an existing rule. This is because the Set-NetFirewallRule cmdlet does not support this function. Delete and re-create this rule instead. 
 
 ## Versions
+
+### Unreleaed
+* MSFT_xFirewall: ApplicationPath Parameter renamed to Program for consistency with Cmdlets.
 
 ### 2.4.0.0
 * Added following resources:

@@ -13,6 +13,6 @@ class MSFT_xFirewall : OMI_BaseResource
   [Write, Description("Local Port used for the filter")] String LocalPort[];
   [Write, Description("Specific Protocol for filter. Specified by name, number, or range")] String Protocol;
   [Write, Description("Documentation for the Rule")] String Description;
-  [Write, Description("Path and file name of the program for which the rule is applied")] String ApplicationPath;
+  [Write, Description("Path and file name of the program for which the rule is applied")] String Program;
   [Write, Description("Specifies the short name of a Windows service to which the firewall rule applies")] String Service;
 };
