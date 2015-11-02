@@ -26,6 +26,7 @@ TestFirewallRuleReturningMessage=Test Firewall rule with Name '{0}' returning {1
 FirewallRuleNotFoundMessage=No Firewall Rule found with Name '{0}'.
 GetAllPropertiesMessage=Get all the properties and add filter info to rule map.
 RuleNotUniqueError={0} Firewall Rules with the Name '{1}' were found. Only one expected.
+CantChangeDisplayGroupError=The DisplayGroup of an existing Firewall Rule can not be changed. Delete and recreate this rule instead.
 '@
 }
 
@@ -80,7 +81,7 @@ function Get-TargetResource
         RemotePort      = @($properties.PortFilters.RemotePort)
         LocalPort       = @($properties.PortFilters.LocalPort)
         Protocol        = $properties.PortFilters.Protocol
-        ApplicationPath = $properties.ApplicationFilters.Program
+        Program         = $properties.ApplicationFilters.Program
         Service         = $properties.ServiceFilters.Service
     }
 }
@@ -140,7 +141,7 @@ function Set-TargetResource
 
         # Path and file name of the program for which the rule is applied
         [ValidateNotNullOrEmpty()]
-        [String] $ApplicationPath,
+        [String] $Program,
 
         # Specifies the short name of a Windows service to which the firewall rule applies
         [ValidateNotNullOrEmpty()]
@@ -188,8 +189,38 @@ function Set-TargetResource
                     $($LocalizedData.UpdatingExistingFirewallMessage) -f $Name
                     ) -join '')
 
-                # Set the existing Firewall rule based on specified parameters
-                Set-NetFirewallRule @PSBoundParameters
+                # If the DisplayGroup is being changed then the rule
+                # Has to be removed and recreated because that is the
+                # Only way the DisplayGroup can be changed unfortunately.
+                # A change to the set-netfirewallrule has been requested:
+                # https://connect.microsoft.com/PowerShell/feedbackdetail/view/1970765/add-ability-to-change-firewall-displaygroup-in-set-netfirewallrule-cmdlet
+                if ($PSBoundParameters.ContainsKey('Group') `
+                    -and ($Group -ne $FirewallRule.Group)) {
+                    # Although it is possible to automatically remove and recreate
+                    # this rule, it introduces more problems than it solves.
+                    # So for now this will throw an error with the suggested solution.
+                    $errorId = 'CantChangeDisplayGroupError'
+                    $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+                    $errorMessage = $($LocalizedData.CantChangeDisplayGroupError) -f $Name
+                    $exception = New-Object -TypeName System.InvalidOperationException `
+                        -ArgumentList $errorMessage
+                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                        -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                    $PSCmdlet.ThrowTerminatingError($errorRecord)
+                } else {
+                    # If the DisplayName is provided then need to remove it
+                    # And change it to NewDisplayName if it is different.
+                    if ($PSBoundParameters.ContainsKey('DisplayName')) {
+                        $null = $PSBoundParameters.Remove('DisplayName')
+                        if ($DisplayName -ne $FirewallRule.DisplayName) {
+                            $null = $PSBoundParameters.Add('NewDisplayName',$Name)
+                        }
+                    }
+               
+                    # Set the existing Firewall rule based on specified parameters
+                    Set-NetFirewallRule @PSBoundParameters
+                }
             }
         }
         else
@@ -295,7 +326,7 @@ function Test-TargetResource
 
         # Path and file name of the program for which the rule is applied
         [ValidateNotNullOrEmpty()]
-        [String] $ApplicationPath,
+        [String] $Program,
 
         # Specifies the short name of a Windows service to which the firewall rule applies
         [ValidateNotNullOrEmpty()]
@@ -373,7 +404,7 @@ function Test-RuleProperties
         [String[]] $LocalPort,
         [String] $Protocol,
         [String] $Description,
-        [String] $ApplicationPath,
+        [String] $Program,
         [String] $Service
     )
 
@@ -416,7 +447,8 @@ function Test-RuleProperties
                 if (-not ($networkProfileinRule -contains $networkProfile))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.PropertyNoMatchMessage) -f 'Profile',$networkProfileinRule,$Profile
+                        $($LocalizedData.PropertyNoMatchMessage) `
+                            -f 'Profile',($networkProfileinRule -join ','),($Profile -join ',')
                         ) -join '')
                     $desiredConfigurationMatch = $false
                     break
@@ -426,7 +458,8 @@ function Test-RuleProperties
         else
         {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.PropertyNoMatchMessage) -f 'Profile',$networkProfileinRule,$Profile
+                $($LocalizedData.PropertyNoMatchMessage) `
+                    -f 'Profile',($networkProfileinRule -join ','),($Profile -join ',')
                 ) -join '')
             $desiredConfigurationMatch = $false
         }
@@ -435,7 +468,8 @@ function Test-RuleProperties
     if ($Direction -and ($FirewallRule.Direction -ne $Direction))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) -f 'Direction',$FirewallRule.Direction,$Direction
+            $($LocalizedData.PropertyNoMatchMessage) `
+                -f 'Direction',$FirewallRule.Direction,$Direction
             ) -join '')
         $desiredConfigurationMatch = $false
     }
@@ -451,7 +485,8 @@ function Test-RuleProperties
                 if (-not ($remotePortInRule -contains($port)))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.PropertyNoMatchMessage) -f 'RemotePort',$remotePortInRule,$RemotePort
+                        $($LocalizedData.PropertyNoMatchMessage) `
+                            -f 'RemotePort',($remotePortInRule -join ','),($RemotePort -join ',')
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
@@ -460,7 +495,8 @@ function Test-RuleProperties
         else
         {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.PropertyNoMatchMessage) -f 'RemotePort',$remotePortInRule,$RemotePort
+                $($LocalizedData.PropertyNoMatchMessage) `
+                    -f 'RemotePort',($remotePortInRule -join ','),($RemotePort -join ',')
                 ) -join '')
             $desiredConfigurationMatch = $false
         }
@@ -477,7 +513,8 @@ function Test-RuleProperties
                 if (-not ($localPortInRule -contains($port)))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.PropertyNoMatchMessage) -f 'LocalPort',$localPortInRule,$LocalPort
+                        $($LocalizedData.PropertyNoMatchMessage) `
+                            -f 'LocalPort',($localPortInRule -join ','),($LocalPort -join ',')
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
@@ -486,7 +523,8 @@ function Test-RuleProperties
         else
         {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.PropertyNoMatchMessage) -f 'LocalPort',$localPortInRule,$LocalPort
+                $($LocalizedData.PropertyNoMatchMessage) `
+                    -f 'LocalPort',($localPortInRule -join ','),($LocalPort -join ',')
                 ) -join '')
             $desiredConfigurationMatch = $false
         }
@@ -495,7 +533,8 @@ function Test-RuleProperties
     if ($Protocol -and ($properties.PortFilters.Protocol -ne $Protocol))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) -f 'Protocol',$properties.PortFilters.Protocol,$Protocol
+            $($LocalizedData.PropertyNoMatchMessage) `
+                -f 'Protocol',$properties.PortFilters.Protocol,$Protocol
             ) -join '')
         $desiredConfigurationMatch = $false
     }
@@ -503,15 +542,17 @@ function Test-RuleProperties
     if ($Description -and ($FirewallRule.Description -ne $Description))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) -f 'Description',$FirewallRule.Description,$Description
+            $($LocalizedData.PropertyNoMatchMessage) `
+                -f 'Description',$FirewallRule.Description,$Description
             ) -join '')
         $desiredConfigurationMatch = $false
     }
 
-    if ($ApplicationPath -and ($properties.ApplicationFilters.Program -ne $ApplicationPath))
+    if ($Program -and ($properties.ApplicationFilters.Program -ne $Program))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) -f 'ApplicationPath',$properties.ApplicationFilters.Program,$ApplicationPath
+            $($LocalizedData.PropertyNoMatchMessage) `
+                -f 'Program',$properties.ApplicationFilters.Program,$Program
             ) -join '')
         $desiredConfigurationMatch = $false
     }
@@ -519,7 +560,8 @@ function Test-RuleProperties
     if ($Service -and ($properties.ServiceFilters.Service -ne $Service))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) -f 'Service',$properties.ServiceFilters.Service,$Service
+            $($LocalizedData.PropertyNoMatchMessage) `
+                -f 'Service',$properties.ServiceFilters.Service,$Service
             ) -join '')
         $desiredConfigurationMatch = $false
     }
@@ -564,7 +606,8 @@ function Get-FirewallRule
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
 
-    return $firewallRule
+    # The array will only contain a single rule so only return the first one (not the array)
+    return $firewallRule[0]
 }
 
 ######################################################################################
