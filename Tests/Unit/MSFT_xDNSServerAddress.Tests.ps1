@@ -41,6 +41,8 @@ InModuleScope MSFT_xDNSServerAddress {
 
     Describe 'Get-TargetResource' {
 
+        # Test IPv4
+
         #region Mocks
         Mock Get-DnsClientServerAddress -MockWith {
 
@@ -52,7 +54,7 @@ InModuleScope MSFT_xDNSServerAddress {
         }
         #endregion
 
-        Context 'comparing IPv4 Address' {
+        Context 'invoking with an IPv4 address' {
             It 'should return true' {
 
                 $Splat = @{
@@ -65,6 +67,8 @@ InModuleScope MSFT_xDNSServerAddress {
             }
         }
 
+        # Test IPv6 
+
         #region Mocks
         Mock Get-DnsClientServerAddress -MockWith {
 
@@ -76,7 +80,7 @@ InModuleScope MSFT_xDNSServerAddress {
         }
         #endregion
 
-        Context 'comparing IPv6 Address' {
+        Context 'invoking with an IPv6 address' {
             It 'should return true' {
 
                 $Splat = @{
