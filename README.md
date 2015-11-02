@@ -58,7 +58,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1974268/new-set-netfirewallrule-cmdlet-localport-parameter-documentation-is-incorrect-for-playtodiscovery)
 
 * The exception 'The DisplayGroup of an existing Firewall Rule can not be changed' will be thrown if a configuration tries to change DisplayGroup property of an existing rule. This is because the Set-NetFirewallRule cmdlet does not support this function. Delete and re-create this rule instead.
-This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1970765/add-ability-to-change-firewall-displaygroup-in-set-netfirewallrule-cmdlet) 
+This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1970765/add-ability-to-change-firewall-displaygroup-in-set-netfirewallrule-cmdlet)
 
 ## Versions
 
@@ -78,7 +78,7 @@ This issue has been reported on [Microsoft Connect](https://connect.microsoft.co
 * MSFT_xDefaultGatewayAddress: Removed unessesary try/catch logic from around networking cmdlets.
 * MSFT_xIPAddress: Removed unessesary try/catch logic from around networking cmdlets.
 * MSFT_xDNSServerAddress: Removed unessesary try/catch logic from around networking cmdlets.
-* MSFT_xDefaultGatewayAddress: Refactored to add more unit tests and cleanup logic. 
+* MSFT_xDefaultGatewayAddress: Refactored to add more unit tests and cleanup logic.
 * MSFT_xIPAddress: Network Connection Profile no longer forced to Private when IP address changed.
 * MSFT_xIPAddress: Refactored to add more unit tests and cleanup logic.
 * MSFT_xDNSServerAddress: Refactored to add more unit tests and cleanup logic.
