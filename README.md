@@ -54,8 +54,11 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 ## Known Invalid Configurations
 
 ### xFirewall
-* The exception 'One of the port keywords is invalid' will be thrown if a rule is created with the LocalPort set to PlayToDiscovery and the Protocol is not set to UDP. This is not an unexpected error, but because the New-NetFirewallRule documentation is ambiguous.
-* The exception 'The DisplayGroup of an existing Firewall Rule can not be changed' will be thrown if a configuration tries to change DisplayGroup property of an existing rule. This is because the Set-NetFirewallRule cmdlet does not support this function. Delete and re-create this rule instead. 
+* The exception 'One of the port keywords is invalid' will be thrown if a rule is created with the LocalPort set to PlayToDiscovery and the Protocol is not set to UDP. This is not an unexpected error, but because the New-NetFirewallRule documentation is incorrect.
+This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1974268/new-set-netfirewallrule-cmdlet-localport-parameter-documentation-is-incorrect-for-playtodiscovery)
+
+* The exception 'The DisplayGroup of an existing Firewall Rule can not be changed' will be thrown if a configuration tries to change DisplayGroup property of an existing rule. This is because the Set-NetFirewallRule cmdlet does not support this function. Delete and re-create this rule instead.
+This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1970765/add-ability-to-change-firewall-displaygroup-in-set-netfirewallrule-cmdlet) 
 
 ## Versions
 
