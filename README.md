@@ -53,6 +53,10 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ## Versions
 
+### Unreleased Version
+* MSFT_xDNSServerAddress: Corrected Verbose logging messages when multiple DNS adddressed specified.
+* MSFT_xDNSServerAddress: Change to ensure resource terminates if DNS Server validation fails.
+
 ### 2.4.0.0
 * Added following resources:
   * MSFT_xDefaultGatewayAddress

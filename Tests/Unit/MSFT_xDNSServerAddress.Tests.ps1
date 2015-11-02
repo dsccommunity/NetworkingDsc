@@ -41,6 +41,8 @@ InModuleScope MSFT_xDNSServerAddress {
 
     Describe 'Get-TargetResource' {
 
+        # Test IPv4
+
         #region Mocks
         Mock Get-DnsClientServerAddress -MockWith {
 
@@ -52,7 +54,7 @@ InModuleScope MSFT_xDNSServerAddress {
         }
         #endregion
 
-        Context 'comparing IPAddress' {
+        Context 'invoking with an IPv4 address' {
             It 'should return true' {
 
                 $Splat = @{
@@ -64,11 +66,40 @@ InModuleScope MSFT_xDNSServerAddress {
                 $Result.IPAddress | Should Be $Splat.IPAddress
             }
         }
+
+        # Test IPv6 
+
+        #region Mocks
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = 'fe80:ab04:30F5:002b::1'
+                InterfaceAlias = 'Ethernet'
+                AddressFamily = 'IPv6'
+            }
+        }
+        #endregion
+
+        Context 'invoking with an IPv6 address' {
+            It 'should return true' {
+
+                $Splat = @{
+                    Address = 'fe80:ab04:30F5:002b::1'
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                $Result = Get-TargetResource @Splat
+                $Result.IPAddress | Should Be $Splat.IPAddress
+            }
+        }
+
     }
 
     #######################################################################################
 
     Describe 'Set-TargetResource' {
+
+        # Test IPv4
 
         #region Mocks
         Mock Get-DnsClientServerAddress -MockWith {
@@ -82,7 +113,7 @@ InModuleScope MSFT_xDNSServerAddress {
         Mock Set-DnsClientServerAddress
         #endregion
 
-        Context 'invoking with single Server Address that is the same as current' {
+        Context 'invoking with single IPv4 Server Address that is the same as current' {
             It 'should not throw an exception' {
 
                 $Splat = @{
@@ -97,7 +128,7 @@ InModuleScope MSFT_xDNSServerAddress {
                 Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0
             }
         }
-        Context 'invoking with single Server Address that is different to current' {
+        Context 'invoking with single IPv4 Server Address that is different to current' {
             It 'should not throw an exception' {
 
                 $Splat = @{
@@ -112,7 +143,7 @@ InModuleScope MSFT_xDNSServerAddress {
                 Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1
             }
         }
-        Context 'invoking with multiple Server Addresses that are different to current' {
+        Context 'invoking with multiple IPv4 Server Addresses that are different to current' {
             It 'should not throw an exception' {
 
                 $Splat = @{
@@ -127,11 +158,130 @@ InModuleScope MSFT_xDNSServerAddress {
                 Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1
             }
         }
+
+        #region Mocks
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @()
+                InterfaceAlias = 'Ethernet'
+                AddressFamily = 'IPv4'
+            }
+        }
+        Mock Set-DnsClientServerAddress
+        #endregion
+
+        Context 'invoking with multiple IPv4 Server Addresses When there are no address assiged' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('192.168.0.2','192.168.0.3')
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv4'
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1
+            }
+        }
+
+        # Test IPv6 
+
+        #region Mocks
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @('fe80:ab04:30F5:002b::1')
+                InterfaceAlias = 'Ethernet'
+                AddressFamily = 'IPv6'
+            }
+        }
+        Mock Set-DnsClientServerAddress
+        #endregion
+
+        Context 'invoking with single IPv6 Server Address that is the same as current' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::1')
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0
+            }
+        }
+        Context 'invoking with single IPv6 Server Address that is different to current' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::2')
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1
+            }
+        }
+        Context 'invoking with multiple IPv6 Server Addresses that are different to current' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2')
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1
+            }
+        }
+
+        #region Mocks
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @()
+                InterfaceAlias = 'Ethernet'
+                AddressFamily = 'IPv6'
+            }
+        }
+        Mock Set-DnsClientServerAddress
+        #endregion
+
+        Context 'invoking with multiple IPv6 Server Addresses When there are no address assiged' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::1')
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1
+            }
+        }
+
     }
 
     #######################################################################################
 
     Describe 'Test-TargetResource' {
+
+        # Test IPv4 
 
         #region Mocks
         Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
@@ -145,7 +295,7 @@ InModuleScope MSFT_xDNSServerAddress {
         }
         #endregion
 
-        Context 'invoking with single Server Address that is the same as current' {
+        Context 'invoking with single IPv4 Server Address that is the same as current' {
             It 'should return true' {
 
                 $Splat = @{
@@ -159,7 +309,7 @@ InModuleScope MSFT_xDNSServerAddress {
                 Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
             }
         }
-        Context 'invoking with single Server Address that is different to current' {
+        Context 'invoking with single IPv4 Server Address that is different to current' {
             It 'should return false' {
 
                 $Splat = @{
@@ -173,7 +323,7 @@ InModuleScope MSFT_xDNSServerAddress {
                 Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
             }
         }
-        Context 'invoking with multiple Server Addresses that are different to current' {
+        Context 'invoking with multiple IPv4 Server Addresses that are different to current' {
             It 'should return false' {
 
                 $Splat = @{
@@ -187,6 +337,118 @@ InModuleScope MSFT_xDNSServerAddress {
                 Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
             }
         }
+
+        #region Mocks
+        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @()
+                InterfaceAlias = 'Ethernet'
+                AddressFamily = 'IPv4'
+            }
+        }
+        #endregion
+
+        Context 'invoking with multiple IPv4 Server Addresses that are no addresses assigned' {
+            It 'should return false' {
+
+                $Splat = @{
+                    Address = @('192.168.0.2','192.168.0.3')
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv4'
+                }
+                Test-TargetResource @Splat | Should Be $False
+            }
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+            }
+        }
+
+        # Test IPv6 
+
+        #region Mocks
+        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @('fe80:ab04:30F5:002b::1')
+                InterfaceAlias = 'Ethernet'
+                AddressFamily = 'IPv6'
+            }
+        }
+        #endregion
+
+        Context 'invoking with single IPv6 Server Address that is the same as current' {
+            It 'should return true' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::1')
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                Test-TargetResource @Splat | Should Be $True
+            }
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+            }
+        }
+        Context 'invoking with single IPv6 Server Address that is different to current' {
+            It 'should return false' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::2')
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                Test-TargetResource @Splat | Should Be $False
+            }
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+            }
+        }
+        Context 'invoking with multiple IPv6 Server Addresses that are different to current' {
+            It 'should return false' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2')
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                Test-TargetResource @Splat | Should Be $False
+            }
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+            }
+        }
+
+        #region Mocks
+        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @()
+                InterfaceAlias = 'Ethernet'
+                AddressFamily = 'IPv6'
+            }
+        }
+        #endregion
+
+        Context 'invoking with multiple IPv6 Server Addresses that are no addresses assigned' {
+            It 'should return false' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2')
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                Test-TargetResource @Splat | Should Be $False
+            }
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+            }
+        }
+
     }
 
     #######################################################################################

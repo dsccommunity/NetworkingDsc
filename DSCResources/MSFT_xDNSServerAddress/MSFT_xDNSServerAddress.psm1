@@ -13,6 +13,7 @@ DNSServersSetCorrectlyMessage=DNS Servers are set correctly.
 DNSServersAlreadySetMessage=DNS Servers are already set correctly.
 CheckingDNSServerAddressesMessage=Checking the DNS Server Addresses.
 DNSServersNotCorrectMessage=DNS Servers are not correct. Expected "{0}", actual "{1}".
+DNSServersHaveBeenSetCorrectlyMessage=DNS Servers were set to the desired state.
 InterfaceNotAvailableError=Interface "{0}" is not available. Please select a valid interface and try again.
 AddressFormatError=Address "{0}" is not in the correct format. Please correct the Address parameter in the configuration and try again.
 AddressIPv4MismatchError=Address "{0}" is in IPv4 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
@@ -90,20 +91,21 @@ function Set-TargetResource
         -ErrorAction Stop).ServerAddresses
 
     #Check if the Server addresses are the same as the desired addresses.
-    [Boolean] $addressCompare = (Compare-Object `
+    [Boolean] $addressDifferent = (@(Compare-Object `
             -ReferenceObject $currentAddress `
             -DifferenceObject $Address `
-            -SyncWindow 0).Length -gt 0
+            -SyncWindow 0).Length -gt 0)
 
-    if ($addressCompare)
+    if ($addressDifferent)
     {
         # Set the DNS settings as well
         Set-DnsClientServerAddress `
             -InterfaceAlias $InterfaceAlias `
             -ServerAddresses $Address `
-            -Validate
+            -Validate `
+            -ErrorAction Stop
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DNSServersSetCorrectlyMessage)
+            $($LocalizedData.DNSServersHaveBeenSetCorrectlyMessage)
             ) -join '' )
     }
     else 
@@ -158,14 +160,17 @@ function Test-TargetResource
         -ErrorAction Stop).ServerAddresses
 
     #Check if the Server addresses are the same as the desired addresses.
-    if (@(Compare-Object `
-        -ReferenceObject $currentAddress `
-        -DifferenceObject $Address `
-        -SyncWindow 0).Length -gt 0)
+    [Boolean] $addressDifferent = (@(Compare-Object `
+            -ReferenceObject $currentAddress `
+            -DifferenceObject $Address `
+            -SyncWindow 0).Length -gt 0)
+
+    if ($addressDifferent)
     {
         $desiredConfigurationMatch = $false
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DNSServersNotCorrectMessage) -f $Address,$currentAddress
+            $($LocalizedData.DNSServersNotCorrectMessage) `
+                -f ($Address -join ','),($currentAddress -join ',')
             ) -join '' )
     }
     else 
