@@ -48,10 +48,25 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **LocalPort**: Local port used for the filter.
 * **Protocol**: Specific protocol for filter. Specified by name, number, or range.
 * **Description**: Documentation for the rule.
-* **ApplicationPath**: Path and filename of the program for which the rule is applied.
+* **Program**: Path and filename of the program for which the rule is applied.
 * **Service**: Specifies the short name of a Windows service to which the firewall rule applies.
 
+## Known Invalid Configurations
+
+### xFirewall
+* The exception 'One of the port keywords is invalid' will be thrown if a rule is created with the LocalPort set to PlayToDiscovery and the Protocol is not set to UDP. This is not an unexpected error, but because the New-NetFirewallRule documentation is incorrect.
+This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1974268/new-set-netfirewallrule-cmdlet-localport-parameter-documentation-is-incorrect-for-playtodiscovery)
+
+* The exception 'The DisplayGroup of an existing Firewall Rule can not be changed' will be thrown if a configuration tries to change DisplayGroup property of an existing rule. This is because the Set-NetFirewallRule cmdlet does not support this function. Delete and re-create this rule instead.
+This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1970765/add-ability-to-change-firewall-displaygroup-in-set-netfirewallrule-cmdlet)
+
 ## Versions
+
+### Unreleased Version
+* MSFT_xDNSServerAddress: Corrected Verbose logging messages when multiple DNS adddressed specified.
+* MSFT_xDNSServerAddress: Change to ensure resource terminates if DNS Server validation fails.
+* MSFT_xFirewall: ApplicationPath Parameter renamed to Program for consistency with Cmdlets.
+* MSFT_xFirewall: Fix to prevent error when DisplayName parameter is set on an existing rule.
 
 ### 2.4.0.0
 * Added following resources:
@@ -63,7 +78,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * MSFT_xDefaultGatewayAddress: Removed unessesary try/catch logic from around networking cmdlets.
 * MSFT_xIPAddress: Removed unessesary try/catch logic from around networking cmdlets.
 * MSFT_xDNSServerAddress: Removed unessesary try/catch logic from around networking cmdlets.
-* MSFT_xDefaultGatewayAddress: Refactored to add more unit tests and cleanup logic. 
+* MSFT_xDefaultGatewayAddress: Refactored to add more unit tests and cleanup logic.
 * MSFT_xIPAddress: Network Connection Profile no longer forced to Private when IP address changed.
 * MSFT_xIPAddress: Refactored to add more unit tests and cleanup logic.
 * MSFT_xDNSServerAddress: Refactored to add more unit tests and cleanup logic.
