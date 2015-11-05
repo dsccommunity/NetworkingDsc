@@ -11,7 +11,8 @@ RemovingConnectionSuffix  = Removing connection suffix '{0}' on interface '{1}'.
 '@
 }
 
-function Get-TargetResource {
+function Get-TargetResource
+{
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param (
@@ -40,20 +41,38 @@ function Get-TargetResource {
         RegisterThisConnectionsAddress = $dnsClient.RegisterThisConnectionsAddress;
         UseSuffixWhenRegistering = $dnsClient.UseSuffixWhenRegistering;
     }
-    if ($Ensure -eq 'Present') {
+    if ($Ensure -eq 'Present')
+    {
         ## Test to see if the connection-specific suffix matches
-        Write-Verbose ($LocalizedData.CheckingConnectionSuffix -f $ConnectionSpecificSuffix);
-        $targetResource['Ensure'] = if ($dnsClient.ConnectionSpecificSuffix -eq $ConnectionSpecificSuffix) { 'Present' } else { 'Absent' }
+        Write-Verbose -Message ($LocalizedData.CheckingConnectionSuffix -f $ConnectionSpecificSuffix);
+        if ($dnsClient.ConnectionSpecificSuffix -eq $ConnectionSpecificSuffix)
+        {
+            $Ensure = 'Present'
+        }
+        else
+        {
+            $Ensure = 'Absent'
+        }
     }
-    else {
+    else
+    {
         ## ($Ensure -eq 'Absent'). Test to see if there is a connection-specific suffix
-        Write-Verbose ($LocalizedData.CheckingConnectionSuffix -f '');
-        $targetResource['Ensure'] = if ([System.String]::IsNullOrEmpty($dnsClient.ConnectionSpecificSuffix)) { 'Absent' } else { 'Present' }
+        Write-Verbose -Message ($LocalizedData.CheckingConnectionSuffix -f '');
+        if ([System.String]::IsNullOrEmpty($dnsClient.ConnectionSpecificSuffix))
+        {
+            $Ensure = 'Absent'
+        }
+        else
+        {
+            $Ensure = 'Present'
+        }
     }
+    $targetResource['Ensure'] = $Ensure
     return $targetResource;
 }
 
-function Test-TargetResource {
+function Test-TargetResource
+{
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param (
@@ -77,30 +96,33 @@ function Test-TargetResource {
     )
     $targetResource = Get-TargetResource @PSBoundParameters;
     $inDesiredState = $true;
-    if ($targetResource.Ensure -ne $Ensure) {
-        Write-Verbose ($LocalizedData.PropertyMismatch -f 'Ensure', $Ensure, $targetResource.Ensure);
+    if ($targetResource.Ensure -ne $Ensure)
+    {
+        Write-Verbose -Message ($LocalizedData.PropertyMismatch -f 'Ensure', $Ensure, $targetResource.Ensure);
         $inDesiredState = $false;
     }
     if ($targetResource.RegisterThisConnectionsAddress -ne $RegisterThisConnectionsAddress)
     {
-        Write-Verbose ($LocalizedData.PropertyMismatch -f 'RegisterThisConnectionsAddress', $RegisterThisConnectionsAddress, $targetResource.RegisterThisConnectionsAddress);
+        Write-Verbose -Message ($LocalizedData.PropertyMismatch -f 'RegisterThisConnectionsAddress', $RegisterThisConnectionsAddress, $targetResource.RegisterThisConnectionsAddress);
         $inDesiredState = $false;
     }
     if ($targetResource.UseSuffixWhenRegistering -ne $UseSuffixWhenRegistering)
     {
-        Write-Verbose ($LocalizedData.PropertyMismatch -f 'UseSuffixWhenRegistering', $UseSuffixWhenRegistering, $targetResource.UseSuffixWhenRegistering);
+        Write-Verbose -Message ($LocalizedData.PropertyMismatch -f 'UseSuffixWhenRegistering', $UseSuffixWhenRegistering, $targetResource.UseSuffixWhenRegistering);
         $inDesiredState = $false;
     }
-    if ($inDesiredState) {
-        Write-Verbose $LocalizedData.ResourceInDesiredState;
+    if ($inDesiredState)
+    {
+        Write-Verbose -Message $LocalizedData.ResourceInDesiredState;
     }
     else {
-        Write-Verbose $LocalizedData.ResourceNotInDesiredState;
+        Write-Verbose -Message $LocalizedData.ResourceNotInDesiredState;
     }
     return $inDesiredState;
 }
 
-function Set-TargetResource {
+function Set-TargetResource
+{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
@@ -129,12 +151,12 @@ function Set-TargetResource {
     if ($Ensure -eq 'Present')
     {
         $setDnsClientParams['ConnectionSpecificSuffix'] = $ConnectionSpecificSuffix;
-        Write-Verbose ($LocalizedData.SettingConnectionSuffix -f $ConnectionSpecificSuffix, $InterfaceAlias);
+        Write-Verbose -Message ($LocalizedData.SettingConnectionSuffix -f $ConnectionSpecificSuffix, $InterfaceAlias);
     }
     else
     {
         $setDnsClientParams['ConnectionSpecificSuffix'] = '';
-        Write-Verbose ($LocalizedData.RemovingConnectionSuffix -f $ConnectionSpecificSuffix, $InterfaceAlias);
+        Write-Verbose -Message ($LocalizedData.RemovingConnectionSuffix -f $ConnectionSpecificSuffix, $InterfaceAlias);
     }
     Set-DnsClient @setDnsClientParams;
 }

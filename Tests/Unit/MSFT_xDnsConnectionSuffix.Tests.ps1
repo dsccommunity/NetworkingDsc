@@ -97,7 +97,7 @@ Describe $ModuleName {
 
                 $targetResource | Should Be $true;
             }
-            It 'Passes when no DNS suffis is registered and "Ensure" = "Absent"' {
+            It 'Passes when no DNS suffix is registered and "Ensure" = "Absent"' {
                 Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixAbsent; }
 
                 $targetResource = Test-TargetResource @testDnsSuffixParams -Ensure Absent;
