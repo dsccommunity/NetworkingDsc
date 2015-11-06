@@ -35,14 +35,13 @@ if (Get-Module -Name $DSCResourceName)
 
 Import-Module -Name $DSCResourceModuleFile.FullName -Force
 
-$breakvar = $True
-
 InModuleScope $DSCResourceName {
+
+######################################################################################
+
     Describe 'Get-TargetResource' {
         Context 'Absent should return correctly' {
             Mock Get-NetFirewallRule
-
-                $breakvar = $true;
 
             It 'Should return absent' {
                 $result = Get-TargetResource -Name 'FirewallRule'
@@ -60,6 +59,11 @@ InModuleScope $DSCResourceName {
             It 'should have the correct DisplayName and type' {
                 $result.DisplayName | Should Be $rule.DisplayName
                 $result.DisplayName.GetType() | Should Be $rule.DisplayName.GetType()
+            }
+
+            It 'Should have the correct Group and type' {
+                $result.Group | Should Be $rule.Group
+                $result.Group.GetType() | Should Be $rule.Group.GetType()
             }
 
             It 'Should have the correct DisplayGroup and type' {
@@ -97,8 +101,8 @@ InModuleScope $DSCResourceName {
                 $result.Protocol | Should Be $ruleProperties.PortFilters.Protocol
             }
 
-            It 'Should have the correct ApplicationPath and type' {
-                $result.ApplicationPath | Should Be $ruleProperties.ApplicationFilters.Program
+            It 'Should have the correct Program and type' {
+                $result.Program | Should Be $ruleProperties.ApplicationFilters.Program
             }
 
             It 'Should have the correct Service and type' {
@@ -107,64 +111,69 @@ InModuleScope $DSCResourceName {
         }
     }
 
+######################################################################################
+
     Describe 'Test-TargetResource' {
         $rule = Get-NetFirewallRule | `
             Where-Object {$_.DisplayName -ne $null} | `
             Select-Object -first 1
 
         Context 'Ensure is Absent and the Firewall is not Present' {
+            Mock Get-FirewallRule
+
             It 'should return $true' {
-                Mock Get-FirewallRule
                 $result = Test-TargetResource -Name 'FirewallRule' -Ensure 'Absent'
                 $result | Should Be $true
             }
         }
         Context 'Ensure is Absent and the Firewall is Present' {
+            Mock Test-RuleProperties
+
             It 'should return $false' {
-                Mock Test-RuleProperties
-
-                $result = Test-TargetResource -Name $rule.Name `
-                    -DisplayName $rule.DisplayName `
-                    -Ensure 'Absent'
-
+                $result = Test-TargetResource -Name $rule.Name -Ensure 'Absent'
                 $result | Should Be $false
             }
         }
-        Context 'Ensure is Present and the Firewall is Present' {
-            It 'should return $true' {
-                $result = Test-TargetResource `
-                    -Name $rule.Name `
-                    -DisplayName $rule.DisplayName
+        Context 'Ensure is Present and the Firewall is Present and properties match' {
+            Mock Test-RuleProperties -MockWith { return $true }
 
+            It 'should return $true' {
+                $result = Test-TargetResource -Name $rule.Name
                 $result | Should Be $true
+            }
+        }
+        Context 'Ensure is Present and the Firewall is Present and properties are different' {
+            Mock Test-RuleProperties -MockWith { return $false }
+
+            It 'should return $false' {
+                $result = Test-TargetResource -Name $rule.Name
+                $result | Should Be $false
             }
         }
         Context 'Ensure is Present and the Firewall is Absent' {
             It 'should return $false' {
-                Mock Test-RuleProperties
-                $result = Test-TargetResource `
-                    -Name $rule.Name `
-                    -DisplayName $rule.DisplayName -Ensure 'Absent'
-
+                $result = Test-TargetResource -Name $rule.Name
                 $result | Should Be $false
             }
         }
     }
 
+######################################################################################
+
     Describe 'Set-TargetResource' {
         $rule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
             Select-Object -First 1
 
-        Context 'Ensure is Absent and Firewall Exists' {
-            It "should call all the mocks on firewall rule $($rule.Name)" {
+        Context 'Ensure is Absent and Firewall Exist' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
                 Mock Remove-NetFirewallRule
                 $result = Set-TargetResource -Name $rule.Name -Ensure 'Absent'
 
                 Assert-MockCalled Remove-NetFirewallRule -Exactly 1
             }
         }
-        Context 'Ensure is Absent and the Firewall Does Not Exists' {
-            It "should call all the mocks on firewall rule $($rule.Name)" {
+        Context 'Ensure is Absent and the Firewall Does Not Exist' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
                 Mock Get-FirewallRule
                 Mock Remove-NetFirewallRule
                 $result = Set-TargetResource -Name $rule.Name -Ensure 'Absent'
@@ -172,8 +181,8 @@ InModuleScope $DSCResourceName {
                 Assert-MockCalled Remove-NetFirewallRule -Exactly 0
             }
         }
-        Context 'Ensure is Present and the Firewall Does Not Exists' {
-            It "should call all the mocks on firewall rule $($rule.Name)" {
+        Context 'Ensure is Present and the Firewall Does Not Exist' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
                 Mock Get-FirewallRule
                 Mock New-NetFirewallRule
                 $result = Set-TargetResource -Name $rule.Name -Ensure 'Present'
@@ -182,24 +191,227 @@ InModuleScope $DSCResourceName {
                 Assert-MockCalled Get-FirewallRule -Exactly 1
             }
         }
-        Context 'Ensure is Present and the Firewall Does Exists' {
-            It "should call all the mocks on firewall rule $($rule.Name)" {
-                Mock Remove-NetFirewallRule
-                Mock New-NetFirewallRule
+        Context 'Ensure is Present and the Firewall Does Exist but has a different DisplayName' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
                 Mock Test-RuleProperties {return $false}
-                $result = Set-TargetResource -Name $rule.Name -Ensure 'Present'
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -DisplayName 'Different' `
+                    -Ensure 'Present'
 
-                Assert-MockCalled New-NetFirewallRule -Exactly 1
-                Assert-MockCalled Remove-NetFirewallRule -Exactly 1
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
                 Assert-MockCalled Test-RuleProperties -Exactly 1
             }
         }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different DisplayGroup' {
+            It "should throw a CantChangeDisplayGroupError exception on rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+
+                $errorId = 'CantChangeDisplayGroupError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+                $errorMessage = $($LocalizedData.CantChangeDisplayGroupError) -f $Name
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -DisplayGroup 'Different' `
+                    -Ensure 'Present' } | Should Throw $errorRecord
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 0
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different Enabled' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                if( $rule.Enabled -eq 'True' ) {
+                    $NewEnabled = 'False'
+                }
+                else
+                {
+                    $NewEnabled = 'True'
+                }                
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -Enabled $NewEnabled `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different Action' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                if ( $rule.Action -eq 'Allow') {
+                    $NewAction = 'Block'
+                }
+                else
+                {
+                    $NewAction = 'Allow'
+                }
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -Action $NewAction `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different Profile' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                if ( $rule.Profile -ccontains 'Domain') {
+                    $NewProfile = @('Public','Private')
+                }
+                else
+                { 
+                    $NewProfile = @('Domain','Public')
+                }
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -Profile $NewProfile `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different Direction' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                if ( $rule.Direction -eq 'Inbound') { 
+                    $NewDirection = 'Outbound'
+                }
+                    else
+                {
+                    $NewDirection = 'Inbound'
+                }
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -Direction $NewDirection `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different RemotePort' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -RemotePort 9999 `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different LocalPort' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -LocalPort 9999 `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different Protocol' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                if ( $rule.Protocol -eq 'TCP') {
+                    $NewProtocol = 'UDP'
+                }
+                else
+                {
+                    $NewProtocol = 'TCP'
+                }
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -Protocol $NewProtocol `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different Description' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -Description 'Different' `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different Program' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -Program 'Different' `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different Service' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $rule.Name `
+                    -Service 'Different' `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+
+
+        Context 'Ensure is Present and the Firewall Does Exist and is the same' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $true}
+                $result = Set-TargetResource -Name $rule.Name -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 0
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+
     }
+
+######################################################################################
 
     Describe 'Test-RuleProperties' {
         $rule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
                     Select-Object -First 1
-        $FirewallRule = Get-FirewallRule -Name $($rule.name)
+        $FirewallRule = Get-FirewallRule -Name $rule.name
         $Properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
 
         # Make an object that can be splatted onto the function
@@ -214,7 +426,7 @@ InModuleScope $DSCResourceName {
             LocalPort = $Properties.PortFilters.LocalPort
             Protocol = $Properties.PortFilters.Protocol
             Description = $FirewallRule.Description
-            ApplicationPath = $Properties.ApplicationFilters.Program
+            Program = $Properties.ApplicationFilters.Program
             Service = $Properties.ServiceFilters.Service
         }
 
@@ -239,7 +451,13 @@ InModuleScope $DSCResourceName {
         }
         Context 'testing with a rule with a different enabled' {
             $CompareRule = $Splat.Clone()
-            $CompareRule.Enabled = if( $CompareRule.Enabled -eq 'True' ) {'False'} Else {'True'}
+            if( $CompareRule.Enabled -eq 'True' ) {
+                $CompareRule.Enabled = 'False'
+            }
+            else
+            {
+                $CompareRule.Enabled = 'True'
+            }
             It 'should return False' {
                 $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                 $Result | Should be $False
@@ -247,7 +465,13 @@ InModuleScope $DSCResourceName {
         }
         Context 'testing with a rule with a different action' {
             $CompareRule = $Splat.Clone()
-            $CompareRule.Action = if ($CompareRule.Action -eq 'Allow') {'Block'} else {'Allow'}
+            if ($CompareRule.Action -eq 'Allow') {
+                $CompareRule.Action = 'Block'
+            }
+            else
+            {
+                $CompareRule.Action = 'Allow'
+            }
             It 'should return False' {
                 $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                 $Result | Should be $False
@@ -255,7 +479,13 @@ InModuleScope $DSCResourceName {
         }
         Context 'testing with a rule with a different profile' {
             $CompareRule = $Splat.Clone()
-            $CompareRule.Profile = 'Different'
+            if ( $CompareRule.Profile -ccontains 'Domain') {
+                $CompareRule.Profile = @('Public','Private')
+            }
+            else
+            { 
+                $CompareRule.Profile = @('Domain','Public')
+            }
             It 'should return False' {
                 $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                 $Result | Should be $False
@@ -263,7 +493,13 @@ InModuleScope $DSCResourceName {
         }
         Context 'testing with a rule with a different direction' {
             $CompareRule = $Splat.Clone()
-            $CompareRule.Direction = if ($CompareRule.Direction -eq 'Inbound') {'Outbound'} else {'Inbound'}
+            if ($CompareRule.Direction -eq 'Inbound') {
+                $CompareRule.Direction = 'Outbound'
+            }
+            else
+            {
+                $CompareRule.Direction = 'Inbound'
+            }
             It 'should return False' {
                 $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                 $Result | Should be $False
@@ -287,7 +523,13 @@ InModuleScope $DSCResourceName {
         }
         Context 'testing with a rule with a different protocol' {
             $CompareRule = $Splat.Clone()
-            $CompareRule.Protocol = 'Different'
+            if ( $CompareRule.Protocol -eq 'TCP') {
+                $CompareRule.Protocol = 'UDP'
+            }
+            else
+            {
+                $CompareRule.Protocol = 'TCP'
+            }
             It 'should return False' {
                 $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                 $Result | Should be $False
@@ -303,7 +545,7 @@ InModuleScope $DSCResourceName {
         }
         Context 'testing with a rule with a different application path' {
             $CompareRule = $Splat.Clone()
-            $CompareRule.ApplicationPath = 'Different'
+            $CompareRule.Program = 'Different'
             It 'should return False' {
                 $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                 $Result | Should be $False
@@ -319,17 +561,15 @@ InModuleScope $DSCResourceName {
         }
     }
 
+######################################################################################
+
     Describe ' Get-FirewallRule' {
-        $rule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
-            Select-Object -First 1
+        $rule = Get-NetFirewallRule | Select-Object -First 1
+        $rules = Get-NetFirewallRule | Select-Object -First 2
 
         Context 'testing with firewall that exists' {
             It 'should return a firewall rule when name is passed' {
                 $Result = Get-FirewallRule -Name $rule.Name
-                $Result | Should Not BeNullOrEmpty
-            }
-            It 'should return a firewall rule when name and display group is passed' {
-                $Result = Get-FirewallRule -Name $rule.Name -DisplayGroup $rule.Group
                 $Result | Should Not BeNullOrEmpty
             }
         }
@@ -339,7 +579,24 @@ InModuleScope $DSCResourceName {
                 $Result | Should BeNullOrEmpty
             }
         }
+        Context 'testing with firewall that somehow occurs more than once' {
+            Mock Get-NetFirewallRule -MockWith { $rules }
+
+            $errorId = 'RuleNotUnique'
+            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+            $errorMessage = $($LocalizedData.RuleNotUniqueError) -f 2,$rule.Name
+            $exception = New-Object -TypeName System.InvalidOperationException `
+                -ArgumentList $errorMessage
+            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                -ArgumentList $exception, $errorId, $errorCategory, $null
+
+            It 'should throw RuleNotUnique exception' {
+                { $Result = Get-FirewallRule -Name $rule.Name } | Should Throw $errorRecord
+            }
+        }
     }
+
+######################################################################################
 
     Describe 'Get-FirewallRuleProperty' {
         $rule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
@@ -405,6 +662,9 @@ InModuleScope $DSCResourceName {
             }
         }
     }
+
+######################################################################################
+
 }
 
 # Clean up after the test completes.

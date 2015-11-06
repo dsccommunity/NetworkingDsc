@@ -1,9 +1,8 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+﻿[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
 
 # xNetworking
 
-The **xNetworking** module contains the **xFirewall, xIPAddress** and **xDnsServerAddress** DSC resources for configuring a node’s IP address, DNS server address, and firewall rules.
-
+The **xNetworking** module contains the **xFirewall, xIPAddress, xDnsServerAddress, xDnsConnectionSuffix** and **xDefaultGatewayAddress** DSC resources for configuring a node’s IP address, DNS server address, and firewall rules.
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -14,6 +13,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **xFirewall** sets a node's firewall rules.
 * **xIPAddress** sets a node's IP address.
 * **xDnsServerAddress** sets a node's DNS server.
+* **xDnsConnectionSuffix** sets a node's network interface connection-specific DNS suffix.
 * **xDefaultGatewayAddress** sets a node's default gateway address.
 
 ### xIPAddress
@@ -28,6 +28,15 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Address**: The desired DNS Server address(es)
 * **InterfaceAlias**: Alias of the network interface for which the DNS server address is set.
 * **AddressFamily**: IP address family: { IPv4 | IPv6 }
+* **Validate**: Requires that the DNS Server addresses be validated if they are updated. It will cause the resouce to throw a 'A general error occurred that is not covered by a more specific error code.' error if set to True and specified DNS Servers are not accessible. Defaults to False.
+
+### xDnsConnectionSuffix
+
+* **InterfaceAlias**: Alias of the network interface for which the DNS server address is set.
+* **ConnectionSpecificSuffix**: DNS connection-specific suffix to assign to the network interface.
+* **RegisterThisConnectionsAddress**: Specifies that the IP address for this connection is to be registered. The default value is True.
+* **UseSuffixWhenRegistering**: Specifies that this host name and the connection specific suffix for this connection are to be registered. The default value is False.
+* **Ensure**: Ensure that the network interface connection-specific suffix is present or not. { Present | Absent }
 
 ### xDefaultGatewayAddress
 
@@ -49,15 +58,43 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **LocalPort**: Local port used for the filter.
 * **Protocol**: Specific protocol for filter. Specified by name, number, or range.
 * **Description**: Documentation for the rule.
-* **ApplicationPath**: Path and filename of the program for which the rule is applied.
+* **Program**: Path and filename of the program for which the rule is applied.
 * **Service**: Specifies the short name of a Windows service to which the firewall rule applies.
 
+## Known Invalid Configurations
+
+### xFirewall
+* The exception 'One of the port keywords is invalid' will be thrown if a rule is created with the LocalPort set to PlayToDiscovery and the Protocol is not set to UDP. This is not an unexpected error, but because the New-NetFirewallRule documentation is incorrect.
+This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1974268/new-set-netfirewallrule-cmdlet-localport-parameter-documentation-is-incorrect-for-playtodiscovery)
+
+* The exception 'The DisplayGroup of an existing Firewall Rule can not be changed' will be thrown if a configuration tries to change DisplayGroup property of an existing rule. This is because the Set-NetFirewallRule cmdlet does not support this function. Delete and re-create this rule instead.
+This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1970765/add-ability-to-change-firewall-displaygroup-in-set-netfirewallrule-cmdlet)
 
 ## Versions
 
-### Unreleased
-* MSFT_xFirewall: Refactored to add more unit tests and cleanup logic
-* MSFT_xDefaultGatewayAddress: Added
+### Unreleased Version
+* MSFT_xDNSServerAddress: Corrected Verbose logging messages when multiple DNS adddressed specified.
+* MSFT_xDNSServerAddress: Change to ensure resource terminates if DNS Server validation fails.
+* MSFT_xDNSServerAddress: Added Validate parameter to enable DNS server validation when changing server addresses.
+* MSFT_xFirewall: ApplicationPath Parameter renamed to Program for consistency with Cmdlets.
+* MSFT_xFirewall: Fix to prevent error when DisplayName parameter is set on an existing rule.
+* Added xDnsConnectionSuffix resource to manage connection-specific DNS suffixes.
+
+### 2.4.0.0
+* Added following resources:
+  * MSFT_xDefaultGatewayAddress
+* MSFT_xFirewall: Removed code using DisplayGroup to lookup Firewall Rule because it was redundant.
+* MSFT_xFirewall: Set-TargetResource now updates firewall rules instead of recreating them.
+* MSFT_xFirewall: Added message localization support.
+* MSFT_xFirewall: Removed unessesary code for handling multiple rules with same name.
+* MSFT_xDefaultGatewayAddress: Removed unessesary try/catch logic from around networking cmdlets.
+* MSFT_xIPAddress: Removed unessesary try/catch logic from around networking cmdlets.
+* MSFT_xDNSServerAddress: Removed unessesary try/catch logic from around networking cmdlets.
+* MSFT_xDefaultGatewayAddress: Refactored to add more unit tests and cleanup logic.
+* MSFT_xIPAddress: Network Connection Profile no longer forced to Private when IP address changed.
+* MSFT_xIPAddress: Refactored to add more unit tests and cleanup logic.
+* MSFT_xDNSServerAddress: Refactored to add more unit tests and cleanup logic.
+* MSFT_xFirewall: Refactored to add more unit tests and cleanup logic.
 * MSFT_xIPAddress: Removed default gateway parameter - use xDefaultGatewayAddress resource.
 * MSFT_xIPAddress: Added check for IP address format not matching address family.
 * MSFT_xDNSServerAddress: Corrected error message when address format doesn't match address family.
@@ -172,7 +209,8 @@ Configuration Sample_xDnsServerAddress
         [Parameter(Mandatory)]
         [string]$InterfaceAlias,
         [ValidateSet("IPv4","IPv6")]
-        [string]$AddressFamily = 'IPv4'
+        [string]$AddressFamily = 'IPv4',
+        [Boolean]$Validate
     )
     Import-DscResource -Module xNetworking
     Node $NodeName
@@ -182,6 +220,34 @@ Configuration Sample_xDnsServerAddress
             Address        = $DnsServerAddress
             InterfaceAlias = $InterfaceAlias
             AddressFamily  = $AddressFamily
+            Validate       = $Validate
+        }
+    }
+}
+```
+
+### Set a DNS connection suffix
+
+This configuration will set a DNS connection-specific suffix on a network interface that is identified by its alias.
+
+```powershell
+Configuration Sample_xDnsConnectionSuffix
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost',
+        [Parameter(Mandatory)]
+        [string]$InterfaceAlias,
+        [Parameter(Mandatory)]
+        [string]$DnsSuffix
+    )
+    Import-DscResource -Module xNetworking
+    Node $NodeName
+    {
+        xDnsConnectionSuffix DnsConnectionSuffix
+        {
+            InterfaceAlias           = $InterfaceAlias
+            ConnectionSpecificSuffix = $DnsSuffix
         }
     }
 }
@@ -375,3 +441,27 @@ Sample_xFirewall
 Start-DscConfiguration -Path Sample_xFirewall -Wait -Verbose -Force
 ```
 
+### Enable a built-in Firewall Rule
+
+This example enables the built-in Firewall Rule 'World Wide Web Services (HTTP Traffic-In)'.
+```powershell
+configuration Sample_xFirewall_EnableBuiltInFirewallRule
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xFirewall Firewall
+        {
+            Name                  = "IIS-WebServerRole-HTTP-In-TCP"
+            Ensure                = "Present"
+            Enabled               = "True"
+        }
+    }
+ }
+```
