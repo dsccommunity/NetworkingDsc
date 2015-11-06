@@ -54,7 +54,6 @@ function Get-TargetResource
             -AddressFamily $AddressFamily).ServerAddresses
         AddressFamily = $AddressFamily
         InterfaceAlias = $InterfaceAlias
-        Validate = $null
     }
 
     $returnValue
