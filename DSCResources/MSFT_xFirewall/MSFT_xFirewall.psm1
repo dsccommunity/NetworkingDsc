@@ -71,7 +71,6 @@ function Get-TargetResource
         Name            = $Name
         Ensure          = 'Present'
         DisplayName     = $firewallRule.DisplayName
-        Group           = $firewallRule.Group
         DisplayGroup    = $firewallRule.DisplayGroup
         Enabled         = $firewallRule.Enabled
         Action          = $firewallRule.Action
