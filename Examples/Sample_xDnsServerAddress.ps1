@@ -11,7 +11,9 @@ configuration Sample_xDnsServerAddress
         [string]$InterfaceAlias,
 
         [ValidateSet("IPv4","IPv6")]
-        [string]$AddressFamily = 'IPv4'
+        [string]$AddressFamily = 'IPv4',
+        
+        [Boolean]$Validate
     )
 
     Import-DscResource -Module xNetworking
@@ -23,6 +25,7 @@ configuration Sample_xDnsServerAddress
             Address        = $DnsServerAddress
             InterfaceAlias = $InterfaceAlias
             AddressFamily  = $AddressFamily
+            Validate       = $Validate
         }
     }
 }

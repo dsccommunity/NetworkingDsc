@@ -110,7 +110,8 @@ InModuleScope MSFT_xDNSServerAddress {
                 AddressFamily = 'IPv4'
             }
         }
-        Mock Set-DnsClientServerAddress
+        Mock Set-DnsClientServerAddress -ParameterFilter { $Validate -eq $true }
+        Mock Set-DnsClientServerAddress -ParameterFilter { $Validate -eq $false }
         #endregion
 
         Context 'invoking with single IPv4 Server Address that is the same as current' {
@@ -125,7 +126,8 @@ InModuleScope MSFT_xDNSServerAddress {
             }
             It 'should call all the mocks' {
                 Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
-                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
             }
         }
         Context 'invoking with single IPv4 Server Address that is different to current' {
@@ -140,9 +142,27 @@ InModuleScope MSFT_xDNSServerAddress {
             }
             It 'should call all the mocks' {
                 Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
-                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
             }
         }
+        Context 'invoking with single IPv4 Server Address that is different to current and validate true' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('192.168.0.2')
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv4'
+                    Validate = $True
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
+            }
+        }        
         Context 'invoking with multiple IPv4 Server Addresses that are different to current' {
             It 'should not throw an exception' {
 
@@ -155,7 +175,8 @@ InModuleScope MSFT_xDNSServerAddress {
             }
             It 'should call all the mocks' {
                 Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
-                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
             }
         }
 
@@ -168,7 +189,6 @@ InModuleScope MSFT_xDNSServerAddress {
                 AddressFamily = 'IPv4'
             }
         }
-        Mock Set-DnsClientServerAddress
         #endregion
 
         Context 'invoking with multiple IPv4 Server Addresses When there are no address assiged' {
@@ -183,7 +203,8 @@ InModuleScope MSFT_xDNSServerAddress {
             }
             It 'should call all the mocks' {
                 Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
-                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
             }
         }
 
@@ -198,7 +219,8 @@ InModuleScope MSFT_xDNSServerAddress {
                 AddressFamily = 'IPv6'
             }
         }
-        Mock Set-DnsClientServerAddress
+        Mock Set-DnsClientServerAddress -ParameterFilter { $Validate -eq $true }
+        Mock Set-DnsClientServerAddress -ParameterFilter { $Validate -eq $false }
         #endregion
 
         Context 'invoking with single IPv6 Server Address that is the same as current' {
@@ -213,7 +235,8 @@ InModuleScope MSFT_xDNSServerAddress {
             }
             It 'should call all the mocks' {
                 Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
-                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
             }
         }
         Context 'invoking with single IPv6 Server Address that is different to current' {
@@ -228,7 +251,25 @@ InModuleScope MSFT_xDNSServerAddress {
             }
             It 'should call all the mocks' {
                 Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
-                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
+            }
+        }
+        Context 'invoking with single IPv6 Server Address that is different to current and validate true' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::2')
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                    Validate = $True
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
             }
         }
         Context 'invoking with multiple IPv6 Server Addresses that are different to current' {
@@ -243,7 +284,8 @@ InModuleScope MSFT_xDNSServerAddress {
             }
             It 'should call all the mocks' {
                 Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
-                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
             }
         }
 
@@ -256,7 +298,6 @@ InModuleScope MSFT_xDNSServerAddress {
                 AddressFamily = 'IPv6'
             }
         }
-        Mock Set-DnsClientServerAddress
         #endregion
 
         Context 'invoking with multiple IPv6 Server Addresses When there are no address assiged' {
@@ -271,10 +312,10 @@ InModuleScope MSFT_xDNSServerAddress {
             }
             It 'should call all the mocks' {
                 Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
-                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
             }
         }
-
     }
 
     #######################################################################################

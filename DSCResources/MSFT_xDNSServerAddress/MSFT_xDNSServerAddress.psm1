@@ -54,6 +54,7 @@ function Get-TargetResource
             -AddressFamily $AddressFamily).ServerAddresses
         AddressFamily = $AddressFamily
         InterfaceAlias = $InterfaceAlias
+        Validate = $null
     }
 
     $returnValue
@@ -78,7 +79,9 @@ function Set-TargetResource
 
         [Parameter(Mandatory)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily
+        [String]$AddressFamily,
+        
+        [Boolean]$Validate = $false
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
@@ -87,6 +90,7 @@ function Set-TargetResource
 
     #Get the current DNS Server Addresses based on the parameters given.
     $PSBoundParameters.Remove('Address')
+    $PSBoundParameters.Remove('Validate')
     $currentAddress = (Get-DnsClientServerAddress @PSBoundParameters `
         -ErrorAction Stop).ServerAddresses
 
@@ -99,11 +103,14 @@ function Set-TargetResource
     if ($addressDifferent)
     {
         # Set the DNS settings as well
-        Set-DnsClientServerAddress `
-            -InterfaceAlias $InterfaceAlias `
-            -ServerAddresses $Address `
-            -Validate `
+        $Splat = @{
+            InterfaceAlias = $InterfaceAlias
+            Address = $Address
+            Validate = $Validate
+        }
+        Set-DnsClientServerAddress @Splat `
             -ErrorAction Stop
+
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($LocalizedData.DNSServersHaveBeenSetCorrectlyMessage)
             ) -join '' )
@@ -136,7 +143,9 @@ function Test-TargetResource
 
         [Parameter(Mandatory)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily
+        [String]$AddressFamily,
+        
+        [Boolean]$Validate = $false        
     )
     # Flag to signal whether settings are correct
     [Boolean] $desiredConfigurationMatch = $true

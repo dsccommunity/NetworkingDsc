@@ -27,6 +27,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Address**: The desired DNS Server address(es)
 * **InterfaceAlias**: Alias of the network interface for which the DNS server address is set.
 * **AddressFamily**: IP address family: { IPv4 | IPv6 }
+* **Validate**: Requires that the DNS Server addresses be validated if they are updated. It will cause the resouce to throw a 'A general error occurred that is not covered by a more specific error code.' error if set to True and specified DNS Servers are not accessible. Defaults to False.
 
 ### xDefaultGatewayAddress
 
@@ -67,6 +68,7 @@ This issue has been reported on [Microsoft Connect](https://connect.microsoft.co
 * MSFT_xDNSServerAddress: Change to ensure resource terminates if DNS Server validation fails.
 * MSFT_xFirewall: ApplicationPath Parameter renamed to Program for consistency with Cmdlets.
 * MSFT_xFirewall: Fix to prevent error when DisplayName parameter is set on an existing rule.
+* MSFT_xDNSServerAddress: Added Validate parameter to enable DNS server validation when changing server addresses.
 
 ### 2.4.0.0
 * Added following resources:
@@ -197,7 +199,8 @@ Configuration Sample_xDnsServerAddress
         [Parameter(Mandatory)]
         [string]$InterfaceAlias,
         [ValidateSet("IPv4","IPv6")]
-        [string]$AddressFamily = 'IPv4'
+        [string]$AddressFamily = 'IPv4',
+        [Boolean]$Validate
     )
     Import-DscResource -Module xNetworking
     Node $NodeName
@@ -207,6 +210,7 @@ Configuration Sample_xDnsServerAddress
             Address        = $DnsServerAddress
             InterfaceAlias = $InterfaceAlias
             AddressFamily  = $AddressFamily
+            Validate       = $Validate
         }
     }
 }
