@@ -47,6 +47,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 ### xFirewall
 
 * **Name**: Name of the firewall rule
+* **DisplayName**: Localized, user-facing name of the firewall rule being created.
 * **Group**: Name of the firewall group where we want to put the firewall rule.
 * **Ensure**: Ensure that the firewall rule is Present or Absent.
 * **Enabled**: Enable or Disable the supplied configuration.
