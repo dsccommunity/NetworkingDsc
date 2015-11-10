@@ -30,9 +30,14 @@ if (($env:PSModulePath).Split(';') -ccontains $pwd.Path)
     $env:PSModulePath = ($env:PSModulePath -split ';' | Where-Object {$_ -ne $pwd.path}) -join ';'
 }
 
+# Preserve and set the execution policy so that the DSC MOF can be created
+$OldExecutionPolicy = Get-ExecutionPolicy
+Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
+
 try {
     # Load in the DSC Configuration
     . $PSScriptRoot\Firewall.ps1
+
     Describe 'xFirewall_Integration' {
         It 'Should compile without throwing' {
             {
@@ -51,7 +56,8 @@ try {
             $firewallRule = Get-NetFireWallRule -Name $rule.Name
 
             $firewallRule.Name         | Should Be $rule.Name
-            $firewallRule.DisplayName  | Should Be $rule.DisplayGroup
+            $firewallRule.DisplayName  | Should Be $rule.DisplayName
+            $firewallRule.Group        | Should Be $rule.Group
             $firewallRule.Enabled      | Should Be $rule.Enabled
             $firewallRule.Profile      | Should Be $rule.Profile
             $firewallRule.Action       | Should Be $rule.Action
@@ -62,6 +68,9 @@ try {
     }
 }
 finally {
+    # Restore the Execution Policy
+    Set-ExecutionPolicy -ExecutionPolicy $OldExecutionPolicy -Force
+
     # Cleanup DSC Configuration
     Remove-NetFirewallRule -Name 'b8df0af9-d0cc-4080-885b-6ed263aaed67'
     Remove-Item -Path $env:Temp\Firewall -Recurse -Force
