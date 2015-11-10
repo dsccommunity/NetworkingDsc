@@ -198,7 +198,9 @@ function Set-TargetResource
                             if (-not $PSBoundParameters.ContainsKey($_))
                             {
                                 $PropertyValue = (Invoke-Expression -Command "`$FirewallRule.$_")
-                                $null = $PSBoundParameters.Add($_,$PropertyValue)
+                                if ($PropertyValue) {
+                                    $null = $PSBoundParameters.Add($_,$PropertyValue)
+                                }
                             }
                         }
 
