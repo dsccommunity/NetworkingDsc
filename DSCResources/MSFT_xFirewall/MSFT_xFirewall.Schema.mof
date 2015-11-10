@@ -3,7 +3,8 @@ class MSFT_xFirewall : OMI_BaseResource
 {
   [Key, Description("Name of the Firewall Rule")] String Name;
   [Write, Description("Localized, user-facing name of the Firewall Rule being created")] String DisplayName;
-  [Write, Description("Name of the Firewall Group where we want to put the Firewall Rules")] string DisplayGroup;
+  [Write, Description("Name of the Firewall Group where we want to put the Firewall Rule")] string Group;
+  [Read, Description("The current value of the Display Group of the Firewall Rule")] string DisplayGroup;
   [Write, Description("Ensure the presence/absence of the resource"), ValueMap{"Present", "Absent"},Values{"Present", "Absent"}] String Ensure;
   [Write, Description("Enable or disable the supplied configuration"), ValueMap{"True", "False"},Values{"True", "False"}] string Enabled;
   [Write, Description("Permit or Block the supplied configuration"), ValueMap{"NotConfigured", "Allow", "Block"},Values{"NotConfigured", "Allow", "Block"}] String Action;
