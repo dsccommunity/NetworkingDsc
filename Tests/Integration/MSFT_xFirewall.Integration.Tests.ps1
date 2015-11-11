@@ -75,7 +75,7 @@ finally {
     # Restore the Execution Policy
     if ($rollbackExecution)
     {
-        Set-ExectuionPolicy $executionPolicy
+        Set-ExecutionPolicy -ExecutionPolicy $executionPolicy -Force
     }
     
     # Cleanup DSC Configuration
