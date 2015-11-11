@@ -20,7 +20,6 @@ FirewallRuleShouldNotExistButDoesMessage=We do not want the firewall rule with N
 FirewallRuleShouldNotExistAndDoesNotMessage=We do not want the firewall rule with Name '{0}' to exist, and it does not.
 CheckingFirewallRuleMessage=Checking settings for firewall rule with Name '{0}'.
 CheckingFirewallReturningMessage=Check Firewall rule with Name '{0}' returning {1}.
-CheckingFirewallParametersMessage=Check each defined parameter against the existing Firewall Rule with Name '{0}'.
 PropertyNoMatchMessage={0} property value '{1}' does not match desired state '{2}'.
 TestFirewallRuleReturningMessage=Test Firewall rule with Name '{0}' returning {1}.
 FirewallRuleNotFoundMessage=No Firewall Rule found with Name '{0}'.
@@ -71,7 +70,6 @@ function Get-TargetResource
         Name            = $Name
         Ensure          = 'Present'
         DisplayName     = $firewallRule.DisplayName
-        Group           = $firewallRule.Group
         DisplayGroup    = $firewallRule.DisplayGroup
         Enabled         = $firewallRule.Enabled
         Action          = $firewallRule.Action
@@ -154,11 +152,6 @@ function Set-TargetResource
 
     # Remove any parameters not used in Splats
     $null = $PSBoundParameters.Remove('Ensure')
-
-    # Effectively renaming DisplayGroup to Group
-    if ($DisplayGroup) {
-        $null = $PSBoundParameters.Add('Group', $DisplayGroup)
-    }
     $null = $PSBoundParameters.Remove('DisplayGroup')
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -185,6 +178,11 @@ function Set-TargetResource
 
             if (-not (Test-RuleProperties -FirewallRule $firewallRule @PSBoundParameters))
             {
+                # Effectively renaming DisplayGroup to Group
+                if ($DisplayGroup) {
+                    $null = $PSBoundParameters.Add('Group', $DisplayGroup)
+                }
+
                 Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                     $($LocalizedData.UpdatingExistingFirewallMessage) -f $Name
                     ) -join '')
@@ -208,16 +206,20 @@ function Set-TargetResource
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
                     $PSCmdlet.ThrowTerminatingError($errorRecord)
-                } else {
+                }
+                else
+                {
                     # If the DisplayName is provided then need to remove it
                     # And change it to NewDisplayName if it is different.
-                    if ($PSBoundParameters.ContainsKey('DisplayName')) {
+                    if ($PSBoundParameters.ContainsKey('DisplayName'))
+                    {
                         $null = $PSBoundParameters.Remove('DisplayName')
-                        if ($DisplayName -ne $FirewallRule.DisplayName) {
+                        if ($DisplayName -ne $FirewallRule.DisplayName)
+                        {
                             $null = $PSBoundParameters.Add('NewDisplayName',$Name)
                         }
                     }
-               
+
                     # Set the existing Firewall rule based on specified parameters
                     Set-NetFirewallRule @PSBoundParameters
                 }
@@ -238,7 +240,6 @@ function Set-TargetResource
                 }
             }
 
-
             # Add the new Firewall rule based on specified parameters
             New-NetFirewallRule @PSBoundParameters
         }
@@ -250,7 +251,7 @@ function Set-TargetResource
             ) -join '')
 
         if ($exists)
-        {           
+        {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                 $($LocalizedData.FirewallRuleShouldNotExistButDoesMessage) -f $Name
                 ) -join '')
@@ -364,7 +365,7 @@ function Test-TargetResource
     }
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.CheckingFirewallParametersMessage) -f $Name
+        $($LocalizedData.CheckFirewallRuleParametersMessage) -f $Name
         ) -join '')
     $desiredConfigurationMatch = Test-RuleProperties -FirewallRule $firewallRule @PSBoundParameters
 
@@ -389,13 +390,14 @@ function Test-TargetResource
 ######################################################################################
 function Test-RuleProperties
 {
-    param (
+    param
+    (
         [Parameter(Mandatory)]
         $FirewallRule,
         [String] $Name,
         [String] $DisplayName = $Name,
+        [string] $Group,
         [String] $DisplayGroup,
-        [String] $Group,
         [String] $Enabled = 'True',
         [string] $Action = 'Allow',
         [String[]] $Profile = 'Any',

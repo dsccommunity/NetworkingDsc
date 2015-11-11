@@ -2,7 +2,7 @@
 
 # xNetworking
 
-The **xNetworking** module contains the **xFirewall, xIPAddress** and **xDnsServerAddress** DSC resources for configuring a node’s IP address, DNS server address, and firewall rules.
+The **xNetworking** module contains the **xFirewall, xIPAddress, xDnsServerAddress, xDnsConnectionSuffix** and **xDefaultGatewayAddress** DSC resources for configuring a node’s IP address, DNS server address, and firewall rules.
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -13,6 +13,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **xFirewall** sets a node's firewall rules.
 * **xIPAddress** sets a node's IP address.
 * **xDnsServerAddress** sets a node's DNS server.
+* **xDnsConnectionSuffix** sets a node's network interface connection-specific DNS suffix.
 * **xDefaultGatewayAddress** sets a node's default gateway address.
 
 ### xIPAddress
@@ -27,6 +28,15 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Address**: The desired DNS Server address(es)
 * **InterfaceAlias**: Alias of the network interface for which the DNS server address is set.
 * **AddressFamily**: IP address family: { IPv4 | IPv6 }
+* **Validate**: Requires that the DNS Server addresses be validated if they are updated. It will cause the resouce to throw a 'A general error occurred that is not covered by a more specific error code.' error if set to True and specified DNS Servers are not accessible. Defaults to False.
+
+### xDnsConnectionSuffix
+
+* **InterfaceAlias**: Alias of the network interface for which the DNS server address is set.
+* **ConnectionSpecificSuffix**: DNS connection-specific suffix to assign to the network interface.
+* **RegisterThisConnectionsAddress**: Specifies that the IP address for this connection is to be registered. The default value is True.
+* **UseSuffixWhenRegistering**: Specifies that this host name and the connection specific suffix for this connection are to be registered. The default value is False.
+* **Ensure**: Ensure that the network interface connection-specific suffix is present or not. { Present | Absent }
 
 ### xDefaultGatewayAddress
 
@@ -60,13 +70,23 @@ This issue has been reported on [Microsoft Connect](https://connect.microsoft.co
 * The exception 'The DisplayGroup of an existing Firewall Rule can not be changed' will be thrown if a configuration tries to change DisplayGroup property of an existing rule. This is because the Set-NetFirewallRule cmdlet does not support this function. Delete and re-create this rule instead.
 This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1970765/add-ability-to-change-firewall-displaygroup-in-set-netfirewallrule-cmdlet)
 
+## Known Issues
+
+### xFirewall
+The following error may occur when applying xFirewall configurations on Windows Server 2012 R2 if [KB3000850](https://support.microsoft.com/en-us/kb/3000850) is not installed. Please ensure this update is installed if this error occurs.
+```
+The cmdlet does not fully support the Inquire action for debug messages. Cmdlet operation will continue during the prompt. Select a different action preference via -Debug switch or $DebugPreference variable, and try again.
+```
+
 ## Versions
 
 ### Unreleased Version
 * MSFT_xDNSServerAddress: Corrected Verbose logging messages when multiple DNS adddressed specified.
 * MSFT_xDNSServerAddress: Change to ensure resource terminates if DNS Server validation fails.
+* MSFT_xDNSServerAddress: Added Validate parameter to enable DNS server validation when changing server addresses.
 * MSFT_xFirewall: ApplicationPath Parameter renamed to Program for consistency with Cmdlets.
 * MSFT_xFirewall: Fix to prevent error when DisplayName parameter is set on an existing rule.
+* Added xDnsConnectionSuffix resource to manage connection-specific DNS suffixes.
 
 ### 2.4.0.0
 * Added following resources:
@@ -197,7 +217,8 @@ Configuration Sample_xDnsServerAddress
         [Parameter(Mandatory)]
         [string]$InterfaceAlias,
         [ValidateSet("IPv4","IPv6")]
-        [string]$AddressFamily = 'IPv4'
+        [string]$AddressFamily = 'IPv4',
+        [Boolean]$Validate
     )
     Import-DscResource -Module xNetworking
     Node $NodeName
@@ -207,6 +228,34 @@ Configuration Sample_xDnsServerAddress
             Address        = $DnsServerAddress
             InterfaceAlias = $InterfaceAlias
             AddressFamily  = $AddressFamily
+            Validate       = $Validate
+        }
+    }
+}
+```
+
+### Set a DNS connection suffix
+
+This configuration will set a DNS connection-specific suffix on a network interface that is identified by its alias.
+
+```powershell
+Configuration Sample_xDnsConnectionSuffix
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost',
+        [Parameter(Mandatory)]
+        [string]$InterfaceAlias,
+        [Parameter(Mandatory)]
+        [string]$DnsSuffix
+    )
+    Import-DscResource -Module xNetworking
+    Node $NodeName
+    {
+        xDnsConnectionSuffix DnsConnectionSuffix
+        {
+            InterfaceAlias           = $InterfaceAlias
+            ConnectionSpecificSuffix = $DnsSuffix
         }
     }
 }

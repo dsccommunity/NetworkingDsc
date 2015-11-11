@@ -61,11 +61,6 @@ InModuleScope $DSCResourceName {
                 $result.DisplayName.GetType() | Should Be $rule.DisplayName.GetType()
             }
 
-            It 'Should have the correct Group and type' {
-                $result.Group | Should Be $rule.Group
-                $result.Group.GetType() | Should Be $rule.Group.GetType()
-            }
-
             It 'Should have the correct DisplayGroup and type' {
                 $result.DisplayGroup | Should Be $rule.DisplayGroup
                 $result.DisplayGroup.GetType() | Should Be $rule.DisplayGroup.GetType()
@@ -236,7 +231,7 @@ InModuleScope $DSCResourceName {
                 else
                 {
                     $NewEnabled = 'True'
-                }                
+                }
                 $result = Set-TargetResource `
                     -Name $rule.Name `
                     -Enabled $NewEnabled `
@@ -274,7 +269,7 @@ InModuleScope $DSCResourceName {
                     $NewProfile = @('Public','Private')
                 }
                 else
-                { 
+                {
                     $NewProfile = @('Domain','Public')
                 }
                 $result = Set-TargetResource `
@@ -290,7 +285,7 @@ InModuleScope $DSCResourceName {
             It "should call expected mocks on firewall rule $($rule.Name)" {
                 Mock Set-NetFirewallRule
                 Mock Test-RuleProperties {return $false}
-                if ( $rule.Direction -eq 'Inbound') { 
+                if ( $rule.Direction -eq 'Inbound') {
                     $NewDirection = 'Outbound'
                 }
                     else
@@ -483,7 +478,7 @@ InModuleScope $DSCResourceName {
                 $CompareRule.Profile = @('Public','Private')
             }
             else
-            { 
+            {
                 $CompareRule.Profile = @('Domain','Public')
             }
             It 'should return False' {
