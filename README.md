@@ -47,8 +47,8 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 ### xFirewall
 
 * **Name**: Name of the firewall rule
-* **DisplayName**: Localized, user-facing name of the firewall rule being created .
-* **DisplayGroup**: Name of the firewall group where we want to put the firewall rules.
+* **DisplayName**: Localized, user-facing name of the firewall rule being created.
+* **Group**: Name of the firewall group where we want to put the firewall rule.
 * **Ensure**: Ensure that the firewall rule is Present or Absent.
 * **Enabled**: Enable or Disable the supplied configuration.
 * **Action**: Permit or Block the supplied configuration
@@ -67,9 +67,6 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * The exception 'One of the port keywords is invalid' will be thrown if a rule is created with the LocalPort set to PlayToDiscovery and the Protocol is not set to UDP. This is not an unexpected error, but because the New-NetFirewallRule documentation is incorrect.
 This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1974268/new-set-netfirewallrule-cmdlet-localport-parameter-documentation-is-incorrect-for-playtodiscovery)
 
-* The exception 'The DisplayGroup of an existing Firewall Rule can not be changed' will be thrown if a configuration tries to change DisplayGroup property of an existing rule. This is because the Set-NetFirewallRule cmdlet does not support this function. Delete and re-create this rule instead.
-This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1970765/add-ability-to-change-firewall-displaygroup-in-set-netfirewallrule-cmdlet)
-
 ## Known Issues
 
 ### xFirewall
@@ -81,17 +78,21 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased Version
+* Added the following resources:
+    * MSFT_xDNSConnectionSuffix resource to manage connection-specific DNS suffixes.
+    * MSFT_xNetConnectionProfile resource to manage Connection Profiles for interfaces.
 * MSFT_xDNSServerAddress: Corrected Verbose logging messages when multiple DNS adddressed specified.
 * MSFT_xDNSServerAddress: Change to ensure resource terminates if DNS Server validation fails.
 * MSFT_xDNSServerAddress: Added Validate parameter to enable DNS server validation when changing server addresses.
 * MSFT_xFirewall: ApplicationPath Parameter renamed to Program for consistency with Cmdlets.
 * MSFT_xFirewall: Fix to prevent error when DisplayName parameter is set on an existing rule.
-* Added xDnsConnectionSuffix resource to manage connection-specific DNS suffixes.
-* Added xNetConnectionProfile resource to manage Connection Profiles for interfaces.
+* MSFT_xFirewall: Setting a different DisplayName parameter on an existing rule now correctly reports as needs change.
+* MSFT_xFirewall: Changed DisplayGroup parameter to Group for consistency with Cmdlets and reduce confusion.
+* MSFT_xFirewall: Changing the Group of an existing Firewall rule will recreate the Firewall rule rather than change it.
 
 ### 2.4.0.0
 * Added following resources:
-  * MSFT_xDefaultGatewayAddress
+   * MSFT_xDefaultGatewayAddress
 * MSFT_xFirewall: Removed code using DisplayGroup to lookup Firewall Rule because it was redundant.
 * MSFT_xFirewall: Set-TargetResource now updates firewall rules instead of recreating them.
 * MSFT_xFirewall: Added message localization support.
@@ -365,14 +366,14 @@ Configuration Add_FirewallRuleToExistingGroup
         {
             Name                  = "MyFirewallRule"
             DisplayName           = "My Firewall Rule"
-            DisplayGroup          = "My Firewall Rule Group"
+            Group                 = "My Firewall Rule Group"
         }
 
         xFirewall Firewall1
         {
             Name                  = "MyFirewallRule1"
             DisplayName           = "My Firewall Rule"
-            DisplayGroup          = "My Firewall Rule Group"
+            Group                 = "My Firewall Rule Group"
             Ensure                = "Present"
             Enabled               = "True"
             Profile               = ("Domain", "Private")
@@ -400,7 +401,7 @@ Configuration Disable_AccessToApplication
         {
             Name                  = "NotePadFirewallRule"
             DisplayName           = "Firewall Rule for Notepad.exe"
-            DisplayGroup          = "NotePad Firewall Rule Group"
+            Group                 = "NotePad Firewall Rule Group"
             Ensure                = "Present"
             Action                = 'Blocked'
             Description           = "Firewall Rule for Notepad.exe"
@@ -430,7 +431,7 @@ Configuration Sample_xFirewall
         {
             Name                  = "NotePadFirewallRule"
             DisplayName           = "Firewall Rule for Notepad.exe"
-            DisplayGroup          = "NotePad Firewall Rule Group"
+            Group                 = "NotePad Firewall Rule Group"
             Ensure                = "Present"
             Enabled               = "True"
             Action                = 'Allow'

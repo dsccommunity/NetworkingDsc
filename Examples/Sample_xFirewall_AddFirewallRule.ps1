@@ -15,7 +15,7 @@ configuration Sample_xFirewall_AddFirewallRule
         {
             Name                  = "NotePadFirewallRule"
             DisplayName           = "Firewall Rule for Notepad.exe"
-            DisplayGroup          = "NotePad Firewall Rule Group"
+            Group                 = "NotePad Firewall Rule Group"
             Ensure                = "Present"
             Enabled               = "True"
             Profile               = ("Domain", "Private")
