@@ -60,7 +60,3 @@ before_deploy:
           Write-Host "Pushing package $_ as Appveyor artifact"
           Push-AppveyorArtifact $_
         }
-
-
-
-
