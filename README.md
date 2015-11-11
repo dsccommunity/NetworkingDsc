@@ -87,6 +87,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 * MSFT_xFirewall: ApplicationPath Parameter renamed to Program for consistency with Cmdlets.
 * MSFT_xFirewall: Fix to prevent error when DisplayName parameter is set on an existing rule.
 * Added xDnsConnectionSuffix resource to manage connection-specific DNS suffixes.
+* Added xNetConnectionProfile resource to manage Connection Profiles for interfaces.
 
 ### 2.4.0.0
 * Added following resources:
