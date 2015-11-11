@@ -61,9 +61,9 @@ InModuleScope $DSCResourceName {
                 $result.DisplayName.GetType() | Should Be $rule.DisplayName.GetType()
             }
 
-            It 'Should have the correct DisplayGroup and type' {
-                $result.DisplayGroup | Should Be $rule.DisplayGroup
-                $result.DisplayGroup.GetType() | Should Be $rule.DisplayGroup.GetType()
+            It 'Should have the correct Group and type' {
+                $result.Group | Should Be $rule.Group
+                $result.Group.GetType() | Should Be $rule.Group.GetType()
             }
 
             It 'Should have the correct Profile' {
@@ -199,25 +199,19 @@ InModuleScope $DSCResourceName {
                 Assert-MockCalled Test-RuleProperties -Exactly 1
             }
         }
-        Context 'Ensure is Present and the Firewall Does Exist but has a different DisplayGroup' {
-            It "should throw a CantChangeDisplayGroupError exception on rule $($rule.Name)" {
-                Mock Set-NetFirewallRule
+        Context 'Ensure is Present and the Firewall Does Exist but has a different Group' {
+            It "should call expected mocks on firewall rule $($rule.Name)" {
+                Mock New-NetFirewallRule
+                Mock Remove-NetFirewallRule
                 Mock Test-RuleProperties {return $false}
-
-                $errorId = 'CantChangeDisplayGroupError'
-                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-                $errorMessage = $($LocalizedData.CantChangeDisplayGroupError) -f $Name
-                $exception = New-Object -TypeName System.InvalidOperationException `
-                    -ArgumentList $errorMessage
-                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                    -ArgumentList $exception, $errorId, $errorCategory, $null
-
-                { $result = Set-TargetResource `
+                $result = Set-TargetResource `
                     -Name $rule.Name `
-                    -DisplayGroup 'Different' `
-                    -Ensure 'Present' } | Should Throw $errorRecord
+                    -DisplayName $rule.DisplayName `
+                    -Group 'Different' `
+                    -Ensure 'Present'
 
-                Assert-MockCalled Set-NetFirewallRule -Exactly 0
+                Assert-MockCalled New-NetFirewallRule -Exactly 1
+                Assert-MockCalled Remove-NetFirewallRule -Exactly 1
                 Assert-MockCalled Test-RuleProperties -Exactly 1
             }
         }
@@ -413,6 +407,7 @@ InModuleScope $DSCResourceName {
         $Splat = @{
             Name = $FirewallRule.Name
             DisplayGroup = $FirewallRule.DisplayGroup
+            Group = $FirewallRule.Group
             Enabled = $FirewallRule.Enabled
             Profile = $FirewallRule.Profile.ToString() -replace(' ', '') -split(',')
             Direction = $FirewallRule.Direction
@@ -439,6 +434,22 @@ InModuleScope $DSCResourceName {
         Context 'testing with a rule with a different name' {
             $CompareRule = $Splat.Clone()
             $CompareRule.Name = 'Different'
+            It 'should return False' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $False
+            }
+        }
+        Context 'testing with a rule with a different displayname' {
+            $CompareRule = $Splat.Clone()
+            $CompareRule.DisplayName = 'Different'
+            It 'should return False' {
+                $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                $Result | Should be $False
+            }
+        }
+        Context 'testing with a rule with a different group' {
+            $CompareRule = $Splat.Clone()
+            $CompareRule.Group = 'Different'
             It 'should return False' {
                 $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                 $Result | Should be $False
