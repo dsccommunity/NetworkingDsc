@@ -90,7 +90,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 ### 2.4.0.0
 * Added following resources:
-    * MSFT_xDefaultGatewayAddress
+   * MSFT_xDefaultGatewayAddress
 * MSFT_xFirewall: Removed code using DisplayGroup to lookup Firewall Rule because it was redundant.
 * MSFT_xFirewall: Set-TargetResource now updates firewall rules instead of recreating them.
 * MSFT_xFirewall: Added message localization support.
