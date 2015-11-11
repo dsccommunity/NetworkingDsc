@@ -73,7 +73,7 @@ try {
 }
 finally {
     # Restore the Execution Policy
-    if ($rollbackExection)
+    if ($rollbackExecution)
     {
         Set-ExectuionPolicy $executionPolicy
     }
