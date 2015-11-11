@@ -70,6 +70,14 @@ This issue has been reported on [Microsoft Connect](https://connect.microsoft.co
 * The exception 'The DisplayGroup of an existing Firewall Rule can not be changed' will be thrown if a configuration tries to change DisplayGroup property of an existing rule. This is because the Set-NetFirewallRule cmdlet does not support this function. Delete and re-create this rule instead.
 This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1970765/add-ability-to-change-firewall-displaygroup-in-set-netfirewallrule-cmdlet)
 
+## Known Issues
+
+### xFirewall
+The following error may occur when applying xFirewall configurations on Windows Server 2012 R2 if [KB3000850](https://support.microsoft.com/en-us/kb/3000850) is not installed. Please ensure this update is installed if this error occurs.
+```
+The cmdlet does not fully support the Inquire action for debug messages. Cmdlet operation will continue during the prompt. Select a different action preference via -Debug switch or $DebugPreference variable, and try again.
+```
+
 ## Versions
 
 ### Unreleased Version
