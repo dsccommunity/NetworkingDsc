@@ -31,8 +31,12 @@ if (($env:PSModulePath).Split(';') -ccontains $pwd.Path)
 }
 
 # Preserve and set the execution policy so that the DSC MOF can be created
-$OldExecutionPolicy = Get-ExecutionPolicy
-Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
+$executionPolicy = Get-ExecutionPolicy
+if ($executionPolicy -ne 'Unrestricted')
+{
+    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
+    $rollbackExecution = $true
+}
 
 try {
     # Load in the DSC Configuration
@@ -69,8 +73,11 @@ try {
 }
 finally {
     # Restore the Execution Policy
-    Set-ExecutionPolicy -ExecutionPolicy $OldExecutionPolicy -Force
-
+    if ($rollbackExection)
+    {
+        Set-ExectuionPolicy $executionPolicy
+    }
+    
     # Cleanup DSC Configuration
     Remove-NetFirewallRule -Name 'b8df0af9-d0cc-4080-885b-6ed263aaed67'
     Remove-Item -Path $env:Temp\Firewall -Recurse -Force

@@ -183,7 +183,8 @@ function Set-TargetResource
 
                 # If the Group is being changed the the rule needs to be recreated
                 if ($PSBoundParameters.ContainsKey('Group') `
-                    -and ($Group -ne $FirewallRule.Group)) {
+                    -and ($Group -ne $FirewallRule.Group))
+                {
 
                     Remove-NetFirewallRule -Name $Name
 
@@ -192,17 +193,18 @@ function Set-TargetResource
 
                     # Loop through each possible property and if it is not passed as a parameter
                     # then set the PSBoundParameter property to the exiting rule value.
-                    'DisplayName','Group','Enabled','Action','Profile','Direction', `
-                    'RemotePort','LocalPort','Protocol','Description','Program','Service' `
-                        | Foreach-Object -Process {
-                            if (-not $PSBoundParameters.ContainsKey($_))
-                            {
-                                $PropertyValue = (Invoke-Expression -Command "`$FirewallRule.$_")
-                                if ($PropertyValue) {
-                                    $null = $PSBoundParameters.Add($_,$PropertyValue)
-                                }
+                    $PropList = @('DisplayName','Group','Enabled','Action','Profile','Direction', `
+                    'RemotePort','LocalPort','Protocol','Description','Program','Service')
+
+                    Foreach ($Prop in $PropsList) {
+                        if (-not $PSBoundParameters.ContainsKey($Prop))
+                        {
+                            $PropertyValue = (Invoke-Expression -Command "`$FirewallRule.$Prop")
+                            if ($PropertyValue) {
+                                $null = $PSBoundParameters.Add($Prop,$PropertyValue)
                             }
                         }
+                    }
 
                     New-NetFirewallRule @PSBoundParameters
                 }

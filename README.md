@@ -356,7 +356,7 @@ Configuration Add_FirewallRuleToExistingGroup
         {
             Name                  = "MyFirewallRule"
             DisplayName           = "My Firewall Rule"
-            Group          = "My Firewall Rule Group"
+            Group                 = "My Firewall Rule Group"
         }
 
         xFirewall Firewall1
