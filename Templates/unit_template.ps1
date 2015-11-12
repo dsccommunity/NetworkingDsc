@@ -489,7 +489,7 @@ try
                     Mock Test-RuleProperties {return $false}
                     $result = Set-TargetResource `
                         -Name $FirewallRule.Name `
-                        -Platform @('6.2') `
+                        -Platform '6.2' `
                         -Ensure 'Present'
 
                     Assert-MockCalled Set-NetFirewallRule -Exactly 1
@@ -801,7 +801,7 @@ try
             }
             Context 'testing with a rule with a different Platform' {
                 $CompareRule = $Splat.Clone()
-                $CompareRule.Platform = @('6.2')
+                $CompareRule.Platform = '6.2'
                 It 'should return False' {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False

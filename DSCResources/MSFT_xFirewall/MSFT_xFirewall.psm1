@@ -8,6 +8,7 @@ data LocalizedData
     ConvertFrom-StringData -StringData @'
 GettingFirewallRuleMessage=Getting firewall rule with Name '{0}'.
 FirewallRuleDoesNotExistMessage=Firewall rule with Name '{0}' does not exist.
+FirewallParameterValueMessage=Firewall rule with Name '{0}' parameter {1} is '{2}'.
 ApplyingFirewallRuleMessage=Applying settings for firewall rule with Name '{0}'.
 FindFirewallRuleMessage=Find firewall rule with Name '{0}'.
 FirewallRuleShouldExistMessage=We want the firewall rule with Name '{0}' to exist since Ensure is set to {1}.
@@ -59,7 +60,7 @@ data ParameterList
         @{ Name = 'LocalAddress'; Source = '$properties.AddressFilters.LocalAddress'; Type = 'Array' }
         @{ Name = 'LocalUser'; Source = '$properties.SecurityFilters.LocalUser'; Type = 'String' }
         @{ Name = 'Package'; Source = '$properties.ApplicationFilters.Package'; Type = 'String' }
-        @{ Name = 'Platform'; Source = '$firewallRule.Platform'; Type = 'String' }
+        @{ Name = 'Platform'; Source = '$firewallRule.Platform'; Type = 'Array' }
         @{ Name = 'RemoteAddress'; Source = '$properties.AddressFilters.RemoteAddress'; Type = 'Array' }
         @{ Name = 'RemoteMachine'; Source = '$properties.SecurityFilters.RemoteMachine'; Type = 'String' }
         @{ Name = 'RemoteUser'; Source = '$properties.SecurityFilters.RemoteUser'; Type = 'String' }
@@ -79,7 +80,7 @@ function Get-TargetResource
         [ValidateNotNullOrEmpty()]
         [String] $Name
     )
-
+    $ErrorActionPreference = 'Stop'
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
         $($LocalizedData.GettingFirewallRuleMessage) -f $Name
         ) -join '')
@@ -110,17 +111,29 @@ function Get-TargetResource
     # the parameter array list and adding the values to 
     foreach ($p in $ParameterList)
     {
+
         if ($p.type -eq 'Array')
         {
+            $Value = @(Invoke-Expression -Command "`$($($p.source))")
             $Result += @{
-                $p.Name = @(Invoke-Expression -Command "`$($($p.source))")
+                $p.Name = $Value
             }
+
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                $($LocalizedData.FirewallParameterValueMessage) -f $Name,$p.Name,($Value -join ',')
+                ) -join '')
         }
         else 
         {
+            $Value = (Invoke-Expression -Command "`$($($p.source))")
             $Result += @{
-                $p.Name = (Invoke-Expression -Command "`$($($p.source))")
+                $p.Name = $Value
             }
+
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                $($LocalizedData.FirewallParameterValueMessage) -f $Name,$p.Name,$Value
+                ) -join '')
+
         }
     }
     return $Result

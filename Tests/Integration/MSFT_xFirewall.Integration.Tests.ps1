@@ -69,12 +69,12 @@ try
                 [System.Environment]::SetEnvironmentVariable('PSModulePath',
                     $env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
                 Firewall -OutputPath $env:Temp\Firewall
-                Start-DscConfiguration -Path $env:Temp\Firewall -ComputerName localhost -Wait -Verbose -Force
+                Start-DscConfiguration -Path $env:Temp\Firewall -ComputerName localhost -Wait -Verbose -Force -ErrorAction Stop
             } | Should not throw
         }
 
         It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
 
         It 'Should have set the firewall and all the parameters should match' {
@@ -124,6 +124,6 @@ finally
     }
 
     # Other Cleanup Code Goes Here...
-    Remove-NetFirewallRule -Name $rule.Name
+    # Remove-NetFirewallRule -Name $rule.Name
     Remove-Item -Path $env:Temp\Firewall -Recurse -Force
 }
