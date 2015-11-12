@@ -77,8 +77,8 @@ try
       This file exists so we can load the test file without necessarily having xNetworking in
       the $env:PSModulePath. Otherwise PowerShell will throw an error when reading the Pester File.
     #>
-    $fileName = "$DSCResourceName_Config.ps1"
-    . $PSScriptRoot\$fileName
+    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$DSCResourceName.Config.ps1"
+    . $ConfigFile
     
     Describe "$($DSCResourceName)_Integration" {
         It 'Should compile without throwing' {
