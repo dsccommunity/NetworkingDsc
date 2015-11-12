@@ -725,6 +725,113 @@ try
                     $Result | Should be $False
                 }
             }
+            Context 'testing with a rule with a different Authentication' {
+                $CompareRule = $Splat.Clone()
+                if ( $CompareRule.Authentication -eq 'Required') {
+                    $CompareRule.Authentication = 'NotRequired'
+                }
+                else
+                {
+                    $CompareRule.Authentication = 'Required'
+                }
+                It 'should return False' {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different Encryption' {
+                $CompareRule = $Splat.Clone()
+                if ( $CompareRule.Encryption -eq 'Required') {
+                    $CompareRule.Encryption = 'NotRequired'
+                }
+                else
+                {
+                    $CompareRule.Encryption = 'Required'
+                }
+                It 'should return False' {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different InterfaceAlias' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.InterfaceAlias = 'Different'
+                It 'should return False' {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different InterfaceType' {
+                $CompareRule = $Splat.Clone()
+                if ( $CompareRule.InterfaceType -eq 'Wired') {
+                    $CompareRule.InterfaceType = 'Wireless'
+                }
+                else
+                {
+                    $CompareRule.InterfaceType = 'Wired'
+                }
+                It 'should return False' {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different LocalAddress' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.LocalAddress = @('10.0.0.1/255.0.0.0','10.1.1.0-10.1.2.0')
+                It 'should return False' {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different LocalUser' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.LocalUser = 'O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)'
+                It 'should return False' {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different Package' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.Package = 'S-1-15-2-3676279713-3632409675-756843784-3388909659-2454753834-4233625902-1413163418'
+                It 'should return False' {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different Platform' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.Platform = '6.2'
+                It 'should return False' {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different RemoteAddress' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.RemoteAddress = @('10.0.0.1/255.0.0.0','10.1.1.0-10.1.2.0')
+                It 'should return False' {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different RemoteMachine' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.RemoteMachine = 'O:LSD:(D;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1621)(A;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1620)'
+                It 'should return False' {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different RemoteUser' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.RemoteUser = 'O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)'
+                It 'should return False' {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+
         }
 
 ####################################################################################################
