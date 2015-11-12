@@ -39,6 +39,16 @@ InModuleScope $DSCResourceName {
 
 ######################################################################################
 
+    # Get the rule that will be used for testing
+    $FirewallRuleName = (Get-NetFirewallRule | `
+        Sort-Object Name | `
+        Where-Object {$_.DisplayGroup -ne $null} | `
+        Select-Object -first 1).Name
+    $FirewallRule = Get-FirewallRule -Name $FirewallRuleName
+    $Properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
+
+######################################################################################
+
     Describe 'Get-TargetResource' {
         Context 'Absent should return correctly' {
             Mock Get-NetFirewallRule
@@ -51,9 +61,6 @@ InModuleScope $DSCResourceName {
         }
 
         Context 'Present should return correctly' {
-            $FirewallRule = Get-NetFirewallRule | Sort-Object Name | Where-Object {$_.DisplayGroup -ne $null} | Select-Object -first 1
-            $Properties = Get-FirewallRuleProperty $FirewallRule
-
             $result = Get-TargetResource -Name $FirewallRule.Name
 
             # Looping these tests
@@ -71,10 +78,6 @@ InModuleScope $DSCResourceName {
 ######################################################################################
 
     Describe 'Test-TargetResource' {
-        $FirewallRule = Get-NetFirewallRule | `
-            Where-Object {$_.DisplayName -ne $null} | `
-            Select-Object -first 1
-
         Context 'Ensure is Absent and the Firewall is not Present' {
             Mock Get-FirewallRule
 
@@ -118,9 +121,6 @@ InModuleScope $DSCResourceName {
 ######################################################################################
 
     Describe 'Set-TargetResource' {
-        $FirewallRule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
-            Select-Object -First 1
-
         Context 'Ensure is Absent and Firewall Exist' {
             It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
                 Mock Remove-NetFirewallRule
@@ -342,7 +342,171 @@ InModuleScope $DSCResourceName {
                 Assert-MockCalled Test-RuleProperties -Exactly 1
             }
         }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different Authentication' {
+            It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                if ( $properties.SecurityFilters.Authentication -eq 'Required') {
+                    $NewAuthentication = 'NotRequired'
+                }
+                else
+                {
+                    $NewAuthentication = 'Required'
+                }
+                $result = Set-TargetResource `
+                    -Name $FirewallRule.Name `
+                    -Authentication $NewAuthentication `
+                    -Ensure 'Present'
 
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different Encryption' {
+            It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                if ( $properties.SecurityFilters.Encryption -eq 'Required') {
+                    $NewEncryption = 'NotRequired'
+                }
+                else
+                {
+                    $NewEncryption = 'Required'
+                }
+                $result = Set-TargetResource `
+                    -Name $FirewallRule.Name `
+                    -Encryption $NewEncryption `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different InterfaceAlias' {
+            It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $FirewallRule.Name `
+                    -InterfaceAlias 'Different' `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different InterfaceType' {
+            It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                if ( $properties.InterfaceTypeFilters.InterfaceType -eq 'Wired') {
+                    $NewInterfaceType = 'Wireless'
+                }
+                else
+                {
+                    $NewInterfaceType = 'Wired'
+                }
+                $result = Set-TargetResource `
+                    -Name $FirewallRule.Name `
+                    -InterfaceType $NewInterfaceType `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different LocalAddress' {
+            It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $FirewallRule.Name `
+                    -LocalAddress @('10.0.0.1/255.0.0.0','10.1.1.0-10.1.2.0') `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different LocalUser' {
+            It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $FirewallRule.Name `
+                    -LocalUser 'O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)' `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different Package' {
+            It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $FirewallRule.Name `
+                    -Package 'S-1-15-2-3676279713-3632409675-756843784-3388909659-2454753834-4233625902-1413163418' `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different Platform' {
+            It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $FirewallRule.Name `
+                    -Platform '6.2' `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+
+        Context 'Ensure is Present and the Firewall Does Exist but has a different RemoteAddress' {
+            It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $FirewallRule.Name `
+                    -RemoteAddress @('10.0.0.1/255.0.0.0','10.1.1.0-10.1.2.0') `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different RemoteMachine' {
+            It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $FirewallRule.Name `
+                    -RemoteMachine 'O:LSD:(D;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1621)(A;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1620)' `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
+        Context 'Ensure is Present and the Firewall Does Exist but has a different RemoteUser' {
+            It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                Mock Set-NetFirewallRule
+                Mock Test-RuleProperties {return $false}
+                $result = Set-TargetResource `
+                    -Name $FirewallRule.Name `
+                    -RemoteUser 'O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)' `
+                    -Ensure 'Present'
+
+                Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                Assert-MockCalled Test-RuleProperties -Exactly 1
+            }
+        }
 
         Context 'Ensure is Present and the Firewall Does Exist and is the same' {
             It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
@@ -360,18 +524,13 @@ InModuleScope $DSCResourceName {
 ######################################################################################
 
     Describe 'Test-RuleProperties' {
-        $FirewallRule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
-                    Select-Object -First 1
-        $FirewallRule = Get-FirewallRule -Name $FirewallRule.name
-        $Properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
-
         # Make an object that can be splatted onto the function
         $Splat = @{
             Name = $FirewallRule.Name
             DisplayGroup = $FirewallRule.DisplayGroup
             Group = $FirewallRule.Group
             Enabled = $FirewallRule.Enabled
-            Profile = $FirewallRule.Profile.ToString() -replace(' ', '') -split(',')
+            Profile = $FirewallRule.Profile
             Direction = $FirewallRule.Direction
             Action = $FirewallRule.Action
             RemotePort = $Properties.PortFilters.RemotePort
@@ -511,7 +670,7 @@ InModuleScope $DSCResourceName {
                 $Result | Should be $False
             }
         }
-        Context 'testing with a rule with a different application path' {
+        Context 'testing with a rule with a different program' {
             $CompareRule = $Splat.Clone()
             $CompareRule.Program = 'Different'
             It 'should return False' {
@@ -567,9 +726,6 @@ InModuleScope $DSCResourceName {
 ######################################################################################
 
     Describe 'Get-FirewallRuleProperty' {
-        $FirewallRule = Get-NetFirewallRule | Where-Object {$_.DisplayName -ne $null} |
-            Select-Object -First 1
-
         Context 'All Properties' {
             $result = Get-FirewallRuleProperty -FirewallRule $FirewallRule
             It 'Should return the right address filter' {
