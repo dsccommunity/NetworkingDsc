@@ -55,8 +55,8 @@ if ($executionPolicy -ne 'Unrestricted')
 # Other Init Code Goes Here...
 
 # Begin Testing
-try
-{
+#try
+#{
 
 ####################################################################################################
 
@@ -103,9 +103,9 @@ try
 
 ####################################################################################################
 
-}
-finally
-{
+#}
+#finally
+#{
     # Restore the Execution Policy
     if ($rollbackExecution)
     {
@@ -126,4 +126,4 @@ finally
     # Other Cleanup Code Goes Here...
     Remove-NetFirewallRule -Name $rule.Name
     Remove-Item -Path $env:Temp\Firewall -Recurse -Force
-}
+#}
