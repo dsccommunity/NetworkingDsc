@@ -592,6 +592,9 @@ function Test-RuleProperties
             }
             'Array' {
                 # Array comparison uses Compare-Object
+                if ($ParameterSource -eq $null) {
+                    $ParameterSource = @()
+                }
                 if ($ParameterNew `
                     -and ((Compare-Object `
                         -ReferenceObject $ParameterSource `
