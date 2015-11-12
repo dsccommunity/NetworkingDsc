@@ -1,11 +1,11 @@
-# Configure these three lines:
 $DSCModuleName   = 'xNetworking'
 $DSCResourceName = 'MSFT_xFirewall'
 $RelativeModulePath = "DSCResources\$DSCResourceName\$DSCResourceName.psm1"
 
+$moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
+
 # If this module already exists in the Modules folder, make a copy of it in
 # the temporary folder so that it isn't accidentally used in this test.
-$moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
 if(-not (Test-Path -Path $moduleRoot))
 {
     $null = New-Item -Path $moduleRoot -ItemType Directory
@@ -489,7 +489,7 @@ try
                     Mock Test-RuleProperties {return $false}
                     $result = Set-TargetResource `
                         -Name $FirewallRule.Name `
-                        -Platform @('6.2') `
+                        -Platform @('6.1') `
                         -Ensure 'Present'
 
                     Assert-MockCalled Set-NetFirewallRule -Exactly 1

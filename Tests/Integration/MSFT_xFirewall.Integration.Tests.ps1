@@ -1,11 +1,11 @@
-# Configure these three lines:
 $DSCModuleName   = 'xNetworking'
 $DSCResourceName = 'MSFT_xFirewall'
 $RelativeModulePath = "$DSCModuleName.psd1"
 
+$moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
+
 # If this module already exists in the Modules folder, make a copy of it in
 # the temporary folder so that it isn't accidentally used in this test.
-$moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
 if(-not (Test-Path -Path $moduleRoot))
 {
     $null = New-Item -Path $moduleRoot -ItemType Directory
@@ -124,6 +124,6 @@ finally
     }
 
     # Other Cleanup Code Goes Here...
-    # Remove-NetFirewallRule -Name $rule.Name
+    Remove-NetFirewallRule -Name $rule.Name
     Remove-Item -Path $env:Temp\Firewall -Recurse -Force
 }
