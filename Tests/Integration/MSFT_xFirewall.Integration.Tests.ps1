@@ -1,6 +1,11 @@
-$DSCModuleName = 'xNetworking'
-$moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
+# Configure these three lines:
+$DSCModuleName   = 'xNetworking'
+$DSCResourceName = 'MSFT_xFirewall'
+$RelativeModulePath = "$DSCModuleName.psd1"
 
+# If this module already exists in the Modules folder, make a copy of it in
+# the temporary folder so that it isn't accidentally used in this test.
+$moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
 if(-not (Test-Path -Path $moduleRoot))
 {
     $null = New-Item -Path $moduleRoot -ItemType Directory
@@ -15,15 +20,24 @@ else
     $null = New-Item -Path $moduleRoot -ItemType Directory
 }
 
+# Copy the module to be tested into the Module Root
 Copy-Item -Path $PSScriptRoot\..\..\* -Destination $moduleRoot -Recurse -Force -Exclude '.git'
 
-if (Get-Module -Name $DSCModuleName -All)
-{
-    Get-Module -Name $DSCModuleName -All | Remove-Module
+# Import the Module
+$Splat = @{
+    Path = $moduleRoot
+    ChildPath = $RelativeModulePath
+    Resolve = $true
+    ErrorAction = 'Stop'
 }
+$DSCModuleFile = Get-Item -Path (Join-Path @Splat)
+if (Get-Module -Name $DSCModuleFile.BaseName -All)
+{
+    Get-Module -Name $DSCModuleFile.BaseName -All | Remove-Module
+}
+Import-Module -Name $DSCModuleFile.FullName -Force
 
-Import-Module -Name $(Get-Item -Path (Join-Path $moduleRoot -ChildPath "$DSCModuleName.psd1")) -Force
-
+# Remove the Current Path from the Module Search Path
 if (($env:PSModulePath).Split(';') -ccontains $pwd.Path)
 {
     $script:tempPath = $env:PSModulePath
@@ -38,7 +52,14 @@ if ($executionPolicy -ne 'Unrestricted')
     $rollbackExecution = $true
 }
 
-try {
+# Other Init Code Goes Here...
+
+# Begin Testing
+try
+{
+
+####################################################################################################
+
     # Load in the DSC Configuration
     . $PSScriptRoot\Firewall.ps1
 
@@ -57,30 +78,39 @@ try {
         }
 
         It 'Should have set the firewall and all the parameters should match' {
+            # Get the Rule details
             $firewallRule = Get-NetFireWallRule -Name $rule.Name
+            $Properties = @{
+                AddressFilters       = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
+                ApplicationFilters   = @(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $FirewallRule)
+                InterfaceFilters     = @(Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $FirewallRule)
+                InterfaceTypeFilters = @(Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $FirewallRule)
+                PortFilters          = @(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $FirewallRule)
+                Profile              = @(Get-NetFirewallProfile -AssociatedNetFirewallRule $FirewallRule)
+                SecurityFilters      = @(Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $FirewallRule)
+                ServiceFilters       = @(Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule)
+            }
 
-            $firewallRule.Name         | Should Be $rule.Name
-            $firewallRule.DisplayName  | Should Be $rule.DisplayName
-            $firewallRule.Group        | Should Be $rule.Group
-            $firewallRule.Enabled      | Should Be $rule.Enabled
-            $firewallRule.Profile      | Should Be $rule.Profile
-            $firewallRule.Action       | Should Be $rule.Action
-            $firewallRule.Description  | Should Be $rule.Description
-            $firewallRule.Direction    | Should Be $rule.Direction
+            # Use the Parameters List to perform these tests
+            foreach ($p in $ParameterList)
+            {
+                $ParameterSource = (Invoke-Expression -Command "`$($($p.source))")
+                $ParameterNew = (Invoke-Expression -Command "`$rule.$($p.name)")
+                $ParameterSource | Should Be $ParameterNew
+            }
         }
-
     }
+
+####################################################################################################
+
 }
-finally {
+finally
+{
     # Restore the Execution Policy
     if ($rollbackExecution)
     {
         Set-ExecutionPolicy -ExecutionPolicy $executionPolicy -Force
-    }
-    
-    # Cleanup DSC Configuration
-    Remove-NetFirewallRule -Name 'b8df0af9-d0cc-4080-885b-6ed263aaed67'
-    Remove-Item -Path $env:Temp\Firewall -Recurse -Force
+    }   
 
     # Clean up after the test completes.
     Remove-Item -Path $moduleRoot -Recurse -Force
@@ -92,4 +122,8 @@ finally {
         Copy-Item -Path $tempLocation -Destination "${env:ProgramFiles}\WindowsPowerShell\Modules" -Recurse -Force
         Remove-Item -Path $tempLocation -Recurse -Force
     }
+
+    # Other Cleanup Code Goes Here...
+    Remove-NetFirewallRule -Name $rule.Name
+    Remove-Item -Path $env:Temp\Firewall -Recurse -Force
 }

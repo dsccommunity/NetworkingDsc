@@ -110,6 +110,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
     * RemoteAddress
     * RemoteMachine
     * RemoteUser
+ * MSFT_xFirewall: Profile parameter now handled as an Array.
 
 ### 2.4.0.0
 * Added following resources:
