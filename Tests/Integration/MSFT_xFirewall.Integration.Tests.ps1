@@ -55,8 +55,8 @@ if ($executionPolicy -ne 'Unrestricted')
 # Other Init Code Goes Here...
 
 # Begin Testing
-#try
-#{
+try
+{
 
 ####################################################################################################
 
@@ -74,7 +74,7 @@ if ($executionPolicy -ne 'Unrestricted')
         }
 
         It 'should be able to call Get-DscConfiguration without throwing' {
-            {Get-DscConfiguration} | Should Not throw
+            { Get-DscConfiguration -ErrorAction Stop } | Should Not throw
         }
 
         It 'Should have set the firewall and all the parameters should match' {
@@ -103,9 +103,9 @@ if ($executionPolicy -ne 'Unrestricted')
 
 ####################################################################################################
 
-#}
-#finally
-#{
+}
+finally
+{
     # Restore the Execution Policy
     if ($rollbackExecution)
     {
@@ -126,4 +126,4 @@ if ($executionPolicy -ne 'Unrestricted')
     # Other Cleanup Code Goes Here...
     Remove-NetFirewallRule -Name $rule.Name
     Remove-Item -Path $env:Temp\Firewall -Recurse -Force
-#}
+}
