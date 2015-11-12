@@ -31,7 +31,7 @@ $rule = @{
     RemoteUser            = 'Any'
 }
 
-Configuration Firewall {
+Configuration MSFT_xFirewall_Config {
     Import-DscResource -ModuleName xNetworking
     node localhost {
        xFirewall Integration_Test {

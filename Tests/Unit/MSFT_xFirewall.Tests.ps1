@@ -2,6 +2,7 @@ $DSCModuleName   = 'xNetworking'
 $DSCResourceName = 'MSFT_xFirewall'
 $RelativeModulePath = "DSCResources\$DSCResourceName\$DSCResourceName.psm1"
 
+# Copy to Program Files for WMF 4.0 Compatability as it can only find resources in a few known places.
 $moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
 
 # If this module already exists in the Modules folder, make a copy of it in

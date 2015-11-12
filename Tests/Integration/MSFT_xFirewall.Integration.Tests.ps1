@@ -1,7 +1,9 @@
+# +++ Customize these paramters...
 $DSCModuleName   = 'xNetworking'
 $DSCResourceName = 'MSFT_xFirewall'
 $RelativeModulePath = "$DSCModuleName.psd1"
 
+# Copy to Program Files for WMF 4.0 Compatability as it can only find resources in a few known places.
 $moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
 
 # If this module already exists in the Modules folder, make a copy of it in
@@ -60,16 +62,21 @@ try
 
 ####################################################################################################
 
-    # Load in the DSC Configuration
-    . $PSScriptRoot\Firewall.ps1
-
-    Describe 'xFirewall_Integration' {
+    <#
+      This file exists so we can load the test file without necessarily having xNetworking in
+      the $env:PSModulePath. Otherwise PowerShell will throw an error when reading the Pester File.
+    #>
+    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$DSCResourceName.Config.ps1"
+    . $ConfigFile
+    
+    Describe "$($DSCResourceName)_Integration" {
         It 'Should compile without throwing' {
             {
                 [System.Environment]::SetEnvironmentVariable('PSModulePath',
                     $env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
-                Firewall -OutputPath $env:Temp\Firewall
-                Start-DscConfiguration -Path $env:Temp\Firewall -ComputerName localhost -Wait -Verbose -Force -ErrorAction Stop
+                Invoke-Expression -Command "$($DSCResourceName)_Config -OutputPath `$env:Temp\`$DSCResourceName"
+                Start-DscConfiguration -Path (Join-Path -Path $env:Temp -ChildPath $DSCResourceName) `
+                    -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw
         }
 
@@ -106,11 +113,20 @@ try
 }
 finally
 {
+    # Set PSModulePath back to previous settings
+    $env:PSModulePath = $script:tempPath;
+
     # Restore the Execution Policy
     if ($rollbackExecution)
     {
         Set-ExecutionPolicy -ExecutionPolicy $executionPolicy -Force
     }   
+
+    # Remove the DSC Config File
+    if (Test-Path -Path $env:Temp\$DSCResourceName)
+    {
+        Remove-Item -Path $env:Temp\$DSCResourceName -Recurse -Force
+    }
 
     # Clean up after the test completes.
     Remove-Item -Path $moduleRoot -Recurse -Force
@@ -123,7 +139,6 @@ finally
         Remove-Item -Path $tempLocation -Recurse -Force
     }
 
-    # Other Cleanup Code Goes Here...
+    # +++ Other Cleanup Code Goes Here...
     Remove-NetFirewallRule -Name $rule.Name
-    Remove-Item -Path $env:Temp\Firewall -Recurse -Force
 }
