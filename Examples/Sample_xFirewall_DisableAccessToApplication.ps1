@@ -16,7 +16,7 @@ configuration Sample_xFirewall_AddFirewallRuleToNewGroup
         {
             Name                  = "NotePadFirewallRule"
             DisplayName           = "Firewall Rule for Notepad.exe"
-            DisplayGroup          = "NotePad Firewall Rule Group"
+            Group                 = "NotePad Firewall Rule Group"
             Ensure                = "Present"
             Description           = "Firewall Rule for Notepad.exe"
             ApplicationPath       = "c:\windows\system32\notepad.exe"

@@ -5,7 +5,8 @@
 
 $rule = @{
     Name         = 'b8df0af9-d0cc-4080-885b-6ed263aaed67'
-    DisplayGroup = 'b8df0af9-d0cc-4080-885b-6ed263aaed67'
+    DisplayName  = 'b8df0af9-d0cc-4080-885b-6ed263aaed67'
+    Group        = 'b8df0af9-d0cc-4080-885b-6ed263aaed67'
     Ensure       = 'Present'
     Enabled      = 'False'
     Profile      = 'Domain, Private'
@@ -19,7 +20,8 @@ Configuration Firewall {
     node localhost {
        xFirewall Integration_Test {
             Name            = $rule.Name
-            DisplayGroup    = $rule.DisplayGroup
+            DisplayName     = $rule.DisplayName
+            Group           = $rule.Group
             Ensure          = 'Present'
             Enabled         = $rule.Enabled
             Profile         = ($rule.Profile).toString()
