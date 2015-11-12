@@ -1,9 +1,25 @@
-# Template for Integration Testing
+<#
+.Synopsis
+   Template for creating Integration Tests
+.DESCRIPTION
+   To Use:
+     1. Copy to \Tests\Integration\ folder and rename MSFT_x<ResourceName>.tests.ps1
+     2. Customize TODO sections.
 
-# +++ Customize these paramters...
-$DSCModuleName = 'xNetworking'
-$DSCResourceName = 'MSFT_x<ResourceName>'
+.NOTES
+   Code in HEADER, FOOTER and DEFAULT TEST regions are standard and may be moved into
+   DSCResource.Tools in Future and therefore should not be altered if possible.
+#>
+
+# TODO: Customize these paramters...
+$DSCModuleName      = 'xNetworking'
+$DSCResourceName    = 'MSFT_x<ResourceName>'
 $RelativeModulePath = "$DSCModuleName.psd1"
+# /TODO
+
+#region HEADER
+# Temp Working Folder - always gets remove on completion
+$WorkingFolder = Join-Path -Path $env:Temp -ChildPath $DSCResourceName
 
 # Copy to Program Files for WMF 4.0 Compatability as it can only find resources in a few known places.
 $moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
@@ -64,8 +80,9 @@ if ($executionPolicy -ne 'Unrestricted')
     Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
     $rollbackExecution = $true
 }
+#endregion
 
-# +++ Other Init Code Goes Here...
+# TODO: Other Init Code Goes Here...
 
 # Using try/finally to always cleanup even if something awful happens.
 try
@@ -81,11 +98,12 @@ try
     . $ConfigFile
     
     Describe "$($DSCResourceName)_Integration" {
+        #region DEFAULT TESTS
         It 'Should compile without throwing' {
             {
                 [System.Environment]::SetEnvironmentVariable('PSModulePath',
                     $env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
-                Invoke-Expression -Command "$($DSCResourceName)_Config -OutputPath `$env:Temp\`$DSCResourceName"
+                Invoke-Expression -Command "$($DSCResourceName)_Config -OutputPath `$WorkingFolder"
                 Start-DscConfiguration -Path (Join-Path -Path $env:Temp -ChildPath $DSCResourceName) `
                     -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw
@@ -94,9 +112,10 @@ try
         It 'should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
+        #endregion
 
         It 'Should have set the firewall and all the parameters should match' {
-            # +++ Validate the Config was Set Correctly Here...
+            # TODO: Validate the Config was Set Correctly Here...
         }
 
     }
@@ -106,6 +125,7 @@ try
 
 finally
 {
+    #region FOOTER
     # Set PSModulePath back to previous settings
     $env:PSModulePath = $script:tempPath;
 
@@ -115,10 +135,10 @@ finally
         Set-ExecutionPolicy -ExecutionPolicy $executionPolicy -Force
     }   
 
-    # Remove the DSC Config File
-    if (Test-Path -Path $env:Temp\$DSCResourceName)
+    # Cleanup Working Folder
+    if (Test-Path -Path $WorkingFolder)
     {
-        Remove-Item -Path $env:Temp\$DSCResourceName -Recurse -Force
+        Remove-Item -Path $WorkingFolder -Recurse -Force
     }
 
     # Clean up after the test completes.
@@ -131,6 +151,7 @@ finally
         Copy-Item -Path $tempLocation -Destination "${env:ProgramFiles}\WindowsPowerShell\Modules" -Recurse -Force
         Remove-Item -Path $tempLocation -Recurse -Force
     }
+    #endregion
 
-    # +++ Other Cleanup Code Goes Here...
+    # TODO: Other Cleanup Code Goes Here...
 }

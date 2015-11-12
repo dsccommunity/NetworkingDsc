@@ -1,7 +1,15 @@
-# +++ Customize these paramters...
-$DSCModuleName   = 'xNetworking'
-$DSCResourceName = 'MSFT_xFirewall'
+<#
+.Synopsis
+   MSFT_xFirewall Integration Tests
+#>
+
+$DSCModuleName      = 'xNetworking'
+$DSCResourceName    = 'MSFT_xFirewall'
 $RelativeModulePath = "$DSCModuleName.psd1"
+
+#region HEADER
+# Temp Working Folder - always gets remove on completion
+$WorkingFolder = Join-Path -Path $env:Temp -ChildPath $DSCResourceName
 
 # Copy to Program Files for WMF 4.0 Compatability as it can only find resources in a few known places.
 $moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
@@ -22,6 +30,7 @@ else
     $null = New-Item -Path $moduleRoot -ItemType Directory
 }
 
+
 # Copy the module to be tested into the Module Root
 Copy-Item -Path $PSScriptRoot\..\..\* -Destination $moduleRoot -Recurse -Force -Exclude '.git'
 
@@ -33,13 +42,21 @@ $Splat = @{
     ErrorAction = 'Stop'
 }
 $DSCModuleFile = Get-Item -Path (Join-Path @Splat)
+
+# Remove all copies of the module from memory so an old one is not used.
 if (Get-Module -Name $DSCModuleFile.BaseName -All)
 {
     Get-Module -Name $DSCModuleFile.BaseName -All | Remove-Module
 }
+
+# Import the Module to test.
 Import-Module -Name $DSCModuleFile.FullName -Force
 
-# Remove the Current Path from the Module Search Path
+<#
+  This is to fix a problem in AppVoyer where we have multiple copies of the resource
+  in two different folders. This should probably be adjusted to be smarter about how
+  it finds the resources.
+#>
 if (($env:PSModulePath).Split(';') -ccontains $pwd.Path)
 {
     $script:tempPath = $env:PSModulePath
@@ -53,10 +70,9 @@ if ($executionPolicy -ne 'Unrestricted')
     Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
     $rollbackExecution = $true
 }
+#endregion
 
-# Other Init Code Goes Here...
-
-# Begin Testing
+# Using try/finally to always cleanup even if something awful happens.
 try
 {
 
@@ -70,11 +86,12 @@ try
     . $ConfigFile
     
     Describe "$($DSCResourceName)_Integration" {
+        #region DEFAULT TESTS
         It 'Should compile without throwing' {
             {
                 [System.Environment]::SetEnvironmentVariable('PSModulePath',
                     $env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
-                Invoke-Expression -Command "$($DSCResourceName)_Config -OutputPath `$env:Temp\`$DSCResourceName"
+                Invoke-Expression -Command "$($DSCResourceName)_Config -OutputPath `$WorkingFolder"
                 Start-DscConfiguration -Path (Join-Path -Path $env:Temp -ChildPath $DSCResourceName) `
                     -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw
@@ -83,6 +100,7 @@ try
         It 'should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
+        #endregion
 
         It 'Should have set the firewall and all the parameters should match' {
             # Get the Rule details
@@ -113,6 +131,7 @@ try
 }
 finally
 {
+    #region FOOTER
     # Set PSModulePath back to previous settings
     $env:PSModulePath = $script:tempPath;
 
@@ -122,10 +141,10 @@ finally
         Set-ExecutionPolicy -ExecutionPolicy $executionPolicy -Force
     }   
 
-    # Remove the DSC Config File
-    if (Test-Path -Path $env:Temp\$DSCResourceName)
+    # Cleanup Working Folder
+    if (Test-Path -Path $WorkingFolder)
     {
-        Remove-Item -Path $env:Temp\$DSCResourceName -Recurse -Force
+        Remove-Item -Path $WorkingFolder -Recurse -Force
     }
 
     # Clean up after the test completes.
@@ -138,7 +157,7 @@ finally
         Copy-Item -Path $tempLocation -Destination "${env:ProgramFiles}\WindowsPowerShell\Modules" -Recurse -Force
         Remove-Item -Path $tempLocation -Recurse -Force
     }
+    #endregion
 
-    # +++ Other Cleanup Code Goes Here...
     Remove-NetFirewallRule -Name $rule.Name
 }

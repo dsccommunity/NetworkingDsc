@@ -1,9 +1,27 @@
-# Template for Unit Testing
+<#
+.Synopsis
+   Template for creating Unit Tests
+.DESCRIPTION
+   To Use:
+     1. Copy to \Tests\Integration\ folder and rename MSFT_x<ResourceName>.tests.ps1
+     2. Customize TODO sections.
+     3. Create MSFT_x<ResourceName>.config.ps1 to be used as test DSC Configurtion file.
 
-# +++ Customize these paramters...
-$DSCModuleName   = 'xNetworking'
-$DSCResourceName = 'MSFT_x<ResourceName>'
+.NOTES
+   Code in HEADER and FOOTER regions are standard and may be moved into DSCResource.Tools in
+   Future and therefore should not be altered if possible.
+#>
+
+
+# TODO: Customize these paramters...
+$DSCModuleName      = 'xNetworking'
+$DSCResourceName    = 'MSFT_x<ResourceName>'
 $RelativeModulePath = "DSCResources\$DSCResourceName\$DSCResourceName.psm1"
+# /TODO
+
+#region HEADER
+# Temp Working Folder - always gets remove on completion
+$WorkingFolder = Join-Path -Path $env:Temp -ChildPath $DSCResourceName
 
 # Copy to Program Files for WMF 4.0 Compatability as it can only find resources in a few known places.
 $moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
@@ -64,8 +82,9 @@ if ($executionPolicy -ne 'Unrestricted')
     Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
     $rollbackExecution = $true
 }
+#endregion
 
-# +++ Other Init Code Goes Here...
+# TODO: Other Optional Init Code Goes Here...
 
 # Begin Testing
 try
@@ -77,22 +96,29 @@ try
 
 ####################################################################################################
 
-        # +++ Load Mock Data Here...
+        # TODO: Optopnal Load Mock for use in Pester tests here...
 
 ####################################################################################################
 
         Describe 'Get-TargetResource' {
+            # TODO: Complete Tests...
         }
 
 ####################################################################################################
 
         Describe 'Test-TargetResource' {
+            # TODO: Complete Tests...
         }
 
 ####################################################################################################
 
         Describe 'Set-TargetResource' {
+            # TODO: Complete Tests...
         }
+
+####################################################################################################
+
+        # TODO: Pester Tests for any Helper Cmdlets
 
 ####################################################################################################
 
@@ -102,6 +128,7 @@ try
 }
 finally
 {
+    #region FOOTER
     # Set PSModulePath back to previous settings
     $env:PSModulePath = $script:tempPath;
 
@@ -110,6 +137,12 @@ finally
     {
         Set-ExecutionPolicy -ExecutionPolicy $executionPolicy -Force
     }   
+
+    # Cleanup Working Folder
+    if (Test-Path -Path $WorkingFolder)
+    {
+        Remove-Item -Path $WorkingFolder -Recurse -Force
+    }
 
     # Clean up after the test completes.
     Remove-Item -Path $moduleRoot -Recurse -Force
@@ -121,6 +154,7 @@ finally
         Copy-Item -Path $tempLocation -Destination "${env:ProgramFiles}\WindowsPowerShell\Modules" -Recurse -Force
         Remove-Item -Path $tempLocation -Recurse -Force
     }
+    #endregion
 
-    # +++ Other Cleanup Code Goes Here...
+    # TODO: Other Optional Cleanup Code Goes Here...
 }
