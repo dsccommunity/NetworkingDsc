@@ -1,7 +1,3 @@
-#######################################################################################
-#  xFirewall : DSC Resource that will set/test/get Firewall Rules
-#######################################################################################
-
 data LocalizedData
 {
     # culture="en-US"
@@ -29,13 +25,16 @@ RuleNotUniqueError={0} Firewall Rules with the Name '{1}' were found. Only one e
 '@
 }
 
-# This is an array of all the parameters used by this resource
-# It can be used by several of the functions to reduce the amount of code required
-# Each element contains 3 properties:
-# Name: The parameter name
-# Source: The source where the existing parameter can be pulled from
-# Type: This is the content type of the paramater (it is either array or string or blank)
-# A blank type means it will not be compared
+<#
+    This is an array of all the parameters used by this resource
+    It can be used by several of the functions to reduce the amount of code required
+    Each element contains 3 properties:
+    Name: The parameter name
+    Source: The source where the existing parameter can be pulled from
+    Type: This is the content type of the paramater (it is either array or string or blank)
+    A blank type means it will not be compared
+    data ParameterList
+#>
 data ParameterList
 {
     @( 
@@ -67,9 +66,6 @@ data ParameterList
     )
 }
 
-######################################################################################
-# The Get-TargetResource cmdlet.
-######################################################################################
 function Get-TargetResource
 {
     [OutputType([System.Collections.Hashtable])]
@@ -139,9 +135,6 @@ function Get-TargetResource
     return $Result
 }
 
-######################################################################################
-# The Set-TargetResource cmdlet.
-######################################################################################
 function Set-TargetResource
 {
     param
@@ -369,11 +362,7 @@ function Set-TargetResource
     }
 }
 
-######################################################################################
-# The Test-TargetResource cmdlet.
-# DSC uses Test-TargetResource cmdlet to check the status of the resource instance on
-# the target machine
-######################################################################################
+
 function Test-TargetResource
 {
     [OutputType([System.Boolean])]
@@ -525,14 +514,10 @@ function Test-TargetResource
 }
 
 #region HelperFunctions
-
-######################
-## Helper Functions ##
-######################
-
-######################################################################################
-# Function to validate if the supplied Rule adheres to all parameters set
-######################################################################################
+<#
+    .SYNOPSIS
+    Function to validate if the supplied Rule adheres to all parameters set
+#>
 function Test-RuleProperties
 {
     param
@@ -619,9 +604,11 @@ function Test-RuleProperties
     return $desiredConfigurationMatch
 }
 
-######################################################################################
-# Returns a list of FirewallRules that comply to the specified parameters.
-######################################################################################
+
+<#
+    .SYNOPSIS
+    Returns a list of FirewallRules that comply to the specified parameters.
+#>
 function Get-FirewallRule
 {
     param (
@@ -657,9 +644,11 @@ function Get-FirewallRule
     return $firewallRule[0]
 }
 
-######################################################################################
-# Returns the filters associated with the given firewall rule
-######################################################################################
+
+<#
+    .SYNOPSIS
+    Returns the filters associated with the given firewall rule
+#>
 function Get-FirewallRuleProperty
 {
     param (
@@ -681,7 +670,6 @@ function Get-FirewallRuleProperty
         ServiceFilters       = @(Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule)
     }
 }
-
 #endregion
 
 Export-ModuleMember -Function *-TargetResource
