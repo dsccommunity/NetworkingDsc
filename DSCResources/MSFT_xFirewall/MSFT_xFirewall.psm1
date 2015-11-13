@@ -109,29 +109,29 @@ function Get-TargetResource
 
     # Populate the properties for get target resource by looping through
     # the parameter array list and adding the values to 
-    foreach ($p in $ParameterList)
+    foreach ($parameter in $ParameterList)
     {
 
-        if ($p.type -eq 'Array')
+        if ($parameter.type -eq 'Array')
         {
-            $Value = @(Invoke-Expression -Command "`$($($p.source))")
+            $Value = @(Invoke-Expression -Command "`$($($parameter.source))")
             $Result += @{
-                $p.Name = $Value
+                $parameter.Name = $Value
             }
 
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.FirewallParameterValueMessage) -f $Name,$p.Name,($Value -join ',')
+                $($LocalizedData.FirewallParameterValueMessage) -f $Name,$parameter.Name,($Value -join ',')
                 ) -join '')
         }
         else 
         {
-            $Value = (Invoke-Expression -Command "`$($($p.source))")
+            $Value = (Invoke-Expression -Command "`$($($parameter.source))")
             $Result += @{
-                $p.Name = $Value
+                $parameter.Name = $Value
             }
 
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.FirewallParameterValueMessage) -f $Name,$p.Name,$Value
+                $($LocalizedData.FirewallParameterValueMessage) -f $Name,$parameter.Name,$Value
                 ) -join '')
 
         }
@@ -295,12 +295,12 @@ function Set-TargetResource
 
                     # Loop through each possible property and if it is not passed as a parameter
                     # then set the PSBoundParameter property to the exiting rule value.
-                    Foreach ($p in $ParametersList) {
-                        if (-not $PSBoundParameters.ContainsKey($p.Name))
+                    Foreach ($parameter in $ParametersList) {
+                        if (-not $PSBoundParameters.ContainsKey($parameter.Name))
                         {
-                            $ParameterValue = (Invoke-Expression -Command "`$($($p.source))")
+                            $ParameterValue = (Invoke-Expression -Command "`$($($parameter.source))")
                             if ($ParameterValue) {
-                                $null = $PSBoundParameters.Add($p.Name,$ParameterValue)
+                                $null = $PSBoundParameters.Add($parameter.Name,$ParameterValue)
                             }
                         }
                     }
@@ -570,29 +570,32 @@ function Test-RuleProperties
 
     $desiredConfigurationMatch = $true
 
-    # Loop throug the ParameterList array and compare the source
+    # Loop through the $ParameterList array and compare the source
     # with the value of each parameter. If different then
     # set $desiredConfigurationMatch to false.
-    foreach ($p in $ParameterList)
+    foreach ($parameter in $ParameterList)
     {
-        $ParameterSource = (Invoke-Expression -Command "`$($($p.source))")
-        $ParameterNew = (Invoke-Expression -Command "`$$($p.name)")
-        switch ($p.type)
+        $ParameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
+        $ParameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
+        switch ($parameter.type)
         {
-            'String' {
+            'String'
+            {
                 # Perform a plain string comparison.
                 if ($ParameterNew -and ($ParameterSource -ne $ParameterNew))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                         $($LocalizedData.PropertyNoMatchMessage) `
-                            -f $p.Name,$ParameterSource,$ParameterNew
+                            -f $parameter.Name,$ParameterSource,$ParameterNew
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
             }
-            'Array' {
+            'Array'
+            {
                 # Array comparison uses Compare-Object
-                if ($ParameterSource -eq $null) {
+                if ($ParameterSource -eq $null)
+                {
                     $ParameterSource = @()
                 }
                 if ($ParameterNew `
@@ -602,7 +605,7 @@ function Test-RuleProperties
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                         $($LocalizedData.PropertyNoMatchMessage) `
-                            -f $p.Name,($ParameterSource -join ','),($ParameterNew -join ',')
+                            -f $parameter.Name,($ParameterSource -join ','),($ParameterNew -join ',')
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }

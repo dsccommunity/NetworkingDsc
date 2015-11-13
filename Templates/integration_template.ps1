@@ -88,13 +88,13 @@ if ($executionPolicy -ne 'Unrestricted')
 try
 {
 
-####################################################################################################
 
+    #region Integration Tests
     <#
       This file exists so we can load the test file without necessarily having xNetworking in
       the $env:PSModulePath. Otherwise PowerShell will throw an error when reading the Pester File.
     #>
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$DSCResourceName.Config.ps1"
+    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$DSCResourceName.config.ps1"
     . $ConfigFile
     
     Describe "$($DSCResourceName)_Integration" {
@@ -114,15 +114,14 @@ try
         }
         #endregion
 
-        It 'Should have set the firewall and all the parameters should match' {
+        It 'Should have set the resource and all the parameters should match' {
             # TODO: Validate the Config was Set Correctly Here...
         }
-
     }
+    #endregion
+
+
 }
-
-####################################################################################################
-
 finally
 {
     #region FOOTER

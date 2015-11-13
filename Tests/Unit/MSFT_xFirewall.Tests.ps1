@@ -71,12 +71,11 @@ if ($executionPolicy -ne 'Unrestricted')
 try
 {
 
-####################################################################################################
+    #region Pester Tests
 
     InModuleScope $DSCResourceName {
 
-####################################################################################################
-
+        #region Pester Test Initialization
         # Get the rule that will be used for testing
         $FirewallRuleName = (Get-NetFirewallRule | `
             Sort-Object Name | `
@@ -84,9 +83,9 @@ try
             Select-Object -first 1).Name
         $FirewallRule = Get-FirewallRule -Name $FirewallRuleName
         $Properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
+        #endregion
 
-####################################################################################################
-
+        #region Function Get-TargetResource
         Describe 'Get-TargetResource' {
             Context 'Absent should return correctly' {
                 Mock Get-NetFirewallRule
@@ -102,19 +101,20 @@ try
                 $result = Get-TargetResource -Name $FirewallRule.Name
 
                 # Looping these tests
-                foreach ($p in $ParameterList)
+                foreach ($parameter in $ParameterList)
                 {
-                    $ParameterSource = (Invoke-Expression -Command "`$($($p.source))")
-                    $ParameterNew = (Invoke-Expression -Command "`$result.$($p.name)")
-                    It "should have the correct $($p.Name)" {
+                    $ParameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
+                    $ParameterNew = (Invoke-Expression -Command "`$result.$($parameter.name)")
+                    It "should have the correct $($parameter.Name)" {
                         $ParameterSource | Should Be $ParameterNew
                     }
                 }
             }
         }
+        #endregion
 
-####################################################################################################
 
+        #region Function Test-TargetResource
         Describe 'Test-TargetResource' {
             Context 'Ensure is Absent and the Firewall is not Present' {
                 Mock Get-FirewallRule
@@ -155,9 +155,10 @@ try
                 }
             }
         }
+        #endregion
 
-####################################################################################################
 
+        #region Function Set-TargetResource
         Describe 'Set-TargetResource' {
             # To speed up all these tests create Mocks so that these functions are not repeatedly called
             Mock Get-FirewallRule -MockWith { $FirewallRule }
@@ -561,9 +562,10 @@ try
                 }
             }
         }
+        #endregion
 
-####################################################################################################
 
+        #region Function Test-RuleProperties
         Describe 'Test-RuleProperties' {
             # Make an object that can be splatted onto the function
             $Splat = @{
@@ -846,9 +848,10 @@ try
             }
 
         }
+        #endregion
 
-####################################################################################################
 
+        #region Function Get-FirewallRule
         Describe ' Get-FirewallRule' {
             $FirewallRule = Get-NetFirewallRule | Select-Object -First 1
             $FirewallRules = Get-NetFirewallRule | Select-Object -First 2
@@ -881,9 +884,10 @@ try
                 }
             }
         }
+        #endregion
 
-####################################################################################################
 
+        #region Function Get-FirewallRuleProperty
         Describe 'Get-FirewallRuleProperty' {
             Context 'All Properties' {
                 $result = Get-FirewallRuleProperty -FirewallRule $FirewallRule
@@ -945,11 +949,11 @@ try
                 }
             }
         }
-####################################################################################################
+        #endregion
 
     }
+    #endregion
 
-####################################################################################################
 }
 finally
 {

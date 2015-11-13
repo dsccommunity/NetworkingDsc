@@ -90,41 +90,39 @@ if ($executionPolicy -ne 'Unrestricted')
 try
 {
 
-####################################################################################################
+    #region Pester Tests
 
     InModuleScope $DSCResourceName {
 
-####################################################################################################
-
+        #region Pester Test Initialization
         # TODO: Optopnal Load Mock for use in Pester tests here...
+        #endregion
 
-####################################################################################################
 
+        #region Function Get-TargetResource
         Describe 'Get-TargetResource' {
             # TODO: Complete Tests...
         }
+        #endregion
 
-####################################################################################################
 
+        #region Function Test-TargetResource
         Describe 'Test-TargetResource' {
             # TODO: Complete Tests...
         }
+        #endregion
 
-####################################################################################################
 
+        #region Function Set-TargetResource
         Describe 'Set-TargetResource' {
             # TODO: Complete Tests...
         }
-
-####################################################################################################
+        #endregion
 
         # TODO: Pester Tests for any Helper Cmdlets
 
-####################################################################################################
-
     }
-
-####################################################################################################
+    #endregion
 }
 finally
 {
