@@ -117,10 +117,10 @@ try
             }
 
             # Use the Parameters List to perform these tests
-            foreach ($p in $ParameterList)
+            foreach ($parameters in $ParameterList)
             {
-                $ParameterSource = (Invoke-Expression -Command "`$($($p.source))")
-                $ParameterNew = (Invoke-Expression -Command "`$rule.$($p.name)")
+                $ParameterSource = (Invoke-Expression -Command "`$($($parameters.source))")
+                $ParameterNew = (Invoke-Expression -Command "`$rule.$($parameters.name)")
                 $ParameterSource | Should Be $ParameterNew
             }
         }
