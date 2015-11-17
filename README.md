@@ -1,4 +1,4 @@
-﻿[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
 
 # xNetworking
 
@@ -15,6 +15,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **xDnsServerAddress** sets a node's DNS server.
 * **xDnsConnectionSuffix** sets a node's network interface connection-specific DNS suffix.
 * **xDefaultGatewayAddress** sets a node's default gateway address.
+* **xNetConnectionProfile** sets a node's connection profile.
 
 ### xIPAddress
 
@@ -71,6 +72,13 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **RemoteAddress**: Specifies that network packets with matching IP addresses match this rule. This parameter value is the second end point of an IPsec rule and specifies the computers that are subject to the requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet, range, or the following keyword: Any
 * **RemoteMachine**: Specifies that matching IPsec rules of the indicated computer accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a computer identified in the list of computer accounts (SID) match this rule. This parameter value is specified as an SDDL string. 
 * **RemoteUser**: Specifies that matching IPsec rules of the indicated user accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a user identified in the list of user accounts match this rule. This parameter value is specified as an SDDL string. 
+
+### xNetConnectionProfile
+* **InterfaceAlias**: Specifies the alias for the Interface that is being changed.
+* **NetworkCategory**: Sets the NetworkCategory for the interface - per [the documentation ](https://technet.microsoft.com/en-us/%5Clibrary/jj899565(v=wps.630).aspx) this can only be set to { Public | Private }
+* **IPv4Connectivity**: Specifies the IPv4 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
+* **IPv6Connectivity**: Specifies the IPv6 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
+
 
 ## Known Invalid Configurations
 
@@ -549,3 +557,19 @@ configuration Sample_xFirewall_AddFirewallRule_AllParameters
 Sample_xFirewall_AddFirewallRule_AllParameters
 Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule_AllParameters -Wait -Verbose -Force
 ```
+
+### Set the NetConnectionProfile to Public
+
+````powershell
+configuration MSFT_xNetConnectionProfile_Config {
+    Import-DscResource -ModuleName xNetworking
+    node localhost {
+        xNetConnectionProfile Integration_Test {
+            InterfaceAlias   = 'Wi-Fi'
+            NetworkCategory  = 'Public'
+            IPv4Connectivity = 'Internet'
+            IPv6Connectivity = 'Disconncted'
+        }
+    }
+}
+````
