@@ -37,6 +37,14 @@ Import-Module -Name $DSCResourceModuleFile.FullName -Force
 
 InModuleScope $DSCResourceName {
     Describe 'Get-TargetResource - MSFT_xNetConnectionProfile' {
+        Mock Get-NetConnectionProfile {
+            return @{
+                InterfaceAlias   = 'InterfaceAlias'
+                NetworkCategory  = 'Wired'
+                IPv4Connectivity = 'IPv4'
+                IPv6Connectivity = 'IPv6'
+            }
+        }
         $expected = Get-NetConnectionProfile | select -first 1
         $result = Get-TargetResource -InterfaceAlias $expected.InterfaceAlias
 
