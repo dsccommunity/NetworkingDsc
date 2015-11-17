@@ -1,6 +1,6 @@
 configuration Sample_xNetConnectionProfile
-{    
-	param
+{
+    param
     (
         [parameter(Mandatory = $true)]
         [string] $InterfaceAlias,
@@ -20,7 +20,7 @@ configuration Sample_xNetConnectionProfile
     Node $NodeName
     {
         xNetConnectionProfile Integration_Test
-		{
+        {
             InterfaceAlias   = $InterfaceAlias
             NetworkCategory  = $NetworkCategory
             IPv4Connectivity = $IPv4Connectivity
