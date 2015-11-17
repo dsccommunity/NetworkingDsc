@@ -27,7 +27,6 @@ function Get-TargetResource
     $result = Get-NetConnectionProfile -InterfaceAlias $InterfaceAlias
 
     return @{
-        Name             = $result.Name
         InterfaceAlias   = $result.InterfaceAlias
         NetworkCategory  = $result.NetworkCategory
         IPv4Connectivity = $result.IPv4Connectivity
