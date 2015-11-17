@@ -19,7 +19,7 @@ configuration Sample_xFirewall_AddFirewallRuleToNewGroup
             Group                 = "NotePad Firewall Rule Group"
             Ensure                = "Present"
             Description           = "Firewall Rule for Notepad.exe"
-            ApplicationPath       = "c:\windows\system32\notepad.exe"
+            Program               = "c:\windows\system32\notepad.exe"
         }
     }
  }

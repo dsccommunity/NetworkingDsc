@@ -14,7 +14,7 @@ configuration Sample_xFirewall_AddFirewallRuleToNewGroup
         xFirewall Firewall
         {
             Name                  = "MyAppFirewallRule"
-            ApplicationPath       = "c:\windows\system32\MyApp.exe"
+            Program               = "c:\windows\system32\MyApp.exe"
         }
     }
  }
