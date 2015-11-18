@@ -68,18 +68,17 @@ function Get-TargetResource
     # Populate the properties for get target resource
     return @{
         Name            = $Name
-        Ensure          = 'Present'
         DisplayName     = $firewallRule.DisplayName
-        Group           = $firewallRule.Group
         DisplayGroup    = $firewallRule.DisplayGroup
+        Ensure          = 'Present'
         Enabled         = $firewallRule.Enabled
         Action          = $firewallRule.Action
         Profile         = $firewallRule.Profile.ToString() -replace(' ', '') -split(',')
         Direction       = $firewallRule.Direction
-        Description     = $firewallRule.Description
         RemotePort      = @($properties.PortFilters.RemotePort)
         LocalPort       = @($properties.PortFilters.LocalPort)
         Protocol        = $properties.PortFilters.Protocol
+        Description     = $firewallRule.Description
         ApplicationPath = $properties.ApplicationFilters.Program
         Service         = $properties.ServiceFilters.Service
     }
