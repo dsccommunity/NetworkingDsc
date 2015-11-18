@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="1" errors="0" failures="1" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2015-11-19" time="10:07:03">
+  <environment user="Daniel" machine-name="PLAGUE-WINDEV" cwd="C:\Users\Daniel\Source\GitHub\xNetworking" user-domain="PLAGUE-WINDEV" platform="Microsoft Windows 10 Enterprise|C:\WINDOWS|\Device\Harddisk0\Partition5" nunit-version="2.5.8.0" os-version="10.0.10240" clr-version="4.0.30319.42000" />
+  <culture-info current-culture="en-NZ" current-uiculture="en-US" />
+  <test-suite type="Powershell" name="Pester" executed="True" result="Failure" success="False" time="0.3065" asserts="0">
+    <results>
+      <test-suite type="TestFixture" name="" executed="True" result="Failure" success="False" time="0.3065" asserts="0" description="">
+        <results>
+          <test-case description="Error occurred in test script '.\Tests\Unit\MSFT_xFirewall.Tests.ps1'" name=".Error occurred in test script '.\Tests\Unit\MSFT_xFirewall.Tests.ps1'" time="0.3065" asserts="0" success="False" result="Failure" executed="True">
+            <failure>
+              <message>You cannot call a method on a null-valued expression.</message>
+              <stack-trace>at &lt;ScriptBlock&gt;, C:\Users\Daniel\Source\GitHub\xNetworking\Tests\Unit\MSFT_xFirewall.Tests.ps1: line 55</stack-trace>
+            </failure>
+          </test-case>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
