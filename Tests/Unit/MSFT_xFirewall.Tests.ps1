@@ -83,6 +83,7 @@ try
             Select-Object -first 1).Name
         $FirewallRule = Get-FirewallRule -Name $FirewallRuleName
         $Properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
+        # Pull two rules to use testing that error is thrown when this occurs
         $FirewallRules = (Get-NetFirewallRule | `
             Sort-Object Name | `
             Where-Object {$_.DisplayGroup -ne $null} | `
