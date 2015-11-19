@@ -62,7 +62,7 @@ if (($env:PSModulePath).Split(';') -ccontains $pwd.Path)
 $executionPolicy = Get-ExecutionPolicy
 if ($executionPolicy -ne 'Unrestricted')
 {
-    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
+    #Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
     $rollbackExecution = $true
 }
 #endregion
@@ -83,14 +83,18 @@ try
             Select-Object -first 1).Name
         $FirewallRule = Get-FirewallRule -Name $FirewallRuleName
         $Properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
+        $FirewallRules = (Get-NetFirewallRule | `
+            Sort-Object Name | `
+            Where-Object {$_.DisplayGroup -ne $null} | `
+            Select-Object -first 2)
         #endregion
 
         #region Function Get-TargetResource
-        Describe 'Get-TargetResource' {
+        Describe 'MSFT_xFirewall\Get-TargetResource' {
             Context 'Absent should return correctly' {
                 Mock Get-NetFirewallRule
 
-                It 'Should return absent' {
+                It "Should return absent on firewall rule $($FirewallRule.Name)" {
                     $result = Get-TargetResource -Name 'FirewallRule'
                     $result.Name | Should Be 'FirewallRule'
                     $result.Ensure | Should Be 'Absent'
@@ -105,7 +109,7 @@ try
                 {
                     $ParameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
                     $ParameterNew = (Invoke-Expression -Command "`$result.$($parameter.name)")
-                    It "should have the correct $($parameter.Name)" {
+                    It "should have the correct $($parameter.Name) on firewall rule $($FirewallRule.Name)" {
                         $ParameterSource | Should Be $ParameterNew
                     }
                 }
@@ -115,11 +119,11 @@ try
 
 
         #region Function Test-TargetResource
-        Describe 'Test-TargetResource' {
+        Describe 'MSFT_xFirewall\Test-TargetResource' {
             Context 'Ensure is Absent and the Firewall is not Present' {
                 Mock Get-FirewallRule
 
-                It 'should return $true' {
+                It "should return $true on firewall rule $($FirewallRule.Name)" {
                     $result = Test-TargetResource -Name 'FirewallRule' -Ensure 'Absent'
                     $result | Should Be $true
                 }
@@ -127,7 +131,7 @@ try
             Context 'Ensure is Absent and the Firewall is Present' {
                 Mock Test-RuleProperties
 
-                It 'should return $false' {
+                It "should return $false on firewall rule $($FirewallRule.Name)" {
                     $result = Test-TargetResource -Name $FirewallRule.Name -Ensure 'Absent'
                     $result | Should Be $false
                 }
@@ -135,7 +139,7 @@ try
             Context 'Ensure is Present and the Firewall is Present and properties match' {
                 Mock Test-RuleProperties -MockWith { return $true }
 
-                It 'should return $true' {
+                It "should return $true on firewall rule $($FirewallRule.Name)" {
                     $result = Test-TargetResource -Name $FirewallRule.Name
                     $result | Should Be $true
                 }
@@ -143,14 +147,14 @@ try
             Context 'Ensure is Present and the Firewall is Present and properties are different' {
                 Mock Test-RuleProperties -MockWith { return $false }
 
-                It 'should return $false' {
+                It "should return $false on firewall rule $($FirewallRule.Name)" {
                     $result = Test-TargetResource -Name $FirewallRule.Name
                     $result | Should Be $false
                 }
             }
             Context 'Ensure is Present and the Firewall is Absent' {
                 Mock Get-FirewallRule
-                It 'should return $false' {
+                It "should return $false on firewall rule $($FirewallRule.Name)" {
                     $result = Test-TargetResource -Name $FirewallRule.Name
                     $result | Should Be $false
                 }
@@ -160,7 +164,7 @@ try
 
 
         #region Function Set-TargetResource
-        Describe 'Set-TargetResource' {
+        Describe 'MSFT_xFirewall\Set-TargetResource' {
             # To speed up all these tests create Mocks so that these functions are not repeatedly called
             Mock Get-FirewallRule -MockWith { $FirewallRule }
             Mock Get-FirewallRuleProperty -MockWith { $Properties }
@@ -478,7 +482,7 @@ try
                     Mock Test-RuleProperties {return $false}
                     $result = Set-TargetResource `
                         -Name $FirewallRule.Name `
-                        -LocalUser 'O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)' `
+                        -LocalUser 'Different' `
                         -Ensure 'Present'
 
                     Assert-MockCalled Set-NetFirewallRule -Exactly 1
@@ -491,7 +495,7 @@ try
                     Mock Test-RuleProperties {return $false}
                     $result = Set-TargetResource `
                         -Name $FirewallRule.Name `
-                        -Package 'S-1-15-2-3676279713-3632409675-756843784-3388909659-2454753834-4233625902-1413163418' `
+                        -Package 'Different' `
                         -Ensure 'Present'
 
                     Assert-MockCalled Set-NetFirewallRule -Exactly 1
@@ -531,7 +535,7 @@ try
                     Mock Test-RuleProperties {return $false}
                     $result = Set-TargetResource `
                         -Name $FirewallRule.Name `
-                        -RemoteMachine 'O:LSD:(D;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1621)(A;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1620)' `
+                        -RemoteMachine 'Different' `
                         -Ensure 'Present'
 
                     Assert-MockCalled Set-NetFirewallRule -Exactly 1
@@ -544,7 +548,7 @@ try
                     Mock Test-RuleProperties {return $false}
                     $result = Set-TargetResource `
                         -Name $FirewallRule.Name `
-                        -RemoteUser 'O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)' `
+                        -RemoteUser 'Different' `
                         -Ensure 'Present'
 
                     Assert-MockCalled Set-NetFirewallRule -Exactly 1
@@ -567,7 +571,7 @@ try
 
 
         #region Function Test-RuleProperties
-        Describe 'Test-RuleProperties' {
+        Describe 'MSFT_xFirewall\Test-RuleProperties' {
             # Make an object that can be splatted onto the function
             $Splat = @{
                 Name = $FirewallRule.Name
@@ -602,7 +606,7 @@ try
 
             Context 'testing with a rule with no property differences' {
                 $CompareRule = $Splat.Clone()
-                It 'should return True' {
+                It "should return True on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $True
                 }
@@ -610,7 +614,7 @@ try
             Context 'testing with a rule with a different name' {
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Name = 'Different'
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -618,7 +622,7 @@ try
             Context 'testing with a rule with a different displayname' {
                 $CompareRule = $Splat.Clone()
                 $CompareRule.DisplayName = 'Different'
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -626,7 +630,7 @@ try
             Context 'testing with a rule with a different group' {
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Group = 'Different'
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -640,7 +644,7 @@ try
                 {
                     $CompareRule.Enabled = 'True'
                 }
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -654,7 +658,7 @@ try
                 {
                     $CompareRule.Action = 'Allow'
                 }
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -668,7 +672,7 @@ try
                 {
                     $CompareRule.Profile = @('Domain','Public')
                 }
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -682,7 +686,7 @@ try
                 {
                     $CompareRule.Direction = 'Inbound'
                 }
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -690,7 +694,7 @@ try
             Context 'testing with a rule with a different remote port' {
                 $CompareRule = $Splat.Clone()
                 $CompareRule.RemotePort = 1
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -698,7 +702,7 @@ try
             Context 'testing with a rule with a different local port' {
                 $CompareRule = $Splat.Clone()
                 $CompareRule.LocalPort = 1
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -712,7 +716,7 @@ try
                 {
                     $CompareRule.Protocol = 'TCP'
                 }
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -720,7 +724,7 @@ try
             Context 'testing with a rule with a different description' {
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Description = 'Different'
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -728,7 +732,7 @@ try
             Context 'testing with a rule with a different program' {
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Program = 'Different'
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -736,7 +740,7 @@ try
             Context 'testing with a rule with a different service' {
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Service = 'Different'
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -750,7 +754,7 @@ try
                 {
                     $CompareRule.Authentication = 'Required'
                 }
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -764,7 +768,7 @@ try
                 {
                     $CompareRule.Encryption = 'Required'
                 }
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -772,7 +776,7 @@ try
             Context 'testing with a rule with a different InterfaceAlias' {
                 $CompareRule = $Splat.Clone()
                 $CompareRule.InterfaceAlias = 'Different'
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -786,7 +790,7 @@ try
                 {
                     $CompareRule.InterfaceType = 'Wired'
                 }
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -794,23 +798,23 @@ try
             Context 'testing with a rule with a different LocalAddress' {
                 $CompareRule = $Splat.Clone()
                 $CompareRule.LocalAddress = @('10.0.0.1/255.0.0.0','10.1.1.0-10.1.2.0')
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
             Context 'testing with a rule with a different LocalUser' {
                 $CompareRule = $Splat.Clone()
-                $CompareRule.LocalUser = 'O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)'
-                It 'should return False' {
+                $CompareRule.LocalUser = 'Different'
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
             Context 'testing with a rule with a different Package' {
                 $CompareRule = $Splat.Clone()
-                $CompareRule.Package = 'S-1-15-2-3676279713-3632409675-756843784-3388909659-2454753834-4233625902-1413163418'
-                It 'should return False' {
+                $CompareRule.Package = 'Different'
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -818,7 +822,7 @@ try
             Context 'testing with a rule with a different Platform' {
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Platform = @('6.2')
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -826,23 +830,23 @@ try
             Context 'testing with a rule with a different RemoteAddress' {
                 $CompareRule = $Splat.Clone()
                 $CompareRule.RemoteAddress = @('10.0.0.1/255.0.0.0','10.1.1.0-10.1.2.0')
-                It 'should return False' {
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
             Context 'testing with a rule with a different RemoteMachine' {
                 $CompareRule = $Splat.Clone()
-                $CompareRule.RemoteMachine = 'O:LSD:(D;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1621)(A;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1620)'
-                It 'should return False' {
+                $CompareRule.RemoteMachine = 'Different'
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
             Context 'testing with a rule with a different RemoteUser' {
                 $CompareRule = $Splat.Clone()
-                $CompareRule.RemoteUser = 'O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)'
-                It 'should return False' {
+                $CompareRule.RemoteUser = 'Different'
+                It "should return False on firewall rule $($FirewallRule.Name)" {
                     $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
@@ -853,18 +857,15 @@ try
 
 
         #region Function Get-FirewallRule
-        Describe ' Get-FirewallRule' {
-            $FirewallRule = Get-NetFirewallRule | Select-Object -First 1
-            $FirewallRules = Get-NetFirewallRule | Select-Object -First 2
-
+        Describe 'MSFT_xFirewall\Get-FirewallRule' {
             Context 'testing with firewall that exists' {
-                It 'should return a firewall rule when name is passed' {
+                It "should return a firewall rule when name is passed on firewall rule $($FirewallRule.Name)" {
                     $Result = Get-FirewallRule -Name $FirewallRule.Name
                     $Result | Should Not BeNullOrEmpty
                 }
             }
             Context 'testing with firewall that does not exist' {
-                It 'should not return anything' {
+                It "should not return anything on firewall rule $($FirewallRule.Name)" {
                     $Result = Get-FirewallRule -Name 'Does not exist'
                     $Result | Should BeNullOrEmpty
                 }
@@ -880,7 +881,7 @@ try
                 $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                     -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                It 'should throw RuleNotUnique exception' {
+                It "should throw RuleNotUnique exception on firewall rule $($FirewallRule.Name)" {
                     { $Result = Get-FirewallRule -Name $FirewallRule.Name } | Should Throw $errorRecord
                 }
             }
@@ -889,61 +890,61 @@ try
 
 
         #region Function Get-FirewallRuleProperty
-        Describe 'Get-FirewallRuleProperty' {
+        Describe 'MSFT_xFirewall\Get-FirewallRuleProperty' {
             Context 'All Properties' {
                 $result = Get-FirewallRuleProperty -FirewallRule $FirewallRule
-                It 'Should return the right address filter' {
+                It "Should return the right address filter on firewall rule $($FirewallRule.Name)" {
                     $expected = Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule
 
                     $($result.AddressFilters | Out-String -Stream) |
                         Should Be $($expected | Out-String -Stream)
                 }
 
-                It 'Should return the right application filter' {
+                It "Should return the right application filter on firewall rule $($FirewallRule.Name)" {
                     $expected = Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $FirewallRule
 
                     $($result.ApplicationFilters | Out-String -Stream) |
                         Should Be $($expected | Out-String -Stream)
                 }
 
-                It 'Should return the right interface filter' {
+                It "Should return the right interface filter on firewall rule $($FirewallRule.Name)" {
                     $expected = Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $FirewallRule
 
                     $($result.InterfaceFilters | Out-String -Stream) |
                         Should Be $($expected | Out-String -Stream)
                 }
 
-                It 'Should return the right interface type filter' {
+                It "Should return the right interface type filter on firewall rule $($FirewallRule.Name)" {
                     $expected = Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $FirewallRule
                     $($result.InterfaceTypeFilters | Out-String -Stream) |
                         Should Be $($expected | Out-String -Stream)
                 }
 
-                It 'Should return the right port filter' {
+                It "Should return the right port filter on firewall rule $($FirewallRule.Name)" {
                     $expected = Get-NetFirewallPortFilter -AssociatedNetFirewallRule $FirewallRule
                     $($result.PortFilters | Out-String -Stream) |
                         Should Be $($expected | Out-String -Stream)
                 }
 
-                It 'Should return the right Profile' {
+                It "Should return the right Profile on firewall rule $($FirewallRule.Name)" {
                     $expected = Get-NetFirewallProfile -AssociatedNetFirewallRule $FirewallRule
                     $($result.Profile | Out-String -Stream) |
                         Should Be $($expected | Out-String -Stream)
                 }
 
-                It 'Should return the right Profile' {
+                It "Should return the right Profile on firewall rule $($FirewallRule.Name)" {
                     $expected = Get-NetFirewallProfile -AssociatedNetFirewallRule $FirewallRule
                     $($result.Profile | Out-String -Stream) |
                         Should Be $($expected | Out-String -Stream)
                 }
 
-                It 'Should return the right Security Filters' {
+                It "Should return the right Security Filters on firewall rule $($FirewallRule.Name)" {
                     $expected = Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $FirewallRule
                     $($result.SecurityFilters | Out-String -Stream) |
                         Should Be $($expected | Out-String -Stream)
                 }
 
-                It 'Should return the right Service Filters' {
+                It "Should return the right Service Filters on firewall rule $($FirewallRule.Name)" {
                     $expected = Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule
                     $($result.ServiceFilters | Out-String -Stream) |
                         Should Be $($expected | Out-String -Stream)
