@@ -62,7 +62,7 @@ if (($env:PSModulePath).Split(';') -ccontains $pwd.Path)
 $executionPolicy = Get-ExecutionPolicy
 if ($executionPolicy -ne 'Unrestricted')
 {
-    #Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
+    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
     $rollbackExecution = $true
 }
 #endregion
