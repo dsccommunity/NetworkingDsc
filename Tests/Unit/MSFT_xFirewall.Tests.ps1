@@ -76,7 +76,7 @@ try
     InModuleScope $DSCResourceName {
 
         # Get all the rules that will be used for testing
-        $FirewallRuleNames = (Get-NetFirewallRule).Name
+        $FirewallRuleNames = (Get-NetFirewallRule).Name | Select-Object -First 1
         foreach ($FirewallRuleName in $FirewallRuleNames) 
         {
 
