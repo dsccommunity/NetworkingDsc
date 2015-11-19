@@ -149,6 +149,7 @@ try
                 }
             }
             Context 'Ensure is Present and the Firewall is Absent' {
+                Mock Get-FirewallRule
                 It 'should return $false' {
                     $result = Test-TargetResource -Name $FirewallRule.Name
                     $result | Should Be $false
@@ -965,7 +966,7 @@ finally
     if ($rollbackExecution)
     {
         Set-ExecutionPolicy -ExecutionPolicy $executionPolicy -Force
-    }   
+    }
 
     # Cleanup Working Folder
     if (Test-Path -Path $WorkingFolder)
