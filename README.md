@@ -1,4 +1,4 @@
-﻿[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
 
 # xNetworking
 
@@ -15,6 +15,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **xDnsServerAddress** sets a node's DNS server.
 * **xDnsConnectionSuffix** sets a node's network interface connection-specific DNS suffix.
 * **xDefaultGatewayAddress** sets a node's default gateway address.
+* **xNetConnectionProfile** sets a node's connection profile.
 
 ### xIPAddress
 
@@ -72,6 +73,13 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **RemoteMachine**: Specifies that matching IPsec rules of the indicated computer accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a computer identified in the list of computer accounts (SID) match this rule. This parameter value is specified as an SDDL string. 
 * **RemoteUser**: Specifies that matching IPsec rules of the indicated user accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a user identified in the list of user accounts match this rule. This parameter value is specified as an SDDL string. 
 
+### xNetConnectionProfile
+* **InterfaceAlias**: Specifies the alias for the Interface that is being changed.
+* **NetworkCategory**: Sets the NetworkCategory for the interface - per [the documentation ](https://technet.microsoft.com/en-us/%5Clibrary/jj899565(v=wps.630).aspx) this can only be set to { Public | Private }
+* **IPv4Connectivity**: Specifies the IPv4 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
+* **IPv6Connectivity**: Specifies the IPv6 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
+
+
 ## Known Invalid Configurations
 
 ### xFirewall
@@ -89,12 +97,14 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased Version
+* Added the following resources:
+    * MSFT_xDNSConnectionSuffix resource to manage connection-specific DNS suffixes.
+    * MSFT_xNetConnectionProfile resource to manage Connection Profiles for interfaces.
 * MSFT_xDNSServerAddress: Corrected Verbose logging messages when multiple DNS adddressed specified.
 * MSFT_xDNSServerAddress: Change to ensure resource terminates if DNS Server validation fails.
 * MSFT_xDNSServerAddress: Added Validate parameter to enable DNS server validation when changing server addresses.
 * MSFT_xFirewall: ApplicationPath Parameter renamed to Program for consistency with Cmdlets.
 * MSFT_xFirewall: Fix to prevent error when DisplayName parameter is set on an existing rule.
-* Added xDnsConnectionSuffix resource to manage connection-specific DNS suffixes.
 * MSFT_xFirewall: Setting a different DisplayName parameter on an existing rule now correctly reports as needs change.
 * MSFT_xFirewall: Changed DisplayGroup parameter to Group for consistency with Cmdlets and reduce confusion.
 * MSFT_xFirewall: Changing the Group of an existing Firewall rule will recreate the Firewall rule rather than change it.
@@ -547,3 +557,19 @@ configuration Sample_xFirewall_AddFirewallRule_AllParameters
 Sample_xFirewall_AddFirewallRule_AllParameters
 Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule_AllParameters -Wait -Verbose -Force
 ```
+
+### Set the NetConnectionProfile to Public
+
+````powershell
+configuration MSFT_xNetConnectionProfile_Config {
+    Import-DscResource -ModuleName xNetworking
+    node localhost {
+        xNetConnectionProfile Integration_Test {
+            InterfaceAlias   = 'Wi-Fi'
+            NetworkCategory  = 'Public'
+            IPv4Connectivity = 'Internet'
+            IPv6Connectivity = 'Disconncted'
+        }
+    }
+}
+````

@@ -76,7 +76,7 @@ try
     InModuleScope $DSCResourceName {
 
         # Get all the rules that will be used for testing
-        $FirewallRuleNames = (Get-NetFirewallRule).Name | Where-Object {$_ -in '{4282FE99-8560-4BC7-9576-5F3ED84E263F}','{DB59588E-ED90-4C47-A7B5-7929DD0C0BD2}'}
+        $FirewallRuleNames = (Get-NetFirewallRule).Name
         foreach ($FirewallRuleName in $FirewallRuleNames) 
         {
 
@@ -968,7 +968,7 @@ finally
     if ($rollbackExecution)
     {
         Set-ExecutionPolicy -ExecutionPolicy $executionPolicy -Force
-    }   
+    }
 
     # Cleanup Working Folder
     if (Test-Path -Path $WorkingFolder)
