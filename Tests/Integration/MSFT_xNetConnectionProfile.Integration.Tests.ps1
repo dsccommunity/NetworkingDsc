@@ -1,21 +1,6 @@
-<#
-.Synopsis
-   Template for creating Integration Tests
-.DESCRIPTION
-   To Use:
-     1. Copy to \Tests\Integration\ folder and rename MSFT_x<ResourceName>.Integration.tests.ps1
-     2. Customize TODO sections.
-
-.NOTES
-   Code in HEADER, FOOTER and DEFAULT TEST regions are standard and may be moved into
-   DSCResource.Tools in Future and therefore should not be altered if possible.
-#>
-
-# TODO: Customize these paramters...
 $DSCModuleName      = 'xNetworking'
-$DSCResourceName    = 'MSFT_x<ResourceName>'
+$DSCResourceName    = 'MSFT_xNetConnectionProfile'
 $RelativeModulePath = "$DSCModuleName.psd1"
-# /TODO
 
 #region HEADER
 # Temp Working Folder - always gets remove on completion
@@ -82,13 +67,9 @@ if ($executionPolicy -ne 'Unrestricted')
 }
 #endregion
 
-# TODO: Other Init Code Goes Here...
-
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-
-
     #region Integration Tests
     <#
       This file exists so we can load the test file without necessarily having xNetworking in
@@ -115,12 +96,14 @@ try
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            # TODO: Validate the Config was Set Correctly Here...
+            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq 'MSFT_xNetconnectionProfile_Config'}
+            $rule.InterfaceAlias   | Should Be $current.InterfaceAlias
+            $rule.NetworkCategory  | Should Be $current.NetworkCategory
+            $rule.IPv4Connectivity | Should Be $current.IPv4Connectivity
+            $rule.IPv6Connectivity | Should Be $current.IPv6Connectivity
         }
     }
     #endregion
-
-
 }
 finally
 {
