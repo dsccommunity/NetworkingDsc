@@ -1,19 +1,21 @@
-if (!$PSScriptRoot) # $PSScriptRoot is not defined in 2.0
+$DSCResourceName = 'MSFT_xDnsConnectionSuffix'
+$DSCModuleName   = 'xNetworking'
+
+#region HEADER
+Import-Module DSCResource.Tools\TestHelper.psm1
+$TestEnvironment = Initialize-TestEnvironment `
+    -DSCModuleName $DSCModuleName `
+    -DSCResourceName $DSCResourceName `
+    -TestType Unit 
+#endregion
+
+# Begin Testing
+try
 {
-    $PSScriptRoot = [System.IO.Path]::GetDirectoryName($MyInvocation.MyCommand.Path)
-}
 
-$ErrorActionPreference = 'stop'
-Set-StrictMode -Version latest
+    #region Pester Tests
 
-$RepoRoot = (Resolve-Path $PSScriptRoot\..\..).Path
-
-$ModuleName = 'MSFT_xDnsConnectionSuffix'
-Import-Module (Join-Path $RepoRoot "DSCResources\$ModuleName\$ModuleName.psm1") -Force;
-
-Describe $ModuleName {
-
-    InModuleScope $ModuleName {
+    InModuleScope $DSCResourceName {
 
         $testDnsSuffix = 'example.local';
         $testInterfaceAlias = 'Ethernet';
@@ -175,7 +177,13 @@ Describe $ModuleName {
             }
 
         } #end Context 'Validates "Set-TargetResource" method'
-    
-    } #end InModuleScope $ModuleName
 
+    } #end InModuleScope $DSCResourceName
+    #endregion
+}
+finally
+{
+    #region FOOTER
+    Restore-TestEnvironment -TestEnvironment $TestEnvironment
+    #endregion
 }

@@ -5,7 +5,7 @@ os: Unstable
 version: 2.4.{build}.0
 install:
   - cinst -y pester
-  - git clone https://github.com/PowerShell/DscResource.Tests
+  - git clone https://github.com/PlagueHO/DscResource.Tests
   - ps: Push-Location
   - cd DscResource.Tests
   - ps: Import-Module .\TestHelper.psm1 -force
