@@ -2,6 +2,15 @@
 $DSCModuleName   = 'xNetworking'
 
 #region HEADER
+if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
+     (-not (Test-Path -Path '.\DSCResource.Tests\TestHelper.psm1')) )
+{
+    Throw @(
+        "The DSCResource.Tests folder could not be found in the root folder of the $DSCModuleName DSC Module to test."
+        "Please use Git to clone this repository to the root folder of the $DSCModuleName DSC Module that needs to be tested using the command:"
+        "git clone https://github.com/PowerShell/DscResource.Tests.git"
+    ) -join "`n"
+}
 Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $DSCModuleName `
