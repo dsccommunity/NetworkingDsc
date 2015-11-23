@@ -2,7 +2,7 @@ $DSCModuleName      = 'xNetworking'
 $DSCResourceName    = 'MSFT_xFirewall'
 
 #region HEADER
-Import-Module DSCResource.Tools\TestHelper.psm1
+Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $DSCModuleName `
     -DSCResourceName $DSCResourceName `
@@ -29,8 +29,7 @@ try
                 [System.Environment]::SetEnvironmentVariable('PSModulePath',
                     $env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
                 Invoke-Expression -Command "$($DSCResourceName)_Config -OutputPath `$TestEnvironment.WorkingFolder"
-                Start-DscConfiguration -Path (Join-Path -Path $env:Temp -ChildPath $DSCResourceName) `
-                    -ComputerName localhost -Wait -Verbose -Force
+                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw
         }
 
