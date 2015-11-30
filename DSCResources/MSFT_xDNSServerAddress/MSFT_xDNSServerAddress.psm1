@@ -168,7 +168,7 @@ function Test-TargetResource
     # Get the current DNS Server Addresses based on the parameters given.
     # Interface Alias may return multiple when passed WildCard (*)
     $interfaceAliases = Get-NetAdapter -Name $InterfaceAlias
-    foreach ($alias in $interfaceAliases.InterfaceAlias)
+    foreach ($alias in $interfaceAliases.Name)
     {
         $currentAddress = (Get-DnsClientServerAddress `
             -InterfaceAlias $alias `

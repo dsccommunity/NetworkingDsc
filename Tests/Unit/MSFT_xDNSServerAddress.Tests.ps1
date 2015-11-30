@@ -325,7 +325,7 @@ InModuleScope MSFT_xDNSServerAddress {
         # Test IPv4 
 
         #region Mocks
-        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+        Mock Get-NetAdapter -MockWith { [PSCustomObject]@{ Name = 'Ethernet' } }
         Mock Get-DnsClientServerAddress -MockWith {
 
             [PSCustomObject]@{
