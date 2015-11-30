@@ -10,10 +10,10 @@ data LocalizedData
 GettingDNSServerAddressesMessage=Getting the DNS Server Addresses.
 ApplyingDNSServerAddressesMessage=Applying the DNS Server Addresses.
 DNSServersSetCorrectlyMessage=DNS Servers are set correctly.
-DNSServersAlreadySetMessage=DNS Servers are already set correctly.
+DNSServersAlreadySetMessage=DNS Servers are already set correctly for Interface Alias : "{0}".
 CheckingDNSServerAddressesMessage=Checking the DNS Server Addresses.
 DNSServersNotCorrectMessage=DNS Servers are not correct. Expected "{0}", actual "{1}".
-DNSServersHaveBeenSetCorrectlyMessage=DNS Servers were set to the desired state.
+DNSServersHaveBeenSetCorrectlyMessage=DNS Servers were set to the desired state for Interface Alias : "{0}".
 InterfaceNotAvailableError=Interface "{0}" is not available. Please select a valid interface and try again.
 AddressFormatError=Address "{0}" is not in the correct format. Please correct the Address parameter in the configuration and try again.
 AddressIPv4MismatchError=Address "{0}" is in IPv4 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
@@ -48,15 +48,14 @@ function Get-TargetResource
         $($LocalizedData.GettingDNSServerAddressesMessage)
         ) -join '')
 
+    $dnsClientServerAddresses = Get-NetAdapter -Name $InterfaceAlias | ForEach-Object { Get-DnsClientServerAddress -InterfaceAlias $_  -AddressFamily $AddressFamily }
     $returnValue = @{
-        Address = (Get-DnsClientServerAddress `
-            -InterfaceAlias $InterfaceAlias `
-            -AddressFamily $AddressFamily).ServerAddresses
+        Address = $dnsClientServerAddresses.ServerAddresses
         AddressFamily = $AddressFamily
         InterfaceAlias = $InterfaceAlias
     }
 
-    $returnValue
+    return $returnValue
 }
 
 ######################################################################################
@@ -88,38 +87,43 @@ function Set-TargetResource
         ) -join '')
 
     #Get the current DNS Server Addresses based on the parameters given.
-    $PSBoundParameters.Remove('Address')
-    $PSBoundParameters.Remove('Validate')
-    $currentAddress = (Get-DnsClientServerAddress @PSBoundParameters `
-        -ErrorAction Stop).ServerAddresses
-
-    #Check if the Server addresses are the same as the desired addresses.
-    [Boolean] $addressDifferent = (@(Compare-Object `
-            -ReferenceObject $currentAddress `
-            -DifferenceObject $Address `
-            -SyncWindow 0).Length -gt 0)
-
-    if ($addressDifferent)
+    # Interface Alias may return multiple when passed WildCard (*)
+    $interfaceAliases = Get-NetAdapter -Name $InterfaceAlias
+    foreach ($alias in $interfaceAliases.InterfaceAlias)
     {
-        # Set the DNS settings as well
-        $Splat = @{
-            InterfaceAlias = $InterfaceAlias
-            Address = $Address
-            Validate = $Validate
-        }
-        Set-DnsClientServerAddress @Splat `
-            -ErrorAction Stop
+        $currentAddress = (Get-DnsClientServerAddress `
+                -InterfaceAlias $alias `
+                -AddressFamily $AddressFamily `
+                -ErrorAction Stop).ServerAddresses
 
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DNSServersHaveBeenSetCorrectlyMessage)
-            ) -join '' )
-    }
-    else 
-    { 
-        #Test will return true in this case
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DNSServersAlreadySetMessage)
-            ) -join '' )
+        #Check if the Server addresses are the same as the desired addresses.
+        [Boolean] $addressDifferent = (@(Compare-Object `
+                -ReferenceObject $currentAddress `
+                -DifferenceObject $Address `
+                -SyncWindow 0).Length -gt 0)
+
+        if ($addressDifferent)
+        {
+            # Set the DNS settings as well
+            $Splat = @{
+                InterfaceAlias = $alias
+                Address = $Address
+                Validate = $Validate
+            }
+            Set-DnsClientServerAddress @Splat `
+                -ErrorAction Stop
+
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                $($LocalizedData.DNSServersHaveBeenSetCorrectlyMessage -f $alias)
+                ) -join '' )
+        }
+        else 
+        { 
+            #Test will return true in this case
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                $($LocalizedData.DNSServersAlreadySetMessage -f $alias)
+                ) -join '' )
+        }
     }
 }
 
@@ -147,7 +151,7 @@ function Test-TargetResource
         [Boolean]$Validate = $false        
     )
     # Flag to signal whether settings are correct
-    [Boolean] $desiredConfigurationMatch = $true
+    $desiredConfigurationMatch = New-Object System.Collections.Generic.List[Boolean];
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
         $($LocalizedData.CheckingDNSServerAddressesMessage)
@@ -161,34 +165,41 @@ function Test-TargetResource
             -InterfaceAlias $InterfaceAlias
     }
 
-    #Get the current DNS Server Addresses based on the parameters given.
-    $currentAddress = (Get-DnsClientServerAddress `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily `
-        -ErrorAction Stop).ServerAddresses
-
-    #Check if the Server addresses are the same as the desired addresses.
-    [Boolean] $addressDifferent = (@(Compare-Object `
-            -ReferenceObject $currentAddress `
-            -DifferenceObject $Address `
-            -SyncWindow 0).Length -gt 0)
-
-    if ($addressDifferent)
+    # Get the current DNS Server Addresses based on the parameters given.
+    # Interface Alias may return multiple when passed WildCard (*)
+    $interfaceAliases = Get-NetAdapter -Name $InterfaceAlias
+    foreach ($alias in $interfaceAliases.InterfaceAlias)
     {
-        $desiredConfigurationMatch = $false
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DNSServersNotCorrectMessage) `
-                -f ($Address -join ','),($currentAddress -join ',')
-            ) -join '' )
+        $currentAddress = (Get-DnsClientServerAddress `
+            -InterfaceAlias $alias `
+            -AddressFamily $AddressFamily `
+            -ErrorAction Stop).ServerAddresses
+
+        # Check if the Server addresses are the same as the desired addresses.
+        [Boolean] $addressDifferent = (@(Compare-Object `
+                -ReferenceObject $currentAddress `
+                -DifferenceObject $Address `
+                -SyncWindow 0).Length -gt 0)
+
+        if ($addressDifferent)
+        {
+            $desiredConfigurationMatch.Add($false)
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                $($LocalizedData.DNSServersNotCorrectMessage) `
+                    -f ($Address -join ','),($currentAddress -join ',')
+                ) -join '' )
+        }
+        else 
+        {
+            $desiredConfigurationMatch.Add($true)
+            # Test will return true in this case
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                $($LocalizedData.DNSServersSetCorrectlyMessage)
+                ) -join '' )
+        }
     }
-    else 
-    { 
-        #Test will return true in this case
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DNSServersSetCorrectlyMessage)
-            ) -join '' )
-    }
-    return $desiredConfigurationMatch
+
+    return !($desiredConfigurationMatch -contains $false)
 }
 
 #######################################################################################
