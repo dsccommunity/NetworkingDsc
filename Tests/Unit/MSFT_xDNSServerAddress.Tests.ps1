@@ -67,6 +67,32 @@ InModuleScope MSFT_xDNSServerAddress {
             }
         }
 
+        # Test Wildcard IPv4
+
+        #region Mocks
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = '192.168.0.1'
+                InterfaceAlias = 'Ether*'
+                AddressFamily = 'IPv4'
+            }
+        }
+        #endregion
+
+        Context 'invoking with Wildcard InterfaceAlias and an IPv4 address' {
+            It 'should return true' {
+
+                $Splat = @{
+                    Address = '192.168.0.1'
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv4'
+                }
+                $Result = Get-TargetResource @Splat
+                $Result.IPAddress | Should Be $Splat.IPAddress
+            }
+        }
+
         # Test IPv6 
 
         #region Mocks
@@ -86,6 +112,32 @@ InModuleScope MSFT_xDNSServerAddress {
                 $Splat = @{
                     Address = 'fe80:ab04:30F5:002b::1'
                     InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                $Result = Get-TargetResource @Splat
+                $Result.IPAddress | Should Be $Splat.IPAddress
+            }
+        }
+
+        # Test Wildcard IPv6 
+
+        #region Mocks
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = 'fe80:ab04:30F5:002b::1'
+                InterfaceAlias = 'Ether*'
+                AddressFamily = 'IPv6'
+            }
+        }
+        #endregion
+
+        Context 'invoking with Wildcard InterfaceAlias and an IPv6 address' {
+            It 'should return true' {
+
+                $Splat = @{
+                    Address = 'fe80:ab04:30F5:002b::1'
+                    InterfaceAlias = 'Ethe*'
                     AddressFamily = 'IPv6'
                 }
                 $Result = Get-TargetResource @Splat
@@ -208,6 +260,121 @@ InModuleScope MSFT_xDNSServerAddress {
             }
         }
 
+
+        # Test Wildcard IPv4
+
+        #region Mocks
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @('192.168.0.1')
+                InterfaceAlias = 'Ether*'
+                AddressFamily = 'IPv4'
+            }
+        }
+        Mock Set-DnsClientServerAddress -ParameterFilter { $Validate -eq $true }
+        Mock Set-DnsClientServerAddress -ParameterFilter { $Validate -eq $false }
+        #endregion
+
+        Context 'invoking with Wildcard InterfaceAlias && single IPv4 Server Address that is the same as current' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('192.168.0.1')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv4'
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
+            }
+        }
+        Context 'invoking with Wildcard InterfaceAlias && single IPv4 Server Address that is different to current' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('192.168.0.2')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv4'
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly $exactly -ParameterFilter { $Validate -eq $false }
+            }
+        }
+        Context 'invoking with Wildcard InterfaceAlias && single IPv4 Server Address that is different to current and validate true' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('192.168.0.2')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv4'
+                    Validate = $True
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly $exactly -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
+            }
+        }        
+        Context 'invoking with Wildcard InterfaceAlias && multiple IPv4 Server Addresses that are different to current' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('192.168.0.2','192.168.0.3')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv4'
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly $exactly -ParameterFilter { $Validate -eq $false }
+            }
+        }
+
+        #region Mocks
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @()
+                InterfaceAlias = 'Ethernet'
+                AddressFamily = 'IPv4'
+            }
+        }
+        #endregion
+
+        Context 'invoking with Wildcard InterfaceAlias && multiple IPv4 Server Addresses When there are no address assiged' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('192.168.0.2','192.168.0.3')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv4'
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly $exactly -ParameterFilter { $Validate -eq $false }
+            }
+        }
+
         # Test IPv6 
 
         #region Mocks
@@ -316,6 +483,120 @@ InModuleScope MSFT_xDNSServerAddress {
                 Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
             }
         }
+
+        # Test Wildcard IPv6 
+
+        #region Mocks
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @('fe80:ab04:30F5:002b::1')
+                InterfaceAlias = 'Ether*'
+                AddressFamily = 'IPv6'
+            }
+        }
+        Mock Set-DnsClientServerAddress -ParameterFilter { $Validate -eq $true }
+        Mock Set-DnsClientServerAddress -ParameterFilter { $Validate -eq $false }
+        #endregion
+
+        Context 'invoking with Wildcard InterfaceAlias && single IPv6 Server Address that is the same as current' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::1')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv6'
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
+            }
+        }
+        Context 'invoking with Wildcard InterfaceAlias && single IPv6 Server Address that is different to current' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::2')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv6'
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly $exactly -ParameterFilter { $Validate -eq $false }
+            }
+        }
+        Context 'invoking with Wildcard InterfaceAlias && single IPv6 Server Address that is different to current and validate true' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::2')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv6'
+                    Validate = $True
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly $exactly -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
+            }
+        }
+        Context 'invoking with Wildcard InterfaceAlias && multiple IPv6 Server Addresses that are different to current' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv6'
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly $exactly -ParameterFilter { $Validate -eq $false }
+            }
+        }
+
+        #region Mocks
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @()
+                InterfaceAlias = 'Ether*'
+                AddressFamily = 'IPv6'
+            }
+        }
+        #endregion
+
+        Context 'invoking with Wildcard InterfaceAlias && multiple IPv6 Server Addresses When there are no address assiged' {
+            It 'should not throw an exception' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::1')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv6'
+                }
+                { Set-TargetResource @Splat } | Should Not Throw
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly $exactly -ParameterFilter { $Validate -eq $false }
+            }
+        }
     }
 
     #######################################################################################
@@ -406,6 +687,94 @@ InModuleScope MSFT_xDNSServerAddress {
             }
         }
 
+        # Test Wildcard IPv4 
+
+        #region Mocks
+        Mock Get-NetAdapter -MockWith { [PSCustomObject]@{ Name = 'Ether*' } }
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @('192.168.0.1')
+                InterfaceAlias = 'Ether*'
+                AddressFamily = 'IPv4'
+            }
+        }
+        #endregion
+
+        Context 'invoking with Wildcard InterfaceAlias && single IPv4 Server Address that is the same as current' {
+            It 'should return true' {
+
+                $Splat = @{
+                    Address = @('192.168.0.1')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv4'
+                }
+                Test-TargetResource @Splat | Should Be $True
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+            }
+        }
+        Context 'invoking with Wildcard InterfaceAlias && single IPv4 Server Address that is different to current' {
+            It 'should return false' {
+
+                $Splat = @{
+                    Address = @('192.168.0.2')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv4'
+                }
+                Test-TargetResource @Splat | Should Be $False
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+            }
+        }
+        Context 'invoking with Wildcard InterfaceAlias && multiple IPv4 Server Addresses that are different to current' {
+            It 'should return false' {
+
+                $Splat = @{
+                    Address = @('192.168.0.2','192.168.0.3')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv4'
+                }
+                Test-TargetResource @Splat | Should Be $False
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+            }
+        }
+
+        #region Mocks
+        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ether*' } }
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @()
+                InterfaceAlias = 'Ether*'
+                AddressFamily = 'IPv4'
+            }
+        }
+        #endregion
+
+        Context 'invoking with Wildcard InterfaceAlias && multiple IPv4 Server Addresses that are no addresses assigned' {
+            It 'should return false' {
+
+                $Splat = @{
+                    Address = @('192.168.0.2','192.168.0.3')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv4'
+                }
+                Test-TargetResource @Splat | Should Be $False
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+            }
+        }
+
         # Test IPv6 
 
         #region Mocks
@@ -490,6 +859,93 @@ InModuleScope MSFT_xDNSServerAddress {
             }
         }
 
+        # Test Wildcard IPv6 
+
+        #region Mocks
+        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ether*' } }
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @('fe80:ab04:30F5:002b::1')
+                InterfaceAlias = 'Ether*'
+                AddressFamily = 'IPv6'
+            }
+        }
+        #endregion
+
+        Context 'invoking with single IPv6 Server Address that is the same as current' {
+            It 'should return true' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::1')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv6'
+                }
+                Test-TargetResource @Splat | Should Be $True
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+            }
+        }
+        Context 'invoking with single IPv6 Server Address that is different to current' {
+            It 'should return false' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::2')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv6'
+                }
+                Test-TargetResource @Splat | Should Be $False
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+            }
+        }
+        Context 'invoking with multiple IPv6 Server Addresses that are different to current' {
+            It 'should return false' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv6'
+                }
+                Test-TargetResource @Splat | Should Be $False
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+            }
+        }
+
+        #region Mocks
+        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ether*' } }
+        Mock Get-DnsClientServerAddress -MockWith {
+
+            [PSCustomObject]@{
+                ServerAddresses = @()
+                InterfaceAlias = 'Ether*'
+                AddressFamily = 'IPv6'
+            }
+        }
+        #endregion
+
+        Context 'invoking with multiple IPv6 Server Addresses that are no addresses assigned' {
+            It 'should return false' {
+
+                $Splat = @{
+                    Address = @('fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2')
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv6'
+                }
+                Test-TargetResource @Splat | Should Be $False
+            }
+            It 'should call all the mocks' {
+                $exactly = (Get-NetAdapter -Name 'Ether*' | Measure-Object).Count
+                Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly $exactly
+            }
+        }
     }
 
     #######################################################################################
@@ -596,6 +1052,114 @@ InModuleScope MSFT_xDNSServerAddress {
                 $Splat = @{
                     Address = 'fe80:ab04:30F5:002b::1'
                     InterfaceAlias = 'Ethernet'
+                    AddressFamily = 'IPv6'
+                }
+                { Test-ResourceProperty @Splat } | Should Not Throw
+            }
+        }
+
+        # Wildcard Interface Alias cases
+
+        Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ether*' } }
+
+        Context 'invoking with bad Wildcard interface alias' {
+
+            It 'should throw an InterfaceNotAvailable error' {
+                $Splat = @{
+                    Address = '192.168.0.1'
+                    InterfaceAlias = 'NotReal*'
+                    AddressFamily = 'IPv4'
+                }
+                $errorId = 'InterfaceNotAvailable'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
+                $errorMessage = $($LocalizedData.InterfaceNotAvailableError) -f $Splat.InterfaceAlias
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+            }
+        }
+
+        Context 'invoking with invalid IP Address with Wildcard interface alias' {
+
+            It 'should throw an AddressFormatError error' {
+                $Splat = @{
+                    Address = 'NotReal'
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv4'
+                }
+                $errorId = 'AddressFormatError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                $errorMessage = $($LocalizedData.AddressFormatError) -f $Splat.Address
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+            }
+        }
+
+        Context 'invoking with IPv4 Address and family mismatch with Wildcard interface alias' {
+
+            It 'should throw an AddressMismatchError error' {
+                $Splat = @{
+                    Address = '192.168.0.1'
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv6'
+                }
+                $errorId = 'AddressMismatchError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f $Splat.Address,$Splat.AddressFamily
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+            }
+        }
+
+        Context 'invoking with IPv6 Address and family mismatch with Wildcard interface alias' {
+
+            It 'should throw an AddressMismatchError error' {
+                $Splat = @{
+                    Address = 'fe80::'
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv4'
+                }
+                $errorId = 'AddressMismatchError'
+                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f $Splat.Address,$Splat.AddressFamily
+                $exception = New-Object -TypeName System.InvalidOperationException `
+                    -ArgumentList $errorMessage
+                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                    -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+            }
+        }
+
+        Context 'invoking with valid IPv4 Addresses with Wildcard interface alias' {
+
+            It 'should not throw an error' {
+                $Splat = @{
+                    Address = '192.168.0.1'
+                    InterfaceAlias = 'Ether*'
+                    AddressFamily = 'IPv4'
+                }
+                { Test-ResourceProperty @Splat } | Should Not Throw
+            }
+        }
+
+        Context 'invoking with valid IPv6 Addresses with Wildcard interface alias' {
+
+            It 'should not throw an error' {
+                $Splat = @{
+                    Address = 'fe80:ab04:30F5:002b::1'
+                    InterfaceAlias = 'Ether*'
                     AddressFamily = 'IPv6'
                 }
                 { Test-ResourceProperty @Splat } | Should Not Throw
