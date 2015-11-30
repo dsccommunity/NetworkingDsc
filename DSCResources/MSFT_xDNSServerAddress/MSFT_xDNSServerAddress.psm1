@@ -212,7 +212,9 @@ function Test-ResourceProperty
         [String]$AddressFamily = 'IPv4'
     )
 
-    if ( -not (Get-NetAdapter | Where-Object -Property Name -Like $InterfaceAlias )) # -Like means support wildcard for InterfaceAlias. InterfaceAlias doesn't need to be exact name, as uniqueness is proved with Get-DnsClientServerAddress. 
+    # -Like means support wildcard for InterfaceAlias.
+    #InterfaceAlias doesn't need to be exact name, as uniqueness, singularity, is proved with Get-DnsClientServerAddress. 
+    if ( -not (Get-NetAdapter | Where-Object -Property Name -Like $InterfaceAlias))
     {
         $errorId = 'InterfaceNotAvailable'
         $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
