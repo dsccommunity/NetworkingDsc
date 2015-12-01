@@ -1,7 +1,8 @@
-#######################################################################################
-#  xDNSServerAddress : DSC Resource that will set/test/get the current DNS Server
-#  Address, by accepting values among those given in xDNSServerAddress.schema.mof
-#######################################################################################
+# xDNSServerAddress
+# DSC Resource that will set/test/get the current DNS Server Address,
+# by accepting values among those given in xDNSServerAddress.schema.mof
+
+#region LocalizedData
 
 data LocalizedData
 {
@@ -21,14 +22,21 @@ AddressIPv6MismatchError=Address "{0}" is in IPv6 format, which does not match s
 '@
 }
 
-######################################################################################
-# The Get-TargetResource cmdlet.
-# This function will get the present list of DNS ServerAddress DSC Resource
-# schema variables on the system
-######################################################################################
+#endregion
+
+#region Get-TargetResource function
+
 function Get-TargetResource
 {
+<#
+.SYNOPSIS 
+Get current Node configuration.
+
+.DESCRIPTION
+Get the present list of DNS ServerAddress DSC Resource schema variables on the system
+#>
     [OutputType([System.Collections.Hashtable])]
+    [CmdletBinding()]
     param
     (        
         [Parameter(Mandatory)]
@@ -58,24 +66,33 @@ function Get-TargetResource
     return $returnValue
 }
 
-######################################################################################
-# The Set-TargetResource cmdlet.
-# This function will set a new Server Address in the current node
-######################################################################################
+#endregion
+
+#region Set-TargetResource function
+
 function Set-TargetResource
 {
+<#
+.SYNOPSIS 
+Set Node configuration to desired state.
+
+.DESCRIPTION
+Set a new Server Address in the current node
+#>
+    [OutputType([Void])]
+    [CmdletBinding()]
     param
     (    
-        #IP Address that has to be set    
-        [Parameter(Mandatory)]
+        # IP Address that has to be set    
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String[]]$Address,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
         [String]$AddressFamily,
         
@@ -86,7 +103,7 @@ function Set-TargetResource
         $($LocalizedData.ApplyingDNSServerAddressesMessage)
         ) -join '')
 
-    #Get the current DNS Server Addresses based on the parameters given.
+    # Get the current DNS Server Addresses based on the parameters given.
     # Interface Alias may return multiple when passed WildCard (*)
     $interfaceAliases = Get-NetAdapter -Name $InterfaceAlias
     foreach ($alias in $interfaceAliases.InterfaceAlias)
@@ -96,7 +113,7 @@ function Set-TargetResource
                 -AddressFamily $AddressFamily `
                 -ErrorAction Stop).ServerAddresses
 
-        #Check if the Server addresses are the same as the desired addresses.
+        # Check if the Server addresses are the same as the desired addresses.
         [Boolean] $addressDifferent = (@(Compare-Object `
                 -ReferenceObject $currentAddress `
                 -DifferenceObject $Address `
@@ -119,7 +136,7 @@ function Set-TargetResource
         }
         else 
         { 
-            #Test will return true in this case
+            # Test will return true in this case
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                 $($LocalizedData.DNSServersAlreadySetMessage -f $alias)
                 ) -join '' )
@@ -127,24 +144,32 @@ function Set-TargetResource
     }
 }
 
-######################################################################################
-# The Test-TargetResource cmdlet.
-# This will test if the given Server Address is among the current node's Server Address collection
-######################################################################################
+#endregion
+
+#region Test-TargetResource function
+
 function Test-TargetResource
 {
+<#
+.SYNOPSIS 
+Test Node configuration is in desired state or not.
+
+.DESCRIPTION
+Test if the given Server Address is among the current node's Server Address collection.
+#>
     [OutputType([System.Boolean])]
+    [CmdletBinding()]
     param
     (        
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String[]]$Address,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
         [String]$AddressFamily,
         
@@ -157,7 +182,7 @@ function Test-TargetResource
         $($LocalizedData.CheckingDNSServerAddressesMessage)
         ) -join '' )
 
-    #Validate the Settings passed
+    # Validate the Settings passed
     Foreach ($ServerAddress in $Address) {       
         Test-ResourceProperty `
             -Address $ServerAddress `
@@ -183,6 +208,7 @@ function Test-TargetResource
 
         if ($addressDifferent)
         {
+            # Not return at once. To show user which interface is which status.
             $desiredConfigurationMatch.Add($false)
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                 $($LocalizedData.DNSServersNotCorrectMessage) `
@@ -202,20 +228,22 @@ function Test-TargetResource
     return !($desiredConfigurationMatch -contains $false)
 }
 
-#######################################################################################
-#  Helper functions
-#######################################################################################
+#endregion
+
+#region Helper functions
+
 function Test-ResourceProperty
 {
     # Function will check the Address details are valid and do not conflict with
     # Address family. Ensures interface exists.
     # If any problems are detected an exception will be thrown.
+    [OutputType([Void])]
     [CmdletBinding()]
     param
     (
         [String]$Address,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
@@ -224,7 +252,7 @@ function Test-ResourceProperty
     )
 
     # -Like means support wildcard for InterfaceAlias.
-    #InterfaceAlias doesn't need to be exact name, as uniqueness, singularity, is proved with Get-DnsClientServerAddress. 
+    # InterfaceAlias doesn't need to be exact name.
     if ( -not (Get-NetAdapter | Where-Object -Property Name -Like $InterfaceAlias))
     {
         $errorId = 'InterfaceNotAvailable'
@@ -279,8 +307,9 @@ function Test-ResourceProperty
 
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
-} # Test-ResourceProperty
-#######################################################################################
+}
 
-#  FUNCTIONS TO BE EXPORTED 
+#endregion
+
+# Functions to be exported
 Export-ModuleMember -function Get-TargetResource, Set-TargetResource, Test-TargetResource
