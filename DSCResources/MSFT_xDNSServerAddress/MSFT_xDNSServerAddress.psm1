@@ -55,8 +55,11 @@ Get the present list of DNS ServerAddress DSC Resource schema variables on the s
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
         $($LocalizedData.GettingDNSServerAddressesMessage)
         ) -join '')
+    
+    # obtain all the interface addresses
+    $dnsClientServerAddresses = Get-NetAdapter -Name $InterfaceAlias `
+    | ForEach-Object { Get-DnsClientServerAddress -InterfaceAlias $_  -AddressFamily $AddressFamily }
 
-    $dnsClientServerAddresses = Get-NetAdapter -Name $InterfaceAlias | ForEach-Object { Get-DnsClientServerAddress -InterfaceAlias $_  -AddressFamily $AddressFamily }
     $returnValue = @{
         Address = $dnsClientServerAddresses.ServerAddresses
         AddressFamily = $AddressFamily
