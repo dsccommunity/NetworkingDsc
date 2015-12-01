@@ -425,13 +425,6 @@ InModuleScope MSFT_xDNSServerAddress {
         #endregion
 
         Context 'invoking with Wildcard InterfaceAlias && multiple IPv4 Server Addresses When there are no address assiged' {
-            # Mock should capsul inside script block scope
-            Mock Get-NetAdapter {
-                return @(
-                    [PSCustomObject]@{ Name = 'Ethernet 1'; InterfaceAlias = 'Ethernet 1' },
-                    [PSCustomObject]@{ Name = 'Ethernet 2'; InterfaceAlias = 'Ethernet 2' }
-                )
-            }
 
             It 'should not throw an exception' {
 
