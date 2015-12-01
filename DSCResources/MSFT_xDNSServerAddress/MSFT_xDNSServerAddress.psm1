@@ -79,7 +79,6 @@ Set Node configuration to desired state.
 .DESCRIPTION
 Set a new Server Address in the current node
 #>
-    [OutputType([Void])]
     [CmdletBinding()]
     param
     (    
