@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+﻿[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
 
 # xNetworking
 
@@ -97,6 +97,8 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased Version
+
+### 2.5.0.0
 * Added the following resources:
     * MSFT_xDNSConnectionSuffix resource to manage connection-specific DNS suffixes.
     * MSFT_xNetConnectionProfile resource to manage Connection Profiles for interfaces.
@@ -120,7 +122,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
     * RemoteAddress
     * RemoteMachine
     * RemoteUser
- * MSFT_xFirewall: Profile parameter now handled as an Array.
+* MSFT_xFirewall: Profile parameter now handled as an Array.
 
 ### 2.4.0.0
 * Added following resources:
