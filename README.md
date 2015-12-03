@@ -15,6 +15,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **xDnsServerAddress** sets a node's DNS server.
 * **xDnsConnectionSuffix** sets a node's network interface connection-specific DNS suffix.
 * **xDefaultGatewayAddress** sets a node's default gateway address.
+* **xNetConnectionProfile** sets a node's connection profile.
 
 ### xIPAddress
 
@@ -46,12 +47,12 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ### xFirewall
 
-* **Name**: Name of the firewall rule
+* **Name**: Name of the firewall rule.
 * **DisplayName**: Localized, user-facing name of the firewall rule being created.
 * **Group**: Name of the firewall group where we want to put the firewall rule.
 * **Ensure**: Ensure that the firewall rule is Present or Absent.
 * **Enabled**: Enable or Disable the supplied configuration.
-* **Action**: Permit or Block the supplied configuration
+* **Action**: Permit or Block the supplied configuration.
 * **Profile**: Specifies one or more profiles to which the rule is assigned.
 * **Direction**: Direction of the connection.
 * **RemotePort**: Specific port used for filter. Specified by port number, range, or keyword.
@@ -60,6 +61,24 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Description**: Documentation for the rule.
 * **Program**: Path and filename of the program for which the rule is applied.
 * **Service**: Specifies the short name of a Windows service to which the firewall rule applies.
+* **Authentication**: Specifies that authentication is required on firewall rules: { NotRequired | Required | NoEncap }
+* **Encryption**: Specifies that encryption in authentication is required on firewall rules: { NotRequired | Required | Dynamic }
+* **InterfaceAlias**: Specifies the alias of the interface that applies to the traffic. 
+* **InterfaceType**: Specifies that only network connections made through the indicated interface types are subject to the requirements of this rule: { Any | Wired | Wireless | RemoteAccess }
+* **LocalAddress**: Specifies that network packets with matching IP addresses match this rule. This parameter value is the first end point of an IPsec rule and specifies the computers that are subject to the requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet, range, or the following keyword: Any. 
+* **LocalUser**: Specifies the principals to which network traffic this firewall rule applies. The principals, represented by security identifiers (SIDs) in the security descriptor definition language (SDDL) string, are services, users, application containers, or any SID to which network traffic is associated.
+* **Package**: Specifies the Windows Store application to which the firewall rule applies. This parameter is specified as a security identifier (SID). 
+* **Platform**: Specifies which version of Windows the associated rule applies.
+* **RemoteAddress**: Specifies that network packets with matching IP addresses match this rule. This parameter value is the second end point of an IPsec rule and specifies the computers that are subject to the requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet, range, or the following keyword: Any
+* **RemoteMachine**: Specifies that matching IPsec rules of the indicated computer accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a computer identified in the list of computer accounts (SID) match this rule. This parameter value is specified as an SDDL string. 
+* **RemoteUser**: Specifies that matching IPsec rules of the indicated user accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a user identified in the list of user accounts match this rule. This parameter value is specified as an SDDL string. 
+
+### xNetConnectionProfile
+* **InterfaceAlias**: Specifies the alias for the Interface that is being changed.
+* **NetworkCategory**: Sets the NetworkCategory for the interface - per [the documentation ](https://technet.microsoft.com/en-us/%5Clibrary/jj899565(v=wps.630).aspx) this can only be set to { Public | Private }
+* **IPv4Connectivity**: Specifies the IPv4 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
+* **IPv6Connectivity**: Specifies the IPv6 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
+
 
 ## Known Invalid Configurations
 
@@ -78,19 +97,36 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased Version
+
+### 2.5.0.0
+* Added the following resources:
+    * MSFT_xDNSConnectionSuffix resource to manage connection-specific DNS suffixes.
+    * MSFT_xNetConnectionProfile resource to manage Connection Profiles for interfaces.
 * MSFT_xDNSServerAddress: Corrected Verbose logging messages when multiple DNS adddressed specified.
 * MSFT_xDNSServerAddress: Change to ensure resource terminates if DNS Server validation fails.
 * MSFT_xDNSServerAddress: Added Validate parameter to enable DNS server validation when changing server addresses.
 * MSFT_xFirewall: ApplicationPath Parameter renamed to Program for consistency with Cmdlets.
 * MSFT_xFirewall: Fix to prevent error when DisplayName parameter is set on an existing rule.
-* Added xDnsConnectionSuffix resource to manage connection-specific DNS suffixes.
 * MSFT_xFirewall: Setting a different DisplayName parameter on an existing rule now correctly reports as needs change.
 * MSFT_xFirewall: Changed DisplayGroup parameter to Group for consistency with Cmdlets and reduce confusion.
 * MSFT_xFirewall: Changing the Group of an existing Firewall rule will recreate the Firewall rule rather than change it.
+* MSFT_xFirewall: New parameters added:
+    * Authentication
+    * Encryption
+    * InterfaceAlias
+    * InterfaceType
+    * LocalAddress
+    * LocalUser
+    * Package
+    * Platform
+    * RemoteAddress
+    * RemoteMachine
+    * RemoteUser
+* MSFT_xFirewall: Profile parameter now handled as an Array.
 
 ### 2.4.0.0
 * Added following resources:
-   * MSFT_xDefaultGatewayAddress
+    * MSFT_xDefaultGatewayAddress
 * MSFT_xFirewall: Removed code using DisplayGroup to lookup Firewall Rule because it was redundant.
 * MSFT_xFirewall: Set-TargetResource now updates firewall rules instead of recreating them.
 * MSFT_xFirewall: Added message localization support.
@@ -338,7 +374,7 @@ Configuration Add_FirewallRule
         xFirewall Firewall
         {
             Name                  = "MyAppFirewallRule"
-            ApplicationPath       = "c:\windows\system32\MyApp.exe"
+            Program               = "c:\windows\system32\MyApp.exe"
         }
     }
 }
@@ -403,7 +439,7 @@ Configuration Disable_AccessToApplication
             Ensure                = "Present"
             Action                = 'Blocked'
             Description           = "Firewall Rule for Notepad.exe"
-            ApplicationPath       = "c:\windows\system32\notepad.exe"
+            Program               = "c:\windows\system32\notepad.exe"
         }
     }
 }
@@ -414,7 +450,9 @@ Configuration Disable_AccessToApplication
 This example will disable notepad.exe's outbound access.
 
 ```powershell
-Configuration Sample_xFirewall
+# DSC configuration for Firewall
+
+configuration Sample_xFirewall_AddFirewallRule
 {
     param
     (
@@ -432,21 +470,20 @@ Configuration Sample_xFirewall
             Group                 = "NotePad Firewall Rule Group"
             Ensure                = "Present"
             Enabled               = "True"
-            Action                = 'Allow'
             Profile               = ("Domain", "Private")
             Direction             = "OutBound"
             RemotePort            = ("8080", "8081")
             LocalPort             = ("9080", "9081")
             Protocol              = "TCP"
             Description           = "Firewall Rule for Notepad.exe"
-            ApplicationPath       = "c:\windows\system32\notepad.exe"
-            Service               =  "WinRM"
+            Program               = "c:\windows\system32\notepad.exe"
+            Service               = "WinRM"
         }
     }
  }
 
-Sample_xFirewall
-Start-DscConfiguration -Path Sample_xFirewall -Wait -Verbose -Force
+Sample_xFirewall_AddFirewallRule
+Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule -Wait -Verbose -Force
 ```
 
 ### Enable a built-in Firewall Rule
@@ -473,3 +510,68 @@ configuration Sample_xFirewall_EnableBuiltInFirewallRule
     }
  }
 ```
+
+### Create a Firewall Rule using all available Parameters
+
+This example will create a firewall rule using all available xFirewall resource parameters. This rule is not meaningful and would not be used like this in reality. It is used to show the expected formats of the different parameters.
+```powershell
+configuration Sample_xFirewall_AddFirewallRule_AllParameters
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xFirewall Firewall
+        {
+            Name                  = "NotePadFirewallRule"
+            DisplayName           = "Firewall Rule for Notepad.exe"
+            Group                 = "NotePad Firewall Rule Group"
+            Ensure                = "Present"
+            Enabled               = "True"
+            Profile               = ("Domain", "Private")
+            Direction             = "OutBound"
+            RemotePort            = ("8080", "8081")
+            LocalPort             = ("9080", "9081")
+            Protocol              = "TCP"
+            Description           = "Firewall Rule for Notepad.exe"
+            Program               = "c:\windows\system32\notepad.exe"
+            Service               = "WinRM"
+            Authentication        = "Required"
+            Encryption            = "Required"
+            InterfaceAlias        = "Ethernet"
+            InterfaceType         = "Wired"
+            LocalAddress          = @("192.168.2.0-192.168.2.128","192.168.1.0/255.255.255.0")
+            LocalUser             = "O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)"
+            Package               = "S-1-15-2-3676279713-3632409675-756843784-3388909659-2454753834-4233625902-1413163418"
+            Platform              = "6.1"
+            RemoteAddress         = @("192.168.2.0-192.168.2.128","192.168.1.0/255.255.255.0")
+            RemoteMachine         = "O:LSD:(D;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1621)(A;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1620)"
+            RemoteUser            = "O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)"
+        }
+    }
+ }
+
+Sample_xFirewall_AddFirewallRule_AllParameters
+Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule_AllParameters -Wait -Verbose -Force
+```
+
+### Set the NetConnectionProfile to Public
+
+````powershell
+configuration MSFT_xNetConnectionProfile_Config {
+    Import-DscResource -ModuleName xNetworking
+    node localhost {
+        xNetConnectionProfile Integration_Test {
+            InterfaceAlias   = 'Wi-Fi'
+            NetworkCategory  = 'Public'
+            IPv4Connectivity = 'Internet'
+            IPv6Connectivity = 'Disconncted'
+        }
+    }
+}
+````

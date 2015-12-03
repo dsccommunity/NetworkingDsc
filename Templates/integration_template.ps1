@@ -1,10 +1,31 @@
-# Template for Integration Testing
+<#
+.Synopsis
+   Template for creating Integration Tests
+.DESCRIPTION
+   To Use:
+     1. Copy to \Tests\Integration\ folder and rename MSFT_x<ResourceName>.Integration.tests.ps1
+     2. Customize TODO sections.
+
+.NOTES
+   Code in HEADER, FOOTER and DEFAULT TEST regions are standard and may be moved into
+   DSCResource.Tools in Future and therefore should not be altered if possible.
+#>
+
+# TODO: Customize these paramters...
+$DSCModuleName      = 'xNetworking'
+$DSCResourceName    = 'MSFT_x<ResourceName>'
+$RelativeModulePath = "$DSCModuleName.psd1"
+# /TODO
+
+#region HEADER
+# Temp Working Folder - always gets remove on completion
+$WorkingFolder = Join-Path -Path $env:Temp -ChildPath $DSCResourceName
 
 # Copy to Program Files for WMF 4.0 Compatability as it can only find resources in a few known places.
-$DSCModuleName = 'xNetworking'
-$DSCResourceName = 'x<ResourceName>'
 $moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
 
+# If this module already exists in the Modules folder, make a copy of it in
+# the temporary folder so that it isn't accidentally used in this test.
 if(-not (Test-Path -Path $moduleRoot))
 {
     $null = New-Item -Path $moduleRoot -ItemType Directory
@@ -19,16 +40,27 @@ else
     $null = New-Item -Path $moduleRoot -ItemType Directory
 }
 
+
+# Copy the module to be tested into the Module Root
 Copy-Item -Path $PSScriptRoot\..\..\* -Destination $moduleRoot -Recurse -Force -Exclude '.git'
 
+# Import the Module
+$Splat = @{
+    Path = $moduleRoot
+    ChildPath = $RelativeModulePath
+    Resolve = $true
+    ErrorAction = 'Stop'
+}
+$DSCModuleFile = Get-Item -Path (Join-Path @Splat)
+
 # Remove all copies of the module from memory so an old one is not used.
-if (Get-Module -Name $DSCModuleName -All)
+if (Get-Module -Name $DSCModuleFile.BaseName -All)
 {
-    Get-Module -Name $DSCModuleName -All | Remove-Module
+    Get-Module -Name $DSCModuleFile.BaseName -All | Remove-Module
 }
 
 # Import the Module to test.
-Import-Module -Name $(Get-Item -Path (Join-Path $moduleRoot -ChildPath "$DSCModuleName.psd1")) -Force
+Import-Module -Name $DSCModuleFile.FullName -Force
 
 <#
   This is to fix a problem in AppVoyer where we have multiple copies of the resource
@@ -41,50 +73,74 @@ if (($env:PSModulePath).Split(';') -ccontains $pwd.Path)
     $env:PSModulePath = ($env:PSModulePath -split ';' | Where-Object {$_ -ne $pwd.path}) -join ';'
 }
 
+# Preserve and set the execution policy so that the DSC MOF can be created
+$executionPolicy = Get-ExecutionPolicy
+if ($executionPolicy -ne 'Unrestricted')
+{
+    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
+    $rollbackExecution = $true
+}
+#endregion
+
+# TODO: Other Init Code Goes Here...
+
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
+
+
+    #region Integration Tests
     <#
       This file exists so we can load the test file without necessarily having xNetworking in
       the $env:PSModulePath. Otherwise PowerShell will throw an error when reading the Pester File.
     #>
-    $fileName = "$DSCResourceName.ps1"
-    . $PSScriptRoot\$fileName
-    Describe "$DSCResourceName_Integration" {
+    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$DSCResourceName.config.ps1"
+    . $ConfigFile
+
+    Describe "$($DSCResourceName)_Integration" {
+        #region DEFAULT TESTS
         It 'Should compile without throwing' {
             {
                 [System.Environment]::SetEnvironmentVariable('PSModulePath',
                     $env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
-                $DSCResourceName -OutputPath $env:Temp\$DSCResourceName
-                Start-DscConfiguration -Path $env:Temp\$DSCResourceName -ComputerName localhost -Wait -Verbose -Force
+                Invoke-Expression -Command "$($DSCResourceName)_Config -OutputPath `$WorkingFolder"
+                Start-DscConfiguration -Path (Join-Path -Path $env:Temp -ChildPath $DSCResourceName) `
+                    -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw
         }
 
         It 'should be able to call Get-DscConfiguration without throwing' {
-            {Get-DscConfiguration} | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
+        #endregion
 
-        It 'Should have set the firewall and all the parameters should match' {
-            # Vaidate the config was set correctly
+        It 'Should have set the resource and all the parameters should match' {
+            # TODO: Validate the Config was Set Correctly Here...
         }
-
     }
+    #endregion
+
+
 }
 finally
 {
+    #region FOOTER
     # Set PSModulePath back to previous settings
     $env:PSModulePath = $script:tempPath;
 
-    # Cleanup DSC Configuration
-    # ie: Remove-NetFirewallRule -Name 'b8df0af9-d0cc-4080-885b-6ed263aaed67'
-
-    # Remove the DSC Config File
-    if (Test-Path -Path $env:Temp\$DSCResourceName)
+    # Restore the Execution Policy
+    if ($rollbackExecution)
     {
-        Remove-Item -Path $env:Temp\$DSCResourceName -Recurse -Force
+        Set-ExecutionPolicy -ExecutionPolicy $executionPolicy -Force
     }
 
-    # Clean up Program Files after the test completes.
+    # Cleanup Working Folder
+    if (Test-Path -Path $WorkingFolder)
+    {
+        Remove-Item -Path $WorkingFolder -Recurse -Force
+    }
+
+    # Clean up after the test completes.
     Remove-Item -Path $moduleRoot -Recurse -Force
 
     # Restore previous versions, if it exists.
@@ -94,4 +150,7 @@ finally
         Copy-Item -Path $tempLocation -Destination "${env:ProgramFiles}\WindowsPowerShell\Modules" -Recurse -Force
         Remove-Item -Path $tempLocation -Recurse -Force
     }
+    #endregion
+
+    # TODO: Other Cleanup Code Goes Here...
 }
