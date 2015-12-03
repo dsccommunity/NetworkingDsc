@@ -32,8 +32,7 @@ try
                 [System.Environment]::SetEnvironmentVariable('PSModulePath',
                     $env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
                 Invoke-Expression -Command "$($DSCResourceName)_Config -OutputPath `$TestEnvironment.WorkingFolder"
-                Start-DscConfiguration -Path (Join-Path -Path $env:Temp -ChildPath $DSCResourceName) `
-                    -ComputerName localhost -Wait -Verbose -Force
+                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw
         }
 
