@@ -17,22 +17,13 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-
-
     #region Integration Tests
-    <#
-      This file exists so we can load the test file without necessarily having xNetworking in
-      the $env:PSModulePath. Otherwise PowerShell will throw an error when reading the Pester File.
-    #>
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$DSCResourceName.config.ps1"
-    . $ConfigFile
-    
     Describe "$($DSCResourceName)_Integration" {
         #region DEFAULT TESTS
         It 'Should compile without throwing' {
             {
-                [System.Environment]::SetEnvironmentVariable('PSModulePath',
-                    $env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
+                $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$DSCResourceName.config.ps1"
+                . $ConfigFile
                 Invoke-Expression -Command "$($DSCResourceName)_Config -OutputPath `$TestEnvironment.WorkingFolder"
                 Start-DscConfiguration -Path $TestEnvironment.WorkingFolder -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw
@@ -63,18 +54,17 @@ try
                 $ParameterSource = (Invoke-Expression -Command "`$($($parameters.source))")
                 $ParameterNew = (Invoke-Expression -Command "`$rule.$($parameters.name)")
                 $ParameterSource | Should Be $ParameterNew
-            }
+            }           
         }
+
+        # Cleanup the Rule
+        Remove-NetFirewallRule -Name $rule.Name
     }
     #endregion
-
-
 }
 finally
 {
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
-    
-    Remove-NetFirewallRule -Name $rule.Name
 }

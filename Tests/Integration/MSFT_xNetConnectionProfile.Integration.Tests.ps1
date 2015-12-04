@@ -18,19 +18,12 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     #region Integration Tests
-    <#
-      This file exists so we can load the test file without necessarily having xNetworking in
-      the $env:PSModulePath. Otherwise PowerShell will throw an error when reading the Pester File.
-    #>
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$DSCResourceName.config.ps1"
-    . $ConfigFile
-
     Describe "$($DSCResourceName)_Integration" {
         #region DEFAULT TESTS
         It 'Should compile without throwing' {
             {
-                [System.Environment]::SetEnvironmentVariable('PSModulePath',
-                    $env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
+                $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$DSCResourceName.config.ps1"
+                . $ConfigFile -Verbose -ErrorAction Stop
                 Invoke-Expression -Command "$($DSCResourceName)_Config -OutputPath `$TestEnvironment.WorkingFolder"
                 Start-DscConfiguration -Path $TestEnvironment.WorkingFolder -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw

@@ -1,4 +1,4 @@
-$rule = Get-NetConnectionProfile
+$rule = Get-NetConnectionProfile | Select-Object -First 1
 
 configuration MSFT_xNetConnectionProfile_Config {
     Import-DscResource -ModuleName xNetworking
