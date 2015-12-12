@@ -128,7 +128,10 @@ finally
 {
     #region FOOTER
     # Set PSModulePath back to previous settings
-    $env:PSModulePath = $script:tempPath;
+    if ($script:tempPath)
+    {
+        $env:PSModulePath = $script:tempPath
+    }
 
     # Restore the Execution Policy
     if ($rollbackExecution)
