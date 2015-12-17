@@ -36,11 +36,10 @@ try
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq 'MSFT_xNetconnectionProfile_Config'}
+            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($DSCResourceName)_Config"}
             $rule.InterfaceAlias   | Should Be $current.InterfaceAlias
-            $rule.NetworkCategory  | Should Be $current.NetworkCategory
-            $rule.IPv4Connectivity | Should Be $current.IPv4Connectivity
-            $rule.IPv6Connectivity | Should Be $current.IPv6Connectivity
+            $rule.Address          | Should Be $current.Address
+            $rule.AddressFamily    | Should Be $current.AddressFamily
         }
     }
     #endregion
