@@ -23,6 +23,13 @@ if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
 {
     & git @('clone','https://github.com/PowerShell/DscResource.Tests.git')
 }
+else
+{
+    Push-Location
+    Set-Location -Path '.\DSCResource.Tests\'
+    & git @('pull')
+    Pop-Location
+}
 Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
