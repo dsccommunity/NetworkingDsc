@@ -22,7 +22,7 @@ try
 
     InModuleScope $DSCResourceName {
             
-        Describe "$DSCResourceName\Get-TargetResource" {
+        Describe "MSFT_xNetConnectionProfile\Get-TargetResource" {
             Mock Get-NetConnectionProfile {
                 return @{
                     InterfaceAlias   = 'InterfaceAlias'
@@ -42,7 +42,7 @@ try
             }
         }
     
-        Describe "$DSCResourceName\Test-TargetResource" {
+        Describe "MSFT_xNetConnectionProfile\Test-TargetResource" {
             $Splat = @{
                 InterfaceAlias   = 'Test'
                 NetworkCategory  = 'Private'
@@ -87,7 +87,7 @@ try
             }
         }
     
-        Describe "$DSCResourceName\Set-TargetResource" {
+        Describe "MSFT_xNetConnectionProfile\Set-TargetResource" {
             It 'Should do call all the mocks' {
                 $Splat = @{
                     InterfaceAlias   = 'Test'

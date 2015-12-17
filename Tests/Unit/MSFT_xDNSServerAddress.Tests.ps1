@@ -22,7 +22,7 @@ try
 
     InModuleScope $DSCResourceName {
 
-        Describe "$DSCResourceName\Get-TargetResource" {
+        Describe "MSFT_xDNSServerAddress\Get-TargetResource" {
     
             # Test IPv4
     
@@ -77,7 +77,7 @@ try
             }
         }
     
-        Describe "$DSCResourceName\Set-TargetResource" {
+        Describe "MSFT_xDNSServerAddress\Set-TargetResource" {
     
             # Test IPv4
     
@@ -298,7 +298,7 @@ try
             }
         }
     
-        Describe "$DSCResourceName\Test-TargetResource" {
+        Describe "MSFT_xDNSServerAddress\Test-TargetResource" {
     
             # Test IPv4 
     
@@ -470,7 +470,7 @@ try
     
         }
     
-        Describe "$DSCResourceName\Test-ResourceProperty" {
+        Describe "MSFT_xDNSServerAddress\Test-ResourceProperty" {
     
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
     

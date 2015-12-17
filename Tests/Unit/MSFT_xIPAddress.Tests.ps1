@@ -22,7 +22,7 @@ try
 
     InModuleScope $DSCResourceName {
 
-        Describe "$DSCResourceName\Get-TargetResource" {
+        Describe "MSFT_xIPAddress\Get-TargetResource" {
     
             #region Mocks
             Mock Get-NetIPAddress -MockWith {
@@ -63,7 +63,7 @@ try
             }
         }
     
-        Describe "$DSCResourceName\Set-TargetResource" {
+        Describe "MSFT_xIPAddress\Set-TargetResource" {
     
             #region Mocks
             Mock Get-NetIPAddress -MockWith {
@@ -115,7 +115,7 @@ try
             }
         }
     
-        Describe "$DSCResourceName\Test-TargetResource" {
+        Describe "MSFT_xIPAddress\Test-TargetResource" {
     
     
             #region Mocks
@@ -264,7 +264,7 @@ try
             }
         }
     
-        Describe "$DSCResourceName\Test-ResourceProperty" {
+        Describe "MSFT_xIPAddress\Test-ResourceProperty" {
     
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
     

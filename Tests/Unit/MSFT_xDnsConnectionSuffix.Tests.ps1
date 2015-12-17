@@ -43,7 +43,7 @@ try
         $fakeDnsSuffixAbsent['ConnectionSpecificSuffix'] = '';
 
 
-       Describe "$DSCResourceName\Get-TargetResource" {
+       Describe "MSFT_xDnsConnectionSuffix\Get-TargetResource" {
             Context 'Validates "Get-TargetResource" method' {
                 It 'Returns a "System.Collections.Hashtable" object type' {
                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent; }
@@ -96,7 +96,7 @@ try
             } #end Context 'Validates "Get-TargetResource" method'
         }
 
-        Describe "$DSCResourceName\Test-TargetResource" {
+        Describe "MSFT_xDnsConnectionSuffix\Test-TargetResource" {
             Context 'Validates "Test-TargetResource" method' {
     
                 It 'Passes when all properties match and "Ensure" = "Present"' {
@@ -166,7 +166,7 @@ try
             } #end Context 'Validates "Test-TargetResource" method'
         }
         
-        Describe "$DSCResourceName\Test-TargetResource" {
+        Describe "MSFT_xDnsConnectionSuffix\Test-TargetResource" {
             Context 'Validates "Set-TargetResource" method' {
                 It 'Calls "Set-DnsClient" with specified DNS suffix when "Ensure" = "Present"' {
                     Mock Set-DnsClient -ParameterFilter { $InterfaceAlias -eq $testInterfaceAlias -and $ConnectionSpecificSuffix -eq $testDnsSuffix } { }

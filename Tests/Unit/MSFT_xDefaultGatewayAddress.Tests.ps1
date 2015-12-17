@@ -22,7 +22,7 @@ try
 
     InModuleScope $DSCResourceName {
 
-        Describe "$DSCResourceName\Get-TargetResource" {
+        Describe "MSFT_xDefaultGatewayAddress\Get-TargetResource" {
     
             #region Mocks
             Mock Get-NetRoute -MockWith {
@@ -65,7 +65,7 @@ try
             }
         }
     
-        Describe "$DSCResourceName\Set-TargetResource" {
+        Describe "MSFT_xDefaultGatewayAddress\Set-TargetResource" {
     
             #region Mocks
             Mock Get-NetRoute -MockWith {
@@ -119,7 +119,7 @@ try
             }
         }
     
-        Describe "$DSCResourceName\Test-TargetResource" {
+        Describe "MSFT_xDefaultGatewayAddress\Test-TargetResource" {
     
             #region Mocks
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
@@ -186,7 +186,7 @@ try
             }
         }
     
-        Describe "$DSCResourceName\Test-ResourceProperty" {
+        Describe "MSFT_xDefaultGatewayAddress\Test-ResourceProperty" {
     
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
     
