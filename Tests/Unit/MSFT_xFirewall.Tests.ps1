@@ -1,5 +1,5 @@
-$DSCModuleName      = 'xNetworking'
-$DSCResourceName    = 'MSFT_xFirewall'
+$Global:DSCModuleName      = 'xNetworking'
+$Global:DSCResourceName    = 'MSFT_xFirewall'
 
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
@@ -9,8 +9,8 @@ if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
 }
 Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $DSCModuleName `
-    -DSCResourceName $DSCResourceName `
+    -DSCModuleName $Global:DSCModuleName `
+    -DSCResourceName $Global:DSCResourceName `
     -TestType Unit 
 #endregion
 
@@ -20,7 +20,7 @@ try
 
     #region Pester Tests
 
-    InModuleScope $DSCResourceName {
+    InModuleScope $Global:DSCResourceName {
 
         #region Pester Test Initialization
         # Get the rule that will be used for testing
@@ -38,7 +38,7 @@ try
         #endregion
 
         #region Function Get-TargetResource
-        Describe "MSFT_xFirewall\Get-TargetResource" {
+        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
             Context 'Absent should return correctly' {
                 Mock Get-NetFirewallRule
 
@@ -67,7 +67,7 @@ try
 
 
         #region Function Test-TargetResource
-        Describe "MSFT_xFirewall\Test-TargetResource" {
+        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
             Context 'Ensure is Absent and the Firewall is not Present' {
                 Mock Get-FirewallRule
 
@@ -112,7 +112,7 @@ try
 
 
         #region Function Set-TargetResource
-        Describe "MSFT_xFirewall\Set-TargetResource" {
+        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
             # To speed up all these tests create Mocks so that these functions are not repeatedly called
             Mock Get-FirewallRule -MockWith { $FirewallRule }
             Mock Get-FirewallRuleProperty -MockWith { $Properties }
@@ -805,7 +805,7 @@ try
 
 
         #region Function Get-FirewallRule
-        Describe "MSFT_xFirewall\Get-FirewallRule" {
+        Describe "$($Global:DSCResourceName)\Get-FirewallRule" {
             Context 'testing with firewall that exists' {
                 It "should return a firewall rule when name is passed on firewall rule $($FirewallRule.Name)" {
                     $Result = Get-FirewallRule -Name $FirewallRule.Name
@@ -838,7 +838,7 @@ try
 
 
         #region Function Get-FirewallRuleProperty
-        Describe "MSFT_xFirewall\Get-FirewallRuleProperty" {
+        Describe "$($Global:DSCResourceName)\Get-FirewallRuleProperty" {
             Context 'All Properties' {
                 $result = Get-FirewallRuleProperty -FirewallRule $FirewallRule
                 It "Should return the right address filter on firewall rule $($FirewallRule.Name)" {

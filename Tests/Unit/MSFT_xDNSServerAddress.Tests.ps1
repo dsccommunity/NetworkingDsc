@@ -1,5 +1,5 @@
-$DSCModuleName      = 'xNetworking'
-$DSCResourceName    = 'MSFT_xDNSServerAddress'
+$Global:DSCModuleName      = 'xNetworking'
+$Global:DSCResourceName    = 'MSFT_xDNSServerAddress'
 
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
@@ -9,8 +9,8 @@ if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
 }
 Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $DSCModuleName `
-    -DSCResourceName $DSCResourceName `
+    -DSCModuleName $Global:DSCModuleName `
+    -DSCResourceName $Global:DSCResourceName `
     -TestType Unit 
 #endregion
 
@@ -20,9 +20,9 @@ try
 
     #region Pester Tests
 
-    InModuleScope $DSCResourceName {
+    InModuleScope $Global:DSCResourceName {
 
-        Describe "MSFT_xDNSServerAddress\Get-TargetResource" {
+        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
     
             # Test IPv4
     
@@ -77,7 +77,7 @@ try
             }
         }
     
-        Describe "MSFT_xDNSServerAddress\Set-TargetResource" {
+        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
     
             # Test IPv4
     
@@ -298,7 +298,7 @@ try
             }
         }
     
-        Describe "MSFT_xDNSServerAddress\Test-TargetResource" {
+        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
     
             # Test IPv4 
     
@@ -470,7 +470,7 @@ try
     
         }
     
-        Describe "MSFT_xDNSServerAddress\Test-ResourceProperty" {
+        Describe "$($Global:DSCResourceName)\Test-ResourceProperty" {
     
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
     

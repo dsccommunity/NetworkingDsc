@@ -1,5 +1,5 @@
-$DSCModuleName      = 'xNetworking'
-$DSCResourceName    = 'MSFT_xNetConnectionProfile'
+$Global:DSCModuleName      = 'xNetworking'
+$Global:DSCResourceName    = 'MSFT_xNetConnectionProfile'
 
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
@@ -9,8 +9,8 @@ if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
 }
 Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $DSCModuleName `
-    -DSCResourceName $DSCResourceName `
+    -DSCModuleName $Global:DSCModuleName `
+    -DSCResourceName $Global:DSCResourceName `
     -TestType Unit 
 #endregion
 
@@ -20,9 +20,9 @@ try
 
     #region Pester Tests
 
-    InModuleScope $DSCResourceName {
+    InModuleScope $Global:DSCResourceName {
             
-        Describe "MSFT_xNetConnectionProfile\Get-TargetResource" {
+        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
             Mock Get-NetConnectionProfile {
                 return @{
                     InterfaceAlias   = 'InterfaceAlias'
@@ -42,7 +42,7 @@ try
             }
         }
     
-        Describe "MSFT_xNetConnectionProfile\Test-TargetResource" {
+        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
             $Splat = @{
                 InterfaceAlias   = 'Test'
                 NetworkCategory  = 'Private'
@@ -87,7 +87,7 @@ try
             }
         }
     
-        Describe "MSFT_xNetConnectionProfile\Set-TargetResource" {
+        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
             It 'Should do call all the mocks' {
                 $Splat = @{
                     InterfaceAlias   = 'Test'

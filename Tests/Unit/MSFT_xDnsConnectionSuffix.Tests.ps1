@@ -1,5 +1,5 @@
-$DSCModuleName      = 'xNetworking'
-$DSCResourceName    = 'MSFT_xDnsConnectionSuffix'
+$Global:DSCModuleName      = 'xNetworking'
+$Global:DSCResourceName    = 'MSFT_xDnsConnectionSuffix'
 
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
@@ -9,8 +9,8 @@ if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
 }
 Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $DSCModuleName `
-    -DSCResourceName $DSCResourceName `
+    -DSCModuleName $Global:DSCModuleName `
+    -DSCResourceName $Global:DSCResourceName `
     -TestType Unit 
 #endregion
 
@@ -20,7 +20,7 @@ try
 
     #region Pester Tests
 
-    InModuleScope $DSCResourceName {
+    InModuleScope $Global:DSCResourceName {
 
         $testDnsSuffix = 'example.local';
         $testInterfaceAlias = 'Ethernet';
@@ -43,7 +43,7 @@ try
         $fakeDnsSuffixAbsent['ConnectionSpecificSuffix'] = '';
 
 
-       Describe "MSFT_xDnsConnectionSuffix\Get-TargetResource" {
+       Describe "$($Global:DSCResourceName)\Get-TargetResource" {
             Context 'Validates "Get-TargetResource" method' {
                 It 'Returns a "System.Collections.Hashtable" object type' {
                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent; }
@@ -96,7 +96,7 @@ try
             } #end Context 'Validates "Get-TargetResource" method'
         }
 
-        Describe "MSFT_xDnsConnectionSuffix\Test-TargetResource" {
+        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
             Context 'Validates "Test-TargetResource" method' {
     
                 It 'Passes when all properties match and "Ensure" = "Present"' {
@@ -166,7 +166,7 @@ try
             } #end Context 'Validates "Test-TargetResource" method'
         }
         
-        Describe "MSFT_xDnsConnectionSuffix\Test-TargetResource" {
+        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
             Context 'Validates "Set-TargetResource" method' {
                 It 'Calls "Set-DnsClient" with specified DNS suffix when "Ensure" = "Present"' {
                     Mock Set-DnsClient -ParameterFilter { $InterfaceAlias -eq $testInterfaceAlias -and $ConnectionSpecificSuffix -eq $testDnsSuffix } { }

@@ -13,8 +13,8 @@
 
 
 # TODO: Customize these parameters...
-$DSCModuleName      = 'x<ModuleName>' # Example xNetworking
-$DSCResourceName    = 'MSFT_x<ResourceName>' # Example MSFT_xFirewall
+$Global:DSCModuleName      = 'x<ModuleName>' # Example xNetworking
+$Global:DSCResourceName    = 'MSFT_x<ResourceName>' # Example MSFT_xFirewall
 # /TODO
 
 #region HEADER
@@ -25,8 +25,8 @@ if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
 }
 Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $DSCModuleName `
-    -DSCResourceName $DSCResourceName `
+    -DSCModuleName $Global:DSCModuleName `
+    -DSCResourceName $Global:DSCResourceName `
     -TestType Unit 
 #endregion
 
@@ -40,7 +40,7 @@ try
 
     # The InModuleScope command allows you to perform white-box unit testing on the internal
     # (non-exported) code of a Script Module.
-    InModuleScope $DSCResourceName {
+    InModuleScope $Global:DSCResourceName {
 
         #region Pester Test Initialization
         # TODO: Optopnal Load Mock for use in Pester tests here...
@@ -48,21 +48,21 @@ try
 
 
         #region Function Get-TargetResource
-        Describe 'Get-TargetResource' {
+        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
             # TODO: Complete Tests...
         }
         #endregion
 
 
         #region Function Test-TargetResource
-        Describe 'Test-TargetResource' {
+        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
             # TODO: Complete Tests...
         }
         #endregion
 
 
         #region Function Set-TargetResource
-        Describe 'Set-TargetResource' {
+        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
             # TODO: Complete Tests...
         }
         #endregion
