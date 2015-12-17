@@ -7,6 +7,10 @@ if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
 {
     & git @('clone','https://github.com/PowerShell/DscResource.Tests.git')
 }
+else
+{
+    & git @('-C',(Join-Path -Path (Get-Location) -ChildPath '\DSCResource.Tests\'),'pull')
+}
 Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `

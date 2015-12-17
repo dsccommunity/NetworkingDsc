@@ -25,10 +25,7 @@ if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
 }
 else
 {
-    Push-Location
-    Set-Location -Path '.\DSCResource.Tests\'
-    & git @('pull')
-    Pop-Location
+    & git @('-C',(Join-Path -Path (Get-Location) -ChildPath '\DSCResource.Tests\'),'pull')
 }
 Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
