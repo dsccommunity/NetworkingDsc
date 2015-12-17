@@ -1,5 +1,5 @@
-$DSCResourceName = 'MSFT_xNetConnectionProfile'
-$DSCModuleName   = 'xNetworking'
+$DSCModuleName      = 'xNetworking'
+$DSCResourceName    = 'MSFT_xNetConnectionProfile'
 
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
@@ -22,7 +22,7 @@ try
 
     InModuleScope $DSCResourceName {
             
-        Describe 'Get-TargetResource - MSFT_xNetConnectionProfile' {
+        Describe "$DSCResourceName\Get-TargetResource" {
             Mock Get-NetConnectionProfile {
                 return @{
                     InterfaceAlias   = 'InterfaceAlias'
@@ -42,7 +42,7 @@ try
             }
         }
     
-        Describe 'Test-TargetResource - MSFT_xNetConnectionProfile' {
+        Describe "$DSCResourceName\Test-TargetResource" {
             $Splat = @{
                 InterfaceAlias   = 'Test'
                 NetworkCategory  = 'Private'
@@ -87,7 +87,7 @@ try
             }
         }
     
-        Describe 'Set-TargetResource - MSFT_xNetConnectionProfile' {
+        Describe "$DSCResourceName\Set-TargetResource" {
             It 'Should do call all the mocks' {
                 $Splat = @{
                     InterfaceAlias   = 'Test'

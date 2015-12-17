@@ -97,6 +97,9 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased Version
+* MSFT_*: Unit and Integration tests updated to use DSCResource.Tests\TestHelper.psm1 code.
+* MSFT_*: Resource Name added to all unit test Desribes.
+ 
 
 ### 2.5.0.0
 * Added the following resources:

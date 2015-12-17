@@ -1,5 +1,5 @@
-﻿$DSCResourceName = 'MSFT_xIPAddress'
-$DSCModuleName   = 'xNetworking'
+﻿$DSCModuleName      = 'xNetworking'
+$DSCResourceName    = 'MSFT_xIPAddress'
 
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
@@ -22,7 +22,7 @@ try
 
     InModuleScope $DSCResourceName {
 
-        Describe 'Get-TargetResource' {
+        Describe "$DSCResourceName\Get-TargetResource" {
     
             #region Mocks
             Mock Get-NetIPAddress -MockWith {
@@ -63,7 +63,7 @@ try
             }
         }
     
-        Describe 'Set-TargetResource' {
+        Describe "$DSCResourceName\Set-TargetResource" {
     
             #region Mocks
             Mock Get-NetIPAddress -MockWith {
@@ -115,7 +115,7 @@ try
             }
         }
     
-        Describe 'Test-TargetResource' {
+        Describe "$DSCResourceName\Test-TargetResource" {
     
     
             #region Mocks
@@ -264,7 +264,7 @@ try
             }
         }
     
-        Describe 'Test-ResourceProperty' {
+        Describe "$DSCResourceName\Test-ResourceProperty" {
     
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
     

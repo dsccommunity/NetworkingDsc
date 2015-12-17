@@ -1,5 +1,5 @@
-$DSCResourceName = 'MSFT_xDefaultGatewayAddress'
-$DSCModuleName   = 'xNetworking'
+$DSCModuleName      = 'xNetworking'
+$DSCResourceName    = 'MSFT_xDefaultGatewayAddress'
 
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
@@ -22,7 +22,7 @@ try
 
     InModuleScope $DSCResourceName {
 
-        Describe 'Get-TargetResource' {
+        Describe "$DSCResourceName\Get-TargetResource" {
     
             #region Mocks
             Mock Get-NetRoute -MockWith {
@@ -65,7 +65,7 @@ try
             }
         }
     
-        Describe 'Set-TargetResource' {
+        Describe "$DSCResourceName\Set-TargetResource" {
     
             #region Mocks
             Mock Get-NetRoute -MockWith {
@@ -119,7 +119,7 @@ try
             }
         }
     
-        Describe 'Test-TargetResource' {
+        Describe "$DSCResourceName\Test-TargetResource" {
     
             #region Mocks
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
@@ -186,7 +186,7 @@ try
             }
         }
     
-        Describe 'Test-ResourceProperty' {
+        Describe "$DSCResourceName\Test-ResourceProperty" {
     
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
     
