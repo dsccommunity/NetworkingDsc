@@ -1,10 +1,5 @@
-<#
-.Synopsis
-   MSFT_xFirewall Integration Tests
-#>
-
 $DSCModuleName      = 'xNetworking'
-$DSCResourceName    = 'MSFT_xFirewall'
+$DSCResourceName    = 'MSFT_xNetConnectionProfile'
 $RelativeModulePath = "$DSCModuleName.psd1"
 
 #region HEADER
@@ -75,8 +70,6 @@ if ($executionPolicy -ne 'Unrestricted')
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-
-
     #region Integration Tests
     <#
       This file exists so we can load the test file without necessarily having xNetworking in
@@ -84,7 +77,7 @@ try
     #>
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$DSCResourceName.config.ps1"
     . $ConfigFile
-    
+
     Describe "$($DSCResourceName)_Integration" {
         #region DEFAULT TESTS
         It 'Should compile without throwing' {
@@ -103,31 +96,14 @@ try
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            # Get the Rule details
-            $firewallRule = Get-NetFireWallRule -Name $rule.Name
-            $Properties = @{
-                AddressFilters       = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
-                ApplicationFilters   = @(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $FirewallRule)
-                InterfaceFilters     = @(Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $FirewallRule)
-                InterfaceTypeFilters = @(Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $FirewallRule)
-                PortFilters          = @(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $FirewallRule)
-                Profile              = @(Get-NetFirewallProfile -AssociatedNetFirewallRule $FirewallRule)
-                SecurityFilters      = @(Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $FirewallRule)
-                ServiceFilters       = @(Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule)
-            }
-
-            # Use the Parameters List to perform these tests
-            foreach ($parameters in $ParameterList)
-            {
-                $ParameterSource = (Invoke-Expression -Command "`$($($parameters.source))")
-                $ParameterNew = (Invoke-Expression -Command "`$rule.$($parameters.name)")
-                $ParameterSource | Should Be $ParameterNew
-            }
+            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq 'MSFT_xNetconnectionProfile_Config'}
+            $rule.InterfaceAlias   | Should Be $current.InterfaceAlias
+            $rule.NetworkCategory  | Should Be $current.NetworkCategory
+            $rule.IPv4Connectivity | Should Be $current.IPv4Connectivity
+            $rule.IPv6Connectivity | Should Be $current.IPv6Connectivity
         }
     }
     #endregion
-
-
 }
 finally
 {
@@ -139,7 +115,7 @@ finally
     if ($rollbackExecution)
     {
         Set-ExecutionPolicy -ExecutionPolicy $executionPolicy -Force
-    }   
+    }
 
     # Cleanup Working Folder
     if (Test-Path -Path $WorkingFolder)
@@ -159,5 +135,5 @@ finally
     }
     #endregion
 
-    Remove-NetFirewallRule -Name $rule.Name
+    # TODO: Other Cleanup Code Goes Here...
 }

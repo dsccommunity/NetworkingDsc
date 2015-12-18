@@ -1,11 +1,23 @@
 <#
 .Synopsis
-   MSFT_xFirewall Integration Tests
+   Template for creating Unit Tests
+.DESCRIPTION
+   To Use:
+     1. Copy to \Tests\Integration\ folder and rename MSFT_x<ResourceName>.tests.ps1
+     2. Customize TODO sections.
+     3. Create MSFT_x<ResourceName>.config.ps1 to be used as test DSC Configurtion file.
+
+.NOTES
+   Code in HEADER and FOOTER regions are standard and may be moved into DSCResource.Tools in
+   Future and therefore should not be altered if possible.
 #>
 
+
+# TODO: Customize these paramters...
 $DSCModuleName      = 'xNetworking'
-$DSCResourceName    = 'MSFT_xFirewall'
-$RelativeModulePath = "$DSCModuleName.psd1"
+$DSCResourceName    = 'MSFT_x<ResourceName>'
+$RelativeModulePath = "DSCResources\$DSCResourceName\$DSCResourceName.psm1"
+# /TODO
 
 #region HEADER
 # Temp Working Folder - always gets remove on completion
@@ -72,68 +84,54 @@ if ($executionPolicy -ne 'Unrestricted')
 }
 #endregion
 
-# Using try/finally to always cleanup even if something awful happens.
+# TODO: Other Optional Init Code Goes Here...
+
+# Begin Testing
 try
 {
 
+    #region Pester Tests
 
-    #region Integration Tests
-    <#
-      This file exists so we can load the test file without necessarily having xNetworking in
-      the $env:PSModulePath. Otherwise PowerShell will throw an error when reading the Pester File.
-    #>
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$DSCResourceName.config.ps1"
-    . $ConfigFile
-    
-    Describe "$($DSCResourceName)_Integration" {
-        #region DEFAULT TESTS
-        It 'Should compile without throwing' {
-            {
-                [System.Environment]::SetEnvironmentVariable('PSModulePath',
-                    $env:PSModulePath,[System.EnvironmentVariableTarget]::Machine)
-                Invoke-Expression -Command "$($DSCResourceName)_Config -OutputPath `$WorkingFolder"
-                Start-DscConfiguration -Path (Join-Path -Path $env:Temp -ChildPath $DSCResourceName) `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
-        }
+    InModuleScope $DSCResourceName {
 
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+        #region Pester Test Initialization
+        # TODO: Optopnal Load Mock for use in Pester tests here...
+        #endregion
+
+
+        #region Function Get-TargetResource
+        Describe 'Get-TargetResource' {
+            # TODO: Complete Tests...
         }
         #endregion
 
-        It 'Should have set the resource and all the parameters should match' {
-            # Get the Rule details
-            $firewallRule = Get-NetFireWallRule -Name $rule.Name
-            $Properties = @{
-                AddressFilters       = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
-                ApplicationFilters   = @(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $FirewallRule)
-                InterfaceFilters     = @(Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $FirewallRule)
-                InterfaceTypeFilters = @(Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $FirewallRule)
-                PortFilters          = @(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $FirewallRule)
-                Profile              = @(Get-NetFirewallProfile -AssociatedNetFirewallRule $FirewallRule)
-                SecurityFilters      = @(Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $FirewallRule)
-                ServiceFilters       = @(Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule)
-            }
 
-            # Use the Parameters List to perform these tests
-            foreach ($parameters in $ParameterList)
-            {
-                $ParameterSource = (Invoke-Expression -Command "`$($($parameters.source))")
-                $ParameterNew = (Invoke-Expression -Command "`$rule.$($parameters.name)")
-                $ParameterSource | Should Be $ParameterNew
-            }
+        #region Function Test-TargetResource
+        Describe 'Test-TargetResource' {
+            # TODO: Complete Tests...
         }
+        #endregion
+
+
+        #region Function Set-TargetResource
+        Describe 'Set-TargetResource' {
+            # TODO: Complete Tests...
+        }
+        #endregion
+
+        # TODO: Pester Tests for any Helper Cmdlets
+
     }
     #endregion
-
-
 }
 finally
 {
     #region FOOTER
     # Set PSModulePath back to previous settings
-    $env:PSModulePath = $script:tempPath;
+    if ($script:tempPath)
+    {
+        $env:PSModulePath = $script:tempPath
+    }
 
     # Restore the Execution Policy
     if ($rollbackExecution)
@@ -159,5 +157,5 @@ finally
     }
     #endregion
 
-    Remove-NetFirewallRule -Name $rule.Name
+    # TODO: Other Optional Cleanup Code Goes Here...
 }
