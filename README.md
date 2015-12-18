@@ -97,6 +97,11 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased Version
+* MSFT_*: Unit and Integration tests updated to use DSCResource.Tests\TestHelper.psm1 functions.
+* MSFT_*: Resource Name added to all unit test Desribes.
+* Templates update to use DSCResource.Tests\TestHelper.psm1 functions. 
+* MSFT_xNetConnectionProfile: Integration tests fixed when more than one connection profile present.
+* Changed AppVeyor.yml to use WMF 5 build environment.
 
 ### 2.5.0.0
 * Added the following resources:

@@ -1,18 +1,21 @@
 <#
-  This file exists so we can load the test file without necessarily having xNetworking in
-  the $env:PSModulePath. Otherwise PowerShell will throw an error when reading the Pester File
+.Synopsis
+   DSC Configuration Template for DSC Resource Integration tests.
+.DESCRIPTION
+   To Use:
+     1. Copy to \Tests\Integration\ folder and rename MSFT_<ResourceName>.config.ps1 (e.g. MSFT_xFirewall.config.ps1)
+     2. Customize TODO sections.
+
+.NOTES
 #>
 
-$rule = @{
-    # TODO: Populate $rule with config data.
-}
 
 # TODO: Modify ResourceName
-configuration 'MSFT_<xResourceName>' {
-    Import-DscResource -ModuleName xNetworking
+configuration 'MSFT_<ResourceName>_config' {
+    Import-DscResource -Name 'MSFT_<ResourceName>'
     node localhost {
        # TODO: Modify ResourceName
-       '<xResourceName>' Integration_Test {
+       '<ResourceName>' Integration_Test {
             # TODO: Fill Configuration Code Here
        }
     }
