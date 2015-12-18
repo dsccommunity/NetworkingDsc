@@ -1,7 +1,7 @@
 #---------------------------------#
 #      environment configuration  #
 #---------------------------------#
-os: Unstable
+os: WMF 5.0
 version: 2.5.{build}.0
 install:
   - cinst -y pester --version 3.3.13
