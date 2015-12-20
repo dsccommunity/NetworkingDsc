@@ -245,7 +245,7 @@ try
                 }
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
+                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 0
                 }
             }
             
@@ -263,7 +263,7 @@ try
                 }
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
+                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 0
                 }
             }
         }
