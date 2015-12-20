@@ -230,21 +230,27 @@ function Test-TargetResource
         }
     }
 
-    # Test if DHCP is already disabled
-    if (-not (Get-NetIPInterface `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily).Dhcp.ToString().Equals('Disabled'))
+    # If DHCP is still enabled on IPv4 then IP address changes are definitely needed
+    # This test doesn't apply to IPv6 because the DHCP parameter returned on an IPv6
+    # does not mean DHCP is actually active.
+    if ($AddressFamily -eq 'IPv4')
     {
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DHCPIsNotDisabledMessage)
-            ) -join '' )
-        $desiredConfigurationMatch = $false
-    }
-    else
-    {
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DHCPIsAlreadyDisabledMessage)
-            ) -join '' )
+        # Test if DHCP is already disabled
+        if (-not (Get-NetIPInterface `
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily).Dhcp.ToString().Equals('Disabled'))
+        {
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                $($LocalizedData.DHCPIsNotDisabledMessage)
+                ) -join '' )
+            $desiredConfigurationMatch = $false
+        }
+        else
+        {
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                $($LocalizedData.DHCPIsAlreadyDisabledMessage)
+                ) -join '' )
+        }
     }
     return $desiredConfigurationMatch
 } # Test-TargetResource
