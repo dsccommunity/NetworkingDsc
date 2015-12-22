@@ -88,6 +88,7 @@ function Set-TargetResource
         $($LocalizedData.DHCPClientSetStateMessage) `
         -f $InterfaceAlias,$AddressFamily,$State `
         ) -join '' )
+        
 } # Set-TargetResource
 
 function Test-TargetResource
