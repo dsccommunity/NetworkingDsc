@@ -37,7 +37,7 @@ function Get-TargetResource
     $dnsClient = Get-DnsClient -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue;
     $targetResource = @{
         InterfaceAlias = $dnsClient.InterfaceAlias;
-        DnsSuffix = $dnsClient.ConnectionSpecificSuffix;
+        ConnectionSpecificSuffix = $dnsClient.ConnectionSpecificSuffix;
         RegisterThisConnectionsAddress = $dnsClient.RegisterThisConnectionsAddress;
         UseSuffixWhenRegistering = $dnsClient.UseSuffixWhenRegistering;
     }
