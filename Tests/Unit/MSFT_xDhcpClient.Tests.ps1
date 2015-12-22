@@ -116,7 +116,7 @@ try
                     Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
                     Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
                     Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Enabled' } -Exactly 0
-                    Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Disabled' } -Exactly 0
+                    Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Disabled' } -Exactly 1
                 }
             }
 
@@ -129,7 +129,7 @@ try
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
                     Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
-                    Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Enabled' } -Exactly 0
+                    Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Enabled' } -Exactly 1
                     Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Disabled' } -Exactly 0
                 }
             }
