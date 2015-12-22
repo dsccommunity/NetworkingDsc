@@ -135,15 +135,6 @@ try
                     AddressFamily = 'IPv4'
                 }
             }
-    
-            Mock Get-NetIPInterface {
-                [PSCustomObject]@{
-                    InterfaceAlias = 'Ethernet'
-                    InterfaceIndex = 1
-                    AddressFamily = 'IPv4'
-                    Dhcp = 'Disabled'
-                }
-            }
             #endregion
     
             Context 'invoking with invalid IPv4 Address' {
@@ -179,7 +170,6 @@ try
                 }
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
                 }
             }
             
@@ -196,7 +186,6 @@ try
                 }
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
                 }
             }
     
@@ -245,7 +234,6 @@ try
                 }
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 0
                 }
             }
             
@@ -263,7 +251,6 @@ try
                 }
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 0
                 }
             }
         }

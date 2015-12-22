@@ -79,6 +79,12 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **IPv4Connectivity**: Specifies the IPv4 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
 * **IPv6Connectivity**: Specifies the IPv6 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
 
+### xDhcpClient
+
+* **State**: The desired state of the DHCP Client: { Enabled | Disabled }. Mandatory.
+* **InterfaceAlias**: Alias of the network interface for which the DNS server address is set. Mandatory.
+* **AddressFamily**: IP address family: { IPv4 | IPv6 }. Mandatory.
+
 
 ## Known Invalid Configurations
 
@@ -97,12 +103,14 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased Version
+* Added the following resources:
+    * MSFT_xDhcpClient resource to enable/disable DHCP on individual interfaces.
 * MSFT_*: Unit and Integration tests updated to use DSCResource.Tests\TestHelper.psm1 functions.
 * MSFT_*: Resource Name added to all unit test Desribes.
 * Templates update to use DSCResource.Tests\TestHelper.psm1 functions. 
 * MSFT_xNetConnectionProfile: Integration tests fixed when more than one connection profile present.
 * Changed AppVeyor.yml to use WMF 5 build environment.
-* MSFT_xIPAddress: Test for DHCP Status disabled for IPv6.
+* MSFT_xIPAddress: Removed test for DHCP Status.
 
 ### 2.5.0.0
 * Added the following resources:
@@ -568,7 +576,7 @@ Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule_AllParameters -Wai
 
 ### Set the NetConnectionProfile to Public
 
-````powershell
+```powershell
 configuration MSFT_xNetConnectionProfile_Config {
     Import-DscResource -ModuleName xNetworking
     node localhost {
@@ -580,4 +588,36 @@ configuration MSFT_xNetConnectionProfile_Config {
         }
     }
 }
-````
+```
+
+### Set the DHCP Client state
+This example would set the DHCP Client State to enabled.
+
+```powershell
+configuration Sample_xDhcpClient_Enabled
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost',
+
+        [Parameter(Mandatory)]
+        [string]$InterfaceAlias,
+
+        [Parameter(Mandatory)]
+        [ValidateSet("IPv4","IPv6")]
+        [string]$AddressFamily
+    )
+
+    Import-DscResource -Module xDhcpClient
+
+    Node $NodeName
+    {
+        xDhcpClient EnableDhcpClient
+        {
+            State          = 'Enabled'
+            InterfaceAlias = $InterfaceAlias
+            AddressFamily  = $AddressFamily
+        }
+    }
+}
+```
