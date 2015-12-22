@@ -2,7 +2,15 @@
 
 # xNetworking
 
-The **xNetworking** module contains the **xFirewall, xIPAddress, xDnsServerAddress, xDnsConnectionSuffix** and **xDefaultGatewayAddress** DSC resources for configuring a node’s IP address, DNS server address, and firewall rules.
+The **xNetworking** module contains the following resources:
+* **xFirewall**
+* **xIPAddress**
+* **xDnsServerAddress**
+* **xDnsConnectionSuffix**
+* **xDefaultGatewayAddress**
+* **xNetConnectionProfile**
+* **xDhcpClient**
+* **xRoute**
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -74,6 +82,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **RemoteUser**: Specifies that matching IPsec rules of the indicated user accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a user identified in the list of user accounts match this rule. This parameter value is specified as an SDDL string. 
 
 ### xNetConnectionProfile
+
 * **InterfaceAlias**: Specifies the alias for the Interface that is being changed.
 * **NetworkCategory**: Sets the NetworkCategory for the interface - per [the documentation ](https://technet.microsoft.com/en-us/%5Clibrary/jj899565(v=wps.630).aspx) this can only be set to { Public | Private }
 * **IPv4Connectivity**: Specifies the IPv4 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
@@ -84,6 +93,17 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **State**: The desired state of the DHCP Client: { Enabled | Disabled }. Mandatory.
 * **InterfaceAlias**: Alias of the network interface for which the DNS server address is set. Mandatory.
 * **AddressFamily**: IP address family: { IPv4 | IPv6 }. Mandatory.
+
+### xRoute
+
+* **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
+* **AddressFamily**: Specifies the IP address family. { IPv4 | IPv6 }. Mandatory.
+* **DestinationPrefix**: Specifies a destination prefix of an IP route. A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/). Mandatory.
+* **NextHop**: Specifies the next hop for the IP route. Mandatory.
+* **Ensure**: Specifies whether the route should exist. { Present | Absent }. Defaults: Present.
+* **RouteMetric**: Specifies an integer route metric for an IP route. Default: 256.
+* **Publish**: Specifies the publish setting of an IP route. { No | Yes | Age }. Default: No.
+* **PreferredLifetime**: Specifies a preferred lifetime in seconds of an IP route.
 
 
 ## Known Invalid Configurations
@@ -105,6 +125,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ### Unreleased Version
 * Added the following resources:
     * MSFT_xDhcpClient resource to enable/disable DHCP on individual interfaces.
+    * MSFT_xRoute resource to manage network routes.
 * MSFT_*: Unit and Integration tests updated to use DSCResource.Tests\TestHelper.psm1 functions.
 * MSFT_*: Resource Name added to all unit test Desribes.
 * Templates update to use DSCResource.Tests\TestHelper.psm1 functions. 
@@ -620,4 +641,35 @@ configuration Sample_xDhcpClient_Enabled
         }
     }
 }
+```
+
+### Add a Route
+This example will add an IPv4 route on interface Ethernet.
+
+```powershell
+configuration Sample_xRoute_AddRoute
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xRoute NetRoute1
+        {
+            Ensure = 'Present'
+            InterfaceAlias = 'Ethernet'
+            AddressFamily = 'IPv4'
+            DestinationPrefix = '192.168.0.0/16'
+            NextHop = '192.168.120.0'
+            RouteMetric = 200
+        }
+    }
+ }
+
+Sample_xRoute_AddRoute
+Start-DscConfiguration -Path Sample_xRoute_AddRoute -Wait -Verbose -Force
 ```
