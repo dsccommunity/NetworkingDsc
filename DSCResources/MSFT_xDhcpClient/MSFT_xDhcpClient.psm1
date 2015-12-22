@@ -78,19 +78,16 @@ function Set-TargetResource
         -AddressFamily $AddressFamily
         
     # The DHCP Client is in a different state - so change it.
-    if ($CurrentDHCPClient.DHCP -ne $State)
-    {
-        Set-NetIPInterface `
-            -InterfaceAlias $InterfaceAlias `
-            -AddressFamily $AddressFamily `
-            -Dhcp $State `
-            -ErrorAction Stop
+    Set-NetIPInterface `
+        -InterfaceAlias $InterfaceAlias `
+        -AddressFamily $AddressFamily `
+        -Dhcp $State `
+        -ErrorAction Stop
 
-        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.DHCPClientSetStateMessage) `
-            -f $InterfaceAlias,$AddressFamily,$State `
-            ) -join '' )
-    }
+    Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+        $($LocalizedData.DHCPClientSetStateMessage) `
+        -f $InterfaceAlias,$AddressFamily,$State `
+        ) -join '' )
 } # Set-TargetResource
 
 function Test-TargetResource
