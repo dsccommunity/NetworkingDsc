@@ -65,7 +65,7 @@ data ParameterList
         @{ Name = 'RemoteUser'; Source = '$properties.SecurityFilters.RemoteUser'; Type = 'String' }
         @{ Name = 'DynamicTransport'; Source = '$properties.PortFilters.DynamicTransport'; Type = 'String' }
         @{ Name = 'EdgeTraversalPolicy'; Source = '$FirewallRule.EdgeTraversalPolicy'; Type = 'String' }
-        @{ Name = 'IcmpType'; Source = '$properties.PortFilters.IcmpType'; Type = 'String' }
+        @{ Name = 'IcmpType'; Source = '$properties.PortFilters.IcmpType'; Type = 'Array' }
         @{ Name = 'LocalOnlyMapping'; Source = '$FirewallRule.LocalOnlyMapping'; Type = 'Boolean' }
         @{ Name = 'LooseSourceMapping'; Source = '$FirewallRule.LooseSourceMapping'; Type = 'Boolean' }
         @{ Name = 'OverrideBlockRules'; Source = '$properties.SecurityFilters.OverrideBlockRules'; Type = 'Boolean' }
@@ -255,7 +255,7 @@ function Set-TargetResource
         
         # Specifies the ICMP type codes
         [ValidateNotNullOrEmpty()]
-        [String] $IcmpType,
+        [String[]] $IcmpType,
         
         # Indicates that matching firewall rules of the indicated value are created
         [Boolean] $LocalOnlyMapping,
@@ -509,7 +509,7 @@ function Test-TargetResource
         
         # Specifies the ICMP type codes
         [ValidateNotNullOrEmpty()]
-        [String] $IcmpType,
+        [String[]] $IcmpType,
         
         # Indicates that matching firewall rules of the indicated value are created
         [Boolean] $LocalOnlyMapping,
@@ -608,7 +608,7 @@ function Test-RuleProperties
         [String] $RemoteUser,
         [String] $DynamicTransport,
         [String] $EdgeTraversalPolicy,
-        [String] $IcmpType,
+        [String[]] $IcmpType,
         [Boolean] $LocalOnlyMapping,
         [Boolean] $LooseSourceMapping,
         [Boolean] $OverrideBlockRules,
@@ -631,6 +631,18 @@ function Test-RuleProperties
             'String'
             {
                 # Perform a plain string comparison.
+                if ($ParameterNew -and ($ParameterSource -ne $ParameterNew))
+                {
+                    Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                        $($LocalizedData.PropertyNoMatchMessage) `
+                            -f $parameter.Name,$ParameterSource,$ParameterNew
+                        ) -join '')
+                    $desiredConfigurationMatch = $false
+                }
+            }
+            'Boolean'
+            {
+                # Perform a boolean comparison.
                 if ($ParameterNew -and ($ParameterSource -ne $ParameterNew))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
