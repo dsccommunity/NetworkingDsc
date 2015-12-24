@@ -467,7 +467,6 @@ try
                     Assert-MockCalled Test-RuleProperties -Exactly 1
                 }
             }
-
             Context 'Ensure is Present and the Firewall Does Exist but has a different RemoteAddress' {
                 It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
                     Mock Set-NetFirewallRule
@@ -507,6 +506,97 @@ try
                     Assert-MockCalled Test-RuleProperties -Exactly 1
                 }
             }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different DynamicTransport' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -DynamicTransport 'WifiDirectDisplay' `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different EdgeTraversalPolicy' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -EdgeTraversalPolicy 'Allow' `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different IcmpType' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -IcmpType @('52','53') `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different LocalOnlyMapping' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -LocalOnlyMapping $true `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different LooseSourceMapping' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -LooseSourceMapping $true `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different OverrideBlockRules' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -OverrideBlockRules $true `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different Owner' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -Owner (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
 
             Context 'Ensure is Present and the Firewall Does Exist and is the same' {
                 It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
@@ -526,30 +616,37 @@ try
         Describe 'MSFT_xFirewall\Test-RuleProperties' {
             # Make an object that can be splatted onto the function
             $Splat = @{
-                Name = $FirewallRule.Name
-                DisplayGroup = $FirewallRule.DisplayGroup
-                Group = $FirewallRule.Group
-                Enabled = $FirewallRule.Enabled
-                Profile = $FirewallRule.Profile
-                Direction = $FirewallRule.Direction
-                Action = $FirewallRule.Action
-                RemotePort = $Properties.PortFilters.RemotePort
-                LocalPort = $Properties.PortFilters.LocalPort
-                Protocol = $Properties.PortFilters.Protocol
-                Description = $FirewallRule.Description
-                Program = $Properties.ApplicationFilters.Program
-                Service = $Properties.ServiceFilters.Service
-                Authentication = $properties.SecurityFilters.Authentication
-                Encryption = $properties.SecurityFilters.Encryption
-                InterfaceAlias = $properties.InterfaceFilters.InterfaceAlias
-                InterfaceType = $properties.InterfaceTypeFilters.InterfaceType
-                LocalAddress = $properties.AddressFilters.LocalAddress
-                LocalUser = $properties.SecurityFilters.LocalUser
-                Package = $properties.ApplicationFilters.Package
-                Platform = $firewallRule.Platform
-                RemoteAddress = $properties.AddressFilters.RemoteAddress
-                RemoteMachine = $properties.SecurityFilters.RemoteMachine
-                RemoteUser = $properties.SecurityFilters.RemoteUser
+                Name                = $FirewallRule.Name
+                DisplayGroup        = $FirewallRule.DisplayGroup
+                Group               = $FirewallRule.Group
+                Enabled             = $FirewallRule.Enabled
+                Profile             = $FirewallRule.Profile
+                Direction           = $FirewallRule.Direction
+                Action              = $FirewallRule.Action
+                RemotePort          = $Properties.PortFilters.RemotePort
+                LocalPort           = $Properties.PortFilters.LocalPort
+                Protocol            = $Properties.PortFilters.Protocol
+                Description         = $FirewallRule.Description
+                Program             = $Properties.ApplicationFilters.Program
+                Service             = $Properties.ServiceFilters.Service
+                Authentication      = $properties.SecurityFilters.Authentication
+                Encryption          = $properties.SecurityFilters.Encryption
+                InterfaceAlias      = $properties.InterfaceFilters.InterfaceAlias
+                InterfaceType       = $properties.InterfaceTypeFilters.InterfaceType
+                LocalAddress        = $properties.AddressFilters.LocalAddress
+                LocalUser           = $properties.SecurityFilters.LocalUser
+                Package             = $properties.ApplicationFilters.Package
+                Platform            = $firewallRule.Platform
+                RemoteAddress       = $properties.AddressFilters.RemoteAddress
+                RemoteMachine       = $properties.SecurityFilters.RemoteMachine
+                RemoteUser          = $properties.SecurityFilters.RemoteUser
+                DynamicTransport    = $properties.PortFilters.DynamicTransport
+                EdgeTraversalPolicy = $FirewallRule.EdgeTraversalPolicy
+                IcmpType            = $properties.PortFilters.IcmpType
+                LocalOnlyMapping    = $FirewallRule.LocalOnlyMapping
+                LooseSourceMapping  = $FirewallRule.LooseSourceMapping
+                OverrideBlockRules  = $properties.SecurityFilters.OverrideBlockRules
+                Owner               = $FirewallRule.Owner
             }
 
             # To speed up all these tests create Mocks so that these functions are not repeatedly called
@@ -803,7 +900,62 @@ try
                     $Result | Should be $False
                 }
             }
-
+            Context 'testing with a rule with a different DynamicTransport' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.DynamicTransport = 'WifiDirectDevices'
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different EdgeTraversalPolicy' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.EdgeTraversalPolicy = 'DeferToApp'
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different IcmpType' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.IcmpType = @('53','54')
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different LocalOnlyMapping' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.LocalOnlyMapping = ! $CompareRule.LocalOnlyMapping
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different LooseSourceMapping' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.LooseSourceMapping = ! $CompareRule.LooseSourceMapping
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different OverrideBlockRules' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.OverrideBlockRules = ! $CompareRule.OverrideBlockRules
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different Owner' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.Owner = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
         }
         #endregion
 
