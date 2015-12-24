@@ -39,9 +39,16 @@ configuration Sample_xFirewall_AddFirewallRule_AllParameters
             RemoteAddress         = @("192.168.2.0-192.168.2.128","192.168.1.0/255.255.255.0")
             RemoteMachine         = "O:LSD:(D;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1621)(A;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1620)"
             RemoteUser            = "O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)"
+            DynamicTransport      = "ProximitySharing"
+            EdgeTraversalPolicy   = "Block"
+            IcmpType              = ("51","52")
+            LocalOnlyMapping      = $true
+            LooseSourceMapping    = $true
+            OverrideBlockRules    = $true
+            Owner                 = "S-1-5-21-3337988176-3917481366-464002247-500"
         }
     }
- }
+}
 
 Sample_xFirewall_AddFirewallRule_AllParameters
 Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule_AllParameters -Wait -Verbose -Force
