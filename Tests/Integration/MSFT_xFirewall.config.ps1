@@ -29,11 +29,11 @@ $rule = @{
     RemoteAddress         = @('192.168.2.0-192.168.2.128','192.168.1.0/255.255.255.0')
     RemoteMachine         = 'Any'
     RemoteUser            = 'Any'
-    DynamicTransport      = 'ProximitySharing'
-    EdgeTraversalPolicy   = 'Block'
-    LocalOnlyMapping      = $true
-    LooseSourceMapping    = $true
-    OverrideBlockRules    = $true
+    DynamicTransport      = 'Any'
+    EdgeTraversalPolicy   = 'Allow'
+    LocalOnlyMapping      = $false
+    LooseSourceMapping    = $false
+    OverrideBlockRules    = $false
     Owner                 = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
 }
 
