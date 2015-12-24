@@ -31,7 +31,6 @@ $rule = @{
     RemoteUser            = 'Any'
     DynamicTransport      = 'ProximitySharing'
     EdgeTraversalPolicy   = 'Block'
-    IcmpType              = $null
     LocalOnlyMapping      = $true
     LooseSourceMapping    = $true
     OverrideBlockRules    = $true
@@ -69,7 +68,6 @@ Configuration MSFT_xFirewall_Config {
             RemoteUser            = $rule.RemoteUser
             DynamicTransport      = $rule.DynamicTransport
             EdgeTraversalPolicy   = $rule.EdgeTraversalPolicy
-            IcmpType              = $rule.IcmpType
             LocalOnlyMapping      = $rule.LocalOnlyMapping
             LooseSourceMapping    = $rule.LooseSourceMapping
             OverrideBlockRules    = $rule.OverrideBlockRules
