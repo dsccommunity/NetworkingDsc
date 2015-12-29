@@ -71,7 +71,14 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Platform**: Specifies which version of Windows the associated rule applies.
 * **RemoteAddress**: Specifies that network packets with matching IP addresses match this rule. This parameter value is the second end point of an IPsec rule and specifies the computers that are subject to the requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet, range, or the following keyword: Any
 * **RemoteMachine**: Specifies that matching IPsec rules of the indicated computer accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a computer identified in the list of computer accounts (SID) match this rule. This parameter value is specified as an SDDL string. 
-* **RemoteUser**: Specifies that matching IPsec rules of the indicated user accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a user identified in the list of user accounts match this rule. This parameter value is specified as an SDDL string. 
+* **RemoteUser**: Specifies that matching IPsec rules of the indicated user accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a user identified in the list of user accounts match this rule. This parameter value is specified as an SDDL string.
+* **DynamicTransport**: Specifies a dynamic transport: { Any | ProximityApps | ProximitySharing | WifiDirectPrinting | WifiDirectDisplay | WifiDirectDevices }
+* **EdgeTraversalPolicy**: Specifies that matching firewall rules of the indicated edge traversal policy are created: { Block | Allow | DeferToUser | DeferToApp }
+* **IcmpType**: Specifies the ICMP type codes.
+* **LocalOnlyMapping**: Indicates that matching firewall rules of the indicated value are created.
+* **LooseSourceMapping**: Indicates that matching firewall rules of the indicated value are created.
+* **OverrideBlockRules**: Indicates that matching network traffic that would otherwise be blocked are allowed.
+* **Owner**: Specifies that matching firewall rules of the indicated owner are created.
 
 ### xNetConnectionProfile
 * **InterfaceAlias**: Specifies the alias for the Interface that is being changed.
@@ -111,6 +118,13 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 * MSFT_xNetConnectionProfile: Integration tests fixed when more than one connection profile present.
 * Changed AppVeyor.yml to use WMF 5 build environment.
 * MSFT_xIPAddress: Removed test for DHCP Status.
+* MSFT_xFirewall: New parameters added:
+    * DynamicTransport
+    * EdgeTraversalPolicy
+    * LocalOnlyMapping
+    * LooseSourceMapping
+    * OverrideBlockRules
+    * Owner
 
 ### 2.5.0.0
 * Added the following resources:
@@ -566,6 +580,13 @@ configuration Sample_xFirewall_AddFirewallRule_AllParameters
             RemoteAddress         = @("192.168.2.0-192.168.2.128","192.168.1.0/255.255.255.0")
             RemoteMachine         = "O:LSD:(D;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1621)(A;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1620)"
             RemoteUser            = "O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)"
+            DynamicTransport      = "ProximitySharing"
+            EdgeTraversalPolicy   = "Block"
+            IcmpType              = ("51","52")
+            LocalOnlyMapping      = $true
+            LooseSourceMapping    = $true
+            OverrideBlockRules    = $true
+            Owner                 = "S-1-5-21-3337988176-3917481366-464002247-500"
         }
     }
  }

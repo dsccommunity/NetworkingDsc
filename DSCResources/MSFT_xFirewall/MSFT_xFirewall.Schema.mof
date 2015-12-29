@@ -27,4 +27,11 @@ class MSFT_xFirewall : OMI_BaseResource
   [Write, Description("Specifies that network packets with matching IP addresses match this rule")] String RemoteAddress[];
   [Write, Description("Specifies that matching IPsec rules of the indicated computer accounts are created")] String RemoteMachine;
   [Write, Description("Specifies that matching IPsec rules of the indicated user accounts are created")] String RemoteUser;
+  [Write, Description("Specifies a dynamic transport"), ValueMap{"Any","ProximityApps","ProximitySharing","WifiDirectPrinting","WifiDirectDisplay","WifiDirectDevices"},Values{"Any","ProximityApps","ProximitySharing","WifiDirectPrinting","WifiDirectDisplay","WifiDirectDevices"}] String DynamicTransport;
+  [Write, Description("Specifies that matching firewall rules of the indicated edge traversal policy are created"), ValueMap{"Block","Allow","DeferToUser","DeferToApp"},Values{"Block","Allow","DeferToUser","DeferToApp"}] String EdgeTraversalPolicy;
+  [Write, Description("Specifies the ICMP type codes")] String IcmpType[];
+  [Write, Description("Indicates that matching firewall rules of the indicated value are created")] Boolean LocalOnlyMapping;
+  [Write, Description("Indicates that matching firewall rules of the indicated value are created")] Boolean LooseSourceMapping;
+  [Write, Description("Indicates that matching network traffic that would otherwise be blocked are allowed")] Boolean OverrideBlockRules;
+  [Write, Description("Specifies that matching firewall rules of the indicated owner are created")] String Owner;
 };
