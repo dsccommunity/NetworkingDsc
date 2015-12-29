@@ -15,7 +15,6 @@ The **xNetworking** module contains the following resources:
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
 
-
 ## Resources
 
 * **xFirewall** sets a node's firewall rules.
