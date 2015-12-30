@@ -7,8 +7,7 @@
      2. Customize TODO sections.
 
 .NOTES
-   Code in HEADER and FOOTER regions are standard and may be moved into DSCResource.Tools in
-   Future and therefore should not be altered if possible.
+   Code in HEADER and FOOTER regions are standard and should not be altered if possible.
 #>
 
 
