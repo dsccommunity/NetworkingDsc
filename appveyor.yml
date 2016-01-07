@@ -4,7 +4,7 @@
 os: WMF 5
 version: 2.5.{build}.0
 install:
-  - cinst -y pester --version 3.3.13
+  - cinst -y pester
   - git clone https://github.com/PowerShell/DscResource.Tests
   - ps: Push-Location
   - cd DscResource.Tests
