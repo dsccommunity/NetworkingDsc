@@ -35,8 +35,8 @@ try
         }
 
         $MockTeam = [PSObject]@{
-            Name                    = $MockNetTeam.Name
-            TeamMembers             = $MockNetTeam.TeamMembers
+            Name                    = $TestTeam.Name
+            TeamMembers             = $TestTeam.TeamMembers
             loadBalancingAlgorithm  = 'Dynamic'
             teamingMode             = 'SwitchIndependent'
             Ensure                  = 'Present'
