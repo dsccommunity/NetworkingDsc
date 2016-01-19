@@ -26,16 +26,17 @@ try
         # Create the Mock Objects that will be used for running tests
         $MockNetTeam = [PSCustomObject] @{
             Name                    = 'HostTeam'
+            TeamMembers             = 'NIC1','NIC2'
         }
 
         $TestTeam = [PSObject]@{
             Name                    = $MockNetTeam.Name
-            TeamMembers             = 'NIC1','NIC2'
+            TeamMembers             = $MockNetTeam.TeamMembers
         }
 
         $MockTeam = [PSObject]@{
             Name                    = $MockNetTeam.Name
-            TeamMembers             = $TestTeam.TeamMembers
+            TeamMembers             = $MockNetTeam.TeamMembers
             loadBalancingAlgorithm  = 'Dynamic'
             teamingMode             = 'SwitchIndependent'
             Ensure                  = 'Present'
