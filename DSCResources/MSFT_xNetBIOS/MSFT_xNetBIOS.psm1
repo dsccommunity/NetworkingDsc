@@ -1,12 +1,18 @@
-Add-Type -TypeDefinition @'
-   public enum NetBiosSetting
-   {
-      Default,
-      Enable,
-      Disable
-   }
+try
+{
+    [void][reflection.assembly]::GetAssembly([NetBIOSSetting])
+}
+catch
+{
+    Add-Type -TypeDefinition @'
+    public enum NetBiosSetting
+    {
+       Default,
+       Enable,
+       Disable
+    }
 '@
-
+}
 
 function Get-TargetResource
 {
@@ -25,11 +31,16 @@ function Get-TargetResource
     )
     try
     {
-        $NetAdapterConfig = Get-CimInstance -ClassName Win32_NetworkAdapter -Filter "NetConnectionID=`"$InterfaceAlias`"" | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
+        $Netadapterparams = @{
+            ClassName = 'Win32_NetworkAdapter'
+            Filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
+        }
+        $NetAdapterConfig = Get-CimInstance @Netadapterparams | 
+            Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
     }
     catch
     {
-        Write-Error -ErrorRecord $_ -ErrorAction Stop
+        throw $_
     }
     return @{
         InterfaceAlias = $InterfaceAlias
@@ -52,15 +63,29 @@ function Set-TargetResource
         [System.String]
         $Setting
     )
-    $NetAdapterConfig = Get-CimInstance -ClassName Win32_NetworkAdapter -Filter "NetConnectionID=`"$InterfaceAlias`"" | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
+    $Netadapterparams = @{
+        ClassName = 'Win32_NetworkAdapter'
+        Filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
+    }
+    $NetAdapterConfig = Get-CimInstance @Netadapterparams | 
+        Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
+
     if ($Setting -eq [NETBIOSSetting]::Default) 
     {
         #If DHCP is not enabled, settcpipnetbios CIM Method won't take 0 so overwrite registry entry instead.
-        $null = Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetAdapterConfig.SettingID)" -Name NetbiosOptions -Value 0
+        $RegParam = @{
+            Path = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetAdapterConfig.SettingID)"
+            Name = 'NetbiosOptions'
+            Value = 0
+        }
+        $null = Set-ItemProperty @RegParam
     }
     else
     {
-        $null = $NetAdapterConfig | Invoke-CimMethod -MethodName settcpipnetbios -Arguments @{TcpipNetbiosOptions = [uint32][NETBIOSSetting]::$Setting.value__}
+        $null = $NetAdapterConfig | 
+            Invoke-CimMethod -MethodName settcpipnetbios -Arguments @{
+                TcpipNetbiosOptions = [uint32][NETBIOSSetting]::$Setting.value__
+            }
     }
 }
 
@@ -87,7 +112,7 @@ function Test-TargetResource
     }
     else
     {
-        Write-Error -Message "Nic with Alias $InterfaceAlias was not found" -ErrorAction Stop
+        throw "Nic with Alias $InterfaceAlias was not found"
     }
 
     $NICConfig = $NIC | Get-CimAssociatedInstance -ResultClassName win32_networkadapterconfiguration

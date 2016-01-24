@@ -39,9 +39,9 @@ try
         }
         #endregion
 
-        It 'Should have set the resource and all setting should match' {
-            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($Global:DSCResourceName)_Config"}
-            $current.Setting | should be 'Disable'
+        It 'Should have set the resource and all setting should match current state' {
+            $Live = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($Global:DSCResourceName)_Config"}
+            $Live.Setting | should be $Current #Current is defined in MSFT_xNetBIOS.config.ps1
         }
     }
     #endregion
