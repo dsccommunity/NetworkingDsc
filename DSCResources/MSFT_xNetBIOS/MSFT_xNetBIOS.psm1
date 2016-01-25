@@ -1,3 +1,11 @@
+data LocalizedData
+{
+    # culture="en-US"
+    ConvertFrom-StringData -StringData @'
+
+'@
+}
+
 try
 {
     [void][reflection.assembly]::GetAssembly([NetBIOSSetting])
@@ -29,19 +37,16 @@ function Get-TargetResource
         [System.String]
         $Setting
     )
-    try
-    {
-        $Netadapterparams = @{
-            ClassName = 'Win32_NetworkAdapter'
-            Filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
-        }
-        $NetAdapterConfig = Get-CimInstance @Netadapterparams | 
-            Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
+    $Netadapterparams = @{
+        ClassName = 'Win32_NetworkAdapter'
+        Filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
     }
-    catch
-    {
-        throw $_
-    }
+
+    $NetAdapterConfig = Get-CimInstance @Netadapterparams -ErrorAction Stop |
+            Get-CimAssociatedInstance `
+                -ResultClassName Win32_NetworkAdapterConfiguration `
+                -ErrorAction Stop
+
     return @{
         InterfaceAlias = $InterfaceAlias
         Setting = $([NETBIOSSetting].GetEnumValues()[$NetAdapterConfig.TcpipNetbiosOptions])
@@ -67,8 +72,10 @@ function Set-TargetResource
         ClassName = 'Win32_NetworkAdapter'
         Filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
     }
-    $NetAdapterConfig = Get-CimInstance @Netadapterparams | 
-        Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
+    $NetAdapterConfig = Get-CimInstance @Netadapterparams -ErrorAction Stop |
+            Get-CimAssociatedInstance `
+                -ResultClassName Win32_NetworkAdapterConfiguration `
+                -ErrorAction Stop
 
     if ($Setting -eq [NETBIOSSetting]::Default) 
     {
@@ -83,7 +90,7 @@ function Set-TargetResource
     else
     {
         $null = $NetAdapterConfig | 
-            Invoke-CimMethod -MethodName settcpipnetbios -Arguments @{
+            Invoke-CimMethod -MethodName SetTcpipNetbios -ErrorAction Stop -Arguments @{
                 TcpipNetbiosOptions = [uint32][NETBIOSSetting]::$Setting.value__
             }
     }
@@ -105,17 +112,19 @@ function Test-TargetResource
         [System.String]
         $Setting
     )
-    $NIC = Get-CimInstance -ClassName Win32_NetworkAdapter -Filter "NetConnectionID=`"$InterfaceAlias`""
+    $NIC = Get-CimInstance `
+        -ClassName Win32_NetworkAdapter `
+        -Filter "NetConnectionID=`"$InterfaceAlias`""
     if ($Null -ne $NIC)
     {
         Write-Verbose -Message "Interface $InterfaceAlias detected with Index number: $($NIC.InterfaceIndex)"
     }
     else
     {
-        throw "Nic with Alias $InterfaceAlias was not found"
+        throw "NIC with Alias $InterfaceAlias was not found"
     }
 
-    $NICConfig = $NIC | Get-CimAssociatedInstance -ResultClassName win32_networkadapterconfiguration
+    $NICConfig = $NIC | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
     
     Write-Verbose -Message "Current Netbios Configuration: $([NETBIOSSetting].GetEnumValues()[$NICConfig.TcpipNetbiosOptions])"
 
