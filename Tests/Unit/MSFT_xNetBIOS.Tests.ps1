@@ -88,6 +88,14 @@ try
                     Test-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Disable' | Should Be $false
                 }
             }
+
+            Context 'Invoking with NonExisting Network Adapter' {
+                Mock -CommandName Get-CimAssociatedInstance -MockWith { }
+                $ErrorRecord = New-Object System.Management.Automation.ErrorRecord 'Interface BogusAdapter was not found.', 'NICNotFound', 'ObjectNotFound', $null
+                It 'should throw ObjectNotFound exception' {
+                    {Test-TargetResource -InterfaceAlias 'BogusAdapter' -Setting 'Enable'} | Should Throw $ErrorRecord
+                }
+            }
         }
         #endregion
 

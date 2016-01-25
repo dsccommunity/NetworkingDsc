@@ -1,6 +1,6 @@
 try 
 {
-    [reflection.assembly]::GetAssembly([NetBIOSSetting])
+    [void][reflection.assembly]::GetAssembly([NetBIOSSetting])
 }
 catch
 {
