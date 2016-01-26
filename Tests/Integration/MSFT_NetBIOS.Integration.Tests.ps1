@@ -1,5 +1,5 @@
 $Global:DSCModuleName      = 'xNetworking'
-$Global:DSCResourceName    = 'MSFT_xNetBIOS'
+$Global:DSCResourceName    = 'MSFT_NetBIOS'
 
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
@@ -41,7 +41,7 @@ try
 
         It 'Should have set the resource and all setting should match current state' {
             $Live = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($Global:DSCResourceName)_Config"}
-            $Live.Setting | should be $Current #Current is defined in MSFT_xNetBIOS.config.ps1
+            $Live.Setting | should be $Current #Current is defined in MSFT_NetBIOS.config.ps1
         }
     }
     #endregion

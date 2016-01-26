@@ -8,4 +8,3 @@ ConvertFrom-StringData @'
     SetNetBIOS=NetBIOS configuration will be set to: {0}.
     NICNotFound=Interface {0} was not found.
 '@
-
