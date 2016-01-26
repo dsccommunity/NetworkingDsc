@@ -1,4 +1,4 @@
-﻿[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
 
 # xNetworking
 
@@ -11,6 +11,7 @@ The **xNetworking** module contains the following resources:
 * **xNetConnectionProfile**
 * **xDhcpClient**
 * **xRoute**
+* **NetworkTeam**
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -23,6 +24,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **xDnsConnectionSuffix** sets a node's network interface connection-specific DNS suffix.
 * **xDefaultGatewayAddress** sets a node's default gateway address.
 * **xNetConnectionProfile** sets a node's connection profile.
+* **NetworkTeam**
 
 ### xIPAddress
 
@@ -111,6 +113,12 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Publish**: Specifies the publish setting of an IP route. { No | Yes | Age }. Default: No.
 * **PreferredLifetime**: Specifies a preferred lifetime in seconds of an IP route.
 
+### NetworkTeam
+* **Name**: Specifies the name of the network team to create.
+* **TeamMembers**: Specifies the network interfaces that should be a part of the network team. This is a comma-separated list.
+* **TeamingMode**: Specifies the teaming mode configuration. { SwitchIndependent | LACP | Static}.
+* **LoadBalancingAlgorithm**: Specifies the load balancing algorithm for the network team. { Dynamic | HyperVPort | IPAddresses | MacAddresses | TransportPorts }.
+* **Ensure**: Specifies if the network team should be created or deleted. { Present | Absent }.
 
 ## Known Invalid Configurations
 

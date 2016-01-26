@@ -25,18 +25,18 @@ try
     InModuleScope $Global:DSCResourceName {
         # Create the Mock Objects that will be used for running tests
         $MockNetTeam = [PSCustomObject] @{
-            Name                    = 'HostTeam'
-            TeamMembers             = 'NIC1','NIC2'
+            Name                = 'HostTeam'
+            Members             = @('NIC1','NIC2')
         }
 
         $TestTeam = [PSObject]@{
             Name                    = $MockNetTeam.Name
-            TeamMembers             = $MockNetTeam.TeamMembers
+            TeamMembers             = $MockNetTeam.Members
         }
 
         $MockTeam = [PSObject]@{
             Name                    = $TestTeam.Name
-            TeamMembers             = $TestTeam.TeamMembers
+            Members                 = $TestTeam.TeamMembers
             loadBalancingAlgorithm  = 'Dynamic'
             teamingMode             = 'SwitchIndependent'
             Ensure                  = 'Present'
@@ -59,8 +59,7 @@ try
             Context 'Network Team exists' {
                 Mock Get-NetLbfoTeam -MockWith { $MockTeam }
                 It 'should return team properties' {
-                    $Result = Get-TargetResource `
-                        @TestTeam
+                    $Result = Get-TargetResource @TestTeam
                     $Result.Ensure                 | Should Be 'Present'
                     $Result.Name                   | Should Be $TestTeam.Name
                     $Result.TeamMembers            | Should Be $TestTeam.TeamMembers
