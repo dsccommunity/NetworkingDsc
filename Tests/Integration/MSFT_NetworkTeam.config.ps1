@@ -6,7 +6,7 @@ $TestTeam = [PSObject]@{
     Ensure                  = 'Present'
 }
 
-configuration Sample_NetworkTeam_AddTeam
+configuration MSFT_NetworkTeam_Config
 {
     param
     (
