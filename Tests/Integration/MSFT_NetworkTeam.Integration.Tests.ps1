@@ -44,8 +44,6 @@ try
             $result.Ensure                 | Should Be $TestTeam.Ensure
             $result.Name                   | Should Be $TestTeam.Name
             $result.TeamMembers            | Should Be $TestTeam.TeamMembers
-            $result.loadBalancingAlgorithm | Should Be $TestTeam.loadBalancingAlgorithm
-            $result.teamingMode            | Should Be $TestTeam.teamingMode
         }
 
         Remove-NetLbfoTeam `
