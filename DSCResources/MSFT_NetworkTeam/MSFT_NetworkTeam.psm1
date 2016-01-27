@@ -128,19 +128,20 @@ Function Set-TargetResource
         else 
         {
             Write-Verbose -Message ($localizedData.createTeam -f $Name)
-            $null = New-NetLbfoTeam `
-                        -Name $Name `
-                        -TeamMembers $teamMembers `
-                        -TeamingMode $TeamingMode `
-                        -LoadBalancingAlgorithm $loadBalancingAlgorithm `
-                        -ErrorAction Stop `
-                        -Confirm:$false
-            $timeout = 0
-            While ((Get-NetLbfoTeam -Name $Name).status -ne 'Up')
+            try
             {
-                Write-Verbose -Message $localizedData.waitingForTeam
-                if ($timeout -ge 120)
-                {
+                $null = New-NetLbfoTeam `
+                            -Name $Name `
+                            -TeamMembers $teamMembers `
+                            -TeamingMode $TeamingMode `
+                            -LoadBalancingAlgorithm $loadBalancingAlgorithm `
+                            -ErrorAction Stop `
+                            -Confirm:$false
+                Write-Verbose -Message $localizedData.createdNetTeam
+            }
+
+            catch
+            {
                     $errorId = 'TeamCreateError'
                     $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
                     $errorMessage = $localizedData.failedToCreateTeam
@@ -150,14 +151,6 @@ Function Set-TargetResource
                                             -ArgumentList $exception, $errorId, $errorCategory, $null
 
                     $PSCmdlet.ThrowTerminatingError($errorRecord)
-                }
-                Start-Sleep -Seconds 2
-                $timeout += 2
-            }
-
-            if ((Get-NetLbfoTeam -Name $Name).status -eq 'Up')
-            {
-                Write-Verbose -Message $localizedData.createdNetTeam
             }
         }
     }
@@ -193,7 +186,7 @@ Function Test-TargetResource
     )
     
     Write-Verbose -Message ($localizedData.GetTeamInfo -f $Name)
-    $networkTeam = Get-NetLBFOTeam -Name $Name -ErrorAction SilentlyContinue
+    $networkTeam = Get-NetLbfoTeam -Name $Name -ErrorAction SilentlyContinue
     
     if ($ensure -eq 'Present')
     {
