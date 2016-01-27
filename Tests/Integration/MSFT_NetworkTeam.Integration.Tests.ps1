@@ -35,6 +35,7 @@ try
         }
 
         It 'should be able to call Get-DscConfiguration without throwing' {
+            Start-Sleep -Seconds 30
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
         #endregion
