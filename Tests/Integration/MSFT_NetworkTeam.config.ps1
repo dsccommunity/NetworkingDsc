@@ -25,4 +25,5 @@ configuration Sample_NetworkTeam_AddTeam
           TeamMembers = $TestTeam.Members
           Ensure = 'Present'
         }
+    }
 }
