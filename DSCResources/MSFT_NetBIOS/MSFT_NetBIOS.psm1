@@ -1,23 +1,12 @@
 #region localizeddata
-# Fallback message strings in en-US
-DATA localizedData
-{
-    # same as culture = "en-US"
-ConvertFrom-StringData @'
-    InterfaceDetected=Interface {0} detected with Index number: {1}.
-    CurrentNetBiosSetting=Current NetBIOS Configuration: {0}.
-    DesiredSetting=Desired NetBIOS Configuration: {0}.
-    InDesiredState=NetBIOS configuration is in desired state.
-    NotInDesiredState=NetBIOS configuration is not in desired state.
-    ResetToDefaut=NetBIOS configuration will be reset to default.
-    SetNetBIOS=NetBIOS configuration will be set to: {0}.
-    NICNotFound=Interface {0} was not found.
-'@
-}
-
 if (Test-Path "${PSScriptRoot}\${PSUICulture}")
 {
     Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_NetBIOS.psd1 -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
+} 
+else
+{
+    #fallback to en-US
+    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_NetBIOS.psd1 -BaseDirectory "${PSScriptRoot}\en-US"
 }
 #endregion
 
