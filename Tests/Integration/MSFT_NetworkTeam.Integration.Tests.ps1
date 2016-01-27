@@ -46,9 +46,9 @@ try
             $result.TeamMembers            | Should Be $TestTeam.TeamMembers
         }
 
-        Remove-NetLbfoTeam `
-            -InterfaceAlias $TestTeam.Name `
-            -Confirm:$false
+        #Remove-NetLbfoTeam `
+        #    -Name $TestTeam.Name `
+        #    -Confirm:$false
     }
     #endregion
 }
