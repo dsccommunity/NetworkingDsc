@@ -1,5 +1,6 @@
 $Global:DSCModuleName      = 'xNetworking'
 $Global:DSCResourceName    = 'MSFT_NetworkTeam'
+$Global:teamMembers        = (Get-NetAdapter -Physical).Name
 
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
@@ -44,7 +45,7 @@ try
             $result = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($Global:DSCResourceName)_Config"}
             $result.Ensure                 | Should Be $TestTeam.Ensure
             $result.Name                   | Should Be $TestTeam.Name
-            $result.TeamMembers            | Should Be $TestTeam.TeamMembers
+            $result.TeamMembers            | Should Be $Global:teamMembers
         }
 
         #Remove-NetLbfoTeam `
