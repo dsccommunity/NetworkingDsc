@@ -23,7 +23,7 @@ configuration MSFT_NetworkTeam_Config
           TeamingMode = $TestTeam.teamingMode
           LoadBalancingAlgorithm = $TestTeam.loadBalancingAlgorithm
           TeamMembers = $TestTeam.Members
-          Ensure = 'Present'
+          Ensure = $TestTeam.Ensure
         }
     }
 }
