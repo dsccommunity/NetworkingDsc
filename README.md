@@ -145,6 +145,8 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
     * LooseSourceMapping
     * OverrideBlockRules
     * Owner
+* All unit & integration tests updated to be able to be run from any folder under tests directory.
+* Unit & Integration test template headers updated to match DSCResource templates.
 
 ### 2.5.0.0
 * Added the following resources:
