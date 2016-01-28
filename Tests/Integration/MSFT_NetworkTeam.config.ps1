@@ -3,7 +3,7 @@ $TestTeam = [PSObject]@{
     Members                 =  (Get-NetAdapter -Physical).Name
     loadBalancingAlgorithm  = 'Dynamic'
     teamingMode             = 'SwitchIndependent'
-    Ensure                  = 'Absent'
+    Ensure                  = 'Present'
 }
 
 configuration MSFT_NetworkTeam_Config

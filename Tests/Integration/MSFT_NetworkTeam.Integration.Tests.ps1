@@ -1,3 +1,6 @@
+#Remove this following line before using this integration test script
+return
+
 $Global:DSCModuleName      = 'xNetworking'
 $Global:DSCResourceName    = 'MSFT_NetworkTeam'
 $Global:teamMembers        = (Get-NetAdapter -Physical).Name
@@ -46,11 +49,13 @@ try
             $result.Ensure                 | Should Be $TestTeam.Ensure
             $result.Name                   | Should Be $TestTeam.Name
             $result.TeamMembers            | Should Be $Global:teamMembers
+            $result.loadBalancingAlgorithm | Should Be $TestTeam.loadBalancingAlgorithm
+            $result.teamingMode            | Should Be $TestTeam.teamingMode
         }
 
-        #Remove-NetLbfoTeam `
-        #    -Name $TestTeam.Name `
-        #    -Confirm:$false
+        Remove-NetLbfoTeam `
+            -Name $TestTeam.Name `
+            -Confirm:$false
     }
     #endregion
 }
