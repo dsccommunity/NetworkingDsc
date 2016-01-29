@@ -25,10 +25,10 @@ $Current = [NETBIOSSetting].GetEnumValues()[(
         -ResultClassName Win32_NetworkAdapterConfiguration
 ).TcpipNetbiosOptions]
 
-configuration MSFT_NetBIOS_Config {
+configuration MSFT_xNetBIOS_Config {
     Import-DscResource -ModuleName xNetworking
     node localhost {
-        NetBIOS Integration_Test {
+        xNetBIOS Integration_Test {
             InterfaceAlias   = $adapter.NetConnectionID
             Setting = $Current
         }

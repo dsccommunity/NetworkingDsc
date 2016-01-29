@@ -1,4 +1,4 @@
-configuration Sample_NetBIOS_Disabled
+configuration Sample_xNetBIOS_Disabled
 {
     param
     (
@@ -9,7 +9,7 @@ configuration Sample_NetBIOS_Disabled
 
     node $NodeName 
     {
-        NetBIOS DisableNetBIOS 
+        xNetBIOS DisableNetBIOS 
         {
             InterfaceAlias   = 'Ethernet'
             Setting = 'Disable'
@@ -17,5 +17,5 @@ configuration Sample_NetBIOS_Disabled
     }
 }
 
-Sample_NetBIOS_Disabled
-Start-DscConfiguration -Path Sample_NetBIOS_Disabled -Wait -Verbose -Force 
+Sample_xNetBIOS_Disabled
+Start-DscConfiguration -Path Sample_xNetBIOS_Disabled -Wait -Verbose -Force 

@@ -11,7 +11,7 @@ The **xNetworking** module contains the following resources:
 * **xNetConnectionProfile**
 * **xDhcpClient**
 * **xRoute**
-* **NetBIOS**
+* **xNetBIOS**
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -115,7 +115,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 ### NetBIOS
 
 * **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
-* **Setting**: NetBIOS setting { Default | Enable | Disable }. Mandatory.
+* **Setting**: xNetBIOS setting { Default | Enable | Disable }. Mandatory.
 
 ## Known Invalid Configurations
 
@@ -137,7 +137,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 * Added the following resources:
     * MSFT_xDhcpClient resource to enable/disable DHCP on individual interfaces.
     * MSFT_xRoute resource to manage network routes.
-    * MSFT_NetBIOS resource to configure NetBIOS over TCP/IP settings on individual interfaces.
+    * MSFT_xNetBIOS resource to configure NetBIOS over TCP/IP settings on individual interfaces.
 * MSFT_*: Unit and Integration tests updated to use DSCResource.Tests\TestHelper.psm1 functions.
 * MSFT_*: Resource Name added to all unit test Desribes.
 * Templates update to use DSCResource.Tests\TestHelper.psm1 functions. 
