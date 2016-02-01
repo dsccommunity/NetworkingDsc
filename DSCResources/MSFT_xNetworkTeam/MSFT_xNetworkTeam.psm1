@@ -1,6 +1,6 @@
 ﻿if (Test-Path "${PSScriptRoot}\${PSUICulture}")
 {
-    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_NetworkTeam.psd1 -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
+    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeam.psd1 -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
 }
 
 Function Get-TargetResource

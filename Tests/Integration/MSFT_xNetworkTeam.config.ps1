@@ -6,7 +6,7 @@ $TestTeam = [PSObject]@{
     Ensure                  = 'Present'
 }
 
-configuration MSFT_NetworkTeam_Config
+configuration MSFT_xNetworkTeam_Config
 {
     param
     (
@@ -17,7 +17,7 @@ configuration MSFT_NetworkTeam_Config
 
     Node $NodeName
     {
-        NetworkTeam HostTeam
+        xNetworkTeam HostTeam
         {
           Name = $TestTeam.Name
           TeamingMode = $TestTeam.teamingMode

@@ -1,4 +1,4 @@
-configuration Sample_NetworkTeam_AddTeam
+configuration Sample_xNetworkTeam_AddTeam
 {
     param
     (
@@ -9,7 +9,7 @@ configuration Sample_NetworkTeam_AddTeam
 
     Node $NodeName
     {
-        NetworkTeam HostTeam
+        xNetworkTeam HostTeam
         {
           Name = 'HostTeam'
           TeamingMode = 'SwitchIndependent'
@@ -20,5 +20,5 @@ configuration Sample_NetworkTeam_AddTeam
     }
  }
 
-Sample_NetworkTeam_AddTeam
-Start-DscConfiguration -Path Sample_NetworkTeam_AddTeam -Wait -Verbose -Force
+Sample_xNetworkTeam_AddTeam
+Start-DscConfiguration -Path Sample_xNetworkTeam_AddTeam -Wait -Verbose -Force

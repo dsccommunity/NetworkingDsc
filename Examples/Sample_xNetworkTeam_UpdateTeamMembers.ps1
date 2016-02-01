@@ -1,4 +1,4 @@
-configuration Sample_NetworkTeam_UpdateTeamMembers
+configuration Sample_xNetworkTeam_UpdateTeamMembers
 {
     param
     (
@@ -9,7 +9,7 @@ configuration Sample_NetworkTeam_UpdateTeamMembers
 
     Node $NodeName
     {
-        NetworkTeam HostTeam
+        xNetworkTeam HostTeam
         {
           Name = 'HostTeam'
           TeamingMode = 'SwitchIndependent'
@@ -20,5 +20,5 @@ configuration Sample_NetworkTeam_UpdateTeamMembers
     }
  }
 
-Sample_NetworkTeam_UpdateTeamMembers
-Start-DscConfiguration -Path Sample_NetworkTeam_UpdateTeamMembers -Wait -Verbose -Force
+Sample_xNetworkTeam_UpdateTeamMembers
+Start-DscConfiguration -Path Sample_xNetworkTeam_UpdateTeamMembers -Wait -Verbose -Force

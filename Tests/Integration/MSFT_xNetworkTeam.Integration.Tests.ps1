@@ -2,7 +2,7 @@
 return
 
 $Global:DSCModuleName      = 'xNetworking'
-$Global:DSCResourceName    = 'MSFT_NetworkTeam'
+$Global:DSCResourceName    = 'MSFT_xNetworkTeam'
 $Global:teamMembers        = (Get-NetAdapter -Physical).Name
 
 #region HEADER

@@ -1,4 +1,4 @@
-configuration Sample_NetworkTeam_RemoveTeam
+configuration Sample_xNetworkTeam_RemoveTeam
 {
     param
     (
@@ -9,7 +9,7 @@ configuration Sample_NetworkTeam_RemoveTeam
 
     Node $NodeName
     {
-        NetworkTeam HostTeam
+        xNetworkTeam HostTeam
         {
           Name = 'HostTeam'
           Ensure = 'Absent'
@@ -17,5 +17,5 @@ configuration Sample_NetworkTeam_RemoveTeam
     }
  }
 
-Sample_NetworkTeam_RemoveTeam
-Start-DscConfiguration -Path Sample_NetworkTeam_RemoveTeam -Wait -Verbose -Force
+Sample_xNetworkTeam_RemoveTeam
+Start-DscConfiguration -Path Sample_xNetworkTeam_RemoveTeam -Wait -Verbose -Force

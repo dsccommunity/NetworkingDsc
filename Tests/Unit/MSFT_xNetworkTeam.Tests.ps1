@@ -1,5 +1,5 @@
 $Global:DSCModuleName   = 'xNetworking'
-$Global:DSCResourceName = 'MSFT_NetworkTeam'
+$Global:DSCResourceName = 'MSFT_xNetworkTeam'
 
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `

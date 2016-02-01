@@ -1,5 +1,5 @@
-[ClassVersion("1.1"), FriendlyName("NetworkTeam")]
-class MSFT_NetworkTeam : OMI_BaseResource
+[ClassVersion("1.1"), FriendlyName("xNetworkTeam")]
+class MSFT_xNetworkTeam : OMI_BaseResource
 {
     [Key] String Name;
     [Write, ValueMap{"SwitchIndependent","LACP","Static"}, Values{"SwitchIndependent","LACP","Static"}] String TeamingMode;
