@@ -133,7 +133,8 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 ## Versions
 
-### Unreleased Version
+### Unreleased
+
 * Added the following resources:
     * MSFT_xDhcpClient resource to enable/disable DHCP on individual interfaces.
     * MSFT_xRoute resource to manage network routes.
