@@ -1,12 +1,20 @@
-﻿[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
 
 # xNetworking
 
-The **xNetworking** module contains the **xFirewall, xIPAddress, xDnsServerAddress, xDnsConnectionSuffix** and **xDefaultGatewayAddress** DSC resources for configuring a node’s IP address, DNS server address, and firewall rules.
+The **xNetworking** module contains the following resources:
+* **xFirewall**
+* **xIPAddress**
+* **xDnsServerAddress**
+* **xDnsConnectionSuffix**
+* **xDefaultGatewayAddress**
+* **xNetConnectionProfile**
+* **xDhcpClient**
+* **xRoute**
+* **xNetBIOS**
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
-
 
 ## Resources
 
@@ -71,14 +79,43 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Platform**: Specifies which version of Windows the associated rule applies.
 * **RemoteAddress**: Specifies that network packets with matching IP addresses match this rule. This parameter value is the second end point of an IPsec rule and specifies the computers that are subject to the requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet, range, or the following keyword: Any
 * **RemoteMachine**: Specifies that matching IPsec rules of the indicated computer accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a computer identified in the list of computer accounts (SID) match this rule. This parameter value is specified as an SDDL string. 
-* **RemoteUser**: Specifies that matching IPsec rules of the indicated user accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a user identified in the list of user accounts match this rule. This parameter value is specified as an SDDL string. 
+* **RemoteUser**: Specifies that matching IPsec rules of the indicated user accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a user identified in the list of user accounts match this rule. This parameter value is specified as an SDDL string.
+* **DynamicTransport**: Specifies a dynamic transport: { Any | ProximityApps | ProximitySharing | WifiDirectPrinting | WifiDirectDisplay | WifiDirectDevices }
+* **EdgeTraversalPolicy**: Specifies that matching firewall rules of the indicated edge traversal policy are created: { Block | Allow | DeferToUser | DeferToApp }
+* **IcmpType**: Specifies the ICMP type codes.
+* **LocalOnlyMapping**: Indicates that matching firewall rules of the indicated value are created.
+* **LooseSourceMapping**: Indicates that matching firewall rules of the indicated value are created.
+* **OverrideBlockRules**: Indicates that matching network traffic that would otherwise be blocked are allowed.
+* **Owner**: Specifies that matching firewall rules of the indicated owner are created.
 
 ### xNetConnectionProfile
+
 * **InterfaceAlias**: Specifies the alias for the Interface that is being changed.
 * **NetworkCategory**: Sets the NetworkCategory for the interface - per [the documentation ](https://technet.microsoft.com/en-us/%5Clibrary/jj899565(v=wps.630).aspx) this can only be set to { Public | Private }
 * **IPv4Connectivity**: Specifies the IPv4 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
 * **IPv6Connectivity**: Specifies the IPv6 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
 
+### xDhcpClient
+
+* **State**: The desired state of the DHCP Client: { Enabled | Disabled }. Mandatory.
+* **InterfaceAlias**: Alias of the network interface for which the DNS server address is set. Mandatory.
+* **AddressFamily**: IP address family: { IPv4 | IPv6 }. Mandatory.
+
+### xRoute
+
+* **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
+* **AddressFamily**: Specifies the IP address family. { IPv4 | IPv6 }. Mandatory.
+* **DestinationPrefix**: Specifies a destination prefix of an IP route. A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/). Mandatory.
+* **NextHop**: Specifies the next hop for the IP route. Mandatory.
+* **Ensure**: Specifies whether the route should exist. { Present | Absent }. Defaults: Present.
+* **RouteMetric**: Specifies an integer route metric for an IP route. Default: 256.
+* **Publish**: Specifies the publish setting of an IP route. { No | Yes | Age }. Default: No.
+* **PreferredLifetime**: Specifies a preferred lifetime in seconds of an IP route.
+
+### NetBIOS
+
+* **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
+* **Setting**: xNetBIOS setting { Default | Enable | Disable }. Mandatory.
 
 ## Known Invalid Configurations
 
@@ -96,7 +133,29 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 ## Versions
 
-### Unreleased Version
+### Unreleased
+
+### 2.6.0.0
+
+* Added the following resources:
+    * MSFT_xDhcpClient resource to enable/disable DHCP on individual interfaces.
+    * MSFT_xRoute resource to manage network routes.
+    * MSFT_xNetBIOS resource to configure NetBIOS over TCP/IP settings on individual interfaces.
+* MSFT_*: Unit and Integration tests updated to use DSCResource.Tests\TestHelper.psm1 functions.
+* MSFT_*: Resource Name added to all unit test Desribes.
+* Templates update to use DSCResource.Tests\TestHelper.psm1 functions. 
+* MSFT_xNetConnectionProfile: Integration tests fixed when more than one connection profile present.
+* Changed AppVeyor.yml to use WMF 5 build environment.
+* MSFT_xIPAddress: Removed test for DHCP Status.
+* MSFT_xFirewall: New parameters added:
+    * DynamicTransport
+    * EdgeTraversalPolicy
+    * LocalOnlyMapping
+    * LooseSourceMapping
+    * OverrideBlockRules
+    * Owner
+* All unit & integration tests updated to be able to be run from any folder under tests directory.
+* Unit & Integration test template headers updated to match DSCResource templates.
 
 ### 2.5.0.0
 * Added the following resources:
@@ -552,6 +611,13 @@ configuration Sample_xFirewall_AddFirewallRule_AllParameters
             RemoteAddress         = @("192.168.2.0-192.168.2.128","192.168.1.0/255.255.255.0")
             RemoteMachine         = "O:LSD:(D;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1621)(A;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1620)"
             RemoteUser            = "O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)"
+            DynamicTransport      = "ProximitySharing"
+            EdgeTraversalPolicy   = "Block"
+            IcmpType              = ("51","52")
+            LocalOnlyMapping      = $true
+            LooseSourceMapping    = $true
+            OverrideBlockRules    = $true
+            Owner                 = "S-1-5-21-3337988176-3917481366-464002247-500"
         }
     }
  }
@@ -562,7 +628,7 @@ Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule_AllParameters -Wai
 
 ### Set the NetConnectionProfile to Public
 
-````powershell
+```powershell
 configuration MSFT_xNetConnectionProfile_Config {
     Import-DscResource -ModuleName xNetworking
     node localhost {
@@ -574,4 +640,67 @@ configuration MSFT_xNetConnectionProfile_Config {
         }
     }
 }
-````
+```
+
+### Set the DHCP Client state
+This example would set the DHCP Client State to enabled.
+
+```powershell
+configuration Sample_xDhcpClient_Enabled
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost',
+
+        [Parameter(Mandatory)]
+        [string]$InterfaceAlias,
+
+        [Parameter(Mandatory)]
+        [ValidateSet("IPv4","IPv6")]
+        [string]$AddressFamily
+    )
+
+    Import-DscResource -Module xDhcpClient
+
+    Node $NodeName
+    {
+        xDhcpClient EnableDhcpClient
+        {
+            State          = 'Enabled'
+            InterfaceAlias = $InterfaceAlias
+            AddressFamily  = $AddressFamily
+        }
+    }
+}
+```
+
+### Add a Route
+This example will add an IPv4 route on interface Ethernet.
+
+```powershell
+configuration Sample_xRoute_AddRoute
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xRoute NetRoute1
+        {
+            Ensure = 'Present'
+            InterfaceAlias = 'Ethernet'
+            AddressFamily = 'IPv4'
+            DestinationPrefix = '192.168.0.0/16'
+            NextHop = '192.168.120.0'
+            RouteMetric = 200
+        }
+    }
+ }
+
+Sample_xRoute_AddRoute
+Start-DscConfiguration -Path Sample_xRoute_AddRoute -Wait -Verbose -Force
+```

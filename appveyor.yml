@@ -1,8 +1,8 @@
 #---------------------------------#
 #      environment configuration  #
 #---------------------------------#
-os: Unstable
-version: 2.5.{build}.0
+os: WMF 5
+version: 2.6.{build}.0
 install:
   - cinst -y pester
   - git clone https://github.com/PowerShell/DscResource.Tests
@@ -36,12 +36,12 @@ test_script:
 #---------------------------------#
 
 # scripts to run before deployment
-before_deploy:
+deploy_script:
   - ps: |
       # Creating project artifact
       $stagingDirectory = (Resolve-Path ..).Path
       $manifest = Join-Path $pwd "xNetworking.psd1"
-      (Get-Content $manifest -Raw).Replace("2.5.0.0", $env:APPVEYOR_BUILD_VERSION) | Out-File $manifest
+      (Get-Content $manifest -Raw).Replace("2.6.0.0", $env:APPVEYOR_BUILD_VERSION) | Out-File $manifest
       $zipFilePath = Join-Path $stagingDirectory "$(Split-Path $pwd -Leaf).zip"
       Add-Type -assemblyname System.IO.Compression.FileSystem
       [System.IO.Compression.ZipFile]::CreateFromDirectory($pwd, $zipFilePath)

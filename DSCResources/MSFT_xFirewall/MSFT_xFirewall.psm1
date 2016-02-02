@@ -63,6 +63,13 @@ data ParameterList
         @{ Name = 'RemoteAddress'; Source = '$properties.AddressFilters.RemoteAddress'; Type = 'Array' }
         @{ Name = 'RemoteMachine'; Source = '$properties.SecurityFilters.RemoteMachine'; Type = 'String' }
         @{ Name = 'RemoteUser'; Source = '$properties.SecurityFilters.RemoteUser'; Type = 'String' }
+        @{ Name = 'DynamicTransport'; Source = '$properties.PortFilters.DynamicTransport'; Type = 'String' }
+        @{ Name = 'EdgeTraversalPolicy'; Source = '$FirewallRule.EdgeTraversalPolicy'; Type = 'String' }
+        @{ Name = 'IcmpType'; Source = '$properties.PortFilters.IcmpType'; Type = 'Array' }
+        @{ Name = 'LocalOnlyMapping'; Source = '$FirewallRule.LocalOnlyMapping'; Type = 'Boolean' }
+        @{ Name = 'LooseSourceMapping'; Source = '$FirewallRule.LooseSourceMapping'; Type = 'Boolean' }
+        @{ Name = 'OverrideBlockRules'; Source = '$properties.SecurityFilters.OverrideBlockRules'; Type = 'Boolean' }
+        @{ Name = 'Owner'; Source = '$FirewallRule.Owner'; Type = 'String' }
     )
 }
 
@@ -236,7 +243,32 @@ function Set-TargetResource
 
         # Specifies that matching IPsec rules of the indicated user accounts are created
         [ValidateNotNullOrEmpty()]
-        [String] $RemoteUser
+        [String] $RemoteUser,
+        
+        # Specifies a dynamic transport
+        [ValidateSet('Any','ProximityApps','ProximitySharing','WifiDirectPrinting','WifiDirectDisplay','WifiDirectDevices')]
+        [String] $DynamicTransport,
+        
+        # Specifies that matching firewall rules of the indicated edge traversal policy are created
+        [ValidateSet('Block','Allow','DeferToUser','DeferToApp')]
+        [String] $EdgeTraversalPolicy,
+        
+        # Specifies the ICMP type codes
+        [ValidateNotNullOrEmpty()]
+        [String[]] $IcmpType,
+        
+        # Indicates that matching firewall rules of the indicated value are created
+        [Boolean] $LocalOnlyMapping,
+
+        # Indicates that matching firewall rules of the indicated value are created
+        [Boolean] $LooseSourceMapping,
+
+        # Indicates that matching network traffic that would otherwise be blocked are allowed
+        [Boolean] $OverrideBlockRules,
+
+        # Specifies that matching firewall rules of the indicated owner are created
+        [ValidateNotNullOrEmpty()]
+        [String] $Owner
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -465,7 +497,32 @@ function Test-TargetResource
 
         # Specifies that matching IPsec rules of the indicated user accounts are created
         [ValidateNotNullOrEmpty()]
-        [String] $RemoteUser
+        [String] $RemoteUser,
+        
+        # Specifies a dynamic transport
+        [ValidateSet('Any','ProximityApps','ProximitySharing','WifiDirectPrinting','WifiDirectDisplay','WifiDirectDevices')]
+        [String] $DynamicTransport,
+        
+        # Specifies that matching firewall rules of the indicated edge traversal policy are created
+        [ValidateSet('Block','Allow','DeferToUser','DeferToApp')]
+        [String] $EdgeTraversalPolicy,
+        
+        # Specifies the ICMP type codes
+        [ValidateNotNullOrEmpty()]
+        [String[]] $IcmpType,
+        
+        # Indicates that matching firewall rules of the indicated value are created
+        [Boolean] $LocalOnlyMapping,
+
+        # Indicates that matching firewall rules of the indicated value are created
+        [Boolean] $LooseSourceMapping,
+
+        # Indicates that matching network traffic that would otherwise be blocked are allowed
+        [Boolean] $OverrideBlockRules,
+
+        # Specifies that matching firewall rules of the indicated owner are created
+        [ValidateNotNullOrEmpty()]
+        [String] $Owner
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -548,7 +605,14 @@ function Test-RuleProperties
         [String[]] $Platform,
         [String[]] $RemoteAddress,
         [String] $RemoteMachine,
-        [String] $RemoteUser
+        [String] $RemoteUser,
+        [String] $DynamicTransport,
+        [String] $EdgeTraversalPolicy,
+        [String[]] $IcmpType,
+        [Boolean] $LocalOnlyMapping,
+        [Boolean] $LooseSourceMapping,
+        [Boolean] $OverrideBlockRules,
+        [String] $Owner
     )
 
     $properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
@@ -567,6 +631,18 @@ function Test-RuleProperties
             'String'
             {
                 # Perform a plain string comparison.
+                if ($ParameterNew -and ($ParameterSource -ne $ParameterNew))
+                {
+                    Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                        $($LocalizedData.PropertyNoMatchMessage) `
+                            -f $parameter.Name,$ParameterSource,$ParameterNew
+                        ) -join '')
+                    $desiredConfigurationMatch = $false
+                }
+            }
+            'Boolean'
+            {
+                # Perform a boolean comparison.
                 if ($ParameterNew -and ($ParameterSource -ne $ParameterNew))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "

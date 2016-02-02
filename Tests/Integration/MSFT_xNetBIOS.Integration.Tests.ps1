@@ -1,5 +1,5 @@
 $Global:DSCModuleName      = 'xNetworking'
-$Global:DSCResourceName    = 'MSFT_xFirewall'
+$Global:DSCResourceName    = 'MSFT_xNetBIOS'
 
 #region HEADER
 [String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
@@ -24,7 +24,7 @@ try
 {
     #region Integration Tests
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($Global:DSCResourceName).config.ps1"
-    . $ConfigFile
+    . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($Global:DSCResourceName)_Integration" {
         #region DEFAULT TESTS
@@ -40,31 +40,10 @@ try
         }
         #endregion
 
-        It 'Should have set the resource and all the parameters should match' {
-            # Get the Rule details
-            $firewallRule = Get-NetFireWallRule -Name $rule.Name
-            $Properties = @{
-                AddressFilters       = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
-                ApplicationFilters   = @(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $FirewallRule)
-                InterfaceFilters     = @(Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $FirewallRule)
-                InterfaceTypeFilters = @(Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $FirewallRule)
-                PortFilters          = @(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $FirewallRule)
-                Profile              = @(Get-NetFirewallProfile -AssociatedNetFirewallRule $FirewallRule)
-                SecurityFilters      = @(Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $FirewallRule)
-                ServiceFilters       = @(Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule)
-            }
-
-            # Use the Parameters List to perform these tests
-            foreach ($parameters in $ParameterList)
-            {
-                $ParameterSource = (Invoke-Expression -Command "`$($($parameters.source))")
-                $ParameterNew = (Invoke-Expression -Command "`$rule.$($parameters.name)")
-                $ParameterSource | Should Be $ParameterNew
-            }           
+        It 'Should have set the resource and all setting should match current state' {
+            $Live = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($Global:DSCResourceName)_Config"}
+            $Live.Setting | should be $Current #Current is defined in MSFT_NetBIOS.config.ps1
         }
-
-        # Cleanup the Rule
-        Remove-NetFirewallRule -Name $rule.Name
     }
     #endregion
 }
