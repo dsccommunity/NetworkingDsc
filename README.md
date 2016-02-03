@@ -12,7 +12,7 @@ The **xNetworking** module contains the following resources:
 * **xDhcpClient**
 * **xRoute**
 * **xNetBIOS**
-* **xNetworking**
+* **xNetworkTeam**
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -149,7 +149,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
     * MSFT_xDhcpClient resource to enable/disable DHCP on individual interfaces.
     * MSFT_xRoute resource to manage network routes.
     * MSFT_xNetBIOS resource to configure NetBIOS over TCP/IP settings on individual interfaces.
-    * MSFT_NetworkTeam resource to manage native network adapter teaming.
+    * MSFT_xNetworkTeam resource to manage native network adapter teaming.
 * MSFT_*: Unit and Integration tests updated to use DSCResource.Tests\TestHelper.psm1 functions.
 * MSFT_*: Resource Name added to all unit test Desribes.
 * Templates update to use DSCResource.Tests\TestHelper.psm1 functions. 
