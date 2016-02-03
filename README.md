@@ -11,7 +11,11 @@ The **xNetworking** module contains the following resources:
 * **xNetConnectionProfile**
 * **xDhcpClient**
 * **xRoute**
+<<<<<<< HEAD
 * **NetworkTeam**
+=======
+* **xNetBIOS**
+>>>>>>> refs/remotes/PowerShell/dev
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -113,12 +117,19 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Publish**: Specifies the publish setting of an IP route. { No | Yes | Age }. Default: No.
 * **PreferredLifetime**: Specifies a preferred lifetime in seconds of an IP route.
 
+<<<<<<< HEAD
 ### NetworkTeam
 * **Name**: Specifies the name of the network team to create.
 * **TeamMembers**: Specifies the network interfaces that should be a part of the network team. This is a comma-separated list.
 * **TeamingMode**: Specifies the teaming mode configuration. { SwitchIndependent | LACP | Static}.
 * **LoadBalancingAlgorithm**: Specifies the load balancing algorithm for the network team. { Dynamic | HyperVPort | IPAddresses | MacAddresses | TransportPorts }.
 * **Ensure**: Specifies if the network team should be created or deleted. { Present | Absent }.
+=======
+### NetBIOS
+
+* **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
+* **Setting**: xNetBIOS setting { Default | Enable | Disable }. Mandatory.
+>>>>>>> refs/remotes/PowerShell/dev
 
 ## Known Invalid Configurations
 
@@ -136,11 +147,18 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 ## Versions
 
-### Unreleased Version
+### Unreleased
+
+### 2.6.0.0
+
 * Added the following resources:
     * MSFT_xDhcpClient resource to enable/disable DHCP on individual interfaces.
     * MSFT_xRoute resource to manage network routes.
+<<<<<<< HEAD
     * MSFT_NetworkTeam resource to manage native network teaming.
+=======
+    * MSFT_xNetBIOS resource to configure NetBIOS over TCP/IP settings on individual interfaces.
+>>>>>>> refs/remotes/PowerShell/dev
 * MSFT_*: Unit and Integration tests updated to use DSCResource.Tests\TestHelper.psm1 functions.
 * MSFT_*: Resource Name added to all unit test Desribes.
 * Templates update to use DSCResource.Tests\TestHelper.psm1 functions. 
@@ -154,6 +172,8 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
     * LooseSourceMapping
     * OverrideBlockRules
     * Owner
+* All unit & integration tests updated to be able to be run from any folder under tests directory.
+* Unit & Integration test template headers updated to match DSCResource templates.
 
 ### 2.5.0.0
 * Added the following resources:
