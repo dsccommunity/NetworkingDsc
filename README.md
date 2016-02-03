@@ -12,6 +12,7 @@ The **xNetworking** module contains the following resources:
 * **xDhcpClient**
 * **xRoute**
 * **xNetBIOS**
+* **xNetworkTeam**
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -71,14 +72,14 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Service**: Specifies the short name of a Windows service to which the firewall rule applies.
 * **Authentication**: Specifies that authentication is required on firewall rules: { NotRequired | Required | NoEncap }
 * **Encryption**: Specifies that encryption in authentication is required on firewall rules: { NotRequired | Required | Dynamic }
-* **InterfaceAlias**: Specifies the alias of the interface that applies to the traffic. 
+* **InterfaceAlias**: Specifies the alias of the interface that applies to the traffic.
 * **InterfaceType**: Specifies that only network connections made through the indicated interface types are subject to the requirements of this rule: { Any | Wired | Wireless | RemoteAccess }
-* **LocalAddress**: Specifies that network packets with matching IP addresses match this rule. This parameter value is the first end point of an IPsec rule and specifies the computers that are subject to the requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet, range, or the following keyword: Any. 
+* **LocalAddress**: Specifies that network packets with matching IP addresses match this rule. This parameter value is the first end point of an IPsec rule and specifies the computers that are subject to the requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet, range, or the following keyword: Any.
 * **LocalUser**: Specifies the principals to which network traffic this firewall rule applies. The principals, represented by security identifiers (SIDs) in the security descriptor definition language (SDDL) string, are services, users, application containers, or any SID to which network traffic is associated.
-* **Package**: Specifies the Windows Store application to which the firewall rule applies. This parameter is specified as a security identifier (SID). 
+* **Package**: Specifies the Windows Store application to which the firewall rule applies. This parameter is specified as a security identifier (SID).
 * **Platform**: Specifies which version of Windows the associated rule applies.
 * **RemoteAddress**: Specifies that network packets with matching IP addresses match this rule. This parameter value is the second end point of an IPsec rule and specifies the computers that are subject to the requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet, range, or the following keyword: Any
-* **RemoteMachine**: Specifies that matching IPsec rules of the indicated computer accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a computer identified in the list of computer accounts (SID) match this rule. This parameter value is specified as an SDDL string. 
+* **RemoteMachine**: Specifies that matching IPsec rules of the indicated computer accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a computer identified in the list of computer accounts (SID) match this rule. This parameter value is specified as an SDDL string.
 * **RemoteUser**: Specifies that matching IPsec rules of the indicated user accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a user identified in the list of user accounts match this rule. This parameter value is specified as an SDDL string.
 * **DynamicTransport**: Specifies a dynamic transport: { Any | ProximityApps | ProximitySharing | WifiDirectPrinting | WifiDirectDisplay | WifiDirectDevices }
 * **EdgeTraversalPolicy**: Specifies that matching firewall rules of the indicated edge traversal policy are created: { Block | Allow | DeferToUser | DeferToApp }
@@ -112,10 +113,17 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Publish**: Specifies the publish setting of an IP route. { No | Yes | Age }. Default: No.
 * **PreferredLifetime**: Specifies a preferred lifetime in seconds of an IP route.
 
-### NetBIOS
+### xNetBIOS
 
 * **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
 * **Setting**: xNetBIOS setting { Default | Enable | Disable }. Mandatory.
+
+### xNetworkTeam
+* **Name**: Specifies the name of the network team to create.
+* **TeamMembers**: Specifies the network interfaces that should be a part of the network team. This is a comma-separated list.
+* **TeamingMode**: Specifies the teaming mode configuration. { SwitchIndependent | LACP | Static}.
+* **LoadBalancingAlgorithm**: Specifies the load balancing algorithm for the network team. { Dynamic | HyperVPort | IPAddresses | MacAddresses | TransportPorts }.
+* **Ensure**: Specifies if the network team should be created or deleted. { Present | Absent }.
 
 ## Known Invalid Configurations
 
@@ -135,6 +143,11 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 ### Unreleased
 
+### 2.7.0.0
+
+* Added the following resources:
+    * MSFT_xNetworkTeam resource to manage native network adapter teaming.
+
 ### 2.6.0.0
 
 * Added the following resources:
@@ -143,7 +156,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
     * MSFT_xNetBIOS resource to configure NetBIOS over TCP/IP settings on individual interfaces.
 * MSFT_*: Unit and Integration tests updated to use DSCResource.Tests\TestHelper.psm1 functions.
 * MSFT_*: Resource Name added to all unit test Desribes.
-* Templates update to use DSCResource.Tests\TestHelper.psm1 functions. 
+* Templates update to use DSCResource.Tests\TestHelper.psm1 functions.
 * MSFT_xNetConnectionProfile: Integration tests fixed when more than one connection profile present.
 * Changed AppVeyor.yml to use WMF 5 build environment.
 * MSFT_xIPAddress: Removed test for DHCP Status.
