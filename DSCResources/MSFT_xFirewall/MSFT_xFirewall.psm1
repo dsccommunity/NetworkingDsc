@@ -1,13 +1,10 @@
-#######################################################################################
-#  xFirewall : DSC Resource that will set/test/get Firewall Rules
-#######################################################################################
-
 data LocalizedData
 {
     # culture="en-US"
     ConvertFrom-StringData -StringData @'
 GettingFirewallRuleMessage=Getting firewall rule with Name '{0}'.
 FirewallRuleDoesNotExistMessage=Firewall rule with Name '{0}' does not exist.
+FirewallParameterValueMessage=Firewall rule with Name '{0}' parameter {1} is '{2}'.
 ApplyingFirewallRuleMessage=Applying settings for firewall rule with Name '{0}'.
 FindFirewallRuleMessage=Find firewall rule with Name '{0}'.
 FirewallRuleShouldExistMessage=We want the firewall rule with Name '{0}' to exist since Ensure is set to {1}.
@@ -20,19 +17,62 @@ FirewallRuleShouldNotExistButDoesMessage=We do not want the firewall rule with N
 FirewallRuleShouldNotExistAndDoesNotMessage=We do not want the firewall rule with Name '{0}' to exist, and it does not.
 CheckingFirewallRuleMessage=Checking settings for firewall rule with Name '{0}'.
 CheckingFirewallReturningMessage=Check Firewall rule with Name '{0}' returning {1}.
-CheckingFirewallParametersMessage=Check each defined parameter against the existing Firewall Rule with Name '{0}'.
 PropertyNoMatchMessage={0} property value '{1}' does not match desired state '{2}'.
 TestFirewallRuleReturningMessage=Test Firewall rule with Name '{0}' returning {1}.
 FirewallRuleNotFoundMessage=No Firewall Rule found with Name '{0}'.
 GetAllPropertiesMessage=Get all the properties and add filter info to rule map.
 RuleNotUniqueError={0} Firewall Rules with the Name '{1}' were found. Only one expected.
-CantChangeDisplayGroupError=The DisplayGroup of an existing Firewall Rule can not be changed. Delete and recreate this rule instead.
 '@
 }
 
-######################################################################################
-# The Get-TargetResource cmdlet.
-######################################################################################
+<#
+    This is an array of all the parameters used by this resource
+    It can be used by several of the functions to reduce the amount of code required
+    Each element contains 3 properties:
+    Name: The parameter name
+    Source: The source where the existing parameter can be pulled from
+    Type: This is the content type of the paramater (it is either array or string or blank)
+    A blank type means it will not be compared
+    data ParameterList
+#>
+data ParameterList
+{
+    @( 
+        @{ Name = 'Name'; Source = '$FirewallRule.Name'; Type = 'String' },
+        @{ Name = 'DisplayName'; Source = '$FirewallRule.DisplayName'; Type = 'String' },
+        @{ Name = 'Group'; Source = '$FirewallRule.Group'; Type = 'String' },
+        @{ Name = 'DisplayGroup'; Source = '$FirewallRule.DisplayGroup'; Type = '' },
+        @{ Name = 'Enabled'; Source = '$FirewallRule.Enabled'; Type = 'String' },
+        @{ Name = 'Action'; Source = '$FirewallRule.Action'; Type = 'String' },
+        @{ Name = 'Profile'; Source = '$firewallRule.Profile'; Type = 'Array' },
+        @{ Name = 'Direction'; Source = '$FirewallRule.Direction'; Type = 'String' },
+        @{ Name = 'Description'; Source = '$FirewallRule.Description'; Type = 'String' },
+        @{ Name = 'RemotePort'; Source = '$properties.PortFilters.RemotePort'; Type = 'Array' },
+        @{ Name = 'LocalPort'; Source = '$properties.PortFilters.LocalPort'; Type = 'Array' },
+        @{ Name = 'Protocol'; Source = '$properties.PortFilters.Protocol'; Type = 'String' },
+        @{ Name = 'Program'; Source = '$properties.ApplicationFilters.Program'; Type = 'String' },
+        @{ Name = 'Service'; Source = '$properties.ServiceFilters.Service'; Type = 'String' },
+        @{ Name = 'Authentication'; Source = '$properties.SecurityFilters.Authentication'; Type = 'String' },
+        @{ Name = 'Encryption'; Source = '$properties.SecurityFilters.Encryption'; Type = 'String' }
+        @{ Name = 'InterfaceAlias'; Source = '$properties.InterfaceFilters.InterfaceAlias'; Type = 'Array' }
+        @{ Name = 'InterfaceType'; Source = '$properties.InterfaceTypeFilters.InterfaceType'; Type = 'String' }
+        @{ Name = 'LocalAddress'; Source = '$properties.AddressFilters.LocalAddress'; Type = 'Array' }
+        @{ Name = 'LocalUser'; Source = '$properties.SecurityFilters.LocalUser'; Type = 'String' }
+        @{ Name = 'Package'; Source = '$properties.ApplicationFilters.Package'; Type = 'String' }
+        @{ Name = 'Platform'; Source = '$firewallRule.Platform'; Type = 'Array' }
+        @{ Name = 'RemoteAddress'; Source = '$properties.AddressFilters.RemoteAddress'; Type = 'Array' }
+        @{ Name = 'RemoteMachine'; Source = '$properties.SecurityFilters.RemoteMachine'; Type = 'String' }
+        @{ Name = 'RemoteUser'; Source = '$properties.SecurityFilters.RemoteUser'; Type = 'String' }
+        @{ Name = 'DynamicTransport'; Source = '$properties.PortFilters.DynamicTransport'; Type = 'String' }
+        @{ Name = 'EdgeTraversalPolicy'; Source = '$FirewallRule.EdgeTraversalPolicy'; Type = 'String' }
+        @{ Name = 'IcmpType'; Source = '$properties.PortFilters.IcmpType'; Type = 'Array' }
+        @{ Name = 'LocalOnlyMapping'; Source = '$FirewallRule.LocalOnlyMapping'; Type = 'Boolean' }
+        @{ Name = 'LooseSourceMapping'; Source = '$FirewallRule.LooseSourceMapping'; Type = 'Boolean' }
+        @{ Name = 'OverrideBlockRules'; Source = '$properties.SecurityFilters.OverrideBlockRules'; Type = 'Boolean' }
+        @{ Name = 'Owner'; Source = '$FirewallRule.Owner'; Type = 'String' }
+    )
+}
+
 function Get-TargetResource
 {
     [OutputType([System.Collections.Hashtable])]
@@ -43,7 +83,7 @@ function Get-TargetResource
         [ValidateNotNullOrEmpty()]
         [String] $Name
     )
-
+    $ErrorActionPreference = 'Stop'
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
         $($LocalizedData.GettingFirewallRuleMessage) -f $Name
         ) -join '')
@@ -59,36 +99,49 @@ function Get-TargetResource
             $($LocalizedData.FirewallRuleDoesNotExistMessage) -f $Name
             ) -join '')
         return @{
-            Name   = $Name
             Ensure = 'Absent'
+            Name   = $Name
         }
     }
 
     $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
 
-    # Populate the properties for get target resource
-    return @{
-        Name            = $Name
-        Ensure          = 'Present'
-        DisplayName     = $firewallRule.DisplayName
-        Group           = $firewallRule.Group
-        DisplayGroup    = $firewallRule.DisplayGroup
-        Enabled         = $firewallRule.Enabled
-        Action          = $firewallRule.Action
-        Profile         = $firewallRule.Profile.ToString() -replace(' ', '') -split(',')
-        Direction       = $firewallRule.Direction
-        Description     = $firewallRule.Description
-        RemotePort      = @($properties.PortFilters.RemotePort)
-        LocalPort       = @($properties.PortFilters.LocalPort)
-        Protocol        = $properties.PortFilters.Protocol
-        Program         = $properties.ApplicationFilters.Program
-        Service         = $properties.ServiceFilters.Service
+    $Result = @{
+        Ensure = 'Present'
     }
+
+    # Populate the properties for get target resource by looping through
+    # the parameter array list and adding the values to 
+    foreach ($parameter in $ParameterList)
+    {
+
+        if ($parameter.type -eq 'Array')
+        {
+            $Value = @(Invoke-Expression -Command "`$($($parameter.source))")
+            $Result += @{
+                $parameter.Name = $Value
+            }
+
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                $($LocalizedData.FirewallParameterValueMessage) -f $Name,$parameter.Name,($Value -join ',')
+                ) -join '')
+        }
+        else 
+        {
+            $Value = (Invoke-Expression -Command "`$($($parameter.source))")
+            $Result += @{
+                $parameter.Name = $Value
+            }
+
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                $($LocalizedData.FirewallParameterValueMessage) -f $Name,$parameter.Name,$Value
+                ) -join '')
+
+        }
+    }
+    return $Result
 }
 
-######################################################################################
-# The Set-TargetResource cmdlet.
-######################################################################################
 function Set-TargetResource
 {
     param
@@ -104,7 +157,7 @@ function Set-TargetResource
 
         # Name of the Firewall Group where we want to put the Firewall Rules
         [ValidateNotNullOrEmpty()]
-        [String] $DisplayGroup,
+        [String] $Group,
 
         # Ensure the presence/absence of the resource
         [ValidateSet('Present', 'Absent')]
@@ -145,7 +198,77 @@ function Set-TargetResource
 
         # Specifies the short name of a Windows service to which the firewall rule applies
         [ValidateNotNullOrEmpty()]
-        [String] $Service
+        [String] $Service,
+
+        # Specifies that authentication is required on firewall rules
+        [ValidateSet('NotRequired', 'Required', 'NoEncap')]
+        [String] $Authentication,
+
+        # Specifies that encryption in authentication is required on firewall rules
+        [ValidateSet('NotRequired', 'Required', 'Dynamic')]
+        [String] $Encryption,
+
+        # Specifies the alias of the interface that applies to the traffic
+        [ValidateNotNullOrEmpty()]
+        [String[]] $InterfaceAlias,
+
+        # Specifies that only network connections made through the indicated interface types are
+        # subject to the requirements of this rule
+        [ValidateSet('Any', 'Wired', 'Wireless', 'RemoteAccess')]
+        [String] $InterfaceType,
+
+        # Specifies that network packets with matching IP addresses match this rule
+        [ValidateNotNullOrEmpty()]
+        [String[]] $LocalAddress,
+
+        # Specifies the principals to which network traffic this firewall rule applies
+        [ValidateNotNullOrEmpty()]
+        [String] $LocalUser,
+
+        # Specifies the Windows Store application to which the firewall rule applies
+        [ValidateNotNullOrEmpty()]
+        [String] $Package,
+
+        # Specifies which version of Windows the associated rule applies
+        [ValidateNotNullOrEmpty()]
+        [String[]] $Platform,
+
+        # Specifies that network packets with matching IP addresses match this rule
+        [ValidateNotNullOrEmpty()]
+        [String[]] $RemoteAddress,
+
+        # Specifies that matching IPsec rules of the indicated computer accounts are created
+        [ValidateNotNullOrEmpty()]
+        [String] $RemoteMachine,
+
+        # Specifies that matching IPsec rules of the indicated user accounts are created
+        [ValidateNotNullOrEmpty()]
+        [String] $RemoteUser,
+        
+        # Specifies a dynamic transport
+        [ValidateSet('Any','ProximityApps','ProximitySharing','WifiDirectPrinting','WifiDirectDisplay','WifiDirectDevices')]
+        [String] $DynamicTransport,
+        
+        # Specifies that matching firewall rules of the indicated edge traversal policy are created
+        [ValidateSet('Block','Allow','DeferToUser','DeferToApp')]
+        [String] $EdgeTraversalPolicy,
+        
+        # Specifies the ICMP type codes
+        [ValidateNotNullOrEmpty()]
+        [String[]] $IcmpType,
+        
+        # Indicates that matching firewall rules of the indicated value are created
+        [Boolean] $LocalOnlyMapping,
+
+        # Indicates that matching firewall rules of the indicated value are created
+        [Boolean] $LooseSourceMapping,
+
+        # Indicates that matching network traffic that would otherwise be blocked are allowed
+        [Boolean] $OverrideBlockRules,
+
+        # Specifies that matching firewall rules of the indicated owner are created
+        [ValidateNotNullOrEmpty()]
+        [String] $Owner
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -154,12 +277,6 @@ function Set-TargetResource
 
     # Remove any parameters not used in Splats
     $null = $PSBoundParameters.Remove('Ensure')
-
-    # Effectively renaming DisplayGroup to Group
-    if ($DisplayGroup) {
-        $null = $PSBoundParameters.Add('Group', $DisplayGroup)
-    }
-    $null = $PSBoundParameters.Remove('DisplayGroup')
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
         $($LocalizedData.FindFirewallRuleMessage) -f $Name
@@ -189,35 +306,45 @@ function Set-TargetResource
                     $($LocalizedData.UpdatingExistingFirewallMessage) -f $Name
                     ) -join '')
 
-                # If the DisplayGroup is being changed then the rule
-                # Has to be removed and recreated because that is the
-                # Only way the DisplayGroup can be changed unfortunately.
-                # A change to the set-netfirewallrule has been requested:
-                # https://connect.microsoft.com/PowerShell/feedbackdetail/view/1970765/add-ability-to-change-firewall-displaygroup-in-set-netfirewallrule-cmdlet
+                # If the Group is being changed the the rule needs to be recreated
                 if ($PSBoundParameters.ContainsKey('Group') `
-                    -and ($Group -ne $FirewallRule.Group)) {
-                    # Although it is possible to automatically remove and recreate
-                    # this rule, it introduces more problems than it solves.
-                    # So for now this will throw an error with the suggested solution.
-                    $errorId = 'CantChangeDisplayGroupError'
-                    $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-                    $errorMessage = $($LocalizedData.CantChangeDisplayGroupError) -f $Name
-                    $exception = New-Object -TypeName System.InvalidOperationException `
-                        -ArgumentList $errorMessage
-                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                        -ArgumentList $exception, $errorId, $errorCategory, $null
+                    -and ($Group -ne $FirewallRule.Group))
+                {
 
-                    $PSCmdlet.ThrowTerminatingError($errorRecord)
-                } else {
+                    Remove-NetFirewallRule -Name $Name
+
+                    # Merge the existing rule values into the PSBoundParameters
+                    # so that it can be splatted.
+
+                    $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
+
+                    # Loop through each possible property and if it is not passed as a parameter
+                    # then set the PSBoundParameter property to the exiting rule value.
+                    Foreach ($parameter in $ParametersList) {
+                        if (-not $PSBoundParameters.ContainsKey($parameter.Name))
+                        {
+                            $ParameterValue = (Invoke-Expression -Command "`$($($parameter.source))")
+                            if ($ParameterValue) {
+                                $null = $PSBoundParameters.Add($parameter.Name,$ParameterValue)
+                            }
+                        }
+                    }
+
+                    New-NetFirewallRule @PSBoundParameters
+                }
+                else
+                {
                     # If the DisplayName is provided then need to remove it
                     # And change it to NewDisplayName if it is different.
-                    if ($PSBoundParameters.ContainsKey('DisplayName')) {
+                    if ($PSBoundParameters.ContainsKey('DisplayName'))
+                    {
                         $null = $PSBoundParameters.Remove('DisplayName')
-                        if ($DisplayName -ne $FirewallRule.DisplayName) {
+                        if ($DisplayName -ne $FirewallRule.DisplayName)
+                        {
                             $null = $PSBoundParameters.Add('NewDisplayName',$Name)
                         }
                     }
-               
+
                     # Set the existing Firewall rule based on specified parameters
                     Set-NetFirewallRule @PSBoundParameters
                 }
@@ -238,7 +365,6 @@ function Set-TargetResource
                 }
             }
 
-
             # Add the new Firewall rule based on specified parameters
             New-NetFirewallRule @PSBoundParameters
         }
@@ -250,7 +376,7 @@ function Set-TargetResource
             ) -join '')
 
         if ($exists)
-        {           
+        {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                 $($LocalizedData.FirewallRuleShouldNotExistButDoesMessage) -f $Name
                 ) -join '')
@@ -268,11 +394,7 @@ function Set-TargetResource
     }
 }
 
-######################################################################################
-# The Test-TargetResource cmdlet.
-# DSC uses Test-TargetResource cmdlet to check the status of the resource instance on
-# the target machine
-######################################################################################
+
 function Test-TargetResource
 {
     [OutputType([System.Boolean])]
@@ -289,7 +411,7 @@ function Test-TargetResource
 
         # Name of the Firewall Group where we want to put the Firewall Rules
         [ValidateNotNullOrEmpty()]
-        [String] $DisplayGroup,
+        [String] $Group,
 
         # Ensure the presence/absence of the resource
         [ValidateSet('Present', 'Absent')]
@@ -330,7 +452,77 @@ function Test-TargetResource
 
         # Specifies the short name of a Windows service to which the firewall rule applies
         [ValidateNotNullOrEmpty()]
-        [String] $Service
+        [String] $Service,
+
+        # Specifies that authentication is required on firewall rules
+        [ValidateSet('NotRequired', 'Required', 'NoEncap')]
+        [String] $Authentication,
+        
+        # Specifies that encryption in authentication is required on firewall rules
+        [ValidateSet('NotRequired', 'Required', 'Dynamic')]
+        [String] $Encryption,
+
+        # Specifies the alias of the interface that applies to the traffic
+        [ValidateNotNullOrEmpty()]
+        [String[]] $InterfaceAlias,
+
+        # Specifies that only network connections made through the indicated interface types are
+        # subject to the requirements of this rule
+        [ValidateSet('Any', 'Wired', 'Wireless', 'RemoteAccess')]
+        [String] $InterfaceType,
+
+        # Specifies that network packets with matching IP addresses match this rule
+        [ValidateNotNullOrEmpty()]
+        [String[]] $LocalAddress,
+
+        # Specifies the principals to which network traffic this firewall rule applies
+        [ValidateNotNullOrEmpty()]
+        [String] $LocalUser,
+
+        # Specifies the Windows Store application to which the firewall rule applies
+        [ValidateNotNullOrEmpty()]
+        [String] $Package,
+
+        # Specifies which version of Windows the associated rule applies
+        [ValidateNotNullOrEmpty()]
+        [String[]] $Platform,
+
+        # Specifies that network packets with matching IP addresses match this rule
+        [ValidateNotNullOrEmpty()]
+        [String[]] $RemoteAddress,
+
+        # Specifies that matching IPsec rules of the indicated computer accounts are created
+        [ValidateNotNullOrEmpty()]
+        [String] $RemoteMachine,
+
+        # Specifies that matching IPsec rules of the indicated user accounts are created
+        [ValidateNotNullOrEmpty()]
+        [String] $RemoteUser,
+        
+        # Specifies a dynamic transport
+        [ValidateSet('Any','ProximityApps','ProximitySharing','WifiDirectPrinting','WifiDirectDisplay','WifiDirectDevices')]
+        [String] $DynamicTransport,
+        
+        # Specifies that matching firewall rules of the indicated edge traversal policy are created
+        [ValidateSet('Block','Allow','DeferToUser','DeferToApp')]
+        [String] $EdgeTraversalPolicy,
+        
+        # Specifies the ICMP type codes
+        [ValidateNotNullOrEmpty()]
+        [String[]] $IcmpType,
+        
+        # Indicates that matching firewall rules of the indicated value are created
+        [Boolean] $LocalOnlyMapping,
+
+        # Indicates that matching firewall rules of the indicated value are created
+        [Boolean] $LooseSourceMapping,
+
+        # Indicates that matching network traffic that would otherwise be blocked are allowed
+        [Boolean] $OverrideBlockRules,
+
+        # Specifies that matching firewall rules of the indicated owner are created
+        [ValidateNotNullOrEmpty()]
+        [String] $Owner
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -364,7 +556,7 @@ function Test-TargetResource
     }
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.CheckingFirewallParametersMessage) -f $Name
+        $($LocalizedData.CheckFirewallRuleParametersMessage) -f $Name
         ) -join '')
     $desiredConfigurationMatch = Test-RuleProperties -FirewallRule $firewallRule @PSBoundParameters
 
@@ -379,23 +571,20 @@ function Test-TargetResource
 }
 
 #region HelperFunctions
-
-######################
-## Helper Functions ##
-######################
-
-######################################################################################
-# Function to validate if the supplied Rule adheres to all parameters set
-######################################################################################
+<#
+    .SYNOPSIS
+    Function to validate if the supplied Rule adheres to all parameters set
+#>
 function Test-RuleProperties
 {
-    param (
+    param
+    (
         [Parameter(Mandatory)]
         $FirewallRule,
         [String] $Name,
-        [String] $DisplayName = $Name,
+        [String] $DisplayName,
+        [string] $Group,
         [String] $DisplayGroup,
-        [String] $Group,
         [String] $Enabled = 'True',
         [string] $Action = 'Allow',
         [String[]] $Profile = 'Any',
@@ -405,165 +594,84 @@ function Test-RuleProperties
         [String] $Protocol,
         [String] $Description,
         [String] $Program,
-        [String] $Service
+        [String] $Service,
+        [String] $Authentication,
+        [String] $Encryption,
+        [String[]] $InterfaceAlias,
+        [String] $InterfaceType,
+        [String[]] $LocalAddress,
+        [String] $LocalUser,
+        [String] $Package,
+        [String[]] $Platform,
+        [String[]] $RemoteAddress,
+        [String] $RemoteMachine,
+        [String] $RemoteUser,
+        [String] $DynamicTransport,
+        [String] $EdgeTraversalPolicy,
+        [String[]] $IcmpType,
+        [Boolean] $LocalOnlyMapping,
+        [Boolean] $LooseSourceMapping,
+        [Boolean] $OverrideBlockRules,
+        [String] $Owner
     )
 
     $properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
 
     $desiredConfigurationMatch = $true
 
-    if ($Name -and ($FirewallRule.Name -ne $Name))
+    # Loop through the $ParameterList array and compare the source
+    # with the value of each parameter. If different then
+    # set $desiredConfigurationMatch to false.
+    foreach ($parameter in $ParameterList)
     {
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) -f 'Name',$FirewallRule.Name,$Name
-            ) -join '')
-        $desiredConfigurationMatch = $false
-    }
-
-    if ($Enabled -and ($FirewallRule.Enabled.ToString() -ne $Enabled))
-    {
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) -f 'Enabled',$FirewallRule.Enabled.ToString(),$Enabled
-            ) -join '')
-        $desiredConfigurationMatch = $false
-    }
-
-    if ($Action -and ($FirewallRule.Action -ne $Action))
-    {
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) -f 'Action',$FirewallRule.Action,$Action
-            ) -join '')
-        $desiredConfigurationMatch = $false
-    }
-
-    if ($Profile)
-    {
-        [String[]] $networkProfileinRule = $FirewallRule.Profile.ToString() -replace(' ', '') -split(',')
-
-        if ($networkProfileinRule.Count -eq $Profile.Count)
+        $ParameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
+        $ParameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
+        switch ($parameter.type)
         {
-            foreach($networkProfile in $Profile)
+            'String'
             {
-                if (-not ($networkProfileinRule -contains $networkProfile))
+                # Perform a plain string comparison.
+                if ($ParameterNew -and ($ParameterSource -ne $ParameterNew))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                         $($LocalizedData.PropertyNoMatchMessage) `
-                            -f 'Profile',($networkProfileinRule -join ','),($Profile -join ',')
+                            -f $parameter.Name,$ParameterSource,$ParameterNew
                         ) -join '')
                     $desiredConfigurationMatch = $false
-                    break
                 }
             }
-        }
-        else
-        {
-            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.PropertyNoMatchMessage) `
-                    -f 'Profile',($networkProfileinRule -join ','),($Profile -join ',')
-                ) -join '')
-            $desiredConfigurationMatch = $false
-        }
-    }
-
-    if ($Direction -and ($FirewallRule.Direction -ne $Direction))
-    {
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) `
-                -f 'Direction',$FirewallRule.Direction,$Direction
-            ) -join '')
-        $desiredConfigurationMatch = $false
-    }
-
-    if ($RemotePort)
-    {
-        [String[]]$remotePortInRule = $properties.PortFilters.RemotePort
-
-        if ($remotePortInRule.Count -eq $RemotePort.Count)
-        {
-            foreach($port in $RemotePort)
+            'Boolean'
             {
-                if (-not ($remotePortInRule -contains($port)))
+                # Perform a boolean comparison.
+                if ($ParameterNew -and ($ParameterSource -ne $ParameterNew))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                         $($LocalizedData.PropertyNoMatchMessage) `
-                            -f 'RemotePort',($remotePortInRule -join ','),($RemotePort -join ',')
+                            -f $parameter.Name,$ParameterSource,$ParameterNew
+                        ) -join '')
+                    $desiredConfigurationMatch = $false
+                }
+            }
+            'Array'
+            {
+                # Array comparison uses Compare-Object
+                if ($ParameterSource -eq $null)
+                {
+                    $ParameterSource = @()
+                }
+                if ($ParameterNew `
+                    -and ((Compare-Object `
+                        -ReferenceObject $ParameterSource `
+                        -DifferenceObject $ParameterNew).Count -ne 0))
+                {
+                    Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                        $($LocalizedData.PropertyNoMatchMessage) `
+                            -f $parameter.Name,($ParameterSource -join ','),($ParameterNew -join ',')
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
             }
         }
-        else
-        {
-            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.PropertyNoMatchMessage) `
-                    -f 'RemotePort',($remotePortInRule -join ','),($RemotePort -join ',')
-                ) -join '')
-            $desiredConfigurationMatch = $false
-        }
-    }
-
-    if ($LocalPort)
-    {
-        [String[]]$localPortInRule = $properties.PortFilters.LocalPort
-
-        if ($localPortInRule.Count -eq $LocalPort.Count)
-        {
-            foreach($port in $LocalPort)
-            {
-                if (-not ($localPortInRule -contains($port)))
-                {
-                    Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.PropertyNoMatchMessage) `
-                            -f 'LocalPort',($localPortInRule -join ','),($LocalPort -join ',')
-                        ) -join '')
-                    $desiredConfigurationMatch = $false
-                }
-            }
-        }
-        else
-        {
-            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.PropertyNoMatchMessage) `
-                    -f 'LocalPort',($localPortInRule -join ','),($LocalPort -join ',')
-                ) -join '')
-            $desiredConfigurationMatch = $false
-        }
-    }
-
-    if ($Protocol -and ($properties.PortFilters.Protocol -ne $Protocol))
-    {
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) `
-                -f 'Protocol',$properties.PortFilters.Protocol,$Protocol
-            ) -join '')
-        $desiredConfigurationMatch = $false
-    }
-
-    if ($Description -and ($FirewallRule.Description -ne $Description))
-    {
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) `
-                -f 'Description',$FirewallRule.Description,$Description
-            ) -join '')
-        $desiredConfigurationMatch = $false
-    }
-
-    if ($Program -and ($properties.ApplicationFilters.Program -ne $Program))
-    {
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) `
-                -f 'Program',$properties.ApplicationFilters.Program,$Program
-            ) -join '')
-        $desiredConfigurationMatch = $false
-    }
-
-    if ($Service -and ($properties.ServiceFilters.Service -ne $Service))
-    {
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.PropertyNoMatchMessage) `
-                -f 'Service',$properties.ServiceFilters.Service,$Service
-            ) -join '')
-        $desiredConfigurationMatch = $false
     }
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -572,9 +680,11 @@ function Test-RuleProperties
     return $desiredConfigurationMatch
 }
 
-######################################################################################
-# Returns a list of FirewallRules that comply to the specified parameters.
-######################################################################################
+
+<#
+    .SYNOPSIS
+    Returns a list of FirewallRules that comply to the specified parameters.
+#>
 function Get-FirewallRule
 {
     param (
@@ -610,9 +720,11 @@ function Get-FirewallRule
     return $firewallRule[0]
 }
 
-######################################################################################
-# Returns the filters associated with the given firewall rule
-######################################################################################
+
+<#
+    .SYNOPSIS
+    Returns the filters associated with the given firewall rule
+#>
 function Get-FirewallRuleProperty
 {
     param (
@@ -634,7 +746,6 @@ function Get-FirewallRuleProperty
         ServiceFilters       = @(Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule)
     }
 }
-
 #endregion
 
 Export-ModuleMember -Function *-TargetResource

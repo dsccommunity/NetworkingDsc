@@ -1,19 +1,30 @@
-﻿[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
 
 # xNetworking
 
-The **xNetworking** module contains the **xFirewall, xIPAddress** and **xDnsServerAddress** DSC resources for configuring a node’s IP address, DNS server address, and firewall rules.
+The **xNetworking** module contains the following resources:
+* **xFirewall**
+* **xIPAddress**
+* **xDnsServerAddress**
+* **xDnsConnectionSuffix**
+* **xDefaultGatewayAddress**
+* **xNetConnectionProfile**
+* **xDhcpClient**
+* **xRoute**
+* **xNetBIOS**
+* **xNetworkTeam**
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
-
 
 ## Resources
 
 * **xFirewall** sets a node's firewall rules.
 * **xIPAddress** sets a node's IP address.
 * **xDnsServerAddress** sets a node's DNS server.
+* **xDnsConnectionSuffix** sets a node's network interface connection-specific DNS suffix.
 * **xDefaultGatewayAddress** sets a node's default gateway address.
+* **xNetConnectionProfile** sets a node's connection profile.
 
 ### xIPAddress
 
@@ -27,6 +38,15 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Address**: The desired DNS Server address(es)
 * **InterfaceAlias**: Alias of the network interface for which the DNS server address is set.
 * **AddressFamily**: IP address family: { IPv4 | IPv6 }
+* **Validate**: Requires that the DNS Server addresses be validated if they are updated. It will cause the resouce to throw a 'A general error occurred that is not covered by a more specific error code.' error if set to True and specified DNS Servers are not accessible. Defaults to False.
+
+### xDnsConnectionSuffix
+
+* **InterfaceAlias**: Alias of the network interface for which the DNS server address is set.
+* **ConnectionSpecificSuffix**: DNS connection-specific suffix to assign to the network interface.
+* **RegisterThisConnectionsAddress**: Specifies that the IP address for this connection is to be registered. The default value is True.
+* **UseSuffixWhenRegistering**: Specifies that this host name and the connection specific suffix for this connection are to be registered. The default value is False.
+* **Ensure**: Ensure that the network interface connection-specific suffix is present or not. { Present | Absent }
 
 ### xDefaultGatewayAddress
 
@@ -36,12 +56,12 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ### xFirewall
 
-* **Name**: Name of the firewall rule
-* **DisplayName**: Localized, user-facing name of the firewall rule being created .
-* **DisplayGroup**: Name of the firewall group where we want to put the firewall rules.
+* **Name**: Name of the firewall rule.
+* **DisplayName**: Localized, user-facing name of the firewall rule being created.
+* **Group**: Name of the firewall group where we want to put the firewall rule.
 * **Ensure**: Ensure that the firewall rule is Present or Absent.
 * **Enabled**: Enable or Disable the supplied configuration.
-* **Action**: Permit or Block the supplied configuration
+* **Action**: Permit or Block the supplied configuration.
 * **Profile**: Specifies one or more profiles to which the rule is assigned.
 * **Direction**: Direction of the connection.
 * **RemotePort**: Specific port used for filter. Specified by port number, range, or keyword.
@@ -50,6 +70,60 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Description**: Documentation for the rule.
 * **Program**: Path and filename of the program for which the rule is applied.
 * **Service**: Specifies the short name of a Windows service to which the firewall rule applies.
+* **Authentication**: Specifies that authentication is required on firewall rules: { NotRequired | Required | NoEncap }
+* **Encryption**: Specifies that encryption in authentication is required on firewall rules: { NotRequired | Required | Dynamic }
+* **InterfaceAlias**: Specifies the alias of the interface that applies to the traffic. 
+* **InterfaceType**: Specifies that only network connections made through the indicated interface types are subject to the requirements of this rule: { Any | Wired | Wireless | RemoteAccess }
+* **LocalAddress**: Specifies that network packets with matching IP addresses match this rule. This parameter value is the first end point of an IPsec rule and specifies the computers that are subject to the requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet, range, or the following keyword: Any. 
+* **LocalUser**: Specifies the principals to which network traffic this firewall rule applies. The principals, represented by security identifiers (SIDs) in the security descriptor definition language (SDDL) string, are services, users, application containers, or any SID to which network traffic is associated.
+* **Package**: Specifies the Windows Store application to which the firewall rule applies. This parameter is specified as a security identifier (SID). 
+* **Platform**: Specifies which version of Windows the associated rule applies.
+* **RemoteAddress**: Specifies that network packets with matching IP addresses match this rule. This parameter value is the second end point of an IPsec rule and specifies the computers that are subject to the requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet, range, or the following keyword: Any
+* **RemoteMachine**: Specifies that matching IPsec rules of the indicated computer accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a computer identified in the list of computer accounts (SID) match this rule. This parameter value is specified as an SDDL string. 
+* **RemoteUser**: Specifies that matching IPsec rules of the indicated user accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a user identified in the list of user accounts match this rule. This parameter value is specified as an SDDL string.
+* **DynamicTransport**: Specifies a dynamic transport: { Any | ProximityApps | ProximitySharing | WifiDirectPrinting | WifiDirectDisplay | WifiDirectDevices }
+* **EdgeTraversalPolicy**: Specifies that matching firewall rules of the indicated edge traversal policy are created: { Block | Allow | DeferToUser | DeferToApp }
+* **IcmpType**: Specifies the ICMP type codes.
+* **LocalOnlyMapping**: Indicates that matching firewall rules of the indicated value are created.
+* **LooseSourceMapping**: Indicates that matching firewall rules of the indicated value are created.
+* **OverrideBlockRules**: Indicates that matching network traffic that would otherwise be blocked are allowed.
+* **Owner**: Specifies that matching firewall rules of the indicated owner are created.
+
+### xNetConnectionProfile
+
+* **InterfaceAlias**: Specifies the alias for the Interface that is being changed.
+* **NetworkCategory**: Sets the NetworkCategory for the interface - per [the documentation ](https://technet.microsoft.com/en-us/%5Clibrary/jj899565(v=wps.630).aspx) this can only be set to { Public | Private }
+* **IPv4Connectivity**: Specifies the IPv4 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
+* **IPv6Connectivity**: Specifies the IPv6 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
+
+### xDhcpClient
+
+* **State**: The desired state of the DHCP Client: { Enabled | Disabled }. Mandatory.
+* **InterfaceAlias**: Alias of the network interface for which the DNS server address is set. Mandatory.
+* **AddressFamily**: IP address family: { IPv4 | IPv6 }. Mandatory.
+
+### xRoute
+
+* **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
+* **AddressFamily**: Specifies the IP address family. { IPv4 | IPv6 }. Mandatory.
+* **DestinationPrefix**: Specifies a destination prefix of an IP route. A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/). Mandatory.
+* **NextHop**: Specifies the next hop for the IP route. Mandatory.
+* **Ensure**: Specifies whether the route should exist. { Present | Absent }. Defaults: Present.
+* **RouteMetric**: Specifies an integer route metric for an IP route. Default: 256.
+* **Publish**: Specifies the publish setting of an IP route. { No | Yes | Age }. Default: No.
+* **PreferredLifetime**: Specifies a preferred lifetime in seconds of an IP route.
+
+### NetBIOS
+
+* **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
+* **Setting**: xNetBIOS setting { Default | Enable | Disable }. Mandatory.
+
+### xNetworkTeam
+* **Name**: Specifies the name of the network team to create.
+* **TeamMembers**: Specifies the network interfaces that should be a part of the network team. This is a comma-separated list.
+* **TeamingMode**: Specifies the teaming mode configuration. { SwitchIndependent | LACP | Static}.
+* **LoadBalancingAlgorithm**: Specifies the load balancing algorithm for the network team. { Dynamic | HyperVPort | IPAddresses | MacAddresses | TransportPorts }.
+* **Ensure**: Specifies if the network team should be created or deleted. { Present | Absent }.
 
 ## Known Invalid Configurations
 
@@ -57,20 +131,70 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * The exception 'One of the port keywords is invalid' will be thrown if a rule is created with the LocalPort set to PlayToDiscovery and the Protocol is not set to UDP. This is not an unexpected error, but because the New-NetFirewallRule documentation is incorrect.
 This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1974268/new-set-netfirewallrule-cmdlet-localport-parameter-documentation-is-incorrect-for-playtodiscovery)
 
-* The exception 'The DisplayGroup of an existing Firewall Rule can not be changed' will be thrown if a configuration tries to change DisplayGroup property of an existing rule. This is because the Set-NetFirewallRule cmdlet does not support this function. Delete and re-create this rule instead.
-This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1970765/add-ability-to-change-firewall-displaygroup-in-set-netfirewallrule-cmdlet)
+## Known Issues
+
+### xFirewall
+The following error may occur when applying xFirewall configurations on Windows Server 2012 R2 if [KB3000850](https://support.microsoft.com/en-us/kb/3000850) is not installed. Please ensure this update is installed if this error occurs.
+```
+The cmdlet does not fully support the Inquire action for debug messages. Cmdlet operation will continue during the prompt. Select a different action preference via -Debug switch or $DebugPreference variable, and try again.
+```
 
 ## Versions
 
-### Unreleased Version
+### Unreleased
+
+### 2.6.0.0
+
+* Added the following resources:
+    * MSFT_xDhcpClient resource to enable/disable DHCP on individual interfaces.
+    * MSFT_xRoute resource to manage network routes.
+    * MSFT_xNetBIOS resource to configure NetBIOS over TCP/IP settings on individual interfaces.
+    * MSFT_xNetworkTeam resource to manage native network adapter teaming.
+* MSFT_*: Unit and Integration tests updated to use DSCResource.Tests\TestHelper.psm1 functions.
+* MSFT_*: Resource Name added to all unit test Desribes.
+* Templates update to use DSCResource.Tests\TestHelper.psm1 functions. 
+* MSFT_xNetConnectionProfile: Integration tests fixed when more than one connection profile present.
+* Changed AppVeyor.yml to use WMF 5 build environment.
+* MSFT_xIPAddress: Removed test for DHCP Status.
+* MSFT_xFirewall: New parameters added:
+    * DynamicTransport
+    * EdgeTraversalPolicy
+    * LocalOnlyMapping
+    * LooseSourceMapping
+    * OverrideBlockRules
+    * Owner
+* All unit & integration tests updated to be able to be run from any folder under tests directory.
+* Unit & Integration test template headers updated to match DSCResource templates.
+
+### 2.5.0.0
+* Added the following resources:
+    * MSFT_xDNSConnectionSuffix resource to manage connection-specific DNS suffixes.
+    * MSFT_xNetConnectionProfile resource to manage Connection Profiles for interfaces.
 * MSFT_xDNSServerAddress: Corrected Verbose logging messages when multiple DNS adddressed specified.
 * MSFT_xDNSServerAddress: Change to ensure resource terminates if DNS Server validation fails.
+* MSFT_xDNSServerAddress: Added Validate parameter to enable DNS server validation when changing server addresses.
 * MSFT_xFirewall: ApplicationPath Parameter renamed to Program for consistency with Cmdlets.
 * MSFT_xFirewall: Fix to prevent error when DisplayName parameter is set on an existing rule.
+* MSFT_xFirewall: Setting a different DisplayName parameter on an existing rule now correctly reports as needs change.
+* MSFT_xFirewall: Changed DisplayGroup parameter to Group for consistency with Cmdlets and reduce confusion.
+* MSFT_xFirewall: Changing the Group of an existing Firewall rule will recreate the Firewall rule rather than change it.
+* MSFT_xFirewall: New parameters added:
+    * Authentication
+    * Encryption
+    * InterfaceAlias
+    * InterfaceType
+    * LocalAddress
+    * LocalUser
+    * Package
+    * Platform
+    * RemoteAddress
+    * RemoteMachine
+    * RemoteUser
+* MSFT_xFirewall: Profile parameter now handled as an Array.
 
 ### 2.4.0.0
 * Added following resources:
-  * MSFT_xDefaultGatewayAddress
+    * MSFT_xDefaultGatewayAddress
 * MSFT_xFirewall: Removed code using DisplayGroup to lookup Firewall Rule because it was redundant.
 * MSFT_xFirewall: Set-TargetResource now updates firewall rules instead of recreating them.
 * MSFT_xFirewall: Added message localization support.
@@ -197,7 +321,8 @@ Configuration Sample_xDnsServerAddress
         [Parameter(Mandatory)]
         [string]$InterfaceAlias,
         [ValidateSet("IPv4","IPv6")]
-        [string]$AddressFamily = 'IPv4'
+        [string]$AddressFamily = 'IPv4',
+        [Boolean]$Validate
     )
     Import-DscResource -Module xNetworking
     Node $NodeName
@@ -207,6 +332,34 @@ Configuration Sample_xDnsServerAddress
             Address        = $DnsServerAddress
             InterfaceAlias = $InterfaceAlias
             AddressFamily  = $AddressFamily
+            Validate       = $Validate
+        }
+    }
+}
+```
+
+### Set a DNS connection suffix
+
+This configuration will set a DNS connection-specific suffix on a network interface that is identified by its alias.
+
+```powershell
+Configuration Sample_xDnsConnectionSuffix
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost',
+        [Parameter(Mandatory)]
+        [string]$InterfaceAlias,
+        [Parameter(Mandatory)]
+        [string]$DnsSuffix
+    )
+    Import-DscResource -Module xNetworking
+    Node $NodeName
+    {
+        xDnsConnectionSuffix DnsConnectionSuffix
+        {
+            InterfaceAlias           = $InterfaceAlias
+            ConnectionSpecificSuffix = $DnsSuffix
         }
     }
 }
@@ -289,7 +442,7 @@ Configuration Add_FirewallRule
         xFirewall Firewall
         {
             Name                  = "MyAppFirewallRule"
-            ApplicationPath       = "c:\windows\system32\MyApp.exe"
+            Program               = "c:\windows\system32\MyApp.exe"
         }
     }
 }
@@ -315,14 +468,14 @@ Configuration Add_FirewallRuleToExistingGroup
         {
             Name                  = "MyFirewallRule"
             DisplayName           = "My Firewall Rule"
-            DisplayGroup          = "My Firewall Rule Group"
+            Group                 = "My Firewall Rule Group"
         }
 
         xFirewall Firewall1
         {
             Name                  = "MyFirewallRule1"
             DisplayName           = "My Firewall Rule"
-            DisplayGroup          = "My Firewall Rule Group"
+            Group                 = "My Firewall Rule Group"
             Ensure                = "Present"
             Enabled               = "True"
             Profile               = ("Domain", "Private")
@@ -350,11 +503,11 @@ Configuration Disable_AccessToApplication
         {
             Name                  = "NotePadFirewallRule"
             DisplayName           = "Firewall Rule for Notepad.exe"
-            DisplayGroup          = "NotePad Firewall Rule Group"
+            Group                 = "NotePad Firewall Rule Group"
             Ensure                = "Present"
             Action                = 'Blocked'
             Description           = "Firewall Rule for Notepad.exe"
-            ApplicationPath       = "c:\windows\system32\notepad.exe"
+            Program               = "c:\windows\system32\notepad.exe"
         }
     }
 }
@@ -365,7 +518,9 @@ Configuration Disable_AccessToApplication
 This example will disable notepad.exe's outbound access.
 
 ```powershell
-Configuration Sample_xFirewall
+# DSC configuration for Firewall
+
+configuration Sample_xFirewall_AddFirewallRule
 {
     param
     (
@@ -380,24 +535,23 @@ Configuration Sample_xFirewall
         {
             Name                  = "NotePadFirewallRule"
             DisplayName           = "Firewall Rule for Notepad.exe"
-            DisplayGroup          = "NotePad Firewall Rule Group"
+            Group                 = "NotePad Firewall Rule Group"
             Ensure                = "Present"
             Enabled               = "True"
-            Action                = 'Allow'
             Profile               = ("Domain", "Private")
             Direction             = "OutBound"
             RemotePort            = ("8080", "8081")
             LocalPort             = ("9080", "9081")
             Protocol              = "TCP"
             Description           = "Firewall Rule for Notepad.exe"
-            ApplicationPath       = "c:\windows\system32\notepad.exe"
-            Service               =  "WinRM"
+            Program               = "c:\windows\system32\notepad.exe"
+            Service               = "WinRM"
         }
     }
  }
 
-Sample_xFirewall
-Start-DscConfiguration -Path Sample_xFirewall -Wait -Verbose -Force
+Sample_xFirewall_AddFirewallRule
+Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule -Wait -Verbose -Force
 ```
 
 ### Enable a built-in Firewall Rule
@@ -423,4 +577,139 @@ configuration Sample_xFirewall_EnableBuiltInFirewallRule
         }
     }
  }
+```
+
+### Create a Firewall Rule using all available Parameters
+
+This example will create a firewall rule using all available xFirewall resource parameters. This rule is not meaningful and would not be used like this in reality. It is used to show the expected formats of the different parameters.
+```powershell
+configuration Sample_xFirewall_AddFirewallRule_AllParameters
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xFirewall Firewall
+        {
+            Name                  = "NotePadFirewallRule"
+            DisplayName           = "Firewall Rule for Notepad.exe"
+            Group                 = "NotePad Firewall Rule Group"
+            Ensure                = "Present"
+            Enabled               = "True"
+            Profile               = ("Domain", "Private")
+            Direction             = "OutBound"
+            RemotePort            = ("8080", "8081")
+            LocalPort             = ("9080", "9081")
+            Protocol              = "TCP"
+            Description           = "Firewall Rule for Notepad.exe"
+            Program               = "c:\windows\system32\notepad.exe"
+            Service               = "WinRM"
+            Authentication        = "Required"
+            Encryption            = "Required"
+            InterfaceAlias        = "Ethernet"
+            InterfaceType         = "Wired"
+            LocalAddress          = @("192.168.2.0-192.168.2.128","192.168.1.0/255.255.255.0")
+            LocalUser             = "O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)"
+            Package               = "S-1-15-2-3676279713-3632409675-756843784-3388909659-2454753834-4233625902-1413163418"
+            Platform              = "6.1"
+            RemoteAddress         = @("192.168.2.0-192.168.2.128","192.168.1.0/255.255.255.0")
+            RemoteMachine         = "O:LSD:(D;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1621)(A;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1620)"
+            RemoteUser            = "O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)"
+            DynamicTransport      = "ProximitySharing"
+            EdgeTraversalPolicy   = "Block"
+            IcmpType              = ("51","52")
+            LocalOnlyMapping      = $true
+            LooseSourceMapping    = $true
+            OverrideBlockRules    = $true
+            Owner                 = "S-1-5-21-3337988176-3917481366-464002247-500"
+        }
+    }
+ }
+
+Sample_xFirewall_AddFirewallRule_AllParameters
+Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule_AllParameters -Wait -Verbose -Force
+```
+
+### Set the NetConnectionProfile to Public
+
+```powershell
+configuration MSFT_xNetConnectionProfile_Config {
+    Import-DscResource -ModuleName xNetworking
+    node localhost {
+        xNetConnectionProfile Integration_Test {
+            InterfaceAlias   = 'Wi-Fi'
+            NetworkCategory  = 'Public'
+            IPv4Connectivity = 'Internet'
+            IPv6Connectivity = 'Disconncted'
+        }
+    }
+}
+```
+
+### Set the DHCP Client state
+This example would set the DHCP Client State to enabled.
+
+```powershell
+configuration Sample_xDhcpClient_Enabled
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost',
+
+        [Parameter(Mandatory)]
+        [string]$InterfaceAlias,
+
+        [Parameter(Mandatory)]
+        [ValidateSet("IPv4","IPv6")]
+        [string]$AddressFamily
+    )
+
+    Import-DscResource -Module xDhcpClient
+
+    Node $NodeName
+    {
+        xDhcpClient EnableDhcpClient
+        {
+            State          = 'Enabled'
+            InterfaceAlias = $InterfaceAlias
+            AddressFamily  = $AddressFamily
+        }
+    }
+}
+```
+
+### Add a Route
+This example will add an IPv4 route on interface Ethernet.
+
+```powershell
+configuration Sample_xRoute_AddRoute
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xRoute NetRoute1
+        {
+            Ensure = 'Present'
+            InterfaceAlias = 'Ethernet'
+            AddressFamily = 'IPv4'
+            DestinationPrefix = '192.168.0.0/16'
+            NextHop = '192.168.120.0'
+            RouteMetric = 200
+        }
+    }
+ }
+
+Sample_xRoute_AddRoute
+Start-DscConfiguration -Path Sample_xRoute_AddRoute -Wait -Verbose -Force
 ```

@@ -15,7 +15,7 @@ configuration Sample_xFirewall_AddFirewallRule
         {
             Name                  = "NotePadFirewallRule"
             DisplayName           = "Firewall Rule for Notepad.exe"
-            DisplayGroup          = "NotePad Firewall Rule Group"
+            Group                 = "NotePad Firewall Rule Group"
             Ensure                = "Present"
             Enabled               = "True"
             Profile               = ("Domain", "Private")
@@ -24,8 +24,8 @@ configuration Sample_xFirewall_AddFirewallRule
             LocalPort             = ("9080", "9081")
             Protocol              = "TCP"
             Description           = "Firewall Rule for Notepad.exe"
-            ApplicationPath       = "c:\windows\system32\notepad.exe"
-            Service               =  "WinRM"
+            Program               = "c:\windows\system32\notepad.exe"
+            Service               = "WinRM"
         }
     }
  }
