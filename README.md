@@ -112,7 +112,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Publish**: Specifies the publish setting of an IP route. { No | Yes | Age }. Default: No.
 * **PreferredLifetime**: Specifies a preferred lifetime in seconds of an IP route.
 
-### NetBIOS
+### xNetBIOS
 
 * **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
 * **Setting**: xNetBIOS setting { Default | Enable | Disable }. Mandatory.
