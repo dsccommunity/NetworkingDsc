@@ -31,6 +31,7 @@ function Get-TargetResource
         [String]$PhysicalMediaType = '802.3',
 
         [ValidateNotNullOrEmpty()]
+        [ValidateSet('Up','Disconnected','Disabled')]
         [String]$Status = 'Up',
 
         [Parameter(Mandatory)]
@@ -91,6 +92,7 @@ function Set-TargetResource
         [String]$PhysicalMediaType = '802.3',
 
         [ValidateNotNullOrEmpty()]
+        [ValidateSet('Up','Disconnected','Disabled')]
         [String]$Status = 'Up',
 
 
@@ -160,6 +162,7 @@ function Test-TargetResource
         [String]$PhysicalMediaType = '802.3',
 
         [ValidateNotNullOrEmpty()]
+        [ValidateSet('Up','Disconnected','Disabled')]
         [String]$Status = 'Up',
 
         [Parameter(Mandatory)]
@@ -210,6 +213,7 @@ function Test-ResourceProperty {
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
+        [ValidateSet('Up','Disconnected','Disabled')]
         [String]$Status,
 
         [Parameter(Mandatory)]
