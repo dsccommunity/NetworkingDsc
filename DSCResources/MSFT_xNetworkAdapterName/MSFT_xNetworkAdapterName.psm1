@@ -14,6 +14,7 @@ NetAdapterSetStateMessage=NetAdapter was set to the desired state.
 CheckingNetAdapterMessage=Checking the NetAdapter.
 NetAdapterNotFoundError=A NetAdapter matching the properties was not found. Please correct the properties and try again.
 MultipleMatchingNetAdapterFound=Multiple matching NetAdapters where found for the properties. Please correct the properties or specify IgnoreMultipleMatchingAdapters to only use the first and try again.
+ApplyingWhileInDesiredStateMessage=
 '@
 }
 
@@ -26,11 +27,9 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String]$PhysicalMediaType = '802.3',
 
-        [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String]$Status = 'Up',
 
@@ -88,13 +87,12 @@ function Set-TargetResource
 {
     param
     (
-        [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String]$PhysicalMediaType = '802.3',
 
-        [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String]$Status = 'Up',
+
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
@@ -158,11 +156,9 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String]$PhysicalMediaType = '802.3',
 
-        [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String]$Status = 'Up',
 
