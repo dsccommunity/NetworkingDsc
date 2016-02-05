@@ -1,0 +1,16 @@
+[ClassVersion("1.0.0"), FriendlyName("xNetworkAdapterName")]
+class MSFT_xNetworkAdapterName : OMI_BaseResource
+{
+  [Key, Description("Specifies the Name the adapter should use.")] 
+        string Name;
+  [Write, Description("Specifies physical media type of the adapter you want to affect.  Defaults to `802.3`")] 
+        string PhysicalMediaType;
+  [Write, 
+    Description("Specifies the status of the adapter you want to affect.  Defaults to `Up`."),
+    ValueMap{"Disabled", "Up", "Disconnected"},Values{"Disabled", "Up", "Disconnected"}] 
+        string Status;
+  [Read, Description("Only returned when the resource is retrieved.  Indicates the number of adapters matching the specified criteria.")] 
+        uint32 MatchingAdapterCount;
+  [Write, Description("Specifies that if multiple adapters are found.  The resource should not treat this as an error and affect only the first one.")] 
+        boolean IgnoreMultipleMatchingAdapters;
+};

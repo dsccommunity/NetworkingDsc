@@ -1,9 +1,0 @@
-[ClassVersion("1.0.0"), FriendlyName("xNetAdapter")]
-class MSFT_xNetAdapter : OMI_BaseResource
-{
-  [Key] string PhysicalMediaType;
-  [Key] string Status;
-  [Key] string Name;
-  [Read] uint32 MatchingAdapterCount;
-  [Write] boolean IgnoreMultipleMatchingAdapters;
-};

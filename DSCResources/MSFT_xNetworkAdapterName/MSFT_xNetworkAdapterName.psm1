@@ -1,6 +1,7 @@
 #######################################################################################
-#  xNetAdapter : DSC Resource that will set/test/get the current IP
-#  Address, by accepting values among those given in xNetAdapter.schema.mof
+#  xNetworkAdapterName : DSC Resource that will set/test/get a network adapter name,
+#  by accepting existing properties (given in xNetworkAdapterName.schema.mof)
+#  other than the name and ensuring the name matches for that adapter
 #######################################################################################
 
 data LocalizedData
@@ -8,20 +9,9 @@ data LocalizedData
     # culture="en-US"
     ConvertFrom-StringData -StringData @'
 GettingNetAdapetrMessage=Getting the NetAdapter.
-ApplyingIPAddressMessage=Applying the NetAdapter.
+ApplyingNetAdapterMessage=Applying the NetAdapter.
 NetAdapterSetStateMessage=NetAdapter was set to the desired state.
-CheckingIPAddressMessage=Checking the NetAdapter.
-IPAddressDoesNotMatchMessage=IP Address does NOT match desired state. Expected {0}, actual {1}.
-IPAddressMatchMessage=IP Address is in desired state.
-SubnetMaskDoesNotMatchMessage=Subnet mask does NOT match desired state. Expected {0}, actual {1}.
-SubnetMaskMatchMessage=Subnet mask is in desired state.
-DHCPIsNotDisabledMessage=DHCP is NOT disabled.
-DHCPIsAlreadyDisabledMessage=DHCP is already disabled.
-DHCPIsNotTestedMessage=DHCP status is ignored when Address Family is IPv6.
-InterfaceNotAvailableError=Interface "{0}" is not available. Please select a valid interface and try again.
-AddressFormatError=Address "{0}" is not in the correct format. Please correct the Address parameter in the configuration and try again.
-AddressIPv4MismatchError=Address "{0}" is in IPv4 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
-AddressIPv6MismatchError=Address "{0}" is in IPv6 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
+CheckingNetAdapterMessage=Checking the NetAdapter.
 NetAdapterNotFoundError=A NetAdapter matching the properties was not found. Please correct the properties and try again.
 MultipleMatchingNetAdapterFound=Multiple matching NetAdapters where found for the properties. Please correct the properties or specify IgnoreMultipleMatchingAdapters to only use the first and try again.
 '@
@@ -29,7 +19,7 @@ MultipleMatchingNetAdapterFound=Multiple matching NetAdapters where found for th
 
 ######################################################################################
 # The Get-TargetResource cmdlet.
-# This function will get the present list of IP Address DSC Resource schema variables on the system
+# This function will get the present network adapter name based on the provided properties
 ######################################################################################
 function Get-TargetResource
 {
@@ -38,11 +28,11 @@ function Get-TargetResource
     (
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [String]$PhysicalMediaType,
+        [String]$PhysicalMediaType = '802.3',
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [String]$Status,
+        [String]$Status = 'Up',
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
@@ -58,13 +48,19 @@ function Get-TargetResource
     Test-ResourceProperty @PSBoundParameters
     
     $Adapter  =  @(Get-NetAdapter | Where-Object {$_.PhysicalMediaType -eq $PhysicalMediaType -and $_.Status -eq $Status})
+    $exactAdapter = @($Adapter | Where-Object {$_.Name -eq $Name} )
+    if($exactAdapter.Count -eq 0)
+    {
+        $exactAdapter = $Adapter
+    }
+    
     
     if($Adapter.Count -gt 0)
     {
         $returnValue = @{
             PhysicalMediaType    = $PhysicalMediaType
             Status               = $Status
-            Name                 = $Adapter[0].Name
+            Name                 = $exactAdapter[0].Name
             InterfaceAlias       = $InterfaceAlias
             MatchingAdapterCount = $Adapter.Count
         }
@@ -85,7 +81,8 @@ function Get-TargetResource
 
 ######################################################################################
 # The Set-TargetResource cmdlet.
-# This function will set a new IP Address in the current node
+# This function will set a new network adapter name of the adapter found
+# based on the provided properites
 ######################################################################################
 function Set-TargetResource
 {
@@ -93,11 +90,11 @@ function Set-TargetResource
     (
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [String]$PhysicalMediaType,
+        [String]$PhysicalMediaType = '802.3',
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [String]$Status,
+        [String]$Status = 'Up',
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
@@ -138,9 +135,13 @@ function Set-TargetResource
 
         $PSCmdlet.ThrowTerminatingError($errorRecord)        
     }
-    else
+    elseif($getResults.name -ne $Name)
     {
         Rename-NetAdapter -Name $getResults.Name -NewName $Name
+    }
+    else
+    {
+        Write-Verbose -Message 'Already in desired state'
     }
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
@@ -159,11 +160,11 @@ function Test-TargetResource
     (
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [String]$PhysicalMediaType,
+        [String]$PhysicalMediaType = '802.3',
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [String]$Status,
+        [String]$Status = 'Up',
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
@@ -201,8 +202,8 @@ function Test-TargetResource
 #  Helper functions
 #######################################################################################
 function Test-ResourceProperty {
-    # Function will check the IP Address details are valid and do not conflict with
-    # Address family. Also checks the subnet mask and ensures the interface exists.
+    # Function will check the propertes to find a network adapter 
+    # are valid.
     # If any problems are detected an exception will be thrown.
     [CmdletBinding()]
     param

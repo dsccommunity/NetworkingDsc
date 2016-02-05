@@ -1,5 +1,5 @@
-$Global:DSCModuleName   = 'xNetAdapter'
-$Global:DSCResourceName = 'MSFT_xNetAdapter'
+$Global:DSCModuleName   = 'xNetworkAdapterName'
+$Global:DSCResourceName = 'MSFT_xNetworkAdapterName'
 
 #region HEADER
 [String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
@@ -39,7 +39,7 @@ try
                 Status                         = 'Up'
             },
             [PSCustomObject] @{
-                Name                    = 'Ethernet2'
+                Name                    = 'MyEthernet'
                 PhysicalMediaType              = '802.3'
                 Status                         = 'Up'
             }
@@ -89,7 +89,7 @@ try
                     $Result = Get-TargetResource `
                         @TestAdapterKeys
                     $Result.MatchingAdapterCount | Should Be 2
-                    $Result.Name | Should Be 'Ethernet1'
+                    $Result.Name | Should Be 'MyEthernet'
                 }
                 It 'should call the expected mocks' {
                     Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
@@ -132,7 +132,7 @@ try
                     Assert-MockCalled -commandName Rename-NetAdapter -Exactly 1
                 }
             }
-            Context 'Multiple matching adapter exists and IgnoreMultipleMatchingAdapters is true' {
+            Context 'Multiple matching adapter exists and IgnoreMultipleMatchingAdapters is true and name matches' {
                 
                 Mock Get-NetAdapter -MockWith { $MockMultipleNetAdapter }
                 Mock Rename-NetAdapter
@@ -140,6 +140,23 @@ try
                 It 'should not throw error' {
                     { 
                         $Splat = $TestAdapterKeys.Clone()
+                        Set-TargetResource @Splat
+                    } | Should Not Throw
+                }
+                It 'should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
+                    Assert-MockCalled -commandName Rename-NetAdapter -Exactly 0
+                }
+            }
+            Context 'Multiple matching adapter exists and IgnoreMultipleMatchingAdapters is true and name mismatches' {
+                
+                Mock Get-NetAdapter -MockWith { $MockMultipleNetAdapter }
+                Mock Rename-NetAdapter
+    
+                It 'should not throw error' {
+                    { 
+                        $Splat = $TestAdapterKeys.Clone()
+                        $Splat.Name = 'MyEthernet2'
                         Set-TargetResource @Splat
                     } | Should Not Throw
                 }
