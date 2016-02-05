@@ -13,6 +13,7 @@ The **xNetworking** module contains the following resources:
 * **xRoute**
 * **xNetBIOS**
 * **xNetworkTeam**
+* **xHostsFile**
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -125,6 +126,11 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **LoadBalancingAlgorithm**: Specifies the load balancing algorithm for the network team. { Dynamic | HyperVPort | IPAddresses | MacAddresses | TransportPorts }.
 * **Ensure**: Specifies if the network team should be created or deleted. { Present | Absent }.
 
+### xHostsFile
+* **HostName**: Specifies the name of the computer that will be mapped to an IP address.
+* **IPAddress**: Specifies the IP Address that should be mapped to the host name.
+* **Ensure**: Specifies if the hosts file entry should be created or deleted. { Present | Absent }.
+
 ## Known Invalid Configurations
 
 ### xFirewall
@@ -147,6 +153,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 * Added the following resources:
     * MSFT_xNetworkTeam resource to manage native network adapter teaming.
+    * MSFT_xHostsFile resource to manage hosts file entries.
 
 ### 2.6.0.0
 
