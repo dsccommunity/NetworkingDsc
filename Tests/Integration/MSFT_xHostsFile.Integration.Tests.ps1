@@ -1,6 +1,8 @@
 $Global:DSCModuleName      = 'xNetworking'
 $Global:DSCResourceName    = 'MSFT_xHostsFile'
 
+Copy-Item "${env:SystemRoot}\System32\Drivers\Etc\Hosts" "${env:Temp}\Hosts" -Force
+
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
      (-not (Test-Path -Path '.\DSCResource.Tests\TestHelper.psm1')) )
@@ -48,6 +50,9 @@ try
         }
     }
     #endregion
+
+    #Restore unmodified hosts file
+    Copy-Item "${env:Temp}\Hosts" "${env:SystemRoot}\System32\Drivers\Etc\Hosts" -Force
 }
 finally
 {

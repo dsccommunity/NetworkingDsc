@@ -149,11 +149,13 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 ### Unreleased
 
+* Added the following resources:
+	* MSFT_xHostsFile resource to manage hosts file entries.
+
 ### 2.7.0.0
 
 * Added the following resources:
     * MSFT_xNetworkTeam resource to manage native network adapter teaming.
-    * MSFT_xHostsFile resource to manage hosts file entries.
 
 ### 2.6.0.0
 

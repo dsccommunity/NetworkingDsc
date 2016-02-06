@@ -14,13 +14,15 @@ function Get-TargetResource
         $IPAddress
     )
 
-    $configuration = @{
+    $configuration =
+    @{
         HostName = $HostName
         IPAddress = $IPAddress
     }
 
     Write-Verbose $localizedData.checkingHostsFileEntry
-    try {
+    try
+    {
         if (Test-HostEntry -IPAddress $IPAddress -HostName $HostName) {
             Write-Verbose ($localizedData.hostsFileEntryFound -f $HostName, $IPAddress)
             $configuration.Add('Ensure','Present')
@@ -29,7 +31,10 @@ function Get-TargetResource
             $configuration.Add('Ensure','Absent')
         }
         return $configuration
-    } catch {
+    }
+    
+    catch
+    {
         $exception = $_
         Write-Verbose ($LocalizedData.anErrorOccurred -f $name, $exception.message)
         while ($null -ne $exception.InnerException)
@@ -55,7 +60,8 @@ function Set-TargetResource
         $Ensure = 'Present'
     )
 
-    try {
+    try
+    {
         if ($Ensure -eq 'Present') {
             Write-Verbose ($localizedData.creatingHostsFileEntry -f $HostName, $IPAddress)
             Add-HostEntry -IPAddress $IPAddress -HostName $HostName
@@ -65,13 +71,17 @@ function Set-TargetResource
             Remove-HostEntry -IPAddress $IPAddress -HostName $HostName
             Write-Verbose ($localizedData.hostsFileEntryRemoved -f $HostName, $IPAddress)
         }
-    } catch {
-        $exception = $_
-        Write-Verbose ($LocalizedData.anErrorOccurred -f $name, $exception.message)
-        while ($null -ne $exception.innerException) {
-            $exception = $exception.innerException
-            Write-Verbose ($LocalizedData.innerException -f $name, $exception.message)
-        }
+    }
+    
+    catch
+    {
+        $errorId = 'HostsFileUpdateError'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+        $errorMessage = ($LocalizedData.anErrorOccurred -f $name, $exception.message)
+        $exception = New-Object -TypeName System.InvalidOperationException `
+                                -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                                -ArgumentList $exception, $errorId, $errorCategory, $null
     }
 }
 
@@ -91,31 +101,45 @@ function Test-TargetResource
         $Ensure = 'Present'
     )
 
-    try {
+    try
+    {
         Write-Verbose $localizedData.checkingHostsFileEntry
         $entryExist = Test-HostEntry -IPAddress $IPAddress -HostName $HostName
 
-        if ($Ensure -eq "Present") {
-            if ($entryExist) {
+        if ($Ensure -eq "Present")
+        {
+            if ($entryExist)
+            {
                 Write-Verbose ($localizedData.hostsFileEntryFound -f $HostName, $IPAddress)
                 return $true
-            } else {
+            }
+            else
+            {
                 Write-Verbose ($localizedData.hostsFileEntryShouldExist -f $HostName, $IPAddress)
                 return $false
             }
-        } else {
-            if ($entryExist) {
+        }
+        else
+        {
+            if ($entryExist)
+            {
                 Write-Verbose $localizedData.hostsFileShouldNotExist
                 return $false
-            } else {
+            }
+            else
+            {
                 Write-Verbose $localizedData.hostsFileEntryNotFound
                 return $true
             }
         }
-    } catch {
+    }
+    
+    catch
+    {
         $exception = $_
         Write-Verbose ($LocalizedData.anErrorOccurred -f $name, $exception.message)
-        while ($null -ne $exception.innerException) {
+        while ($null -ne $exception.innerException)
+        {
             $exception = $exception.innerException
             Write-Verbose ($LocalizedData.innerException -f $name, $exception.message)
         }
@@ -129,9 +153,11 @@ function Test-HostEntry
         [string] $HostName
     )
 
-    foreach ($line in Get-Content $script:HostsFilePath) {
-        $parsed = Parse-EntryLine -Line $line
-        if ($parsed.IPAddress -eq $IPAddress) {
+    foreach ($line in Get-Content $script:HostsFilePath)
+    {
+        $parsed = Convert-EntryLine -Line $line
+        if ($parsed.IPAddress -eq $IPAddress)
+        {
             return $parsed.HostNames -contains $HostName
         }
     }
@@ -152,28 +178,35 @@ function Add-HostEntry
     $foundMatch = $false
     $dirty = $false
 
-    for ($i = 0; $i -lt $length; $i++) {
-        $parsed = Parse-EntryLine -Line $content[$i]
+    for ($i = 0; $i -lt $length; $i++)
+    {
+        $parsed = Convert-EntryLine -Line $content[$i]
 
-        if ($parsed.IPAddress -ne $IPAddress) { continue }
+        if ($parsed.IPAddress -ne $IPAddress)
+        { 
+            continue 
+        }
         
         $foundMatch = $true
 
-        if ($parsed.HostNames -notcontains $HostName) {
+        if ($parsed.HostNames -notcontains $HostName)
+        {
             $parsed.HostNames += $HostName
-            $content[$i] = Reconstruct-Line -ParsedLine $parsed
+            $content[$i] = Prepare-Line -ParsedLine $parsed
             $dirty = $true
             # Hosts files shouldn't strictly have the same IP address on multiple lines; should we just break here?
             # Or is it better to search for all matching lines in a malformed file, and modify all of them?
         }
     }
 
-    if (-not $foundMatch) {
+    if (-not $foundMatch)
+    {
         $content += "$IPAddress $HostName"
         $dirty = $true
     }
 
-    if ($dirty) {
+    if ($dirty)
+    {
         Set-Content $script:HostsFilePath -Value $content
     }
 }
@@ -191,31 +224,40 @@ function Remove-HostEntry
     $placeholder = New-Object psobject
     $dirty = $false
 
-    for ($i = 0; $i -lt $length; $i++) {
-        $parsed = Parse-EntryLine -Line $content[$i]
+    for ($i = 0; $i -lt $length; $i++)
+    {
+        $parsed = Convert-EntryLine -Line $content[$i]
 
-        if ($parsed.IPAddress -ne $IPAddress) { continue }
+        if ($parsed.IPAddress -ne $IPAddress)
+        {
+            continue
+        }
         
-        if ($parsed.HostNames -contains $HostName) {
+        if ($parsed.HostNames -contains $HostName)
+        {
             $dirty = $true
 
-            if ($parsed.HostNames.Count -eq 1) {
+            if ($parsed.HostNames.Count -eq 1)
+            {
                 # We're removing the only HostName from this line; just remove the whole line
                 $content[$i] = $placeholder
-            } else {
+            }
+            else
+            {
                 $parsed.HostNames = $parsed.HostNames -ne $HostName
-                $content[$i] = Reconstruct-Line -ParsedLine $parsed
+                $content[$i] = Prepare-Line -ParsedLine $parsed
             }
         }
     }
 
-    if ($dirty) {
+    if ($dirty)
+    {
         $content = $content -ne $placeholder
         Set-Content $script:HostsFilePath -Value $content
     }
 }
 
-function Parse-EntryLine
+function Convert-EntryLine
 {
     param ([string] $Line)
 
@@ -251,13 +293,16 @@ function Parse-EntryLine
     }
 }
 
-function Reconstruct-Line
+function Prepare-Line
 {
     param ([object] $ParsedLine)
 
-    if ($ParsedLine.Comment) {
+    if ($ParsedLine.Comment)
+    {
         $comment = " # $($ParsedLine.Comment)"
-    } else {
+    }
+    else
+    {
         $comment = ''
     }
 
