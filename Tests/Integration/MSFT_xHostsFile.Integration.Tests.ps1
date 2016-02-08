@@ -50,13 +50,13 @@ try
         }
     }
     #endregion
-
-    #Restore unmodified hosts file
-    Copy-Item "${env:Temp}\Hosts" "${env:SystemRoot}\System32\Drivers\Etc\Hosts" -Force
 }
 finally
 {
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
+
+    #Restore unmodified hosts file
+    Copy-Item "${env:Temp}\Hosts" "${env:SystemRoot}\System32\Drivers\Etc\Hosts" -Force
     #endregion
 }

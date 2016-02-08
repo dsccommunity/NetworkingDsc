@@ -1,6 +1,6 @@
 $Script:hostsFilePath = "${env:windir}\system32\drivers\etc\hosts"
 
-Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xHostsFile.psd1 -BaseDirectory $PSScriptRoot -Verbose
+Import-LocalizedData -BindingVariable LocalizedData -FileName MSFT_xHostsFile.psd1 -BaseDirectory $PSScriptRoot -Verbose
 
 function Get-TargetResource
 {
@@ -20,14 +20,14 @@ function Get-TargetResource
         IPAddress = $IPAddress
     }
 
-    Write-Verbose $localizedData.checkingHostsFileEntry
+    Write-Verbose -Message $localizedData.checkingHostsFileEntry
     try
     {
         if (Test-HostEntry -IPAddress $IPAddress -HostName $HostName) {
-            Write-Verbose ($localizedData.hostsFileEntryFound -f $HostName, $IPAddress)
+            Write-Verbose -Message ($localizedData.hostsFileEntryFound -f $HostName, $IPAddress)
             $configuration.Add('Ensure','Present')
         } else {
-            Write-Verbose ($localizedData.hostsFileEntryNotFound -f $HostName, $IPAddress)
+            Write-Verbose -Message ($localizedData.hostsFileEntryNotFound -f $HostName, $IPAddress)
             $configuration.Add('Ensure','Absent')
         }
         return $configuration
@@ -36,11 +36,11 @@ function Get-TargetResource
     catch
     {
         $exception = $_
-        Write-Verbose ($LocalizedData.anErrorOccurred -f $name, $exception.message)
+        Write-Verbose -Message ($LocalizedData.anErrorOccurred -f $name, $exception.message)
         while ($null -ne $exception.InnerException)
         {
             $exception = $exception.innerException
-            Write-Verbose ($LocalizedData.innerException -f $name, $exception.message)
+            Write-Verbose -Message ($LocalizedData.innerException -f $name, $exception.message)
         }
     }
 }
@@ -51,9 +51,11 @@ function Set-TargetResource
         [parameter(Mandatory = $true)]
         [string]
         $HostName,
+
         [parameter(Mandatory = $true)]
         [string]
         $IPAddress,
+
         [parameter()]
         [ValidateSet('Present','Absent')]
         [string]
@@ -63,13 +65,13 @@ function Set-TargetResource
     try
     {
         if ($Ensure -eq 'Present') {
-            Write-Verbose ($localizedData.creatingHostsFileEntry -f $HostName, $IPAddress)
+            Write-Verbose -Message ($localizedData.creatingHostsFileEntry -f $HostName, $IPAddress)
             Add-HostEntry -IPAddress $IPAddress -HostName $HostName
-            Write-Verbose ($localizedData.hostsFileEntryAdded -f $HostName, $IPAddress)
+            Write-Verbose -Message ($localizedData.hostsFileEntryAdded -f $HostName, $IPAddress)
         } else {
-            Write-Verbose ($localizedData.removingHostsFileEntry -f $HostName, $IPAddress)
+            Write-Verbose -Message ($localizedData.removingHostsFileEntry -f $HostName, $IPAddress)
             Remove-HostEntry -IPAddress $IPAddress -HostName $HostName
-            Write-Verbose ($localizedData.hostsFileEntryRemoved -f $HostName, $IPAddress)
+            Write-Verbose -Message ($localizedData.hostsFileEntryRemoved -f $HostName, $IPAddress)
         }
     }
     
@@ -103,19 +105,19 @@ function Test-TargetResource
 
     try
     {
-        Write-Verbose $localizedData.checkingHostsFileEntry
+        Write-Verbose -Message $localizedData.checkingHostsFileEntry
         $entryExist = Test-HostEntry -IPAddress $IPAddress -HostName $HostName
 
         if ($Ensure -eq "Present")
         {
             if ($entryExist)
             {
-                Write-Verbose ($localizedData.hostsFileEntryFound -f $HostName, $IPAddress)
+                Write-Verbose -Message ($localizedData.hostsFileEntryFound -f $HostName, $IPAddress)
                 return $true
             }
             else
             {
-                Write-Verbose ($localizedData.hostsFileEntryShouldExist -f $HostName, $IPAddress)
+                Write-Verbose -Message ($localizedData.hostsFileEntryShouldExist -f $HostName, $IPAddress)
                 return $false
             }
         }
@@ -123,12 +125,12 @@ function Test-TargetResource
         {
             if ($entryExist)
             {
-                Write-Verbose $localizedData.hostsFileShouldNotExist
+                Write-Verbose -Message $localizedData.hostsFileShouldNotExist
                 return $false
             }
             else
             {
-                Write-Verbose $localizedData.hostsFileEntryNotFound
+                Write-Verbose -Message $localizedData.hostsFileEntryNotFound
                 return $true
             }
         }
@@ -137,11 +139,11 @@ function Test-TargetResource
     catch
     {
         $exception = $_
-        Write-Verbose ($LocalizedData.anErrorOccurred -f $name, $exception.message)
+        Write-Verbose -Message ($LocalizedData.anErrorOccurred -f $name, $exception.message)
         while ($null -ne $exception.innerException)
         {
             $exception = $exception.innerException
-            Write-Verbose ($LocalizedData.innerException -f $name, $exception.message)
+            Write-Verbose -Message ($LocalizedData.innerException -f $name, $exception.message)
         }
     }
 }
@@ -153,7 +155,7 @@ function Test-HostEntry
         [string] $HostName
     )
 
-    foreach ($line in Get-Content $script:HostsFilePath)
+    foreach ($line in (Get-Content -Path $script:HostsFilePath))
     {
         $parsed = Convert-EntryLine -Line $line
         if ($parsed.IPAddress -eq $IPAddress)
@@ -172,7 +174,7 @@ function Add-HostEntry
         [string] $HostName
     )
 
-    $content = @(Get-Content $script:HostsFilePath)
+    $content = @(Get-Content -Path $script:HostsFilePath)
     $length = $content.Length
 
     $foundMatch = $false
@@ -207,7 +209,7 @@ function Add-HostEntry
 
     if ($dirty)
     {
-        Set-Content $script:HostsFilePath -Value $content
+        Set-Content -Path $script:HostsFilePath -Value $content
     }
 }
 
@@ -218,7 +220,7 @@ function Remove-HostEntry
         [string] $HostName
     )
 
-    $content = @(Get-Content $script:HostsFilePath)
+    $content = @(Get-Content -Path $script:HostsFilePath)
     $length = $content.Length
 
     $placeholder = New-Object psobject
@@ -253,7 +255,7 @@ function Remove-HostEntry
     if ($dirty)
     {
         $content = $content -ne $placeholder
-        Set-Content $script:HostsFilePath -Value $content
+        Set-Content -Path $script:HostsFilePath -Value $content
     }
 }
 
