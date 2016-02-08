@@ -143,6 +143,8 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 ### Unreleased
 
+* Templates folder removed. Use test templates from [DSCResources](https://github.com/PowerShell/DscResources) repository instead.
+
 ### 2.7.0.0
 
 * Added the following resources:
