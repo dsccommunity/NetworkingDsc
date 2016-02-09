@@ -1,5 +1,5 @@
 $TestAdapter = [PSObject]@{
-    InterfaceAlias          = (Get-NetAdapter -Physical | Select-Object -First 1).Name
+    Name                    = (Get-NetAdapter -Physical | Select-Object -First 1).Name
     PhysicalMediaType       = '802.3'
     Status                  = 'Up'
 }

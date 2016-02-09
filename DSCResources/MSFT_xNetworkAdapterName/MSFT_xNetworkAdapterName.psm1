@@ -61,7 +61,6 @@ function Get-TargetResource
             PhysicalMediaType    = $PhysicalMediaType
             Status               = $Status
             Name                 = $exactAdapter[0].Name
-            InterfaceAlias       = $InterfaceAlias
             MatchingAdapterCount = $Adapter.Count
         }
     }
@@ -71,7 +70,6 @@ function Get-TargetResource
             PhysicalMediaType    = $PhysicalMediaType
             Status               = $Status
             Name                 = $null
-            InterfaceAlias       = $InterfaceAlias
             MatchingAdapterCount = 0
         }
     }

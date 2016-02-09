@@ -42,7 +42,7 @@ try
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($Global:DSCResourceName)_Config"}
-            $current.Name                           | Should Be $TestAdapter.InterfaceAlias
+            $current.Name                           | Should Be $TestAdapter.Name
             $current.PhysicalMediaType              | Should Be $TestAdapter.PhysicalMediaType
             $current.Status                         | Should Be $TestAdapter.Status
             $current.MatchingAdapterCount           | Should not be 0
