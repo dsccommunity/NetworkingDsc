@@ -9,7 +9,7 @@ configuration MSFT_xNetworkAdapterName_Config {
     Import-DscResource -ModuleName xNetworking
     node localhost {
         xNetworkAdapterName Integration_Test {
-            Name                    = $TestAdapter.InterfaceAlias
+            Name                    = $TestAdapter.Name
             PhysicalMediaType       = $TestAdapter.PhysicalMediaType
             Status                  = $TestAdapter.Status
         }
