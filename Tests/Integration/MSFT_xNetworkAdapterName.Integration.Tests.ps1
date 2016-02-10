@@ -46,7 +46,7 @@ try
             $current.PhysicalMediaType              | Should Be $TestAdapter.PhysicalMediaType
             $current.Status                         | Should Be $TestAdapter.Status
             $current.MatchingAdapterCount           | Should not be 0
-            $current.MatchingAdapterCount.GetType() | should be 'int'
+            $current.MatchingAdapterCount.GetType() | should be 'uint32'
         }
 
     }
