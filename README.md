@@ -144,6 +144,8 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ### Unreleased
 
 * Templates folder removed. Use the test templates in the [Tests.Template folder in the DSCResources repository](https://github.com/PowerShell/DscResources/tree/master/Tests.Template) instead.
+* Added the following resources:
+    * MSFT_xHostsFile resource to manage hosts file entries.
 
 ### 2.7.0.0
 
