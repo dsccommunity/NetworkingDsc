@@ -13,6 +13,7 @@ The **xNetworking** module contains the following resources:
 * **xRoute**
 * **xNetBIOS**
 * **xNetworkTeam**
+* **xHostsFile**
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -725,4 +726,62 @@ configuration Sample_xRoute_AddRoute
 
 Sample_xRoute_AddRoute
 Start-DscConfiguration -Path Sample_xRoute_AddRoute -Wait -Verbose -Force
+```
+
+### Create a network team
+This example shows creating a native network team.
+
+```powershell
+configuration Sample_xNetworkTeam_AddTeam
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xNetworkTeam HostTeam
+        {
+          Name = 'HostTeam'
+          TeamingMode = 'SwitchIndependent'
+          LoadBalancingAlgorithm = 'HyperVPort'
+          TeamMembers = 'NIC1','NIC2'
+          Ensure = 'Present'
+        }
+    }
+ }
+
+Sample_xNetworkTeam_AddTeam
+Start-DscConfiguration -Path Sample_xNetworkTeam_AddTeam -Wait -Verbose -Force
+```
+
+### Add a hosts file entry
+This example will add an hosts file entry.
+
+```powershell
+configuration Sample_xHostsFile_AddEntry
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xHostsFile HostEntry
+        {
+          HostName  = 'Host01'
+          IPAddress = '192.168.0.1'
+          Ensure    = 'Present'
+        }
+    }
+ }
+
+Sample_xHostsFile_AddEntry
+Start-DscConfiguration -Path Sample_xHostsFile_AddEntry -Wait -Verbose -Force
 ```
