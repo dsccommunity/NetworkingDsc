@@ -1,70 +1,22 @@
-$DSCModuleName      = 'xNetworking'
-$DSCResourceName    = 'MSFT_xFirewall'
-$RelativeModulePath = "DSCResources\$DSCResourceName\$DSCResourceName.psm1"
+$Global:DSCModuleName      = 'xNetworking'
+$Global:DSCResourceName    = 'MSFT_xFirewall'
 
 #region HEADER
-# Temp Working Folder - always gets remove on completion
-$WorkingFolder = Join-Path -Path $env:Temp -ChildPath $DSCResourceName
-
-# Copy to Program Files for WMF 4.0 Compatability as it can only find resources in a few known places.
-$moduleRoot = "${env:ProgramFiles}\WindowsPowerShell\Modules\$DSCModuleName"
-
-# If this module already exists in the Modules folder, make a copy of it in
-# the temporary folder so that it isn't accidentally used in this test.
-if(-not (Test-Path -Path $moduleRoot))
+[String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
+if ( (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+     (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    $null = New-Item -Path $moduleRoot -ItemType Directory
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 else
 {
-    # Copy the existing folder out to the temp directory to hold until the end of the run
-    # Delete the folder to remove the old files.
-    $tempLocation = Join-Path -Path $env:Temp -ChildPath $DSCModuleName
-    Copy-Item -Path $moduleRoot -Destination $tempLocation -Recurse -Force
-    Remove-Item -Path $moduleRoot -Recurse -Force
-    $null = New-Item -Path $moduleRoot -ItemType Directory
+    & git @('-C',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'),'pull')
 }
-
-
-# Copy the module to be tested into the Module Root
-Copy-Item -Path $PSScriptRoot\..\..\* -Destination $moduleRoot -Recurse -Force -Exclude '.git'
-
-# Import the Module
-$Splat = @{
-    Path = $moduleRoot
-    ChildPath = $RelativeModulePath
-    Resolve = $true
-    ErrorAction = 'Stop'
-}
-$DSCModuleFile = Get-Item -Path (Join-Path @Splat)
-
-# Remove all copies of the module from memory so an old one is not used.
-if (Get-Module -Name $DSCModuleFile.BaseName -All)
-{
-    Get-Module -Name $DSCModuleFile.BaseName -All | Remove-Module
-}
-
-# Import the Module to test.
-Import-Module -Name $DSCModuleFile.FullName -Force
-
-<#
-  This is to fix a problem in AppVoyer where we have multiple copies of the resource
-  in two different folders. This should probably be adjusted to be smarter about how
-  it finds the resources.
-#>
-if (($env:PSModulePath).Split(';') -ccontains $pwd.Path)
-{
-    $script:tempPath = $env:PSModulePath
-    $env:PSModulePath = ($env:PSModulePath -split ';' | Where-Object {$_ -ne $pwd.path}) -join ';'
-}
-
-# Preserve and set the execution policy so that the DSC MOF can be created
-$executionPolicy = Get-ExecutionPolicy
-if ($executionPolicy -ne 'Unrestricted')
-{
-    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
-    $rollbackExecution = $true
-}
+Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+$TestEnvironment = Initialize-TestEnvironment `
+    -DSCModuleName $Global:DSCModuleName `
+    -DSCResourceName $Global:DSCResourceName `
+    -TestType Unit 
 #endregion
 
 # Begin Testing
@@ -73,7 +25,7 @@ try
 
     #region Pester Tests
 
-    InModuleScope $DSCResourceName {
+    InModuleScope $Global:DSCResourceName {
 
         #region Pester Test Initialization
         # Get the rule that will be used for testing
@@ -91,7 +43,7 @@ try
         #endregion
 
         #region Function Get-TargetResource
-        Describe 'MSFT_xFirewall\Get-TargetResource' {
+        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
             Context 'Absent should return correctly' {
                 Mock Get-NetFirewallRule
 
@@ -120,7 +72,7 @@ try
 
 
         #region Function Test-TargetResource
-        Describe 'MSFT_xFirewall\Test-TargetResource' {
+        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
             Context 'Ensure is Absent and the Firewall is not Present' {
                 Mock Get-FirewallRule
 
@@ -165,7 +117,7 @@ try
 
 
         #region Function Set-TargetResource
-        Describe 'MSFT_xFirewall\Set-TargetResource' {
+        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
             # To speed up all these tests create Mocks so that these functions are not repeatedly called
             Mock Get-FirewallRule -MockWith { $FirewallRule }
             Mock Get-FirewallRuleProperty -MockWith { $Properties }
@@ -516,7 +468,6 @@ try
                     Assert-MockCalled Test-RuleProperties -Exactly 1
                 }
             }
-
             Context 'Ensure is Present and the Firewall Does Exist but has a different RemoteAddress' {
                 It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
                     Mock Set-NetFirewallRule
@@ -556,6 +507,97 @@ try
                     Assert-MockCalled Test-RuleProperties -Exactly 1
                 }
             }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different DynamicTransport' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -DynamicTransport 'WifiDirectDisplay' `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different EdgeTraversalPolicy' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -EdgeTraversalPolicy 'Allow' `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different IcmpType' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -IcmpType @('52','53') `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different LocalOnlyMapping' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -LocalOnlyMapping $true `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different LooseSourceMapping' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -LooseSourceMapping $true `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different OverrideBlockRules' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -OverrideBlockRules $true `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
+            Context 'Ensure is Present and the Firewall Does Exist but has a different Owner' {
+                It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
+                    Mock Set-NetFirewallRule
+                    Mock Test-RuleProperties {return $false}
+                    $result = Set-TargetResource `
+                        -Name $FirewallRule.Name `
+                        -Owner (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled Set-NetFirewallRule -Exactly 1
+                    Assert-MockCalled Test-RuleProperties -Exactly 1
+                }
+            }
 
             Context 'Ensure is Present and the Firewall Does Exist and is the same' {
                 It "should call expected mocks on firewall rule $($FirewallRule.Name)" {
@@ -575,30 +617,37 @@ try
         Describe 'MSFT_xFirewall\Test-RuleProperties' {
             # Make an object that can be splatted onto the function
             $Splat = @{
-                Name = $FirewallRule.Name
-                DisplayGroup = $FirewallRule.DisplayGroup
-                Group = $FirewallRule.Group
-                Enabled = $FirewallRule.Enabled
-                Profile = $FirewallRule.Profile
-                Direction = $FirewallRule.Direction
-                Action = $FirewallRule.Action
-                RemotePort = $Properties.PortFilters.RemotePort
-                LocalPort = $Properties.PortFilters.LocalPort
-                Protocol = $Properties.PortFilters.Protocol
-                Description = $FirewallRule.Description
-                Program = $Properties.ApplicationFilters.Program
-                Service = $Properties.ServiceFilters.Service
-                Authentication = $properties.SecurityFilters.Authentication
-                Encryption = $properties.SecurityFilters.Encryption
-                InterfaceAlias = $properties.InterfaceFilters.InterfaceAlias
-                InterfaceType = $properties.InterfaceTypeFilters.InterfaceType
-                LocalAddress = $properties.AddressFilters.LocalAddress
-                LocalUser = $properties.SecurityFilters.LocalUser
-                Package = $properties.ApplicationFilters.Package
-                Platform = $firewallRule.Platform
-                RemoteAddress = $properties.AddressFilters.RemoteAddress
-                RemoteMachine = $properties.SecurityFilters.RemoteMachine
-                RemoteUser = $properties.SecurityFilters.RemoteUser
+                Name                = $FirewallRule.Name
+                DisplayGroup        = $FirewallRule.DisplayGroup
+                Group               = $FirewallRule.Group
+                Enabled             = $FirewallRule.Enabled
+                Profile             = $FirewallRule.Profile
+                Direction           = $FirewallRule.Direction
+                Action              = $FirewallRule.Action
+                RemotePort          = $Properties.PortFilters.RemotePort
+                LocalPort           = $Properties.PortFilters.LocalPort
+                Protocol            = $Properties.PortFilters.Protocol
+                Description         = $FirewallRule.Description
+                Program             = $Properties.ApplicationFilters.Program
+                Service             = $Properties.ServiceFilters.Service
+                Authentication      = $properties.SecurityFilters.Authentication
+                Encryption          = $properties.SecurityFilters.Encryption
+                InterfaceAlias      = $properties.InterfaceFilters.InterfaceAlias
+                InterfaceType       = $properties.InterfaceTypeFilters.InterfaceType
+                LocalAddress        = $properties.AddressFilters.LocalAddress
+                LocalUser           = $properties.SecurityFilters.LocalUser
+                Package             = $properties.ApplicationFilters.Package
+                Platform            = $firewallRule.Platform
+                RemoteAddress       = $properties.AddressFilters.RemoteAddress
+                RemoteMachine       = $properties.SecurityFilters.RemoteMachine
+                RemoteUser          = $properties.SecurityFilters.RemoteUser
+                DynamicTransport    = $properties.PortFilters.DynamicTransport
+                EdgeTraversalPolicy = $FirewallRule.EdgeTraversalPolicy
+                IcmpType            = $properties.PortFilters.IcmpType
+                LocalOnlyMapping    = $FirewallRule.LocalOnlyMapping
+                LooseSourceMapping  = $FirewallRule.LooseSourceMapping
+                OverrideBlockRules  = $properties.SecurityFilters.OverrideBlockRules
+                Owner               = $FirewallRule.Owner
             }
 
             # To speed up all these tests create Mocks so that these functions are not repeatedly called
@@ -852,13 +901,68 @@ try
                     $Result | Should be $False
                 }
             }
-
+            Context 'testing with a rule with a different DynamicTransport' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.DynamicTransport = 'WifiDirectDevices'
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different EdgeTraversalPolicy' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.EdgeTraversalPolicy = 'DeferToApp'
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different IcmpType' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.IcmpType = @('53','54')
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different LocalOnlyMapping' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.LocalOnlyMapping = ! $CompareRule.LocalOnlyMapping
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different LooseSourceMapping' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.LooseSourceMapping = ! $CompareRule.LooseSourceMapping
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different OverrideBlockRules' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.OverrideBlockRules = ! $CompareRule.OverrideBlockRules
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
+            Context 'testing with a rule with a different Owner' {
+                $CompareRule = $Splat.Clone()
+                $CompareRule.Owner = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
+                It "should return False on firewall rule $($FirewallRule.Name)" {
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
+                    $Result | Should be $False
+                }
+            }
         }
         #endregion
 
 
         #region Function Get-FirewallRule
-        Describe 'MSFT_xFirewall\Get-FirewallRule' {
+        Describe "$($Global:DSCResourceName)\Get-FirewallRule" {
             Context 'testing with firewall that exists' {
                 It "should return a firewall rule when name is passed on firewall rule $($FirewallRule.Name)" {
                     $Result = Get-FirewallRule -Name $FirewallRule.Name
@@ -891,7 +995,7 @@ try
 
 
         #region Function Get-FirewallRuleProperty
-        Describe 'MSFT_xFirewall\Get-FirewallRuleProperty' {
+        Describe "$($Global:DSCResourceName)\Get-FirewallRuleProperty" {
             Context 'All Properties' {
                 $result = Get-FirewallRuleProperty -FirewallRule $FirewallRule
                 It "Should return the right address filter on firewall rule $($FirewallRule.Name)" {
@@ -954,39 +1058,12 @@ try
         }
         #endregion
 
-    }
+    } #end InModuleScope $DSCResourceName
     #endregion
-
 }
 finally
 {
     #region FOOTER
-    # Set PSModulePath back to previous settings
-    $env:PSModulePath = $script:tempPath;
-
-    # Restore the Execution Policy
-    if ($rollbackExecution)
-    {
-        Set-ExecutionPolicy -ExecutionPolicy $executionPolicy -Force
-    }
-
-    # Cleanup Working Folder
-    if (Test-Path -Path $WorkingFolder)
-    {
-        Remove-Item -Path $WorkingFolder -Recurse -Force
-    }
-
-    # Clean up after the test completes.
-    Remove-Item -Path $moduleRoot -Recurse -Force
-
-    # Restore previous versions, if it exists.
-    if ($tempLocation)
-    {
-        $null = New-Item -Path $moduleRoot -ItemType Directory
-        Copy-Item -Path $tempLocation -Destination "${env:ProgramFiles}\WindowsPowerShell\Modules" -Recurse -Force
-        Remove-Item -Path $tempLocation -Recurse -Force
-    }
+    Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
-
-    # Other Cleanup Code Goes Here...
 }

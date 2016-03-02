@@ -1,18 +1,19 @@
 $Global:DSCModuleName      = 'xNetworking'
-$Global:DSCResourceName    = 'MSFT_xNetConnectionProfile'
+$Global:DSCResourceName    = 'MSFT_xHostsFile'
+
+Copy-Item "${env:SystemRoot}\System32\Drivers\Etc\Hosts" "${env:Temp}\Hosts" -Force
 
 #region HEADER
-[String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
-if ( (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
+     (-not (Test-Path -Path '.\DSCResource.Tests\TestHelper.psm1')) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git')
 }
 else
 {
-    & git @('-C',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'),'pull')
+    & git @('-C',(Join-Path -Path (Get-Location) -ChildPath '\DSCResource.Tests\'),'pull')
 }
-Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
     -DSCResourceName $Global:DSCResourceName `
@@ -36,18 +37,16 @@ try
         }
 
         It 'should be able to call Get-DscConfiguration without throwing' {
+            Start-Sleep -Seconds 30
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($Global:DSCResourceName)_Config"}
-            $rule.InterfaceAlias   | Should Be $current.InterfaceAlias
-            $rule.NetworkCategory  | Should Be $current.NetworkCategory
-            $rule.IPv4Connectivity | Should Be $current.IPv4Connectivity
-            $rule.IPv6Connectivity | Should Be $current.IPv6Connectivity
-            $rule.Address          | Should Be $current.Address
-            $rule.AddressFamily    | Should Be $current.AddressFamily
+            $result = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($Global:DSCResourceName)_Config"}
+            $result.Ensure                 | Should Be $HostEntry.Ensure
+            $result.HostName               | Should Be $HostEntry.HostName
+            $result.IPAddress              | Should Be $HostEntry.IPAddress
         }
     }
     #endregion
@@ -56,5 +55,8 @@ finally
 {
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
+
+    #Restore unmodified hosts file
+    Copy-Item "${env:Temp}\Hosts" "${env:SystemRoot}\System32\Drivers\Etc\Hosts" -Force
     #endregion
 }

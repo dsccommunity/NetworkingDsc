@@ -17,6 +17,7 @@ SubnetMaskDoesNotMatchMessage=Subnet mask does NOT match desired state. Expected
 SubnetMaskMatchMessage=Subnet mask is in desired state.
 DHCPIsNotDisabledMessage=DHCP is NOT disabled.
 DHCPIsAlreadyDisabledMessage=DHCP is already disabled.
+DHCPIsNotTestedMessage=DHCP status is ignored when Address Family is IPv6.
 InterfaceNotAvailableError=Interface "{0}" is not available. Please select a valid interface and try again.
 AddressFormatError=Address "{0}" is not in the correct format. Please correct the Address parameter in the configuration and try again.
 AddressIPv4MismatchError=Address "{0}" is in IPv4 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
@@ -228,23 +229,6 @@ function Test-TargetResource
                 $($LocalizedData.SubnetMaskMatchMessage)
                 ) -join '' )
         }
-    }
-
-    # Test if DHCP is already disabled
-    if (-not (Get-NetIPInterface `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily).Dhcp.ToString().Equals('Disabled'))
-    {
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DHCPIsNotDisabledMessage)
-            ) -join '' )
-        $desiredConfigurationMatch = $false
-    }
-    else
-    {
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DHCPIsAlreadyDisabledMessage)
-            ) -join '' )
     }
     return $desiredConfigurationMatch
 } # Test-TargetResource
