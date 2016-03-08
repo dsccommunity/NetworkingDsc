@@ -621,7 +621,7 @@ try
                 DisplayGroup        = $FirewallRule.DisplayGroup
                 Group               = $FirewallRule.Group
                 Enabled             = $FirewallRule.Enabled
-                Profile             = $FirewallRule.Profile
+                Profile             = $FirewallRule.Profile -split ', '
                 Direction           = $FirewallRule.Direction
                 Action              = $FirewallRule.Action
                 RemotePort          = $Properties.PortFilters.RemotePort
