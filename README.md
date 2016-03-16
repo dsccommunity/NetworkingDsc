@@ -153,6 +153,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 * Added the following resources:
     * MSFT_xHostsFile resource to manage hosts file entries.
 * MSFT_xFirewall: Fix test of Profile parameter status.
+* MSFT_xIPAddress: Fix false negative when desired IP is a substring of current IP.
 
 ### 2.7.0.0
 
