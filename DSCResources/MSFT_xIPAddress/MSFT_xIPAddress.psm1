@@ -197,7 +197,7 @@ function Test-TargetResource
         -ErrorAction Stop)
 
     # Test if the IP Address passed is present
-    if (-not $currentIPs.IPAddress.Contains($IPAddress))
+    if ($IPAddress -notin $currentIPs.IPAddress)
     {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
