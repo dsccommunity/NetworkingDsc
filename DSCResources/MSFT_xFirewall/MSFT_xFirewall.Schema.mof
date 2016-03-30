@@ -7,7 +7,7 @@ class MSFT_xFirewall : OMI_BaseResource
   [Read, Description("The current value of the Display Group of the Firewall Rule")] string DisplayGroup;
   [Write, Description("Ensure the presence/absence of the resource"), ValueMap{"Present", "Absent"},Values{"Present", "Absent"}] String Ensure;
   [Write, Description("Enable or disable the supplied configuration"), ValueMap{"True", "False"},Values{"True", "False"}] string Enabled;
-  [Write, Description("Permit or Block the supplied configuration"), ValueMap{"NotConfigured", "Allow", "Block"},Values{"NotConfigured", "Allow", "Block"}] String Action;
+  [Write, Description("Allow or Block the supplied configuration"), ValueMap{"NotConfigured", "Allow", "Block"},Values{"NotConfigured", "Allow", "Block"}] String Action;
   [Write, Description("Specifies one or more profiles to which the rule is assigned")] String Profile[];
   [Write, Description("Direction of the connection"), ValueMap{"Inbound","Outbound"},values{"Inbound","Outbound"}] String Direction;
   [Write, Description("Specific Port used for filter. Specified by port number, range, or keyword")] String RemotePort[];
