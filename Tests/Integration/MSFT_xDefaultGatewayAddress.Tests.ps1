@@ -1,5 +1,5 @@
 $Global:DSCModuleName      = 'xNetworking'
-$Global:DSCResourceName    = 'MSFT_xIPAddress'
+$Global:DSCResourceName    = 'MSFT_xDefaultGatewayAddress'
 
 #region HEADER
 [String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
@@ -51,16 +51,8 @@ try
         }
 
         $null = New-LoopbackAdapter `
-            -Name $TestIPAddress.InterfaceAlias `
+            -Name $TestDefaultGatewayAddress.InterfaceAlias `
             @PSBoundParameters
-
-        # The following two commands prevent an issue occuring in AppVeyor where the new
-        # Loopback adapter is created but not detected by WMI in the DSC resource.
-        $null = New-LoopbackAdapter `
-            -Name 'Dummy' `
-            @PSBoundParameters
-
-        Start-Sleep -Seconds 5
 
         #region DEFAULT TESTS
         It 'Should compile without throwing' {
@@ -77,19 +69,14 @@ try
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($Global:DSCResourceName)_Config"}
-            $current.InterfaceAlias             | Should Be $TestIPAddress.InterfaceAlias
-            $current.AddressFamily              | Should Be $TestIPAddress.AddressFamily
-            $current.IPAddress                  | Should Be $TestIPAddress.IPAddress
-            $current.SubnetMask                 | Should Be $TestIPAddress.SubnetMask
+            $current.InterfaceAlias           | Should Be $TestDefaultGatewayAddress.InterfaceAlias
+            $current.AddressFamily            | Should Be $TestDefaultGatewayAddress.AddressFamily
+            $current.Address                  | Should Be $TestDefaultGatewayAddress.Address
         }
 
         # Remove Loopback Adapter
         Remove-LoopbackAdapter `
-            -Name 'Dummy' `
-            @PSBoundParameters
-
-        Remove-LoopbackAdapter `
-            -Name $TestIPAddress.InterfaceAlias `
+            -Name $TestDefaultGatewayAddress.InterfaceAlias `
             @PSBoundParameters
     }
     #endregion
