@@ -50,17 +50,19 @@ try
             Throw 'LoopbackAdapter Module could not be installed.'
         }
 
-        $null = New-LoopbackAdapter `
-            -Name $TestIPAddress.InterfaceAlias `
-            @PSBoundParameters
-
-        # The following two commands prevent an issue occuring in AppVeyor where the new
+        # The following command prevents an issue occuring in AppVeyor where the new
         # Loopback adapter is created but not detected by WMI in the DSC resource.
         $null = New-LoopbackAdapter `
             -Name 'Dummy' `
             @PSBoundParameters
 
-        Start-Sleep -Seconds 5
+        $null = New-LoopbackAdapter `
+            -Name $TestIPAddress.InterfaceAlias `
+            @PSBoundParameters
+
+        # The following command prevents an issue occuring in AppVeyor where the new
+        # Loopback adapter is created but not detected by WMI in the DSC resource.
+        Start-Sleep -Seconds 10
 
         #region DEFAULT TESTS
         It 'Should compile without throwing' {
