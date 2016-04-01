@@ -1,5 +1,5 @@
 $TestDhcpClient = [PSObject]@{
-    InterfaceAlias          = 'DhcpClientLBA'
+    InterfaceAlias          = 'xNetworkingLBA'
     AddressFamily           = 'IPv4'
     State                   = 'Enabled'
 }

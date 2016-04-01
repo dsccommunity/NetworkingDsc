@@ -1,5 +1,5 @@
 $TestDNSServerAddress = [PSObject]@{
-    InterfaceAlias          = 'DNSServerAddressLBA'
+    InterfaceAlias          = 'xNetworkingLBA'
     AddressFamily           = 'IPv4'
     Address                 = '10.139.17.99'
     Validate                = $False

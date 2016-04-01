@@ -19,6 +19,10 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Integration 
 #endregion
 
+# Configure Loopback Adapter
+. (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
+New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
+
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
@@ -27,33 +31,6 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($Global:DSCResourceName)_Integration" {
-        # Configure Loopback Adapter
-        if ($env:APPVEYOR) {
-            # Running in AppVeyor so force silent install of LoopbackAdapter
-            $PSBoundParameters.Force = $true
-        }
-
-        $LoopbackAdapterModuleName = 'LoopbackAdapter'
-        $LoopbackAdapterModulePath = "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\$LoopbackAdapterModuleName"
-        $LoopbackAdapterModule = Install-ModuleFromPowerShellGallery `
-            -ModuleName $LoopbackAdapterModuleName `
-            -ModulePath $LoopbackAdapterModulePath `
-            @PSBoundParameters
-
-        if ($LoopbackAdapterModule) {
-            # Import the module if it is available
-            $LoopbackAdapterModule | Import-Module -Force
-        }
-        else
-        {
-            # Module could not/would not be installed - so warn user that tests will fail.
-            Throw 'LoopbackAdapter Module could not be installed.'
-        }
-
-        $null = New-LoopbackAdapter `
-            -Name $TestDefaultGatewayAddress.InterfaceAlias `
-            @PSBoundParameters
-
         #region DEFAULT TESTS
         It 'Should compile without throwing' {
             {
@@ -73,16 +50,14 @@ try
             $current.AddressFamily            | Should Be $TestDefaultGatewayAddress.AddressFamily
             $current.Address                  | Should Be $TestDefaultGatewayAddress.Address
         }
-
-        # Remove Loopback Adapter
-        Remove-LoopbackAdapter `
-            -Name $TestDefaultGatewayAddress.InterfaceAlias `
-            @PSBoundParameters
     }
     #endregion
 }
 finally
 {
+    # Remove Loopback Adapter
+    Remove-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
+
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion

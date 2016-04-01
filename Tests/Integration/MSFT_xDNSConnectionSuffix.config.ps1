@@ -1,5 +1,5 @@
 $TestDnsConnectionSuffix = [PSObject]@{
-    InterfaceAlias                 = 'DnsConnectionSuffixLBA'
+    InterfaceAlias                 = 'xNetworkingLBA'
     ConnectionSpecificSuffix       = 'contoso.com'
     RegisterThisConnectionsAddress = $true
     UseSuffixWhenRegistering       = $false

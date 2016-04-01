@@ -1,5 +1,5 @@
 $TestIPAddress = [PSObject]@{
-    InterfaceAlias          = 'IPAddressLBA'
+    InterfaceAlias          = 'xNetworkingLBA'
     AddressFamily           = 'IPv4'
     IPAddress               = '10.11.12.13'
     SubnetMask              = 16

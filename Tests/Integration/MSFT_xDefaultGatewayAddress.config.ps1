@@ -1,5 +1,5 @@
 $TestDefaultGatewayAddress = [PSObject]@{
-    InterfaceAlias          = 'DefaultGatewayAddressLBA'
+    InterfaceAlias          = 'xNetworkingLBA'
     AddressFamily           = 'IPv4'
     Address                 = '10.0.0.0'
 }
