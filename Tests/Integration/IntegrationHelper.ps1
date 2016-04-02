@@ -13,7 +13,7 @@ function New-IntegrationLoopbackAdapter
     else
     {
         $Splat = @{ Force = $false }
-    }
+    } # if
 
     $LoopbackAdapterModuleName = 'LoopbackAdapter'
     $LoopbackAdapterModulePath = "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\$LoopbackAdapterModuleName"
@@ -30,7 +30,7 @@ function New-IntegrationLoopbackAdapter
     {
         # Module could not/would not be installed - so warn user that tests will fail.
         Throw 'LoopbackAdapter Module could not be installed.'
-    }
+    } # if
 
     try
     {
@@ -46,7 +46,7 @@ function New-IntegrationLoopbackAdapter
             -ErrorAction Stop `
             @Splat
     }
-}
+} # function New-IntegrationLoopbackAdapter
 
 function Remove-IntegrationLoopbackAdapter
 {
@@ -69,14 +69,16 @@ function Remove-IntegrationLoopbackAdapter
         # Does the loopback adapter exist?
         $null = Get-LoopbackAdapter `
             -Name $AdapterName
-
-        # Remove Loopback Adapter
-        Remove-LoopbackAdapter `
-            -Name $AdapterName `
-            @Splat
     }
     catch
     {
         # Loopback Adapter does not exist - do nothing
+        return
     }
-}
+
+    # Remove Loopback Adapter
+    Remove-LoopbackAdapter `
+        -Name $AdapterName `
+        @Splat
+
+} # function Remove-IntegrationLoopbackAdapter
