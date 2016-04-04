@@ -23,10 +23,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 . (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
 New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
 
-# The following command prevents an issue occuring in AppVeyor where the new
-# Loopback adapter is created but not detected by WMI in the DSC resource.
-# Start-Sleep -Seconds 10
-
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
