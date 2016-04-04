@@ -149,6 +149,13 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 ### Unreleased
 
+* MSFT_xDefaultGatewayAddress: Added Integration Tests.
+* MSFT_xDhcpClient: Added Integration Tests.
+* MSFT_xDnsConnectionSuffix: Added Integration Tests.
+* MSFT_xDnsServerAddress: Added Integration Tests.
+* MSFT_xIPAddress: Added Integration Tests.
+* MSFT_xDhcpClient: Fixed logged message in Test-TargetResource.
+
 ### 2.8.0.0
 
 * Templates folder removed. Use the test templates in the [Tests.Template folder in the DSCResources repository](https://github.com/PowerShell/DscResources/tree/master/Tests.Template) instead.
