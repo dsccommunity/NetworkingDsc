@@ -45,7 +45,7 @@ function New-IntegrationLoopbackAdapter
             -Name $AdapterName `
             -ErrorAction Stop `
             @Splat
-    }
+    } # try
 } # function New-IntegrationLoopbackAdapter
 
 function Remove-IntegrationLoopbackAdapter
