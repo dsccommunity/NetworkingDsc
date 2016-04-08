@@ -129,7 +129,7 @@ try
             Mock Get-NetIPAddress -MockWith {
     
                 [PSCustomObject]@{
-                    IPAddress = '192.168.0.1'
+                    IPAddress = '192.168.0.15'
                     InterfaceAlias = 'Ethernet'
                     InterfaceIndex = 1
                     PrefixLength = [byte]16
@@ -162,7 +162,7 @@ try
     
                 It 'should be $false' {
                     $Splat = @{
-                        IPAddress = '10.0.0.2'
+                        IPAddress = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -178,7 +178,7 @@ try
     
                 It 'should be $true' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.15'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -193,7 +193,7 @@ try
             Mock Get-NetIPAddress -MockWith {
     
                 [PSCustomObject]@{
-                    IPAddress = 'fe80::1'
+                    IPAddress = 'fe80::15'
                     InterfaceAlias = 'Ethernet'
                     InterfaceIndex = 1
                     PrefixLength = [byte]64
@@ -220,12 +220,12 @@ try
                     { $Result = Test-TargetResource @Splat } | Should Throw $errorRecord
                 }
             }
-    
+
             Context 'invoking with different IPv6 Address' {
-    
+
                 It 'should be $false' {
                     $Splat = @{
-                        IPAddress = 'fe80::2'
+                        IPAddress = 'fe80::1'
                         InterfaceAlias = 'Ethernet'
                         SubnetMask = 64
                         AddressFamily = 'IPv6'
@@ -237,12 +237,12 @@ try
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
                 }
             }
-            
+
             Context 'invoking with the same IPv6 Address' {
-    
+
                 It 'should be $true' {
                     $Splat = @{
-                        IPAddress = 'fe80::1'
+                        IPAddress = 'fe80::15'
                         InterfaceAlias = 'Ethernet'
                         SubnetMask = 64
                         AddressFamily = 'IPv6'

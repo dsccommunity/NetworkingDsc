@@ -34,6 +34,9 @@ RuleNotUniqueError={0} Firewall Rules with the Name '{1}' were found. Only one e
     Type: This is the content type of the paramater (it is either array or string or blank)
     A blank type means it will not be compared
     data ParameterList
+    Delimiter: Only required for Profile parameter, because Get-NetFirewall rule doesn't
+    return the profile as an array, but a comma delimited string. Setting this value causes
+    the functions to first split the parameter into an array.
 #>
 data ParameterList
 {
@@ -44,7 +47,7 @@ data ParameterList
         @{ Name = 'DisplayGroup'; Source = '$FirewallRule.DisplayGroup'; Type = '' },
         @{ Name = 'Enabled'; Source = '$FirewallRule.Enabled'; Type = 'String' },
         @{ Name = 'Action'; Source = '$FirewallRule.Action'; Type = 'String' },
-        @{ Name = 'Profile'; Source = '$firewallRule.Profile'; Type = 'Array' },
+        @{ Name = 'Profile'; Source = '$firewallRule.Profile'; Type = 'Array'; Delimiter = ', ' },
         @{ Name = 'Direction'; Source = '$FirewallRule.Direction'; Type = 'String' },
         @{ Name = 'Description'; Source = '$FirewallRule.Description'; Type = 'String' },
         @{ Name = 'RemotePort'; Source = '$properties.PortFilters.RemotePort'; Type = 'Array' },
@@ -122,6 +125,10 @@ function Get-TargetResource
                 $parameter.Name = $Value
             }
 
+            if ($parameter.delimiter)
+            {
+                $Value = $Value -split $parameter.delimiter
+            }
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                 $($LocalizedData.FirewallParameterValueMessage) -f $Name,$parameter.Name,($Value -join ',')
                 ) -join '')
@@ -658,6 +665,10 @@ function Test-RuleProperties
                 if ($ParameterSource -eq $null)
                 {
                     $ParameterSource = @()
+                }
+                if ($parameter.delimiter)
+                {
+                    $ParameterSource = $ParameterSource -split $parameter.delimiter
                 }
                 if ($ParameterNew `
                     -and ((Compare-Object `
