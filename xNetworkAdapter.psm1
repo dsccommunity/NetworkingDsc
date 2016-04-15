@@ -36,9 +36,7 @@ function Get-xNetworkAdapterName
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [String]$Name,
-        
-        [Bool] $IgnoreMultipleMatchingAdapters
+        [String]$Name
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
@@ -52,6 +50,10 @@ function Get-xNetworkAdapterName
     if($exactAdapter.Count -eq 0)
     {
         $exactAdapter = $Adapter
+    }
+    elseif($exactAdapter.Count -eq 1)
+    {
+        $Adapter = $exactAdapter
     }
     
     
@@ -98,7 +100,7 @@ function Set-xNetworkAdapterName
         [ValidateNotNullOrEmpty()]
         [String]$Name,
         
-        [Bool] $IgnoreMultipleMatchingAdapters
+        [Switch] $IgnoreMultipleMatchingAdapters
     )
     
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -108,7 +110,15 @@ function Set-xNetworkAdapterName
     Test-xNetworkAdapterNameProperty -PhysicalMediaType $PhysicalMediaType -Status $Status -Name $Name
 
     # Get the current NetAdapter based on the parameters given.
-    $getResults = Get-xNetworkAdapterName @PSBoundParameters
+    [HashTable] $getParameters = @{}
+    foreach($key in $PSBoundParameters.Keys)
+    {
+        if($key -ne 'IgnoreMultipleMatchingAdapters')
+        {
+            $getParameters.$key = $PSBoundParameters.$key
+        }
+    }
+    $getResults = Get-xNetworkAdapterName @getParameters
     
     # Test if no adapter was found, if so return false
     if(!$getResults.Name)
@@ -169,7 +179,7 @@ function Test-xNetworkAdapterName
         [ValidateNotNullOrEmpty()]
         [String]$Name,
         
-        [Bool] $IgnoreMultipleMatchingAdapters
+        [Switch] $IgnoreMultipleMatchingAdapters
     )
     # Flag to signal whether settings are correct
     [Boolean] $desiredConfigurationMatch = $true
@@ -181,7 +191,15 @@ function Test-xNetworkAdapterName
     Test-xNetworkAdapterNameProperty -PhysicalMediaType $PhysicalMediaType -Status $Status -Name $Name
 
     # Get the current NetAdapter based on the parameters given.
-    $getResults = Get-xNetworkAdapterName @PSBoundParameters
+    [HashTable] $getParameters = @{}
+    foreach($key in $PSBoundParameters.Keys)
+    {
+        if($key -ne 'IgnoreMultipleMatchingAdapters')
+        {
+            $getParameters.$key = $PSBoundParameters.$key
+        }
+    }
+    $getResults = Get-xNetworkAdapterName @getParameters
     
     # Test if no adapter was found, if so return false
     if(!$getResults.Name)
@@ -220,7 +238,7 @@ function Test-xNetworkAdapterNameProperty {
         [ValidateNotNullOrEmpty()]
         [String]$Name,
         
-        [Bool] $IgnoreMultipleMatchingAdapters
+        [Switch] $IgnoreMultipleMatchingAdapters
     )
     
     # TODO add any parameter validation

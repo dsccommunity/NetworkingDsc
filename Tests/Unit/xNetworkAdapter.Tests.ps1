@@ -46,7 +46,6 @@ try
             Name                           = 'MyEthernet'
             PhysicalMediaType              = '802.3'
             Status                         = 'Up'
-            IgnoreMultipleMatchingAdapters = $true
         } 
   
         Describe "$($Global:ModuleName)\Get-xNetworkAdapterName" {
@@ -85,7 +84,7 @@ try
                 It 'should return correct Route' {
                     $Result = Get-xNetworkAdapterName `
                         @TestAdapterKeys
-                    $Result.MatchingAdapterCount | Should Be 2
+                    $Result.MatchingAdapterCount | Should Be 1
                     $Result.Name | Should Be 'MyEthernet'
                 }
                 It 'should call the expected mocks' {
@@ -154,6 +153,7 @@ try
                     { 
                         $Splat = $TestAdapterKeys.Clone()
                         $Splat.Name = 'MyEthernet2'
+                        $Splat.IgnoreMultipleMatchingAdapters = $true
                         Set-xNetworkAdapterName @Splat
                     } | Should Not Throw
                 }
@@ -170,6 +170,7 @@ try
                 It 'should not throw error' {
                     { 
                         $Splat = $TestAdapterKeys.Clone()
+                        $Splat.Name = 'MyEthernet2'
                         $Splat.IgnoreMultipleMatchingAdapters = $false
                         Set-xNetworkAdapterName @Splat
                     } | Should Throw 'Multiple matching NetAdapters where found for the properties. Please correct the properties or specify IgnoreMultipleMatchingAdapters to only use the first and try again.'                    
