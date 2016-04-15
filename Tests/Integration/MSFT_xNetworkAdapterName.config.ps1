@@ -1,7 +1,7 @@
+$realAdapter = (Get-NetAdapter -Physical | Select-Object -First 1)
 $TestAdapter = [PSObject]@{
-    Name                    = (Get-NetAdapter -Physical | Select-Object -First 1).Name
-    PhysicalMediaType       = '802.3'
-    Status                  = 'Up'
+    Name                    = $realAdapter.Name
+    MacAddress              = $realAdapter.MacAddress
 }
 
 
@@ -10,8 +10,7 @@ configuration MSFT_xNetworkAdapterName_Config {
     node localhost {
         xNetworkAdapterName Integration_Test {
             Name                    = $TestAdapter.Name
-            PhysicalMediaType       = $TestAdapter.PhysicalMediaType
-            Status                  = $TestAdapter.Status
+            MacAddress              = $TestAdapter.MacAddress
         }
     }
 }
