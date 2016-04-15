@@ -1,20 +1,5 @@
-<#
-.Synopsis
-   Template for creating DSC Resource Integration Tests
-.DESCRIPTION
-   To Use:
-     1. Copy to \Tests\Integration\ folder and rename MSFT_x<ResourceName>.Integration.tests.ps1
-     2. Customize TODO sections.
-     3. Create test DSC Configurtion file MSFT_x<ResourceName>.config.ps1 from integration_config_template.ps1 file.
-
-.NOTES
-   Code in HEADER and FOOTER and DEFAULT TEST regions are standard and should not be altered if possible.
-#>
-
-# TODO: Customize these parameters...
-$Global:DSCModuleName      = 'x<ModuleName>' # Example xNetworking
-$Global:DSCResourceName    = 'MSFT_x<ResourceName>' # Example MSFT_xFirewall
-# /TODO
+$Global:DSCModuleName      = 'xNetworking'
+$Global:DSCResourceName    = 'MSFT_xIPAddress'
 
 #region HEADER
 [String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
@@ -34,22 +19,23 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Integration 
 #endregion
 
-# TODO: Other Init Code Goes Here...
+# Configure Loopback Adapter
+. (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
+New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
 
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
     #region Integration Tests
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($Global:DSCResourceName).config.ps1"
-    . $ConfigFile
+    . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($Global:DSCResourceName)_Integration" {
         #region DEFAULT TESTS
         It 'Should compile without throwing' {
             {
                 Invoke-Expression -Command "$($Global:DSCResourceName)_Config -OutputPath `$TestEnvironment.WorkingFolder"
-                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
-                    -ComputerName localhost -Wait -Verbose -Force
+                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw
         }
 
@@ -59,17 +45,21 @@ try
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            # TODO: Validate the Config was Set Correctly Here...
+            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($Global:DSCResourceName)_Config"}
+            $current.InterfaceAlias             | Should Be $TestIPAddress.InterfaceAlias
+            $current.AddressFamily              | Should Be $TestIPAddress.AddressFamily
+            $current.IPAddress                  | Should Be $TestIPAddress.IPAddress
+            $current.SubnetMask                 | Should Be $TestIPAddress.SubnetMask
         }
     }
     #endregion
-
 }
 finally
 {
+    # Remove Loopback Adapter
+    Remove-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
+
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
-
-    # TODO: Other Optional Cleanup Code Goes Here...
 }

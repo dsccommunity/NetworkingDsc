@@ -113,7 +113,8 @@ function Test-TargetResource
     [Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.CheckingDHCPClientMessage)
+        $($LocalizedData.CheckingDHCPClientMessage) `
+        -f $InterfaceAlias,$AddressFamily `
         ) -join '')
 
     Test-ResourceProperty @PSBoundParameters

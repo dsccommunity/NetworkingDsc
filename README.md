@@ -13,6 +13,7 @@ The **xNetworking** module contains the following resources:
 * **xRoute**
 * **xNetBIOS**
 * **xNetworkTeam**
+* **xHostsFile**
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -61,7 +62,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Group**: Name of the firewall group where we want to put the firewall rule.
 * **Ensure**: Ensure that the firewall rule is Present or Absent.
 * **Enabled**: Enable or Disable the supplied configuration.
-* **Action**: Permit or Block the supplied configuration.
+* **Action**: Allow or Block the supplied configuration: { NotConfigured | Allow | Block }
 * **Profile**: Specifies one or more profiles to which the rule is assigned.
 * **Direction**: Direction of the connection.
 * **RemotePort**: Specific port used for filter. Specified by port number, range, or keyword.
@@ -125,12 +126,10 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **LoadBalancingAlgorithm**: Specifies the load balancing algorithm for the network team. { Dynamic | HyperVPort | IPAddresses | MacAddresses | TransportPorts }.
 * **Ensure**: Specifies if the network team should be created or deleted. { Present | Absent }.
 
-### xNetworkAdapterName
-* **PhysicalMediaType**: Specifies physical media type of the adapter you want to affect.  Defaults to `802.3`.
-* **Status**: Specifies the status of the adapter you want to affect.  Defaults to `Up`.
-* **Name**: Specifies the Name the adapter should use.
-* **IgnoreMultipleMatchingAdapters**: Specifies that if multiple adapters are found.  The resource should not treat this as an error and affect only the first one.
-* **MatchingAdapterCount**: Only returned when the resource is retrieved.  Indicates the number of adapters matching the specified criteria.
+### xHostsFile
+* **HostName**: Specifies the name of the computer that will be mapped to an IP address.
+* **IPAddress**: Specifies the IP Address that should be mapped to the host name.
+* **Ensure**: Specifies if the hosts file entry should be created or deleted. { Present | Absent }.
 
 ## Known Invalid Configurations
 
@@ -149,9 +148,21 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased
-* Added the following resources:
-    * MSFT_xNetworkAdapterName resource to set adapter names
 
+* MSFT_xDefaultGatewayAddress: Added Integration Tests.
+* MSFT_xDhcpClient: Added Integration Tests.
+* MSFT_xDnsConnectionSuffix: Added Integration Tests.
+* MSFT_xDnsServerAddress: Added Integration Tests.
+* MSFT_xIPAddress: Added Integration Tests.
+* MSFT_xDhcpClient: Fixed logged message in Test-TargetResource.
+
+### 2.8.0.0
+
+* Templates folder removed. Use the test templates in the [Tests.Template folder in the DSCResources repository](https://github.com/PowerShell/DscResources/tree/master/Tests.Template) instead.
+* Added the following resources:
+    * MSFT_xHostsFile resource to manage hosts file entries.
+* MSFT_xFirewall: Fix test of Profile parameter status.
+* MSFT_xIPAddress: Fix false negative when desired IP is a substring of current IP.
 
 ### 2.7.0.0
 
@@ -727,11 +738,12 @@ configuration Sample_xRoute_AddRoute
 Sample_xRoute_AddRoute
 Start-DscConfiguration -Path Sample_xRoute_AddRoute -Wait -Verbose -Force
 ```
-### Rename the first up ethernet adapter
-This example will rename the first up ethernet adapter
+
+### Create a network team
+This example shows creating a native network team.
 
 ```powershell
-configuration Sample_xNetworkAdapterName
+configuration Sample_xNetworkTeam_AddTeam
 {
     param
     (
@@ -742,16 +754,45 @@ configuration Sample_xNetworkAdapterName
 
     Node $NodeName
     {
-        xNetworkAdapterName adapter
+        xNetworkTeam HostTeam
         {
-            Name                           = 'MyEthernet' #key
-            PhysicalMediaType              = '802.3'      #query
-            Status                         = 'Up'         #query
-            IgnoreMultipleMatchingAdapters = $true        #option
+          Name = 'HostTeam'
+          TeamingMode = 'SwitchIndependent'
+          LoadBalancingAlgorithm = 'HyperVPort'
+          TeamMembers = 'NIC1','NIC2'
+          Ensure = 'Present'
         }
     }
  }
 
-Sample_xNetworkAdapterName
-Start-DscConfiguration -Path Sample_xNetworkAdapterName -Wait -Verbose -Force
+Sample_xNetworkTeam_AddTeam
+Start-DscConfiguration -Path Sample_xNetworkTeam_AddTeam -Wait -Verbose -Force
+```
+
+### Add a hosts file entry
+This example will add an hosts file entry.
+
+```powershell
+configuration Sample_xHostsFile_AddEntry
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xHostsFile HostEntry
+        {
+          HostName  = 'Host01'
+          IPAddress = '192.168.0.1'
+          Ensure    = 'Present'
+        }
+    }
+ }
+
+Sample_xHostsFile_AddEntry
+Start-DscConfiguration -Path Sample_xHostsFile_AddEntry -Wait -Verbose -Force
 ```
