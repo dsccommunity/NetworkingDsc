@@ -1,8 +1,0 @@
-[ClassVersion("1.0.0"), FriendlyName("xNetworkAdapterName")]
-class MSFT_xNetworkAdapterName : OMI_BaseResource
-{
-  [Required, Description("Specifies the Name the adapter should use.")] 
-        string Name;
-  [key, Description("The MacAddress of the interface you want to assign the name")] 
-        string MacAddress;
-};
