@@ -28,6 +28,12 @@ try
             PhysicalMediaType              = '802.3'
             Status                         = 'Up'
         }
+
+        $MockHypervVmNetAdapter = [PSCustomObject] @{
+            Name                    = 'Ethernet'
+            PhysicalMediaType              = 'Unspecified'
+            Status                         = 'Up'
+        }
         
         $MockMultipleNetAdapter = @(
             [PSCustomObject] @{
@@ -45,6 +51,11 @@ try
         $TestAdapterKeys = @{
             Name                           = 'MyEthernet'
             PhysicalMediaType              = '802.3'
+            Status                         = 'Up'
+        } 
+
+        $TestHypervVmAdapterKeys = @{
+            Name                           = 'MyEthernet'
             Status                         = 'Up'
         } 
   
@@ -70,6 +81,19 @@ try
     
                 It 'should return correct Route' {
                     $Result = Get-xNetworkAdapterName @TestAdapterKeys
+                    $Result.MatchingAdapterCount | Should Be 1
+                    $Result.Name | Should Be 'Ethernet'
+                }
+                It 'should call the expected mocks' {
+                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
+                }
+            }
+            Context 'Hyperv VM Adapter does exist' {
+                
+                Mock Get-NetAdapter -MockWith { $MockHypervVmNetAdapter }
+    
+                It 'should return correct Route' {
+                    $Result = Get-xNetworkAdapterName @TestHypervVmAdapterKeys
                     $Result.MatchingAdapterCount | Should Be 1
                     $Result.Name | Should Be 'Ethernet'
                 }
@@ -120,6 +144,22 @@ try
                 It 'should not throw error' {
                     { 
                         $Splat = $TestAdapterKeys.Clone()
+                        Set-xNetworkAdapterName @Splat
+                    } | Should Not Throw
+                }
+                It 'should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
+                    Assert-MockCalled -commandName Rename-NetAdapter -Exactly 1
+                }
+            }
+            Context 'Hyperv VM Adapter exists and should be renamed' {
+                
+                Mock Get-NetAdapter -MockWith { $MockHypervVmNetAdapter }
+                Mock Rename-NetAdapter
+    
+                It 'should not throw error' {
+                    { 
+                        $Splat = $TestHypervVmAdapterKeys.Clone()
                         Set-xNetworkAdapterName @Splat
                     } | Should Not Throw
                 }

@@ -27,8 +27,7 @@ function Get-xNetworkAdapterName
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [ValidateNotNullOrEmpty()]
-        [String]$PhysicalMediaType = '802.3',
+        [String]$PhysicalMediaType,
 
         [ValidateNotNullOrEmpty()]
         [ValidateSet('Up','Disconnected','Disabled')]
@@ -45,7 +44,12 @@ function Get-xNetworkAdapterName
 
     Test-xNetworkAdapterNameProperty -PhysicalMediaType $PhysicalMediaType -Status $Status -Name $Name
     
-    $Adapter  =  @(Get-NetAdapter | Where-Object {$_.PhysicalMediaType -eq $PhysicalMediaType -and $_.Status -eq $Status})
+    $Adapter  =  @(Get-NetAdapter | Where-Object {$_.Status -eq $Status})
+    if(![string]::IsNullOrWhiteSpace($PhysicalMediaType))
+    {
+         $Adapter = @($Adapter| Where-Object {$_.PhysicalMediaType -eq $PhysicalMediaType})
+    }
+    
     $exactAdapter = @($Adapter | Where-Object {$_.Name -eq $Name} )
     if($exactAdapter.Count -eq 0)
     {
@@ -88,8 +92,7 @@ function Set-xNetworkAdapterName
 {
     param
     (
-        [ValidateNotNullOrEmpty()]
-        [String]$PhysicalMediaType = '802.3',
+        [String]$PhysicalMediaType,
 
         [ValidateNotNullOrEmpty()]
         [ValidateSet('Up','Disconnected','Disabled')]
@@ -168,8 +171,7 @@ function Test-xNetworkAdapterName
     [OutputType([System.Boolean])]
     param
     (
-        [ValidateNotNullOrEmpty()]
-        [String]$PhysicalMediaType = '802.3',
+        [String]$PhysicalMediaType,
 
         [ValidateNotNullOrEmpty()]
         [ValidateSet('Up','Disconnected','Disabled')]
@@ -225,8 +227,6 @@ function Test-xNetworkAdapterNameProperty {
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
         [String]$PhysicalMediaType,
 
         [Parameter(Mandatory)]
