@@ -37,7 +37,7 @@ function Get-xNetworkAdapterName
         [ValidateNotNullOrEmpty()]
         [String]$Name
     )
-
+    Write-Warning -Message "This is investigational, names and parameters are subject to change"
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
         $($LocalizedData.GettingNetAdapetrMessage)
         ) -join '')
@@ -105,7 +105,6 @@ function Set-xNetworkAdapterName
         
         [Switch] $IgnoreMultipleMatchingAdapters
     )
-    
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
         $($LocalizedData.ApplyingNetAdapterMessage)
         ) -join '')
@@ -179,9 +178,7 @@ function Test-xNetworkAdapterName
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [String]$Name,
-        
-        [Switch] $IgnoreMultipleMatchingAdapters
+        [String]$Name
     )
     # Flag to signal whether settings are correct
     [Boolean] $desiredConfigurationMatch = $true
@@ -193,15 +190,7 @@ function Test-xNetworkAdapterName
     Test-xNetworkAdapterNameProperty -PhysicalMediaType $PhysicalMediaType -Status $Status -Name $Name
 
     # Get the current NetAdapter based on the parameters given.
-    [HashTable] $getParameters = @{}
-    foreach($key in $PSBoundParameters.Keys)
-    {
-        if($key -ne 'IgnoreMultipleMatchingAdapters')
-        {
-            $getParameters.$key = $PSBoundParameters.$key
-        }
-    }
-    $getResults = Get-xNetworkAdapterName @getParameters
+    $getResults = Get-xNetworkAdapterName @PSBoundParameters
     
     # Test if no adapter was found, if so return false
     if(!$getResults.Name)
