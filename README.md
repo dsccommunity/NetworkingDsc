@@ -860,7 +860,7 @@ Configuration SetDns
             }
             TestScript = {
                 Import-module xNetworking
-                Test-xNetworkAdapterName -Name 'Ethernet1' -IgnoreMultipleMatchingAdapters
+                Test-xNetworkAdapterName -Name 'Ethernet1'
             }
             SetScript = {
                 Import-module xNetworking
