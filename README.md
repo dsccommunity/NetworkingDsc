@@ -831,7 +831,7 @@ Start-DscConfiguration -Path Sample_xHostsFile_AddEntry -Wait -Verbose -Force
 
 ### Set a node to use itself as a DNS server
 **Note** this sample assumes you have already setup DNS on the machine for brevity.
-
+**This is investigational, names and parameters are subject to change.  The DSC team is investigating a better way to do this.**
 Sample of using *-xNetworkAdapterName Functions
 ```PowerShell
 Configuration SetDns
