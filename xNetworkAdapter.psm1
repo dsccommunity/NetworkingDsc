@@ -14,7 +14,6 @@ NetAdapterSetStateMessage=NetAdapter was set to the desired state.
 CheckingNetAdapterMessage=Checking the NetAdapter.
 NetAdapterNotFoundError=A NetAdapter matching the properties was not found. Please correct the properties and try again.
 MultipleMatchingNetAdapterFound=Multiple matching NetAdapters where found for the properties. Please correct the properties or specify IgnoreMultipleMatchingAdapters to only use the first and try again.
-ApplyingWhileInDesiredStateMessage=
 '@
 }
 
@@ -135,8 +134,11 @@ function Set-xNetworkAdapterName
 
         $PSCmdlet.ThrowTerminatingError($errorRecord)        
     }
-    elseif($getResults.MatchingAdapterCount -ne 1 -and !$IgnoreMultipleMatchingAdapters) # Test if a found adapter name mismatches, if so return false
+    elseif($getResults.MatchingAdapterCount -ne 1 -and !$IgnoreMultipleMatchingAdapters) 
     {
+        # Mulitple matching adapters, and IgnoreMultipleMatchingAdapters is not specified
+        # throw an error to indicating we found multiple adapters
+        
         $errorId = 'MultipleMatchingNetAdapterFound'
         $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
         $errorMessage = $LocalizedData.MultipleMatchingNetAdapterFound
