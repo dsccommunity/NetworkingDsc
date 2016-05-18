@@ -176,6 +176,8 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 ### Unreleased
 
+### 2.9.0.0
+
 * MSFT_xDefaultGatewayAddress: Added Integration Tests.
 * MSFT_xDhcpClient: Added Integration Tests.
 * MSFT_xDnsConnectionSuffix: Added Integration Tests.
