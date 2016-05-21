@@ -455,7 +455,7 @@ Configuration Sample_xDefaultGatewayAddress_Set
     {
         xDefaultGatewayAddress SetDefaultGateway
         {
-			Address        = $DefaultGateway
+            Address        = $DefaultGateway
             InterfaceAlias = $InterfaceAlias
             AddressFamily  = $AddressFamily
         }
