@@ -14,6 +14,7 @@ The **xNetworking** module contains the following resources:
 * **xNetBIOS**
 * **xNetworkTeam**
 * **xHostsFile**
+* **xNetAdapterBinding**
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -131,6 +132,11 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **IPAddress**: Specifies the IP Address that should be mapped to the host name.
 * **Ensure**: Specifies if the hosts file entry should be created or deleted. { Present | Absent }.
 
+### xNetAdapterBinding
+* **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
+* **ComponentId**: Specifies the underlying name of the transport or filter in the following form - ms_xxxx, such as ms_tcpip. Mandatory.
+* **EnsureEnabled**: Specifies if the component ID for the Interface should be Enabled or Disabled. Optional. Defaults to Enabled. { Enabled | Disabled }.
+
 ## Functions
 
 ### Get-xNetworkAdapterName
@@ -175,6 +181,9 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased
+
+* Added the following resources:
+    * MSFT_xNetAdapterBinding resource to enable/disable network adapter bindings.
 
 ### 2.9.0.0
 
@@ -831,6 +840,34 @@ Sample_xHostsFile_AddEntry
 Start-DscConfiguration -Path Sample_xHostsFile_AddEntry -Wait -Verbose -Force
 ```
 
+### Disable IPv6 on a Network Adapter.
+This example will disable the IPv6 binding on the network adapter 'Ethernet'.
+
+```powershell
+configuration Sample_xNetAdapterBinding_DisableIPv6
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xNetAdapterBinding DisableIPv6
+        {
+            InterfaceAlias = 'Ethernet'
+            ComponentId = 'ms_tcpip6'
+            EnsureEnabled = 'Disabled'
+        }
+    }
+}
+
+Sample_xNetAdapterBinding_DisableIPv6
+Start-DscConfiguration -Path Sample_xNetAdapterBinding_DisableIPv6 -Wait -Verbose -Force
+```
+
 ### Set a node to use itself as a DNS server
 
 **Note** this sample assumes you have already setup DNS on the machine for brevity.
@@ -874,7 +911,7 @@ Configuration SetDns
             Address        = '127.0.0.1'
             InterfaceAlias = 'Ethernet1'
             AddressFamily  = 'IPv4'
-	        DependsOn = @('[Script]NetAdapterName')
+            DependsOn = @('[Script]NetAdapterName')
         }        
     }    
 }
