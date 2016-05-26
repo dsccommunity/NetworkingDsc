@@ -79,9 +79,12 @@ function Set-TargetResource
 
     $CurrentNetAdapterBinding = Get-Binding @PSBoundParameters
 
+    # Remove the EnsureEnabled so we can splat
+    $null = $PSBoundParameters.Remove('EnsureEnabled')
+
     if ($EnsureEnabled -eq 'Enabled')
     {
-        $CurrentNetAdapterBinding | Enable-NetAdapterBinding
+        Enable-NetAdapterBinding @PSBoundParameters
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             $($LocalizedData.NetAdapterBindingEnabledMessage -f `
                 $InterfaceAlias,$ComponentId)
@@ -89,7 +92,7 @@ function Set-TargetResource
     }
     else
     {
-        $CurrentNetAdapterBinding | Disable-NetAdapterBinding
+        Disable-NetAdapterBinding @PSBoundParameters
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             $($LocalizedData.NetAdapterBindingDisabledMessage -f `
                 $InterfaceAlias,$ComponentId)
@@ -114,9 +117,6 @@ function Test-TargetResource
         [String]$EnsureEnabled = 'Enabled'
     )
 
-    # Flag to signal whether settings are correct
-    [Boolean] $desiredConfigurationMatch = $true
-
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
         $($LocalizedData.CheckingNetAdapterBindingMessage -f `
             $InterfaceAlias,$ComponentId)
@@ -140,7 +140,7 @@ function Test-TargetResource
             $($LocalizedData.NetAdapterBindingDoesNotMatchMessage -f `
                 $InterfaceAlias,$ComponentId,$EnsureEnabled,$CurrentEnabled)
             ) -join '' )
-        $desiredConfigurationMatch = $false
+        return $false
     }
     else
     {
@@ -148,8 +148,8 @@ function Test-TargetResource
             $($LocalizedData.NetAdapterBindingMatchMessage -f `
                 $InterfaceAlias,$ComponentId)
             ) -join '' )
+        return $true
     } # if
-    return $desiredConfigurationMatch
 } # Test-TargetResource
 
 function Get-Binding {
@@ -190,6 +190,6 @@ function Get-Binding {
         -ErrorAction Stop
 
     return $Binding
-} # Test-ResourceProperty
+} # Get-Binding
 
 Export-ModuleMember -function *-TargetResource

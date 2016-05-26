@@ -14,7 +14,7 @@ Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHel
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
     -DSCResourceName $Global:DSCResourceName `
-    -TestType Unit 
+    -TestType Unit
 #endregion HEADER
 
 # Begin Testing
@@ -76,19 +76,6 @@ try
         }
 
         Describe "$($Global:DSCResourceName)\Set-TargetResource" {
-            function Enable-NetAdapterBinding {
-                param (
-                    [Parameter(ValueFromPipeline=$True)]
-                    $InputObject
-                )
-            }
-            function Disable-NetAdapterBinding {
-                param (
-                    [Parameter(ValueFromPipeline=$True)]
-                    $InputObject
-                )
-            }
-
             Context 'Adapter exists and set binding to Enabled' {
                 Mock Get-Binding -MockWith { $MockBindingDisabled }
                 Mock Enable-NetAdapterBinding
