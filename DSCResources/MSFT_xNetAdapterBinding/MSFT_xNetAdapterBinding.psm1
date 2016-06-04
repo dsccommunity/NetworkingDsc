@@ -28,7 +28,7 @@ function Get-TargetResource
         [String]$ComponentId,
 
         [ValidateSet('Enabled', 'Disabled')]
-        [String]$EnsureEnabled = 'Enabled'
+        [String]$State = 'Enabled'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -40,17 +40,17 @@ function Get-TargetResource
 
     if ($CurrentNetAdapterBinding.Enabled)
     {
-        $EnsureEnabled = 'Enabled'
+        $State = 'Enabled'
     }
     else
     {
-        $EnsureEnabled = 'Disabled'
+        $State = 'Disabled'
     } # if
 
     $returnValue = @{
         InterfaceAlias = $InterfaceAlias
         ComponentId    = $ComponentId
-        EnsureEnabled  = $EnsureEnabled
+        State          = $State
     }
 
     $returnValue
@@ -69,7 +69,7 @@ function Set-TargetResource
         [String]$ComponentId,
 
         [ValidateSet('Enabled', 'Disabled')]
-        [String]$EnsureEnabled = 'Enabled'
+        [String]$State = 'Enabled'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -79,10 +79,10 @@ function Set-TargetResource
 
     $CurrentNetAdapterBinding = Get-Binding @PSBoundParameters
 
-    # Remove the EnsureEnabled so we can splat
-    $null = $PSBoundParameters.Remove('EnsureEnabled')
+    # Remove the State so we can splat
+    $null = $PSBoundParameters.Remove('State')
 
-    if ($EnsureEnabled -eq 'Enabled')
+    if ($State -eq 'Enabled')
     {
         Enable-NetAdapterBinding @PSBoundParameters
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
@@ -114,7 +114,7 @@ function Test-TargetResource
         [String]$ComponentId,
 
         [ValidateSet('Enabled', 'Disabled')]
-        [String]$EnsureEnabled = 'Enabled'
+        [String]$State = 'Enabled'
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
@@ -134,11 +134,11 @@ function Test-TargetResource
     } # if
 
     # Test if the binding is in the correct state
-    if ($CurrentEnabled -ne $EnsureEnabled)
+    if ($CurrentEnabled -ne $State)
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             $($LocalizedData.NetAdapterBindingDoesNotMatchMessage -f `
-                $InterfaceAlias,$ComponentId,$EnsureEnabled,$CurrentEnabled)
+                $InterfaceAlias,$ComponentId,$State,$CurrentEnabled)
             ) -join '' )
         return $false
     }
@@ -168,7 +168,7 @@ function Get-Binding {
         [String]$ComponentId,
 
         [ValidateSet('Enabled', 'Disabled')]
-        [String]$EnsureEnabled = 'Enabled'
+        [String]$State = 'Enabled'
     )
 
     if (-not (Get-NetAdapter -Name $InterfaceAlias -ErrorAction SilentlyContinue))

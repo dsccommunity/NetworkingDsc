@@ -14,7 +14,7 @@ Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHel
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
     -DSCResourceName $Global:DSCResourceName `
-    -TestType Integration 
+    -TestType Integration
 #endregion
 
 # Configure Loopback Adapter
@@ -46,7 +46,7 @@ try
             $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($Global:DSCResourceName)_Config"}
             $current.InterfaceAlias           | Should Be $TestDisableIPv4.InterfaceAlias
             $current.ComponentId              | Should Be $TestDisableIPv4.ComponentId
-            $current.EnsureEnabled            | Should Be $TestDisableIPv4.EnsureEnabled
+            $current.State                    | Should Be $TestDisableIPv4.State
         }
     }
     #endregion

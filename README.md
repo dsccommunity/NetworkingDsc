@@ -135,7 +135,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 ### xNetAdapterBinding
 * **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
 * **ComponentId**: Specifies the underlying name of the transport or filter in the following form - ms_xxxx, such as ms_tcpip. Mandatory.
-* **EnsureEnabled**: Specifies if the component ID for the Interface should be Enabled or Disabled. Optional. Defaults to Enabled. { Enabled | Disabled }.
+* **State**: Specifies if the component ID for the Interface should be Enabled or Disabled. Optional. Defaults to Enabled. { Enabled | Disabled }.
 
 ## Functions
 
@@ -155,7 +155,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Name**: **Mandatory**, the name of the adapter you are trying to find, if an adapter by this name is found, no other parameters are used.
 * **Status**: Optional, with a default of `Up`. The status of the network adapter. { Up | Disconnected | Disabled }
 * **PhysicalMediaType**:   Optional, with no default. The physical media type of the network adapter. Examples: `802.3`
-* Returns `$true` if the named adapter exist, `$false` if it does not. 
+* Returns `$true` if the named adapter exist, `$false` if it does not.
 
 ### Set-xNetworkAdapterName
 * Sets the network adapter name of the adapter found by the parameters specified.  **This is investigational, names and parameters are subject to change**
@@ -859,7 +859,7 @@ configuration Sample_xNetAdapterBinding_DisableIPv6
         {
             InterfaceAlias = 'Ethernet'
             ComponentId = 'ms_tcpip6'
-            EnsureEnabled = 'Disabled'
+            State = 'Disabled'
         }
     }
 }
@@ -892,7 +892,7 @@ Configuration SetDns
         {
             GetScript = {
                 Import-module xNetworking
-                $getResult = Get-xNetworkAdapterName -Name 'Ethernet1' 
+                $getResult = Get-xNetworkAdapterName -Name 'Ethernet1'
                 return @{
                     result = $getResult
                 }
@@ -912,7 +912,7 @@ Configuration SetDns
             InterfaceAlias = 'Ethernet1'
             AddressFamily  = 'IPv4'
             DependsOn = @('[Script]NetAdapterName')
-        }        
-    }    
+        }
+    }
 }
 ```

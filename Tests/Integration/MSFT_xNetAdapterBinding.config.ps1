@@ -1,7 +1,7 @@
 $TestDisableIPv4 = [PSObject]@{
     InterfaceAlias          = 'xNetworkingLBA'
     ComponentId             = 'ms_tcpip'
-    EnsureEnabled           = 'Disabled'
+    State                   = 'Disabled'
 }
 
 configuration MSFT_xNetAdapterBinding_Config {
@@ -10,7 +10,7 @@ configuration MSFT_xNetAdapterBinding_Config {
         xNetAdapterBinding Integration_Test {
             InterfaceAlias          = $TestDisableIPv4.InterfaceAlias
             ComponentId             = $TestDisableIPv4.ComponentId
-            EnsureEnabled           = $TestDisableIPv4.EnsureEnabled
+            State                   = $TestDisableIPv4.State
         }
     }
 }

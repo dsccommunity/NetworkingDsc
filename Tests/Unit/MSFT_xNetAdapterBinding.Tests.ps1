@@ -24,12 +24,12 @@ try
         $TestBindingEnabled = @{
             InterfaceAlias = 'Ethernet'
             ComponentId = 'ms_tcpip63'
-            EnsureEnabled = 'Enabled'
+            State = 'Enabled'
         }
         $TestBindingDisabled = @{
             InterfaceAlias = 'Ethernet'
             ComponentId = 'ms_tcpip63'
-            EnsureEnabled = 'Disabled'
+            State = 'Disabled'
         }
         $MockAdapter = @{
             InterfaceAlias = 'Ethernet'
@@ -53,7 +53,7 @@ try
                     $Result = Get-TargetResource @TestBindingDisabled
                     $Result.InterfaceAlias | Should Be $TestBindingDisabled.InterfaceAlias
                     $Result.ComponentId | Should Be $TestBindingDisabled.ComponentId
-                    $Result.EnsureEnabled | Should Be 'Enabled'
+                    $Result.State | Should Be 'Enabled'
                 }
                 It 'Should call all the mocks' {
                     Assert-MockCalled -commandName Get-Binding -Exactly 1
@@ -67,7 +67,7 @@ try
                     $Result = Get-TargetResource @TestBindingEnabled
                     $Result.InterfaceAlias | Should Be $TestBindingEnabled.InterfaceAlias
                     $Result.ComponentId | Should Be $TestBindingEnabled.ComponentId
-                    $Result.EnsureEnabled | Should Be 'Disabled'
+                    $Result.State | Should Be 'Disabled'
                 }
                 It 'Should call all the mocks' {
                     Assert-MockCalled -commandName Get-Binding -Exactly 1

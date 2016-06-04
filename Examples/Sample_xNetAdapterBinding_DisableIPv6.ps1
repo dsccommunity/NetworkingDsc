@@ -12,8 +12,8 @@ configuration Sample_xNetAdapterBinding_DisableIPv6
         xNetAdapterBinding DisableIPv6
         {
             InterfaceAlias = 'Ethernet'
-            ComponentId = 'ms_tcpip6'
-            EnsureEnabled = 'Disabled'
+            ComponentId    = 'ms_tcpip6'
+            State          = 'Disabled'
         }
     }
 }
