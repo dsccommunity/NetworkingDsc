@@ -2,16 +2,17 @@
 $Global:DSCResourceName    = 'MSFT_xIPAddress'
 
 #region HEADER
-if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
-     (-not (Test-Path -Path '.\DSCResource.Tests\TestHelper.psm1')) )
+[String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
+if ( (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+     (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git')
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 else
 {
-    & git @('-C',(Join-Path -Path (Get-Location) -ChildPath '\DSCResource.Tests\'),'pull')
+    & git @('-C',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'),'pull')
 }
-Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
+Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
     -DSCResourceName $Global:DSCResourceName `
@@ -128,20 +129,11 @@ try
             Mock Get-NetIPAddress -MockWith {
     
                 [PSCustomObject]@{
-                    IPAddress = '192.168.0.1'
+                    IPAddress = '192.168.0.15'
                     InterfaceAlias = 'Ethernet'
                     InterfaceIndex = 1
                     PrefixLength = [byte]16
                     AddressFamily = 'IPv4'
-                }
-            }
-    
-            Mock Get-NetIPInterface {
-                [PSCustomObject]@{
-                    InterfaceAlias = 'Ethernet'
-                    InterfaceIndex = 1
-                    AddressFamily = 'IPv4'
-                    Dhcp = 'Disabled'
                 }
             }
             #endregion
@@ -170,7 +162,7 @@ try
     
                 It 'should be $false' {
                     $Splat = @{
-                        IPAddress = '10.0.0.2'
+                        IPAddress = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -179,7 +171,6 @@ try
                 }
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
                 }
             }
             
@@ -187,7 +178,7 @@ try
     
                 It 'should be $true' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.15'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -196,14 +187,13 @@ try
                 }
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
                 }
             }
     
             Mock Get-NetIPAddress -MockWith {
     
                 [PSCustomObject]@{
-                    IPAddress = 'fe80::1'
+                    IPAddress = 'fe80::15'
                     InterfaceAlias = 'Ethernet'
                     InterfaceIndex = 1
                     PrefixLength = [byte]64
@@ -230,12 +220,12 @@ try
                     { $Result = Test-TargetResource @Splat } | Should Throw $errorRecord
                 }
             }
-    
+
             Context 'invoking with different IPv6 Address' {
-    
+
                 It 'should be $false' {
                     $Splat = @{
-                        IPAddress = 'fe80::2'
+                        IPAddress = 'fe80::1'
                         InterfaceAlias = 'Ethernet'
                         SubnetMask = 64
                         AddressFamily = 'IPv6'
@@ -245,15 +235,14 @@ try
                 }
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
                 }
             }
-            
+
             Context 'invoking with the same IPv6 Address' {
-    
+
                 It 'should be $true' {
                     $Splat = @{
-                        IPAddress = 'fe80::1'
+                        IPAddress = 'fe80::15'
                         InterfaceAlias = 'Ethernet'
                         SubnetMask = 64
                         AddressFamily = 'IPv6'
@@ -263,7 +252,6 @@ try
                 }
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
                 }
             }
         }

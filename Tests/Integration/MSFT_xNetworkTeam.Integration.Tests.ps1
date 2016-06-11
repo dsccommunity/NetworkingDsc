@@ -1,21 +1,9 @@
-<#
-.Synopsis
-   Template for creating DSC Resource Integration Tests
-.DESCRIPTION
-   To Use:
-     1. Copy to \Tests\Integration\ folder and rename MSFT_x<ResourceName>.Integration.tests.ps1
-     2. Customize TODO sections.
-     3. Create test DSC Configurtion file MSFT_x<ResourceName>.config.ps1 from integration_config_template.ps1 file.
+#Remove this following line before using this integration test script
+return
 
-.NOTES
-   Code in HEADER, FOOTER and DEFAULT TEST regions are standard and may be moved into
-   DSCResource.Tools in Future and therefore should not be altered if possible.
-#>
-
-# TODO: Customize these parameters...
-$Global:DSCModuleName      = 'x<ModuleName>' # Example xNetworking
-$Global:DSCResourceName    = 'MSFT_x<ResourceName>' # Example MSFT_xFirewall
-# /TODO
+$Global:DSCModuleName      = 'xNetworking'
+$Global:DSCResourceName    = 'MSFT_xNetworkTeam'
+$Global:teamMembers        = (Get-NetAdapter -Physical).Name
 
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
@@ -34,42 +22,46 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Integration 
 #endregion
 
-# TODO: Other Init Code Goes Here...
-
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
     #region Integration Tests
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($Global:DSCResourceName).config.ps1"
-    . $ConfigFile
+    . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($Global:DSCResourceName)_Integration" {
         #region DEFAULT TESTS
         It 'Should compile without throwing' {
             {
                 Invoke-Expression -Command "$($Global:DSCResourceName)_Config -OutputPath `$TestEnvironment.WorkingFolder"
-                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
-                    -ComputerName localhost -Wait -Verbose -Force
+                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw
         }
 
         It 'should be able to call Get-DscConfiguration without throwing' {
+            Start-Sleep -Seconds 30
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            # TODO: Validate the Config was Set Correctly Here...
+            $result = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($Global:DSCResourceName)_Config"}
+            $result.Ensure                 | Should Be $TestTeam.Ensure
+            $result.Name                   | Should Be $TestTeam.Name
+            $result.TeamMembers            | Should Be $Global:teamMembers
+            $result.loadBalancingAlgorithm | Should Be $TestTeam.loadBalancingAlgorithm
+            $result.teamingMode            | Should Be $TestTeam.teamingMode
         }
+
+        Remove-NetLbfoTeam `
+            -Name $TestTeam.Name `
+            -Confirm:$false
     }
     #endregion
-
 }
 finally
 {
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
-
-    # TODO: Other Optional Cleanup Code Goes Here...
 }

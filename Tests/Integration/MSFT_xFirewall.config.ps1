@@ -29,6 +29,12 @@ $rule = @{
     RemoteAddress         = @('192.168.2.0-192.168.2.128','192.168.1.0/255.255.255.0')
     RemoteMachine         = 'Any'
     RemoteUser            = 'Any'
+    DynamicTransport      = 'Any'
+    EdgeTraversalPolicy   = 'Allow'
+    LocalOnlyMapping      = $false
+    LooseSourceMapping    = $false
+    OverrideBlockRules    = $false
+    Owner                 = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
 }
 
 Configuration MSFT_xFirewall_Config {
@@ -60,6 +66,12 @@ Configuration MSFT_xFirewall_Config {
             RemoteAddress         = $rule.RemoteAddress
             RemoteMachine         = $rule.RemoteMachine
             RemoteUser            = $rule.RemoteUser
+            DynamicTransport      = $rule.DynamicTransport
+            EdgeTraversalPolicy   = $rule.EdgeTraversalPolicy
+            LocalOnlyMapping      = $rule.LocalOnlyMapping
+            LooseSourceMapping    = $rule.LooseSourceMapping
+            OverrideBlockRules    = $rule.OverrideBlockRules
+            Owner                 = $rule.Owner
         }
     }
 }

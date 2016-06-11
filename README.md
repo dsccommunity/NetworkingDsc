@@ -1,12 +1,23 @@
-﻿[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
 
 # xNetworking
 
-The **xNetworking** module contains the **xFirewall, xIPAddress, xDnsServerAddress, xDnsConnectionSuffix** and **xDefaultGatewayAddress** DSC resources for configuring a node’s IP address, DNS server address, and firewall rules.
+The **xNetworking** module contains the following resources:
+* **xFirewall**
+* **xIPAddress**
+* **xDnsServerAddress**
+* **xDnsConnectionSuffix**
+* **xDefaultGatewayAddress**
+* **xNetConnectionProfile**
+* **xDhcpClient**
+* **xRoute**
+* **xNetBIOS**
+* **xNetworkTeam**
+* **xHostsFile**
+* **xNetAdapterBinding**
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
-
 
 ## Resources
 
@@ -52,7 +63,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Group**: Name of the firewall group where we want to put the firewall rule.
 * **Ensure**: Ensure that the firewall rule is Present or Absent.
 * **Enabled**: Enable or Disable the supplied configuration.
-* **Action**: Permit or Block the supplied configuration.
+* **Action**: Allow or Block the supplied configuration: { NotConfigured | Allow | Block }
 * **Profile**: Specifies one or more profiles to which the rule is assigned.
 * **Direction**: Direction of the connection.
 * **RemotePort**: Specific port used for filter. Specified by port number, range, or keyword.
@@ -63,22 +74,95 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Service**: Specifies the short name of a Windows service to which the firewall rule applies.
 * **Authentication**: Specifies that authentication is required on firewall rules: { NotRequired | Required | NoEncap }
 * **Encryption**: Specifies that encryption in authentication is required on firewall rules: { NotRequired | Required | Dynamic }
-* **InterfaceAlias**: Specifies the alias of the interface that applies to the traffic. 
+* **InterfaceAlias**: Specifies the alias of the interface that applies to the traffic.
 * **InterfaceType**: Specifies that only network connections made through the indicated interface types are subject to the requirements of this rule: { Any | Wired | Wireless | RemoteAccess }
-* **LocalAddress**: Specifies that network packets with matching IP addresses match this rule. This parameter value is the first end point of an IPsec rule and specifies the computers that are subject to the requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet, range, or the following keyword: Any. 
+* **LocalAddress**: Specifies that network packets with matching IP addresses match this rule. This parameter value is the first end point of an IPsec rule and specifies the computers that are subject to the requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet, range, or the following keyword: Any.
 * **LocalUser**: Specifies the principals to which network traffic this firewall rule applies. The principals, represented by security identifiers (SIDs) in the security descriptor definition language (SDDL) string, are services, users, application containers, or any SID to which network traffic is associated.
-* **Package**: Specifies the Windows Store application to which the firewall rule applies. This parameter is specified as a security identifier (SID). 
+* **Package**: Specifies the Windows Store application to which the firewall rule applies. This parameter is specified as a security identifier (SID).
 * **Platform**: Specifies which version of Windows the associated rule applies.
 * **RemoteAddress**: Specifies that network packets with matching IP addresses match this rule. This parameter value is the second end point of an IPsec rule and specifies the computers that are subject to the requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet, range, or the following keyword: Any
-* **RemoteMachine**: Specifies that matching IPsec rules of the indicated computer accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a computer identified in the list of computer accounts (SID) match this rule. This parameter value is specified as an SDDL string. 
-* **RemoteUser**: Specifies that matching IPsec rules of the indicated user accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a user identified in the list of user accounts match this rule. This parameter value is specified as an SDDL string. 
+* **RemoteMachine**: Specifies that matching IPsec rules of the indicated computer accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a computer identified in the list of computer accounts (SID) match this rule. This parameter value is specified as an SDDL string.
+* **RemoteUser**: Specifies that matching IPsec rules of the indicated user accounts are created. This parameter specifies that only network packets that are authenticated as incoming from or outgoing to a user identified in the list of user accounts match this rule. This parameter value is specified as an SDDL string.
+* **DynamicTransport**: Specifies a dynamic transport: { Any | ProximityApps | ProximitySharing | WifiDirectPrinting | WifiDirectDisplay | WifiDirectDevices }
+* **EdgeTraversalPolicy**: Specifies that matching firewall rules of the indicated edge traversal policy are created: { Block | Allow | DeferToUser | DeferToApp }
+* **IcmpType**: Specifies the ICMP type codes.
+* **LocalOnlyMapping**: Indicates that matching firewall rules of the indicated value are created.
+* **LooseSourceMapping**: Indicates that matching firewall rules of the indicated value are created.
+* **OverrideBlockRules**: Indicates that matching network traffic that would otherwise be blocked are allowed.
+* **Owner**: Specifies that matching firewall rules of the indicated owner are created.
 
 ### xNetConnectionProfile
+
 * **InterfaceAlias**: Specifies the alias for the Interface that is being changed.
 * **NetworkCategory**: Sets the NetworkCategory for the interface - per [the documentation ](https://technet.microsoft.com/en-us/%5Clibrary/jj899565(v=wps.630).aspx) this can only be set to { Public | Private }
 * **IPv4Connectivity**: Specifies the IPv4 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
 * **IPv6Connectivity**: Specifies the IPv6 Connection Value { Disconnected | NoTraffic | Subnet | LocalNetwork | Internet }
 
+### xDhcpClient
+
+* **State**: The desired state of the DHCP Client: { Enabled | Disabled }. Mandatory.
+* **InterfaceAlias**: Alias of the network interface for which the DNS server address is set. Mandatory.
+* **AddressFamily**: IP address family: { IPv4 | IPv6 }. Mandatory.
+
+### xRoute
+
+* **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
+* **AddressFamily**: Specifies the IP address family. { IPv4 | IPv6 }. Mandatory.
+* **DestinationPrefix**: Specifies a destination prefix of an IP route. A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/). Mandatory.
+* **NextHop**: Specifies the next hop for the IP route. Mandatory.
+* **Ensure**: Specifies whether the route should exist. { Present | Absent }. Defaults: Present.
+* **RouteMetric**: Specifies an integer route metric for an IP route. Default: 256.
+* **Publish**: Specifies the publish setting of an IP route. { No | Yes | Age }. Default: No.
+* **PreferredLifetime**: Specifies a preferred lifetime in seconds of an IP route.
+
+### xNetBIOS
+
+* **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
+* **Setting**: xNetBIOS setting { Default | Enable | Disable }. Mandatory.
+
+### xNetworkTeam
+* **Name**: Specifies the name of the network team to create.
+* **TeamMembers**: Specifies the network interfaces that should be a part of the network team. This is a comma-separated list.
+* **TeamingMode**: Specifies the teaming mode configuration. { SwitchIndependent | LACP | Static}.
+* **LoadBalancingAlgorithm**: Specifies the load balancing algorithm for the network team. { Dynamic | HyperVPort | IPAddresses | MacAddresses | TransportPorts }.
+* **Ensure**: Specifies if the network team should be created or deleted. { Present | Absent }.
+
+### xHostsFile
+* **HostName**: Specifies the name of the computer that will be mapped to an IP address.
+* **IPAddress**: Specifies the IP Address that should be mapped to the host name.
+* **Ensure**: Specifies if the hosts file entry should be created or deleted. { Present | Absent }.
+
+### xNetAdapterBinding
+* **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
+* **ComponentId**: Specifies the underlying name of the transport or filter in the following form - ms_xxxx, such as ms_tcpip. Mandatory.
+* **State**: Specifies if the component ID for the Interface should be Enabled or Disabled. Optional. Defaults to Enabled. { Enabled | Disabled }.
+
+## Functions
+
+### Get-xNetworkAdapterName
+* Finds a network adapter name based on the parameters specified.  **This is investigational, names and parameters are subject to change**
+* **Name**: **Mandatory**, the name of the adapter you are trying to find, to refine the results after the rest of the criteria are queried.
+* **Status**: Optional, with a default of `Up`. The status of the network adapter. { Up | Disconnected | Disabled }
+* **PhysicalMediaType**:   Optional, with no default. The physical media type of the network adapter. Examples: `802.3`
+* Returns a structure with the following properties:
+    * **Name**: The name of the first matching adapter.
+    * **PhysicalMediaType**: The Physical media type of the first matching adapter.
+    * **Status**: The status of the first matching adapter.
+    * **MatchingAdapterCount**: The count of the matching adapters
+
+### Test-xNetworkAdapterName
+* Tests if a network adapter exists with the specified name by calling Get-xNetworkAdapterName and comparing the returned name.  **This is investigational, names and parameters are subject to change**
+* **Name**: **Mandatory**, the name of the adapter you are trying to find, if an adapter by this name is found, no other parameters are used.
+* **Status**: Optional, with a default of `Up`. The status of the network adapter. { Up | Disconnected | Disabled }
+* **PhysicalMediaType**:   Optional, with no default. The physical media type of the network adapter. Examples: `802.3`
+* Returns `$true` if the named adapter exist, `$false` if it does not.
+
+### Set-xNetworkAdapterName
+* Sets the network adapter name of the adapter found by the parameters specified.  **This is investigational, names and parameters are subject to change**
+* **Name**: **Mandatory**, the name of the adapter you are trying to find, if an adapter by this name is found, no other parameters are used.
+* **Status**: Optional, with a default of `Up`. The status of the network adapter. { Up | Disconnected | Disabled }
+* **PhysicalMediaType**:   Optional, with no default. The physical media type of the network adapter. Examples: `802.3`
+* **IgnoreMultipleMatchingAdapters**: If the function finds multiple adapters, it will error, unless this switch is specified, then it will rename the first adapter.  Since name is part of the query, further queries should return one adapter.
 
 ## Known Invalid Configurations
 
@@ -96,12 +180,59 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 ## Versions
 
-### Unreleased Version
+### Unreleased
+
+* Added the following resources:
+    * MSFT_xNetAdapterBinding resource to enable/disable network adapter bindings.
+
+### 2.9.0.0
+
+* MSFT_xDefaultGatewayAddress: Added Integration Tests.
+* MSFT_xDhcpClient: Added Integration Tests.
+* MSFT_xDnsConnectionSuffix: Added Integration Tests.
+* MSFT_xDnsServerAddress: Added Integration Tests.
+* MSFT_xIPAddress: Added Integration Tests.
+* MSFT_xDhcpClient: Fixed logged message in Test-TargetResource.
+* Added functions:
+    * Get-xNetworkAdapterName
+    * Test-xNetworkAdapterName
+    * Set-xNetworkAdapterName
+
+
+### 2.8.0.0
+
+* Templates folder removed. Use the test templates in the [Tests.Template folder in the DSCResources repository](https://github.com/PowerShell/DscResources/tree/master/Tests.Template) instead.
+* Added the following resources:
+    * MSFT_xHostsFile resource to manage hosts file entries.
+* MSFT_xFirewall: Fix test of Profile parameter status.
+* MSFT_xIPAddress: Fix false negative when desired IP is a substring of current IP.
+
+### 2.7.0.0
+
+* Added the following resources:
+    * MSFT_xNetworkTeam resource to manage native network adapter teaming.
+
+### 2.6.0.0
+
+* Added the following resources:
+    * MSFT_xDhcpClient resource to enable/disable DHCP on individual interfaces.
+    * MSFT_xRoute resource to manage network routes.
+    * MSFT_xNetBIOS resource to configure NetBIOS over TCP/IP settings on individual interfaces.
 * MSFT_*: Unit and Integration tests updated to use DSCResource.Tests\TestHelper.psm1 functions.
 * MSFT_*: Resource Name added to all unit test Desribes.
-* Templates update to use DSCResource.Tests\TestHelper.psm1 functions. 
+* Templates update to use DSCResource.Tests\TestHelper.psm1 functions.
 * MSFT_xNetConnectionProfile: Integration tests fixed when more than one connection profile present.
 * Changed AppVeyor.yml to use WMF 5 build environment.
+* MSFT_xIPAddress: Removed test for DHCP Status.
+* MSFT_xFirewall: New parameters added:
+    * DynamicTransport
+    * EdgeTraversalPolicy
+    * LocalOnlyMapping
+    * LooseSourceMapping
+    * OverrideBlockRules
+    * Owner
+* All unit & integration tests updated to be able to be run from any folder under tests directory.
+* Unit & Integration test template headers updated to match DSCResource templates.
 
 ### 2.5.0.0
 * Added the following resources:
@@ -324,7 +455,7 @@ Configuration Sample_xDefaultGatewayAddress_Set
     {
         xDefaultGatewayAddress SetDefaultGateway
         {
-			Address        = $DefaultGateway
+            Address        = $DefaultGateway
             InterfaceAlias = $InterfaceAlias
             AddressFamily  = $AddressFamily
         }
@@ -557,6 +688,13 @@ configuration Sample_xFirewall_AddFirewallRule_AllParameters
             RemoteAddress         = @("192.168.2.0-192.168.2.128","192.168.1.0/255.255.255.0")
             RemoteMachine         = "O:LSD:(D;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1621)(A;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1620)"
             RemoteUser            = "O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)"
+            DynamicTransport      = "ProximitySharing"
+            EdgeTraversalPolicy   = "Block"
+            IcmpType              = ("51","52")
+            LocalOnlyMapping      = $true
+            LooseSourceMapping    = $true
+            OverrideBlockRules    = $true
+            Owner                 = "S-1-5-21-3337988176-3917481366-464002247-500"
         }
     }
  }
@@ -567,7 +705,7 @@ Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule_AllParameters -Wai
 
 ### Set the NetConnectionProfile to Public
 
-````powershell
+```powershell
 configuration MSFT_xNetConnectionProfile_Config {
     Import-DscResource -ModuleName xNetworking
     node localhost {
@@ -579,4 +717,202 @@ configuration MSFT_xNetConnectionProfile_Config {
         }
     }
 }
-````
+```
+
+### Set the DHCP Client state
+This example would set the DHCP Client State to enabled.
+
+```powershell
+configuration Sample_xDhcpClient_Enabled
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost',
+
+        [Parameter(Mandatory)]
+        [string]$InterfaceAlias,
+
+        [Parameter(Mandatory)]
+        [ValidateSet("IPv4","IPv6")]
+        [string]$AddressFamily
+    )
+
+    Import-DscResource -Module xDhcpClient
+
+    Node $NodeName
+    {
+        xDhcpClient EnableDhcpClient
+        {
+            State          = 'Enabled'
+            InterfaceAlias = $InterfaceAlias
+            AddressFamily  = $AddressFamily
+        }
+    }
+}
+```
+
+### Add a Route
+This example will add an IPv4 route on interface Ethernet.
+
+```powershell
+configuration Sample_xRoute_AddRoute
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xRoute NetRoute1
+        {
+            Ensure = 'Present'
+            InterfaceAlias = 'Ethernet'
+            AddressFamily = 'IPv4'
+            DestinationPrefix = '192.168.0.0/16'
+            NextHop = '192.168.120.0'
+            RouteMetric = 200
+        }
+    }
+ }
+
+Sample_xRoute_AddRoute
+Start-DscConfiguration -Path Sample_xRoute_AddRoute -Wait -Verbose -Force
+```
+
+### Create a network team
+This example shows creating a native network team.
+
+```powershell
+configuration Sample_xNetworkTeam_AddTeam
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xNetworkTeam HostTeam
+        {
+          Name = 'HostTeam'
+          TeamingMode = 'SwitchIndependent'
+          LoadBalancingAlgorithm = 'HyperVPort'
+          TeamMembers = 'NIC1','NIC2'
+          Ensure = 'Present'
+        }
+    }
+ }
+
+Sample_xNetworkTeam_AddTeam
+Start-DscConfiguration -Path Sample_xNetworkTeam_AddTeam -Wait -Verbose -Force
+```
+
+### Add a hosts file entry
+This example will add an hosts file entry.
+
+```powershell
+configuration Sample_xHostsFile_AddEntry
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xHostsFile HostEntry
+        {
+          HostName  = 'Host01'
+          IPAddress = '192.168.0.1'
+          Ensure    = 'Present'
+        }
+    }
+ }
+
+Sample_xHostsFile_AddEntry
+Start-DscConfiguration -Path Sample_xHostsFile_AddEntry -Wait -Verbose -Force
+```
+
+### Disable IPv6 on a Network Adapter.
+This example will disable the IPv6 binding on the network adapter 'Ethernet'.
+
+```powershell
+configuration Sample_xNetAdapterBinding_DisableIPv6
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xNetAdapterBinding DisableIPv6
+        {
+            InterfaceAlias = 'Ethernet'
+            ComponentId = 'ms_tcpip6'
+            State = 'Disabled'
+        }
+    }
+}
+
+Sample_xNetAdapterBinding_DisableIPv6
+Start-DscConfiguration -Path Sample_xNetAdapterBinding_DisableIPv6 -Wait -Verbose -Force
+```
+
+### Set a node to use itself as a DNS server
+
+**Note** this sample assumes you have already setup DNS on the machine for brevity.
+
+**This is investigational, names and parameters are subject to change.  The DSC team is investigating a better way to do this.**
+
+Sample of using *-xNetworkAdapterName Functions
+
+```PowerShell
+Configuration SetDns
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        script NetAdapterName
+        {
+            GetScript = {
+                Import-module xNetworking
+                $getResult = Get-xNetworkAdapterName -Name 'Ethernet1'
+                return @{
+                    result = $getResult
+                }
+            }
+            TestScript = {
+                Import-module xNetworking
+                Test-xNetworkAdapterName -Name 'Ethernet1'
+            }
+            SetScript = {
+                Import-module xNetworking
+                Set-xNetworkAdapterName -Name 'Ethernet1' -IgnoreMultipleMatchingAdapters
+            }
+        }
+        xDnsServerAddress DnsServerAddress
+        {
+            Address        = '127.0.0.1'
+            InterfaceAlias = 'Ethernet1'
+            AddressFamily  = 'IPv4'
+            DependsOn = @('[Script]NetAdapterName')
+        }
+    }
+}
+```
