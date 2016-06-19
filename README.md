@@ -184,6 +184,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 * Added the following resources:
     * MSFT_xNetAdapterBinding resource to enable/disable network adapter bindings.
+* Updated Sample_xIPAddress_*.ps1 examples to show correct usage of setting a Static IP address to prevent issue when DHCP assigned IP address already matches staticly assigned IP address.
 
 ### 2.9.0.0
 

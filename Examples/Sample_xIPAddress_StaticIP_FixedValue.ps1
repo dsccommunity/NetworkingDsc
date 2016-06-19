@@ -9,6 +9,13 @@ configuration Sample_xIPAddress_FixedValue
 
     Node $NodeName
     {
+        xDhcpClient DisabledDhcpClient
+        {
+            State          = 'Disabled'
+            InterfaceAlias = "Ethernet"
+            AddressFamily  = "IPv6"
+        }
+
         xIPAddress NewIPAddress
         {
             IPAddress      = "2001:4898:200:7:6c71:a102:ebd8:f482"
