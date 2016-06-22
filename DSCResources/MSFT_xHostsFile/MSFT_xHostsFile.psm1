@@ -1,12 +1,16 @@
 #region localizeddata
 if (Test-Path "${PSScriptRoot}\${PSUICulture}")
 {
-    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xHostsFile.psd1 -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
+    Import-LocalizedData -BindingVariable LocalizedData `
+                         -Filename MSFT_xHostsFile.psd1 `
+                         -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
 } 
 else
 {
     #fallback to en-US
-    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xHostsFile.psd1 -BaseDirectory "${PSScriptRoot}\en-US"
+    Import-LocalizedData -BindingVariable LocalizedData `
+                         -Filename MSFT_xHostsFile.psd1 `
+                         -BaseDirectory "${PSScriptRoot}\en-US"
 }
 #endregion
 
@@ -29,9 +33,9 @@ function Get-TargetResource
         $Ensure = "Present"
     )
 
-    Write-Verbose ($LocalizedData.StartingGet -f $HostName)
+    Write-Verbose -Message ($LocalizedData.StartingGet -f $HostName)
 
-    $hosts = Get-Content "$env:windir\System32\drivers\etc\hosts"
+    $hosts = Get-Content -Path "$env:windir\System32\drivers\etc\hosts"
     $allHosts = $hosts `
            | Where-Object { [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false } `
            | ForEach-Object { 
@@ -40,7 +44,8 @@ function Get-TargetResource
                 {
                     # Account for host entries that have multiple entries on a single line
                     $result = @()
-                    for ($i = 1; $i -lt $data.Length; $i++) {
+                    for ($i = 1; $i -lt $data.Length; $i++) 
+                    {
                         $result += @{
                             Host = $data[$i]
                             IP = $data[0]
@@ -59,7 +64,7 @@ function Get-TargetResource
         
     $hostEntry = $allHosts | Where-Object { $_.Host -eq $HostName }
     
-    if ($hostEntry -eq $null) 
+    if ($null -eq $hostEntry) 
     {
         return @{
             HostName = $HostName
@@ -96,22 +101,29 @@ function Set-TargetResource
     
     $currentValues = Get-TargetResource @PSBoundParameters
     
-    Write-Verbose ($LocalizedData.StartingSet -f $HostName)
+    Write-Verbose -Message ($LocalizedData.StartingSet -f $HostName)
 
     if ($Ensure -eq "Present" -and $PSBoundParameters.ContainsKey("IPAddress") -eq $false) 
     {
-        throw $LocalizedData.UnableToEnsureWithoutIP
-        return
+        $errorId = 'IPAddressNotPresentError'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+        $errorMessage = $($LocalizedData.UnableToEnsureWithoutIP) -f $Address,$AddressFamily
+        $exception = New-Object -TypeName System.InvalidOperationException `
+                                -ArgumentList $errorMessage
+        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                                  -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
     
     if ($currentValues.Ensure -eq "Absent" -and $Ensure -eq "Present")
     {
         Write-Verbose -Message ($LocalizedData.CreateNewEntry -f $HostName)
-        Add-Content "$env:windir\System32\drivers\etc\hosts" "`r`n$IPAddress`t$HostName"
+        Add-Content -Path "$env:windir\System32\drivers\etc\hosts" -Value "`r`n$IPAddress`t$HostName"
     }
     else 
     {
-        $hosts = Get-Content "$env:windir\System32\drivers\etc\hosts"
+        $hosts = Get-Content -Path "$env:windir\System32\drivers\etc\hosts"
         $replace = $hosts | Where-Object { 
             [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false 
         } | Where-Object { $_ -like "*$HostName" }
@@ -150,7 +162,7 @@ function Set-TargetResource
                 $hosts = $hosts -replace $replace, ""
             }
         }
-        $hosts | Set-Content "$env:windir\System32\drivers\etc\hosts"
+        $hosts | Set-Content -Path "$env:windir\System32\drivers\etc\hosts"
     }
 }
 
@@ -173,7 +185,7 @@ function Test-TargetResource
     )
     
     $currentValues = Get-TargetResource @PSBoundParameters
-    Write-Verbose ($LocalizedData.StartingTest -f $HostName)
+    Write-Verbose -Message ($LocalizedData.StartingTest -f $HostName)
     
     if ($Ensure -ne $currentValues.Ensure) 
     {

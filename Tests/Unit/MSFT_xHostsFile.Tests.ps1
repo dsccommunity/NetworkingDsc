@@ -228,6 +228,26 @@ try
                     Assert-MockCalled Set-Content
                 }
             }
+
+            Context "Invalid parameters will throw meaningful errors" {
+                $testParams = @{
+                    HostName = "www.contoso.com"
+                }
+                
+                Mock Get-Content { 
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        ""
+                    )
+                }
+
+                It "should throw an error when IP Address isn't provide and ensure is present" {
+                    { Set-TargetResource @testParams } | Should throw $LocalizedData.UnableToEnsureWithoutIP
+                }
+            }
         }
     } #end InModuleScope $DSCResourceName
     #endregion
