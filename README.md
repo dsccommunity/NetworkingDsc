@@ -176,6 +176,8 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 ### Unreleased
 
+* Fixed bug where xHostsFile would duplicate an entry instead of updating an existing one
+
 ### 2.9.0.0
 
 * MSFT_xDefaultGatewayAddress: Added Integration Tests.
