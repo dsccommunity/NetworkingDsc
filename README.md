@@ -14,6 +14,7 @@ The **xNetworking** module contains the following resources:
 * **xNetBIOS**
 * **xNetworkTeam**
 * **xHostsFile**
+* **xNetAdapterBinding**
 
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -131,6 +132,38 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **IPAddress**: Specifies the IP Address that should be mapped to the host name.
 * **Ensure**: Specifies if the hosts file entry should be created or deleted. { Present | Absent }.
 
+### xNetAdapterBinding
+* **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
+* **ComponentId**: Specifies the underlying name of the transport or filter in the following form - ms_xxxx, such as ms_tcpip. Mandatory.
+* **State**: Specifies if the component ID for the Interface should be Enabled or Disabled. Optional. Defaults to Enabled. { Enabled | Disabled }.
+
+## Functions
+
+### Get-xNetworkAdapterName
+* Finds a network adapter name based on the parameters specified.  **This is investigational, names and parameters are subject to change**
+* **Name**: **Mandatory**, the name of the adapter you are trying to find, to refine the results after the rest of the criteria are queried.
+* **Status**: Optional, with a default of `Up`. The status of the network adapter. { Up | Disconnected | Disabled }
+* **PhysicalMediaType**:   Optional, with no default. The physical media type of the network adapter. Examples: `802.3`
+* Returns a structure with the following properties:
+    * **Name**: The name of the first matching adapter.
+    * **PhysicalMediaType**: The Physical media type of the first matching adapter.
+    * **Status**: The status of the first matching adapter.
+    * **MatchingAdapterCount**: The count of the matching adapters
+
+### Test-xNetworkAdapterName
+* Tests if a network adapter exists with the specified name by calling Get-xNetworkAdapterName and comparing the returned name.  **This is investigational, names and parameters are subject to change**
+* **Name**: **Mandatory**, the name of the adapter you are trying to find, if an adapter by this name is found, no other parameters are used.
+* **Status**: Optional, with a default of `Up`. The status of the network adapter. { Up | Disconnected | Disabled }
+* **PhysicalMediaType**:   Optional, with no default. The physical media type of the network adapter. Examples: `802.3`
+* Returns `$true` if the named adapter exist, `$false` if it does not.
+
+### Set-xNetworkAdapterName
+* Sets the network adapter name of the adapter found by the parameters specified.  **This is investigational, names and parameters are subject to change**
+* **Name**: **Mandatory**, the name of the adapter you are trying to find, if an adapter by this name is found, no other parameters are used.
+* **Status**: Optional, with a default of `Up`. The status of the network adapter. { Up | Disconnected | Disabled }
+* **PhysicalMediaType**:   Optional, with no default. The physical media type of the network adapter. Examples: `802.3`
+* **IgnoreMultipleMatchingAdapters**: If the function finds multiple adapters, it will error, unless this switch is specified, then it will rename the first adapter.  Since name is part of the query, further queries should return one adapter.
+
 ## Known Invalid Configurations
 
 ### xFirewall
@@ -149,12 +182,22 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 ### Unreleased
 
+* Added the following resources:
+    * MSFT_xNetAdapterBinding resource to enable/disable network adapter bindings.
+
+### 2.9.0.0
+
 * MSFT_xDefaultGatewayAddress: Added Integration Tests.
 * MSFT_xDhcpClient: Added Integration Tests.
 * MSFT_xDnsConnectionSuffix: Added Integration Tests.
 * MSFT_xDnsServerAddress: Added Integration Tests.
 * MSFT_xIPAddress: Added Integration Tests.
 * MSFT_xDhcpClient: Fixed logged message in Test-TargetResource.
+* Added functions:
+    * Get-xNetworkAdapterName
+    * Test-xNetworkAdapterName
+    * Set-xNetworkAdapterName
+
 
 ### 2.8.0.0
 
@@ -412,7 +455,7 @@ Configuration Sample_xDefaultGatewayAddress_Set
     {
         xDefaultGatewayAddress SetDefaultGateway
         {
-			Address        = $DefaultGateway
+            Address        = $DefaultGateway
             InterfaceAlias = $InterfaceAlias
             AddressFamily  = $AddressFamily
         }
@@ -795,4 +838,81 @@ configuration Sample_xHostsFile_AddEntry
 
 Sample_xHostsFile_AddEntry
 Start-DscConfiguration -Path Sample_xHostsFile_AddEntry -Wait -Verbose -Force
+```
+
+### Disable IPv6 on a Network Adapter.
+This example will disable the IPv6 binding on the network adapter 'Ethernet'.
+
+```powershell
+configuration Sample_xNetAdapterBinding_DisableIPv6
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xNetAdapterBinding DisableIPv6
+        {
+            InterfaceAlias = 'Ethernet'
+            ComponentId = 'ms_tcpip6'
+            State = 'Disabled'
+        }
+    }
+}
+
+Sample_xNetAdapterBinding_DisableIPv6
+Start-DscConfiguration -Path Sample_xNetAdapterBinding_DisableIPv6 -Wait -Verbose -Force
+```
+
+### Set a node to use itself as a DNS server
+
+**Note** this sample assumes you have already setup DNS on the machine for brevity.
+
+**This is investigational, names and parameters are subject to change.  The DSC team is investigating a better way to do this.**
+
+Sample of using *-xNetworkAdapterName Functions
+
+```PowerShell
+Configuration SetDns
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        script NetAdapterName
+        {
+            GetScript = {
+                Import-module xNetworking
+                $getResult = Get-xNetworkAdapterName -Name 'Ethernet1'
+                return @{
+                    result = $getResult
+                }
+            }
+            TestScript = {
+                Import-module xNetworking
+                Test-xNetworkAdapterName -Name 'Ethernet1'
+            }
+            SetScript = {
+                Import-module xNetworking
+                Set-xNetworkAdapterName -Name 'Ethernet1' -IgnoreMultipleMatchingAdapters
+            }
+        }
+        xDnsServerAddress DnsServerAddress
+        {
+            Address        = '127.0.0.1'
+            InterfaceAlias = 'Ethernet1'
+            AddressFamily  = 'IPv4'
+            DependsOn = @('[Script]NetAdapterName')
+        }
+    }
+}
 ```

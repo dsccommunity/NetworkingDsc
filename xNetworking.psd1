@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '2.8.0.0'
+ModuleVersion = '2.9.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -29,6 +29,8 @@ FunctionsToExport = '*'
 # Cmdlets to export from this module
 CmdletsToExport = '*'
 
+NestedModules = @( 'xNetworkAdapter.psm1')
+
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 PrivateData = @{
 
@@ -47,7 +49,19 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        # ReleaseNotes = ''
+        ReleaseNotes = '* MSFT_xDefaultGatewayAddress: Added Integration Tests.
+* MSFT_xDhcpClient: Added Integration Tests.
+* MSFT_xDnsConnectionSuffix: Added Integration Tests.
+* MSFT_xDnsServerAddress: Added Integration Tests.
+* MSFT_xIPAddress: Added Integration Tests.
+* MSFT_xDhcpClient: Fixed logged message in Test-TargetResource.
+* Added functions:
+    * Get-xNetworkAdapterName
+    * Test-xNetworkAdapterName
+    * Set-xNetworkAdapterName
+
+
+'
 
     } # End of PSData hashtable
 
