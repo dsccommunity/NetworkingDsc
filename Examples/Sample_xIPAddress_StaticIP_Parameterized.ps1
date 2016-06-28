@@ -1,4 +1,4 @@
-configuration Sample_xIPAddress_Parameterized
+configuration Sample_xIPAddress_StaticIP_Parameterized
 {
     param
     (
@@ -21,6 +21,13 @@ configuration Sample_xIPAddress_Parameterized
 
     Node $NodeName
     {
+        xDhcpClient DisabledDhcpClient
+        {
+            State          = 'Disabled'
+            InterfaceAlias = $InterfaceAlias
+            AddressFamily  = $AddressFamily
+        }
+
         xIPAddress NewIPAddress
         {
             IPAddress      = $IPAddress
