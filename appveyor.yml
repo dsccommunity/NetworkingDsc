@@ -1,17 +1,16 @@
 #---------------------------------#
 #      environment configuration  #
 #---------------------------------#
-os: WMF 5
 version: 2.10.{build}.0
 install:
-  - cinst -y pester
   - git clone https://github.com/PowerShell/DscResource.Tests
-  - ps: Push-Location
-  - cd DscResource.Tests
-  - ps: Import-Module .\TestHelper.psm1 -force
-  - ps: Pop-Location
-  - ps: Get-PackageProvider -name nuget -ForceBootStrap -Force
-
+  - ps: |
+        Push-Location
+        cd DscResource.Tests
+        Import-Module .\TestHelper.psm1 -force
+        Pop-Location
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+        Install-Module -Name Pester -Repository PSGallery -Force
 #---------------------------------#
 #      build configuration        #
 #---------------------------------#
