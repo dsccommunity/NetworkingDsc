@@ -1,7 +1,6 @@
 #---------------------------------#
 #      environment configuration  #
 #---------------------------------#
-os: WMF 5
 version: 2.10.{build}.0
 install:
   - git clone https://github.com/PowerShell/DscResource.Tests
