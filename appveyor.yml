@@ -9,19 +9,8 @@ install:
         cd DscResource.Tests
         Import-Module .\TestHelper.psm1 -force
         Pop-Location
-        Get-PackageProvider -name nuget -ForceBootStrap -Force
-        Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-        (Get-date).AddHours(3).AddMinutes(-5) | Export-Clixml -Path ..\BuildTimeout.xml
-        $installed = $false
-        $retries = 1
-        while($retries -lt 10 -and !$installed)
-        {
-            Write-Verbose -message "Attempting to install Pester, attempt # $retries"
-            $pesterModule = @(find-module 'Pester' -Repository PSGallery -ErrorAction SilentlyContinue)
-            Install-Module -InputObject $pesterModule -Force
-            $installed = ($LASTEXITCODE -eq 0)
-            $retries++
-        }
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+        Install-Module -Name Pester -Repository PSGallery -Force
 #---------------------------------#
 #      build configuration        #
 #---------------------------------#
