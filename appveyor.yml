@@ -5,11 +5,12 @@ os: WMF 5
 version: 2.10.{build}.0
 install:
   - git clone https://github.com/PowerShell/DscResource.Tests
-  - ps: Push-Location
-  - cd DscResource.Tests
-  - ps: Import-Module .\TestHelper.psm1 -force
-  - ps: Pop-Location
-  - ps: Get-PackageProvider -name nuget -ForceBootStrap -Force
+  - ps: |
+        Push-Location
+        cd DscResource.Tests
+        Import-Module .\TestHelper.psm1 -force
+        Pop-Location
+        Get-PackageProvider -name nuget -ForceBootStrap -Force
         Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
         (Get-date).AddHours(3).AddMinutes(-5) | Export-Clixml -Path ..\BuildTimeout.xml
         $installed = $false
