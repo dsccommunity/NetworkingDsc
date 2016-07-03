@@ -16,6 +16,9 @@ The **xNetworking** module contains the following resources:
 * **xHostsFile**
 * **xNetAdapterBinding**
 
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
 
@@ -182,9 +185,12 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 
 ### Unreleased
 
+### 2.10.0.0
+
 * Added the following resources:
     * MSFT_xNetAdapterBinding resource to enable/disable network adapter bindings.
-* Fixed bug where xHostsFile would duplicate an entry instead of updating an existing one
+    * Fixed bug where xHostsFile would duplicate an entry instead of updating an existing one
+    * Updated Sample_xIPAddress_*.ps1 examples to show correct usage of setting a Static IP address to prevent issue when DHCP assigned IP address already matches staticly assigned IP address.
 
 ### 2.9.0.0
 
