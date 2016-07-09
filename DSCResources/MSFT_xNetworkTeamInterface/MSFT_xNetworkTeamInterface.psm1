@@ -76,13 +76,14 @@ function Set-TargetResource
             if ($isNetModifyRequired)
             {
                 Write-Verbose -Message ($LocalizedData.ModifyTeamNic -f $Name)
-                if ($VlanID -in (0, 1))
+                if ($VlanID -in (0, 1) -or $VlanID -eq [System.String]::Empty)
                 {
                     Set-NetLbfoTeamNic -Name $Name -Team $TeamName -Default -ErrorAction Stop -Confirm:$false
                 }
                 else
                 {
-                    Set-NetLbfoTeamNic -Name $Name -Team $TeamName -VlanID $VlanID -ErrorAction Stop -Confirm:$false
+                    Set-NetLbfoTeamNic -Name $Name -Team $TeamName -VlanID $VlanID -ErrorAction Stop -Confirm:$false -PassThru `
+                    | Rename-NetAdapter -NewName $Name -ErrorAction SilentlyContinue -Confirm:$false # Required in case of primary interface, whose name gets changed to include VLAN ID, if specified
                 }
             }
         }
