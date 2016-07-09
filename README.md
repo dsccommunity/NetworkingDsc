@@ -13,6 +13,7 @@ The **xNetworking** module contains the following resources:
 * **xRoute**
 * **xNetBIOS**
 * **xNetworkTeam**
+* **xNetworkTeamInterface**
 * **xHostsFile**
 * **xNetAdapterBinding**
 
@@ -130,6 +131,12 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **LoadBalancingAlgorithm**: Specifies the load balancing algorithm for the network team. { Dynamic | HyperVPort | IPAddresses | MacAddresses | TransportPorts }.
 * **Ensure**: Specifies if the network team should be created or deleted. { Present | Absent }.
 
+### xNetworkTeamInterface
+* **Name**: Specifies the name of the network team interface to create.
+* **TeamName**: Specifies the name of the network team on which this particular interface should exist.
+* **VlanID**: Specifies VlanID to be set on network team interface.
+* **Ensure**: Specifies if the network team interface should be created or deleted. { Present | Absent }
+
 ### xHostsFile
 * **HostName**: Specifies the name of the computer that will be mapped to an IP address.
 * **IPAddress**: Specifies the IP Address that should be mapped to the host name.
@@ -184,6 +191,10 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased
+
+* Added the following resources:
+    * MSFT_xNetworkTeamInterface resource to add/remove network team interfaces
+* Added conditional loading of LocalizedData to MSFT_xHostsFile and MSFT_xNetworkTeam to prevent failures while loading those resources on systems with $PSUICulture other than en-US
 
 ### 2.10.0.0
 

@@ -1,4 +1,14 @@
-Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeamInterface.psd1 -BaseDirectory $PSScriptRoot -Verbose
+#region localizeddata
+if (Test-Path "${PSScriptRoot}\${PSUICulture}")
+{
+    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeamInterface.psd1 -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
+} 
+else
+{
+    #fallback to en-US
+    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeamInterface.psd1 -BaseDirectory "${PSScriptRoot}\en-US"
+}
+#endregion
 
 function Get-TargetResource
 {
@@ -76,7 +86,7 @@ function Set-TargetResource
             if ($isNetModifyRequired)
             {
                 Write-Verbose -Message ($LocalizedData.ModifyTeamNic -f $Name)
-                if ($VlanID -in (0, 1) -or $VlanID -eq [System.String]::Empty)
+                if ($VlanID -eq 0)
                 {
                     Set-NetLbfoTeamNic -Name $Name -Team $TeamName -Default -ErrorAction Stop -Confirm:$false
                 }
@@ -92,8 +102,15 @@ function Set-TargetResource
             Write-Verbose -Message ($LocalizedData.CreateTeamNic -f $Name)
             try
             {
-                $null = Add-NetLbfoTeamNic -Name $Name -Team $TeamName -VlanID $VlanID -ErrorAction Stop -Confirm:$false
-                Write-Verbose -Message ($LocalizedData.CreatedNetTeamNic -f $Name)
+                if ($VlanID -ne 0)
+                {
+                    $null = Add-NetLbfoTeamNic -Name $Name -Team $TeamName -VlanID $VlanID -ErrorAction Stop -Confirm:$false
+                    Write-Verbose -Message ($LocalizedData.CreatedNetTeamNic -f $Name)
+                }
+                else
+                {
+                    throw
+                }
             }
             catch
             {

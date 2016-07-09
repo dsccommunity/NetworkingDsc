@@ -1,6 +1,16 @@
-$Script:hostsFilePath = "${env:windir}\system32\drivers\etc\hosts"
+#region localizeddata
+if (Test-Path "${PSScriptRoot}\${PSUICulture}")
+{
+    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xHostsFile.psd1 -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
+} 
+else
+{
+    #fallback to en-US
+    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xHostsFile.psd1 -BaseDirectory "${PSScriptRoot}\en-US"
+}
+#endregion
 
-Import-LocalizedData -BindingVariable LocalizedData -FileName MSFT_xHostsFile.psd1 -BaseDirectory $PSScriptRoot -Verbose
+$Script:hostsFilePath = "${env:windir}\system32\drivers\etc\hosts"
 
 function Get-TargetResource
 {
