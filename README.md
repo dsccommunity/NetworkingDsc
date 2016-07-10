@@ -829,6 +829,44 @@ Sample_xNetworkTeam_AddTeam
 Start-DscConfiguration -Path Sample_xNetworkTeam_AddTeam -Wait -Verbose -Force
 ```
 
+## Create a network team interface
+This example shows adding a network team interface to native network team.
+
+```powershell
+configuration Sample_xNetworkTeamInterface_AddInterface
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xNetworkTeam HostTeam
+        {
+          Name = 'HostTeam'
+          TeamingMode = 'SwitchIndependent'
+          LoadBalancingAlgorithm = 'HyperVPort'
+          TeamMembers = 'NIC1','NIC2'
+          Ensure = 'Present'
+        }
+        
+        xNetworkTeamInterface NewInterface {
+            Name = 'NewInterface'
+            TeamName = 'HostTeam'
+            VlanID = 100
+            Ensure = 'Present'
+            DependsOn = '[xNetworkTeam]HostTeam'
+        }
+    }
+ }
+
+Sample_xNetworkTeamInterface_AddInterface
+Start-DscConfiguration -Path Sample_xNetworkTeamInterface_AddInterface -Wait -Verbose -Force
+```
+
 ### Add a hosts file entry
 This example will add an hosts file entry.
 
