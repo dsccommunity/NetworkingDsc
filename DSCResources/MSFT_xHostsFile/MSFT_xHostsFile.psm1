@@ -1,12 +1,14 @@
 #region localizeddata
 if (Test-Path "${PSScriptRoot}\${PSUICulture}")
 {
-    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xHostsFile.psd1 -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
+    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xHostsFile.psd1 `
+                         -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
 } 
 else
 {
     #fallback to en-US
-    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xHostsFile.psd1 -BaseDirectory "${PSScriptRoot}\en-US"
+    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xHostsFile.psd1 `
+                         -BaseDirectory "${PSScriptRoot}\en-US"
 }
 #endregion
 

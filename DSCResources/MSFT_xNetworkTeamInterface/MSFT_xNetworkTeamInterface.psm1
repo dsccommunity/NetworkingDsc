@@ -1,12 +1,14 @@
 #region localizeddata
 if (Test-Path "${PSScriptRoot}\${PSUICulture}")
 {
-    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeamInterface.psd1 -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
+    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeamInterface.psd1 `
+                         -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
 } 
 else
 {
     #fallback to en-US
-    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeamInterface.psd1 -BaseDirectory "${PSScriptRoot}\en-US"
+    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeamInterface.psd1 `
+                         -BaseDirectory "${PSScriptRoot}\en-US"
 }
 #endregion
 
@@ -88,31 +90,31 @@ function Set-TargetResource
                 Write-Verbose -Message ($LocalizedData.ModifyTeamNic -f $Name)
                 if ($VlanID -eq 0)
                 {
-                    Set-NetLbfoTeamNic -Name $Name -Team $TeamName -Default -ErrorAction Stop -Confirm:$false
+                    Set-NetLbfoTeamNic -Name $Name -Team $TeamName -Default `
+                                       -ErrorAction Stop -Confirm:$false
                 }
                 else
                 {
-                    Set-NetLbfoTeamNic -Name $Name -Team $TeamName -VlanID $VlanID -ErrorAction Stop -Confirm:$false -PassThru `
-                    | Rename-NetAdapter -NewName $Name -ErrorAction SilentlyContinue -Confirm:$false # Required in case of primary interface, whose name gets changed to include VLAN ID, if specified
+                    # Required in case of primary interface, whose name gets changed
+                    # to include VLAN ID, if specified
+                    Set-NetLbfoTeamNic -Name $Name -Team $TeamName -VlanID $VlanID `
+                                       -ErrorAction Stop -Confirm:$false -PassThru `
+                                       | Rename-NetAdapter -NewName $Name `
+                                                           -ErrorAction SilentlyContinue `
+                                                           -Confirm:$false
                 }
             }
         }
         else
         {
             Write-Verbose -Message ($LocalizedData.CreateTeamNic -f $Name)
-            try
+            if ($VlanID -ne 0)
             {
-                if ($VlanID -ne 0)
-                {
-                    $null = Add-NetLbfoTeamNic -Name $Name -Team $TeamName -VlanID $VlanID -ErrorAction Stop -Confirm:$false
-                    Write-Verbose -Message ($LocalizedData.CreatedNetTeamNic -f $Name)
-                }
-                else
-                {
-                    throw
-                }
+                $null = Add-NetLbfoTeamNic -Name $Name -Team $TeamName -VlanID $VlanID `
+                                           -ErrorAction Stop -Confirm:$false
+                Write-Verbose -Message ($LocalizedData.CreatedNetTeamNic -f $Name)
             }
-            catch
+            else
             {
                 $errorId = "TeamNicCreateError"
                 $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
@@ -128,7 +130,8 @@ function Set-TargetResource
     else
     {
         Write-Verbose -Message ($LocalizedData.RemoveTeamNic -f $Name)
-        $null = Remove-NetLbfoTeamNic -InputObject $teamNic -ErrorAction Stop -Confirm:$false
+        $null = Remove-NetLbfoTeamNic -Team $teamNic.Team -VlanID $teamNic.VlanID `
+                                      -ErrorAction Stop -Confirm:$false
     }
 }
 
