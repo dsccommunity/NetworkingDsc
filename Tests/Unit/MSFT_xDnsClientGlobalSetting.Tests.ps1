@@ -1,5 +1,5 @@
 $Global:DSCModuleName   = 'xNetworking'
-$Global:DSCResourceName = 'MSFT_xDnsClientGlobalSettings'
+$Global:DSCResourceName = 'MSFT_xDnsClientGlobalSetting'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
@@ -24,141 +24,141 @@ try
     InModuleScope $Global:DSCResourceName {
 
         # Create the Mock Objects that will be used for running tests
-        $NamespaceServerConfiguration = [PSObject]@{
-            LdapTimeoutSec               = 45
-            SyncIntervalSec              = 5000
-            UseFQDN                      = $True
+        $DnsClientGlobalSettings = [PSObject]@{
+            SuffixSearchList             = 'contoso.com'
+            DevolutionLevel              = 1
+            UseDevolution                = $True
         }
-        $NamespaceServerConfigurationSplat = [PSObject]@{
+        $DnsClientGlobalSettingsSplat = [PSObject]@{
             IsSingleInstance             = 'Yes'
-            LdapTimeoutSec               = $NamespaceServerConfiguration.LdapTimeoutSec
-            SyncIntervalSec              = $NamespaceServerConfiguration.SyncIntervalSec
-            UseFQDN                      = $NamespaceServerConfiguration.UseFQDN
+            SuffixSearchList             = $DnsClientGlobalSettings.SuffixSearchList
+            DevolutionLevel              = $DnsClientGlobalSettings.DevolutionLevel
+            UseDevolution                = $DnsClientGlobalSettings.UseDevolution
         }
 
         Describe "$($Global:DSCResourceName)\Get-TargetResource" {
 
-            Context 'Namespace Server Configuration Exists' {
+            Context 'DNS Client Global Settings Exists' {
 
-                Mock Get-DFSNServerConfiguration -MockWith { $NamespaceServerConfiguration }
+                Mock Get-DnsClientGlobalSetting -MockWith { $DnsClientGlobalSettings }
 
-                It 'should return correct namespace server configuration values' {
+                It 'should return correct DNS Client Global Settings values' {
                     $Result = Get-TargetResource -IsSingleInstance 'Yes'
-                    $Result.LdapTimeoutSec            | Should Be $NamespaceServerConfiguration.LdapTimeoutSec
-                    $Result.SyncIntervalSec           | Should Be $NamespaceServerConfiguration.SyncIntervalSec
-                    $Result.UseFQDN                   | Should Be $NamespaceServerConfiguration.UseFQDN
+                    $Result.SuffixSearchList          | Should Be $DnsClientGlobalSettings.SuffixSearchList
+                    $Result.DevolutionLevel           | Should Be $DnsClientGlobalSettings.DevolutionLevel
+                    $Result.UseDevolution             | Should Be $DnsClientGlobalSettings.UseDevolution
                 }
                 It 'should call the expected mocks' {
-                    Assert-MockCalled -commandName Get-DFSNServerConfiguration -Exactly 1
+                    Assert-MockCalled -CommandName Get-DnsClientGlobalSetting -Exactly 1
                 }
             }
         }
 
         Describe "$($Global:DSCResourceName)\Set-TargetResource" {
 
-            Mock Get-DFSNServerConfiguration -MockWith { $NamespaceServerConfiguration }
-            Mock Set-DFSNServerConfiguration
+            Mock Get-DnsClientGlobalSetting -MockWith { $DnsClientGlobalSettings }
+            Mock Set-DnsClientGlobalSetting
 
-            Context 'Namespace Server Configuration all parameters are the same' {
+            Context 'DNS Client Global Settings all parameters are the same' {
                 It 'should not throw error' {
                     {
-                        $Splat = $NamespaceServerConfigurationSplat.Clone()
+                        $Splat = $DnsClientGlobalSettingsSplat.Clone()
                         Set-TargetResource @Splat
                     } | Should Not Throw
                 }
                 It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DFSNServerConfiguration -Exactly 1
-                    Assert-MockCalled -commandName Set-DFSNServerConfiguration -Exactly 0
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
+                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -Exactly 0
                 }
             }
 
-            Context 'Namespace Server Configuration LdapTimeoutSec is different' {
+            Context 'DNS Client Global Settings SuffixSearchList is different' {
                 It 'should not throw error' {
                     {
-                        $Splat = $NamespaceServerConfigurationSplat.Clone()
-                        $Splat.LdapTimeoutSec = $Splat.LdapTimeoutSec + 1
+                        $Splat = $DnsClientGlobalSettingsSplat.Clone()
+                        $Splat.SuffixSearchList = 'fabrikam.com'
                         Set-TargetResource @Splat
                     } | Should Not Throw
                 }
                 It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DFSNServerConfiguration -Exactly 1
-                    Assert-MockCalled -commandName Set-DFSNServerConfiguration -Exactly 1
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
+                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -Exactly 1
                 }
             }
 
-            Context 'Namespace Server Configuration SyncIntervalSec is different' {
+            Context 'DNS Client Global Settings DevolutionLevel is different' {
                 It 'should not throw error' {
                     {
-                        $Splat = $NamespaceServerConfigurationSplat.Clone()
-                        $Splat.SyncIntervalSec = $Splat.SyncIntervalSec + 1
+                        $Splat = $DnsClientGlobalSettingsSplat.Clone()
+                        $Splat.DevolutionLevel = $Splat.DevolutionLevel + 1
                         Set-TargetResource @Splat
                     } | Should Not Throw
                 }
                 It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DFSNServerConfiguration -Exactly 1
-                    Assert-MockCalled -commandName Set-DFSNServerConfiguration -Exactly 1
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
+                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -Exactly 1
                 }
             }
 
-            Context 'Namespace Server Configuration UseFQDN is different' {
+            Context 'DNS Client Global Settings UseDevolution is different' {
                 It 'should not throw error' {
                     {
-                        $Splat = $NamespaceServerConfigurationSplat.Clone()
-                        $Splat.UseFQDN = -not $Splat.UseFQDN
+                        $Splat = $DnsClientGlobalSettingsSplat.Clone()
+                        $Splat.UseDevolution = -not $Splat.UseDevolution
                         Set-TargetResource @Splat
                     } | Should Not Throw
                 }
                 It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DFSNServerConfiguration -Exactly 1
-                    Assert-MockCalled -commandName Set-DFSNServerConfiguration -Exactly 1
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
+                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -Exactly 1
                 }
             }
         }
 
         Describe "$($Global:DSCResourceName)\Test-TargetResource" {
 
-            Mock Get-DFSNServerConfiguration -MockWith { $NamespaceServerConfiguration }
+            Mock Get-DnsClientGlobalSetting -MockWith { $DnsClientGlobalSettings }
 
-            Context 'Namespace Server Configuration all parameters are the same' {
+            Context 'DNS Client Global Settings all parameters are the same' {
                 It 'should return true' {
-                    $Splat = $NamespaceServerConfigurationSplat.Clone()
+                    $Splat = $DnsClientGlobalSettingsSplat.Clone()
                     Test-TargetResource @Splat | Should Be $True
                 }
                 It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DFSNServerConfiguration -Exactly 1
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
                 }
             }
 
-            Context 'Namespace Server Configuration LdapTimeoutSec is different' {
+            Context 'DNS Client Global Settings SuffixSearchList is different' {
                 It 'should return false' {
-                    $Splat = $NamespaceServerConfigurationSplat.Clone()
-                    $Splat.LdapTimeoutSec = $Splat.LdapTimeoutSec + 1
+                    $Splat = $DnsClientGlobalSettingsSplat.Clone()
+                    $Splat.SuffixSearchList = 'fabrikam.com'
                     Test-TargetResource @Splat | Should Be $False
                 }
                 It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DFSNServerConfiguration -Exactly 1
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
                 }
             }
 
-            Context 'Namespace Server Configuration SyncIntervalSec is different' {
+            Context 'DNS Client Global Settings DevolutionLevel is different' {
                 It 'should return false' {
-                    $Splat = $NamespaceServerConfigurationSplat.Clone()
-                    $Splat.SyncIntervalSec = $Splat.SyncIntervalSec + 1
+                    $Splat = $DnsClientGlobalSettingsSplat.Clone()
+                    $Splat.DevolutionLevel = $Splat.DevolutionLevel + 1
                     Test-TargetResource @Splat | Should Be $False
                 }
                 It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DFSNServerConfiguration -Exactly 1
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
                 }
             }
 
-            Context 'Namespace Server Configuration UseFQDN is different' {
+            Context 'DNS Client Global Settings UseDevolution is different' {
                 It 'should return false' {
-                    $Splat = $NamespaceServerConfigurationSplat.Clone()
-                    $Splat.UseFQDN = -not $Splat.UseFQDN
+                    $Splat = $DnsClientGlobalSettingsSplat.Clone()
+                    $Splat.UseDevolution = -not $Splat.UseDevolution
                     Test-TargetResource @Splat | Should Be $False
                 }
                 It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DFSNServerConfiguration -Exactly 1
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
                 }
             }
         }

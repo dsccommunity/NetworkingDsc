@@ -78,7 +78,7 @@ function Set-TargetResource
         $UseDevolution,
 
         [Uint32]
-        $DevolutionList
+        $DevolutionLevel
     )
 
     Write-Verbose -Message ( @(
@@ -141,7 +141,7 @@ function Test-TargetResource
         $UseDevolution,
 
         [Uint32]
-        $DevolutionList
+        $DevolutionLevel
     )
 
     Write-Verbose -Message ( @(

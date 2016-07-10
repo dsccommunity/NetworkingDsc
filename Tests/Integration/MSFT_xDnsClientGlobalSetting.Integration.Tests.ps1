@@ -19,6 +19,10 @@ $TestEnvironment = Initialize-TestEnvironment `
 
 # Backup the existing settings
 $CurrentDnsClientGlobalSetting = Get-DnsClientGlobalSetting
+Set-DnsClientGlobalSetting `
+    -SuffixSearchList 'fabrikam.com' `
+    -UseDevolution $False `
+    -DevolutionLevel 4
 
 # Using try/finally to always cleanup even if something awful happens.
 try
