@@ -16,7 +16,7 @@ Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHel
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
     -DSCResourceName $Global:DSCResourceName `
-    -TestType Unit 
+    -TestType Unit
 #endregion
 
 # Begin Testing
@@ -24,6 +24,8 @@ try
 {
     #region Pester Tests
     InModuleScope $Global:DSCResourceName {
+
+        $InterfaceAlias = (Get-NetAdapter -Physical | Select-Object -First 1).Name
 
         $MockNetadapterSettingsDefault = New-Object -TypeName CimInstance -ArgumentList 'Win32_NetworkAdapterConfiguration' | Add-Member -MemberType NoteProperty -Name TcpipNetbiosOptions -Value 0 -PassThru
         $MockNetadapterSettingsEnable = New-Object -TypeName CimInstance -ArgumentList 'Win32_NetworkAdapterConfiguration' | Add-Member -MemberType NoteProperty -Name TcpipNetbiosOptions -Value 1 -PassThru
@@ -35,17 +37,17 @@ try
             Mock -CommandName Get-CimAssociatedInstance -MockWith {return $MockNetadapterSettingsDefault}
 
             It 'Returns a hashtable' {
-                $targetResource = Get-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Default'
+                $targetResource = Get-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Default'
                 $targetResource -is [System.Collections.Hashtable] | Should Be $true
             }
 
             It 'NetBIOS over TCP/IP numerical setting "0" should translate to "Default"' {
-                $Result = Get-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Default'
+                $Result = Get-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Default'
                 $Result.Setting | should be 'Default'
             }
 
             It 'NetBIOS over TCP/IP setting should return real value "Default", not parameter value "Enable"' {
-                $Result = Get-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Enable'
+                $Result = Get-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Enable'
                 $Result.Setting | should be 'Default'
             }
         }
@@ -59,10 +61,10 @@ try
                 Mock -CommandName Get-CimAssociatedInstance -MockWith {return $MockNetadapterSettingsDefault}
 
                 It 'should return true when value "Default" is set' {
-                    Test-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Default' | Should Be $true
+                    Test-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Default' | Should Be $true
                 }
                 It 'should return false when value "Disable" is set' {
-                    Test-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Disable' | Should Be $false
+                    Test-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Disable' | Should Be $false
                 }
             }
 
@@ -71,10 +73,10 @@ try
                 Mock -CommandName Get-CimAssociatedInstance -MockWith {return $MockNetadapterSettingsDisable}
 
                 It 'should return true when value "Disable" is set' {
-                    Test-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Disable' | Should Be $true
+                    Test-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Disable' | Should Be $true
                 }
                 It 'should return false when value "Enable" is set' {
-                    Test-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Enable' | Should Be $false
+                    Test-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Enable' | Should Be $false
                 }
             }
 
@@ -83,10 +85,10 @@ try
                 Mock -CommandName Get-CimAssociatedInstance -MockWith {return $MockNetadapterSettingsEnable}
 
                 It 'should return true when value "Enable" is set' {
-                    Test-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Enable' | Should Be $true
+                    Test-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Enable' | Should Be $true
                 }
                 It 'should return false when value "Disable" is set' {
-                    Test-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Disable' | Should Be $false
+                    Test-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Disable' | Should Be $false
                 }
             }
 
@@ -111,7 +113,7 @@ try
                 Mock -CommandName Get-CimAssociatedInstance -MockWith {return $MockNetadapterSettingsEnable}
 
                 It 'Should call "Set-ItemProperty" instead of "Invoke-CimMethod"' {
-                    $Null = Set-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Default'
+                    $Null = Set-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Default'
 
                     Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 1
                     Assert-MockCalled -CommandName Invoke-CimMethod -Exactly -Times 0
@@ -124,7 +126,7 @@ try
                     Mock -CommandName Get-CimAssociatedInstance -MockWith {return $MockNetadapterSettingsEnable}
                     Mock Invoke-CimMethod
 
-                    $Null = Set-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Disable'
+                    $Null = Set-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Disable'
 
                     Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 0
                     Assert-MockCalled -CommandName Invoke-CimMethod -Exactly -Times 1
