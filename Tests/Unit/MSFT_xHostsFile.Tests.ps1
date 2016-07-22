@@ -1,18 +1,16 @@
-﻿$Global:DSCModuleName   = 'xNetworking'
-$Global:DSCResourceName = 'MSFT_xHostsFile'
+﻿$Global:DSCModuleName      = 'xNetworking'
+$Global:DSCResourceName    = 'MSFT_xHostsFile'
 
 #region HEADER
-if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
-     (-not (Test-Path -Path '.\DSCResource.Tests\TestHelper.psm1')) )
+# Unit Test Template Version: 1.1.0
+[String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
+if ( (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+     (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git')
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
-else
-{
-    & git @('-C',(Join-Path -Path (Get-Location) -ChildPath '\DSCResource.Tests\'),'pull')
-}
-Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 
+Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
     -DSCResourceName $Global:DSCResourceName `
@@ -23,150 +21,235 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     #region Pester Tests
+
     InModuleScope $Global:DSCResourceName {
-        # Create the Mock Objects that will be used for running tests
-        $MockHostEntry = [PSCustomObject] @{
-            IPAddress           = '192.168.10.1'
-            HostName             = 'Host01'
+
+        Describe $Global:DSCResourceName {
+            
+            Mock Add-Content {}
+            Mock Set-Content {}
+            
+            Context "A host entry doesn't exist, and should" {
+                $testParams = @{
+                    HostName = "www.contoso.com"
+                    IPAddress = "192.168.0.156"
+                }
+                
+                Mock Get-Content { 
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        ""
+                    )
+                }
+                
+                It "should return absent from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Absent" 
+                }
+                
+                It "should return false from the test method" {
+                    Test-TargetResource @testParams | Should Be $false
+                }
+                
+                It "should create the entry in the set method" {
+                    Set-TargetResource @testParams
+                    Assert-MockCalled Add-Content
+                }
+            }
+            
+            Context "A host entry exists but has the wrong IP address" {
+                $testParams = @{
+                    HostName = "www.contoso.com"
+                    IPAddress = "192.168.0.156"
+                }
+                
+                Mock Get-Content {
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        "127.0.0.1         $($testParams.HostName)",
+                        ""
+                    )
+                }
+                
+                It "should return present from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Present" 
+                }
+                
+                It "should return false from the test method" {
+                    Test-TargetResource @testParams | Should Be $false
+                }
+                
+                It "should update the entry in the set method" {
+                    Set-TargetResource @testParams
+                    Assert-MockCalled Set-Content
+                }
+            }
+            
+            Context "A host entry exists with the correct IP address" {
+                $testParams = @{
+                    HostName = "www.contoso.com"
+                    IPAddress = "192.168.0.156"
+                }
+                
+                Mock Get-Content {
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        "$($testParams.IPAddress)         $($testParams.HostName)",
+                        ""
+                    )
+                }
+                
+                It "should return present from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Present"
+                }
+                
+                It "should return true from the test method" {
+                    Test-TargetResource @testParams | Should Be $true
+                }
+            }
+            
+            Context "A host entry exists but it shouldn't" {
+                $testParams = @{
+                    HostName = "www.contoso.com"
+                    Ensure = "Absent"
+                }
+                
+                Mock Get-Content {
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        "127.0.0.1         $($testParams.HostName)",
+                        ""
+                    )
+                }
+                
+                It "should return present from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Present"
+                }
+                
+                It "should return false from the test method" {
+                    Test-TargetResource @testParams | Should Be $false
+                }
+                
+                It "should remove the entry in the set method" {
+                    Set-TargetResource @testParams
+                    Assert-MockCalled Set-Content
+                }
+            }
+            
+            Context "A host entry doesn't it exist and shouldn't" {
+                $testParams = @{
+                    HostName = "www.contoso.com"
+                    Ensure = "Absent"
+                }
+                
+                Mock Get-Content {
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        ""
+                    )
+                }
+                
+                It "should return absent from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Absent"
+                }
+                
+                It "should return true from the test method" {
+                    Test-TargetResource @testParams | Should Be $true
+                }
+            }
+
+            Context "A host entry exists and is correct, but it listed with multiple entries on one line" {
+                $testParams = @{
+                    HostName = "www.contoso.com"
+                    IPAddress = "192.168.0.156"
+                }
+                
+                Mock Get-Content {
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        "$($testParams.IPAddress)         demo.contoso.com   $($testParams.HostName) more.examples.com",
+                        ""
+                    )
+                }
+                
+                It "should return present from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Present"
+                }
+                
+                It "should return true from the test method" {
+                    Test-TargetResource @testParams | Should Be $true
+                }
+            }
+
+            Context "A host entry exists and is not correct, but it listed with multiple entries on one line" {
+                $testParams = @{
+                    HostName = "www.contoso.com"
+                    IPAddress = "192.168.0.156"
+                }
+                
+                Mock Get-Content {
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        "127.0.0.1         demo.contoso.com   $($testParams.HostName) more.examples.com",
+                        ""
+                    )
+                }
+                
+                It "should return present from the get method" {
+                    (Get-TargetResource @testParams).Ensure | Should Be "Present"
+                }
+                
+                It "should return false from the test method" {
+                    Test-TargetResource @testParams | Should Be $false
+                }
+
+                It "should update the entry in the set method" {
+                    Set-TargetResource @testParams
+                    Assert-MockCalled Set-Content
+                }
+            }
+
+            Context "Invalid parameters will throw meaningful errors" {
+                $testParams = @{
+                    HostName = "www.contoso.com"
+                }
+                
+                Mock Get-Content { 
+                    return @(
+                        "# A mocked example of a host file - this line is a comment",
+                        "",
+                        "127.0.0.1       localhost",
+                        "127.0.0.1  www.anotherexample.com",
+                        ""
+                    )
+                }
+
+                It "should throw an error when IP Address isn't provide and ensure is present" {
+                    { Set-TargetResource @testParams } | Should throw $LocalizedData.UnableToEnsureWithoutIP
+                }
+            }
         }
-
-        $HostEntry = [PSObject]@{
-            IPAddress               = $MockHostEntry.IPAddress
-            HostName                = $MockHostEntry.HostName
-        }
-
-        $HostEntryObject = [PSObject]@{
-            IPAddress               = $HostEntry.IPAddress
-            HostName                = $HostEntry.HostName
-            Ensure                  = 'Present'
-        }       
-    
-        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
-
-            Context 'Hosts file entry does not exist' {
-                Mock Test-HostEntry
-                It 'should return ensure as absent' {
-                    $Result = Get-TargetResource `
-                        @HostEntry
-                    $Result.Ensure | Should Be 'Absent'
-                }
-                It 'should call the expected mocks' {
-                    Assert-MockCalled -commandName Test-HostEntry -Exactly 1
-                } 
-            }
-    
-            Context 'Hosts file entry exists' {
-                Mock Test-HostEntry -MockWith { $true }
-                It 'should return host entry' {
-                    $Result = Get-TargetResource @HostEntry
-                    $Result.Ensure                 | Should Be 'Present'
-                    $Result.HostName               | Should Be $HostEntry.HostName
-                    $Result.IPAddress              | Should Be $HostEntry.IPAddress
-                }
-                It 'should call the expected mocks' {
-                    Assert-MockCalled -commandName Test-HostEntry  -Exactly 1
-                }
-            }
-        }
-
-        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
-            $newEntry = [PSObject]@{
-                HostName                = $HostEntry.HostName
-                IPAddress               = $HostEntry.IPAddress
-                Ensure                  = 'Present'
-            }
-
-            Context 'hosts file entry does not exist but should' {
-                Mock Add-HostEntry
-                Mock Remove-HostEntry
-
-                It 'should not throw error' {
-                    { 
-                        Set-TargetResource @newEntry
-                    } | Should Not Throw
-                }
-
-                It 'should call the expected mocks' {
-                    Assert-MockCalled -commandName Add-HostEntry -Exactly 1
-                    Assert-MockCalled -commandName Remove-HostEntry -Exactly 0
-                } 
-            }
-    
-            Context 'hosts file exists but should not' {
-                Mock Add-HostEntry
-                Mock Remove-HostEntry
-
-                It 'should not throw error' {
-                    { 
-                        $HostsEntry = $newEntry.Clone()
-                        $HostsEntry.Ensure = 'Absent'
-                        Set-TargetResource @HostsEntry
-                    } | Should Not Throw
-                }
-
-                It 'should call the expected mocks' {
-                    Assert-MockCalled -commandName Add-HostEntry -Exactly 0
-                    Assert-MockCalled -commandName Remove-HostEntry -Exactly 1
-                } 
-            }
-        }
-
-        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
-            $newEntry = [PSObject]@{
-                HostName                = $HostEntry.HostName
-                IPAddress               = $HostEntry.IPAddress
-                Ensure                  = 'Present'
-            }
-  
-            Context 'hosts file entry does not exist but it should' {
-                Mock Test-HostEntry -MockWith { $false }
-    
-                It 'should return false' {
-                    Test-TargetResource @newEntry | Should be $false
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Test-HostEntry -Exactly 1
-                }
-            }
-
-            Context 'hosts file entry exists but it should not' {
-                Mock Test-HostEntry -MockWith { $true }
-    
-                It 'should return false' {
-                    $HostsEntry = $newEntry.Clone()
-                    $HostsEntry.Ensure = 'Absent'
-                    Test-TargetResource @HostsEntry | Should Be $false
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Test-HostEntry -Exactly 1
-                }
-            }
-
-            Context 'hosts file entry does not exist and it should not' {
-                Mock Test-HostEntry -MockWith { $false }
-    
-                It 'should return false' {
-                    $HostsEntry = $newEntry.Clone()
-                    $HostsEntry.Ensure = 'Absent'
-                    Test-TargetResource @HostsEntry | Should be $true
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Test-HostEntry -Exactly 1
-                }
-            }
-
-            Context 'hosts file entry exists and it should' {
-                Mock Test-HostEntry -MockWith { $true }
-    
-                It 'should return false' {
-                    Test-TargetResource @newEntry | Should Be $true
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Test-HostEntry -Exactly 1
-                }
-            }
-        }
-    }
+    } #end InModuleScope $DSCResourceName
     #endregion
 }
 finally
