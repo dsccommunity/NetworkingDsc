@@ -19,14 +19,16 @@ $TestEnvironment = Initialize-TestEnvironment `
 
 # Backup the existing settings
 $CurrentDnsClientGlobalSetting = Get-DnsClientGlobalSetting
-Set-DnsClientGlobalSetting `
-    -SuffixSearchList 'fabrikam.com' `
-    -UseDevolution $False `
-    -DevolutionLevel 4
 
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
+    # Set the DNS Client Global settings to known values
+    Set-DnsClientGlobalSetting `
+        -SuffixSearchList 'fabrikam.com' `
+        -UseDevolution $False `
+        -DevolutionLevel 4
+
     #region Integration Tests
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($Global:DSCResourceName).config.ps1"
     . $ConfigFile
