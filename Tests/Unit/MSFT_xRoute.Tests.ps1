@@ -193,11 +193,11 @@ try
                 Mock Set-NetRoute
                 Mock Remove-NetRoute `
                     -ParameterFilter {
-                        (InterfaceAlias -eq $TestRoute.InterfaceAlias) -and `
-                        (AddressFamily -eq $TestRoute.AddressFamily) -and `
-                        (DestinationPrefix -eq $TestRoute.DestinationPrefix) -and `
-                        (NextHop -eq $TestRoute.NextHop) -and `
-                        (RouteMetric -eq $TestRoute.RouteMetric)
+                        ($InterfaceAlias -eq $TestRoute.InterfaceAlias) -and `
+                        ($AddressFamily -eq $TestRoute.AddressFamily) -and `
+                        ($DestinationPrefix -eq $TestRoute.DestinationPrefix) -and `
+                        ($NextHop -eq $TestRoute.NextHop) -and `
+                        ($RouteMetric -eq $TestRoute.RouteMetric)
                     }
 
                 It 'should not throw error' {
@@ -213,11 +213,11 @@ try
                     Assert-MockCalled -commandName Set-NetRoute -Exactly 0
                     Assert-MockCalled -commandName Remove-NetRoute `
                         -ParameterFilter {
-                            (InterfaceAlias -eq $TestRoute.InterfaceAlias) -and `
-                            (AddressFamily -eq $TestRoute.AddressFamily) -and `
-                            (DestinationPrefix -eq $TestRoute.DestinationPrefix) -and `
-                            (NextHop -eq $TestRoute.NextHop) -and `
-                            (RouteMetric -eq $TestRoute.RouteMetric)
+                            ($InterfaceAlias -eq $TestRoute.InterfaceAlias) -and `
+                            ($AddressFamily -eq $TestRoute.AddressFamily) -and `
+                            ($DestinationPrefix -eq $TestRoute.DestinationPrefix) -and `
+                            ($NextHop -eq $TestRoute.NextHop) -and `
+                            ($RouteMetric -eq $TestRoute.RouteMetric)
                         } `
                         -Exactly 1
                 }
