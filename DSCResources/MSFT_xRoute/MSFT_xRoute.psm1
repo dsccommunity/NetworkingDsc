@@ -36,11 +36,11 @@ function Get-TargetResource
         [Parameter(Mandatory)]
         [ValidateSet('IPv4', 'IPv6')]
         [String] $AddressFamily,
-        
+
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String] $DestinationPrefix,
-        
+
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String] $NextHop
@@ -59,7 +59,7 @@ function Get-TargetResource
         InterfaceAlias    = $InterfaceAlias
         AddressFamily     = $AddressFamily
         DestinationPrefix = $DestinationPrefix
-        NextHop           = $NextHop 
+        NextHop           = $NextHop
     }
     if ($Route)
     {
@@ -89,7 +89,7 @@ function Get-TargetResource
         }
     }
 
-    $returnValue    
+    $returnValue
 } # Get-TargetResource
 
 function Set-TargetResource
@@ -104,11 +104,11 @@ function Set-TargetResource
         [Parameter(Mandatory)]
         [ValidateSet('IPv4', 'IPv6')]
         [String] $AddressFamily,
-        
+
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String] $DestinationPrefix,
-        
+
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String] $NextHop,
@@ -117,7 +117,7 @@ function Set-TargetResource
         [String] $Ensure = 'Present',
 
         [Uint16] $RouteMetric = 256,
-        
+
         [ValidateSet('No', 'Yes', 'Age')]
         [String] $Publish = 'No',
 
@@ -126,7 +126,7 @@ function Set-TargetResource
 
     # Remove any parameters that can't be splatted.
     $null = $PSBoundParameters.Remove('Ensure')
-    
+
     # Lookup the existing Route
     $Route = Get-Route @PSBoundParameters
 
@@ -144,7 +144,7 @@ function Set-TargetResource
             Set-NetRoute @PSBoundParameters `
                 -Confirm:$false `
                 -ErrorAction Stop
-                
+
 
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
@@ -176,10 +176,8 @@ function Set-TargetResource
         if ($Route)
         {
             # The Route exists - remove it
-            $null = $PSBoundParameters.Remove('InterfaceAlias')
-            $null = $PSBoundParameters.Remove('AddressFamily')
-            $null = $PSBoundParameters.Remove('DestinationPrefix')
-            $null = $PSBoundParameters.Remove('NextHop')
+            $null = $PSBoundParameters.Remove('Publish')
+            $null = $PSBoundParameters.Remove('PreferredLifetime')
 
             Remove-NetRoute @PSBoundParameters `
                 -Confirm:$false `
@@ -207,11 +205,11 @@ function Test-TargetResource
         [Parameter(Mandatory)]
         [ValidateSet('IPv4', 'IPv6')]
         [String] $AddressFamily,
-        
+
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String] $DestinationPrefix,
-        
+
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String] $NextHop,
@@ -220,7 +218,7 @@ function Test-TargetResource
         [String] $Ensure = 'Present',
 
         [Uint16] $RouteMetric = 256,
-        
+
         [ValidateSet('No', 'Yes', 'Age')]
         [String] $Publish = 'No',
 
@@ -241,7 +239,7 @@ function Test-TargetResource
 
     # Check the parameters
     Test-ResourceProperty @PSBoundParameters
-    
+
     # Lookup the existing Route
     $Route = Get-Route @PSBoundParameters
 
@@ -336,11 +334,11 @@ Function Get-Route {
         [Parameter(Mandatory)]
         [ValidateSet('IPv4', 'IPv6')]
         [String] $AddressFamily,
-        
+
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String] $DestinationPrefix,
-        
+
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String] $NextHop,
@@ -349,7 +347,7 @@ Function Get-Route {
         [String] $Ensure = 'Present',
 
         [Uint16] $RouteMetric = 256,
-        
+
         [ValidateSet('No', 'Yes', 'Age')]
         [String] $Publish = 'No',
 
@@ -391,11 +389,11 @@ Function Test-ResourceProperty {
         [Parameter(Mandatory)]
         [ValidateSet('IPv4', 'IPv6')]
         [String] $AddressFamily,
-        
+
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String] $DestinationPrefix,
-        
+
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [String] $NextHop,
@@ -404,13 +402,13 @@ Function Test-ResourceProperty {
         [String] $Ensure = 'Present',
 
         [Uint16] $RouteMetric = 256,
-        
+
         [ValidateSet('No', 'Yes', 'Age')]
         [String] $Publish = 'No',
 
         [Double] $PreferredLifetime
     )
-    
+
     # Validate the Adapter exists
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
@@ -471,7 +469,7 @@ Function Test-ResourceProperty {
 
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
-    
+
     # Validate the NextHop Parameter
     if (-not ([System.Net.Ipaddress]::TryParse($NextHop, [ref]0)))
     {
@@ -513,7 +511,7 @@ Function Test-ResourceProperty {
             -ArgumentList $exception, $errorId, $errorCategory, $null
 
         $PSCmdlet.ThrowTerminatingError($errorRecord)
-    }    
+    }
 }
 
 Export-ModuleMember -Function *-TargetResource

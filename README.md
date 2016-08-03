@@ -196,6 +196,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 * Converted AppVeyor.yml to pull Pester from PSGallery instead of Chocolatey.
 * Changed AppVeyor.yml to use default image.
 * Fix xNetBios unit tests to work on default appveyor image.
+* Fix bug in xRoute when removing an existing route.
 
 ### 2.10.0.0
 
