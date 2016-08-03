@@ -193,11 +193,11 @@ try
                 Mock Set-NetRoute
                 Mock Remove-NetRoute `
                     -ParameterFilter {
-                        $InterfaceAlias = $TestRoute.InterfaceAlias;
-                        $AddressFamily = $TestRoute.AddressFamily;
-                        $DestinationPrefix = $TestRoute.DestinationPrefix;
-                        $NextHop = $TestRoute.NextHop;
-                        $RouteMetric = $TestRoute.RouteMetric;
+                        InterfaceAlias = $TestRoute.InterfaceAlias -and `
+                        AddressFamily = $TestRoute.AddressFamily -and `
+                        DestinationPrefix = $TestRoute.DestinationPrefix -and `
+                        NextHop = $TestRoute.NextHop -and `
+                        RouteMetric = $TestRoute.RouteMetric
                     }
                 }
 
@@ -214,11 +214,11 @@ try
                     Assert-MockCalled -commandName Set-NetRoute -Exactly 0
                     Assert-MockCalled -commandName Remove-NetRoute `
                         -ParameterFilter {
-                            $InterfaceAlias = $TestRoute.InterfaceAlias;
-                            $AddressFamily = $TestRoute.AddressFamily;
-                            $DestinationPrefix = $TestRoute.DestinationPrefix;
-                            $NextHop = $TestRoute.NextHop;
-                            $RouteMetric = $TestRoute.RouteMetric;
+                            InterfaceAlias = $TestRoute.InterfaceAlias -and `
+                            AddressFamily = $TestRoute.AddressFamily -and `
+                            DestinationPrefix = $TestRoute.DestinationPrefix -and `
+                            NextHop = $TestRoute.NextHop -and `
+                            RouteMetric = $TestRoute.RouteMetric
                         } `
                         -Exactly 1
                 }
