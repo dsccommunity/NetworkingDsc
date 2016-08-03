@@ -191,14 +191,14 @@ try
                 Mock Get-NetRoute -MockWith { $MockRoute }
                 Mock New-NetRoute
                 Mock Set-NetRoute
-                Mock Remove-NetRoute -ParameterFilter {
+                Mock Remove-NetRoute `
                     -ParameterFilter {
                         $InterfaceAlias = $TestRoute.InterfaceAlias;
                         $AddressFamily = $TestRoute.AddressFamily;
                         $DestinationPrefix = $TestRoute.DestinationPrefix;
                         $NextHop = $TestRoute.NextHop;
                         $RouteMetric = $TestRoute.RouteMetric;
-                    } `
+                    }
                 }
 
                 It 'should not throw error' {
