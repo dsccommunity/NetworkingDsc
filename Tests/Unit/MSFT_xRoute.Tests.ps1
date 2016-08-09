@@ -16,7 +16,7 @@ Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHel
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
     -DSCResourceName $Global:DSCResourceName `
-    -TestType Unit 
+    -TestType Unit
 #endregion
 
 # Begin Testing
@@ -24,7 +24,7 @@ try
 {
     #region Pester Tests
     InModuleScope $Global:DSCResourceName {
-    
+
         # Create the Mock Objects that will be used for running tests
         $MockNetAdapter = [PSCustomObject] @{
             Name                    = 'Ethernet'
@@ -40,7 +40,7 @@ try
             Publish                 = 'Age'
             PreferredLifetime       = 50000
         }
-    
+
         $TestRouteKeys = [PSObject]@{
             InterfaceAlias          = $MockNetAdapter.Name
             AddressFamily           = $TestRoute.AddressFamily
@@ -58,13 +58,13 @@ try
             Publish                 = $TestRoute.Publish
             PreferredLifetime       = ([Timespan]::FromSeconds($TestRoute.PreferredLifetime))
         }
-    
+
         Describe "$($Global:DSCResourceName)\Get-TargetResource" {
-    
+
             Context 'Route does not exist' {
-                
+
                 Mock Get-NetRoute
-    
+
                 It 'should return absent Route' {
                     $Result = Get-TargetResource `
                         @TestRouteKeys
@@ -72,13 +72,13 @@ try
                 }
                 It 'should call the expected mocks' {
                     Assert-MockCalled -commandName Get-NetRoute -Exactly 1
-                } 
+                }
             }
-    
+
             Context 'Route does exist' {
-                
+
                 Mock Get-NetRoute -MockWith { $MockRoute }
-    
+
                 It 'should return correct Route' {
                     $Result = Get-TargetResource `
                         @TestRouteKeys
@@ -96,18 +96,18 @@ try
                 }
             }
         }
-    
+
         Describe "$($Global:DSCResourceName)\Set-TargetResource" {
-    
+
             Context 'Route does not exist but should' {
-                
+
                 Mock Get-NetRoute
                 Mock New-NetRoute
                 Mock Set-NetRoute
                 Mock Remove-NetRoute
-    
+
                 It 'should not throw error' {
-                    { 
+                    {
                         $Splat = $TestRoute.Clone()
                         Set-TargetResource @Splat
                     } | Should Not Throw
@@ -119,16 +119,16 @@ try
                     Assert-MockCalled -commandName Remove-NetRoute -Exactly 0
                 }
             }
-    
+
             Context 'Route exists and should but has a different RouteMetric' {
-                
+
                 Mock Get-NetRoute -MockWith { $MockRoute }
                 Mock New-NetRoute
                 Mock Set-NetRoute
                 Mock Remove-NetRoute
-    
+
                 It 'should not throw error' {
-                    { 
+                    {
                         $Splat = $TestRoute.Clone()
                         $Splat.RouteMetric = $Splat.RouteMetric + 10
                         Set-TargetResource @Splat
@@ -143,14 +143,14 @@ try
             }
 
             Context 'Route exists and should but has a different Publish' {
-                
+
                 Mock Get-NetRoute -MockWith { $MockRoute }
                 Mock New-NetRoute
                 Mock Set-NetRoute
                 Mock Remove-NetRoute
-    
+
                 It 'should not throw error' {
-                    { 
+                    {
                         $Splat = $TestRoute.Clone()
                         $Splat.Publish = 'No'
                         Set-TargetResource @Splat
@@ -163,22 +163,22 @@ try
                     Assert-MockCalled -commandName Remove-NetRoute -Exactly 0
                 }
             }
-       
+
             Context 'Route exists and should but has a different PreferredLifetime' {
-                
+
                 Mock Get-NetRoute -MockWith { $MockRoute }
                 Mock New-NetRoute
                 Mock Set-NetRoute
                 Mock Remove-NetRoute
-    
+
                 It 'should not throw error' {
-                    { 
+                    {
                         $Splat = $TestRoute.Clone()
                         $Splat.PreferredLifetime = $TestRoute.PreferredLifetime + 1000
                         Set-TargetResource @Splat
                     } | Should Not Throw
                 }
-                It 'should call expected Mocks' {
+                It 'should call expected mocks' {
                     Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                     Assert-MockCalled -commandName New-NetRoute -Exactly 0
                     Assert-MockCalled -commandName Set-NetRoute -Exactly 1
@@ -187,36 +187,51 @@ try
             }
 
             Context 'Route exists and but should not' {
-                
+
                 Mock Get-NetRoute -MockWith { $MockRoute }
                 Mock New-NetRoute
                 Mock Set-NetRoute
-                Mock Remove-NetRoute
-    
+                Mock Remove-NetRoute `
+                    -ParameterFilter {
+                        ($InterfaceAlias -eq $TestRoute.InterfaceAlias) -and `
+                        ($AddressFamily -eq $TestRoute.AddressFamily) -and `
+                        ($DestinationPrefix -eq $TestRoute.DestinationPrefix) -and `
+                        ($NextHop -eq $TestRoute.NextHop) -and `
+                        ($RouteMetric -eq $TestRoute.RouteMetric)
+                    }
+
                 It 'should not throw error' {
-                    { 
+                    {
                         $Splat = $TestRoute.Clone()
                         $Splat.Ensure = 'Absent'
                         Set-TargetResource @Splat
                     } | Should Not Throw
                 }
-                It 'should call expected Mocks' {
+                It 'should call expected mocks and parameters' {
                     Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                     Assert-MockCalled -commandName New-NetRoute -Exactly 0
                     Assert-MockCalled -commandName Set-NetRoute -Exactly 0
-                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute `
+                        -ParameterFilter {
+                            ($InterfaceAlias -eq $TestRoute.InterfaceAlias) -and `
+                            ($AddressFamily -eq $TestRoute.AddressFamily) -and `
+                            ($DestinationPrefix -eq $TestRoute.DestinationPrefix) -and `
+                            ($NextHop -eq $TestRoute.NextHop) -and `
+                            ($RouteMetric -eq $TestRoute.RouteMetric)
+                        } `
+                        -Exactly 1
                 }
             }
-    
+
             Context 'Route does not exist and should not' {
-                
+
                 Mock Get-NetRoute
                 Mock New-NetRoute
                 Mock Set-NetRoute
                 Mock Remove-NetRoute
-    
+
                 It 'should not throw error' {
-                    { 
+                    {
                         $Splat = $TestRoute.Clone()
                         $Splat.Ensure = 'Absent'
                         Set-TargetResource @Splat
@@ -230,31 +245,31 @@ try
                 }
             }
         }
-    
+
         Describe "$($Global:DSCResourceName)\Test-TargetResource" {
 
             Context 'Route does not exist but should' {
-                
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
                 Mock Get-NetRoute
-    
+
                 It 'should return false' {
                     $Splat = $TestRoute.Clone()
                     Test-TargetResource @Splat | Should Be $False
-                    
+
                 }
                 It 'should call expected Mocks' {
                     Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                 }
             }
-    
+
             Context 'Route exists and should but has a different RouteMetric' {
-                
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
                 Mock Get-NetRoute -MockWith { $MockRoute }
-    
+
                 It 'should return false' {
-                    { 
+                    {
                         $Splat = $TestRoute.Clone()
                         $Splat.RouteMetric = $Splat.RouteMetric + 5
                         Test-TargetResource @Splat | Should Be $False
@@ -264,14 +279,14 @@ try
                     Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                 }
             }
-    
+
             Context 'Route exists and should but has a different Publish' {
-                
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
                 Mock Get-NetRoute -MockWith { $MockRoute }
-    
+
                 It 'should return false' {
-                    { 
+                    {
                         $Splat = $TestRoute.Clone()
                         $Splat.Publish = 'Yes'
                         Test-TargetResource @Splat | Should Be $False
@@ -283,12 +298,12 @@ try
             }
 
             Context 'Route exists and should but has a different PreferredLifetime' {
-                
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
                 Mock Get-NetRoute -MockWith { $MockRoute }
-    
+
                 It 'should return false' {
-                    { 
+                    {
                         $Splat = $TestRoute.Clone()
                         $Splat.PreferredLifetime = $Splat.PreferredLifetime + 5000
                         Test-TargetResource @Splat | Should Be $False
@@ -300,12 +315,12 @@ try
             }
 
             Context 'Route exists and should and all parameters match' {
-                
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
                 Mock Get-NetRoute -MockWith { $MockRoute }
-    
+
                 It 'should return true' {
-                    { 
+                    {
                         $Splat = $TestRoute.Clone()
                         Test-TargetResource @Splat | Should Be $True
                     } | Should Not Throw
@@ -314,14 +329,14 @@ try
                     Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                 }
             }
-    
+
             Context 'Route exists but should not' {
-                
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
                 Mock Get-NetRoute -MockWith { $MockRoute }
-    
+
                 It 'should return false' {
-                    { 
+                    {
                         $Splat = $TestRoute.Clone()
                         $Splat.Ensure = 'Absent'
                     Test-TargetResource @Splat | Should Be $False
@@ -331,14 +346,14 @@ try
                     Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                 }
             }
-    
+
             Context 'Route does not exist and should not' {
-                
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
                 Mock Get-NetRoute
-    
+
                 It 'should return true' {
-                    { 
+                    {
                         $Splat = $TestRoute.Clone()
                         $Splat.Ensure = 'Absent'
                         Test-TargetResource @Splat | Should Be $True
@@ -351,9 +366,9 @@ try
         }
 
         Describe "$($Global:DSCResourceName)\Test-ResourceProperty" {
-      
+
             Context 'invoking with bad interface alias' {
-    
+
                 Mock Get-NetAdapter
 
                 It 'should throw an InterfaceNotAvailable error' {
@@ -364,21 +379,21 @@ try
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
-    
+
                     { Test-ResourceProperty @TestRoute } | Should Throw $ErrorRecord
                 }
             }
 
             Context 'invoking with bad IPv4 DestinationPrefix address' {
-    
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
 
                 It 'should throw an AddressFormatError error' {
                     $Splat = $TestRoute.Clone()
                     $Splat.DestinationPrefix = '10.0.300.0/24'
                     $Splat.NextHop = '10.0.1.0'
-                    $Splat.AddressFamily = 'IPv4'                    
-                    
+                    $Splat.AddressFamily = 'IPv4'
+
                     $errorId = 'AddressFormatError'
                     $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
                     $errorMessage = $($LocalizedData.AddressFormatError) -f '10.0.300.0'
@@ -386,13 +401,13 @@ try
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
-    
+
                     { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
-               
+
             Context 'invoking with bad IPv6 DestinationPrefix address' {
-    
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
 
                 It 'should throw an AddressFormatError error' {
@@ -408,13 +423,13 @@ try
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
-    
+
                     { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
             Context 'invoking with IPv4 DestinationPrefix mismatch' {
-    
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
 
                 It 'should throw an AddressIPv6MismatchError error' {
@@ -422,7 +437,7 @@ try
                     $Splat.DestinationPrefix = 'fe80::/64'
                     $Splat.NextHop = '10.0.1.0'
                     $Splat.AddressFamily = 'IPv4'
-                    
+
                     $errorId = 'AddressIPv6MismatchError'
                     $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
                     $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f 'fe80::','IPv4'
@@ -430,13 +445,13 @@ try
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
-    
+
                     { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
             Context 'invoking with IPv6 DestinationPrefix mismatch' {
-    
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
 
                 It 'should throw an AddressIPv4MismatchError error' {
@@ -444,7 +459,7 @@ try
                     $Splat.DestinationPrefix = '10.0.0.0/24'
                     $Splat.NextHop = 'fe81::'
                     $Splat.AddressFamily = 'IPv6'
-                    
+
                     $errorId = 'AddressIPv4MismatchError'
                     $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
                     $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f '10.0.0.0','IPv6'
@@ -452,13 +467,13 @@ try
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
-    
+
                     { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
             Context 'invoking with bad IPv4 NextHop address' {
-    
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
 
                 It 'should throw an AddressFormatError error' {
@@ -474,13 +489,13 @@ try
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
-    
+
                     { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
-               
+
             Context 'invoking with bad IPv6 NextHop address' {
-    
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
 
                 It 'should throw an AddressFormatError error' {
@@ -496,13 +511,13 @@ try
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
-    
+
                     { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
             Context 'invoking with IPv4 NextHop mismatch' {
-    
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
 
                 It 'should throw an AddressIPv6MismatchError error' {
@@ -510,7 +525,7 @@ try
                     $Splat.DestinationPrefix = '10.0.0.0/24'
                     $Splat.NextHop = 'fe90::'
                     $Splat.AddressFamily = 'IPv4'
-                                        
+
                     $errorId = 'AddressIPv6MismatchError'
                     $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
                     $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f 'fe90::','IPv4'
@@ -518,13 +533,13 @@ try
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
-    
+
                     { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
             Context 'invoking with IPv6 NextHop mismatch' {
-    
+
                 Mock Get-NetAdapter -MockWith { $MockNetAdapter }
 
                 It 'should throw an AddressIPv4MismatchError error' {
@@ -532,7 +547,7 @@ try
                     $Splat.DestinationPrefix = 'fe80::/64'
                     $Splat.NextHop = '10.0.1.0'
                     $Splat.AddressFamily = 'IPv6'
-                    
+
                     $errorId = 'AddressIPv4MismatchError'
                     $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
                     $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f '10.0.1.0','IPv6'
@@ -540,7 +555,7 @@ try
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
-    
+
                     { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
