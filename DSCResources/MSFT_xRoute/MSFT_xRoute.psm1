@@ -175,7 +175,13 @@ function Set-TargetResource
 
         if ($Route)
         {
-            # The Route exists - remove it
+            <#
+            The Route exists - remove it
+            Use the parameters passed to Set-TargetResource to delete the appropriate route.
+            Clear the Publish and PreferredLifetime parameters so they aren't passed to the
+            Remove-NetRoute cmdlet.
+            #>
+
             $null = $PSBoundParameters.Remove('Publish')
             $null = $PSBoundParameters.Remove('PreferredLifetime')
 
