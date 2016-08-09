@@ -49,7 +49,7 @@ try
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Ad_Config"}
+            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Add_Config"}
             $current.InterfaceAlias    | Should Be $TestRoute.InterfaceAlias
             $current.AddressFamily     | Should Be $TestRoute.AddressFamily
             $current.DestinationPrefix | Should Be $TestRoute.DestinationPrefix
@@ -69,7 +69,7 @@ try
         NextHop                 = '11.0.1.0'
         RouteMetric             = 200
     }
-    New-NetRoute @DummyRoute
+    $null = New-NetRoute @DummyRoute
 
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Remove.config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
@@ -89,14 +89,12 @@ try
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
+            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Remove_Config"}
             $current.InterfaceAlias    | Should Be $TestRoute.InterfaceAlias
             $current.AddressFamily     | Should Be $TestRoute.AddressFamily
             $current.DestinationPrefix | Should Be $TestRoute.DestinationPrefix
             $current.NextHop           | Should Be $TestRoute.NextHop
             $current.Ensure            | Should Be 'Absent'
-            $current.RouteMetric       | Should Be $TestRoute.RouteMetric
-            $current.Publish           | Should Be $TestRoute.Publish
         }
 
         It 'Should not delete the dummy route' {
@@ -108,10 +106,10 @@ try
 finally
 {
     # Clean up any created routes just in case the integration tests fail
-    Remove-NetRoute @DummyRoute `
+    $null = Remove-NetRoute @DummyRoute `
         -Confirm:$false `
         -ErrorAction SilentlyContinue
-    Remove-NetRoute `
+    $null = Remove-NetRoute `
         -InterfaceAlias $TestRoute.InterfaceAlias `
         -AddressFamily $TestRoute.AddressFamily `
         -DestinationPrefix $TestRoute.DestinationPrefix `
