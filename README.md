@@ -191,6 +191,8 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased
+
+### 2.11.0.0
 * Added the following resources:
     * MSFT_xDnsClientGlobalSetting resource to configure the DNS Suffix Search List and Devolution.
 * Converted AppVeyor.yml to pull Pester from PSGallery instead of Chocolatey.
