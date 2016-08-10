@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '2.10.0.0'
+ModuleVersion = '2.11.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -50,8 +50,13 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '* Added the following resources:
-    * MSFT_xNetAdapterBinding resource to enable/disable network adapter bindings.
-* Updated Sample_xIPAddress_*.ps1 examples to show correct usage of setting a Static IP address to prevent issue when DHCP assigned IP address already matches staticly assigned IP address.
+    * MSFT_xDnsClientGlobalSetting resource to configure the DNS Suffix Search List and Devolution.
+* Converted AppVeyor.yml to pull Pester from PSGallery instead of Chocolatey.
+* Changed AppVeyor.yml to use default image.
+* Fix xNetBios unit tests to work on default appveyor image.
+* Fix bug in xRoute when removing an existing route.
+* Updated xRoute integration tests to use v1.1.0 test header.
+* Extended xRoute integration tests to perform both add and remove route tests.
 
 '
 
@@ -59,4 +64,5 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 

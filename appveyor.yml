@@ -1,16 +1,16 @@
 #---------------------------------#
 #      environment configuration  #
 #---------------------------------#
-os: WMF 5
-version: 2.10.{build}.0
+version: 2.11.{build}.0
 install:
-  - cinst -y pester
   - git clone https://github.com/PowerShell/DscResource.Tests
-  - ps: Push-Location
-  - cd DscResource.Tests
-  - ps: Import-Module .\TestHelper.psm1 -force
-  - ps: Pop-Location
-  - ps: Get-PackageProvider -name nuget -ForceBootStrap -Force
+  - ps: |
+        Push-Location
+        cd DscResource.Tests
+        Import-Module .\TestHelper.psm1 -force
+        Pop-Location
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+        Install-Module -Name Pester -Repository PSGallery -Force
 
 #---------------------------------#
 #      build configuration        #
@@ -41,7 +41,7 @@ deploy_script:
       # Creating project artifact
       $stagingDirectory = (Resolve-Path ..).Path
       $manifest = Join-Path $pwd "xNetworking.psd1"
-      (Get-Content $manifest -Raw).Replace("2.10.0.0", $env:APPVEYOR_BUILD_VERSION) | Out-File $manifest
+      (Get-Content $manifest -Raw).Replace("2.11.0.0", $env:APPVEYOR_BUILD_VERSION) | Out-File $manifest
       $zipFilePath = Join-Path $stagingDirectory "$(Split-Path $pwd -Leaf).zip"
       Add-Type -assemblyname System.IO.Compression.FileSystem
       [System.IO.Compression.ZipFile]::CreateFromDirectory($pwd, $zipFilePath)
