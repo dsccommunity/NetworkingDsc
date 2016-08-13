@@ -191,6 +191,15 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased
+* Corrected integration test filenames:
+    * MSFT_xDefaultGatewayAddress.Integration.Tests.ps1
+    * MSFT_xDhcpClient.Integration.Tests.ps1
+    * MSFT_xDNSConnectionSuffix.Integration.Tests.ps1
+    * MSFT_xNetAdapterBinding.Integration.Tests.ps1
+* Updated all integration tests to use v1.1.0 header and script variable context.
+* Updated all unit tests to use v1.1.0 header and script variable context.
+* Removed unneccessary global variable from MSFT_xNetworkTeam.integration.tests.ps1
+* Converted Invoke-Expression in all integration tests to &.
 
 ### 2.11.0.0
 * Added the following resources:
