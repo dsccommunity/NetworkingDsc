@@ -16,6 +16,7 @@ The **xNetworking** module contains the following resources:
 * **xNetworkTeamInterface**
 * **xHostsFile**
 * **xNetAdapterBinding**
+* **xDnsClientGlobalSetting**
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
@@ -147,6 +148,12 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **ComponentId**: Specifies the underlying name of the transport or filter in the following form - ms_xxxx, such as ms_tcpip. Mandatory.
 * **State**: Specifies if the component ID for the Interface should be Enabled or Disabled. Optional. Defaults to Enabled. { Enabled | Disabled }.
 
+### xDnsClientGlobalSetting
+* **IsSingleInstance**: Specifies the resource is a single instance, the value must be 'Yes'.
+* **SuffixSearchList**: Specifies a list of global suffixes that can be used in the specified order by the DNS client for resolving the IP address of the computer name.
+* **UseDevolution**: Specifies that devolution is activated.
+* **DevolutionLevel**: Specifies the number of labels up to which devolution should occur.
+
 ## Functions
 
 ### Get-xNetworkAdapterName
@@ -196,10 +203,21 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
     * MSFT_xNetworkTeamInterface resource to add/remove network team interfaces
 * Added conditional loading of LocalizedData to MSFT_xHostsFile and MSFT_xNetworkTeam to prevent failures while loading those resources on systems with $PSUICulture other than en-US
 
+### 2.11.0.0
+* Added the following resources:
+    * MSFT_xDnsClientGlobalSetting resource to configure the DNS Suffix Search List and Devolution.
+* Converted AppVeyor.yml to pull Pester from PSGallery instead of Chocolatey.
+* Changed AppVeyor.yml to use default image.
+* Fix xNetBios unit tests to work on default appveyor image.
+* Fix bug in xRoute when removing an existing route.
+* Updated xRoute integration tests to use v1.1.0 test header.
+* Extended xRoute integration tests to perform both add and remove route tests.
+
 ### 2.10.0.0
 
 * Added the following resources:
     * MSFT_xNetAdapterBinding resource to enable/disable network adapter bindings.
+* Fixed bug where xHostsFile would duplicate an entry instead of updating an existing one
 * Updated Sample_xIPAddress_*.ps1 examples to show correct usage of setting a Static IP address to prevent issue when DHCP assigned IP address already matches staticly assigned IP address.
 
 ### 2.9.0.0
@@ -970,4 +988,42 @@ Configuration SetDns
         }
     }
 }
+```
+
+### Set the DNS Client Global Setting Suffix Search List
+This example will set the DNS Global Suffix Search list to 'contoso.com'.
+
+```PowerShell
+configuration Sample_xDnsClientGlobalSetting_SuffixSearchList
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost',
+
+        [Parameter(Mandatory)]
+        [string[]]$SuffixSearchList,
+
+        [Parameter(Mandatory)]
+        [boolean]$UseDevolution = $true,
+
+        [Parameter(Mandatory)]
+        [uint32]$DevolutionLevel = 0
+    )
+
+    Import-DscResource -Module xDnsClientGlobalSetting
+
+    Node $NodeName
+    {
+        xDhcpClient EnableDhcpClient
+        {
+            IsSingleInstance = 'Yes'
+            SuffixSearchList = $SuffixSearchList
+            UseDevolution    = $UseDevolution
+            DevolutionLevel  = $DevolutionLevel
+        }
+    }
+}
+
+Sample_xDnsClientGlobalSetting_SuffixSearchList -SuffixSearchList 'contoso.com'
+Start-DscConfiguration -Path Sample_xDnsClientGlobalSetting_SuffixSearchList -Wait -Verbose -Force
 ```

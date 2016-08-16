@@ -1,13 +1,9 @@
 ConvertFrom-StringData @'    
-    checkingHostsFileEntry=Checking if the hosts file entry exists.
-    hostsFileEntryFound=Found a hosts file entry for {0} and {1}.
-    hostsFileEntryNotFound=Did not find a hosts file entry for {0} and {1}.
-    hostsFileShouldNotExist=Hosts file entry exists while it should not.
-    hostsFileEntryShouldExist=Hosts file entry does not exist while it should.
-    creatingHostsFileEntry=Creating a hosts file entry with {0} and {1}.
-    removingHostsFileEntry=Removing a hosts file entry with {0} and {1}.
-    hostsFileEntryAdded=Created the hosts file entry for {0} and {1}.
-    hostsFileEntryRemoved=Removed the hosts file entry for {0} and {1}.
-    anErrorOccurred=An error occurred while creating hosts file entry: {1}.
-    innerException=Nested error trying to create hosts file entry: {1}.
+    UnableToEnsureWithoutIP=Unable to ensure a host entry is present without a corresponding IP address. Please add the IPAddress property and run this resource again.
+    CreateNewEntry=Creating new host entry for {0}
+    UpdateExistingEntry=Updating existing host entry for {0}
+    RemoveEntry=Removing host entry for {0}
+    StartingGet=Looking up host entry for {0}
+    StartingSet=Setting host entry for {0}
+    StartingTest=Testing host entry for {0}
 '@
