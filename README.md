@@ -198,8 +198,9 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
     * MSFT_xNetAdapterBinding.Integration.Tests.ps1
 * Updated all integration tests to use v1.1.0 header and script variable context.
 * Updated all unit tests to use v1.1.0 header and script variable context.
-* Removed unneccessary global variable from MSFT_xNetworkTeam.integration.tests.ps1
+* Removed uneccessary global variable from MSFT_xNetworkTeam.integration.tests.ps1
 * Converted Invoke-Expression in all integration tests to &.
+* Fixed unit test description in xNetworkAdapter.Tests.ps1
 
 ### 2.11.0.0
 * Added the following resources:
