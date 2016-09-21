@@ -198,6 +198,8 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased
+
+### 2.12.0.0
 * Fixed bug in MSFT_xIPAddress resource when xIPAddress follows xVMSwitch.
 
 * Added the following resources:

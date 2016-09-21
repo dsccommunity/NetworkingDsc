@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '2.11.0.0'
+ModuleVersion = '2.12.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -49,14 +49,11 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '* Added the following resources:
-    * MSFT_xDnsClientGlobalSetting resource to configure the DNS Suffix Search List and Devolution.
-* Converted AppVeyor.yml to pull Pester from PSGallery instead of Chocolatey.
-* Changed AppVeyor.yml to use default image.
-* Fix xNetBios unit tests to work on default appveyor image.
-* Fix bug in xRoute when removing an existing route.
-* Updated xRoute integration tests to use v1.1.0 test header.
-* Extended xRoute integration tests to perform both add and remove route tests.
+        ReleaseNotes = '* Fixed bug in MSFT_xIPAddress resource when xIPAddress follows xVMSwitch.
+
+* Added the following resources:
+    * MSFT_xNetworkTeamInterface resource to add/remove network team interfaces
+* Added conditional loading of LocalizedData to MSFT_xHostsFile and MSFT_xNetworkTeam to prevent failures while loading those resources on systems with $PSUICulture other than en-US
 
 '
 
@@ -64,5 +61,6 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
