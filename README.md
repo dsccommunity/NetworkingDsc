@@ -13,6 +13,7 @@ The **xNetworking** module contains the following resources:
 * **xRoute**
 * **xNetBIOS**
 * **xNetworkTeam**
+* **xNetworkTeamInterface**
 * **xHostsFile**
 * **xNetAdapterBinding**
 * **xDnsClientGlobalSetting**
@@ -131,6 +132,12 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **LoadBalancingAlgorithm**: Specifies the load balancing algorithm for the network team. { Dynamic | HyperVPort | IPAddresses | MacAddresses | TransportPorts }.
 * **Ensure**: Specifies if the network team should be created or deleted. { Present | Absent }.
 
+### xNetworkTeamInterface
+* **Name**: Specifies the name of the network team interface to create.
+* **TeamName**: Specifies the name of the network team on which this particular interface should exist.
+* **VlanID**: Specifies VlanID to be set on network team interface.
+* **Ensure**: Specifies if the network team interface should be created or deleted. { Present | Absent }
+
 ### xHostsFile
 * **HostName**: Specifies the name of the computer that will be mapped to an IP address.
 * **IPAddress**: Specifies the IP Address that should be mapped to the host name.
@@ -191,6 +198,13 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased
+
+### 2.12.0.0
+* Fixed bug in MSFT_xIPAddress resource when xIPAddress follows xVMSwitch.
+
+* Added the following resources:
+    * MSFT_xNetworkTeamInterface resource to add/remove network team interfaces
+* Added conditional loading of LocalizedData to MSFT_xHostsFile and MSFT_xNetworkTeam to prevent failures while loading those resources on systems with $PSUICulture other than en-US
 
 ### 2.11.0.0
 * Added the following resources:
@@ -834,6 +848,44 @@ configuration Sample_xNetworkTeam_AddTeam
 
 Sample_xNetworkTeam_AddTeam
 Start-DscConfiguration -Path Sample_xNetworkTeam_AddTeam -Wait -Verbose -Force
+```
+
+## Create a network team interface
+This example shows adding a network team interface to native network team.
+
+```powershell
+configuration Sample_xNetworkTeamInterface_AddInterface
+{
+    param
+    (
+        [string[]]$NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xNetworkTeam HostTeam
+        {
+          Name = 'HostTeam'
+          TeamingMode = 'SwitchIndependent'
+          LoadBalancingAlgorithm = 'HyperVPort'
+          TeamMembers = 'NIC1','NIC2'
+          Ensure = 'Present'
+        }
+        
+        xNetworkTeamInterface NewInterface {
+            Name = 'NewInterface'
+            TeamName = 'HostTeam'
+            VlanID = 100
+            Ensure = 'Present'
+            DependsOn = '[xNetworkTeam]HostTeam'
+        }
+    }
+ }
+
+Sample_xNetworkTeamInterface_AddInterface
+Start-DscConfiguration -Path Sample_xNetworkTeamInterface_AddInterface -Wait -Verbose -Force
 ```
 
 ### Add a hosts file entry

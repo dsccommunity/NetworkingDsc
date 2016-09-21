@@ -191,10 +191,25 @@ function Test-TargetResource
     Test-ResourceProperty @PSBoundParameters
 
     # Get the current IP Address based on the parameters given.
-    $currentIPs = @(Get-NetIPAddress `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily `
-        -ErrorAction Stop)
+     # First make sure that adapter is available
+    [Boolean] $adapterBindingReady = $false
+    [DateTime] $startTime = Get-Date 
+
+    while (-not $adapterBindingReady -and (((Get-Date) - $startTime).TotalSeconds) -lt 30)
+    {      
+        $currentIPs = @(Get-NetIPAddress `
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily `
+            -ErrorAction SilentlyContinue)
+        if ($currentIPs)
+        {
+            $adapterBindingReady = $true
+        }
+        else
+        {
+            Start-Sleep -Milliseconds 200
+        }
+    } # while
 
     # Test if the IP Address passed is present
     if ($IPAddress -notin $currentIPs.IPAddress)

@@ -1,4 +1,16 @@
-﻿Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeam.psd1 -BaseDirectory $PSScriptRoot -Verbose
+﻿#region localizeddata
+if (Test-Path "${PSScriptRoot}\${PSUICulture}")
+{
+    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeam.psd1 `
+                         -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
+} 
+else
+{
+    #fallback to en-US
+    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeam.psd1 `
+                         -BaseDirectory "${PSScriptRoot}\en-US"
+}
+#endregion
 
 Function Get-TargetResource
 {
