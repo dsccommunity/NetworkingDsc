@@ -1,26 +1,27 @@
-﻿$Global:DSCModuleName      = 'xNetworking'
-$Global:DSCResourceName    = 'MSFT_xNetAdapterBinding'
+﻿$script:DSCModuleName      = 'xNetworking'
+$script:DSCResourceName    = 'MSFT_xNetAdapterBinding'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
-[String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
-if ( (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
-Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $Global:DSCModuleName `
-    -DSCResourceName $Global:DSCResourceName `
+    -DSCModuleName $script:DSCModuleName `
+    -DSCResourceName $script:DSCResourceName `
     -TestType Unit
 #endregion HEADER
 
 # Begin Testing
 try
 {
-    InModuleScope $Global:DSCResourceName {
+    InModuleScope $script:DSCResourceName {
+
         $TestBindingEnabled = @{
             InterfaceAlias = 'Ethernet'
             ComponentId = 'ms_tcpip63'
@@ -45,7 +46,7 @@ try
             Enabled = $False
         }
 
-        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
+        Describe "MSFT_xNetAdapterBinding\Get-TargetResource" {
             Context 'Adapter exists and binding Enabled' {
                 Mock Get-Binding -MockWith { $MockBindingEnabled }
 
@@ -75,7 +76,7 @@ try
             }
         }
 
-        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
+        Describe "MSFT_xNetAdapterBinding\Set-TargetResource" {
             Context 'Adapter exists and set binding to Enabled' {
                 Mock Get-Binding -MockWith { $MockBindingDisabled }
                 Mock Enable-NetAdapterBinding
@@ -105,7 +106,7 @@ try
             }
         }
 
-        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
+        Describe "MSFT_xNetAdapterBinding\Test-TargetResource" {
             Context 'Adapter exists, current binding set to Enabled but want it Disabled' {
                 Mock Get-Binding -MockWith { $MockBindingEnabled }
                 It 'Should return false' {
@@ -147,7 +148,7 @@ try
             }
         }
 
-        Describe "$($Global:DSCResourceName)\Get-Binding" {
+        Describe "MSFT_xNetAdapterBinding\Get-Binding" {
             Context 'Adapter does not exist' {
                 Mock Get-NetAdapter
                 It 'Should throw an InterfaceNotAvailable error' {
