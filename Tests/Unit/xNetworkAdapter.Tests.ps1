@@ -1,4 +1,4 @@
-$Global:ModuleName = 'xNetworkAdapter'
+$moduleName = 'xNetworkAdapter'
 
 #region HEADER
 [String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
@@ -12,255 +12,262 @@ else
     & git @('-C',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'),'pull')
 }
 Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-Import-Module (Join-Path -Path $moduleRoot -ChildPath "$Global:ModuleName.psm1") -Force
+Import-Module (Join-Path -Path $moduleRoot -ChildPath "$moduleName.psm1") -Force
 
 #endregion
 
 # Begin Testing
 try
 {
-    #region Pester Tests
-    InModuleScope $Global:ModuleName {
+    Set-StrictMode -Version latest
+    $ErrorActionPreference = 'stop'
     
-        # Create the Mock Objects that will be used for running tests
-        $MockNetAdapter = [PSCustomObject] @{
-            Name                    = 'Ethernet'
-            PhysicalMediaType              = '802.3'
-            Status                         = 'Up'
-        }
+    #region Pester Tests
 
-        $MockHypervVmNetAdapter = [PSCustomObject] @{
-            Name                    = 'Ethernet'
-            PhysicalMediaType              = 'Unspecified'
-            Status                         = 'Up'
+    $GetNetAdapter_PhysicalNetAdapterMock = {
+        return [PSCustomObject] @{
+            Name              = 'Ethernet'
+            PhysicalMediaType = '802.3'
+            Status            = 'Up'
         }
-        
-        $MockMultipleNetAdapter = @(
+    }
+
+    $GetNetAdapter_HypervVmNetAdapterMock = {
+        return [PSCustomObject] @{
+            Name              = 'Ethernet'
+            PhysicalMediaType = 'Unspecified'
+            Status            = 'Up'
+        }
+    }
+
+    $GetNetAdapter_MultipleNetAdapterMock = {
+        return @(
             [PSCustomObject] @{
-                Name                    = 'Ethernet1'
-                PhysicalMediaType              = '802.3'
-                Status                         = 'Up'
+                Name               = 'Ethernet1'
+                PhysicalMediaType  = '802.3'
+                Status             = 'Up'
             },
             [PSCustomObject] @{
-                Name                    = 'MyEthernet'
-                PhysicalMediaType              = '802.3'
-                Status                         = 'Up'
+                Name               = 'MyEthernet'
+                PhysicalMediaType  = '802.3'
+                Status             = 'Up'
             }
         )
+    }
 
-        $TestAdapterKeys = @{
-            Name                           = 'MyEthernet'
-            PhysicalMediaType              = '802.3'
-            Status                         = 'Up'
-        } 
+    $TestAdapterKeys = @{
+        Name               = 'MyEthernet'
+        PhysicalMediaType  = '802.3'
+        Status             = 'Up'
+    }
 
-        $TestHypervVmAdapterKeys = @{
-            Name                           = 'MyEthernet'
-            Status                         = 'Up'
-        } 
+    $TestHypervVmAdapterKeys = @{
+        Name                           = 'MyEthernet'
+        Status                         = 'Up'
+    } 
   
-        Describe "$($Global:ModuleName)\Get-xNetworkAdapterName" {
+    Describe "$moduleName\Get-xNetworkAdapterName" {
     
-            Context 'Adapter does not exist' {
+        Context 'Adapter does not exist' {
+            Mock Get-NetAdapter -ModuleName $moduleName
                 
-                Mock Get-NetAdapter
     
-                It 'should return absent Route' {
-                    $Result = Get-xNetworkAdapterName @TestAdapterKeys
-                    $Result.MatchingAdapterCount | Should Be 0
-                    $Result.Name | Should Be $null
-                }
-                It 'should call the expected mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                } 
+            It 'should return absent Route' {
+                $Result = Get-xNetworkAdapterName @TestAdapterKeys
+                $Result.MatchingAdapterCount | Should Be 0
+                $Result.Name | Should Be $null
             }
-    
-            Context 'Adapter does exist' {
-                
-                Mock Get-NetAdapter -MockWith { $MockNetAdapter }
-    
-                It 'should return correct Route' {
-                    $Result = Get-xNetworkAdapterName @TestAdapterKeys
-                    $Result.MatchingAdapterCount | Should Be 1
-                    $Result.Name | Should Be 'Ethernet'
-                }
-                It 'should call the expected mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                }
-            }
-            Context 'Hyperv VM Adapter does exist' {
-                
-                Mock Get-NetAdapter -MockWith { $MockHypervVmNetAdapter }
-    
-                It 'should return correct Route' {
-                    $Result = Get-xNetworkAdapterName @TestHypervVmAdapterKeys
-                    $Result.MatchingAdapterCount | Should Be 1
-                    $Result.Name | Should Be 'Ethernet'
-                }
-                It 'should call the expected mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                }
-            }
-            Context 'Multiple Adapters exist' {
-                
-                Mock Get-NetAdapter -MockWith { $MockMultipleNetAdapter }
-    
-                It 'should return correct Route' {
-                    $Result = Get-xNetworkAdapterName `
-                        @TestAdapterKeys
-                    $Result.MatchingAdapterCount | Should Be 1
-                    $Result.Name | Should Be 'MyEthernet'
-                }
-                It 'should call the expected mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                }
-            }
+            It 'should call the expected mocks' {
+                Assert-MockCalled -ModuleName $moduleName -commandName Get-NetAdapter -Exactly 1
+            } 
         }
     
-        Describe "$($Global:ModuleName)\Set-xNetworkAdapterName" {
-    
-            Context 'Adapter does not exist' {
+        Context 'Adapter does exist' {
                 
-                Mock Get-NetAdapter
-                Mock Rename-NetAdapter
+            Mock Get-NetAdapter -ModuleName $moduleName -MockWith $GetNetAdapter_PhysicalNetAdapterMock
     
-                It 'should not throw error' {
-                    { 
-                        $Splat = $TestAdapterKeys.Clone()
-                        Set-xNetworkAdapterName @Splat
-                    } | Should Throw 'A NetAdapter matching the properties was not found. Please correct the properties and try again.'
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Rename-NetAdapter -Exactly 0
-                }
+            It 'should return correct Route' {
+                $Result = Get-xNetworkAdapterName @TestAdapterKeys
+                $Result.MatchingAdapterCount | Should Be 1
+                $Result.Name | Should Be 'Ethernet'
             }
-    
-            Context 'Adapter exists and should be renamed' {
-                
-                Mock Get-NetAdapter -MockWith { $MockNetAdapter }
-                Mock Rename-NetAdapter
-    
-                It 'should not throw error' {
-                    { 
-                        $Splat = $TestAdapterKeys.Clone()
-                        Set-xNetworkAdapterName @Splat
-                    } | Should Not Throw
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Rename-NetAdapter -Exactly 1
-                }
+            It 'should call the expected mocks' {
+                Assert-MockCalled -ModuleName $moduleName -commandName Get-NetAdapter -Exactly 1
             }
-            Context 'Hyperv VM Adapter exists and should be renamed' {
-                
-                Mock Get-NetAdapter -MockWith { $MockHypervVmNetAdapter }
-                Mock Rename-NetAdapter
-    
-                It 'should not throw error' {
-                    { 
-                        $Splat = $TestHypervVmAdapterKeys.Clone()
-                        Set-xNetworkAdapterName @Splat
-                    } | Should Not Throw
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Rename-NetAdapter -Exactly 1
-                }
-            }
-            Context 'Multiple matching adapter exists and IgnoreMultipleMatchingAdapters is true and name matches' {
-                
-                Mock Get-NetAdapter -MockWith { $MockMultipleNetAdapter }
-                Mock Rename-NetAdapter
-    
-                It 'should not throw error' {
-                    { 
-                        $Splat = $TestAdapterKeys.Clone()
-                        Set-xNetworkAdapterName @Splat
-                    } | Should Not Throw
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Rename-NetAdapter -Exactly 0
-                }
-            }
-            Context 'Multiple matching adapter exists and IgnoreMultipleMatchingAdapters is true and name mismatches' {
-                
-                Mock Get-NetAdapter -MockWith { $MockMultipleNetAdapter }
-                Mock Rename-NetAdapter
-    
-                It 'should not throw error' {
-                    { 
-                        $Splat = $TestAdapterKeys.Clone()
-                        $Splat.Name = 'MyEthernet2'
-                        $Splat.IgnoreMultipleMatchingAdapters = $true
-                        Set-xNetworkAdapterName @Splat
-                    } | Should Not Throw
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Rename-NetAdapter -Exactly 1
-                }
-            }
-            Context 'Multiple matching adapter exists and IgnoreMultipleMatchingAdapters is false' {
-                
-                Mock Get-NetAdapter -MockWith { $MockMultipleNetAdapter }
-                Mock Rename-NetAdapter
-    
-                It 'should not throw error' {
-                    { 
-                        $Splat = $TestAdapterKeys.Clone()
-                        $Splat.Name = 'MyEthernet2'
-                        $Splat.IgnoreMultipleMatchingAdapters = $false
-                        Set-xNetworkAdapterName @Splat
-                    } | Should Throw 'Multiple matching NetAdapters where found for the properties. Please correct the properties or specify IgnoreMultipleMatchingAdapters to only use the first and try again.'                    
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Rename-NetAdapter -Exactly 0
-                }
-            }        }
-    
-        Describe "$($Global:ModuleName)\Test-xNetworkAdapterName" {
-
-            Context 'NetAdapter does not exist' {
-                
-                Mock Get-NetAdapter -MockWith { $MockNetAdapter }
-    
-                It 'should return false' {
-                    $Splat = $TestAdapterKeys.Clone()
-                    Test-xNetworkAdapterName @Splat | Should Be $False
-                    
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                }
-            }
-    
-            Context 'NetAdapter exists and should but renamed' {
-                
-                Mock Get-NetAdapter -MockWith { $MockNetAdapter }
-    
-                It 'should return false' {
-                    { 
-                       $Splat = $TestAdapterKeys.Clone()
-                        Test-xNetworkAdapterName @Splat | Should Be $False
-                    } | Should Not Throw
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                }
-            }
-    
         }
-
-        Describe "$($Global:ModuleName)\Test-ResourceProperty" {
-      
-            Context 'TBD' {
-  
+        Context 'Hyperv VM Adapter does exist' {
+                
+            Mock Get-NetAdapter -ModuleName $moduleName -MockWith $GetNetAdapter_HypervVmNetAdapterMock
+    
+            It 'should return correct Route' {
+                $Result = Get-xNetworkAdapterName @TestHypervVmAdapterKeys
+                $Result.MatchingAdapterCount | Should Be 1
+                $Result.Name | Should Be 'Ethernet'
+            }
+            It 'should call the expected mocks' {
+                Assert-MockCalled -ModuleName $moduleName -commandName Get-NetAdapter -Exactly 1
+            }
+        }
+        Context 'Multiple Adapters exist' {
+                
+            Mock Get-NetAdapter -ModuleName $moduleName -MockWith $GetNetAdapter_MultipleNetAdapterMock
+    
+            It 'should return correct Route' {
+                $Result = Get-xNetworkAdapterName `
+                    @TestAdapterKeys
+                $Result.MatchingAdapterCount | Should Be 1
+                $Result.Name | Should Be 'MyEthernet'
+            }
+            It 'should call the expected mocks' {
+                Assert-MockCalled -ModuleName $moduleName -commandName Get-NetAdapter -Exactly 1
             }
         }
     }
+    
+    Describe "$moduleName\Set-xNetworkAdapterName" {
+    
+        Context 'Adapter does not exist' {
+                
+            Mock Get-NetAdapter -ModuleName $moduleName 
+            Mock Rename-NetAdapter -ModuleName $moduleName 
+    
+            It 'should not throw error' {
+                { 
+                    $Splat = $TestAdapterKeys.Clone()
+                    Set-xNetworkAdapterName @Splat
+                } | Should Throw 'A NetAdapter matching the properties was not found. Please correct the properties and try again.'
+            }
+            It 'should call expected Mocks' {
+                Assert-MockCalled -ModuleName $moduleName -commandName Get-NetAdapter -Exactly 1
+                Assert-MockCalled -ModuleName $moduleName -commandName Rename-NetAdapter -Exactly 0
+            }
+        }
+    
+        Context 'Adapter exists and should be renamed' {
+                
+            Mock Get-NetAdapter -ModuleName $moduleName -MockWith $GetNetAdapter_PhysicalNetAdapterMock
+            Mock Rename-NetAdapter -ModuleName $moduleName 
+    
+            It 'should not throw error' {
+                { 
+                    $Splat = $TestAdapterKeys.Clone()
+                    Set-xNetworkAdapterName @Splat
+                } | Should Not Throw
+            }
+            It 'should call expected Mocks' {
+                Assert-MockCalled -ModuleName $moduleName -commandName Get-NetAdapter -Exactly 1
+                Assert-MockCalled -ModuleName $moduleName -commandName Rename-NetAdapter -Exactly 1
+            }
+        }
+        Context 'Hyperv VM Adapter exists and should be renamed' {
+                
+            Mock Get-NetAdapter -ModuleName $moduleName -MockWith $GetNetAdapter_HypervVmNetAdapterMock
+            Mock Rename-NetAdapter -ModuleName $moduleName 
+    
+            It 'should not throw error' {
+                { 
+                    $Splat = $TestHypervVmAdapterKeys.Clone()
+                    Set-xNetworkAdapterName @Splat
+                } | Should Not Throw
+            }
+            It 'should call expected Mocks' {
+                Assert-MockCalled -ModuleName $moduleName -commandName Get-NetAdapter -Exactly 1
+                Assert-MockCalled -ModuleName $moduleName -commandName Rename-NetAdapter -Exactly 1
+            }
+        }
+        Context 'Multiple matching adapter exists and IgnoreMultipleMatchingAdapters is true and name matches' {
+                
+            Mock Get-NetAdapter -ModuleName $moduleName -MockWith $GetNetAdapter_MultipleNetAdapterMock
+            Mock Rename-NetAdapter -ModuleName $moduleName 
+    
+            It 'should not throw error' {
+                { 
+                    $Splat = $TestAdapterKeys.Clone()
+                    Set-xNetworkAdapterName @Splat
+                } | Should Not Throw
+            }
+            It 'should call expected Mocks' {
+                Assert-MockCalled -ModuleName $moduleName -commandName Get-NetAdapter -Exactly 1
+                Assert-MockCalled -ModuleName $moduleName -commandName Rename-NetAdapter -Exactly 0
+            }
+        }
+        Context 'Multiple matching adapter exists and IgnoreMultipleMatchingAdapters is true and name mismatches' {
+                
+            Mock Get-NetAdapter -ModuleName $moduleName -MockWith $GetNetAdapter_MultipleNetAdapterMock
+            Mock Rename-NetAdapter -ModuleName $moduleName 
+    
+            It 'should not throw error' {
+                { 
+                    $Splat = $TestAdapterKeys.Clone()
+                    $Splat.Name = 'MyEthernet2'
+                    $Splat.IgnoreMultipleMatchingAdapters = $true
+                    Set-xNetworkAdapterName @Splat
+                } | Should Not Throw
+            }
+            It 'should call expected Mocks' {
+                Assert-MockCalled -ModuleName $moduleName -commandName Get-NetAdapter -Exactly 1
+                Assert-MockCalled -ModuleName $moduleName -commandName Rename-NetAdapter -Exactly 1
+            }
+        }
+        Context 'Multiple matching adapter exists and IgnoreMultipleMatchingAdapters is false' {
+                
+            Mock Get-NetAdapter -ModuleName $moduleName -MockWith $GetNetAdapter_MultipleNetAdapterMock
+            Mock Rename-NetAdapter -ModuleName $moduleName 
+    
+            It 'should not throw error' {
+                { 
+                    $Splat = $TestAdapterKeys.Clone()
+                    $Splat.Name = 'MyEthernet2'
+                    $Splat.IgnoreMultipleMatchingAdapters = $false
+                    Set-xNetworkAdapterName @Splat
+                } | Should Throw 'Multiple matching NetAdapters where found for the properties. Please correct the properties or specify IgnoreMultipleMatchingAdapters to only use the first and try again.'                    
+            }
+            It 'should call expected Mocks' {
+                Assert-MockCalled -ModuleName $moduleName -commandName Get-NetAdapter -Exactly 1
+                Assert-MockCalled -ModuleName $moduleName -commandName Rename-NetAdapter -Exactly 0
+            }
+        }        }
+    
+    Describe "$moduleName\Test-xNetworkAdapterName" {
+
+        Context 'NetAdapter does not exist' {
+                
+            Mock Get-NetAdapter -ModuleName $moduleName -MockWith $GetNetAdapter_PhysicalNetAdapterMock
+    
+            It 'should return false' {
+                $Splat = $TestAdapterKeys.Clone()
+                Test-xNetworkAdapterName @Splat | Should Be $False
+                    
+            }
+            It 'should call expected Mocks' {
+                Assert-MockCalled -ModuleName $moduleName -commandName Get-NetAdapter -Exactly 1
+            }
+        }
+    
+        Context 'NetAdapter exists and should but renamed' {
+                
+            Mock Get-NetAdapter -ModuleName $moduleName -MockWith $GetNetAdapter_PhysicalNetAdapterMock
+    
+            It 'should return false' {
+                { 
+                    $Splat = $TestAdapterKeys.Clone()
+                    Test-xNetworkAdapterName @Splat | Should Be $False
+                } | Should Not Throw
+            }
+            It 'should call expected Mocks' {
+                Assert-MockCalled -ModuleName $moduleName -commandName Get-NetAdapter -Exactly 1
+            }
+        }
+    
+    }
+
+    Describe "$moduleName\Test-ResourceProperty" {
+      
+        Context 'TBD' {
+  
+        }
+    }
+
     #endregion
 }
 finally
