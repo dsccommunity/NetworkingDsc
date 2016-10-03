@@ -11,7 +11,7 @@ configuration Sample_xIPAddress_StaticIP_Parameterized
         [Parameter(Mandatory)]
         [string]$InterfaceAlias,
 
-        [int]$SubnetMask = 16,
+        [int]$PrefixLength = 16,
 
         [ValidateSet("IPv4","IPv6")]
         [string]$AddressFamily = 'IPv4'
@@ -32,7 +32,7 @@ configuration Sample_xIPAddress_StaticIP_Parameterized
         {
             IPAddress      = $IPAddress
             InterfaceAlias = $InterfaceAlias
-            SubnetMask     = $SubnetMask
+            PrefixLength   = $PrefixLength
             AddressFamily  = $AddressFamily
         }
     }
