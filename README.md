@@ -208,6 +208,8 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 * Removed uneccessary global variable from MSFT_xNetworkTeam.integration.tests.ps1
 * Converted Invoke-Expression in all integration tests to &.
 * Fixed unit test description in xNetworkAdapter.Tests.ps1
+* xNetAdapterBinding
+  * Added support for the use of wildcard (*) in InterfaceAlias parameter.
 
 ### 2.12.0.0
 * Fixed bug in MSFT_xIPAddress resource when xIPAddress follows xVMSwitch.
