@@ -51,9 +51,9 @@ try
                 Mock Get-Binding -MockWith { $MockBindingEnabled }
 
                 It 'should return existing binding' {
-                    $Result = Get-TargetResource @TestBindingDisabled
-                    $Result.InterfaceAlias | Should Be $TestBindingDisabled.InterfaceAlias
-                    $Result.ComponentId | Should Be $TestBindingDisabled.ComponentId
+                    $Result = Get-TargetResource @TestBindingEnabled
+                    $Result.InterfaceAlias | Should Be $TestBindingEnabled.InterfaceAlias
+                    $Result.ComponentId | Should Be $TestBindingEnabled.ComponentId
                     $Result.State | Should Be 'Enabled'
                 }
                 It 'Should call all the mocks' {
@@ -65,9 +65,9 @@ try
                 Mock Get-Binding -MockWith { $MockBindingDisabled }
 
                 It 'should return existing binding' {
-                    $Result = Get-TargetResource @TestBindingEnabled
-                    $Result.InterfaceAlias | Should Be $TestBindingEnabled.InterfaceAlias
-                    $Result.ComponentId | Should Be $TestBindingEnabled.ComponentId
+                    $Result = Get-TargetResource @TestBindingDisabled
+                    $Result.InterfaceAlias | Should Be $TestBindingDisabled.InterfaceAlias
+                    $Result.ComponentId | Should Be $TestBindingDisabled.ComponentId
                     $Result.State | Should Be 'Disabled'
                 }
                 It 'Should call all the mocks' {

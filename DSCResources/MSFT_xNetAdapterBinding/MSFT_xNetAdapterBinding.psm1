@@ -38,14 +38,21 @@ function Get-TargetResource
 
     $CurrentNetAdapterBinding = Get-Binding @PSBoundParameters
 
-    if ($CurrentNetAdapterBinding.Enabled)
+    $AdaptersState = $CurrentNetAdapterBinding.Enabled |
+        Sort-Object -Unique
+
+    If ( $AdaptersState.Count -eq 2)
     {
-        $State = 'Enabled'
+        $CurrentEnabled = 'MixedState'
+    }         
+    ElseIf ( $AdaptersState -eq $true )
+    {
+        $CurrentEnabled = 'Enabled'
     }
-    else
+    Else
     {
-        $State = 'Disabled'
-    } # if
+        $CurrentEnabled = 'Disabled'
+    }
 
     $returnValue = @{
         InterfaceAlias = $InterfaceAlias
@@ -124,14 +131,21 @@ function Test-TargetResource
 
     $CurrentNetAdapterBinding = Get-Binding @PSBoundParameters
 
-    if ($CurrentNetAdapterBinding.Enabled)
+    $AdaptersState = $CurrentNetAdapterBinding.Enabled |
+        Sort-Object -Unique
+
+    If ( $AdaptersState.Count -eq 2)
+    {
+        $CurrentEnabled = 'MixedState'
+    }         
+    ElseIf ( $AdaptersState -eq $true )
     {
         $CurrentEnabled = 'Enabled'
     }
-    else
+    Else
     {
         $CurrentEnabled = 'Disabled'
-    } # if
+    }
 
     # Test if the binding is in the correct state
     if ($CurrentEnabled -ne $State)
