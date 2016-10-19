@@ -7,7 +7,7 @@ $script:DSCResourceName    = 'MSFT_xNetAdapterBinding'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    #& git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -35,7 +35,7 @@ try
         $TestBindingMixed = @{
             InterfaceAlias = '*'
             ComponentId = 'ms_tcpip63'
-            State = 'Mixed'
+            State = 'Enabled'
         }
         $MockAdapter = @{
             InterfaceAlias = 'Ethernet'
@@ -71,6 +71,7 @@ try
                     $Result.InterfaceAlias | Should Be $TestBindingEnabled.InterfaceAlias
                     $Result.ComponentId | Should Be $TestBindingEnabled.ComponentId
                     $Result.State | Should Be 'Enabled'
+                    $Result.CurrentState | Should Be 'Enabled'
                 }
                 It 'Should call all the mocks' {
                     Assert-MockCalled -commandName Get-Binding -Exactly 1
@@ -85,6 +86,7 @@ try
                     $Result.InterfaceAlias | Should Be $TestBindingDisabled.InterfaceAlias
                     $Result.ComponentId | Should Be $TestBindingDisabled.ComponentId
                     $Result.State | Should Be 'Disabled'
+                    $Result.CurrentState | Should Be 'Disabled'
                 }
                 It 'Should call all the mocks' {
                     Assert-MockCalled -commandName Get-Binding -Exactly 1
@@ -98,7 +100,8 @@ try
                     $Result = Get-TargetResource @TestBindingMixed
                     $Result.InterfaceAlias | Should Be $TestBindingMixed.InterfaceAlias
                     $Result.ComponentId | Should Be $TestBindingMixed.ComponentId
-                    $Result.State | Should Be 'Mixed'
+                    $Result.State | Should Be 'Enabled'
+                    $Result.CurrentState | Should Be 'Mixed'
                 }
                 It 'Should call all the mocks' {
                     Assert-MockCalled -commandName Get-Binding -Exactly 1

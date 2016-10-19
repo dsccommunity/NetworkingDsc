@@ -54,10 +54,11 @@ function Get-TargetResource
         $CurrentEnabled = 'Disabled'
     }
 
-    $returnValue[$_.InterfaceAlias] = @{
+    $returnValue = @{
         InterfaceAlias = $InterfaceAlias
         ComponentId    = $ComponentId
         State          = $State
+        CurrentState   = $CurrentEnabled
     }
 
     $returnValue
