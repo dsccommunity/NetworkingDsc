@@ -43,7 +43,7 @@ function Get-TargetResource
 
     If ( $AdaptersState.Count -eq 2)
     {
-        $CurrentEnabled = 'MixedState'
+        $CurrentEnabled = 'Mixed'
     }         
     ElseIf ( $AdaptersState -eq $true )
     {
@@ -54,7 +54,7 @@ function Get-TargetResource
         $CurrentEnabled = 'Disabled'
     }
 
-    $returnValue = @{
+    $returnValue[$_.InterfaceAlias] = @{
         InterfaceAlias = $InterfaceAlias
         ComponentId    = $ComponentId
         State          = $State
@@ -136,7 +136,7 @@ function Test-TargetResource
 
     If ( $AdaptersState.Count -eq 2)
     {
-        $CurrentEnabled = 'MixedState'
+        $CurrentEnabled = 'Mixed'
     }         
     ElseIf ( $AdaptersState -eq $true )
     {

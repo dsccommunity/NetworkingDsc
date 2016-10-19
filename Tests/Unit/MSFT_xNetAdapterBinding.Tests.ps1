@@ -32,6 +32,11 @@ try
             ComponentId = 'ms_tcpip63'
             State = 'Disabled'
         }
+        $TestBindingMixed = @{
+            InterfaceAlias = '*'
+            ComponentId = 'ms_tcpip63'
+            State = 'Mixed'
+        }
         $MockAdapter = @{
             InterfaceAlias = 'Ethernet'
         }
@@ -44,6 +49,17 @@ try
             InterfaceAlias = 'Ethernet'
             ComponentId = 'ms_tcpip63'
             Enabled = $False
+        }
+
+        $MockBindingMixed = @{
+            InterfaceAlias = 'Ethernet'
+            ComponentId = 'ms_tcpip63'
+            Enabled = $False
+        },
+        @{
+            InterfaceAlias = 'Ethernet2'
+            ComponentId = 'ms_tcpip63'
+            Enabled = $True
         }
 
         Describe "MSFT_xNetAdapterBinding\Get-TargetResource" {
@@ -74,6 +90,21 @@ try
                     Assert-MockCalled -commandName Get-Binding -Exactly 1
                 }
             }
+
+            Context 'More than one Adapter exists and binding is Disabled on one and Enabled on another' {
+                Mock Get-Binding -MockWith { $MockBindingMixed }
+
+                It 'should return existing binding' {
+                    $Result = Get-TargetResource @TestBindingMixed
+                    $Result.InterfaceAlias | Should Be $TestBindingMixed.InterfaceAlias
+                    $Result.ComponentId | Should Be $TestBindingMixed.ComponentId
+                    $Result.State | Should Be 'Mixed'
+                }
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-Binding -Exactly 1
+                }
+            }
+
         }
 
         Describe "MSFT_xNetAdapterBinding\Set-TargetResource" {
