@@ -144,7 +144,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Ensure**: Specifies if the hosts file entry should be created or deleted. { Present | Absent }.
 
 ### xNetAdapterBinding
-* **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
+* **InterfaceAlias**: Specifies the alias of a network interface. Supports the use of '*'. Mandatory.
 * **ComponentId**: Specifies the underlying name of the transport or filter in the following form - ms_xxxx, such as ms_tcpip. Mandatory.
 * **State**: Specifies if the component ID for the Interface should be Enabled or Disabled. Optional. Defaults to Enabled. { Enabled | Disabled }.
 
