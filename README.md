@@ -621,7 +621,7 @@ Configuration Disable_AccessToApplication
             DisplayName           = "Firewall Rule for Notepad.exe"
             Group                 = "NotePad Firewall Rule Group"
             Ensure                = "Present"
-            Action                = 'Blocked'
+            Action                = 'Block'
             Description           = "Firewall Rule for Notepad.exe"
             Program               = "c:\windows\system32\notepad.exe"
         }
