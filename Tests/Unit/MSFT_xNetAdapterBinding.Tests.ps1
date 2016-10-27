@@ -7,7 +7,7 @@ $script:DSCResourceName    = 'MSFT_xNetAdapterBinding'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    #& git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -32,6 +32,11 @@ try
             ComponentId = 'ms_tcpip63'
             State = 'Disabled'
         }
+        $TestBindingMixed = @{
+            InterfaceAlias = '*'
+            ComponentId = 'ms_tcpip63'
+            State = 'Enabled'
+        }
         $MockAdapter = @{
             InterfaceAlias = 'Ethernet'
         }
@@ -46,15 +51,27 @@ try
             Enabled = $False
         }
 
+        $MockBindingMixed = @{
+            InterfaceAlias = 'Ethernet'
+            ComponentId = 'ms_tcpip63'
+            Enabled = $False
+        },
+        @{
+            InterfaceAlias = 'Ethernet2'
+            ComponentId = 'ms_tcpip63'
+            Enabled = $True
+        }
+
         Describe "MSFT_xNetAdapterBinding\Get-TargetResource" {
             Context 'Adapter exists and binding Enabled' {
                 Mock Get-Binding -MockWith { $MockBindingEnabled }
 
                 It 'should return existing binding' {
-                    $Result = Get-TargetResource @TestBindingDisabled
-                    $Result.InterfaceAlias | Should Be $TestBindingDisabled.InterfaceAlias
-                    $Result.ComponentId | Should Be $TestBindingDisabled.ComponentId
+                    $Result = Get-TargetResource @TestBindingEnabled
+                    $Result.InterfaceAlias | Should Be $TestBindingEnabled.InterfaceAlias
+                    $Result.ComponentId | Should Be $TestBindingEnabled.ComponentId
                     $Result.State | Should Be 'Enabled'
+                    $Result.CurrentState | Should Be 'Enabled'
                 }
                 It 'Should call all the mocks' {
                     Assert-MockCalled -commandName Get-Binding -Exactly 1
@@ -65,15 +82,32 @@ try
                 Mock Get-Binding -MockWith { $MockBindingDisabled }
 
                 It 'should return existing binding' {
-                    $Result = Get-TargetResource @TestBindingEnabled
-                    $Result.InterfaceAlias | Should Be $TestBindingEnabled.InterfaceAlias
-                    $Result.ComponentId | Should Be $TestBindingEnabled.ComponentId
+                    $Result = Get-TargetResource @TestBindingDisabled
+                    $Result.InterfaceAlias | Should Be $TestBindingDisabled.InterfaceAlias
+                    $Result.ComponentId | Should Be $TestBindingDisabled.ComponentId
                     $Result.State | Should Be 'Disabled'
+                    $Result.CurrentState | Should Be 'Disabled'
                 }
                 It 'Should call all the mocks' {
                     Assert-MockCalled -commandName Get-Binding -Exactly 1
                 }
             }
+
+            Context 'More than one Adapter exists and binding is Disabled on one and Enabled on another' {
+                Mock Get-Binding -MockWith { $MockBindingMixed }
+
+                It 'should return existing binding' {
+                    $Result = Get-TargetResource @TestBindingMixed
+                    $Result.InterfaceAlias | Should Be $TestBindingMixed.InterfaceAlias
+                    $Result.ComponentId | Should Be $TestBindingMixed.ComponentId
+                    $Result.State | Should Be 'Enabled'
+                    $Result.CurrentState | Should Be 'Mixed'
+                }
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-Binding -Exactly 1
+                }
+            }
+
         }
 
         Describe "MSFT_xNetAdapterBinding\Set-TargetResource" {

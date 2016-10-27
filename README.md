@@ -144,7 +144,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **Ensure**: Specifies if the hosts file entry should be created or deleted. { Present | Absent }.
 
 ### xNetAdapterBinding
-* **InterfaceAlias**: Specifies the alias of a network interface. Mandatory.
+* **InterfaceAlias**: Specifies the alias of a network interface. Supports the use of '*'. Mandatory.
 * **ComponentId**: Specifies the underlying name of the transport or filter in the following form - ms_xxxx, such as ms_tcpip. Mandatory.
 * **State**: Specifies if the component ID for the Interface should be Enabled or Disabled. Optional. Defaults to Enabled. { Enabled | Disabled }.
 
@@ -208,6 +208,8 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 * Removed uneccessary global variable from MSFT_xNetworkTeam.integration.tests.ps1
 * Converted Invoke-Expression in all integration tests to &.
 * Fixed unit test description in xNetworkAdapter.Tests.ps1
+* xNetAdapterBinding
+  * Added support for the use of wildcard (*) in InterfaceAlias parameter.
 * BREAKING CHANGE - MSFT_xIPAddress: SubnetMask parameter renamed to PrefixLength.
 
 ### 2.12.0.0
