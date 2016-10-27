@@ -46,16 +46,16 @@ try
                     }
                     $Result = Get-TargetResource @Splat
                     $Result.IPAddress | Should Be $Splat.IPAddress
-                    $Result.SubnetMask | Should Be 24
+                    $Result.PrefixLength | Should Be 24
                 }
             }
 
-            Context 'Subnet Mask' {
+            Context 'Prefix Length' {
                 It 'should fail if passed a negative number' {
                     $Splat = @{
                         IPAddress = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
-                        Subnet = -16
+                        PrefixLength = -16
                     }
 
                     { Get-TargetResource @Splat } `
@@ -202,7 +202,7 @@ try
                     $Splat = @{
                         IPAddress = 'BadAddress'
                         InterfaceAlias = 'Ethernet'
-                        SubnetMask = 64
+                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     $errorId = 'AddressFormatError'
@@ -223,7 +223,7 @@ try
                     $Splat = @{
                         IPAddress = 'fe80::1'
                         InterfaceAlias = 'Ethernet'
-                        SubnetMask = 64
+                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     $Result = Test-TargetResource @Splat
@@ -240,7 +240,7 @@ try
                     $Splat = @{
                         IPAddress = 'fe80::15'
                         InterfaceAlias = 'Ethernet'
-                        SubnetMask = 64
+                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     $Result = Test-TargetResource @Splat
@@ -334,25 +334,25 @@ try
                     $Splat = @{
                         IPAddress = 'fe80:ab04:30F5:002b::1'
                         InterfaceAlias = 'Ethernet'
-                        SubnetMask = 64
+                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     { Test-ResourceProperty @Splat } | Should Not Throw
                 }
             }
 
-            Context 'invoking with invalid IPv4 subnet mask' {
+            Context 'invoking with invalid IPv4 prefix length' {
 
-                It 'should throw a SubnetMaskError when greater than 32' {
+                It 'should throw a PrefixLengthError when greater than 32' {
                     $Splat = @{
                         IPAddress = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
-                        SubnetMask = 33
+                        PrefixLength = 33
                         AddressFamily = 'IPv4'
                     }
-                    $errorId = 'SubnetMaskError'
+                    $errorId = 'PrefixLengthError'
                     $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-                    $errorMessage = $($LocalizedData.SubnetMaskError) -f $Splat.SubnetMask,$Splat.AddressFamily
+                    $errorMessage = $($LocalizedData.PrefixLengthError) -f $Splat.PrefixLength,$Splat.AddressFamily
                     $exception = New-Object -TypeName System.InvalidOperationException `
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
@@ -364,7 +364,7 @@ try
                     $Splat = @{
                         IPAddress = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
-                        SubnetMask = -1
+                        PrefixLength = -1
                         AddressFamily = 'IPv4'
                     }
                     { Test-ResourceProperty @Splat } `
@@ -372,19 +372,19 @@ try
                 }
             }
 
-            Context 'invoking with invalid IPv6 subnet mask' {
+            Context 'invoking with invalid IPv6 prefix length' {
 
-                It 'should throw a SubnetMaskError error when greater than 128' {
+                It 'should throw a PrefixLengthError error when greater than 128' {
                     $Splat = @{
                         IPAddress = 'fe80::1'
                         InterfaceAlias = 'Ethernet'
-                        SubnetMask = 129
+                        PrefixLength = 129
                         AddressFamily = 'IPv6'
                     }
 
-                    $errorId = 'SubnetMaskError'
+                    $errorId = 'PrefixLengthError'
                     $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-                    $errorMessage = $($LocalizedData.SubnetMaskError) -f $Splat.SubnetMask,$Splat.AddressFamily
+                    $errorMessage = $($LocalizedData.PrefixLengthError) -f $Splat.PrefixLength,$Splat.AddressFamily
                     $exception = New-Object -TypeName System.InvalidOperationException `
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
@@ -396,7 +396,7 @@ try
                     $Splat = @{
                         IPAddress = 'fe80::1'
                         InterfaceAlias = 'Ethernet'
-                        SubnetMask = -1
+                        PrefixLength = -1
                         AddressFamily = 'IPv6'
                     }
 
@@ -405,13 +405,13 @@ try
                 }
             }
 
-            Context 'invoking with valid string IPv6 subnet mask' {
+            Context 'invoking with valid string IPv6 prefix length' {
 
                 It 'should not throw an error' {
                     $Splat = @{
                         IPAddress = 'fe80::1'
                         InterfaceAlias = 'Ethernet'
-                        SubnetMask = '64'
+                        PrefixLength = '64'
                         AddressFamily = 'IPv6'
                     }
                     { Test-ResourceProperty @Splat } | Should Not Throw

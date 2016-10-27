@@ -37,7 +37,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 * **IPAddress**: The desired IP address.
 * **InterfaceAlias**: Alias of the network interface for which the IP address should be set.
-* **SubnetMask**: Local subnet size.
+* **PrefixLength**: The prefix length of the IP Address.
 * **AddressFamily**: IP address family: { IPv4 | IPv6 }
 
 ### xDnsServerAddress
@@ -210,6 +210,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 * Fixed unit test description in xNetworkAdapter.Tests.ps1
 * xNetAdapterBinding
   * Added support for the use of wildcard (*) in InterfaceAlias parameter.
+* BREAKING CHANGE - MSFT_xIPAddress: SubnetMask parameter renamed to PrefixLength.
 
 ### 2.12.0.0
 * Fixed bug in MSFT_xIPAddress resource when xIPAddress follows xVMSwitch.
@@ -385,7 +386,7 @@ Configuration Sample_xIPAddress_FixedValue
         {
             IPAddress      = "2001:4898:200:7:6c71:a102:ebd8:f482"
             InterfaceAlias = "Ethernet"
-            SubnetMask     = 24
+            PrefixLength   = 24
             AddressFamily  = "IPV6"
         }
     }
@@ -406,7 +407,7 @@ Configuration Sample_xIPAddress_Parameterized
         [string]$IPAddress,
         [Parameter(Mandatory)]
         [string]$InterfaceAlias,
-        [int]$SubnetMask = 16,
+        [int]$PrefixLength = 16,
         [ValidateSet("IPv4","IPv6")]
         [string]$AddressFamily = 'IPv4'
     )
@@ -417,7 +418,7 @@ Configuration Sample_xIPAddress_Parameterized
         {
             IPAddress      = $IPAddress
             InterfaceAlias = $InterfaceAlias
-            SubnetMask     = $SubnetMask
+            PrefixLength   = $PrefixLength
             AddressFamily  = $AddressFamily
         }
     }
@@ -885,7 +886,7 @@ configuration Sample_xNetworkTeamInterface_AddInterface
           TeamMembers = 'NIC1','NIC2'
           Ensure = 'Present'
         }
-        
+
         xNetworkTeamInterface NewInterface {
             Name = 'NewInterface'
             TeamName = 'HostTeam'

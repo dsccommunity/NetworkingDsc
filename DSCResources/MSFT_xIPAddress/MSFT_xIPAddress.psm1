@@ -13,8 +13,8 @@ IPAddressSetStateMessage=IP Interface was set to the desired state.
 CheckingIPAddressMessage=Checking the IP Address.
 IPAddressDoesNotMatchMessage=IP Address does NOT match desired state. Expected {0}, actual {1}.
 IPAddressMatchMessage=IP Address is in desired state.
-SubnetMaskDoesNotMatchMessage=Subnet mask does NOT match desired state. Expected {0}, actual {1}.
-SubnetMaskMatchMessage=Subnet mask is in desired state.
+PrefixLengthDoesNotMatchMessage=Prefix Length does NOT match desired state. Expected {0}, actual {1}.
+PrefixLengthMatchMessage=Prefix Length is in desired state.
 DHCPIsNotDisabledMessage=DHCP is NOT disabled.
 DHCPIsAlreadyDisabledMessage=DHCP is already disabled.
 DHCPIsNotTestedMessage=DHCP status is ignored when Address Family is IPv6.
@@ -22,7 +22,7 @@ InterfaceNotAvailableError=Interface "{0}" is not available. Please select a val
 AddressFormatError=Address "{0}" is not in the correct format. Please correct the Address parameter in the configuration and try again.
 AddressIPv4MismatchError=Address "{0}" is in IPv4 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
 AddressIPv6MismatchError=Address "{0}" is in IPv6 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
-SubnetMaskError=A Subnet Mask of {0} is not valid for {1} addresses. Please correct the subnet mask and try again.
+PrefixLengthError=A Prefix Length of {0} is not valid for {1} addresses. Please correct the Prefix Length and try again.
 '@
 }
 
@@ -43,7 +43,7 @@ function Get-TargetResource
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
-        [uInt32]$SubnetMask = 16,
+        [uInt32]$PrefixLength = 16,
 
         [ValidateSet('IPv4', 'IPv6')]
         [String]$AddressFamily = 'IPv4'
@@ -59,7 +59,7 @@ function Get-TargetResource
 
     $returnValue = @{
         IPAddress      = [System.String]::Join(', ',$CurrentIPAddress.IPAddress)
-        SubnetMask     = [System.String]::Join(', ',$CurrentIPAddress.PrefixLength)
+        PrefixLength     = [System.String]::Join(', ',$CurrentIPAddress.PrefixLength)
         AddressFamily  = $AddressFamily
         InterfaceAlias = $InterfaceAlias
     }
@@ -84,7 +84,7 @@ function Set-TargetResource
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
-        [uInt32]$SubnetMask,
+        [uInt32]$PrefixLength,
 
         [ValidateSet('IPv4', 'IPv6')]
         [String]$AddressFamily = 'IPv4'
@@ -146,7 +146,7 @@ function Set-TargetResource
     # Build parameter hash table
     $Parameters = @{
         IPAddress = $IPAddress
-        PrefixLength = $SubnetMask
+        PrefixLength = $PrefixLength
         InterfaceAlias = $InterfaceAlias
     }
 
@@ -175,7 +175,7 @@ function Test-TargetResource
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
-        [uInt32]$SubnetMask = 16,
+        [uInt32]$PrefixLength = 16,
 
         [ValidateSet('IPv4', 'IPv6')]
         [String]$AddressFamily = 'IPv4'
@@ -193,10 +193,10 @@ function Test-TargetResource
     # Get the current IP Address based on the parameters given.
      # First make sure that adapter is available
     [Boolean] $adapterBindingReady = $false
-    [DateTime] $startTime = Get-Date 
+    [DateTime] $startTime = Get-Date
 
     while (-not $adapterBindingReady -and (((Get-Date) - $startTime).TotalSeconds) -lt 30)
-    {      
+    {
         $currentIPs = @(Get-NetIPAddress `
             -InterfaceAlias $InterfaceAlias `
             -AddressFamily $AddressFamily `
@@ -229,19 +229,19 @@ function Test-TargetResource
         # Filter the IP addresses for the IP address to check
         $filterIP = $currentIPs.Where( { $_.IPAddress -eq $IPAddress } )
 
-        # Only test the Subnet Mask if the IP address is present
-        if (-not $filterIP.PrefixLength.Equals([byte]$SubnetMask))
+        # Only test the Prefix Length if the IP address is present
+        if (-not $filterIP.PrefixLength.Equals([byte]$PrefixLength))
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.SubnetMaskDoesNotMatchMessage) -f $SubnetMask,$currentIPs.PrefixLength
+                $($LocalizedData.PrefixLengthDoesNotMatchMessage) -f $PrefixLength,$currentIPs.PrefixLength
                 ) -join '' )
             $desiredConfigurationMatch = $false
         }
         else
         {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.SubnetMaskMatchMessage)
+                $($LocalizedData.PrefixLengthMatchMessage)
                 ) -join '' )
         }
     }
@@ -253,7 +253,7 @@ function Test-TargetResource
 #######################################################################################
 function Test-ResourceProperty {
     # Function will check the IP Address details are valid and do not conflict with
-    # Address family. Also checks the subnet mask and ensures the interface exists.
+    # Address family. Also checks the prefix length and ensures the interface exists.
     # If any problems are detected an exception will be thrown.
     [CmdletBinding()]
     param
@@ -266,7 +266,7 @@ function Test-ResourceProperty {
         [ValidateNotNullOrEmpty()]
         [String]$InterfaceAlias,
 
-        [uInt32]$SubnetMask = 16,
+        [uInt32]$PrefixLength = 16,
 
         [ValidateSet('IPv4', 'IPv6')]
         [String]$AddressFamily = 'IPv4'
@@ -328,15 +328,15 @@ function Test-ResourceProperty {
 
     if ((
             ($AddressFamily -eq 'IPv4') `
-                -and (($SubnetMask -lt [uint32]0) -or ($SubnetMask -gt [uint32]32))
+                -and (($PrefixLength -lt [uint32]0) -or ($PrefixLength -gt [uint32]32))
             ) -or (
             ($AddressFamily -eq 'IPv6') `
-                -and (($SubnetMask -lt [uint32]0) -or ($SubnetMask -gt [uint32]128))
+                -and (($PrefixLength -lt [uint32]0) -or ($PrefixLength -gt [uint32]128))
         ))
     {
-        $errorId = 'SubnetMaskError'
+        $errorId = 'PrefixLengthError'
         $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-        $errorMessage = $($LocalizedData.SubnetMaskError) -f $SubnetMask,$AddressFamily
+        $errorMessage = $($LocalizedData.PrefixLengthError) -f $PrefixLength,$AddressFamily
         $exception = New-Object -TypeName System.InvalidOperationException `
             -ArgumentList $errorMessage
         $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
