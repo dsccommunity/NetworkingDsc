@@ -1,29 +1,27 @@
-$Global:DSCModuleName   = 'xNetworking'
-$Global:DSCResourceName = 'MSFT_xRoute'
+$script:DSCModuleName   = 'xNetworking'
+$script:DSCResourceName = 'MSFT_xRoute'
 
 #region HEADER
-[String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
-if ( (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+# Unit Test Template Version: 1.1.0
+[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
-else
-{
-    & git @('-C',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'),'pull')
-}
-Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+
+Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $Global:DSCModuleName `
-    -DSCResourceName $Global:DSCResourceName `
+    -DSCModuleName $script:DSCModuleName `
+    -DSCResourceName $script:DSCResourceName `
     -TestType Unit
-#endregion
+#endregion HEADER
 
 # Begin Testing
 try
 {
     #region Pester Tests
-    InModuleScope $Global:DSCResourceName {
+    InModuleScope $script:DSCResourceName {
 
         # Create the Mock Objects that will be used for running tests
         $MockNetAdapter = [PSCustomObject] @{
@@ -59,7 +57,7 @@ try
             PreferredLifetime       = ([Timespan]::FromSeconds($TestRoute.PreferredLifetime))
         }
 
-        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
+        Describe "MSFT_xRoute\Get-TargetResource" {
 
             Context 'Route does not exist' {
 
@@ -97,7 +95,7 @@ try
             }
         }
 
-        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
+        Describe "MSFT_xRoute\Set-TargetResource" {
 
             Context 'Route does not exist but should' {
 
@@ -246,7 +244,7 @@ try
             }
         }
 
-        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
+        Describe "MSFT_xRoute\Test-TargetResource" {
 
             Context 'Route does not exist but should' {
 
@@ -365,7 +363,7 @@ try
             }
         }
 
-        Describe "$($Global:DSCResourceName)\Test-ResourceProperty" {
+        Describe "MSFT_xRoute\Test-ResourceProperty" {
 
             Context 'invoking with bad interface alias' {
 

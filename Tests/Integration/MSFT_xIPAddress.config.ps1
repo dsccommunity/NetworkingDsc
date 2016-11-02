@@ -2,7 +2,7 @@ $TestIPAddress = [PSObject]@{
     InterfaceAlias          = 'xNetworkingLBA'
     AddressFamily           = 'IPv4'
     IPAddress               = '10.11.12.13'
-    SubnetMask              = 16
+    PrefixLength            = 16
 }
 
 configuration MSFT_xIPAddress_Config {
@@ -12,7 +12,7 @@ configuration MSFT_xIPAddress_Config {
             InterfaceAlias          = $TestIPAddress.InterfaceAlias
             AddressFamily           = $TestIPAddress.AddressFamily
             IPAddress               = $TestIPAddress.IPAddress
-            SubnetMask              = $TestIPAddress.SubnetMask
+            PrefixLength            = $TestIPAddress.PrefixLength
         }
     }
 }
