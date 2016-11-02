@@ -38,7 +38,7 @@ try
             Context 'Network adapter does not exist' {
                 It 'should throw error' {
                     Mock Get-NetAdapterRdma
-                    Get-TargetResource @TestAdapter | should throw
+                    { Get-TargetResource @TestAdapter } | should throw
                 }
                 It 'should call the expected mocks' {
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
@@ -74,7 +74,7 @@ try
                     Mock Get-NetAdapterRdma
                     $updateAdapter = $TestAdapter.Clone()
                     $updateAdapter['Enabled'] = $true
-                    Set-TargetResource @updateAdapter | Should throw
+                    { Set-TargetResource @updateAdapter } | Should throw
                 }
                 It 'should call expected Mocks' {
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
@@ -169,7 +169,7 @@ try
                     Mock Get-NetAdapterRdma
                     $updateAdapter = $TestAdapter.Clone()
                     $updateAdapter['Enabled'] = $true
-                    Test-TargetResource @updateAdapter | Should throw
+                    { Test-TargetResource @updateAdapter } | Should throw
                 }
                 It 'should call expected Mocks' {
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
