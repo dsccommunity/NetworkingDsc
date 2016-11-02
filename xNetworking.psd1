@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '2.12.0.0'
+ModuleVersion = '3.0.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -49,11 +49,19 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '* Fixed bug in MSFT_xIPAddress resource when xIPAddress follows xVMSwitch.
-
-* Added the following resources:
-    * MSFT_xNetworkTeamInterface resource to add/remove network team interfaces
-* Added conditional loading of LocalizedData to MSFT_xHostsFile and MSFT_xNetworkTeam to prevent failures while loading those resources on systems with $PSUICulture other than en-US
+        ReleaseNotes = '* Corrected integration test filenames:
+    * MSFT_xDefaultGatewayAddress.Integration.Tests.ps1
+    * MSFT_xDhcpClient.Integration.Tests.ps1
+    * MSFT_xDNSConnectionSuffix.Integration.Tests.ps1
+    * MSFT_xNetAdapterBinding.Integration.Tests.ps1
+* Updated all integration tests to use v1.1.0 header and script variable context.
+* Updated all unit tests to use v1.1.0 header and script variable context.
+* Removed uneccessary global variable from MSFT_xNetworkTeam.integration.tests.ps1
+* Converted Invoke-Expression in all integration tests to &.
+* Fixed unit test description in xNetworkAdapter.Tests.ps1
+* xNetAdapterBinding
+  * Added support for the use of wildcard (*) in InterfaceAlias parameter.
+* BREAKING CHANGE - MSFT_xIPAddress: SubnetMask parameter renamed to PrefixLength.
 
 '
 
@@ -61,6 +69,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 

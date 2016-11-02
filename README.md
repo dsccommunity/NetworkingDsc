@@ -198,6 +198,8 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 ## Versions
 
 ### Unreleased
+
+### 3.0.0.0
 * Corrected integration test filenames:
     * MSFT_xDefaultGatewayAddress.Integration.Tests.ps1
     * MSFT_xDhcpClient.Integration.Tests.ps1
