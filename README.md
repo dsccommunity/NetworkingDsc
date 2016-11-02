@@ -17,6 +17,7 @@ The **xNetworking** module contains the following resources:
 * **xHostsFile**
 * **xNetAdapterBinding**
 * **xDnsClientGlobalSetting**
+* **xNetAdapterRDMA**
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
@@ -154,6 +155,10 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 * **UseDevolution**: Specifies that devolution is activated.
 * **DevolutionLevel**: Specifies the number of labels up to which devolution should occur.
 
+### xNetAdapterRDMA
+* **Name**: Specifies the name of the adapter for which RDMA configuration needs to be done.
+* **Enabled**: Specifies if RDMA setting must be enabled or disabled. { $true | $false }
+
 ## Functions
 
 ### Get-xNetworkAdapterName
@@ -211,6 +216,7 @@ The cmdlet does not fully support the Inquire action for debug messages. Cmdlet 
 * xNetAdapterBinding
   * Added support for the use of wildcard (*) in InterfaceAlias parameter.
 * BREAKING CHANGE - MSFT_xIPAddress: SubnetMask parameter renamed to PrefixLength.
+* Added MSFT_NetAdapterRDMA resource
 
 ### 2.12.0.0
 * Fixed bug in MSFT_xIPAddress resource when xIPAddress follows xVMSwitch.
