@@ -37,7 +37,9 @@ try
             function Get-NetAdapterRdma { }
             Context 'Network adapter does not exist' {
                 It 'should throw error' {
-                    Mock Get-NetAdapterRdma
+                    Mock Get-NetAdapterRdma -MockWith {
+                        throw 'Network adapter not found'
+                    }
                     { Get-TargetResource @TestAdapter } | should throw
                 }
                 It 'should call the expected mocks' {
@@ -71,7 +73,9 @@ try
                 Mock Set-NetAdapterRdma
     
                 It 'should throw error' { 
-                    Mock Get-NetAdapterRdma
+                    Mock Get-NetAdapterRdma -MockWith {
+                        throw 'Network adapter not found'
+                    }
                     $updateAdapter = $TestAdapter.Clone()
                     $updateAdapter['Enabled'] = $true
                     { Set-TargetResource @updateAdapter } | Should throw
@@ -166,7 +170,9 @@ try
   
             Context 'Net Adapter does not exist' {    
                 It 'should throw error' { 
-                    Mock Get-NetAdapterRdma
+                    Mock Get-NetAdapterRdma -MockWith {
+                        throw 'Network adapter not found'
+                    }
                     $updateAdapter = $TestAdapter.Clone()
                     $updateAdapter['Enabled'] = $true
                     { Test-TargetResource @updateAdapter } | Should throw
