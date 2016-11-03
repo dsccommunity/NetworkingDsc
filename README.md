@@ -204,6 +204,12 @@ The following error may occur when applying xFirewall configurations on Windows 
 
 ### Unreleased
 
+- Changed parameter format in Readme.md to improve information coverage and consistency.
+- Changed all MOF files to be consistent and meet HQRM guidelines.
+- Removed most markdown errors (MD*) in Readme.md.
+
+### 3.0.0.0
+
 - Corrected integration test filenames:
   - MSFT_xDefaultGatewayAddress.Integration.Tests.ps1
   - MSFT_xDhcpClient.Integration.Tests.ps1
@@ -217,9 +223,6 @@ The following error may occur when applying xFirewall configurations on Windows 
 - xNetAdapterBinding
   - Added support for the use of wildcard (*) in InterfaceAlias parameter.
 - BREAKING CHANGE - MSFT_xIPAddress: SubnetMask parameter renamed to PrefixLength.
-- Changed parameter format in Readme.md to improve information coverage and consistency.
-- Changed all MOF files to be consistent and meet HQRM guidelines.
-- Removed most markdown errors (MD*) in Readme.md.
 
 ### 2.12.0.0
 
@@ -376,7 +379,6 @@ The following error may occur when applying xFirewall configurations on Windows 
   - xIPAddress
   - xDnsServerAddress
 
-
 ## Examples
 
 ### Set IP Address on an ethernet NIC
@@ -408,7 +410,7 @@ Configuration Sample_xIPAddress_FixedValue
 
 This configuration will set the IP Address on a network interface that is identified by its alias.
 
-``` powershell
+```powershell
 Configuration Sample_xIPAddress_Parameterized
 {
     param
