@@ -1,4 +1,5 @@
-configuration Sample_xNetAdapterRDMA_Enable
+#This configuration disables RDMA setting on the network adapter.
+configuration Sample_xNetAdapterRDMA_Disable
 {
     param
     (
@@ -12,10 +13,10 @@ configuration Sample_xNetAdapterRDMA_Enable
         xNetAdapterRDMA SMBAdapter1
         {
           Name = 'SMB1_1'
-          Enabled = $true
+          Enabled = $false
         }
     }
  }
 
-Sample_xNetAdapterRDMA_Enable
-Start-DscConfiguration -Path Sample_xNetAdapterRDMA_Enable -Wait -Verbose -Force
+Sample_xNetAdapterRDMA_Disable
+Start-DscConfiguration -Path Sample_xNetAdapterRDMA_Disable -Wait -Verbose -Force

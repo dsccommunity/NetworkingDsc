@@ -1,5 +1,5 @@
-$Global:DSCModuleName   = 'xNetworking'
-$Global:DSCResourceName = 'MSFT_xNetAdapterRDMA'
+$script:DSCModuleName   = 'xNetworking'
+$script:DSCResourceName = 'MSFT_xNetAdapterRDMA'
 
 #region HEADER
 if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
@@ -13,8 +13,8 @@ else
 }
 Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $Global:DSCModuleName `
-    -DSCResourceName $Global:DSCResourceName `
+    -DSCModuleName $script:DSCModuleName `
+    -DSCResourceName $script:DSCResourceName `
     -TestType Unit 
 #endregion
 
@@ -22,7 +22,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     #region Pester Tests
-    InModuleScope $Global:DSCResourceName {
+    InModuleScope $script:DSCResourceName {
         # Create the Mock Objects that will be used for running tests
         $MockNetAdapterRDMA = [PSCustomObject] @{
             Name                = 'SMB1_1'
@@ -33,7 +33,7 @@ try
             Name                    = $MockNetAdapterRDMA.Name
         }    
     
-        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
+        Describe "$($script:DSCResourceName)\Get-TargetResource" {
             function Get-NetAdapterRdma { }
             Context 'Network adapter does not exist' {
                 It 'should throw error' {
@@ -60,7 +60,7 @@ try
             }
         }
 
-        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
+        Describe "$($script:DSCResourceName)\Set-TargetResource" {
             function Get-NetAdapterRdma { }
             function Set-NetAdapterRdma {
                 param (
@@ -165,7 +165,7 @@ try
             }                 
         }
 
-        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
+        Describe "$($script:DSCResourceName)\Test-TargetResource" {
             function Get-NetAdapterRdma { }
   
             Context 'Net Adapter does not exist' {    

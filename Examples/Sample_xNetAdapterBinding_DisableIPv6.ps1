@@ -1,4 +1,4 @@
-configuration Sample_xNetAdapterBinding_DisableIPv6
+configuration Sample_xNetAdapterBinding_Disable
 {
     param
     (

@@ -12,14 +12,22 @@ else
 }
 #endregion
 
+<#
+.SYNOPSIS
+    Gets MSFT_xVMNetAdapterRDMA resource current state.
+
+.PARAMETER Name
+    Specifies the name of the network adapter for which the RDMA configuration needs to be retrieved.
+#>
 function Get-TargetResource
 {
     [CmdletBinding()]
     [OutputType([Hashtable])]
     param
     (
-        [parameter(Mandatory)]
-        [String] $Name
+        [parameter(Mandatory = $true)]
+        [String]
+        $Name
     )
 
     $configuration = @{
@@ -43,16 +51,30 @@ function Get-TargetResource
     }
 }
 
+<#
+.SYNOPSIS
+    Sets MSFT_xVMNetAdapterRDMA resource state.
+
+.PARAMETER Name
+    Specifies the name of the network adapter for which the 
+    RDMA configuration needs to be retrieved.
+
+.PARAMETER Enabled
+    Specifies if the RDMA configuration should be enabled or disabled. 
+    This is a boolean value and the default is $true.
+#>
 function Set-TargetResource
 {
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory)]
-        [String] $Name,
+        [parameter(Mandatory = $true)]
+        [String]
+        $Name,
 
         [parameter()]
-        [Boolean] $Enabled = $true
+        [Boolean]
+        $Enabled = $true
     )
 
     $configuration = @{
@@ -80,17 +102,31 @@ function Set-TargetResource
     }
 }
 
+<#
+.SYNOPSIS
+    Tests if MSFT_xVMNetAdapterRDMA resource state is indeed desired state or not.
+
+.PARAMETER Name
+    Specifies the name of the network adapter for which the 
+    RDMA configuration needs to be retrieved.
+
+.PARAMETER Enabled
+    Specifies if the RDMA configuration should be enabled or disabled. 
+    This is a boolean value and the default is $true.
+#>
 function Test-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory)]
-        [String] $Name,
+        [parameter(Mandatory = $true)]
+        [String]
+        $Name,
 
         [parameter()]
-        [Boolean] $Enabled = $true
+        [Boolean]
+        $Enabled = $true
     )
 
     try

@@ -3,6 +3,7 @@ $TestAdapter = [PSObject]@{
     Enabled                 = $true
 }
 
+#This configuration enables RDMA setting on the network adapter.
 configuration MSFT_xNetAdapterRDMA_Config
 {
     param
