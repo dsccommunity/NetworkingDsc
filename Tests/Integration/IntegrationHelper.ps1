@@ -19,7 +19,7 @@ function New-IntegrationLoopbackAdapter
     $LoopbackAdapterModulePath = "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\$LoopbackAdapterModuleName"
     $LoopbackAdapterModule = Install-ModuleFromPowerShellGallery `
         -ModuleName $LoopbackAdapterModuleName `
-        -ModulePath $LoopbackAdapterModulePath
+        -DestinationPath $LoopbackAdapterModulePath
 
     if ($LoopbackAdapterModule) {
         # Import the module if it is available
