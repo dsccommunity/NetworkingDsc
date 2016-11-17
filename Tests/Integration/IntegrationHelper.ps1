@@ -15,20 +15,28 @@ function New-IntegrationLoopbackAdapter
         $Splat = @{ Force = $false }
     } # if
 
-    $LoopbackAdapterModuleName = 'LoopbackAdapter'
-    $LoopbackAdapterModulePath = "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\$LoopbackAdapterModuleName"
-    $LoopbackAdapterModule = Install-ModuleFromPowerShellGallery `
-        -ModuleName $LoopbackAdapterModuleName `
-        -DestinationPath $LoopbackAdapterModulePath
+    $loopbackAdapterModuleName = 'LoopbackAdapter'
+    $loopbackAdapterModulePath = "$env:userProfile\Documents\WindowsPowerShell\Modules\$LoopbackAdapterModuleName"
 
-    if ($LoopbackAdapterModule) {
+    $loopbackAdapterModule = Get-Module -Name $loopbackAdapterModuleName -ListAvailable
+
+    if ($null -eq $loopbackAdapterModule)
+    {
+        Install-ModuleFromPowerShellGallery `
+            -ModuleName $LoopbackAdapterModuleName `
+            -DestinationPath $LoopbackAdapterModulePath
+            
+         $loopbackAdapterModule = Get-Module -Name $loopbackAdapterModuleName -ListAvailable
+    }
+    
+    if ($loopbackAdapterModule) {
         # Import the module if it is available
-        $LoopbackAdapterModule | Import-Module -Force
+        $loopbackAdapterModule | Import-Module -Force
     }
     else
     {
         # Module could not/would not be installed - so warn user that tests will fail.
-        Throw 'LoopbackAdapter Module could not be installed.'
+        throw 'LoopbackAdapter Module could not be installed.'
     } # if
 
     try
