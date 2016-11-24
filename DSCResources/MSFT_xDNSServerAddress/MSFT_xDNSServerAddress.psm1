@@ -212,7 +212,7 @@ function Test-ResourceProperty
         [String]$AddressFamily = 'IPv4'
     )
 
-    if ( -not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
+    if ( -not (Get-NetAdapter | Where-Object -Property Name -Like $InterfaceAlias )) # It doen't need to be unique. As it prove with Get-DnsClientServerAddress.
     {
         $errorId = 'InterfaceNotAvailable'
         $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
