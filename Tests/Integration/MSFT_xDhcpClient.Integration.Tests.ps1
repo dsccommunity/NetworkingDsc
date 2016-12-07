@@ -1,5 +1,5 @@
 $script:DSCModuleName      = 'xNetworking'
-$script:DSCResourceName    = 'MSFT_xNetBIOS'
+$script:DSCResourceName    = 'MSFT_xDhcpClient'
 
 #region HEADER
 # Integration Test Template Version: 1.1.0
@@ -16,6 +16,10 @@ $TestEnvironment = Initialize-TestEnvironment `
     -DSCResourceName $script:DSCResourceName `
     -TestType Integration
 #endregion
+
+# Configure Loopback Adapter
+. (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
+New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
 
 # Using try/finally to always cleanup even if something awful happens.
 try
@@ -38,15 +42,20 @@ try
         }
         #endregion
 
-        It 'Should have set the resource and all setting should match current state' {
-            $Live = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
-            $Live.Setting | should be $Current #Current is defined in MSFT_NetBIOS.config.ps1
+        It 'Should have set the resource and all the parameters should match' {
+            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
+            $current.InterfaceAlias           | Should Be $TestDhcpClient.InterfaceAlias
+            $current.AddressFamily            | Should Be $TestDhcpClient.AddressFamily
+            $current.State                    | Should Be $TestDhcpClient.State
         }
     }
     #endregion
 }
 finally
 {
+    # Remove Loopback Adapter
+    Remove-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
+
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion

@@ -1,4 +1,4 @@
-configuration Sample_xIPAddress_Parameterized
+configuration Sample_xIPAddress_StaticIP_Parameterized
 {
     param
     (
@@ -11,7 +11,7 @@ configuration Sample_xIPAddress_Parameterized
         [Parameter(Mandatory)]
         [string]$InterfaceAlias,
 
-        [int]$SubnetMask = 16,
+        [int]$PrefixLength = 16,
 
         [ValidateSet("IPv4","IPv6")]
         [string]$AddressFamily = 'IPv4'
@@ -21,11 +21,18 @@ configuration Sample_xIPAddress_Parameterized
 
     Node $NodeName
     {
+        xDhcpClient DisabledDhcpClient
+        {
+            State          = 'Disabled'
+            InterfaceAlias = $InterfaceAlias
+            AddressFamily  = $AddressFamily
+        }
+
         xIPAddress NewIPAddress
         {
             IPAddress      = $IPAddress
             InterfaceAlias = $InterfaceAlias
-            SubnetMask     = $SubnetMask
+            PrefixLength   = $PrefixLength
             AddressFamily  = $AddressFamily
         }
     }

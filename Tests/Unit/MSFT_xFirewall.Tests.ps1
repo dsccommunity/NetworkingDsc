@@ -1,31 +1,27 @@
-$Global:DSCModuleName      = 'xNetworking'
-$Global:DSCResourceName    = 'MSFT_xFirewall'
+$script:DSCModuleName      = 'xNetworking'
+$script:DSCResourceName    = 'MSFT_xFirewall'
 
 #region HEADER
-[String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
-if ( (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+# Unit Test Template Version: 1.1.0
+[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
-else
-{
-    & git @('-C',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'),'pull')
-}
-Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+
+Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $Global:DSCModuleName `
-    -DSCResourceName $Global:DSCResourceName `
-    -TestType Unit 
-#endregion
+    -DSCModuleName $script:DSCModuleName `
+    -DSCResourceName $script:DSCResourceName `
+    -TestType Unit
+#endregion HEADER
 
 # Begin Testing
 try
 {
-
     #region Pester Tests
-
-    InModuleScope $Global:DSCResourceName {
+    InModuleScope $script:DSCResourceName {
 
         #region Pester Test Initialization
         # Get the rule that will be used for testing
@@ -43,7 +39,7 @@ try
         #endregion
 
         #region Function Get-TargetResource
-        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
+        Describe "MSFT_xFirewall\Get-TargetResource" {
             Context 'Absent should return correctly' {
                 Mock Get-NetFirewallRule
 
@@ -72,7 +68,7 @@ try
 
 
         #region Function Test-TargetResource
-        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
+        Describe "MSFT_xFirewall\Test-TargetResource" {
             Context 'Ensure is Absent and the Firewall is not Present' {
                 Mock Get-FirewallRule
 
@@ -117,7 +113,7 @@ try
 
 
         #region Function Set-TargetResource
-        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
+        Describe "MSFT_xFirewall\Set-TargetResource" {
             # To speed up all these tests create Mocks so that these functions are not repeatedly called
             Mock Get-FirewallRule -MockWith { $FirewallRule }
             Mock Get-FirewallRuleProperty -MockWith { $Properties }
@@ -962,7 +958,7 @@ try
 
 
         #region Function Get-FirewallRule
-        Describe "$($Global:DSCResourceName)\Get-FirewallRule" {
+        Describe "MSFT_xFirewall\Get-FirewallRule" {
             Context 'testing with firewall that exists' {
                 It "should return a firewall rule when name is passed on firewall rule $($FirewallRule.Name)" {
                     $Result = Get-FirewallRule -Name $FirewallRule.Name
@@ -995,7 +991,7 @@ try
 
 
         #region Function Get-FirewallRuleProperty
-        Describe "$($Global:DSCResourceName)\Get-FirewallRuleProperty" {
+        Describe "MSFT_xFirewall\Get-FirewallRuleProperty" {
             Context 'All Properties' {
                 $result = Get-FirewallRuleProperty -FirewallRule $FirewallRule
                 It "Should return the right address filter on firewall rule $($FirewallRule.Name)" {

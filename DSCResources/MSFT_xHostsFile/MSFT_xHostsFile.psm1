@@ -1,314 +1,201 @@
-$Script:hostsFilePath = "${env:windir}\system32\drivers\etc\hosts"
+#region localizeddata
+if (Test-Path "${PSScriptRoot}\${PSUICulture}")
+{
+    Import-LocalizedData -BindingVariable LocalizedData `
+                         -Filename MSFT_xHostsFile.psd1 `
+                         -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
+} 
+else
+{
+    #fallback to en-US
+    Import-LocalizedData -BindingVariable LocalizedData `
+                         -Filename MSFT_xHostsFile.psd1 `
+                         -BaseDirectory "${PSScriptRoot}\en-US"
+}
+#endregion
 
-Import-LocalizedData -BindingVariable LocalizedData -FileName MSFT_xHostsFile.psd1 -BaseDirectory $PSScriptRoot -Verbose
 
 function Get-TargetResource
 {
-    [OutputType([Hashtable])]
-    param (
-        [parameter(Mandatory = $true)]
-        [string]
+    [OutputType([System.Collections.Hashtable])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.String]
         $HostName,
-        [parameter(Mandatory = $true)]
-        [string]
-        $IPAddress
+        
+        [Parameter(Mandatory = $false)]
+        [System.String]
+        $IPAddress,
+        
+        [Parameter(Mandatory = $false)]
+        [System.String]
+        [ValidateSet("Present","Absent")]
+        $Ensure = "Present"
     )
 
-    $configuration =
-    @{
-        HostName = $HostName
-        IPAddress = $IPAddress
-    }
+    Write-Verbose -Message ($LocalizedData.StartingGet -f $HostName)
 
-    Write-Verbose -Message $localizedData.checkingHostsFileEntry
-    try
-    {
-        if (Test-HostEntry -IPAddress $IPAddress -HostName $HostName) {
-            Write-Verbose -Message ($localizedData.hostsFileEntryFound -f $HostName, $IPAddress)
-            $configuration.Add('Ensure','Present')
-        } else {
-            Write-Verbose -Message ($localizedData.hostsFileEntryNotFound -f $HostName, $IPAddress)
-            $configuration.Add('Ensure','Absent')
-        }
-        return $configuration
-    }
+    $hosts = Get-Content -Path "$env:windir\System32\drivers\etc\hosts"
+    $allHosts = $hosts `
+           | Where-Object { [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false } `
+           | ForEach-Object { 
+                $data = $_ -split '\s+'
+                if ($data.Length -gt 2) 
+                {
+                    # Account for host entries that have multiple entries on a single line
+                    $result = @()
+                    for ($i = 1; $i -lt $data.Length; $i++) 
+                    {
+                        $result += @{
+                            Host = $data[$i]
+                            IP = $data[0]
+                        }    
+                    }
+                    return $result
+                }
+                else 
+                {
+                    return @{
+                        Host = $data[1]
+                        IP = $data[0]
+                    }    
+                }
+        } | Select-Object @{ Name="Host"; Expression={$_.Host}}, @{Name="IP"; Expression={$_.IP}}
+        
+    $hostEntry = $allHosts | Where-Object { $_.Host -eq $HostName }
     
-    catch
+    if ($null -eq $hostEntry) 
     {
-        $exception = $_
-        Write-Verbose -Message ($LocalizedData.anErrorOccurred -f $name, $exception.message)
-        while ($null -ne $exception.InnerException)
-        {
-            $exception = $exception.innerException
-            Write-Verbose -Message ($LocalizedData.innerException -f $name, $exception.message)
+        return @{
+            HostName = $HostName
+            IPAddress = $null
+            Ensure = "Absent"
+        }
+    }
+    else 
+    {
+        return @{
+            HostName = $hostEntry.Host
+            IPAddress = $hostEntry.IP
+            Ensure = "Present"
         }
     }
 }
 
 function Set-TargetResource
 {
-    param (
-        [parameter(Mandatory = $true)]
-        [string]
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.String]
         $HostName,
-
-        [parameter(Mandatory = $true)]
-        [string]
+        
+        [Parameter(Mandatory = $false)]
+        [System.String]
         $IPAddress,
-
-        [parameter()]
-        [ValidateSet('Present','Absent')]
-        [string]
-        $Ensure = 'Present'
+        
+        [Parameter(Mandatory = $false)]
+        [System.String]
+        [ValidateSet("Present","Absent")]
+        $Ensure = "Present"
     )
-
-    try
-    {
-        if ($Ensure -eq 'Present') {
-            Write-Verbose -Message ($localizedData.creatingHostsFileEntry -f $HostName, $IPAddress)
-            Add-HostEntry -IPAddress $IPAddress -HostName $HostName
-            Write-Verbose -Message ($localizedData.hostsFileEntryAdded -f $HostName, $IPAddress)
-        } else {
-            Write-Verbose -Message ($localizedData.removingHostsFileEntry -f $HostName, $IPAddress)
-            Remove-HostEntry -IPAddress $IPAddress -HostName $HostName
-            Write-Verbose -Message ($localizedData.hostsFileEntryRemoved -f $HostName, $IPAddress)
-        }
-    }
     
-    catch
+    $currentValues = Get-TargetResource @PSBoundParameters
+    
+    Write-Verbose -Message ($LocalizedData.StartingSet -f $HostName)
+
+    if ($Ensure -eq "Present" -and $PSBoundParameters.ContainsKey("IPAddress") -eq $false) 
     {
-        $errorId = 'HostsFileUpdateError'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-        $errorMessage = ($LocalizedData.anErrorOccurred -f $name, $exception.message)
+        $errorId = 'IPAddressNotPresentError'
+        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+        $errorMessage = $($LocalizedData.UnableToEnsureWithoutIP) -f $Address,$AddressFamily
         $exception = New-Object -TypeName System.InvalidOperationException `
                                 -ArgumentList $errorMessage
         $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                                -ArgumentList $exception, $errorId, $errorCategory, $null
+                                  -ArgumentList $exception, $errorId, $errorCategory, $null
+
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
+    }
+    
+    if ($currentValues.Ensure -eq "Absent" -and $Ensure -eq "Present")
+    {
+        Write-Verbose -Message ($LocalizedData.CreateNewEntry -f $HostName)
+        Add-Content -Path "$env:windir\System32\drivers\etc\hosts" -Value "`r`n$IPAddress`t$HostName"
+    }
+    else 
+    {
+        $hosts = Get-Content -Path "$env:windir\System32\drivers\etc\hosts"
+        $replace = $hosts | Where-Object { 
+            [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false 
+        } | Where-Object { $_ -like "*$HostName" }
+
+        $multiLineEntry = $false
+        $data = $replace -split '\s+'
+        if ($data.Length -gt 2) 
+        {
+            $multiLineEntry = $true
+        }
+
+        if ($currentValues.Ensure -eq "Present" -and $Ensure -eq "Present")
+        {
+            Write-Verbose -Message ($LocalizedData.UpdateExistingEntry -f $HostName)
+            if ($multiLineEntry -eq $true) 
+            {
+                $newReplaceLine = $replace -replace $HostName, ""
+                $hosts = $hosts -replace $replace, $newReplaceLine
+                $hosts += "$IPAddress`t$HostName"
+            }
+            else 
+            {
+                $hosts = $hosts -replace $replace, "$IPAddress`t$HostName"    
+            }
+        }
+        if ($Ensure -eq "Absent")
+        {
+            Write-Verbose -Message ($LocalizedData.RemoveEntry -f $HostName)
+            if ($multiLineEntry -eq $true) 
+            {
+                $newReplaceLine = $replace -replace $HostName, ""
+                $hosts = $hosts -replace $replace, $newReplaceLine
+            }
+            else 
+            {
+                $hosts = $hosts -replace $replace, ""
+            }
+        }
+        $hosts | Set-Content -Path "$env:windir\System32\drivers\etc\hosts"
     }
 }
 
 function Test-TargetResource
 {
-    [OutputType([boolean])]
-    param (
-        [parameter(Mandatory = $true)]
-        [string]
+    [OutputType([System.Boolean])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.String]
         $HostName,
-        [parameter(Mandatory = $true)]
-        [string]
+        
+        [Parameter(Mandatory = $false)]
+        [System.String]
         $IPAddress,
-        [parameter()]
-        [ValidateSet('Present','Absent')]
-        [string]
-        $Ensure = 'Present'
+        
+        [Parameter(Mandatory = $false)]
+        [System.String]
+        [ValidateSet("Present","Absent")]
+        $Ensure = "Present"
     )
-
-    try
-    {
-        Write-Verbose -Message $localizedData.checkingHostsFileEntry
-        $entryExist = Test-HostEntry -IPAddress $IPAddress -HostName $HostName
-
-        if ($Ensure -eq "Present")
-        {
-            if ($entryExist)
-            {
-                Write-Verbose -Message ($localizedData.hostsFileEntryFound -f $HostName, $IPAddress)
-                return $true
-            }
-            else
-            {
-                Write-Verbose -Message ($localizedData.hostsFileEntryShouldExist -f $HostName, $IPAddress)
-                return $false
-            }
-        }
-        else
-        {
-            if ($entryExist)
-            {
-                Write-Verbose -Message $localizedData.hostsFileShouldNotExist
-                return $false
-            }
-            else
-            {
-                Write-Verbose -Message $localizedData.hostsFileEntryNotFound
-                return $true
-            }
-        }
-    }
     
-    catch
+    $currentValues = Get-TargetResource @PSBoundParameters
+    Write-Verbose -Message ($LocalizedData.StartingTest -f $HostName)
+    
+    if ($Ensure -ne $currentValues.Ensure) 
     {
-        $exception = $_
-        Write-Verbose -Message ($LocalizedData.anErrorOccurred -f $name, $exception.message)
-        while ($null -ne $exception.innerException)
-        {
-            $exception = $exception.innerException
-            Write-Verbose -Message ($LocalizedData.innerException -f $name, $exception.message)
-        }
+        return $false
     }
+   
+    if ($Ensure -eq "Present" -and $IPAddress -ne $currentValues.IPAddress) 
+    {
+        return $false
+    }
+    return $true
 }
 
-function Test-HostEntry
-{
-    param (
-        [string] $IPAddress,
-        [string] $HostName
-    )
-
-    foreach ($line in (Get-Content -Path $script:HostsFilePath))
-    {
-        $parsed = Convert-EntryLine -Line $line
-        if ($parsed.IPAddress -eq $IPAddress)
-        {
-            return $parsed.HostNames -contains $HostName
-        }
-    }
-
-    return $false
-}
-
-function Add-HostEntry
-{
-    param (
-        [string] $IPAddress,
-        [string] $HostName
-    )
-
-    $content = @(Get-Content -Path $script:HostsFilePath)
-    $length = $content.Length
-
-    $foundMatch = $false
-    $dirty = $false
-
-    for ($i = 0; $i -lt $length; $i++)
-    {
-        $parsed = Convert-EntryLine -Line $content[$i]
-
-        if ($parsed.IPAddress -ne $IPAddress)
-        { 
-            continue 
-        }
-        
-        $foundMatch = $true
-
-        if ($parsed.HostNames -notcontains $HostName)
-        {
-            $parsed.HostNames += $HostName
-            $content[$i] = Prepare-Line -ParsedLine $parsed
-            $dirty = $true
-            # Hosts files shouldn't strictly have the same IP address on multiple lines; should we just break here?
-            # Or is it better to search for all matching lines in a malformed file, and modify all of them?
-        }
-    }
-
-    if (-not $foundMatch)
-    {
-        $content += "$IPAddress $HostName"
-        $dirty = $true
-    }
-
-    if ($dirty)
-    {
-        Set-Content -Path $script:HostsFilePath -Value $content
-    }
-}
-
-function Remove-HostEntry
-{
-    param (
-        [string] $IPAddress,
-        [string] $HostName
-    )
-
-    $content = @(Get-Content -Path $script:HostsFilePath)
-    $length = $content.Length
-
-    $placeholder = New-Object psobject
-    $dirty = $false
-
-    for ($i = 0; $i -lt $length; $i++)
-    {
-        $parsed = Convert-EntryLine -Line $content[$i]
-
-        if ($parsed.IPAddress -ne $IPAddress)
-        {
-            continue
-        }
-        
-        if ($parsed.HostNames -contains $HostName)
-        {
-            $dirty = $true
-
-            if ($parsed.HostNames.Count -eq 1)
-            {
-                # We're removing the only HostName from this line; just remove the whole line
-                $content[$i] = $placeholder
-            }
-            else
-            {
-                $parsed.HostNames = $parsed.HostNames -ne $HostName
-                $content[$i] = Prepare-Line -ParsedLine $parsed
-            }
-        }
-    }
-
-    if ($dirty)
-    {
-        $content = $content -ne $placeholder
-        Set-Content -Path $script:HostsFilePath -Value $content
-    }
-}
-
-function Convert-EntryLine
-{
-    param ([string] $Line)
-
-    $indent    = ''
-    $ipAddress = ''
-    $hostNames = @()
-    $comment   = ''
-
-    $regex = '^' +
-             '(?<indent>\s*)' +
-             '(?<IPAddress>\S+)' +
-             '(?:' +
-                 '\s+' +
-                 '(?<HostNames>[^#]*)' +
-                 '(?:#\s*(?<comment>.*))?' +
-             ')?' +
-             '\s*' +
-             '$'
-
-    if ($line -match $regex)
-    {
-        $indent    = $matches['indent']
-        $ipAddress = $matches['ipAddress']
-        $hostNames = $matches['hostNames'] -split '\s+' -match '\S'
-        $comment   = $matches['comment']
-    }
-
-    return [pscustomobject] @{
-        Indent    = $indent
-        IPAddress = $IPAddress
-        HostNames = $HostNames
-        Comment   = $comment
-    }
-}
-
-function Prepare-Line
-{
-    param ([object] $ParsedLine)
-
-    if ($ParsedLine.Comment)
-    {
-        $comment = " # $($ParsedLine.Comment)"
-    }
-    else
-    {
-        $comment = ''
-    }
-
-    return '{0}{1} {2}{3}' -f $ParsedLine.Indent, $ParsedLine.IPAddress, ($ParsedLine.HostNames -join ' '), $comment
-}
-
-Export-ModuleMember -Function Test-TargetResource,Set-TargetResource,Get-TargetResource

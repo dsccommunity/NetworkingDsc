@@ -1,5 +1,5 @@
-$script:DSCModuleName      = 'xNetworking'
-$script:DSCResourceName    = 'MSFT_xNetBIOS'
+$script:DSCModuleName   = 'xNetworking'
+$script:DSCResourceName = 'MSFT_xDnsClientGlobalSetting'
 
 #region HEADER
 # Integration Test Template Version: 1.1.0
@@ -17,12 +17,21 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Integration
 #endregion
 
+# Backup the existing settings
+$CurrentDnsClientGlobalSetting = Get-DnsClientGlobalSetting
+
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
+    # Set the DNS Client Global settings to known values
+    Set-DnsClientGlobalSetting `
+        -SuffixSearchList 'fabrikam.com' `
+        -UseDevolution $False `
+        -DevolutionLevel 4
+
     #region Integration Tests
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
+    . $ConfigFile
 
     Describe "$($script:DSCResourceName)_Integration" {
         #region DEFAULT TESTS
@@ -38,15 +47,24 @@ try
         }
         #endregion
 
-        It 'Should have set the resource and all setting should match current state' {
-            $Live = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
-            $Live.Setting | should be $Current #Current is defined in MSFT_NetBIOS.config.ps1
+        It 'Should have set the resource and all the parameters should match' {
+            # Get the Rule details
+            $DnsClientGlobalSettingNew = Get-DnsClientGlobalSetting
+            $DnsClientGlobalSettingNew.SuffixSearchList | Should Be $DnsClientGlobalSetting.SuffixSearchList
+            $DnsClientGlobalSettingNew.UseDevolution    | Should Be $DnsClientGlobalSetting.UseDevolution
+            $DnsClientGlobalSettingNew.DevolutionLevel  | Should Be $DnsClientGlobalSetting.DevolutionLevel
         }
     }
     #endregion
 }
 finally
 {
+    # Clean up
+    Set-DnsClientGlobalSetting `
+        -SuffixSearchList $CurrentDnsClientGlobalSetting.SuffixSearchList `
+        -UseDevolution $CurrentDnsClientGlobalSetting.UseDevolution `
+        -DevolutionLevel $CurrentDnsClientGlobalSetting.DevolutionLevel
+
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion

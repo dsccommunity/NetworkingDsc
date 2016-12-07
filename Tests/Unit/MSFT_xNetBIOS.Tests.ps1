@@ -1,51 +1,51 @@
-$Global:DSCModuleName   = 'xNetworking'
-$Global:DSCResourceName = 'MSFT_xNetBIOS'
+$script:DSCModuleName   = 'xNetworking'
+$script:DSCResourceName = 'MSFT_xNetBIOS'
 
 #region HEADER
-[String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
-if ( (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+# Unit Test Template Version: 1.1.0
+[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
-else
-{
-    & git @('-C',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'),'pull')
-}
-Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+
+Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $Global:DSCModuleName `
-    -DSCResourceName $Global:DSCResourceName `
-    -TestType Unit 
-#endregion
+    -DSCModuleName $script:DSCModuleName `
+    -DSCResourceName $script:DSCResourceName `
+    -TestType Unit
+#endregion HEADER
 
 # Begin Testing
 try
 {
     #region Pester Tests
-    InModuleScope $Global:DSCResourceName {
+    InModuleScope $script:DSCResourceName {
+
+        $InterfaceAlias = (Get-NetAdapter -Physical | Select-Object -First 1).Name
 
         $MockNetadapterSettingsDefault = New-Object -TypeName CimInstance -ArgumentList 'Win32_NetworkAdapterConfiguration' | Add-Member -MemberType NoteProperty -Name TcpipNetbiosOptions -Value 0 -PassThru
         $MockNetadapterSettingsEnable = New-Object -TypeName CimInstance -ArgumentList 'Win32_NetworkAdapterConfiguration' | Add-Member -MemberType NoteProperty -Name TcpipNetbiosOptions -Value 1 -PassThru
         $MockNetadapterSettingsDisable = New-Object -TypeName CimInstance -ArgumentList 'Win32_NetworkAdapterConfiguration' | Add-Member -MemberType NoteProperty -Name TcpipNetbiosOptions -Value 2 -PassThru
 
         #region Function Get-TargetResource
-        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
+        Describe "MSFT_xNetBIOS\Get-TargetResource" {
 
             Mock -CommandName Get-CimAssociatedInstance -MockWith {return $MockNetadapterSettingsDefault}
 
             It 'Returns a hashtable' {
-                $targetResource = Get-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Default'
+                $targetResource = Get-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Default'
                 $targetResource -is [System.Collections.Hashtable] | Should Be $true
             }
 
             It 'NetBIOS over TCP/IP numerical setting "0" should translate to "Default"' {
-                $Result = Get-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Default'
+                $Result = Get-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Default'
                 $Result.Setting | should be 'Default'
             }
 
             It 'NetBIOS over TCP/IP setting should return real value "Default", not parameter value "Enable"' {
-                $Result = Get-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Enable'
+                $Result = Get-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Enable'
                 $Result.Setting | should be 'Default'
             }
         }
@@ -53,16 +53,16 @@ try
 
 
         #region Function Test-TargetResource
-        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
+        Describe "MSFT_xNetBIOS\Test-TargetResource" {
             Context 'invoking with NetBIOS over TCP/IP set to default' {
 
                 Mock -CommandName Get-CimAssociatedInstance -MockWith {return $MockNetadapterSettingsDefault}
 
                 It 'should return true when value "Default" is set' {
-                    Test-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Default' | Should Be $true
+                    Test-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Default' | Should Be $true
                 }
                 It 'should return false when value "Disable" is set' {
-                    Test-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Disable' | Should Be $false
+                    Test-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Disable' | Should Be $false
                 }
             }
 
@@ -71,10 +71,10 @@ try
                 Mock -CommandName Get-CimAssociatedInstance -MockWith {return $MockNetadapterSettingsDisable}
 
                 It 'should return true when value "Disable" is set' {
-                    Test-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Disable' | Should Be $true
+                    Test-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Disable' | Should Be $true
                 }
                 It 'should return false when value "Enable" is set' {
-                    Test-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Enable' | Should Be $false
+                    Test-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Enable' | Should Be $false
                 }
             }
 
@@ -83,10 +83,10 @@ try
                 Mock -CommandName Get-CimAssociatedInstance -MockWith {return $MockNetadapterSettingsEnable}
 
                 It 'should return true when value "Enable" is set' {
-                    Test-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Enable' | Should Be $true
+                    Test-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Enable' | Should Be $true
                 }
                 It 'should return false when value "Disable" is set' {
-                    Test-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Disable' | Should Be $false
+                    Test-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Disable' | Should Be $false
                 }
             }
 
@@ -102,7 +102,7 @@ try
 
 
         #region Function Set-TargetResource
-        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
+        Describe "MSFT_xNetBIOS\Set-TargetResource" {
             Mock Set-ItemProperty
             Mock Invoke-CimMethod
 
@@ -111,7 +111,7 @@ try
                 Mock -CommandName Get-CimAssociatedInstance -MockWith {return $MockNetadapterSettingsEnable}
 
                 It 'Should call "Set-ItemProperty" instead of "Invoke-CimMethod"' {
-                    $Null = Set-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Default'
+                    $Null = Set-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Default'
 
                     Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 1
                     Assert-MockCalled -CommandName Invoke-CimMethod -Exactly -Times 0
@@ -124,7 +124,7 @@ try
                     Mock -CommandName Get-CimAssociatedInstance -MockWith {return $MockNetadapterSettingsEnable}
                     Mock Invoke-CimMethod
 
-                    $Null = Set-TargetResource -InterfaceAlias 'Ethernet' -Setting 'Disable'
+                    $Null = Set-TargetResource -InterfaceAlias $InterfaceAlias -Setting 'Disable'
 
                     Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 0
                     Assert-MockCalled -CommandName Invoke-CimMethod -Exactly -Times 1
