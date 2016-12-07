@@ -1,0 +1,6 @@
+[ClassVersion("1.0.0.0"), FriendlyName("xNetAdapterRDMA")]
+class MSFT_xNetAdapterRDMA : OMI_BaseResource
+{
+    [Key] String Name;
+    [Write] Boolean Enabled;
+};
