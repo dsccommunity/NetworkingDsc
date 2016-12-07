@@ -5,22 +5,12 @@ function New-IntegrationLoopbackAdapter
         [String]
         $AdapterName
     )
-    # Configure Loopback Adapter
-    if ($env:APPVEYOR) {
-        # Running in AppVeyor so force silent install of LoopbackAdapter
-        $Splat = @{ Force = $true }
-    }
-    else
-    {
-        $Splat = @{ Force = $false }
-    } # if
 
     $LoopbackAdapterModuleName = 'LoopbackAdapter'
     $LoopbackAdapterModulePath = "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\$LoopbackAdapterModuleName"
     $LoopbackAdapterModule = Install-ModuleFromPowerShellGallery `
         -ModuleName $LoopbackAdapterModuleName `
-        -ModulePath $LoopbackAdapterModulePath `
-        @Splat
+        -DestinationPath $LoopbackAdapterModulePath
 
     if ($LoopbackAdapterModule) {
         # Import the module if it is available
