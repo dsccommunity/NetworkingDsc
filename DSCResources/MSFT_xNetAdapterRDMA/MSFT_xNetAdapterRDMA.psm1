@@ -153,3 +153,4 @@ function Test-TargetResource
         throw $localizedData.NetAdapterNotFound
     }
 }
+ 
