@@ -6,21 +6,19 @@ function New-IntegrationLoopbackAdapter
         $AdapterName
     )
 
+    # Ensure the loopback adapter module is downloaded
     $LoopbackAdapterModuleName = 'LoopbackAdapter'
     $LoopbackAdapterModulePath = "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\$LoopbackAdapterModuleName"
-    $LoopbackAdapterModule = Install-ModuleFromPowerShellGallery `
+    Install-ModuleFromPowerShellGallery `
         -ModuleName $LoopbackAdapterModuleName `
         -DestinationPath $LoopbackAdapterModulePath
 
-    if ($LoopbackAdapterModule) {
-        # Import the module if it is available
-        $LoopbackAdapterModule | Import-Module -Force
-    }
-    else
-    {
-        # Module could not/would not be installed - so warn user that tests will fail.
-        Throw 'LoopbackAdapter Module could not be installed.'
-    } # if
+    $LoopbackAdapterModule = Join-Path `
+        -Path $LoopbackAdapterModulePath `
+        -ChildPath "$($LoopbackAdapterModuleName).psm1"
+
+    # Import the loopback adapter module
+    Import-Module -Name $LoopbackAdapterModule -Force
 
     try
     {
@@ -33,8 +31,7 @@ function New-IntegrationLoopbackAdapter
         # The loopback Adapter does not exist so create it
         $null = New-LoopbackAdapter `
             -Name $AdapterName `
-            -ErrorAction Stop `
-            @Splat
+            -ErrorAction Stop
     } # try
 } # function New-IntegrationLoopbackAdapter
 
