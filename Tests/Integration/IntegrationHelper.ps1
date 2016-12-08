@@ -31,6 +31,7 @@ function New-IntegrationLoopbackAdapter
         # The loopback Adapter does not exist so create it
         $null = New-LoopbackAdapter `
             -Name $AdapterName `
+            -Force `
             -ErrorAction Stop
     } # try
 } # function New-IntegrationLoopbackAdapter
