@@ -5,32 +5,20 @@ function New-IntegrationLoopbackAdapter
         [String]
         $AdapterName
     )
-    # Configure Loopback Adapter
-    if ($env:APPVEYOR) {
-        # Running in AppVeyor so force silent install of LoopbackAdapter
-        $Splat = @{ Force = $true }
-    }
-    else
-    {
-        $Splat = @{ Force = $false }
-    } # if
 
+    # Ensure the loopback adapter module is downloaded
     $LoopbackAdapterModuleName = 'LoopbackAdapter'
     $LoopbackAdapterModulePath = "$env:USERPROFILE\Documents\WindowsPowerShell\Modules\$LoopbackAdapterModuleName"
-    $LoopbackAdapterModule = Install-ModuleFromPowerShellGallery `
+    Install-ModuleFromPowerShellGallery `
         -ModuleName $LoopbackAdapterModuleName `
-        -ModulePath $LoopbackAdapterModulePath `
-        @Splat
+        -DestinationPath $LoopbackAdapterModulePath
 
-    if ($LoopbackAdapterModule) {
-        # Import the module if it is available
-        $LoopbackAdapterModule | Import-Module -Force
-    }
-    else
-    {
-        # Module could not/would not be installed - so warn user that tests will fail.
-        Throw 'LoopbackAdapter Module could not be installed.'
-    } # if
+    $LoopbackAdapterModule = Join-Path `
+        -Path $LoopbackAdapterModulePath `
+        -ChildPath "$($LoopbackAdapterModuleName).psm1"
+
+    # Import the loopback adapter module
+    Import-Module -Name $LoopbackAdapterModule -Force
 
     try
     {
@@ -43,8 +31,8 @@ function New-IntegrationLoopbackAdapter
         # The loopback Adapter does not exist so create it
         $null = New-LoopbackAdapter `
             -Name $AdapterName `
-            -ErrorAction Stop `
-            @Splat
+            -Force `
+            -ErrorAction Stop
     } # try
 } # function New-IntegrationLoopbackAdapter
 
