@@ -213,6 +213,7 @@ The following error may occur when applying xFirewall configurations on Windows 
 - Changed all MOF files to be consistent and meet HQRM guidelines.
 - Removed most markdown errors (MD*) in Readme.md.
 - Added xNetAdapterRDMA resource
+- Fixes to support changes to DSCResource.Tests.
 
 ### 3.0.0.0
 
