@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '3.0.0.0'
+ModuleVersion = '3.1.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -49,19 +49,11 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '* Corrected integration test filenames:
-    * MSFT_xDefaultGatewayAddress.Integration.Tests.ps1
-    * MSFT_xDhcpClient.Integration.Tests.ps1
-    * MSFT_xDNSConnectionSuffix.Integration.Tests.ps1
-    * MSFT_xNetAdapterBinding.Integration.Tests.ps1
-* Updated all integration tests to use v1.1.0 header and script variable context.
-* Updated all unit tests to use v1.1.0 header and script variable context.
-* Removed uneccessary global variable from MSFT_xNetworkTeam.integration.tests.ps1
-* Converted Invoke-Expression in all integration tests to &.
-* Fixed unit test description in xNetworkAdapter.Tests.ps1
-* xNetAdapterBinding
-  * Added support for the use of wildcard (*) in InterfaceAlias parameter.
-* BREAKING CHANGE - MSFT_xIPAddress: SubnetMask parameter renamed to PrefixLength.
+        ReleaseNotes = '- Changed parameter format in Readme.md to improve information coverage and consistency.
+- Changed all MOF files to be consistent and meet HQRM guidelines.
+- Removed most markdown errors (MD*) in Readme.md.
+- Added xNetAdapterRDMA resource
+- Fixes to support changes to DSCResource.Tests.
 
 '
 
@@ -69,6 +61,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 

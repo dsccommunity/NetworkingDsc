@@ -209,6 +209,8 @@ The following error may occur when applying xFirewall configurations on Windows 
 
 ### Unreleased
 
+### 3.1.0.0
+
 - Changed parameter format in Readme.md to improve information coverage and consistency.
 - Changed all MOF files to be consistent and meet HQRM guidelines.
 - Removed most markdown errors (MD*) in Readme.md.
