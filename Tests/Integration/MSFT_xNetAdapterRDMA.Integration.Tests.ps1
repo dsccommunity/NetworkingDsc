@@ -2,30 +2,29 @@
 return
 
 $script:DSCModuleName      = 'xNetworking'
-$script:DSCResourceName    = 'MSFT_xNetworkTeam'
+$script:DSCResourceName    = 'MSFT_xNetAdapterRDMA'
 
 #region HEADER
-# Integration Test Template Version: 1.1.0
-[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+if ( (-not (Test-Path -Path '.\DSCResource.Tests\')) -or `
+     (-not (Test-Path -Path '.\DSCResource.Tests\TestHelper.psm1')) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git')
 }
-
-Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+else
+{
+    & git @('-C',(Join-Path -Path (Get-Location) -ChildPath '\DSCResource.Tests\'),'pull')
+}
+Import-Module .\DSCResource.Tests\TestHelper.psm1 -Force
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:DSCModuleName `
     -DSCResourceName $script:DSCResourceName `
-    -TestType Integration
+    -TestType Integration 
 #endregion
 
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
     #region Integration Tests
-    $teamMembers = (Get-NetAdapter -Physical).Name
-
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
@@ -34,28 +33,25 @@ try
         It 'Should compile without throwing' {
             {
                 & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
-                Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+                Start-DscConfiguration -Path $TestDrive `
+                    -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw
         }
 
         It 'should be able to call Get-DscConfiguration without throwing' {
-            Start-Sleep -Seconds 30
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
             $result = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
-            $result.Ensure                 | Should Be $TestTeam.Ensure
-            $result.Name                   | Should Be $TestTeam.Name
-            $result.TeamMembers            | Should Be $teamMembers
-            $result.loadBalancingAlgorithm | Should Be $TestTeam.loadBalancingAlgorithm
-            $result.teamingMode            | Should Be $TestTeam.teamingMode
+            $result.Name                   | Should Be $TestAdapter.Name
+            $result.Enabled                | Should Be $TestAdapter.Enabled
         }
 
-        Remove-NetLbfoTeam `
-            -Name $TestTeam.Name `
-            -Confirm:$false
+        Set-NetAdapterRDMA `
+            -Name $TestAdapter.Name `
+            -Enabled $false
     }
     #endregion
 }
