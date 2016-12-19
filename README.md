@@ -209,6 +209,8 @@ The following error may occur when applying xFirewall configurations on Windows 
 
 ### Unreleased
 
+- Fix xDnsClientGlobalSetting Set/Test-TargetResource to handle comparison of suffix list arrays
+
 ### 3.1.0.0
 
 - Changed parameter format in Readme.md to improve information coverage and consistency.
