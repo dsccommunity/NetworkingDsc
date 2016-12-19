@@ -86,6 +86,29 @@ try
                 }
             }
 
+            Context 'DNS Client Global Settings SuffixSearchList Array is different' {
+                $suffixSearchListArray = @('fabrikam.com', 'fourthcoffee.com')
+
+                Mock -CommandName Set-DnsClientGlobalSetting -ParameterFilter `
+                    {(Compare-Object -ReferenceObject $suffixSearchList -DifferenceObject `
+                    $suffixSearchListArray -SyncWindow 0).Length -eq 0} {return $null}
+                Mock -CommandName Set-DnsClientGlobalSetting -MockWith {throw}
+
+                It 'should not throw error' {
+                    {
+                        $Splat = $DnsClientGlobalSettingsSplat.Clone()
+                        $Splat.SuffixSearchList = $suffixSearchListArray
+                        Set-TargetResource @Splat
+                    } | Should Not Throw
+                }
+                It 'should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
+                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -ParameterFilter `
+                        {(Compare-Object -ReferenceObject $suffixSearchList -DifferenceObject `
+                        $suffixSearchListArray -SyncWindow 0).Length -eq 0} -Exactly 1
+                }
+            }
+
             Context 'DNS Client Global Settings DevolutionLevel is different' {
                 It 'should not throw error' {
                     {
@@ -133,6 +156,70 @@ try
                 It 'should return false' {
                     $Splat = $DnsClientGlobalSettingsSplat.Clone()
                     $Splat.SuffixSearchList = 'fabrikam.com'
+                    Test-TargetResource @Splat | Should Be $False
+                }
+                It 'should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
+                }
+            }
+
+            Context 'DNS Client Global Settings SuffixSearchList Array is different' {
+                $suffixSearchListArray = @('fabrikam.com', 'fourthcoffee.com')
+
+                Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $DnsClientGlobalSettings } `
+                    -ParameterFilter {(Compare-Object -ReferenceObject $suffixSearchList `
+                    -DifferenceObject $suffixSearchListArray -SyncWindow 0).Length -eq 0}
+                Mock -CommandName Get-DnsClientGlobalSetting -MockWith {throw}
+
+                It 'should return false' {
+                    $Splat = $DnsClientGlobalSettingsSplat.Clone()
+                    $Splat.SuffixSearchList = $suffixSearchListArray
+                    Test-TargetResource @Splat | Should Be $False
+                }
+                It 'should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
+                }
+            }
+
+            Context 'DNS Client Global Settings SuffixSearchList Array Order is same' {
+                $suffixSearchListArray = @('fabrikam.com', 'fourthcoffee.com')
+                $DnsClientGlobalSettings = [PSObject]@{
+                    SuffixSearchList             = @('fabrikam.com', 'fourthcoffee.com')
+                    DevolutionLevel              = 1
+                    UseDevolution                = $True
+                }
+
+                Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $DnsClientGlobalSettings } `
+                    -ParameterFilter {(Compare-Object -ReferenceObject $suffixSearchList `
+                    -DifferenceObject $suffixSearchListArray -SyncWindow 0).Length -eq 0}
+                Mock -CommandName Get-DnsClientGlobalSetting -MockWith {throw}
+
+                It 'should return true' {
+                    $Splat = $DnsClientGlobalSettingsSplat.Clone()
+                    $Splat.SuffixSearchList = $suffixSearchListArray
+                    Test-TargetResource @Splat | Should Be $True
+                }
+                It 'should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
+                }
+            }
+
+            Context 'DNS Client Global Settings SuffixSearchList Array Order is different' {
+                $suffixSearchListArray = @('fourthcoffee.com', 'fabrikam.com')
+                $DnsClientGlobalSettings = [PSObject]@{
+                    SuffixSearchList             = @('fabrikam.com', 'fourthcoffee.com')
+                    DevolutionLevel              = 1
+                    UseDevolution                = $True
+                }
+
+                Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $DnsClientGlobalSettings } `
+                    -ParameterFilter {(Compare-Object -ReferenceObject $suffixSearchList `
+                    -DifferenceObject $suffixSearchListArray -SyncWindow 0).Length -eq 0}
+                Mock -CommandName Get-DnsClientGlobalSetting -MockWith {throw}
+
+                It 'should return false' {
+                    $Splat = $DnsClientGlobalSettingsSplat.Clone()
+                    $Splat.SuffixSearchList = $suffixSearchListArray
                     Test-TargetResource @Splat | Should Be $False
                 }
                 It 'should call expected Mocks' {

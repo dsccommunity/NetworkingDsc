@@ -210,6 +210,7 @@ The following error may occur when applying xFirewall configurations on Windows 
 ### Unreleased
 
 - Fixed typo in the example's Action property from "Blocked" (which isn't a valid value) to "Block"
+- Fix xDnsClientGlobalSetting Set/Test-TargetResource to handle comparison of suffix list arrays
 
 ### 3.1.0.0
 
