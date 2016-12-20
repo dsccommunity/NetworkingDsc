@@ -18,6 +18,7 @@ The **xNetworking** module contains the following resources:
 - **xHostsFile**: Adds, edits or removes entries from the hosts file on a node.
 - **xNetAdapterBinding**: Bind or unbind transport or filters to a network interface.
 - **xDnsClientGlobalSetting**: Configure DNS client global settings.
+- **xNetAdapterRDMA**: Enable or disable RDMA on a network adapter.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
@@ -153,6 +154,10 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 - **`[String[]]` SuffixSearchList** (_Write_): Specifies a list of global suffixes that can be used in the specified order by the DNS client for resolving the IP address of the computer name.
 - **`[Boolean]` UseDevolution** (_Write_): Specifies that devolution is activated.
 - **`[Uint32]` DevolutionLevel** (_Write_): Specifies the number of labels up to which devolution should occur.
+
+### xNetAdapterRDMA
+* **`[String]` Name**: Specifies the name of the adapter for which RDMA configuration needs to be done.
+* **`[Boolean]` Enabled**: Specifies if RDMA setting must be enabled or disabled. { $true | $false }
 
 ## Functions
 
