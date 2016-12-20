@@ -18,6 +18,7 @@ The **xNetworking** module contains the following resources:
 - **xHostsFile**: Adds, edits or removes entries from the hosts file on a node.
 - **xNetAdapterBinding**: Bind or unbind transport or filters to a network interface.
 - **xDnsClientGlobalSetting**: Configure DNS client global settings.
+- **xNetAdapterRDMA**: Enable or disable RDMA on a network adapter.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
@@ -154,6 +155,10 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 - **`[Boolean]` UseDevolution** (_Write_): Specifies that devolution is activated.
 - **`[Uint32]` DevolutionLevel** (_Write_): Specifies the number of labels up to which devolution should occur.
 
+### xNetAdapterRDMA
+* **`[String]` Name**: Specifies the name of the adapter for which RDMA configuration needs to be done.
+* **`[Boolean]` Enabled**: Specifies if RDMA setting must be enabled or disabled. { $true | $false }
+
 ## Functions
 
 ### Get-xNetworkAdapterName
@@ -204,9 +209,15 @@ The following error may occur when applying xFirewall configurations on Windows 
 
 ### Unreleased
 
+- Fixed typo in the example's Action property from "Blocked" (which isn't a valid value) to "Block"
+
+### 3.1.0.0
+
 - Changed parameter format in Readme.md to improve information coverage and consistency.
 - Changed all MOF files to be consistent and meet HQRM guidelines.
 - Removed most markdown errors (MD*) in Readme.md.
+- Added xNetAdapterRDMA resource
+- Fixes to support changes to DSCResource.Tests.
 
 ### 3.0.0.0
 
@@ -638,7 +649,7 @@ Configuration Disable_AccessToApplication
             DisplayName           = "Firewall Rule for Notepad.exe"
             Group                 = "NotePad Firewall Rule Group"
             Ensure                = "Present"
-            Action                = 'Blocked'
+            Action                = 'Block'
             Description           = "Firewall Rule for Notepad.exe"
             Program               = "c:\windows\system32\notepad.exe"
         }
