@@ -204,9 +204,15 @@ The following error may occur when applying xFirewall configurations on Windows 
 
 ### Unreleased
 
+- Fixed typo in the example's Action property from "Blocked" (which isn't a valid value) to "Block"
+
+### 3.1.0.0
+
 - Changed parameter format in Readme.md to improve information coverage and consistency.
 - Changed all MOF files to be consistent and meet HQRM guidelines.
 - Removed most markdown errors (MD*) in Readme.md.
+- Added xNetAdapterRDMA resource
+- Fixes to support changes to DSCResource.Tests.
 
 ### 3.0.0.0
 
@@ -638,7 +644,7 @@ Configuration Disable_AccessToApplication
             DisplayName           = "Firewall Rule for Notepad.exe"
             Group                 = "NotePad Firewall Rule Group"
             Ensure                = "Present"
-            Action                = 'Blocked'
+            Action                = 'Block'
             Description           = "Firewall Rule for Notepad.exe"
             Program               = "c:\windows\system32\notepad.exe"
         }
