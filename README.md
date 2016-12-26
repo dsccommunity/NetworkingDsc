@@ -215,8 +215,9 @@ The following error may occur when applying xFirewall configurations on Windows 
 - MSFT_xFirewall:
   - Cleaned up ParameterList table layout and moved into a new file (MSFT_xFirewall.data.psd1).
   - Separated Localization strings into strings file.
-  - Added standard help blocks to all functions to meet HQRM.
-  - Added CmdletBinding attribute to all functions to meet HQRM.
+  - Added standard help blocks to all functions to meet HQRM standards.
+  - Added CmdletBinding attribute to all functions to meet HQRM standards.
+  - Style changes to meet HQRM standards.
   - Fixed issue using CIDR notation for LocalAddress or RemoteAddress. See [GitHub issue](https://github.com/PowerShell/xNetworking/issues/169).
   - Fixed integration tests so that values being set are correctly tested.
   - Added integration tests for Removal of Firewall rule.

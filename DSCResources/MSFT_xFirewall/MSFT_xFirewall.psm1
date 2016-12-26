@@ -47,7 +47,7 @@ function Get-TargetResource
     param
     (
         # Name of the Firewall Rule
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name
     )
@@ -236,7 +236,7 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name,
 
@@ -575,7 +575,7 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name,
 
@@ -840,20 +840,17 @@ function Test-RuleProperties
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         $FirewallRule,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name,
 
-        [ValidateNotNullOrEmpty()]
         [String] $DisplayName,
 
-        [ValidateNotNullOrEmpty()]
         [String] $Group,
 
-        [ValidateNotNullOrEmpty()]
         [String] $DisplayGroup,
 
         [ValidateSet('Present', 'Absent')]
@@ -870,21 +867,16 @@ function Test-RuleProperties
         [ValidateSet('Inbound', 'Outbound')]
         [String] $Direction,
 
-        [ValidateNotNullOrEmpty()]
         [String[]] $RemotePort,
 
-        [ValidateNotNullOrEmpty()]
         [String[]] $LocalPort,
 
-        [ValidateNotNullOrEmpty()]
         [String] $Protocol,
 
         [String] $Description,
 
-        [ValidateNotNullOrEmpty()]
         [String] $Program,
 
-        [ValidateNotNullOrEmpty()]
         [String] $Service,
 
         [ValidateSet('NotRequired', 'Required', 'NoEncap')]
@@ -893,31 +885,23 @@ function Test-RuleProperties
         [ValidateSet('NotRequired', 'Required', 'Dynamic')]
         [String] $Encryption,
 
-        [ValidateNotNullOrEmpty()]
         [String[]] $InterfaceAlias,
 
         [ValidateSet('Any', 'Wired', 'Wireless', 'RemoteAccess')]
         [String] $InterfaceType,
 
-        [ValidateNotNullOrEmpty()]
         [String[]] $LocalAddress,
 
-        [ValidateNotNullOrEmpty()]
         [String] $LocalUser,
 
-        [ValidateNotNullOrEmpty()]
         [String] $Package,
 
-        [ValidateNotNullOrEmpty()]
         [String[]] $Platform,
 
-        [ValidateNotNullOrEmpty()]
         [String[]] $RemoteAddress,
 
-        [ValidateNotNullOrEmpty()]
         [String] $RemoteMachine,
 
-        [ValidateNotNullOrEmpty()]
         [String] $RemoteUser,
 
         [ValidateSet('Any','ProximityApps','ProximitySharing','WifiDirectPrinting','WifiDirectDisplay','WifiDirectDevices')]
@@ -926,7 +910,6 @@ function Test-RuleProperties
         [ValidateSet('Block','Allow','DeferToUser','DeferToApp')]
         [String] $EdgeTraversalPolicy,
 
-        [ValidateNotNullOrEmpty()]
         [String[]] $IcmpType,
 
         [Boolean] $LocalOnlyMapping,
@@ -935,7 +918,6 @@ function Test-RuleProperties
 
         [Boolean] $OverrideBlockRules,
 
-        [ValidateNotNullOrEmpty()]
         [String] $Owner
     )
 
@@ -1030,7 +1012,7 @@ function Get-FirewallRule
     [CmdletBinding()]
     [OutputType([Microsoft.Management.Infrastructure.CimInstance])]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name
     )
@@ -1074,7 +1056,7 @@ function Get-FirewallRuleProperty
     [CmdletBinding()]
     [OutputType([HashTable])]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         $FirewallRule
      )
 
