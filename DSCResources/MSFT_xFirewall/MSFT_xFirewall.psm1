@@ -74,7 +74,7 @@ function Get-TargetResource
 
     $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
 
-    $Result = @{
+    $result = @{
         Ensure = 'Present'
     }
     # Populate the properties for get target resource by looping through
@@ -83,33 +83,35 @@ function Get-TargetResource
     {
         if ($parameter.type -in @('Array','ArrayIP'))
         {
-            $Value = @(Invoke-Expression -Command "`$($($parameter.source))")
-            $Result += @{
-                $parameter.Name = $Value
-            }
-
+            $parameterValue = @(Invoke-Expression -Command "`$($($parameter.source))")
             if ($parameter.delimiter)
             {
-                $Value = $Value -split $parameter.delimiter
+                $parameterValue = $parameterValue -split $parameter.delimiter
             }
+            $result += @{
+                $parameter.Name = $parameterValue
+            }
+
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($script:localizedData.FirewallParameterValueMessage) -f $Name,$parameter.Name,($Value -join ',')
+                $($script:localizedData.FirewallParameterValueMessage) -f `
+                    $Name,$parameter.Name,($parameterValue -join ',')
                 ) -join '')
         }
         else
         {
-            $Value = (Invoke-Expression -Command "`$($($parameter.source))")
-            $Result += @{
-                $parameter.Name = $Value
+            $parameterValue = (Invoke-Expression -Command "`$($($parameter.source))")
+            $result += @{
+                $parameter.Name = $parameterValue
             }
 
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($script:localizedData.FirewallParameterValueMessage) -f $Name,$parameter.Name,$Value
+                $($script:localizedData.FirewallParameterValueMessage) -f `
+                    $Name,$parameter.Name,$parameterValue
                 ) -join '')
 
         }
     }
-    return $Result
+    return $result
 }
 
 <#
@@ -339,7 +341,7 @@ function Set-TargetResource
         ) -join '')
     $firewallRule = Get-FirewallRule -Name $Name
 
-    $exists = ($firewallRule -ne $null)
+    $exists = ($null -ne $firewallRule)
 
     if ($Ensure -eq 'Present')
     {
@@ -678,7 +680,7 @@ function Test-TargetResource
         ) -join '')
     $firewallRule = Get-FirewallRule -Name $Name
 
-    $exists = ($firewallRule -ne $null)
+    $exists = ($null -ne $firewallRule)
 
     if (-not $exists)
     {
@@ -835,6 +837,7 @@ function Test-TargetResource
 function Test-RuleProperties
 {
     [CmdletBinding()]
+    [OutputType([System.Boolean])]
     param
     (
         [Parameter(Mandatory)]
@@ -945,18 +948,18 @@ function Test-RuleProperties
     # set $desiredConfigurationMatch to false.
     foreach ($parameter in $script:parameterList)
     {
-        $ParameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
-        $ParameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
+        $parameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
+        $parameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
         switch -Wildcard ($parameter.type)
         {
             'String'
             {
                 # Perform a plain string comparison.
-                if ($ParameterNew -and ($ParameterSource -ne $ParameterNew))
+                if ($parameterNew -and ($parameterSource -ne $parameterNew))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                         $($script:localizedData.PropertyNoMatchMessage) `
-                            -f $parameter.Name,$ParameterSource,$ParameterNew
+                            -f $parameter.Name,$parameterSource,$parameterNew
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
@@ -964,11 +967,11 @@ function Test-RuleProperties
             'Boolean'
             {
                 # Perform a boolean comparison.
-                if ($ParameterNew -and ($ParameterSource -ne $ParameterNew))
+                if ($parameterNew -and ($parameterSource -ne $parameterNew))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                         $($script:localizedData.PropertyNoMatchMessage) `
-                            -f $parameter.Name,$ParameterSource,$ParameterNew
+                            -f $parameter.Name,$parameterSource,$parameterNew
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
@@ -976,13 +979,13 @@ function Test-RuleProperties
             'Array*'
             {
                 # Array comparison uses Compare-Object
-                if ($ParameterSource -eq $null)
+                if ($null -eq $parameterSource)
                 {
-                    $ParameterSource = @()
+                    $parameterSource = @()
                 }
                 if ($parameter.delimiter)
                 {
-                    $ParameterSource = $ParameterSource -split $parameter.delimiter
+                    $parameterSource = $parameterSource -split $parameter.delimiter
                 }
                 if ($parameter.type -eq 'IPArray') {
                     <#
@@ -991,17 +994,17 @@ function Test-RuleProperties
                         format that the Get-NetFirewallAddressFilter will return the IP addresses in
                         even if they were set using CIDR notation.
                     #>
-                    $ParameterNew = Convert-CIDRToSubhetMask -Address $ParameterNew
+                    $parameterNew = Convert-CIDRToSubhetMask -Address $parameterNew
                 }
 
-                if ($ParameterNew `
+                if ($parameterNew `
                     -and ((Compare-Object `
-                        -ReferenceObject $ParameterSource `
-                        -DifferenceObject $ParameterNew).Count -ne 0))
+                        -ReferenceObject $parameterSource `
+                        -DifferenceObject $parameterNew).Count -ne 0))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                         $($script:localizedData.PropertyNoMatchMessage) `
-                            -f $parameter.Name,($ParameterSource -join ','),($ParameterNew -join ',')
+                            -f $parameter.Name,($parameterSource -join ','),($parameterNew -join ',')
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
@@ -1025,7 +1028,7 @@ function Test-RuleProperties
 function Get-FirewallRule
 {
     [CmdletBinding()]
-    [OutputType([ Microsoft.Management.Infrastructure.CimInstance])]
+    [OutputType([Microsoft.Management.Infrastructure.CimInstance])]
     param (
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
