@@ -1053,7 +1053,6 @@ try
             }
         }
         #endregion
-
     } #end InModuleScope $DSCResourceName
     #endregion
 }

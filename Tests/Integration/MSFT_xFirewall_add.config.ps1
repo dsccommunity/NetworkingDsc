@@ -4,9 +4,9 @@
 #>
 
 $rule = @{
-    Name                  = 'b8df0af9-d0cc-4080-885b-6ed263aaed67'
     DisplayName           = 'Test Rule'
     Group                 = 'Test Group'
+    DisplayGroup          = 'Test Group'
     Ensure                = 'Present'
     Enabled               = 'False'
     Profile               = @('Domain','Private')
@@ -22,7 +22,7 @@ $rule = @{
     Encryption            = 'NotRequired'
     InterfaceAlias        = (Get-NetAdapter -Physical | Select-Object -First 1).Name
     InterfaceType         = 'Wired'
-    LocalAddress          = @('192.168.2.0-192.168.2.128','192.168.1.0/255.255.255.0')
+    LocalAddress          = @('192.168.2.0-192.168.2.128','192.168.1.0/255.255.255.0','10.0.240.1/8')
     LocalUser             = 'Any'
     Package               = 'S-1-15-2-3676279713-3632409675-756843784-3388909659-2454753834-4233625902-1413163418'
     Platform              = @('6.1')
@@ -35,16 +35,17 @@ $rule = @{
     LooseSourceMapping    = $false
     OverrideBlockRules    = $false
     Owner                 = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
+    IcmpType              = 'Any'
 }
 
-Configuration MSFT_xFirewall_Config {
+Configuration MSFT_xFirewall_Add_Config {
     Import-DscResource -ModuleName xNetworking
     node localhost {
        xFirewall Integration_Test {
-            Name                  = $rule.Name
+            Name                  = $Node.RuleName
             DisplayName           = $rule.DisplayName
             Group                 = $rule.Group
-            Ensure                = 'Present'
+            Ensure                = $rule.Ensure
             Enabled               = $rule.Enabled
             Profile               = $rule.Profile
             Action                = $rule.Action
@@ -72,6 +73,7 @@ Configuration MSFT_xFirewall_Config {
             LooseSourceMapping    = $rule.LooseSourceMapping
             OverrideBlockRules    = $rule.OverrideBlockRules
             Owner                 = $rule.Owner
+            IcmpType              = $rule.IcmpType
         }
     }
 }

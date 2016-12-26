@@ -156,8 +156,9 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 - **`[Uint32]` DevolutionLevel** (_Write_): Specifies the number of labels up to which devolution should occur.
 
 ### xNetAdapterRDMA
-* **`[String]` Name**: Specifies the name of the adapter for which RDMA configuration needs to be done.
-* **`[Boolean]` Enabled**: Specifies if RDMA setting must be enabled or disabled. { $true | $false }
+
+- **`[String]` Name**: Specifies the name of the adapter for which RDMA configuration needs to be done.
+- **`[Boolean]` Enabled**: Specifies if RDMA setting must be enabled or disabled. { $true | $false }
 
 ## Functions
 
@@ -191,7 +192,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ## Known Invalid Configurations
 
-### xFirewall
+### xFirewall Invalid Configurations
 
 - The exception 'One of the port keywords is invalid' will be thrown if a rule is created with the LocalPort set to PlayToDiscovery and the Protocol is not set to UDP. This is not an unexpected error, but because the New-NetFirewallRule documentation is incorrect.
 
@@ -199,7 +200,7 @@ This issue has been reported on [Microsoft Connect](https://connect.microsoft.co
 
 ## Known Issues
 
-### xFirewall
+### xFirewall Known Issues
 
 The following error may occur when applying xFirewall configurations on Windows Server 2012 R2 if [KB3000850](https://support.microsoft.com/en-us/kb/3000850) is not installed. Please ensure this update is installed if this error occurs.
 
@@ -209,7 +210,18 @@ The following error may occur when applying xFirewall configurations on Windows 
 
 ### Unreleased
 
-- Fixed typo in the example's Action property from "Blocked" (which isn't a valid value) to "Block"
+- Fixed typo in the example's Action property from "Blocked" (which isn't a valid value) to "Block".
+- Added CommonResourceHelper.psm1 based on copy from [PSDscResources](https://github.com/PowerShell/PSDscResources/blob/dev/DscResources/CommonResourceHelper.psm1).
+- MSFT_xFirewall:
+  - Cleaned up ParameterList table layout and moved into a new file (MSFT_xFirewall.data.psd1).
+  - Separated Localization strings into strings file.
+  - Added standard help blocks to all functions to meet HQRM.
+  - Added CmdletBinding attribute to all functions to meet HQRM.
+  - Fixed issue using CIDR notation for LocalAddress or RemoteAddress. See [GitHub issue](https://github.com/PowerShell/xNetworking/issues/169).
+  - Fixed integration tests so that values being set are correctly tested.
+  - Added integration tests for Removal of Firewall rule.
+- Resolved final markdown errors (MD*) in Readmd.md.
+- Added NetworkingCommon module to contain shared networking functions.
 
 ### 3.1.0.0
 
@@ -397,6 +409,7 @@ The following error may occur when applying xFirewall configurations on Windows 
 This configuration will set the IP Address with some typical values for a network interface with the alias 'Ethernet'.
 
 ```powershell
+
 Configuration Sample_xIPAddress_FixedValue
 {
     param
@@ -415,6 +428,7 @@ Configuration Sample_xIPAddress_FixedValue
         }
     }
 }
+
 ```
 
 ### Set IP Address with parameterized values
@@ -422,6 +436,7 @@ Configuration Sample_xIPAddress_FixedValue
 This configuration will set the IP Address on a network interface that is identified by its alias.
 
 ```powershell
+
 Configuration Sample_xIPAddress_Parameterized
 {
     param
@@ -447,6 +462,7 @@ Configuration Sample_xIPAddress_Parameterized
         }
     }
 }
+
 ```
 
 ### Set DNS server address
@@ -454,6 +470,7 @@ Configuration Sample_xIPAddress_Parameterized
 This configuration will set the DNS server address on a network interface that is identified by its alias.
 
 ```powershell
+
 Configuration Sample_xDnsServerAddress
 {
     param
@@ -479,6 +496,7 @@ Configuration Sample_xDnsServerAddress
         }
     }
 }
+
 ```
 
 ### Set a DNS connection suffix
@@ -486,6 +504,7 @@ Configuration Sample_xDnsServerAddress
 This configuration will set a DNS connection-specific suffix on a network interface that is identified by its alias.
 
 ```powershell
+
 Configuration Sample_xDnsConnectionSuffix
 {
     param
@@ -506,6 +525,7 @@ Configuration Sample_xDnsConnectionSuffix
         }
     }
 }
+
 ```
 
 ### Set Default Gateway server address
@@ -513,6 +533,7 @@ Configuration Sample_xDnsConnectionSuffix
 This configuration will set the default gateway address on a network interface that is identified by its alias.
 
 ```powershell
+
 Configuration Sample_xDefaultGatewayAddress_Set
 {
     param
@@ -536,6 +557,7 @@ Configuration Sample_xDefaultGatewayAddress_Set
         }
     }
 }
+
 ```
 
 ### Remove Default Gateway server address
@@ -543,6 +565,7 @@ Configuration Sample_xDefaultGatewayAddress_Set
 This configuration will remove the default gateway address on a network interface that is identified by its alias.
 
 ```powershell
+
 Configuration Sample_xDefaultGatewayAddress_Remove
 {
     param
@@ -563,6 +586,7 @@ Configuration Sample_xDefaultGatewayAddress_Remove
         }
     }
 }
+
 ```
 
 ### Adding a firewall rule
@@ -570,6 +594,7 @@ Configuration Sample_xDefaultGatewayAddress_Remove
 This configuration will ensure that a firewall rule is present.
 
 ```powershell
+
 # DSC configuration for Firewall
 Configuration Add_FirewallRule
 {
@@ -589,6 +614,7 @@ Configuration Add_FirewallRule
         }
     }
 }
+
 ```
 
 ### Add a firewall rule to an existing group
@@ -596,6 +622,7 @@ Configuration Add_FirewallRule
 This configuration ensures that two firewall rules are present on the target node, both within the same group.
 
 ```powershell
+
 Configuration Add_FirewallRuleToExistingGroup
 {
     param
@@ -625,6 +652,7 @@ Configuration Add_FirewallRuleToExistingGroup
         }
     }
 }
+
 ```
 
 ### Disable access to an application
@@ -632,6 +660,7 @@ Configuration Add_FirewallRuleToExistingGroup
 This example ensures that notepad.exe is blocked by the firewall.
 
 ```powershell
+
 Configuration Disable_AccessToApplication
 {
     param
@@ -655,6 +684,7 @@ Configuration Disable_AccessToApplication
         }
     }
 }
+
 ```
 
 ### Disable access with additional parameters
@@ -662,6 +692,7 @@ Configuration Disable_AccessToApplication
 This example will disable notepad.exe's outbound access.
 
 ```powershell
+
 # DSC configuration for Firewall
 
 configuration Sample_xFirewall_AddFirewallRule
@@ -696,6 +727,7 @@ configuration Sample_xFirewall_AddFirewallRule
 
 Sample_xFirewall_AddFirewallRule
 Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule -Wait -Verbose -Force
+
 ```
 
 ### Enable a built-in Firewall Rule
@@ -703,6 +735,7 @@ Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule -Wait -Verbose -Fo
 This example enables the built-in Firewall Rule 'World Wide Web Services (HTTP Traffic-In)'.
 
 ```powershell
+
 configuration Sample_xFirewall_EnableBuiltInFirewallRule
 {
     param
@@ -722,6 +755,7 @@ configuration Sample_xFirewall_EnableBuiltInFirewallRule
         }
     }
  }
+
 ```
 
 ### Create a Firewall Rule using all available Parameters
@@ -729,6 +763,7 @@ configuration Sample_xFirewall_EnableBuiltInFirewallRule
 This example will create a firewall rule using all available xFirewall resource parameters. This rule is not meaningful and would not be used like this in reality. It is used to show the expected formats of the different parameters.
 
 ```powershell
+
 configuration Sample_xFirewall_AddFirewallRule_AllParameters
 {
     param
@@ -759,11 +794,11 @@ configuration Sample_xFirewall_AddFirewallRule_AllParameters
             Encryption            = "Required"
             InterfaceAlias        = "Ethernet"
             InterfaceType         = "Wired"
-            LocalAddress          = @("192.168.2.0-192.168.2.128","192.168.1.0/255.255.255.0")
+            LocalAddress          = @("192.168.2.0-192.168.2.128","192.168.1.0/255.255.255.0","10.0.0.0/8")
             LocalUser             = "O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)"
             Package               = "S-1-15-2-3676279713-3632409675-756843784-3388909659-2454753834-4233625902-1413163418"
             Platform              = "6.1"
-            RemoteAddress         = @("192.168.2.0-192.168.2.128","192.168.1.0/255.255.255.0")
+            RemoteAddress         = @("192.168.2.0-192.168.2.128","192.168.1.0/255.255.255.0","10.0.0.0/8")
             RemoteMachine         = "O:LSD:(D;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1621)(A;;CC;;;S-1-5-21-1915925333-479612515-2636650677-1620)"
             RemoteUser            = "O:LSD:(D;;CC;;;S-1-15-3-4)(A;;CC;;;S-1-5-21-3337988176-3917481366-464002247-1001)"
             DynamicTransport      = "ProximitySharing"
@@ -779,11 +814,13 @@ configuration Sample_xFirewall_AddFirewallRule_AllParameters
 
 Sample_xFirewall_AddFirewallRule_AllParameters
 Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule_AllParameters -Wait -Verbose -Force
+
 ```
 
 ### Set the NetConnectionProfile to Public
 
 ```powershell
+
 configuration MSFT_xNetConnectionProfile_Config {
     Import-DscResource -ModuleName xNetworking
     node localhost {
@@ -795,6 +832,7 @@ configuration MSFT_xNetConnectionProfile_Config {
         }
     }
 }
+
 ```
 
 ### Set the DHCP Client state
@@ -802,6 +840,7 @@ configuration MSFT_xNetConnectionProfile_Config {
 This example would set the DHCP Client State to enabled.
 
 ```powershell
+
 configuration Sample_xDhcpClient_Enabled
 {
     param
@@ -828,6 +867,7 @@ configuration Sample_xDhcpClient_Enabled
         }
     }
 }
+
 ```
 
 ### Add a Route
@@ -835,6 +875,7 @@ configuration Sample_xDhcpClient_Enabled
 This example will add an IPv4 route on interface Ethernet.
 
 ```powershell
+
 configuration Sample_xRoute_AddRoute
 {
     param
@@ -860,6 +901,7 @@ configuration Sample_xRoute_AddRoute
 
 Sample_xRoute_AddRoute
 Start-DscConfiguration -Path Sample_xRoute_AddRoute -Wait -Verbose -Force
+
 ```
 
 ### Create a network team
@@ -867,6 +909,7 @@ Start-DscConfiguration -Path Sample_xRoute_AddRoute -Wait -Verbose -Force
 This example shows creating a native network team.
 
 ```powershell
+
 configuration Sample_xNetworkTeam_AddTeam
 {
     param
@@ -891,6 +934,7 @@ configuration Sample_xNetworkTeam_AddTeam
 
 Sample_xNetworkTeam_AddTeam
 Start-DscConfiguration -Path Sample_xNetworkTeam_AddTeam -Wait -Verbose -Force
+
 ```
 
 ## Create a network team interface
@@ -898,6 +942,7 @@ Start-DscConfiguration -Path Sample_xNetworkTeam_AddTeam -Wait -Verbose -Force
 This example shows adding a network team interface to native network team.
 
 ```powershell
+
 configuration Sample_xNetworkTeamInterface_AddInterface
 {
     param
@@ -930,6 +975,7 @@ configuration Sample_xNetworkTeamInterface_AddInterface
 
 Sample_xNetworkTeamInterface_AddInterface
 Start-DscConfiguration -Path Sample_xNetworkTeamInterface_AddInterface -Wait -Verbose -Force
+
 ```
 
 ### Add a hosts file entry
@@ -937,6 +983,7 @@ Start-DscConfiguration -Path Sample_xNetworkTeamInterface_AddInterface -Wait -Ve
 This example will add an hosts file entry.
 
 ```powershell
+
 configuration Sample_xHostsFile_AddEntry
 {
     param
@@ -959,6 +1006,7 @@ configuration Sample_xHostsFile_AddEntry
 
 Sample_xHostsFile_AddEntry
 Start-DscConfiguration -Path Sample_xHostsFile_AddEntry -Wait -Verbose -Force
+
 ```
 
 ### Disable IPv6 on a Network adapter
@@ -966,6 +1014,7 @@ Start-DscConfiguration -Path Sample_xHostsFile_AddEntry -Wait -Verbose -Force
 This example will disable the IPv6 binding on the network adapter 'Ethernet'.
 
 ```powershell
+
 configuration Sample_xNetAdapterBinding_DisableIPv6
 {
     param
@@ -988,6 +1037,7 @@ configuration Sample_xNetAdapterBinding_DisableIPv6
 
 Sample_xNetAdapterBinding_DisableIPv6
 Start-DscConfiguration -Path Sample_xNetAdapterBinding_DisableIPv6 -Wait -Verbose -Force
+
 ```
 
 ### Set a node to use itself as a DNS server
@@ -999,6 +1049,7 @@ Start-DscConfiguration -Path Sample_xNetAdapterBinding_DisableIPv6 -Wait -Verbos
 Sample of using *-xNetworkAdapterName Functions
 
 ```PowerShell
+
 Configuration SetDns
 {
     param
@@ -1037,6 +1088,7 @@ Configuration SetDns
         }
     }
 }
+
 ```
 
 ### Set the DNS Client Global Setting Suffix Search List
@@ -1044,6 +1096,7 @@ Configuration SetDns
 This example will set the DNS Global Suffix Search list to 'contoso.com'.
 
 ```PowerShell
+
 configuration Sample_xDnsClientGlobalSetting_SuffixSearchList
 {
     param
@@ -1076,4 +1129,5 @@ configuration Sample_xDnsClientGlobalSetting_SuffixSearchList
 
 Sample_xDnsClientGlobalSetting_SuffixSearchList -SuffixSearchList 'contoso.com'
 Start-DscConfiguration -Path Sample_xDnsClientGlobalSetting_SuffixSearchList -Wait -Verbose -Force
+
 ```
