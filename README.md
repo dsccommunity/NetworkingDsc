@@ -38,7 +38,7 @@ The following error may occur when applying xFirewall configurations on Windows
 Server 2012 R2 if [KB3000850](https://support.microsoft.com/en-us/kb/3000850) is
 not installed. Please ensure this update is installed if this error occurs.
 
-```markdown
+````markdown
     The cmdlet does not fully support the Inquire action for debug messages.
     Cmdlet operation will continue during the prompt. Select a different action
     preference via -Debug switch or $DebugPreference variable, and try again.
