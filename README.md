@@ -7,7 +7,8 @@ The **xNetworking** module contains the following resources:
 - **xFirewall**: Sets a node's firewall rules.
 - **xIPAddress**: Sets a node's IP address(s).
 - **xDnsServerAddress**: Sets a node's DNS server address(s).
-- **xDnsConnectionSuffix**: Sets a node's network interface connection-specific DNS suffix.
+- **xDnsConnectionSuffix**: Sets a node's network interface
+    connection-specific DNS suffix.
 - **xDefaultGatewayAddress**: Sets a node's default gateway address.
 - **xNetConnectionProfile**: Sets a node's connection profile.
 - **xDhcpClient**: Enable or Disable DHCP on an network interface.
@@ -51,4 +52,3 @@ not installed. Please ensure this update is installed if this error occurs.
     New-NetFirewallRule documentation is incorrect.
 
 This issue has been reported on [Microsoft Connect](https://connect.microsoft.com/PowerShell/feedbackdetail/view/1974268/new-set-netfirewallrule-cmdlet-localport-parameter-documentation-is-incorrect-for-playtodiscovery)
-

@@ -946,7 +946,6 @@ try
                 }
             }
             Context 'testing with a rule with a different Owner' {
-                NOTE: TEMPORARILY REMOVED - SHOULD NOT BE PUSHED WITH THIS COMMENTED
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Owner = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
                 It "should return False on firewall rule $($FirewallRule.Name)" {
