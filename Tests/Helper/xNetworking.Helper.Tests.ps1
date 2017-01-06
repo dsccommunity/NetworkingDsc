@@ -19,7 +19,7 @@ Describe 'xNetworking whole of module tests' {
             ## in to a PSModulePath folder and is picked up correctly. 
             if ($env:APPVEYOR -eq $true) 
             {
-                Copy-item -Path "$env:APPVEYOR_BUILD_FOLDER\xNetworking" `
+                Copy-item -Path "$env:APPVEYOR_BUILD_FOLDER\Modules\xNetworking" `
                           -Destination 'C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules\xNetworking' `
                           -Recurse
             }
