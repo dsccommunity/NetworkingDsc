@@ -9,4 +9,3 @@ Modules/xNetworking/DscResource.Tests/*
 node_modules
 node_modules/*
 markdownissues.txt
-DscResources
