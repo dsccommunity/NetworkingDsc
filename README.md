@@ -211,6 +211,7 @@ The following error may occur when applying xFirewall configurations on Windows 
 ### Unreleased
 
 - Fixed typo in the example's Action property from "Blocked" (which isn't a valid value) to "Block".
+- Fix xDnsClientGlobalSetting Set/Test-TargetResource to handle comparison of suffix list arrays.
 - Added CommonResourceHelper.psm1 based on copy from [PSDscResources](https://github.com/PowerShell/PSDscResources/blob/dev/DscResources/CommonResourceHelper.psm1).
 - MSFT_xFirewall:
   - Cleaned up ParameterList table layout and moved into a new file (MSFT_xFirewall.data.psd1).
