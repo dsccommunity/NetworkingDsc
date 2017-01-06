@@ -24,7 +24,7 @@ function Start-AppveyorTestScriptTask
 {
     $testResultsFile = ".\TestsResults.xml"
     $testHarnessPath = Join-Path -Path $env:APPVEYOR_BUILD_FOLDER `
-                                 -ChildPath "\Tests\Unit\xNetworking.TestHarness.psm1"
+                                 -ChildPath "\Tests\xNetworking.TestHarness.psm1"
     $dscTestsPath = Join-Path -Path $env:APPVEYOR_BUILD_FOLDER `
                               -ChildPath "Modules\xNetworking\DscResource.Tests"
     Import-Module -Name $testHarnessPath
