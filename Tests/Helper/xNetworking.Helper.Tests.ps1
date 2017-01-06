@@ -52,7 +52,7 @@ Describe 'xNetworking whole of module tests' {
                 Remove-item -Path 'C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules\xNetworking' `
                             -Recurse -Force -Confirm:$false
                 # Restore the load of the module to ensure future tests have access to it
-                Import-Module -Name "$RepoRoot\xNetworking.psd1" -Global -Force
+                Import-Module -Name "$RepoRoot\Modules\xNetworking\xNetworking.psd1" -Global -Force
             }
         }
 
