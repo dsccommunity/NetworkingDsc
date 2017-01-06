@@ -1,0 +1,184 @@
+# Versions
+
+## Unreleased
+
+- Fixed typo in the example's Action property from "Blocked" (which isn't a valid value) to "Block"
+
+## 3.1.0.0
+
+- Changed parameter format in Readme.md to improve information coverage and consistency.
+- Changed all MOF files to be consistent and meet HQRM guidelines.
+- Removed most markdown errors (MD*) in Readme.md.
+- Added xNetAdapterRDMA resource
+- Fixes to support changes to DSCResource.Tests.
+
+## 3.0.0.0
+
+- Corrected integration test filenames:
+  - MSFT_xDefaultGatewayAddress.Integration.Tests.ps1
+  - MSFT_xDhcpClient.Integration.Tests.ps1
+  - MSFT_xDNSConnectionSuffix.Integration.Tests.ps1
+  - MSFT_xNetAdapterBinding.Integration.Tests.ps1
+- Updated all integration tests to use v1.1.0 header and script variable context.
+- Updated all unit tests to use v1.1.0 header and script variable context.
+- Removed uneccessary global variable from MSFT_xNetworkTeam.integration.tests.ps1
+- Converted Invoke-Expression in all integration tests to &.
+- Fixed unit test description in xNetworkAdapter.Tests.ps1
+- xNetAdapterBinding
+  - Added support for the use of wildcard (*) in InterfaceAlias parameter.
+- BREAKING CHANGE - MSFT_xIPAddress: SubnetMask parameter renamed to PrefixLength.
+
+## 2.12.0.0
+
+- Fixed bug in MSFT_xIPAddress resource when xIPAddress follows xVMSwitch.
+- Added the following resources:
+  - MSFT_xNetworkTeamInterface resource to add/remove network team interfaces
+- Added conditional loading of LocalizedData to MSFT_xHostsFile and MSFT_xNetworkTeam to prevent failures while loading those resources on systems with $PSUICulture other than en-US
+
+## 2.11.0.0
+
+- Added the following resources:
+  - MSFT_xDnsClientGlobalSetting resource to configure the DNS Suffix Search List and Devolution.
+- Converted AppVeyor.yml to pull Pester from PSGallery instead of Chocolatey.
+- Changed AppVeyor.yml to use default image.
+- Fix xNetBios unit tests to work on default appveyor image.
+- Fix bug in xRoute when removing an existing route.
+- Updated xRoute integration tests to use v1.1.0 test header.
+- Extended xRoute integration tests to perform both add and remove route tests.
+
+## 2.10.0.0
+
+- Added the following resources:
+  - MSFT_xNetAdapterBinding resource to enable/disable network adapter bindings.
+- Fixed bug where xHostsFile would duplicate an entry instead of updating an existing one
+- Updated Sample_xIPAddress_*.ps1 examples to show correct usage of setting a Static IP address to prevent issue when DHCP assigned IP address already matches staticly assigned IP address.
+
+## 2.9.0.0
+
+- MSFT_xDefaultGatewayAddress: Added Integration Tests.
+- MSFT_xDhcpClient: Added Integration Tests.
+- MSFT_xDnsConnectionSuffix: Added Integration Tests.
+- MSFT_xDnsServerAddress: Added Integration Tests.
+- MSFT_xIPAddress: Added Integration Tests.
+- MSFT_xDhcpClient: Fixed logged message in Test-TargetResource.
+- Added functions:
+  - Get-xNetworkAdapterName
+  - Test-xNetworkAdapterName
+  - Set-xNetworkAdapterName
+
+## 2.8.0.0
+
+- Templates folder removed. Use the test templates in the [Tests.Template folder in the DSCResources repository](https://github.com/PowerShell/DscResources/tree/master/Tests.Template) instead.
+- Added the following resources:
+  - MSFT_xHostsFile resource to manage hosts file entries.
+- MSFT_xFirewall: Fix test of Profile parameter status.
+- MSFT_xIPAddress: Fix false negative when desired IP is a substring of current IP.
+
+## 2.7.0.0
+
+- Added the following resources:
+  - MSFT_xNetworkTeam resource to manage native network adapter teaming.
+
+## 2.6.0.0
+
+- Added the following resources:
+  - MSFT_xDhcpClient resource to enable/disable DHCP on individual interfaces.
+  - MSFT_xRoute resource to manage network routes.
+  - MSFT_xNetBIOS resource to configure NetBIOS over TCP/IP settings on individual interfaces.
+- MSFT_*: Unit and Integration tests updated to use DSCResource.Tests\TestHelper.psm1 functions.
+- MSFT_*: Resource Name added to all unit test Desribes.
+- Templates update to use DSCResource.Tests\TestHelper.psm1 functions.
+- MSFT_xNetConnectionProfile: Integration tests fixed when more than one connection profile present.
+- Changed AppVeyor.yml to use WMF 5 build environment.
+- MSFT_xIPAddress: Removed test for DHCP Status.
+- MSFT_xFirewall: New parameters added:
+  - DynamicTransport
+  - EdgeTraversalPolicy
+  - LocalOnlyMapping
+  - LooseSourceMapping
+  - OverrideBlockRules
+  - Owner
+- All unit & integration tests updated to be able to be run from any folder under tests directory.
+- Unit & Integration test template headers updated to match DSCResource templates.
+
+## 2.5.0.0
+
+- Added the following resources:
+  - MSFT_xDNSConnectionSuffix resource to manage connection-specific DNS suffixes.
+  - MSFT_xNetConnectionProfile resource to manage Connection Profiles for interfaces.
+- MSFT_xDNSServerAddress: Corrected Verbose logging messages when multiple DNS adddressed specified.
+- MSFT_xDNSServerAddress: Change to ensure resource terminates if DNS Server validation fails.
+- MSFT_xDNSServerAddress: Added Validate parameter to enable DNS server validation when changing server addresses.
+- MSFT_xFirewall: ApplicationPath Parameter renamed to Program for consistency with Cmdlets.
+- MSFT_xFirewall: Fix to prevent error when DisplayName parameter is set on an existing rule.
+- MSFT_xFirewall: Setting a different DisplayName parameter on an existing rule now correctly reports as needs change.
+- MSFT_xFirewall: Changed DisplayGroup parameter to Group for consistency with Cmdlets and reduce confusion.
+- MSFT_xFirewall: Changing the Group of an existing Firewall rule will recreate the Firewall rule rather than change it.
+- MSFT_xFirewall: New parameters added:
+  - Authentication
+  - Encryption
+  - InterfaceAlias
+  - InterfaceType
+  - LocalAddress
+  - LocalUser
+  - Package
+  - Platform
+  - RemoteAddress
+  - RemoteMachine
+  - RemoteUser
+- MSFT_xFirewall: Profile parameter now handled as an Array.
+
+## 2.4.0.0
+
+- Added following resources:
+  - MSFT_xDefaultGatewayAddress
+- MSFT_xFirewall: Removed code using DisplayGroup to lookup Firewall Rule because it was redundant.
+- MSFT_xFirewall: Set-TargetResource now updates firewall rules instead of recreating them.
+- MSFT_xFirewall: Added message localization support.
+- MSFT_xFirewall: Removed unessesary code for handling multiple rules with same name.
+- MSFT_xDefaultGatewayAddress: Removed unessesary try/catch logic from around networking cmdlets.
+- MSFT_xIPAddress: Removed unessesary try/catch logic from around networking cmdlets.
+- MSFT_xDNSServerAddress: Removed unessesary try/catch logic from around networking cmdlets.
+- MSFT_xDefaultGatewayAddress: Refactored to add more unit tests and cleanup logic.
+- MSFT_xIPAddress: Network Connection Profile no longer forced to Private when IP address changed.
+- MSFT_xIPAddress: Refactored to add more unit tests and cleanup logic.
+- MSFT_xDNSServerAddress: Refactored to add more unit tests and cleanup logic.
+- MSFT_xFirewall: Refactored to add more unit tests and cleanup logic.
+- MSFT_xIPAddress: Removed default gateway parameter - use xDefaultGatewayAddress resource.
+- MSFT_xIPAddress: Added check for IP address format not matching address family.
+- MSFT_xDNSServerAddress: Corrected error message when address format doesn't match address family.
+
+## 2.3.0.0
+
+- MSFT_xDNSServerAddress: Added support for setting DNS for both IPv4 and IPv6 on the same Interface
+- MSFT_xDNSServerAddress: AddressFamily parameter has been changed to mandatory.
+- Removed xDscResourceDesigner tests (moved to common tests)
+- Fixed Test-TargetResource to test against all provided parameters
+- Modified tests to not copy file to Program Files
+
+- Changes to xFirewall causes Get-DSCConfiguration to no longer crash
+  - Modified Schema to reduce needed functions.
+  - General re-factoring and clean up of xFirewall.
+  - Added Unit and Integration tests to resource.
+
+## 2.2.0.0
+
+- Changes in xFirewall resources to meet Test-xDscResource criteria
+
+## 2.1.1.1
+
+- Updated to fix issue with Get-DscConfiguration and xFirewall
+
+## 2.1.0
+
+- Added validity check that IPAddress and IPAddressFamily conforms with each other
+
+## 2.0.0.0
+
+- Adding the xFirewall resource
+
+## 1.0.0.0
+
+- Initial release with the following resources:
+  - xIPAddress
+  - xDnsServerAddress
