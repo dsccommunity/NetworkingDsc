@@ -29,7 +29,7 @@ additional questions or comments.
 
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
 
-## Known Invalid Configurations
+## Known Issues
 
 ### xFirewall
 
