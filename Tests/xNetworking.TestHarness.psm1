@@ -26,7 +26,7 @@ function Invoke-xNetworkingTest
         $testResultSettings.Add('OutputFile', $TestResultsFile)
     }
     
-    # Import-Module "$repoDir\modules\xNetworking\xNetworking.psd1"
+    Import-Module "$repoDir\modules\xNetworking\xNetworking.psd1"
     $testsToRun = @()
     
     # Helper tests
@@ -39,14 +39,14 @@ function Invoke-xNetworkingTest
         })
     }
 
-    # # Run Unit Tests
-    # $unitTests = (Get-ChildItem (Join-Path $repoDir '\Tests\Unit\')).Name
+    # Run Unit Tests
+    $unitTests = (Get-ChildItem (Join-Path $repoDir '\Tests\Unit\')).Name
     
-    # $unitTests | ForEach-Object {
-    #     $testsToRun += @(@{
-    #         'Path' = "$repoDir\Tests\Unit\$_"
-    #     })
-    # }
+    $unitTests | ForEach-Object {
+        $testsToRun += @(@{
+            'Path' = "$repoDir\Tests\Unit\$_"
+        })
+    }
     
     # Integration Tests
     $integrationTests = (Get-ChildItem -Path (Join-Path $repoDir '\Tests\Integration\') -Filter '*.Tests.ps1').Name
@@ -57,12 +57,12 @@ function Invoke-xNetworkingTest
         })
     }
 
-    # # DSC Common Tests
-    # if ($PSBoundParameters.ContainsKey('DscTestsPath') -eq $true) {
-    #     $testsToRun += @{
-    #         'Path' = $DscTestsPath
-    #     }
-    # }
+    # DSC Common Tests
+    if ($PSBoundParameters.ContainsKey('DscTestsPath') -eq $true) {
+        $testsToRun += @{
+            'Path' = $DscTestsPath
+        }
+    }
 
     $results = Invoke-Pester -Script $testsToRun `
         -CodeCoverage $testCoverageFiles `

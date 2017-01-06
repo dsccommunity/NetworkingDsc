@@ -4,7 +4,7 @@ var through2 = require("through2");
 var markdownlint = require("markdownlint");
 
 gulp.task("test-mdsyntax", function task() {
-  return gulp.src("Modules/xNetworking/DSCResources/**/*.md", { "read": false })
+  return gulp.src(["Modules/xNetworking/DSCResources/**/*.md","./README.MD","./CHANGELOG.MD"], { "read": false })
     .pipe(through2.obj(function obj(file, enc, next) {
       markdownlint(
         { 
