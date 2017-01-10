@@ -42,9 +42,9 @@ not installed. Please ensure this update is installed if this error occurs.
     The cmdlet does not fully support the Inquire action for debug messages.
     Cmdlet operation will continue during the prompt. Select a different action
     preference via -Debug switch or $DebugPreference variable, and try again.
-```
+````
 
-#### Known Invalid Configuraiton
+### Known Invalid Configuraiton
 
 - The exception 'One of the port keywords is invalid' will be thrown if a rule
     is created with the LocalPort set to PlayToDiscovery and the Protocol is not

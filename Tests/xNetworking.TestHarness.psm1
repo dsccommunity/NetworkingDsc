@@ -1,5 +1,6 @@
 function Invoke-xNetworkingTest
 {
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $false)]
@@ -9,12 +10,12 @@ function Invoke-xNetworkingTest
         [System.String] $DscTestsPath
     )
 
-    Write-Verbose 'Commencing all xNetworking tests'
+    Write-Verbose -Message 'Commencing all xNetworking tests'
 
     $repoDir = Join-Path -Path $PSScriptRoot -ChildPath "..\" -Resolve
 
     $testCoverageFiles = @()
-    Get-ChildItem "$repoDir\modules\xNetworking\DSCResources\**\*.psm1" -Recurse | ForEach-Object { 
+    Get-ChildItem -Path "$repoDir\modules\xNetworking\DSCResources\**\*.psm1" -Recurse | ForEach-Object { 
         if ($_.FullName -notlike '*\DSCResource.Tests\*') {
             $testCoverageFiles += $_.FullName    
         }
@@ -26,12 +27,12 @@ function Invoke-xNetworkingTest
         $testResultSettings.Add('OutputFile', $TestResultsFile)
     }
     
-    Import-Module "$repoDir\modules\xNetworking\xNetworking.psd1"
+    Import-Module -Name "$repoDir\modules\xNetworking\xNetworking.psd1"
     $testsToRun = @()
     
     # Helper tests
 
-    $helperTests = (Get-ChildItem (Join-Path $repoDir '\Tests\Helper\')).Name
+    $helperTests = (Get-ChildItem -Path (Join-Path -Path $repoDir -ChildPath '\Tests\Helper\')).Name
     
     $helperTests | ForEach-Object {
         $testsToRun += @(@{
@@ -40,7 +41,7 @@ function Invoke-xNetworkingTest
     }
 
     # Run Unit Tests
-    $unitTests = (Get-ChildItem (Join-Path $repoDir '\Tests\Unit\')).Name
+    $unitTests = (Get-ChildItem (Join-Path -Path $repoDir -ChildPath '\Tests\Unit\')).Name
     
     $unitTests | ForEach-Object {
         $testsToRun += @(@{
@@ -49,7 +50,7 @@ function Invoke-xNetworkingTest
     }
     
     # Integration Tests
-    $integrationTests = (Get-ChildItem -Path (Join-Path $repoDir '\Tests\Integration\') -Filter '*.Tests.ps1').Name
+    $integrationTests = (Get-ChildItem -Path (Join-Path -Path $repoDir -ChildPath '\Tests\Integration\') -Filter '*.Tests.ps1').Name
     
     $integrationTests | ForEach-Object {
         $testsToRun += @(@{
