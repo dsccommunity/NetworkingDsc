@@ -7,9 +7,10 @@ Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
                                -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
                                                      -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
-
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xFirewall'
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xFirewall' `
+    -ResourcePath (Split-Path -Path $PSScriptRoot -Parent)
 
 # Import the common networking functions
 Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `

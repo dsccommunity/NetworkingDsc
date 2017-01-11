@@ -142,16 +142,20 @@ function Get-LocalizedData
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $ResourceName
+        $ResourceName,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $ResourcePath
     )
 
-    $resourceDirectory = (Join-Path -Path $PSScriptRoot -ChildPath $ResourceName)
-    $localizedStringFileLocation = Join-Path -Path $resourceDirectory -ChildPath $PSUICulture
+    $localizedStringFileLocation = Join-Path -Path $ResourcePath -ChildPath $PSUICulture
 
     if (-not (Test-Path -Path $localizedStringFileLocation))
     {
         # Fallback to en-US
-        $localizedStringFileLocation = Join-Path -Path $resourceDirectory -ChildPath 'en-US'
+        $localizedStringFileLocation = Join-Path -Path $ResourcePath -ChildPath 'en-US'
     }
 
     Import-LocalizedData `
