@@ -2,11 +2,11 @@
 # Note: This configuration sample uses all Firewall rule parameters.
 # It is only used to show example usage and should not be created.
 
-configuration Sample_xFirewall_AddFirewallRule_AllParameters
+configuration Example
 {
     param
     (
-        [string[]]$NodeName = 'localhost'
+        [string[]] $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking
