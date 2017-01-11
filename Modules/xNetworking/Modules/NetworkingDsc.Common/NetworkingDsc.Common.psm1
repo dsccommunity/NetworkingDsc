@@ -1,5 +1,5 @@
 ﻿Import-Module `
-    -Name (Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) `
+    -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
     -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Localized messages for Write-Verbose statements in this resource
