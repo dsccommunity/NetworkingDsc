@@ -1,9 +1,9 @@
 $script:DSCModuleName      = 'xNetworking'
-$script:DSCResourceName    = 'NetworkingCommon'
+$script:DSCResourceName    = 'NetworkingDsc.Common'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
-[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -27,7 +27,7 @@ try
     }
 
     #region Function Convert-CIDRToSubhetMask
-    Describe "MSFT_xFirewall\Convert-CIDRToSubhetMask" {
+    Describe "NetworkingDsc.Common\Convert-CIDRToSubhetMask" {
         Context 'Subnet Mask Notation Used "192.168.0.0/255.255.0.0"' {
             It 'Should Return "192.168.0.0/255.255.0.0"' {
                 Convert-CIDRToSubhetMask -Address @('192.168.0.0/255.255.0.0') | Should Be '192.168.0.0/255.255.0.0'

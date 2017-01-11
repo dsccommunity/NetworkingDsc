@@ -1,19 +1,20 @@
-# Import CommonResourceHelper
-$script:dscResourcesFolderFilePath = Split-Path `
-    -Path $PSScriptRoot `
-    -Parent
-$script:commonResourceHelperFilePath = Join-Path `
-    -Path $script:dscResourcesFolderFilePath `
-    -ChildPath 'CommonResourceHelper.psm1'
-Import-Module -Name $script:commonResourceHelperFilePath
+# Get the path to the shared modules folder
+$script:ModulesFolderPath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)) `
+                                      -ChildPath 'Modules'
+
+# Import the common
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+
 
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xFirewall'
 
 # Import the common networking functions
-Import-Module -Name ( Join-Path `
-    -Path (Split-Path -Path $PSScriptRoot -Parent) `
-    -ChildPath '\NetworkingCommon\NetworkingCommon.psm1' )
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
 
 <#
     This is an array of all the parameters used by this resource

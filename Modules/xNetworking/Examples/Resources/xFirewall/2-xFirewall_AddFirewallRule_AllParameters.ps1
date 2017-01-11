@@ -49,6 +49,3 @@ configuration Example
         }
     }
 }
-
-Sample_xFirewall_AddFirewallRule_AllParameters
-Start-DscConfiguration -Path Sample_xFirewall_AddFirewallRule_AllParameters -Wait -Verbose -Force

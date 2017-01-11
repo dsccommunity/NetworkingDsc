@@ -22,7 +22,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     # Import the Common Networking functions
-    Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResources\NetworkingCommon\NetworkingCommon.psm1') -Force
+    Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'Modules\NetworkingDsc.Common\NetworkingDsc.Common.psm1') -Force
 
     # Load the ParameterList from the data file.
     $resourceDataPath = Join-Path `
