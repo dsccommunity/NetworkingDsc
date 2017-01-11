@@ -10,12 +10,10 @@
             "cwd": "${file}"
         },
         {
-            "name": "PowerShell x86",
-            "type": "PowerShell x86",
+            "name": "Run all tests",
+            "type": "PowerShell",
             "request": "launch",
-            "program": "${file}",
-            "args": [],
-            "cwd": "${file}"
+            "program": "${workspaceRoot}/.vscode/RunAllTests.ps1"
         }
     ]
 }
