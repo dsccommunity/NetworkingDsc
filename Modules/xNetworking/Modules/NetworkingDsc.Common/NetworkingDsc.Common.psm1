@@ -5,7 +5,7 @@ Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
 
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_xFirewall' `
+    -ResourceName 'NetworkingDsc.Common' `
     -ResourcePath $PSScriptRoot
 
 <#
