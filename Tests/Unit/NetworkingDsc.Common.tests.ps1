@@ -1,5 +1,4 @@
-$script:DSCModuleName      = 'xNetworking'
-$script:DSCResourceName    = 'NetworkingDsc.Common'
+$script:ModuleName = 'NetworkingDsc.Common'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
@@ -11,10 +10,7 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
-    -TestType Unit
+Import-Module (Join-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath (Join-Path -Path 'Modules' -ChildPath $script:ModuleName)) -ChildPath "$script:ModuleName.psm1") -Force
 #endregion HEADER
 
 # Begin Testing
@@ -22,7 +18,7 @@ try
 {
     #region Pester Tests
 
-    $LocalizedData = InModuleScope $script:DSCResourceName {
+    $LocalizedData = InModuleScope $script:ModuleName {
         $LocalizedData
     }
 
@@ -71,7 +67,5 @@ try
 finally
 {
     #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
-
 }
