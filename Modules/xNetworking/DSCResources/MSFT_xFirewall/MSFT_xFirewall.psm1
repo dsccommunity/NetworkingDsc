@@ -1,8 +1,3 @@
-# Suppressed PSAvoidUsingInvokeExpression because alternative method to is not currently known.
-# https://github.com/PowerShell/DscResources/blob/master/PSSARuleSeverities.md
-[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingInvokeExpression', '')]
-param ()
-
 # Get the path to the shared modules folder
 $script:ModulesFolderPath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)) `
                                       -ChildPath 'Modules'
