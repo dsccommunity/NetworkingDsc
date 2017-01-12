@@ -1,7 +1,9 @@
-# DSC configuration for Firewall
-# Note: This configuration sample uses all Firewall rule parameters.
-# It is only used to show example usage and should not be created.
-
+<#
+    .EXAMPLE
+    DSC configuration for Firewall
+    Note: This configuration sample uses all Firewall rule parameters.
+    It is only used to show example usage and should not be created.
+#>
 configuration Example
 {
     param
