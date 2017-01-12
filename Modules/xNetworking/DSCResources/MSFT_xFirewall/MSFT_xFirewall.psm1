@@ -2,7 +2,7 @@
 $script:ModulesFolderPath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)) `
                                       -ChildPath 'Modules'
 
-# Import the common
+# Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
                                -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
                                                      -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))

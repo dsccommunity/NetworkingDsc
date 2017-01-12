@@ -1,9 +1,12 @@
-﻿Import-Module `
-    -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
-    -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+﻿# Import the Networking Resource Helper Module
+Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
-# Localized messages for Write-Verbose statements in this resource
-$script:localizedData = Get-LocalizedData -ResourceName 'NetworkingDsc.Common'
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xFirewall' `
+    -ResourcePath $PSScriptRoot
 
 <#
     .SYNOPSIS
