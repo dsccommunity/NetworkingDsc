@@ -33,13 +33,45 @@ try
         -FileName "$($script:DSCResourceName).data.psd1"
     $parameterList = $resourceData.ParameterList
 
-    # Create a config data object to pass to the DSC Configs
+    # Create a config data object to pass to the Add Rule Config
     $ruleName = [Guid]::NewGuid()
     $configData = @{
         AllNodes = @(
             @{
-                NodeName = 'localhost'
-                RuleName = $ruleName
+                NodeName              = 'localhost'
+                RuleName              = $ruleName
+                Ensure                = 'Present'
+                DisplayName           = 'Test Rule'
+                Group                 = 'Test Group'
+                DisplayGroup          = 'Test Group'
+                Enabled               = 'False'
+                Profile               = @('Domain','Private')
+                Action                = 'Allow'
+                Description           = 'MSFT_xFirewall Test Firewall Rule'
+                Direction             = 'Inbound'
+                RemotePort            = @('8080', '8081')
+                LocalPort             = @('9080', '9081')
+                Protocol              = 'TCP'
+                Program               = 'c:\windows\system32\notepad.exe'
+                Service               = 'WinRM'
+                Authentication        = 'NotRequired'
+                Encryption            = 'NotRequired'
+                InterfaceAlias        = (Get-NetAdapter -Physical | Select-Object -First 1).Name
+                InterfaceType         = 'Wired'
+                LocalAddress          = @('192.168.2.0-192.168.2.128','192.168.1.0/255.255.255.0','10.0.240.1/8')
+                LocalUser             = 'Any'
+                Package               = 'S-1-15-2-3676279713-3632409675-756843784-3388909659-2454753834-4233625902-1413163418'
+                Platform              = @('6.1')
+                RemoteAddress         = @('192.168.2.0-192.168.2.128','192.168.1.0/255.255.255.0')
+                RemoteMachine         = 'Any'
+                RemoteUser            = 'Any'
+                DynamicTransport      = 'Any'
+                EdgeTraversalPolicy   = 'Allow'
+                LocalOnlyMapping      = $false
+                LooseSourceMapping    = $false
+                OverrideBlockRules    = $false
+                Owner                 = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
+                IcmpType              = 'Any'
             }
         )
     }
@@ -111,6 +143,17 @@ try
 
     }
     #endregion
+
+    # Create a config data object to pass to the Remove Rule Config
+    $configData = @{
+        AllNodes = @(
+            @{
+                NodeName              = 'localhost'
+                RuleName              = $ruleName
+                Ensure                = 'Absent'
+            }
+        )
+    }
 
     #region Integration Tests for Remove Firewall Rule
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_remove.config.ps1"
