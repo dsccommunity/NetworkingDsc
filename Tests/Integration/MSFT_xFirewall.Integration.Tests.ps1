@@ -116,7 +116,7 @@ try
             $parameterName = $parameter.Name
             if ($parameterName -ne 'Name') {
                 $parameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
-                $parameterNew = (Invoke-Expression -Command "`$rule.$($parameter.name)")
+                $parameterNew = (Invoke-Expression -Command "`$configData.AllNodes[0].$($parameter.name)")
                 if ($parameter.type -eq 'Array' -and $parameter.Delimiter) {
                     $parameterNew = $parameterNew -join $parameter.Delimiter
                     It "Should have set the '$parameterName' to '$parameterNew'" {
