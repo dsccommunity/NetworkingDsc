@@ -144,16 +144,8 @@ try
     }
     #endregion
 
-    # Create a config data object to pass to the Remove Rule Config
-    $configData = @{
-        AllNodes = @(
-            @{
-                NodeName              = 'localhost'
-                RuleName              = $ruleName
-                Ensure                = 'Absent'
-            }
-        )
-    }
+    # Modify the config data object to pass to the Remove Rule Config
+    $configData.AllNodes[0].Ensure = 'Absent'
 
     #region Integration Tests for Remove Firewall Rule
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_remove.config.ps1"
