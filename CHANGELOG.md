@@ -6,6 +6,19 @@
   value) to "Block"
 - Added support for auto generating wiki, help files, markdown linting
   and checking examples.
+- Added NetworkingDsc.ResourceHelper module based on copy from [PSDscResources](https://github.com/PowerShell/PSDscResources/blob/dev/DscResources/CommonResourceHelper.psm1).
+- MSFT_xFirewall:
+  - Cleaned up ParameterList table layout and moved into a new file
+    (MSFT_xFirewall.data.psd1).
+  - Separated Localization strings into strings file.
+  - Added standard help blocks to all functions to meet HQRM standards.
+  - Added CmdletBinding attribute to all functions to meet HQRM standards.
+  - Style changes to meet HQRM standards.
+  - Fixed issue using CIDR notation for LocalAddress or RemoteAddress.
+    See [GitHub issue](https://github.com/PowerShell/xNetworking/issues/169).
+  - Fixed integration tests so that values being set are correctly tested.
+  - Added integration tests for Removal of Firewall rule.
+- Added NetworkingDsc.Common module to contain shared networking functions.
 
 ## 3.1.0.0
 

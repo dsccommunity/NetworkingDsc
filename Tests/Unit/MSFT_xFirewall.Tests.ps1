@@ -56,10 +56,14 @@ try
                 # Looping these tests
                 foreach ($parameter in $ParameterList)
                 {
-                    $ParameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
-                    $ParameterNew = (Invoke-Expression -Command "`$result.$($parameter.name)")
+                    $parameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
+                    $parameterNew = (Invoke-Expression -Command "`$result.$($parameter.name)")
                     It "should have the correct $($parameter.Name) on firewall rule $($FirewallRule.Name)" {
-                        $ParameterSource | Should Be $ParameterNew
+                        if ($parameter.delimiter)
+                        {
+                            $parameterNew = $parameterNew -join ','
+                        }
+                        $parameterNew | Should Be $parameterSource
                     }
                 }
             }
@@ -612,38 +616,15 @@ try
         #region Function Test-RuleProperties
         Describe 'MSFT_xFirewall\Test-RuleProperties' {
             # Make an object that can be splatted onto the function
-            $Splat = @{
-                Name                = $FirewallRule.Name
-                DisplayGroup        = $FirewallRule.DisplayGroup
-                Group               = $FirewallRule.Group
-                Enabled             = $FirewallRule.Enabled
-                Profile             = $FirewallRule.Profile -split ', '
-                Direction           = $FirewallRule.Direction
-                Action              = $FirewallRule.Action
-                RemotePort          = $Properties.PortFilters.RemotePort
-                LocalPort           = $Properties.PortFilters.LocalPort
-                Protocol            = $Properties.PortFilters.Protocol
-                Description         = $FirewallRule.Description
-                Program             = $Properties.ApplicationFilters.Program
-                Service             = $Properties.ServiceFilters.Service
-                Authentication      = $properties.SecurityFilters.Authentication
-                Encryption          = $properties.SecurityFilters.Encryption
-                InterfaceAlias      = $properties.InterfaceFilters.InterfaceAlias
-                InterfaceType       = $properties.InterfaceTypeFilters.InterfaceType
-                LocalAddress        = $properties.AddressFilters.LocalAddress
-                LocalUser           = $properties.SecurityFilters.LocalUser
-                Package             = $properties.ApplicationFilters.Package
-                Platform            = $firewallRule.Platform
-                RemoteAddress       = $properties.AddressFilters.RemoteAddress
-                RemoteMachine       = $properties.SecurityFilters.RemoteMachine
-                RemoteUser          = $properties.SecurityFilters.RemoteUser
-                DynamicTransport    = $properties.PortFilters.DynamicTransport
-                EdgeTraversalPolicy = $FirewallRule.EdgeTraversalPolicy
-                IcmpType            = $properties.PortFilters.IcmpType
-                LocalOnlyMapping    = $FirewallRule.LocalOnlyMapping
-                LooseSourceMapping  = $FirewallRule.LooseSourceMapping
-                OverrideBlockRules  = $properties.SecurityFilters.OverrideBlockRules
-                Owner               = $FirewallRule.Owner
+            $Splat = @{}
+            foreach ($parameter in $ParameterList)
+            {
+                $parameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
+                if ($parameter.delimiter)
+                {
+                    $parameterSource = $parameterSource -split $parameter.delimiter
+                }
+                $Splat += @{ $parameter.name = $parameterSource }
             }
 
             # To speed up all these tests create Mocks so that these functions are not repeatedly called
@@ -1053,7 +1034,6 @@ try
             }
         }
         #endregion
-
     } #end InModuleScope $DSCResourceName
     #endregion
 }

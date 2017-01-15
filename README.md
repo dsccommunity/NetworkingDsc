@@ -32,7 +32,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ## Known Issues
 
-### xFirewall
+### xFirewall Known Issues
 
 The following error may occur when applying xFirewall configurations on Windows
 Server 2012 R2 if [KB3000850](https://support.microsoft.com/en-us/kb/3000850) is
