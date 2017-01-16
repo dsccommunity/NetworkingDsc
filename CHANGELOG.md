@@ -30,6 +30,8 @@
   - Style changes to meet HQRM standards.
 - MSFT_xDnsClientGlobalSetting:
   - Renamed Localization strings file to be standard naming format.
+  - Moved ParameterList into a new file (MSFT_xDnsClientGlobalSetting.data.psd1).
+  - Style changes to meet HQRM standards.
 - MSFT_xDnsConnectionSuffix:
   - Separated Localization strings into strings file.
 - MSFT_xHostsFile:
