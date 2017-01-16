@@ -17,6 +17,16 @@ Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
                                -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
                                                      -ChildPath 'NetworkingDsc.Common.psm1'))
 
+<#
+    .SYNOPSIS
+    Returns the current state of a Network Team Interface in a Network Team.
+
+    .PARAMETER Name
+    Specifies the name of the network team interface to create.
+
+    .PARAMETER TeamName
+    Specifies the name of the network team on which this particular interface should exist.
+#>
 function Get-TargetResource
 {
     [CmdletBinding()]
@@ -33,7 +43,7 @@ function Get-TargetResource
     )
 
     $configuration = @{
-        name = $Name
+        name     = $Name
         teamName = $TeamName
     }
 
@@ -52,9 +62,25 @@ function Get-TargetResource
         $configuration.Add("ensure", "Absent")
     }
 
-    $configuration
+    return $configuration
 }
 
+<#
+    .SYNOPSIS
+    Adds, updates or removes a Network Team Interface from a Network Team.
+
+    .PARAMETER Name
+    Specifies the name of the network team interface to create.
+
+    .PARAMETER TeamName
+    Specifies the name of the network team on which this particular interface should exist.
+
+    .PARAMETER VlanID
+    Specifies VlanID to be set on network team interface.
+
+    .PARAMETER Ensure
+    Specifies if the network team interface should be created or deleted.
+#>
 function Set-TargetResource
 {
     [CmdletBinding()]
@@ -140,7 +166,22 @@ function Set-TargetResource
     }
 }
 
+<#
+    .SYNOPSIS
+    Tests is a specified Network Team Interface is in the correct state.
 
+    .PARAMETER Name
+    Specifies the name of the network team interface to create.
+
+    .PARAMETER TeamName
+    Specifies the name of the network team on which this particular interface should exist.
+
+    .PARAMETER VlanID
+    Specifies VlanID to be set on network team interface.
+
+    .PARAMETER Ensure
+    Specifies if the network team interface should be created or deleted.
+#>
 function Test-TargetResource
 {
     [CmdletBinding()]

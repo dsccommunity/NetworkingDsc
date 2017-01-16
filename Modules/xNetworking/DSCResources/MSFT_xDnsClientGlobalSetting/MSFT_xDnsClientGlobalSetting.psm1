@@ -51,15 +51,15 @@ function Get-TargetResource
         -ErrorAction Stop
 
     # Generate the return object.
-    $ReturnValue = @{
+    $returnValue = @{
         IsSingleInstance = 'Yes'
     }
     foreach ($parameter in $ParameterList)
     {
-        $ReturnValue += @{ $parameter.Name = $DnsClientGlobalSetting.$($parameter.name) }
+        $returnValue += @{ $parameter.Name = $DnsClientGlobalSetting.$($parameter.name) }
     } # foreach
 
-    return $ReturnValue
+    return $returnValue
 } # Get-TargetResource
 
 function Set-TargetResource

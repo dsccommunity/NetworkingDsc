@@ -17,6 +17,17 @@ Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
                                -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
                                                      -ChildPath 'NetworkingDsc.Common.psm1'))
 
+<#
+    .SYNOPSIS
+    Returns the current state of a Network Team.
+
+    .PARAMETER Name
+    Specifies the name of the network team to create.
+
+    .PARAMETER TeamMembers
+    Specifies the network interfaces that should be a part of the network team.
+    This is a comma-separated list.
+#>
 Function Get-TargetResource
 {
     [CmdletBinding()]
@@ -24,14 +35,16 @@ Function Get-TargetResource
     Param
     (
         [Parameter(Mandatory = $true)]
-        [string]$Name,
+        [string]
+        $Name,
 
         [Parameter(Mandatory = $true)]
-        [String[]]$TeamMembers
+        [String[]]
+        $TeamMembers
     )
 
     $configuration = @{
-        name = $Name
+        name        = $Name
         teamMembers = $TeamMembers
     }
 
@@ -54,30 +67,56 @@ Function Get-TargetResource
         Write-Verbose -Message ($localizedData.TeamNotFound -f $Name)
         $configuration.Add('ensure','Absent')
     }
-    $configuration
+
+    return $configuration
 }
 
+<#
+    .SYNOPSIS
+    Adds, updates or removes a Network Team.
+
+    .PARAMETER Name
+    Specifies the name of the network team to create.
+
+    .PARAMETER TeamMembers
+    Specifies the network interfaces that should be a part of the network team.
+    This is a comma-separated list.
+
+    .PARAMETER TeamingMode
+    Specifies the teaming mode configuration.
+
+    .PARAMETER LoadBalancingAlgorithm
+    Specifies the load balancing algorithm for the network team.
+
+    .PARAMETER Ensure
+    Specifies if the network team should be created or deleted.
+#>
 Function Set-TargetResource
 {
     [CmdletBinding()]
     Param
     (
         [Parameter(Mandatory = $true)]
-        [string]$Name,
+        [string]
+        $Name,
 
         [Parameter(Mandatory = $true)]
-        [String[]]$TeamMembers,
+        [String[]]
+        $TeamMembers,
 
         [Parameter()]
         [ValidateSet("SwitchIndependent", "LACP", "Static")]
-        [String]$TeamingMode = "SwitchIndependent",
+        [String]
+        $TeamingMode = "SwitchIndependent",
 
         [Parameter()]
         [ValidateSet("Dynamic", "HyperVPort", "IPAddresses", "MacAddresses", "TransportPorts")]
-        [String]$LoadBalancingAlgorithm = "HyperVPort",
+        [String]
+        $LoadBalancingAlgorithm = "HyperVPort",
 
         [ValidateSet('Present', 'Absent')]
-        [String]$Ensure = 'Present'
+        [String]
+        $Ensure = 'Present'
     )
     Write-Verbose -Message ($localizedData.GetTeamInfo -f $Name)
     $networkTeam = Get-NetLBFOTeam -Name $Name -ErrorAction SilentlyContinue
@@ -94,7 +133,7 @@ Function Set-TargetResource
             if ($networkTeam.loadBalancingAlgorithm -ne $LoadBalancingAlgorithm)
             {
                 Write-Verbose -Message ($localizedData.lbAlgoDifferent -f $LoadBalancingAlgorithm)
-                $SetArguments.Add('loadBalancingAlgorithm', $LoadBalancingAlgorithm)
+                $setArguments.Add('loadBalancingAlgorithm', $LoadBalancingAlgorithm)
                 $isNetModifyRequired = $true
             }
 
@@ -175,6 +214,26 @@ Function Set-TargetResource
     }
 }
 
+<#
+    .SYNOPSIS
+    Tests is a specified Network Team is in the correct state.
+
+    .PARAMETER Name
+    Specifies the name of the network team to create.
+
+    .PARAMETER TeamMembers
+    Specifies the network interfaces that should be a part of the network team.
+    This is a comma-separated list.
+
+    .PARAMETER TeamingMode
+    Specifies the teaming mode configuration.
+
+    .PARAMETER LoadBalancingAlgorithm
+    Specifies the load balancing algorithm for the network team.
+
+    .PARAMETER Ensure
+    Specifies if the network team should be created or deleted.
+#>
 Function Test-TargetResource
 {
     [CmdletBinding()]
@@ -182,21 +241,26 @@ Function Test-TargetResource
     Param
     (
         [Parameter(Mandatory = $true)]
-        [string]$Name,
+        [string]
+        $Name,
 
         [Parameter(Mandatory = $true)]
-        [String[]]$TeamMembers,
+        [String[]]
+        $TeamMembers,
 
         [Parameter()]
         [ValidateSet("SwitchIndependent", "LACP", "Static")]
-        [String]$TeamingMode = "SwitchIndependent",
+        [String]
+        $TeamingMode = "SwitchIndependent",
 
         [Parameter()]
         [ValidateSet("Dynamic", "HyperVPort", "IPAddresses", "MacAddresses", "TransportPorts")]
-        [String]$LoadBalancingAlgorithm = "HyperVPort",
+        [String]
+        $LoadBalancingAlgorithm = "HyperVPort",
 
         [ValidateSet('Present', 'Absent')]
-        [String]$Ensure = 'Present'
+        [String]
+        $Ensure = 'Present'
     )
 
     Write-Verbose -Message ($localizedData.GetTeamInfo -f $Name)

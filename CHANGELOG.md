@@ -44,6 +44,10 @@
   - Renamed Localization strings file to be standard naming format.
 - MSFT_xNetConnectionProfile:
   - Separated Localization strings into strings file.
+- MSFT_xNetworkTeam:
+  - Style changes to meet HQRM standards.
+- MSFT_xNetworkTeamInterface:
+  - Style changes to meet HQRM standards.
 - MSFT_xRoute:
   - Separated Localization strings into strings file.
   - Style changes to meet HQRM standards.

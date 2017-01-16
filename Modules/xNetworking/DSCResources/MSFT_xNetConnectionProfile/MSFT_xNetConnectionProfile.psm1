@@ -17,13 +17,22 @@ Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
                                -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
                                                      -ChildPath 'NetworkingDsc.Common.psm1'))
 
+<#
+    .SYNOPSIS
+    Returns the current Networking Connection Profile for the specified interface.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias for the Interface that is being changed.
+#>
 function Get-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
         [parameter(Position = 0, Mandatory = $true)]
-        [string] $InterfaceAlias
+        [string]
+        $InterfaceAlias
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -40,21 +49,43 @@ function Get-TargetResource
     }
 }
 
+<#
+    .SYNOPSIS
+    Sets the Network Connection Profile for a specified interface.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias for the Interface that is being changed.
+
+    .PARAMETER IPv4Connectivity
+    Specifies the network interfaces that should be a part of the network team.
+    This is a comma-separated list.
+
+    .PARAMETER IPv6Connectivity
+    Specifies the teaming mode configuration.
+
+    .PARAMETER NetworkCategory
+    Specifies the load balancing algorithm for the network team.
+#>
 function Set-TargetResource
 {
+    [CmdletBinding()]
     param
     (
         [parameter(Mandatory = $true)]
-        [string] $InterfaceAlias,
+        [string]
+        $InterfaceAlias,
 
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
-        [string] $IPv4Connectivity,
+        [string]
+        $IPv4Connectivity,
 
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
-        [string] $IPv6Connectivity,
+        [string]
+        $IPv6Connectivity,
 
         [ValidateSet('Public', 'Private')]
-        [string] $NetworkCategory
+        [string]
+        $NetworkCategory
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -64,23 +95,44 @@ function Set-TargetResource
     Set-NetConnectionProfile @PSBoundParameters
 }
 
+<#
+    .SYNOPSIS
+    Tests is the Network Connection Profile for the specified interface is in the correct state.
 
+    .PARAMETER InterfaceAlias
+    Specifies the alias for the Interface that is being changed.
+
+    .PARAMETER IPv4Connectivity
+    Specifies the network interfaces that should be a part of the network team.
+    This is a comma-separated list.
+
+    .PARAMETER IPv6Connectivity
+    Specifies the teaming mode configuration.
+
+    .PARAMETER NetworkCategory
+    Specifies the load balancing algorithm for the network team.
+#>
 function Test-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
     (
         [parameter(Mandatory = $true)]
-        [string] $InterfaceAlias,
+        [string]
+        $InterfaceAlias,
 
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
-        [string] $IPv4Connectivity,
+        [string]
+        $IPv4Connectivity,
 
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
-        [string] $IPv6Connectivity,
+        [string]
+        $IPv6Connectivity,
 
         [ValidateSet('Public', 'Private')]
-        [string] $NetworkCategory
+        [string]
+        $NetworkCategory
     )
 
     $current = Get-TargetResource -InterfaceAlias $InterfaceAlias

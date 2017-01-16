@@ -37,15 +37,18 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String] $State
+        [String]
+        $State
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -87,15 +90,18 @@ function Set-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String] $State
+        [String]
+        $State
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -143,15 +149,18 @@ function Test-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String] $State
+        [String]
+        $State
     )
 
     # Flag to signal whether settings are correct
@@ -201,15 +210,18 @@ function Test-ResourceProperty {
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String] $State
+        [String]
+        $State
     )
 
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))

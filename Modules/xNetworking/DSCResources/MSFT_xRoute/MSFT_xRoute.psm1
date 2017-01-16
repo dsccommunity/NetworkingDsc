@@ -139,29 +139,37 @@ function Set-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $DestinationPrefix,
+        [String]
+        $DestinationPrefix,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $NextHop,
+        [String]
+        $NextHop,
 
         [ValidateSet('Present', 'Absent')]
-        [String] $Ensure = 'Present',
+        [String]
+        $Ensure = 'Present',
 
-        [Uint16] $RouteMetric = 256,
+        [Uint16]
+        $RouteMetric = 256,
 
         [ValidateSet('No', 'Yes', 'Age')]
-        [String] $Publish = 'No',
+        [String]
+        $Publish = 'No',
 
-        [Double] $PreferredLifetime
+        [Double]
+        $PreferredLifetime
     )
 
     # Remove any parameters that can't be splatted.
@@ -274,29 +282,37 @@ function Test-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $DestinationPrefix,
+        [String]
+        $DestinationPrefix,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $NextHop,
+        [String]
+        $NextHop,
 
         [ValidateSet('Present', 'Absent')]
-        [String] $Ensure = 'Present',
+        [String]
+        $Ensure = 'Present',
 
-        [Uint16] $RouteMetric = 256,
+        [Uint16]
+        $RouteMetric = 256,
 
         [ValidateSet('No', 'Yes', 'Age')]
-        [String] $Publish = 'No',
+        [String]
+        $Publish = 'No',
 
-        [Double] $PreferredLifetime
+        [Double]
+        $PreferredLifetime
     )
 
     Write-Verbose -Message ( @(
@@ -429,29 +445,37 @@ Function Get-Route {
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $DestinationPrefix,
+        [String]
+        $DestinationPrefix,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $NextHop,
+        [String]
+        $NextHop,
 
         [ValidateSet('Present', 'Absent')]
-        [String] $Ensure = 'Present',
+        [String]
+        $Ensure = 'Present',
 
-        [Uint16] $RouteMetric = 256,
+        [Uint16]
+        $RouteMetric = 256,
 
         [ValidateSet('No', 'Yes', 'Age')]
-        [String] $Publish = 'No',
+        [String]
+        $Publish = 'No',
 
-        [Double] $PreferredLifetime
+        [Double]
+        $PreferredLifetime
     )
 
     try
@@ -509,29 +533,37 @@ Function Test-ResourceProperty {
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $DestinationPrefix,
+        [String]
+        $DestinationPrefix,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $NextHop,
+        [String]
+        $NextHop,
 
         [ValidateSet('Present', 'Absent')]
-        [String] $Ensure = 'Present',
+        [String]
+        $Ensure = 'Present',
 
-        [Uint16] $RouteMetric = 256,
+        [Uint16]
+        $RouteMetric = 256,
 
         [ValidateSet('No', 'Yes', 'Age')]
-        [String] $Publish = 'No',
+        [String]
+        $Publish = 'No',
 
-        [Double] $PreferredLifetime
+        [Double]
+        $PreferredLifetime
     )
 
     # Validate the Adapter exists

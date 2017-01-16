@@ -38,13 +38,16 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily,
+        [String]
+        $AddressFamily,
 
-        [String]$Address
+        [String]
+        $Address
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
@@ -97,13 +100,16 @@ function Set-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily,
+        [String]
+        $AddressFamily,
 
-        [String]$Address
+        [String]
+        $Address
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
@@ -179,13 +185,16 @@ function Test-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily,
+        [String]
+        $AddressFamily,
 
-        [String]$Address
+        [String]
+        $Address
     )
 
     # Flag to signal whether settings are correct
@@ -262,27 +271,30 @@ function Test-TargetResource
     Check the Address details are valid and do not conflict with Address family.
     Ensures interface exists. If any problems are detected an exception will be thrown.
 
-    .PARAMETER Address
-    The desired default gateway address - if not provided default gateway will be removed.
-
     .PARAMETER InterfaceAlias
     Alias of the network interface for which the default gateway address is set.
 
     .PARAMETER AddressFamily
     IP address family.
+
+    .PARAMETER Address
+    The desired default gateway address - if not provided default gateway will be removed.
 #>
 function Test-ResourceProperty {
     [CmdletBinding()]
     param
     (
-        [String]$Address,
-
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily = 'IPv4'
+        [String]
+        $AddressFamily = 'IPv4',
+
+        [String]
+        $Address
     )
 
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
