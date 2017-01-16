@@ -17,20 +17,33 @@ Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
                                -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
                                                      -ChildPath 'NetworkingDsc.Common.psm1'))
 
+<#
+    .SYNOPSIS
+    Returns the current state of the DHCP Client for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DHCP Client is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER State
+    The desired state of the DHCP Client.
+#>
 function Get-TargetResource
 {
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
         [String] $AddressFamily,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
         [String] $State
     )
@@ -55,19 +68,32 @@ function Get-TargetResource
     $returnValue
 }
 
+<#
+    .SYNOPSIS
+    Sets the DHCP Client for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DHCP Client is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER State
+    The desired state of the DHCP Client.
+#>
 function Set-TargetResource
 {
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
         [String] $AddressFamily,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
         [String] $State
     )
@@ -97,20 +123,33 @@ function Set-TargetResource
 
 } # Set-TargetResource
 
+<#
+    .SYNOPSIS
+    Tests the state of the DHCP Client for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DHCP Client is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER State
+    The desired state of the DHCP Client.
+#>
 function Test-TargetResource
 {
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
         [String] $AddressFamily,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
         [String] $State
     )
@@ -142,21 +181,33 @@ function Test-TargetResource
     return $desiredConfigurationMatch
 } # Test-TargetResource
 
+<#
+    .SYNOPSIS
+    Function will check the interface exists.
+    If any problems are detected an exception will be thrown.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DHCP Client is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER State
+    The desired state of the DHCP Client.
+#>
 function Test-ResourceProperty {
-    # Function will check the interface exists.
-    # If any problems are detected an exception will be thrown.
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
         [String] $AddressFamily,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
         [String] $State
     )

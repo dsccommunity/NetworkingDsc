@@ -23,8 +23,10 @@
   - Separated Localization strings into strings file.
 - MSFT_xDefaultGatewayAddress:
   - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
 - MSFT_xDhcpClient:
   - Separated Localization strings into strings file.
+  - Fix parameter descriptions in MOF file.
 - MSFT_xDnsClientGlobalSetting:
   - Renamed Localization strings file to be standard naming format.
 - MSFT_xDnsConnectionSuffix:

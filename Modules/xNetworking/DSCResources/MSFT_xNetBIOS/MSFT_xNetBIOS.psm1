@@ -170,13 +170,13 @@ function New-TerminatingError
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String] $ErrorId,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String] $ErrorMessage,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [System.Management.Automation.ErrorCategory] $ErrorCategory
     )
 

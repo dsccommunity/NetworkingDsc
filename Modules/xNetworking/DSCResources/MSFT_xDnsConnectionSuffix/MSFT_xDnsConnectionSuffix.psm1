@@ -22,11 +22,11 @@ function Get-TargetResource
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String] $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String] $ConnectionSpecificSuffix,
 
@@ -82,11 +82,11 @@ function Test-TargetResource
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String] $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String] $ConnectionSpecificSuffix,
 
@@ -131,11 +131,11 @@ function Set-TargetResource
 {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String] $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String] $ConnectionSpecificSuffix,
 

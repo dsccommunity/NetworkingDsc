@@ -21,7 +21,7 @@ function Convert-CIDRToSubhetMask
     [CmdletBinding()]
     [OutputType([ Microsoft.Management.Infrastructure.CimInstance])]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String[]] $Address
     )

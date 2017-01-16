@@ -23,10 +23,10 @@ Function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     Param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]$Name,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String[]]$TeamMembers
     )
 
@@ -62,10 +62,10 @@ Function Set-TargetResource
     [CmdletBinding()]
     Param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]$Name,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String[]]$TeamMembers,
 
         [Parameter()]
@@ -181,10 +181,10 @@ Function Test-TargetResource
     [OutputType([System.Boolean])]
     Param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]$Name,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String[]]$TeamMembers,
 
         [Parameter()]
