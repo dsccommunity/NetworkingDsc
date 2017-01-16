@@ -82,7 +82,7 @@ try
         {
             $parameterName = $parameter.Name
             if ($parameterName -ne 'Name') {
-                $parameterSource = $DnsClientGlobalSettingNew.$($parameter.source)
+                $parameterSource = (Invoke-Expression -Command "`$DnsClientGlobalSettingNew.$($parameter.source)")
                 $parameterNew = (Invoke-Expression -Command "`$configData.AllNodes[0].$($parameter.name)")
                 It "Should have set the '$parameterName' to '$parameterNew'" {
                     $parameterSource | Should Be $parameterNew
