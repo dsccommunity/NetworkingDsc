@@ -9,7 +9,7 @@ Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
 
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_xDefaultGateway' `
+    -ResourceName 'MSFT_xDefaultGatewayAddress' `
     -ResourcePath $PSScriptRoot
 
 # Import the common networking functions
