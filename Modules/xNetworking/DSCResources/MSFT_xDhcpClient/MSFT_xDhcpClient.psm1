@@ -1,15 +1,21 @@
-data LocalizedData
-{
-    # culture="en-US"
-    ConvertFrom-StringData -StringData @'
-GettingDHCPClientMessage=Getting the DHCP Client on {1} interface "{0}".
-ApplyingDHCPClientMessage=Applying the DHCP Client on {1} interface "{0}".
-DHCPClientSetStateMessage=DHCP Client was set to the desired state {2} on {1} interface "{0}".
-CheckingDHCPClientMessage=Checking the DHCP Client on {1} interface "{0}".
-DHCPClientDoesNotMatchMessage=DHCP Client is not in the desired state {2} on {1} interface "{0}".
-InterfaceNotAvailableError=Interface "{0}" is not available. Please select a valid interface and try again.
-'@
-}
+# Get the path to the shared modules folder
+$script:ModulesFolderPath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)) `
+                                      -ChildPath 'Modules'
+
+# Import the Networking Resource Helper Module
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xDhcpClient' `
+    -ResourcePath $PSScriptRoot
+
+# Import the common networking functions
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
 
 function Get-TargetResource
 {
@@ -35,7 +41,7 @@ function Get-TargetResource
         ) -join '')
 
     Test-ResourceProperty @PSBoundParameters
-    
+
     $CurrentDHCPClient = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily
@@ -72,11 +78,11 @@ function Set-TargetResource
         ) -join '')
 
     Test-ResourceProperty @PSBoundParameters
-    
+
     $CurrentDHCPClient = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily
-        
+
     # The DHCP Client is in a different state - so change it.
     Set-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
@@ -88,7 +94,7 @@ function Set-TargetResource
         $($LocalizedData.DHCPClientSetStateMessage) `
         -f $InterfaceAlias,$AddressFamily,$State `
         ) -join '' )
-        
+
 } # Set-TargetResource
 
 function Test-TargetResource
@@ -122,7 +128,7 @@ function Test-TargetResource
     $CurrentDHCPClient = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily
-        
+
     # The DHCP Client is in a different state - so change it.
     if ($CurrentDHCPClient.DHCP -ne $State)
     {

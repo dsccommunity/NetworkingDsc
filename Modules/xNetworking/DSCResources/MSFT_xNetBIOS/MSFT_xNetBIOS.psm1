@@ -1,14 +1,21 @@
-#region localizeddata
-if (Test-Path "${PSScriptRoot}\${PSUICulture}")
-{
-    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetBIOS.psd1 -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
-} 
-else
-{
-    #fallback to en-US
-    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetBIOS.psd1 -BaseDirectory "${PSScriptRoot}\en-US"
-}
-#endregion
+# Get the path to the shared modules folder
+$script:ModulesFolderPath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)) `
+                                      -ChildPath 'Modules'
+
+# Import the Networking Resource Helper Module
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xNetBIOS' `
+    -ResourcePath $PSScriptRoot
+
+# Import the common networking functions
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
 
 #region check NetBIOSSetting enum loaded, if not load
 try
@@ -26,7 +33,7 @@ catch
     }
 '@
 }
-#endregion 
+#endregion
 
 function Get-TargetResource
 {
@@ -83,7 +90,7 @@ function Set-TargetResource
                 -ResultClassName Win32_NetworkAdapterConfiguration `
                 -ErrorAction Stop
 
-    if ($Setting -eq [NETBIOSSetting]::Default) 
+    if ($Setting -eq [NETBIOSSetting]::Default)
     {
         Write-Verbose -Message $LocalizedData.ResetToDefaut
         #If DHCP is not enabled, settcpipnetbios CIM Method won't take 0 so overwrite registry entry instead.
@@ -97,7 +104,7 @@ function Set-TargetResource
     else
     {
         Write-Verbose -Message ($LocalizedData.SetNetBIOS -f $Setting)
-        $null = $NetAdapterConfig | 
+        $null = $NetAdapterConfig |
             Invoke-CimMethod -MethodName SetTcpipNetbios -ErrorAction Stop -Arguments @{
                 TcpipNetbiosOptions = [uint32][NETBIOSSetting]::$Setting.value__
             }
@@ -139,18 +146,18 @@ function Test-TargetResource
     }
 
     $NICConfig = $NIC | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
-    
+
     Write-Verbose -Message ($LocalizedData.CurrentNetBiosSetting -f [NETBIOSSetting].GetEnumValues()[$NICConfig.TcpipNetbiosOptions])
 
     $DesiredSetting = ([NETBIOSSetting]::$($Setting)).value__
     Write-Verbose -Message ($LocalizedData.DesiredSetting -f $Setting)
 
-    if ($NICConfig.TcpipNetbiosOptions -eq $DesiredSetting) 
+    if ($NICConfig.TcpipNetbiosOptions -eq $DesiredSetting)
     {
         Write-Verbose -Message $LocalizedData.InDesiredState
         return $true
     }
-    else 
+    else
     {
         Write-Verbose -Message $LocalizedData.NotInDesiredState
         return $false

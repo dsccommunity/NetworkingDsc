@@ -1,18 +1,21 @@
-data LocalizedData
-{
-    # culture="en-US"
-    ConvertFrom-StringData -StringData @'
-GettingNetAdapterBindingMessage=Getting the '{0}' Inerface '{1}' Binding.
-ApplyingNetAdapterBindingMessage=Applying the '{0}' Inerface '{1}' Binding.
-NetAdapterBindingEnabledMessage='{0}' Inerface '{1}' Binding was Enabled.
-NetAdapterBindingDisabledMessage='{0}' Inerface '{1}' Binding was Disabled.
-CheckingNetAdapterBindingMessage=Checking the '{0}' Inerface '{1}' Binding.
-NetAdapterBindingDoesNotMatchMessage='{0}' Inerface '{1}' Binding does NOT match desired state. Expected {2}, actual {3}.
-NetAdapterBindingMatchMessage='{0}' Inerface '{1}' Binding is in desired state.
-InterfaceNotAvailableError=Interface '{0}' is not available. Please select a valid interface and try again.
-ComponentIdNotAvailableError=Inerface '{0}' does not have '{1}' bound to it. Please select a bound component Id and try again.
-'@
-}
+# Get the path to the shared modules folder
+$script:ModulesFolderPath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)) `
+                                      -ChildPath 'Modules'
+
+# Import the Networking Resource Helper Module
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xNetAdapterBinding' `
+    -ResourcePath $PSScriptRoot
+
+# Import the common networking functions
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
 
 function Get-TargetResource
 {
@@ -44,7 +47,7 @@ function Get-TargetResource
     If ( $AdaptersState.Count -eq 2)
     {
         $CurrentEnabled = 'Mixed'
-    }         
+    }
     ElseIf ( $AdaptersState -eq $true )
     {
         $CurrentEnabled = 'Enabled'
@@ -138,7 +141,7 @@ function Test-TargetResource
     If ( $AdaptersState.Count -eq 2)
     {
         $CurrentEnabled = 'Mixed'
-    }         
+    }
     ElseIf ( $AdaptersState -eq $true )
     {
         $CurrentEnabled = 'Enabled'

@@ -1,16 +1,21 @@
-﻿#region localizeddata
-if (Test-Path "${PSScriptRoot}\${PSUICulture}")
-{
-    Import-LocalizedData -BindingVariable localizedData -filename MSFT_xNetAdapterRDMA.psd1 `
-                         -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
-} 
-else
-{
-    #fallback to en-US
-    Import-LocalizedData -BindingVariable localizedData -filename MSFT_xNetAdapterRDMA.psd1 `
-                         -BaseDirectory "${PSScriptRoot}\en-US"
-}
-#endregion
+﻿# Get the path to the shared modules folder
+$script:ModulesFolderPath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)) `
+                                      -ChildPath 'Modules'
+
+# Import the Networking Resource Helper Module
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xNetAdapterRDMA' `
+    -ResourcePath $PSScriptRoot
+
+# Import the common networking functions
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
 
 <#
 .SYNOPSIS
@@ -56,11 +61,11 @@ function Get-TargetResource
     Sets MSFT_xVMNetAdapterRDMA resource state.
 
 .PARAMETER Name
-    Specifies the name of the network adapter for which the 
+    Specifies the name of the network adapter for which the
     RDMA configuration needs to be retrieved.
 
 .PARAMETER Enabled
-    Specifies if the RDMA configuration should be enabled or disabled. 
+    Specifies if the RDMA configuration should be enabled or disabled.
     This is a boolean value and the default is $true.
 #>
 function Set-TargetResource
@@ -107,11 +112,11 @@ function Set-TargetResource
     Tests if MSFT_xVMNetAdapterRDMA resource state is indeed desired state or not.
 
 .PARAMETER Name
-    Specifies the name of the network adapter for which the 
+    Specifies the name of the network adapter for which the
     RDMA configuration needs to be retrieved.
 
 .PARAMETER Enabled
-    Specifies if the RDMA configuration should be enabled or disabled. 
+    Specifies if the RDMA configuration should be enabled or disabled.
     This is a boolean value and the default is $true.
 #>
 function Test-TargetResource

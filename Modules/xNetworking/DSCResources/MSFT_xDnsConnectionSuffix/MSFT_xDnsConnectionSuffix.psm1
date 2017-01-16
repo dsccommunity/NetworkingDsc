@@ -1,15 +1,21 @@
-data LocalizedData
-{
-    # culture="en-US"
-    ConvertFrom-StringData -StringData @'
-PropertyMismatch          = Property '{0}' does NOT match. Expected '{1}', actual '{2}'.
-CheckingConnectionSuffix  = Checking connection suffix matches '{0}'.
-ResourceInDesiredState    = Resource is in the desired state.
-ResourceNotInDesiredState = Resource is NOT in the desired state.
-SettingConnectionSuffix   = Setting connection suffix '{0}' on interface '{1}'.
-RemovingConnectionSuffix  = Removing connection suffix '{0}' on interface '{1}'.
-'@
-}
+# Get the path to the shared modules folder
+$script:ModulesFolderPath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)) `
+                                      -ChildPath 'Modules'
+
+# Import the Networking Resource Helper Module
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xDnsConnectionSuffix' `
+    -ResourcePath $PSScriptRoot
+
+# Import the common networking functions
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
 
 function Get-TargetResource
 {
@@ -19,16 +25,16 @@ function Get-TargetResource
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [System.String] $InterfaceAlias,
-        
+
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [System.String] $ConnectionSpecificSuffix,
-        
+
         [Parameter()]
         [System.Boolean] $RegisterThisConnectionsAddress = $true,
 
         [Parameter()]
-        [System.Boolean] $UseSuffixWhenRegistering = $false, 
+        [System.Boolean] $UseSuffixWhenRegistering = $false,
 
         [Parameter()]
         [ValidateSet('Present','Absent')]
@@ -79,16 +85,16 @@ function Test-TargetResource
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [System.String] $InterfaceAlias,
-        
+
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [System.String] $ConnectionSpecificSuffix,
-        
+
         [Parameter()]
         [System.Boolean] $RegisterThisConnectionsAddress = $true,
 
         [Parameter()]
-        [System.Boolean] $UseSuffixWhenRegistering = $false, 
+        [System.Boolean] $UseSuffixWhenRegistering = $false,
 
         [Parameter()]
         [ValidateSet('Present','Absent')]
@@ -128,16 +134,16 @@ function Set-TargetResource
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [System.String] $InterfaceAlias,
-        
+
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [System.String] $ConnectionSpecificSuffix,
-        
+
         [Parameter()]
         [System.Boolean] $RegisterThisConnectionsAddress = $true,
 
         [Parameter()]
-        [System.Boolean] $UseSuffixWhenRegistering = $false, 
+        [System.Boolean] $UseSuffixWhenRegistering = $false,
 
         [Parameter()]
         [ValidateSet('Present','Absent')]

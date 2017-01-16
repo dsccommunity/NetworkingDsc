@@ -19,6 +19,30 @@
   - Fixed integration tests so that values being set are correctly tested.
   - Added integration tests for Removal of Firewall rule.
 - Added NetworkingDsc.Common module to contain shared networking functions.
+- MSFT_xDNSServerAddress:
+  - Separated Localization strings into strings file.
+- MSFT_xDefaultGatewayAddress:
+  - Separated Localization strings into strings file.
+- MSFT_xDhcpClient:
+  - Separated Localization strings into strings file.
+- MSFT_xDnsClientGlobalSetting:
+  - Renamed Localization strings file to be standard naming format.
+- MSFT_xDnsConnectionSuffix:
+  - Separated Localization strings into strings file.
+- MSFT_xHostsFile:
+  - Renamed Localization strings file to be standard naming format.
+- MSFT_xIPAddress:
+  - Separated Localization strings into strings file.
+- MSFT_xNetAdapterBinding:
+  - Separated Localization strings into strings file.
+- MSFT_xNetAdapterRDMA:
+  - Renamed Localization strings file to be standard naming format.
+- MSFT_xNetBIOS:
+  - Renamed Localization strings file to be standard naming format.
+- MSFT_xNetConnectionProfile:
+  - Separated Localization strings into strings file.
+- MSFT_xNetRoute:
+  - Separated Localization strings into strings file.
 
 ## 3.1.0.0
 

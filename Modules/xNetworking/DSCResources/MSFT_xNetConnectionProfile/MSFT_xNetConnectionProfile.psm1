@@ -1,15 +1,21 @@
-data LocalizedData
-{
-    # culture="en-US"
-    ConvertFrom-StringData -StringData @'
-    GettingNetConnectionProfile = Getting NetConnectionProfile from interface '{0}'.
-    TestIPv4Connectivity        = IPv4Connectivity '{0}' does not match set IPv4Connectivity '{1}'
-    TestIPv6Connectivity        = IPv6Connectivity '{0}' does not match set IPv6Connectivity '{1}'
-    TestNetworkCategory         = NetworkCategory '{0}' does not match set NetworkCategory '{1}'
-    SetNetConnectionProfile     = Setting NetConnectionProfile on interface '{0}'
-'@
-}
+# Get the path to the shared modules folder
+$script:ModulesFolderPath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)) `
+                                      -ChildPath 'Modules'
 
+# Import the Networking Resource Helper Module
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xNetConnectionProfile' `
+    -ResourcePath $PSScriptRoot
+
+# Import the common networking functions
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
 
 function Get-TargetResource
 {

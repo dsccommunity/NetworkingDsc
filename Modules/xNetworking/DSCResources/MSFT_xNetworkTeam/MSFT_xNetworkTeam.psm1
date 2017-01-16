@@ -1,21 +1,26 @@
-﻿#region localizeddata
-if (Test-Path "${PSScriptRoot}\${PSUICulture}")
-{
-    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeam.psd1 `
-                         -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
-} 
-else
-{
-    #fallback to en-US
-    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeam.psd1 `
-                         -BaseDirectory "${PSScriptRoot}\en-US"
-}
-#endregion
+﻿# Get the path to the shared modules folder
+$script:ModulesFolderPath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)) `
+                                      -ChildPath 'Modules'
+
+# Import the Networking Resource Helper Module
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xNetworkTeam' `
+    -ResourcePath $PSScriptRoot
+
+# Import the common networking functions
+Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
+                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
 
 Function Get-TargetResource
 {
     [CmdletBinding()]
-    [OutputType([System.Collections.Hashtable])] 
+    [OutputType([System.Collections.Hashtable])]
     Param
     (
         [Parameter(Mandatory)]
@@ -24,7 +29,7 @@ Function Get-TargetResource
         [Parameter(Mandatory)]
         [String[]]$TeamMembers
     )
-    
+
     $configuration = @{
         name = $Name
         teamMembers = $TeamMembers
@@ -33,7 +38,7 @@ Function Get-TargetResource
     Write-Verbose -Message ($localizedData.GetTeamInfo -f $Name)
     $networkTeam = Get-NetLBFOTeam -Name $Name -ErrorAction SilentlyContinue
 
-    if ($networkTeam) 
+    if ($networkTeam)
     {
         Write-Verbose -Message ($localizedData.FoundTeam -f $Name)
         if ($null -eq (Compare-Object -ReferenceObject $TeamMembers -DifferenceObject $networkTeam.Members))
@@ -52,7 +57,7 @@ Function Get-TargetResource
     $configuration
 }
 
-Function Set-TargetResource 
+Function Set-TargetResource
 {
     [CmdletBinding()]
     Param
@@ -62,7 +67,7 @@ Function Set-TargetResource
 
         [Parameter(Mandatory)]
         [String[]]$TeamMembers,
-    
+
         [Parameter()]
         [ValidateSet("SwitchIndependent", "LACP", "Static")]
         [String]$TeamingMode = "SwitchIndependent",
@@ -99,7 +104,7 @@ Function Set-TargetResource
                 $setArguments.Add('teamingMode', $TeamingMode)
                 $isNetModifyRequired = $true
             }
-            
+
             if ($isNetModifyRequired)
             {
                 Write-Verbose -Message ($localizedData.modifyTeam -f $Name)
@@ -132,9 +137,9 @@ Function Set-TargetResource
                                         -Confirm:$false
                 }
             }
-            
-        } 
-        else 
+
+        }
+        else
         {
             Write-Verbose -Message ($localizedData.createTeam -f $Name)
             try
@@ -181,7 +186,7 @@ Function Test-TargetResource
 
         [Parameter(Mandatory)]
         [String[]]$TeamMembers,
-    
+
         [Parameter()]
         [ValidateSet("SwitchIndependent", "LACP", "Static")]
         [String]$TeamingMode = "SwitchIndependent",
@@ -193,18 +198,18 @@ Function Test-TargetResource
         [ValidateSet('Present', 'Absent')]
         [String]$Ensure = 'Present'
     )
-    
+
     Write-Verbose -Message ($localizedData.GetTeamInfo -f $Name)
     $networkTeam = Get-NetLbfoTeam -Name $Name -ErrorAction SilentlyContinue
-    
+
     if ($ensure -eq 'Present')
     {
         if ($networkTeam)
         {
             Write-Verbose -Message ($localizedData.foundTeam -f $Name)
             if (
-                ($networkTeam.LoadBalancingAlgorithm -eq $LoadBalancingAlgorithm) -and 
-                ($networkTeam.teamingMode -eq $TeamingMode) -and 
+                ($networkTeam.LoadBalancingAlgorithm -eq $LoadBalancingAlgorithm) -and
+                ($networkTeam.teamingMode -eq $TeamingMode) -and
                 ($null -eq (Compare-Object -ReferenceObject $TeamMembers -DifferenceObject $networkTeam.Members))
             )
             {
