@@ -27,6 +27,7 @@
 - MSFT_xDhcpClient:
   - Separated Localization strings into strings file.
   - Fix parameter descriptions in MOF file.
+  - Style changes to meet HQRM standards.
 - MSFT_xDnsClientGlobalSetting:
   - Renamed Localization strings file to be standard naming format.
 - MSFT_xDnsConnectionSuffix:
@@ -43,8 +44,9 @@
   - Renamed Localization strings file to be standard naming format.
 - MSFT_xNetConnectionProfile:
   - Separated Localization strings into strings file.
-- MSFT_xNetRoute:
+- MSFT_xRoute:
   - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
 
 ## 3.1.0.0
 
