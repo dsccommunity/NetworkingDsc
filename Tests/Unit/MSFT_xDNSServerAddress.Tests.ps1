@@ -471,7 +471,7 @@ try
 
         }
 
-        Describe "MSFT_xDNSServerAddress\Test-ResourceProperty" {
+        Describe "MSFT_xDNSServerAddress\Assert-ResourceProperty" {
 
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
 
@@ -491,7 +491,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -511,7 +511,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -531,7 +531,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -551,7 +551,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -563,7 +563,7 @@ try
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    { Test-ResourceProperty @Splat } | Should Not Throw
+                    { Assert-ResourceProperty @Splat } | Should Not Throw
                 }
             }
 
@@ -575,7 +575,7 @@ try
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv6'
                     }
-                    { Test-ResourceProperty @Splat } | Should Not Throw
+                    { Assert-ResourceProperty @Splat } | Should Not Throw
                 }
             }
         }

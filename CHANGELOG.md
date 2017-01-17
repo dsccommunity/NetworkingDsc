@@ -35,6 +35,7 @@
   - Removed New-TerminatingError function because never called.
 - MSFT_xDnsConnectionSuffix:
   - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
 - MSFT_xHostsFile:
   - Renamed Localization strings file to be standard naming format.
 - MSFT_xIPAddress:

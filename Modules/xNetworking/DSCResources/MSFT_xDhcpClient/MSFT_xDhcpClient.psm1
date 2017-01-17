@@ -56,7 +56,7 @@ function Get-TargetResource
         -f $InterfaceAlias,$AddressFamily `
         ) -join '')
 
-    Test-ResourceProperty @PSBoundParameters
+    Assert-ResourceProperty @PSBoundParameters
 
     $CurrentDHCPClient = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
@@ -109,7 +109,7 @@ function Set-TargetResource
         -f $InterfaceAlias,$AddressFamily `
         ) -join '')
 
-    Test-ResourceProperty @PSBoundParameters
+    Assert-ResourceProperty @PSBoundParameters
 
     $CurrentDHCPClient = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
@@ -171,7 +171,7 @@ function Test-TargetResource
         -f $InterfaceAlias,$AddressFamily `
         ) -join '')
 
-    Test-ResourceProperty @PSBoundParameters
+    Assert-ResourceProperty @PSBoundParameters
 
     $CurrentDHCPClient = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
@@ -204,7 +204,7 @@ function Test-TargetResource
     .PARAMETER State
     The desired state of the DHCP Client.
 #>
-function Test-ResourceProperty {
+function Assert-ResourceProperty {
     [CmdletBinding()]
     param
     (
@@ -236,6 +236,6 @@ function Test-ResourceProperty {
 
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
-} # Test-ResourceProperty
+} # Assert-ResourceProperty
 
 Export-ModuleMember -function *-TargetResource

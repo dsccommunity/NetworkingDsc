@@ -17,22 +17,39 @@ Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
                                -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
                                                      -ChildPath 'NetworkingDsc.Common.psm1'))
 
+<#
+    .SYNOPSIS
+    Returns the current DNS Server Addresses for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DNS server address is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER Address
+    The desired DNS Server address(es).
+#>
 function Get-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String[]]$Address,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily
+        [String]
+        $AddressFamily,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]
+        $Address
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -47,27 +64,49 @@ function Get-TargetResource
         InterfaceAlias = $InterfaceAlias
     }
 
-    $returnValue
+    return $returnValue
 }
 
+<#
+    .SYNOPSIS
+    Sets the DNS Server Address for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DNS server address is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER Address
+    The desired DNS Server address(es).
+
+    .PARAMETER Validate
+    Requires that the DNS Server addresses be validated if they are updated.
+    It will cause the resouce to throw a 'A general error occurred that is not covered by a more
+    specific error code.' error if set to True and specified DNS Servers are not accessible.
+#>
 function Set-TargetResource
 {
+    [CmdletBinding()]
     param
     (
-        #IP Address that has to be set
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String[]]$Address,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily,
+        [String]
+        $AddressFamily,
 
-        [Boolean]$Validate = $false
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]
+        $Address,
+
+        [Boolean]
+        $Validate = $false
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
@@ -110,24 +149,47 @@ function Set-TargetResource
     }
 }
 
+<#
+    .SYNOPSIS
+    Tests the current state of a DNS Server Address for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DNS server address is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER Address
+    The desired DNS Server address(es).
+
+    .PARAMETER Validate
+    Requires that the DNS Server addresses be validated if they are updated.
+    It will cause the resouce to throw a 'A general error occurred that is not covered by a more
+    specific error code.' error if set to True and specified DNS Servers are not accessible.
+#>
 function Test-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String[]]$Address,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily,
+        [String]
+        $AddressFamily,
 
-        [Boolean]$Validate = $false
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]
+        $Address,
+
+        [Boolean]
+        $Validate = $false
     )
     # Flag to signal whether settings are correct
     [Boolean] $desiredConfigurationMatch = $true
@@ -138,7 +200,7 @@ function Test-TargetResource
 
     #Validate the Settings passed
     Foreach ($ServerAddress in $Address) {
-        Test-ResourceProperty `
+        Assert-ResourceProperty `
             -Address $ServerAddress `
             -AddressFamily $AddressFamily `
             -InterfaceAlias $InterfaceAlias
@@ -174,22 +236,40 @@ function Test-TargetResource
     return $desiredConfigurationMatch
 }
 
-function Test-ResourceProperty
+<#
+    .SYNOPSIS
+    Checks the Address details are valid and do not conflict with Address family.
+    Ensures interface exists. If any problems are detected an exception will be thrown.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DNS server address is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER Address
+    The desired DNS Server address.
+#>
+
+function Assert-ResourceProperty
 {
-    # Function will check the Address details are valid and do not conflict with
-    # Address family. Ensures interface exists.
-    # If any problems are detected an exception will be thrown.
     [CmdletBinding()]
     param
     (
-        [String]$Address,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $InterfaceAlias,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('IPv4', 'IPv6')]
+        [String]
+        $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
-
-        [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily = 'IPv4'
+        [String]
+        $Address
     )
 
     if ( -not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
@@ -246,6 +326,6 @@ function Test-ResourceProperty
 
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
-} # Test-ResourceProperty
+} # Assert-ResourceProperty
 
-Export-ModuleMember -function Get-TargetResource, Set-TargetResource, Test-TargetResource
+Export-ModuleMember -function *-TargetResource

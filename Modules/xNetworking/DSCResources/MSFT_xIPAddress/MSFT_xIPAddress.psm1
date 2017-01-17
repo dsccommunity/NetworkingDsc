@@ -167,7 +167,7 @@ function Test-TargetResource
         $($LocalizedData.CheckingIPAddressMessage)
         ) -join '')
 
-    Test-ResourceProperty @PSBoundParameters
+    Assert-ResourceProperty @PSBoundParameters
 
     # Get the current IP Address based on the parameters given.
      # First make sure that adapter is available
@@ -227,7 +227,7 @@ function Test-TargetResource
     return $desiredConfigurationMatch
 } # Test-TargetResource
 
-function Test-ResourceProperty {
+function Assert-ResourceProperty {
     # Function will check the IP Address details are valid and do not conflict with
     # Address family. Also checks the prefix length and ensures the interface exists.
     # If any problems are detected an exception will be thrown.
@@ -321,6 +321,6 @@ function Test-ResourceProperty {
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
 
-} # Test-ResourceProperty
+} # Assert-ResourceProperty
 
 Export-ModuleMember -function Get-TargetResource, Set-TargetResource, Test-TargetResource

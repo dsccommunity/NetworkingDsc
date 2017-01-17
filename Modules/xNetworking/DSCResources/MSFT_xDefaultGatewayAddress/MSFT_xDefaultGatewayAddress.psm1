@@ -204,7 +204,7 @@ function Test-TargetResource
         $($LocalizedData.CheckingDefaultGatewayAddressMessage)
         ) -join '' )
 
-    Test-ResourceProperty @PSBoundParameters
+    Assert-ResourceProperty @PSBoundParameters
 
     # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
     $destinationPrefix = '0.0.0.0/0'
@@ -280,7 +280,7 @@ function Test-TargetResource
     .PARAMETER Address
     The desired default gateway address - if not provided default gateway will be removed.
 #>
-function Test-ResourceProperty {
+function Assert-ResourceProperty {
     [CmdletBinding()]
     param
     (
@@ -353,6 +353,6 @@ function Test-ResourceProperty {
             $PSCmdlet.ThrowTerminatingError($errorRecord)
         }
     }
-} # Test-ResourceProperty
+} # Assert-ResourceProperty
 
 Export-ModuleMember -function *-TargetResource

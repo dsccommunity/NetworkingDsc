@@ -328,7 +328,7 @@ function Test-TargetResource
     $null = $PSBoundParameters.Remove('Ensure')
 
     # Check the parameters
-    Test-ResourceProperty @PSBoundParameters
+    Assert-ResourceProperty @PSBoundParameters
 
     # Lookup the existing Route
     $route = Get-Route @PSBoundParameters
@@ -527,7 +527,7 @@ Function Get-Route {
     .PARAMETER PreferredLifetime
     Specifies a preferred lifetime in seconds of an IP route.
 #>
-Function Test-ResourceProperty {
+Function Assert-ResourceProperty {
     [CmdletBinding()]
     param
     (

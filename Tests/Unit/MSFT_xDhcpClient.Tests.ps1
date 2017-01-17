@@ -192,7 +192,7 @@ try
             }
         }
 
-        Describe "MSFT_xDhcpClient\Test-ResourceProperty" {
+        Describe "MSFT_xDhcpClient\Assert-ResourceProperty" {
 
             Mock Get-NetAdapter
 
@@ -207,7 +207,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @TestNetIPInterfaceEnabled } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @TestNetIPInterfaceEnabled } | Should Throw $ErrorRecord
                 }
             }
         }
