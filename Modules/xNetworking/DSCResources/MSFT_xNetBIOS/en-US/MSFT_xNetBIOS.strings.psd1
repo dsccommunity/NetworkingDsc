@@ -1,6 +1,7 @@
 # Localized resources for MSFT_xNetBIOS
 
 ConvertFrom-StringData @'
+    GettingNetBiosSetting = Getting NetBIOS Configuration for Interface {0}.
     InterfaceDetected = Interface {0} detected with Index number: {1}.
     CurrentNetBiosSetting = Current NetBIOS Configuration: {0}.
     DesiredSetting = Desired NetBIOS Configuration: {0}.

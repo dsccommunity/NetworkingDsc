@@ -61,6 +61,8 @@ function Get-TargetResource
         $Setting
     )
 
+    Write-Verbose -Message $LocalizedData.GettingNetBiosSetting -f $InterfaceAlias
+
     $netadapterparams = @{
         ClassName = 'Win32_NetworkAdapter'
         Filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
