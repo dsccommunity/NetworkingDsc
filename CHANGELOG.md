@@ -44,6 +44,7 @@
   - Style changes to meet HQRM standards.
 - MSFT_xNetAdapterBinding:
   - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
 - MSFT_xNetAdapterRDMA:
   - Renamed Localization strings file to be standard naming format.
 - MSFT_xNetBIOS:

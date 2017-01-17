@@ -308,9 +308,6 @@ function Test-TargetResource
     IP address family.
 #>
 function Assert-ResourceProperty {
-    # Function will check the IP Address details are valid and do not conflict with
-    # Address family. Also checks the prefix length and ensures the interface exists.
-    # If any problems are detected an exception will be thrown.
     [CmdletBinding()]
     param
     (

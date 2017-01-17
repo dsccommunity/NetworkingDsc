@@ -17,21 +17,39 @@ Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
                                -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
                                                      -ChildPath 'NetworkingDsc.Common.psm1'))
 
+<#
+    .SYNOPSIS
+    Returns the current state of an Adapter Binding on an interface.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface. Supports the use of '*'.
+
+    .PARAMETER ComponentId
+    Specifies the underlying name of the transport or filter in the following
+    form - ms_xxxx, such as ms_tcpip.
+
+    .PARAMETER Ensure
+    Specifies if the component ID for the Interface should be Enabled or Disabled.
+#>
 function Get-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$ComponentId,
+        [String]
+        $ComponentId,
 
         [ValidateSet('Enabled', 'Disabled')]
-        [String]$State = 'Enabled'
+        [String]
+        $State = 'Enabled'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -39,48 +57,66 @@ function Get-TargetResource
             $InterfaceAlias,$ComponentId)
         ) -join '')
 
-    $CurrentNetAdapterBinding = Get-Binding @PSBoundParameters
+    $currentNetAdapterBinding = Get-Binding @PSBoundParameters
 
-    $AdaptersState = $CurrentNetAdapterBinding.Enabled |
+    $adapterState = $currentNetAdapterBinding.Enabled |
         Sort-Object -Unique
 
-    If ( $AdaptersState.Count -eq 2)
+    if ( $adapterState.Count -eq 2)
     {
-        $CurrentEnabled = 'Mixed'
+        $currentEnabled = 'Mixed'
     }
-    ElseIf ( $AdaptersState -eq $true )
+    elseif ( $adapterState -eq $true )
     {
-        $CurrentEnabled = 'Enabled'
+        $currentEnabled = 'Enabled'
     }
-    Else
+    else
     {
-        $CurrentEnabled = 'Disabled'
+        $currentEnabled = 'Disabled'
     }
 
     $returnValue = @{
         InterfaceAlias = $InterfaceAlias
         ComponentId    = $ComponentId
         State          = $State
-        CurrentState   = $CurrentEnabled
+        CurrentState   = $currentEnabled
     }
 
-    $returnValue
+    return $returnValue
 } # Get-TargetResource
 
+<#
+    .SYNOPSIS
+    Sets the Adapter Binding on a specific interface.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface. Supports the use of '*'.
+
+    .PARAMETER ComponentId
+    Specifies the underlying name of the transport or filter in the following
+    form - ms_xxxx, such as ms_tcpip.
+
+    .PARAMETER Ensure
+    Specifies if the component ID for the Interface should be Enabled or Disabled.
+#>
 function Set-TargetResource
 {
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$ComponentId,
+        [String]
+        $ComponentId,
 
         [ValidateSet('Enabled', 'Disabled')]
-        [String]$State = 'Enabled'
+        [String]
+        $State = 'Enabled'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -88,7 +124,7 @@ function Set-TargetResource
             $InterfaceAlias,$ComponentId)
         ) -join '')
 
-    $CurrentNetAdapterBinding = Get-Binding @PSBoundParameters
+    $currentNetAdapterBinding = Get-Binding @PSBoundParameters
 
     # Remove the State so we can splat
     $null = $PSBoundParameters.Remove('State')
@@ -111,21 +147,39 @@ function Set-TargetResource
     } # if
 } # Set-TargetResource
 
+<#
+    .SYNOPSIS
+    Tests the current state of an Adapter Binding on an interface.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface. Supports the use of '*'.
+
+    .PARAMETER ComponentId
+    Specifies the underlying name of the transport or filter in the following
+    form - ms_xxxx, such as ms_tcpip.
+
+    .PARAMETER Ensure
+    Specifies if the component ID for the Interface should be Enabled or Disabled.
+#>
 function Test-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$ComponentId,
+        [String]
+        $ComponentId,
 
         [ValidateSet('Enabled', 'Disabled')]
-        [String]$State = 'Enabled'
+        [String]
+        $State = 'Enabled'
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
@@ -133,30 +187,30 @@ function Test-TargetResource
             $InterfaceAlias,$ComponentId)
         ) -join '')
 
-    $CurrentNetAdapterBinding = Get-Binding @PSBoundParameters
+    $currentNetAdapterBinding = Get-Binding @PSBoundParameters
 
-    $AdaptersState = $CurrentNetAdapterBinding.Enabled |
+    $adapterState = $currentNetAdapterBinding.Enabled |
         Sort-Object -Unique
 
-    If ( $AdaptersState.Count -eq 2)
+    if ( $adapterState.Count -eq 2)
     {
-        $CurrentEnabled = 'Mixed'
+        $currentEnabled = 'Mixed'
     }
-    ElseIf ( $AdaptersState -eq $true )
+    elseif ( $adapterState -eq $true )
     {
-        $CurrentEnabled = 'Enabled'
+        $currentEnabled = 'Enabled'
     }
-    Else
+    else
     {
-        $CurrentEnabled = 'Disabled'
+        $currentEnabled = 'Disabled'
     }
 
     # Test if the binding is in the correct state
-    if ($CurrentEnabled -ne $State)
+    if ($currentEnabled -ne $State)
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             $($LocalizedData.NetAdapterBindingDoesNotMatchMessage -f `
-                $InterfaceAlias,$ComponentId,$State,$CurrentEnabled)
+                $InterfaceAlias,$ComponentId,$State,$currentEnabled)
             ) -join '' )
         return $false
     }
@@ -170,23 +224,38 @@ function Test-TargetResource
     } # if
 } # Test-TargetResource
 
+<#
+    .SYNOPSIS
+    Ensures the interface and component Id exists and returns the Net Adapter binding object.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface. Supports the use of '*'.
+
+    .PARAMETER ComponentId
+    Specifies the underlying name of the transport or filter in the following
+    form - ms_xxxx, such as ms_tcpip.
+
+    .PARAMETER Ensure
+    Specifies if the component ID for the Interface should be Enabled or Disabled.
+#>
 function Get-Binding {
-    # Function ensures the interface and component Id exists and
-    # returns the Net Adapter binding object.
     [CmdletBinding()]
     [OutputType([Microsoft.Management.Infrastructure.CimInstance])]
     param
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$ComponentId,
+        [String]
+        $ComponentId,
 
         [ValidateSet('Enabled', 'Disabled')]
-        [String]$State = 'Enabled'
+        [String]
+        $State = 'Enabled'
     )
 
     if (-not (Get-NetAdapter -Name $InterfaceAlias -ErrorAction SilentlyContinue))
@@ -202,12 +271,12 @@ function Get-Binding {
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     } # if
 
-    $Binding = Get-NetAdapterBinding `
+    $Bbinding = Get-NetAdapterBinding `
         -InterfaceAlias $InterfaceAlias `
         -ComponentId $ComponentId `
         -ErrorAction Stop
 
-    return $Binding
+    return $binding
 } # Get-Binding
 
 Export-ModuleMember -function *-TargetResource

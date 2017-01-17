@@ -77,7 +77,6 @@ function Set-TargetResource
         [String]
         $Name,
 
-        [parameter()]
         [Boolean]
         $Enabled = $true
     )
@@ -129,7 +128,6 @@ function Test-TargetResource
         [String]
         $Name,
 
-        [parameter()]
         [Boolean]
         $Enabled = $true
     )
