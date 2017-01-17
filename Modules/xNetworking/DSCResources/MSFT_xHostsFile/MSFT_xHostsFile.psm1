@@ -17,21 +17,34 @@ Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
                                -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
                                                      -ChildPath 'NetworkingDsc.Common.psm1'))
 
+<#
+    .SYNOPSIS
+    Returns the current state of a hosts file entry.
+
+    .PARAMETER HostName
+    Specifies the name of the computer that will be mapped to an IP address.
+
+    .PARAMETER IPAddress
+    Specifies the IP Address that should be mapped to the host name.
+
+    .PARAMETER Ensure
+    Specifies if the hosts file entry should be created or deleted.
+#>
 function Get-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
-    param(
+    param
+    (
         [Parameter(Mandatory = $true)]
         [System.String]
         $HostName,
 
-        [Parameter(Mandatory = $false)]
         [System.String]
         $IPAddress,
 
-        [Parameter(Mandatory = $false)]
-        [System.String]
         [ValidateSet("Present","Absent")]
+        [System.String]
         $Ensure = "Present"
     )
 
@@ -84,20 +97,33 @@ function Get-TargetResource
     }
 }
 
+<#
+    .SYNOPSIS
+    Adds, updates or removes a hosts file entry.
+
+    .PARAMETER HostName
+    Specifies the name of the computer that will be mapped to an IP address.
+
+    .PARAMETER IPAddress
+    Specifies the IP Address that should be mapped to the host name.
+
+    .PARAMETER Ensure
+    Specifies if the hosts file entry should be created or deleted.
+#>
 function Set-TargetResource
 {
-    param(
+    [CmdletBinding()]
+    param
+    (
         [Parameter(Mandatory = $true)]
         [System.String]
         $HostName,
 
-        [Parameter(Mandatory = $false)]
         [System.String]
         $IPAddress,
 
-        [Parameter(Mandatory = $false)]
-        [System.String]
         [ValidateSet("Present","Absent")]
+        [System.String]
         $Ensure = "Present"
     )
 
@@ -168,21 +194,34 @@ function Set-TargetResource
     }
 }
 
+<#
+    .SYNOPSIS
+    Tests the current state of a hosts file entry.
+
+    .PARAMETER HostName
+    Specifies the name of the computer that will be mapped to an IP address.
+
+    .PARAMETER IPAddress
+    Specifies the IP Address that should be mapped to the host name.
+
+    .PARAMETER Ensure
+    Specifies if the hosts file entry should be created or deleted.
+#>
 function Test-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Boolean])]
-    param(
+    param
+    (
         [Parameter(Mandatory = $true)]
         [System.String]
         $HostName,
 
-        [Parameter(Mandatory = $false)]
         [System.String]
         $IPAddress,
 
-        [Parameter(Mandatory = $false)]
-        [System.String]
         [ValidateSet("Present","Absent")]
+        [System.String]
         $Ensure = "Present"
     )
 
@@ -200,4 +239,3 @@ function Test-TargetResource
     }
     return $true
 }
-

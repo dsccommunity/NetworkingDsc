@@ -38,8 +38,10 @@
   - Style changes to meet HQRM standards.
 - MSFT_xHostsFile:
   - Renamed Localization strings file to be standard naming format.
+  - Style changes to meet HQRM standards.
 - MSFT_xIPAddress:
   - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
 - MSFT_xNetAdapterBinding:
   - Separated Localization strings into strings file.
 - MSFT_xNetAdapterRDMA:
