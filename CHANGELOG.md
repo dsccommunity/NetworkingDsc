@@ -47,10 +47,13 @@
   - Style changes to meet HQRM standards.
 - MSFT_xNetAdapterRDMA:
   - Renamed Localization strings file to be standard naming format.
+  - Style changes to meet HQRM standards.
 - MSFT_xNetBIOS:
   - Renamed Localization strings file to be standard naming format.
+  - Style changes to meet HQRM standards.
 - MSFT_xNetConnectionProfile:
   - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
 - MSFT_xNetworkTeam:
   - Style changes to meet HQRM standards.
 - MSFT_xNetworkTeamInterface:

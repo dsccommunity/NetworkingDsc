@@ -35,6 +35,16 @@ catch
 }
 #endregion
 
+<#
+    .SYNOPSIS
+    Returns the current state of the Net Bios on an interface.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface. Supports the use of '*'.
+
+    .PARAMETER Setting
+    Default - Use NetBios settings from the DHCP server. If static IP, Enable NetBIOS.
+#>
 function Get-TargetResource
 {
     [CmdletBinding()]
@@ -50,23 +60,33 @@ function Get-TargetResource
         [System.String]
         $Setting
     )
-    $Netadapterparams = @{
+
+    $netadapterparams = @{
         ClassName = 'Win32_NetworkAdapter'
         Filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
     }
 
-    $NetAdapterConfig = Get-CimInstance @Netadapterparams -ErrorAction Stop |
+    $netAdapterConfig = Get-CimInstance @netadapterparams -ErrorAction Stop |
             Get-CimAssociatedInstance `
                 -ResultClassName Win32_NetworkAdapterConfiguration `
                 -ErrorAction Stop
 
     return @{
         InterfaceAlias = $InterfaceAlias
-        Setting = $([NETBIOSSetting].GetEnumValues()[$NetAdapterConfig.TcpipNetbiosOptions])
+        Setting = $([NETBIOSSetting].GetEnumValues()[$netAdapterConfig.TcpipNetbiosOptions])
     }
 }
 
+<#
+    .SYNOPSIS
+    Sets the state of the Net Bios on an interface.
 
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface. Supports the use of '*'.
+
+    .PARAMETER Setting
+    Default - Use NetBios settings from the DHCP server. If static IP, Enable NetBIOS.
+#>
 function Set-TargetResource
 {
     [CmdletBinding()]
@@ -81,11 +101,12 @@ function Set-TargetResource
         [System.String]
         $Setting
     )
-    $Netadapterparams = @{
+
+    $netadapterparams = @{
         ClassName = 'Win32_NetworkAdapter'
         Filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
     }
-    $NetAdapterConfig = Get-CimInstance @Netadapterparams -ErrorAction Stop |
+    $netAdapterConfig = Get-CimInstance @netadapterparams -ErrorAction Stop |
             Get-CimAssociatedInstance `
                 -ResultClassName Win32_NetworkAdapterConfiguration `
                 -ErrorAction Stop
@@ -94,23 +115,33 @@ function Set-TargetResource
     {
         Write-Verbose -Message $LocalizedData.ResetToDefaut
         #If DHCP is not enabled, settcpipnetbios CIM Method won't take 0 so overwrite registry entry instead.
-        $RegParam = @{
+        $regParam = @{
             Path = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetAdapterConfig.SettingID)"
             Name = 'NetbiosOptions'
             Value = 0
         }
-        $null = Set-ItemProperty @RegParam
+        $null = Set-ItemProperty @regParam
     }
     else
     {
         Write-Verbose -Message ($LocalizedData.SetNetBIOS -f $Setting)
-        $null = $NetAdapterConfig |
+        $null = $netAdapterConfig |
             Invoke-CimMethod -MethodName SetTcpipNetbios -ErrorAction Stop -Arguments @{
                 TcpipNetbiosOptions = [uint32][NETBIOSSetting]::$Setting.value__
             }
     }
 }
 
+<#
+    .SYNOPSIS
+    Tests the current state the Net Bios on an interface.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface. Supports the use of '*'.
+
+    .PARAMETER Setting
+    Default - Use NetBios settings from the DHCP server. If static IP, Enable NetBIOS.
+#>
 function Test-TargetResource
 {
     [CmdletBinding()]
@@ -126,32 +157,31 @@ function Test-TargetResource
         [System.String]
         $Setting
     )
-    $NIC = Get-CimInstance `
+
+    $nic = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
         -Filter "NetConnectionID=`"$InterfaceAlias`""
-    if ($Null -ne $NIC)
+    if ($null -ne $nic)
     {
-        Write-Verbose -Message ($LocalizedData.InterfaceDetected -f $InterfaceAlias,$NIC.InterfaceIndex)
+        Write-Verbose -Message ($LocalizedData.InterfaceDetected -f $InterfaceAlias,$nic.InterfaceIndex)
     }
     else
     {
-        $ErrorParam = @{
-            ErrorId = 'NICNotFound'
-            ErrorMessage = ($LocalizedData.NICNotFound -f $InterfaceAlias)
-            ErrorCategory = 'ObjectNotFound'
-            ErrorAction = 'Stop'
+        $errorParam = @{
+            Message = ($LocalizedData.NICNotFound -f $InterfaceAlias)
+            ArgumentName = 'InterfaceAlias'
         }
-        New-TerminatingError @ErrorParam
+        New-InvalidArgumentException @errorParam
     }
 
-    $NICConfig = $NIC | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
+    $nicConfig = $NIC | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
 
     Write-Verbose -Message ($LocalizedData.CurrentNetBiosSetting -f [NETBIOSSetting].GetEnumValues()[$NICConfig.TcpipNetbiosOptions])
 
-    $DesiredSetting = ([NETBIOSSetting]::$($Setting)).value__
+    $desiredSetting = ([NETBIOSSetting]::$($Setting)).value__
     Write-Verbose -Message ($LocalizedData.DesiredSetting -f $Setting)
 
-    if ($NICConfig.TcpipNetbiosOptions -eq $DesiredSetting)
+    if ($nicConfig.TcpipNetbiosOptions -eq $desiredSetting)
     {
         Write-Verbose -Message $LocalizedData.InDesiredState
         return $true
@@ -163,28 +193,4 @@ function Test-TargetResource
     }
 }
 
-#region helper functions
-function New-TerminatingError
-{
-    [CmdletBinding()]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [String] $ErrorId,
-
-        [Parameter(Mandatory = $true)]
-        [String] $ErrorMessage,
-
-        [Parameter(Mandatory = $true)]
-        [System.Management.Automation.ErrorCategory] $ErrorCategory
-    )
-
-    $exception = New-Object System.InvalidOperationException $errorMessage
-    $errorRecord = New-Object System.Management.Automation.ErrorRecord $exception, $errorId, $errorCategory, $null
-    throw $errorRecord
-}
-#endregion
-
-
 Export-ModuleMember -Function *-TargetResource
-

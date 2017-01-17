@@ -1,6 +1,8 @@
 $script:DSCModuleName   = 'xNetworking'
 $script:DSCResourceName = 'MSFT_xNetAdapterRDMA'
 
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1')
+
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
@@ -30,8 +32,8 @@ try
 
         $TestAdapter = [PSObject]@{
             Name                    = $MockNetAdapterRDMA.Name
-        }    
-    
+        }
+
         Describe "$($script:DSCResourceName)\Get-TargetResource" {
             function Get-NetAdapterRdma { }
             Context 'Network adapter does not exist' {
@@ -43,9 +45,9 @@ try
                 }
                 It 'should call the expected mocks' {
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
-                } 
+                }
             }
-    
+
             Context 'Network Team exists' {
                 Mock Get-NetAdapterRdma -MockWith { $MockNetAdapterRDMA }
                 It 'should return network adapter RDMA properties' {
@@ -67,11 +69,11 @@ try
                     [Boolean] $Enabled = $true
                 )
             }
-  
+
             Context 'Net Adapter does not exist' {
                 Mock Set-NetAdapterRdma
-    
-                It 'should throw error' { 
+
+                It 'should throw error' {
                     Mock Get-NetAdapterRdma -MockWith {
                         throw 'Network adapter not found'
                     }
@@ -83,12 +85,12 @@ try
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
                     Assert-MockCalled -commandName Set-NetAdapterRdma -Exactly 0
                 }
-            } 
+            }
 
             Context 'Net Adapter RDMA is already enabled and no action needed' {
                 Mock Set-NetAdapterRdma
-    
-                It 'should not throw error' { 
+
+                It 'should not throw error' {
                     Mock Get-NetAdapterRdma -MockWith { $MockNetAdapterRDMA }
                     $updateAdapter = $TestAdapter.Clone()
                     $updateAdapter['Enabled'] = $true
@@ -98,18 +100,18 @@ try
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
                     Assert-MockCalled -commandName Set-NetAdapterRdma -Exactly 0
                 }
-            } 
+            }
 
             Context 'Net Adapter RDMA is disabled and should be enabled' {
                 Mock Set-NetAdapterRdma
-    
-                It 'should not throw error' { 
-                    Mock Get-NetAdapterRdma -MockWith { 
+
+                It 'should not throw error' {
+                    Mock Get-NetAdapterRdma -MockWith {
                         $configuration = [PSCustomObject] @{
                             Name    = 'SMB1_1'
                             Enabled = $false
                         }
-                        return $configuration 
+                        return $configuration
                     }
                     $updateAdapter = $TestAdapter.Clone()
                     $updateAdapter['Enabled'] = $true
@@ -119,18 +121,18 @@ try
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
                     Assert-MockCalled -commandName Set-NetAdapterRdma -Exactly 1
                 }
-            }            
+            }
 
             Context 'Net Adapter RDMA is enabled and should be disabled' {
                 Mock Set-NetAdapterRdma
-    
-                It 'should not throw error' { 
-                    Mock Get-NetAdapterRdma -MockWith { 
+
+                It 'should not throw error' {
+                    Mock Get-NetAdapterRdma -MockWith {
                         $configuration = [PSCustomObject] @{
                             Name    = 'SMB1_1'
                             Enabled = $true
                         }
-                        return $configuration 
+                        return $configuration
                     }
                     $updateAdapter = $TestAdapter.Clone()
                     $updateAdapter['Enabled'] = $false
@@ -140,18 +142,18 @@ try
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
                     Assert-MockCalled -commandName Set-NetAdapterRdma -Exactly 1
                 }
-            }    
+            }
 
             Context 'Net Adapter RDMA is already disabled and no action needed' {
                 Mock Set-NetAdapterRdma
-    
-                It 'should not throw error' { 
-                    Mock Get-NetAdapterRdma -MockWith { 
+
+                It 'should not throw error' {
+                    Mock Get-NetAdapterRdma -MockWith {
                         $configuration = [PSCustomObject] @{
                             Name    = 'SMB1_1'
                             Enabled = $false
                         }
-                        return $configuration 
+                        return $configuration
                     }
                     $updateAdapter = $TestAdapter.Clone()
                     $updateAdapter['Enabled'] = $false
@@ -161,14 +163,14 @@ try
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
                     Assert-MockCalled -commandName Set-NetAdapterRdma -Exactly 0
                 }
-            }                 
+            }
         }
 
         Describe "$($script:DSCResourceName)\Test-TargetResource" {
             function Get-NetAdapterRdma { }
-  
-            Context 'Net Adapter does not exist' {    
-                It 'should throw error' { 
+
+            Context 'Net Adapter does not exist' {
+                It 'should throw error' {
                     Mock Get-NetAdapterRdma -MockWith {
                         throw 'Network adapter not found'
                     }
@@ -179,10 +181,10 @@ try
                 It 'should call expected Mocks' {
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
                 }
-            } 
+            }
 
             Context 'Net Adapter RDMA is already enabled and no action needed' {
-                It 'should return true' { 
+                It 'should return true' {
                     Mock Get-NetAdapterRdma -MockWith { $MockNetAdapterRDMA }
                     $updateAdapter = $TestAdapter.Clone()
                     $updateAdapter['Enabled'] = $true
@@ -191,16 +193,16 @@ try
                 It 'should call expected Mocks' {
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
                 }
-            } 
+            }
 
             Context 'Net Adapter RDMA is disabled and should be enabled' {
-                It 'should return false' { 
-                    Mock Get-NetAdapterRdma -MockWith { 
+                It 'should return false' {
+                    Mock Get-NetAdapterRdma -MockWith {
                         $configuration = [PSCustomObject] @{
                             Name    = 'SMB1_1'
                             Enabled = $false
                         }
-                        return $configuration 
+                        return $configuration
                     }
                     $updateAdapter = $TestAdapter.Clone()
                     $updateAdapter['Enabled'] = $true
@@ -209,16 +211,16 @@ try
                 It 'should call expected Mocks' {
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
                 }
-            }            
+            }
 
-            Context 'Net Adapter RDMA is enabled and should be disabled' {    
-                It 'should return false' { 
-                    Mock Get-NetAdapterRdma -MockWith { 
+            Context 'Net Adapter RDMA is enabled and should be disabled' {
+                It 'should return false' {
+                    Mock Get-NetAdapterRdma -MockWith {
                         $configuration = [PSCustomObject] @{
                             Name    = 'SMB1_1'
                             Enabled = $true
                         }
-                        return $configuration 
+                        return $configuration
                     }
                     $updateAdapter = $TestAdapter.Clone()
                     $updateAdapter['Enabled'] = $false
@@ -227,16 +229,16 @@ try
                 It 'should call expected Mocks' {
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
                 }
-            }    
+            }
 
             Context 'Net Adapter RDMA is already disabled and no action needed' {
-                It 'should return true' { 
-                    Mock Get-NetAdapterRdma -MockWith { 
+                It 'should return true' {
+                    Mock Get-NetAdapterRdma -MockWith {
                         $configuration = [PSCustomObject] @{
                             Name    = 'SMB1_1'
                             Enabled = $false
                         }
-                        return $configuration 
+                        return $configuration
                     }
                     $updateAdapter = $TestAdapter.Clone()
                     $updateAdapter['Enabled'] = $false
@@ -245,8 +247,8 @@ try
                 It 'should call expected Mocks' {
                     Assert-MockCalled -commandName Get-NetAdapterRdma -Exactly 1
                 }
-            }                 
-        }                  
+            }
+        }
     }
     #endregion
 }

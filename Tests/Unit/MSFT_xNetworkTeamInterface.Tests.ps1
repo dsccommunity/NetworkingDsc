@@ -1,6 +1,8 @@
 $Global:DSCModuleName   = 'xNetworking'
 $Global:DSCResourceName = 'MSFT_xNetworkTeamInterface'
 
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1')
+
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
@@ -27,12 +29,12 @@ try
             Name                = 'HostTeamNic'
             Team                = 'HostTeam'
         }
-        
+
         $TestTeamNic = [PSObject] @{
             Name                = $MockNetTeamNic.Name
             TeamName            = $MockNetTeamNic.Team
         }
-        
+
         $MockTeamNic = [PSObject] @{
             Name                = $TestTeamNic.Name
             Team                = $TestTeamNic.TeamName
@@ -164,7 +166,7 @@ try
                     Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
                 }
             }
-            
+
             Context 'Team Interface exists but should not exist' {
                 Mock Get-NetLbfoTeamNic -MockWith { $MockTeamNic }
 
