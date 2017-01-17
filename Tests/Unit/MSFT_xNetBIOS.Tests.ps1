@@ -1,8 +1,6 @@
 $script:DSCModuleName   = 'xNetworking'
 $script:DSCResourceName = 'MSFT_xNetBIOS'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1')
-
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
@@ -94,11 +92,9 @@ try
 
             Context 'Invoking with NonExisting Network Adapter' {
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { }
-                $ErrorRecord = Get-InvalidArgumentRecord `
-                    -Message ($LocalizedData.NICNotFound -f 'BogusAdapter') `
-                    -ArgumentName 'InterfaceAlias'
+                $errorMessage = ($LocalizedData.NICNotFound -f 'BogusAdapter')
                 It 'should throw ObjectNotFound exception' {
-                    {Test-TargetResource -InterfaceAlias 'BogusAdapter' -Setting 'Enable'} | Should Throw $ErrorRecord
+                    {Test-TargetResource -InterfaceAlias 'BogusAdapter' -Setting 'Enable'} | Should Throw $errorMessage
                 }
             }
         }
