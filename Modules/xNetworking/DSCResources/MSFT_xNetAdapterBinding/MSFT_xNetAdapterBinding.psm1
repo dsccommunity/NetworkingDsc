@@ -271,7 +271,7 @@ function Get-Binding {
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     } # if
 
-    $Bbinding = Get-NetAdapterBinding `
+    $binding = Get-NetAdapterBinding `
         -InterfaceAlias $InterfaceAlias `
         -ComponentId $ComponentId `
         -ErrorAction Stop
