@@ -42,7 +42,8 @@ function Get-TargetResource
         # Name of the Firewall Rule
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $Name
+        [String]
+        $Name
     )
     $ErrorActionPreference = 'Stop'
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -233,95 +234,127 @@ function Set-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $Name,
+        [String]
+        $Name,
 
         [ValidateNotNullOrEmpty()]
-        [String] $DisplayName,
+        [String]
+        $DisplayName,
 
         [ValidateNotNullOrEmpty()]
-        [String] $Group,
+        [String]
+        $Group,
 
         [ValidateSet('Present', 'Absent')]
-        [String] $Ensure = 'Present',
+        [String]
+        $Ensure = 'Present',
 
         [ValidateSet('True', 'False')]
-        [String] $Enabled,
+        [String]
+        $Enabled,
 
         [ValidateSet('NotConfigured', 'Allow', 'Block')]
-        [String] $Action,
+        [String]
+        $Action,
 
-        [String[]] $Profile,
+        [String[]]
+        $Profile,
 
         [ValidateSet('Inbound', 'Outbound')]
-        [String] $Direction,
+        [String]
+        $Direction,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $RemotePort,
+        [String[]]
+        $RemotePort,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $LocalPort,
+        [String[]]
+        $LocalPort,
 
         [ValidateNotNullOrEmpty()]
-        [String] $Protocol,
+        [String]
+        $Protocol,
 
-        [String] $Description,
+        [String]
+        $Description,
 
         [ValidateNotNullOrEmpty()]
-        [String] $Program,
+        [String]
+        $Program,
 
         [ValidateNotNullOrEmpty()]
-        [String] $Service,
+        [String]
+        $Service,
 
         [ValidateSet('NotRequired', 'Required', 'NoEncap')]
-        [String] $Authentication,
+        [String]
+        $Authentication,
 
         [ValidateSet('NotRequired', 'Required', 'Dynamic')]
-        [String] $Encryption,
+        [String]
+        $Encryption,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $InterfaceAlias,
+        [String[]]
+        $InterfaceAlias,
 
         [ValidateSet('Any', 'Wired', 'Wireless', 'RemoteAccess')]
-        [String] $InterfaceType,
+        [String]
+        $InterfaceType,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $LocalAddress,
+        [String[]]
+        $LocalAddress,
 
         [ValidateNotNullOrEmpty()]
-        [String] $LocalUser,
+        [String]
+        $LocalUser,
 
         [ValidateNotNullOrEmpty()]
-        [String] $Package,
+        [String]
+        $Package,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $Platform,
+        [String[]]
+        $Platform,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $RemoteAddress,
+        [String[]]
+        $RemoteAddress,
 
         [ValidateNotNullOrEmpty()]
-        [String] $RemoteMachine,
+        [String]
+        $RemoteMachine,
 
         [ValidateNotNullOrEmpty()]
-        [String] $RemoteUser,
+        [String]
+        $RemoteUser,
 
         [ValidateSet('Any','ProximityApps','ProximitySharing','WifiDirectPrinting','WifiDirectDisplay','WifiDirectDevices')]
-        [String] $DynamicTransport,
+        [String]
+        $DynamicTransport,
 
         [ValidateSet('Block','Allow','DeferToUser','DeferToApp')]
-        [String] $EdgeTraversalPolicy,
+        [String]
+        $EdgeTraversalPolicy,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $IcmpType,
+        [String[]]
+        $IcmpType,
 
-        [Boolean] $LocalOnlyMapping,
+        [Boolean]
+        $LocalOnlyMapping,
 
-        [Boolean] $LooseSourceMapping,
+        [Boolean]
+        $LooseSourceMapping,
 
-        [Boolean] $OverrideBlockRules,
+        [Boolean]
+        $OverrideBlockRules,
 
         [ValidateNotNullOrEmpty()]
-        [String] $Owner
+        [String]
+        $Owner
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -573,95 +606,127 @@ function Test-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $Name,
+        [String]
+        $Name,
 
         [ValidateNotNullOrEmpty()]
-        [String] $DisplayName,
+        [String]
+        $DisplayName,
 
         [ValidateNotNullOrEmpty()]
-        [String] $Group,
+        [String]
+        $Group,
 
         [ValidateSet('Present', 'Absent')]
-        [String] $Ensure = 'Present',
+        [String]
+        $Ensure = 'Present',
 
         [ValidateSet('True', 'False')]
-        [String] $Enabled,
+        [String]
+        $Enabled,
 
         [ValidateSet('NotConfigured', 'Allow', 'Block')]
-        [String] $Action,
+        [String]
+        $Action,
 
-        [String[]] $Profile,
+        [String[]]
+        $Profile,
 
         [ValidateSet('Inbound', 'Outbound')]
-        [String] $Direction,
+        [String]
+        $Direction,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $RemotePort,
+        [String[]]
+        $RemotePort,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $LocalPort,
+        [String[]]
+        $LocalPort,
 
         [ValidateNotNullOrEmpty()]
-        [String] $Protocol,
+        [String]
+        $Protocol,
 
-        [String] $Description,
+        [String]
+        $Description,
 
         [ValidateNotNullOrEmpty()]
-        [String] $Program,
+        [String]
+        $Program,
 
         [ValidateNotNullOrEmpty()]
-        [String] $Service,
+        [String]
+        $Service,
 
         [ValidateSet('NotRequired', 'Required', 'NoEncap')]
-        [String] $Authentication,
+        [String]
+        $Authentication,
 
         [ValidateSet('NotRequired', 'Required', 'Dynamic')]
-        [String] $Encryption,
+        [String]
+        $Encryption,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $InterfaceAlias,
+        [String[]]
+        $InterfaceAlias,
 
         [ValidateSet('Any', 'Wired', 'Wireless', 'RemoteAccess')]
-        [String] $InterfaceType,
+        [String]
+        $InterfaceType,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $LocalAddress,
+        [String[]]
+        $LocalAddress,
 
         [ValidateNotNullOrEmpty()]
-        [String] $LocalUser,
+        [String]
+        $LocalUser,
 
         [ValidateNotNullOrEmpty()]
-        [String] $Package,
+        [String]
+        $Package,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $Platform,
+        [String[]]
+        $Platform,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $RemoteAddress,
+        [String[]]
+        $RemoteAddress,
 
         [ValidateNotNullOrEmpty()]
-        [String] $RemoteMachine,
+        [String]
+        $RemoteMachine,
 
         [ValidateNotNullOrEmpty()]
-        [String] $RemoteUser,
+        [String]
+        $RemoteUser,
 
         [ValidateSet('Any','ProximityApps','ProximitySharing','WifiDirectPrinting','WifiDirectDisplay','WifiDirectDevices')]
-        [String] $DynamicTransport,
+        [String]
+        $DynamicTransport,
 
         [ValidateSet('Block','Allow','DeferToUser','DeferToApp')]
-        [String] $EdgeTraversalPolicy,
+        [String]
+        $EdgeTraversalPolicy,
 
         [ValidateNotNullOrEmpty()]
-        [String[]] $IcmpType,
+        [String[]]
+        $IcmpType,
 
-        [Boolean] $LocalOnlyMapping,
+        [Boolean]
+        $LocalOnlyMapping,
 
-        [Boolean] $LooseSourceMapping,
+        [Boolean]
+        $LooseSourceMapping,
 
-        [Boolean] $OverrideBlockRules,
+        [Boolean]
+        $OverrideBlockRules,
 
         [ValidateNotNullOrEmpty()]
-        [String] $Owner
+        [String]
+        $Owner
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -841,80 +906,113 @@ function Test-RuleProperties
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $Name,
+        [String]
+        $Name,
 
-        [String] $DisplayName,
+        [String]
+        $DisplayName,
 
-        [String] $Group,
+        [String]
+        $Group,
 
-        [String] $DisplayGroup,
+        [String]
+        $DisplayGroup,
 
         [ValidateSet('Present', 'Absent')]
-        [String] $Ensure = 'Present',
+        [String]
+        $Ensure = 'Present',
 
         [ValidateSet('True', 'False')]
-        [String] $Enabled,
+        [String]
+        $Enabled,
 
         [ValidateSet('NotConfigured', 'Allow', 'Block')]
-        [String] $Action,
+        [String]
+        $Action,
 
-        [String[]] $Profile,
+        [String[]]
+        $Profile,
 
         [ValidateSet('Inbound', 'Outbound')]
-        [String] $Direction,
+        [String]
+        $Direction,
 
-        [String[]] $RemotePort,
+        [String[]]
+        $RemotePort,
 
-        [String[]] $LocalPort,
+        [String[]]
+        $LocalPort,
 
-        [String] $Protocol,
+        [String]
+        $Protocol,
 
-        [String] $Description,
+        [String]
+        $Description,
 
-        [String] $Program,
+        [String]
+        $Program,
 
-        [String] $Service,
+        [String]
+        $Service,
 
         [ValidateSet('NotRequired', 'Required', 'NoEncap')]
-        [String] $Authentication,
+        [String]
+        $Authentication,
 
         [ValidateSet('NotRequired', 'Required', 'Dynamic')]
-        [String] $Encryption,
+        [String]
+        $Encryption,
 
-        [String[]] $InterfaceAlias,
+        [String[]]
+        $InterfaceAlias,
 
         [ValidateSet('Any', 'Wired', 'Wireless', 'RemoteAccess')]
-        [String] $InterfaceType,
+        [String]
+        $InterfaceType,
 
-        [String[]] $LocalAddress,
+        [String[]]
+        $LocalAddress,
 
-        [String] $LocalUser,
+        [String]
+        $LocalUser,
 
-        [String] $Package,
+        [String]
+        $Package,
 
-        [String[]] $Platform,
+        [String[]]
+        $Platform,
 
-        [String[]] $RemoteAddress,
+        [String[]]
+        $RemoteAddress,
 
-        [String] $RemoteMachine,
+        [String]
+        $RemoteMachine,
 
-        [String] $RemoteUser,
+        [String]
+        $RemoteUser,
 
         [ValidateSet('Any','ProximityApps','ProximitySharing','WifiDirectPrinting','WifiDirectDisplay','WifiDirectDevices')]
-        [String] $DynamicTransport,
+        [String]
+        $DynamicTransport,
 
         [ValidateSet('Block','Allow','DeferToUser','DeferToApp')]
-        [String] $EdgeTraversalPolicy,
+        [String]
+        $EdgeTraversalPolicy,
 
-        [String[]] $IcmpType,
+        [String[]]
+        $IcmpType,
 
-        [Boolean] $LocalOnlyMapping,
+        [Boolean]
+        $LocalOnlyMapping,
 
-        [Boolean] $LooseSourceMapping,
+        [Boolean]
+        $LooseSourceMapping,
 
-        [Boolean] $OverrideBlockRules,
+        [Boolean]
+        $OverrideBlockRules,
 
-        [String] $Owner
+        [String]
+        $Owner
     )
 
     $properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
@@ -926,9 +1024,9 @@ function Test-RuleProperties
     # set $desiredConfigurationMatch to false.
     foreach ($parameter in $script:parameterList)
     {
-        $parameterSource = (Get-Variable -Name ($parameter.Variable)).value.$($parameter.Source)
+        $parameterSource = (Get-Variable -Name ($parameter.Variable)).Value.$($parameter.Source)
         #$parameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
-        $parameterNew = (Get-Variable -Name ($parameter.Name)).value
+        $parameterNew = (Get-Variable -Name ($parameter.Name)).Value
         #$parameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
         switch -Wildcard ($parameter.Type)
         {
@@ -1012,7 +1110,8 @@ function Get-FirewallRule
     param (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $Name
+        [String]
+        $Name
     )
 
     $firewallRule = @(Get-NetFirewallRule -Name $Name -ErrorAction SilentlyContinue)

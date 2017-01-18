@@ -51,12 +51,12 @@ try
             }
 
             Context 'Present should return correctly' {
-                $result = Get-TargetResource -Name $FirewallRule.Name
+                $result = Get-TargetResource -Name $FirewallRule.Name -Verbose
 
                 # Looping these tests
                 foreach ($parameter in $ParameterList)
                 {
-                    $parameterSource = (Get-Variable -Name ($parameter.Variable)).value.$($parameter.Source)
+                    $parameterSource = (Get-Variable -Name ($parameter.Variable)).Value.$($parameter.Source)
                     $parameterNew = (Get-Variable -Name 'Result').Value.$($parameter.Name)
                     It "should have the correct $($parameter.Name) on firewall rule $($FirewallRule.Name)" {
                         if ($parameter.Delimiter)
@@ -619,12 +619,12 @@ try
             $Splat = @{}
             foreach ($parameter in $ParameterList)
             {
-                $parameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
-                if ($parameter.delimiter)
+                $parameterSource = (Get-Variable -Name ($parameter.Variable)).Value.$($parameter.Source)
+                if ($parameter.Delimiter)
                 {
-                    $parameterSource = $parameterSource -split $parameter.delimiter
+                    $parameterSource = $parameterSource -split $parameter.Delimiter
                 }
-                $Splat += @{ $parameter.name = $parameterSource }
+                $Splat += @{ $parameter.Name = $parameterSource }
             }
 
             # To speed up all these tests create Mocks so that these functions are not repeatedly called
