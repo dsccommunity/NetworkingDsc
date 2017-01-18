@@ -1,3 +1,8 @@
+$script:ResourceRootPath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)
+
+# Import the xNetworking Resource Module (to import the common modules)
+Import-Module -Name (Join-Path -Path $script:ResourceRootPath -ChildPath 'xNetworking.psd1')
+
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_xDefaultGatewayAddress' `
