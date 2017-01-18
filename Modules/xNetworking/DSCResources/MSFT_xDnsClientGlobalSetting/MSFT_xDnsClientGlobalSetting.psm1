@@ -107,7 +107,8 @@ function Set-TargetResource
     foreach ($parameter in $script:parameterList)
     {
         $parameterSource = $dnsClientGlobalSetting.$($parameter.name)
-        $parameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
+        $parameterNew = Get-Variable -Name ($parameter.name)
+        # $parameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
         if ($PSBoundParameters.ContainsKey($parameter.Name) `
             -and (Compare-Object -ReferenceObject $parameterSource -DifferenceObject $parameterNew -SyncWindow 0))
         {
@@ -189,7 +190,8 @@ function Test-TargetResource
     foreach ($parameter in $script:parameterList)
     {
         $parameterSource = $DnsClientGlobalSetting.$($parameter.name)
-        $parameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
+        $parameterNew = Get-Variable -Name ($parameter.name)
+        # $parameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
         if ($PSBoundParameters.ContainsKey($parameter.Name) `
             -and (Compare-Object -ReferenceObject $parameterSource -DifferenceObject $parameterNew -SyncWindow 0)) {
             Write-Verbose -Message ( @(
