@@ -620,6 +620,7 @@ try
             foreach ($parameter in $ParameterList)
             {
                 $parameterSource = (Get-Variable -Name ($parameter.Variable)).Value.$($parameter.Source)
+                Write-Verbose -Verbose -Message "$($parameter.Variable).$($parameter.Source) -> $($parameter.Name) = $parameterSource"
                 if ($parameter.Delimiter)
                 {
                     $parameterSource = $parameterSource -split $parameter.Delimiter
