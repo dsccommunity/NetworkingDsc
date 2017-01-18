@@ -1,21 +1,7 @@
-# Get the path to the shared modules folder
-$script:ModulesFolderPath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)) `
-                                      -ChildPath 'Modules'
-
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_xDefaultGatewayAddress' `
     -ResourcePath $PSScriptRoot
-
-# Import the common networking functions
-Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
 
 <#
     .SYNOPSIS
