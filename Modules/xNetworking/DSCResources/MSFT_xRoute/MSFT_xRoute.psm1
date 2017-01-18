@@ -1,21 +1,12 @@
-# Get the path to the shared modules folder
-$script:ModulesFolderPath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)) `
-                                      -ChildPath 'Modules'
+$script:ResourceRootPath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)
 
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+# Import the xNetworking Resource Module (to import the common modules)
+Import-Module -Name (Join-Path -Path $script:ResourceRootPath -ChildPath 'xNetworking.psd1')
 
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData `
+$localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_xRoute' `
-    -ResourcePath $PSScriptRoot
-
-# Import the common networking functions
-Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
     .SYNOPSIS
@@ -440,7 +431,8 @@ function Test-TargetResource
     Specifies a preferred lifetime in seconds of an IP route.
 
 #>
-Function Get-Route {
+Function Get-Route
+{
     param
     (
         [Parameter(Mandatory = $true)]
@@ -497,6 +489,7 @@ Function Get-Route {
     }
     Return $route
 }
+
 <#
     .SYNOPSIS
     This function validates the parameters passed. Called by Test-Resource.
@@ -527,7 +520,8 @@ Function Get-Route {
     .PARAMETER PreferredLifetime
     Specifies a preferred lifetime in seconds of an IP route.
 #>
-Function Assert-ResourceProperty {
+Function Assert-ResourceProperty
+{
     [CmdletBinding()]
     param
     (

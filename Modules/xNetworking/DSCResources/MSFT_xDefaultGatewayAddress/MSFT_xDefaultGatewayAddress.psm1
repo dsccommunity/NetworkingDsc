@@ -271,7 +271,8 @@ function Test-TargetResource
     .PARAMETER Address
     The desired default gateway address - if not provided default gateway will be removed.
 #>
-function Assert-ResourceProperty {
+function Assert-ResourceProperty
+{
     [CmdletBinding()]
     param
     (

@@ -1,21 +1,12 @@
-# Get the path to the shared modules folder
-$script:ModulesFolderPath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)) `
-                                      -ChildPath 'Modules'
+$script:ResourceRootPath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)
 
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+# Import the xNetworking Resource Module (to import the common modules)
+Import-Module -Name (Join-Path -Path $script:ResourceRootPath -ChildPath 'xNetworking.psd1')
 
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData `
+$localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_xDnsConnectionSuffix' `
-    -ResourcePath $PSScriptRoot
-
-# Import the common networking functions
-Import-Module -Name (Join-Path -Path $script:ModulesFolderPath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
     .SYNOPSIS
@@ -41,7 +32,8 @@ function Get-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
-    param (
+    param
+    (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
@@ -52,15 +44,12 @@ function Get-TargetResource
         [System.String]
         $ConnectionSpecificSuffix,
 
-        [Parameter()]
         [System.Boolean]
         $RegisterThisConnectionsAddress = $true,
 
-        [Parameter()]
         [System.Boolean]
         $UseSuffixWhenRegistering = $false,
 
-        [Parameter()]
         [ValidateSet('Present','Absent')]
         [System.String]
         $Ensure = 'Present'
@@ -68,10 +57,10 @@ function Get-TargetResource
 
     $dnsClient = Get-DnsClient -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
     $targetResource = @{
-        InterfaceAlias = $dnsClient.InterfaceAlias
-        ConnectionSpecificSuffix = $dnsClient.ConnectionSpecificSuffix
+        InterfaceAlias                 = $dnsClient.InterfaceAlias
+        ConnectionSpecificSuffix       = $dnsClient.ConnectionSpecificSuffix
         RegisterThisConnectionsAddress = $dnsClient.RegisterThisConnectionsAddress
-        UseSuffixWhenRegistering = $dnsClient.UseSuffixWhenRegistering
+        UseSuffixWhenRegistering       = $dnsClient.UseSuffixWhenRegistering
     }
     if ($Ensure -eq 'Present')
     {
@@ -126,7 +115,8 @@ function Get-TargetResource
 function Set-TargetResource
 {
     [CmdletBinding()]
-    param (
+    param
+    (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
@@ -137,15 +127,12 @@ function Set-TargetResource
         [System.String]
         $ConnectionSpecificSuffix,
 
-        [Parameter()]
         [System.Boolean]
         $RegisterThisConnectionsAddress = $true,
 
-        [Parameter()]
         [System.Boolean]
         $UseSuffixWhenRegistering = $false,
 
-        [Parameter()]
         [ValidateSet('Present','Absent')]
         [System.String]
         $Ensure = 'Present'
@@ -168,7 +155,7 @@ function Set-TargetResource
         Write-Verbose -Message ($LocalizedData.RemovingConnectionSuffix `
             -f $ConnectionSpecificSuffix, $InterfaceAlias)
     }
-    Set-DnsClient @setDnsClientParams;
+    Set-DnsClient @setDnsClientParams
 }
 
 <#
@@ -195,7 +182,8 @@ function Test-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
-    param (
+    param
+    (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
@@ -206,22 +194,19 @@ function Test-TargetResource
         [System.String]
         $ConnectionSpecificSuffix,
 
-        [Parameter()]
         [System.Boolean]
         $RegisterThisConnectionsAddress = $true,
 
-        [Parameter()]
         [System.Boolean]
         $UseSuffixWhenRegistering = $false,
 
-        [Parameter()]
         [ValidateSet('Present','Absent')]
         [System.String]
         $Ensure = 'Present'
     )
 
-    $targetResource = Get-TargetResource @PSBoundParameters;
-    $inDesiredState = $true;
+    $targetResource = Get-TargetResource @PSBoundParameters
+    $inDesiredState = $true
     if ($targetResource.Ensure -ne $Ensure)
     {
         Write-Verbose -Message ($LocalizedData.PropertyMismatch `
@@ -244,10 +229,11 @@ function Test-TargetResource
     {
         Write-Verbose -Message $LocalizedData.ResourceInDesiredState
     }
-    else {
+    else
+    {
         Write-Verbose -Message $LocalizedData.ResourceNotInDesiredState
     }
-    return $inDesiredState;
+    return $inDesiredState
 }
 
 Export-ModuleMember -function *-TargetResource
