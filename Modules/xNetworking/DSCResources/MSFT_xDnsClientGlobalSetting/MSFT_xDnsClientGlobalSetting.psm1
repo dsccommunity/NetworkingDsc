@@ -108,7 +108,6 @@ function Set-TargetResource
     {
         $parameterSource = $dnsClientGlobalSetting.$($parameter.name)
         $parameterNew = (Get-Variable -Name ($parameter.name)).Value
-        # $parameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
         if ($PSBoundParameters.ContainsKey($parameter.Name) `
             -and (Compare-Object -ReferenceObject $parameterSource -DifferenceObject $parameterNew -SyncWindow 0))
         {
@@ -191,7 +190,6 @@ function Test-TargetResource
     {
         $parameterSource = $DnsClientGlobalSetting.$($parameter.name)
         $parameterNew = (Get-Variable -Name ($parameter.name)).Value
-        # $parameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
         if ($PSBoundParameters.ContainsKey($parameter.Name) `
             -and (Compare-Object -ReferenceObject $parameterSource -DifferenceObject $parameterNew -SyncWindow 0)) {
             Write-Verbose -Message ( @(

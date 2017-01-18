@@ -1,36 +1,36 @@
 @{
     ParameterList = @(
-        @{ Name = 'Name';                Source = '$FirewallRule.Name';                             Type = 'String'                  }
-        @{ Name = 'DisplayName';         Source = '$FirewallRule.DisplayName';                      Type = 'String'                  }
-        @{ Name = 'Group';               Source = '$FirewallRule.Group';                            Type = 'String'                  }
-        @{ Name = 'DisplayGroup';        Source = '$FirewallRule.DisplayGroup';                     Type = ''                        }
-        @{ Name = 'Enabled';             Source = '$FirewallRule.Enabled';                          Type = 'String'                  }
-        @{ Name = 'Action';              Source = '$FirewallRule.Action';                           Type = 'String'                  }
-        @{ Name = 'Profile';             Source = '$firewallRule.Profile';                          Type = 'Array'; Delimiter = ', ' }
-        @{ Name = 'Direction';           Source = '$FirewallRule.Direction';                        Type = 'String'                  }
-        @{ Name = 'Description';         Source = '$FirewallRule.Description';                      Type = 'String'                  }
-        @{ Name = 'RemotePort';          Source = '$properties.PortFilters.RemotePort';             Type = 'Array'                   }
-        @{ Name = 'LocalPort';           Source = '$properties.PortFilters.LocalPort';              Type = 'Array'                   }
-        @{ Name = 'Protocol';            Source = '$properties.PortFilters.Protocol';               Type = 'String'                  }
-        @{ Name = 'Program';             Source = '$properties.ApplicationFilters.Program';         Type = 'String'                  }
-        @{ Name = 'Service';             Source = '$properties.ServiceFilters.Service';             Type = 'String'                  }
-        @{ Name = 'Authentication';      Source = '$properties.SecurityFilters.Authentication';     Type = 'String'                  }
-        @{ Name = 'Encryption';          Source = '$properties.SecurityFilters.Encryption';         Type = 'String'                  }
-        @{ Name = 'InterfaceAlias';      Source = '$properties.InterfaceFilters.InterfaceAlias';    Type = 'Array'                   }
-        @{ Name = 'InterfaceType';       Source = '$properties.InterfaceTypeFilters.InterfaceType'; Type = 'String'                  }
-        @{ Name = 'LocalAddress';        Source = '$properties.AddressFilters.LocalAddress';        Type = 'ArrayIP'                 }
-        @{ Name = 'LocalUser';           Source = '$properties.SecurityFilters.LocalUser';          Type = 'String'                  }
-        @{ Name = 'Package';             Source = '$properties.ApplicationFilters.Package';         Type = 'String'                  }
-        @{ Name = 'Platform';            Source = '$firewallRule.Platform';                         Type = 'Array'                   }
-        @{ Name = 'RemoteAddress';       Source = '$properties.AddressFilters.RemoteAddress';       Type = 'ArrayIP'                 }
-        @{ Name = 'RemoteMachine';       Source = '$properties.SecurityFilters.RemoteMachine';      Type = 'String'                  }
-        @{ Name = 'RemoteUser';          Source = '$properties.SecurityFilters.RemoteUser';         Type = 'String'                  }
-        @{ Name = 'DynamicTransport';    Source = '$properties.PortFilters.DynamicTransport';       Type = 'String'                  }
-        @{ Name = 'EdgeTraversalPolicy'; Source = '$FirewallRule.EdgeTraversalPolicy';              Type = 'String'                  }
-        @{ Name = 'IcmpType';            Source = '$properties.PortFilters.IcmpType';               Type = 'Array'                   }
-        @{ Name = 'LocalOnlyMapping';    Source = '$FirewallRule.LocalOnlyMapping';                 Type = 'Boolean'                 }
-        @{ Name = 'LooseSourceMapping';  Source = '$FirewallRule.LooseSourceMapping';               Type = 'Boolean'                 }
-        @{ Name = 'OverrideBlockRules';  Source = '$properties.SecurityFilters.OverrideBlockRules'; Type = 'Boolean'                 }
-        @{ Name = 'Owner';               Source = '$FirewallRule.Owner';                            Type = 'String'                  }
+        @{ Name = 'Name';                Source = 'Name';                               Variable = 'FirewallRule'; Type = 'String'                  }
+        @{ Name = 'DisplayName';         Source = 'DisplayName';                        Variable = 'FirewallRule'; Type = 'String'                  }
+        @{ Name = 'Group';               Source = 'Group';                              Variable = 'FirewallRule'; Type = 'String'                  }
+        @{ Name = 'DisplayGroup';        Source = 'DisplayGroup';                       Variable = 'FirewallRule'; Type = ''                        }
+        @{ Name = 'Enabled';             Source = 'Enabled';                            Variable = 'FirewallRule'; Type = 'String'                  }
+        @{ Name = 'Action';              Source = 'Action';                             Variable = 'FirewallRule'; Type = 'String'                  }
+        @{ Name = 'Profile';             Source = 'Profile';                            Variable = 'FirewallRule'; Type = 'Array'; Delimiter = ', ' }
+        @{ Name = 'Direction';           Source = 'Direction';                          Variable = 'FirewallRule'; Type = 'String'                  }
+        @{ Name = 'Description';         Source = 'Description';                        Variable = 'FirewallRule'; Type = 'String'                  }
+        @{ Name = 'RemotePort';          Source = 'PortFilters.RemotePort';             Variable = 'properties';   Type = 'Array'                   }
+        @{ Name = 'LocalPort';           Source = 'PortFilters.LocalPort';              Variable = 'properties';   Type = 'Array'                   }
+        @{ Name = 'Protocol';            Source = 'PortFilters.Protocol';               Variable = 'properties';   Type = 'String'                  }
+        @{ Name = 'Program';             Source = 'ApplicationFilters.Program';         Variable = 'properties';   Type = 'String'                  }
+        @{ Name = 'Service';             Source = 'ServiceFilters.Service';             Variable = 'properties';   Type = 'String'                  }
+        @{ Name = 'Authentication';      Source = 'SecurityFilters.Authentication';     Variable = 'properties';   Type = 'String'                  }
+        @{ Name = 'Encryption';          Source = 'SecurityFilters.Encryption';         Variable = 'properties';   Type = 'String'                  }
+        @{ Name = 'InterfaceAlias';      Source = 'InterfaceFilters.InterfaceAlias';    Variable = 'properties';   Type = 'Array'                   }
+        @{ Name = 'InterfaceType';       Source = 'InterfaceTypeFilters.InterfaceType'; Variable = 'properties';   Type = 'String'                  }
+        @{ Name = 'LocalAddress';        Source = 'AddressFilters.LocalAddress';        Variable = 'properties';   Type = 'ArrayIP'                 }
+        @{ Name = 'LocalUser';           Source = 'SecurityFilters.LocalUser';          Variable = 'properties';   Type = 'String'                  }
+        @{ Name = 'Package';             Source = 'ApplicationFilters.Package';         Variable = 'properties';   Type = 'String'                  }
+        @{ Name = 'Platform';            Source = 'Platform';                           Variable = 'FirewallRule'; Type = 'Array'                   }
+        @{ Name = 'RemoteAddress';       Source = 'AddressFilters.RemoteAddress';       Variable = 'properties';   Type = 'ArrayIP'                 }
+        @{ Name = 'RemoteMachine';       Source = 'SecurityFilters.RemoteMachine';      Variable = 'properties';   Type = 'String'                  }
+        @{ Name = 'RemoteUser';          Source = 'SecurityFilters.RemoteUser';         Variable = 'properties';   Type = 'String'                  }
+        @{ Name = 'DynamicTransport';    Source = 'PortFilters.DynamicTransport';       Variable = 'properties';   Type = 'String'                  }
+        @{ Name = 'EdgeTraversalPolicy'; Source = 'EdgeTraversalPolicy';                Variable = 'FirewallRule'; Type = 'String'                  }
+        @{ Name = 'IcmpType';            Source = 'PortFilters.IcmpType';               Variable = 'properties';   Type = 'Array'                   }
+        @{ Name = 'LocalOnlyMapping';    Source = 'LocalOnlyMapping';                   Variable = 'FirewallRule'; Type = 'Boolean'                 }
+        @{ Name = 'LooseSourceMapping';  Source = 'LooseSourceMapping';                 Variable = 'FirewallRule'; Type = 'Boolean'                 }
+        @{ Name = 'OverrideBlockRules';  Source = 'SecurityFilters.OverrideBlockRules'; Variable = 'properties';   Type = 'Boolean'                 }
+        @{ Name = 'Owner';               Source = 'Owner';                              Variable = 'FirewallRule'; Type = 'String'                  }
     )
 }

@@ -74,12 +74,13 @@ function Get-TargetResource
     # the parameter array list and adding the values to
     foreach ($parameter in $script:parameterList)
     {
-        if ($parameter.type -in @('Array','ArrayIP'))
+        if ($parameter.Type -in @('Array','ArrayIP'))
         {
-            $parameterValue = @(Invoke-Expression -Command "`$($($parameter.source))")
-            if ($parameter.delimiter)
+            $parameterValue = @((Get-Variable -Name ($parameter.Variable)).value.$($parameter.Source))
+            #$parameterValue = @(Invoke-Expression -Command "`$($($parameter.source))")
+            if ($parameter.Delimiter)
             {
-                $parameterValue = $parameterValue -split $parameter.delimiter
+                $parameterValue = $parameterValue -split $parameter.Delimiter
             }
             $result += @{
                 $parameter.Name = $parameterValue
@@ -92,7 +93,8 @@ function Get-TargetResource
         }
         else
         {
-            $parameterValue = (Invoke-Expression -Command "`$($($parameter.source))")
+            $parameterValue = (Get-Variable -Name ($parameter.Variable)).value.$($parameter.Source)
+            #$parameterValue = (Invoke-Expression -Command "`$($($parameter.Source))")
             $result += @{
                 $parameter.Name = $parameterValue
             }
@@ -374,7 +376,8 @@ function Set-TargetResource
                     Foreach ($parameter in $ParametersList) {
                         if (-not $PSBoundParameters.ContainsKey($parameter.Name))
                         {
-                            $ParameterValue = (Invoke-Expression -Command "`$($($parameter.source))")
+                            $parameterValue = (Get-Variable -Name ($parameter.Variable)).value.$($parameter.Source)
+                            #$ParameterValue = (Invoke-Expression -Command "`$($($parameter.source))")
                             if ($ParameterValue) {
                                 $null = $PSBoundParameters.Add($parameter.Name,$ParameterValue)
                             }
@@ -923,9 +926,11 @@ function Test-RuleProperties
     # set $desiredConfigurationMatch to false.
     foreach ($parameter in $script:parameterList)
     {
-        $parameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
-        $parameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
-        switch -Wildcard ($parameter.type)
+        $parameterSource = (Get-Variable -Name ($parameter.Variable)).value.$($parameter.Source)
+        #$parameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
+        $parameterNew = (Get-Variable -Name ($parameter.Name)).value
+        #$parameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
+        switch -Wildcard ($parameter.Type)
         {
             'String'
             {
@@ -958,11 +963,11 @@ function Test-RuleProperties
                 {
                     $parameterSource = @()
                 }
-                if ($parameter.delimiter)
+                if ($parameter.Delimiter)
                 {
-                    $parameterSource = $parameterSource -split $parameter.delimiter
+                    $parameterSource = $parameterSource -split $parameter.Delimiter
                 }
-                if ($parameter.type -eq 'IPArray') {
+                if ($parameter.Type -eq 'IPArray') {
                     <#
                         IPArray comparison uses Compare-Object, except needs to convert any IP addresses
                         that use CIDR notation to use Subnet Mask notification because this is the
