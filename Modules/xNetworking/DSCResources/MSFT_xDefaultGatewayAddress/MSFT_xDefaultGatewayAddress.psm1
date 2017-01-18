@@ -1,7 +1,7 @@
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData `
+$localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_xDefaultGatewayAddress' `
-    -ResourcePath $PSScriptRoot
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
     .SYNOPSIS
