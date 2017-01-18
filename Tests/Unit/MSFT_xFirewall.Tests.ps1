@@ -56,10 +56,10 @@ try
                 # Looping these tests
                 foreach ($parameter in $ParameterList)
                 {
-                    $parameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
-                    $parameterNew = (Invoke-Expression -Command "`$result.$($parameter.name)")
+                    $parameterSource = (Get-Variable -Name ($parameter.Variable)).value.$($parameter.Source)
+                    $parameterNew = (Get-Variable -Name 'Result').Value.$($parameter.Name)
                     It "should have the correct $($parameter.Name) on firewall rule $($FirewallRule.Name)" {
-                        if ($parameter.delimiter)
+                        if ($parameter.Delimiter)
                         {
                             $parameterNew = $parameterNew -join ','
                         }
