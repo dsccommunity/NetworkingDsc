@@ -1198,7 +1198,6 @@ function Get-FirewallRuleProperty
 function Get-FirewallPropertyValue
 {
     [CmdletBinding()]
-    [OutputType([HashTable])]
     param (
         [Parameter(Mandatory = $true)]
         $FirewallRule,
