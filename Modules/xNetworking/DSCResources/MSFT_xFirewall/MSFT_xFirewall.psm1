@@ -77,8 +77,15 @@ function Get-TargetResource
     {
         if ($parameter.Type -in @('Array','ArrayIP'))
         {
-            $parameterValue = @((Get-Variable -Name ($parameter.Variable)).value.$($parameter.Source))
-            #$parameterValue = @(Invoke-Expression -Command "`$($($parameter.source))")
+            if ($parameter.Property) {
+                $parameterValue = @((Get-Variable `
+                    -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name))
+            }
+            else
+            {
+                $parameterValue = @((Get-Variable `
+                    -Name ($parameter.Variable)).value.$($parameter.Name))
+            }
             if ($parameter.Delimiter)
             {
                 $parameterValue = $parameterValue -split $parameter.Delimiter
@@ -94,8 +101,15 @@ function Get-TargetResource
         }
         else
         {
-            $parameterValue = (Get-Variable -Name ($parameter.Variable)).value.$($parameter.Source)
-            #$parameterValue = (Invoke-Expression -Command "`$($($parameter.Source))")
+            if ($parameter.Property) {
+                $parameterValue = (Get-Variable `
+                    -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
+            }
+            else
+            {
+                $parameterValue = (Get-Variable `
+                    -Name ($parameter.Variable)).value.$($parameter.Name)
+            }
             $result += @{
                 $parameter.Name = $parameterValue
             }
@@ -409,8 +423,15 @@ function Set-TargetResource
                     Foreach ($parameter in $ParametersList) {
                         if (-not $PSBoundParameters.ContainsKey($parameter.Name))
                         {
-                            $parameterValue = (Get-Variable -Name ($parameter.Variable)).value.$($parameter.Source)
-                            #$ParameterValue = (Invoke-Expression -Command "`$($($parameter.source))")
+                            if ($parameter.Property) {
+                                $parameterValue = (Get-Variable `
+                                    -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
+                            }
+                            else
+                            {
+                                $parameterValue = (Get-Variable `
+                                    -Name ($parameter.Variable)).value.$($parameter.Name)
+                            }
                             if ($ParameterValue) {
                                 $null = $PSBoundParameters.Add($parameter.Name,$ParameterValue)
                             }
@@ -1024,10 +1045,16 @@ function Test-RuleProperties
     # set $desiredConfigurationMatch to false.
     foreach ($parameter in $script:parameterList)
     {
-        $parameterSource = (Get-Variable -Name ($parameter.Variable)).Value.$($parameter.Source)
-        #$parameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
+        if ($parameter.Property) {
+            $parameterValue = (Get-Variable `
+                -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
+        }
+        else
+        {
+            $parameterValue = (Get-Variable `
+                -Name ($parameter.Variable)).value.$($parameter.Name)
+        }
         $parameterNew = (Get-Variable -Name ($parameter.Name)).Value
-        #$parameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
         switch -Wildcard ($parameter.Type)
         {
             'String'
