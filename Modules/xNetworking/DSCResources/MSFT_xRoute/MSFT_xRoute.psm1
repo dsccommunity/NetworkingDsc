@@ -1,47 +1,49 @@
-data LocalizedData
-{
-    # culture="en-US"
-    ConvertFrom-StringData -StringData @'
-GettingRouteMessage=Getting {0} Route on "{1}" dest {2} nexthop {3}.
-RouteExistsMessage={0} Route on "{1}" dest {2} nexthop {3} exists.
-RouteDoesNotExistMessage={0} Route on "{1}" dest {2} nexthop {3} does not exist.
-SettingRouteMessage=Setting {0} Route on "{1}" dest {2} nexthop {3}.
-EnsureRouteExistsMessage=Ensuring {0} Route on "{1}" dest {2} nexthop {3} exists.
-EnsureRouteDoesNotExistMessage=Ensuring {0} Route on "{1}" dest {2} nexthop {3} does not exist.
-RouteCreatedMessage={0} Route on "{1}" dest {2} nexthop {3} has been created.
-RouteUpdatedMessage={0} Route on "{1}" dest {2} nexthop {3} has been updated.
-RouteRemovedMessage={0} Route on "{1}" dest {2} nexthop {3} has been removed.
-TestingRouteMessage=Testing {0} Route on "{1}" dest {2} nexthop {3}.
-RoutePropertyNeedsUpdateMessage={4} property on {0} Route on "{1}" dest {2} nexthop {3} is different. Change required.
-RouteDoesNotExistButShouldMessage={0} Route on "{1}" dest {2} nexthop {3} does not exist but should. Change required.
-RouteExistsButShouldNotMessage={0} Route on "{1}" dest {2} nexthop {3} exists but should not. Change required.
-RouteDoesNotExistAndShouldNotMessage={0} Route on "{1}" dest {2} nexthop {3} does not exist and should not. Change not required.
-InterfaceNotAvailableError=Interface "{0}" is not available. Please select a valid interface and try again.
-AddressFormatError=Address "{0}" is not in the correct format. Please correct the Address parameter in the configuration and try again.
-AddressIPv4MismatchError=Address "{0}" is in IPv4 format, which does not match address family {1}. Please correct either of them in the configuration and try again.
-AddressIPv6MismatchError=Address "{0}" is in IPv6 format, which does not match address family {1}. Please correct either of them in the configuration and try again.
-'@
-}
+$script:ResourceRootPath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)
 
+# Import the xNetworking Resource Module (to import the common modules)
+Import-Module -Name (Join-Path -Path $script:ResourceRootPath -ChildPath 'xNetworking.psd1')
+
+# Import Localization Strings
+$localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xRoute' `
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+
+<#
+    .SYNOPSIS
+    Returns the current state of a Route for an interface.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface.
+
+    .PARAMETER AddressFamily
+    Specify the IP address family.
+
+    .PARAMETER DestinationPrefix
+    Specifies a destination prefix of an IP route.
+    A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/).
+
+    .PARAMETER NextHop
+    Specifies the next hop for the IP route.
+#>
 function Get-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
         [String] $AddressFamily,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $DestinationPrefix,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $NextHop
     )
@@ -53,7 +55,7 @@ function Get-TargetResource
         ) -join '' )
 
     # Lookup the existing Route
-    $Route = Get-Route @PSBoundParameters
+    $route = Get-Route @PSBoundParameters
 
     $returnValue = @{
         InterfaceAlias    = $InterfaceAlias
@@ -61,7 +63,7 @@ function Get-TargetResource
         DestinationPrefix = $DestinationPrefix
         NextHop           = $NextHop
     }
-    if ($Route)
+    if ($route)
     {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
@@ -70,10 +72,10 @@ function Get-TargetResource
             ) -join '' )
 
         $returnValue += @{
-            Ensure = 'Present'
-            RouteMetric = [Uint16] $Route.RouteMetric
-            Publish = $Route.Publish
-            PreferredLifetime = [Double] $Route.PreferredLifetime.TotalSeconds
+            Ensure            = 'Present'
+            RouteMetric       = [Uint16] $route.RouteMetric
+            Publish           = $route.Publish
+            PreferredLifetime = [Double] $route.PreferredLifetime.TotalSeconds
         }
     }
     else
@@ -92,43 +94,80 @@ function Get-TargetResource
     $returnValue
 } # Get-TargetResource
 
+<#
+    .SYNOPSIS
+    Sets a Route for an interface.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface.
+
+    .PARAMETER AddressFamily
+    Specify the IP address family.
+
+    .PARAMETER DestinationPrefix
+    Specifies a destination prefix of an IP route.
+    A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/).
+
+    .PARAMETER NextHop
+    Specifies the next hop for the IP route.
+
+    .PARAMETER Ensure
+    Specifies whether the route should exist.
+
+    .PARAMETER RouteMetric
+    Specifies an integer route metric for an IP route.
+
+    .PARAMETER Publish
+    Specifies the publish setting of an IP route.
+
+    .PARAMETER PreferredLifetime
+    Specifies a preferred lifetime in seconds of an IP route.
+#>
 function Set-TargetResource
 {
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $DestinationPrefix,
+        [String]
+        $DestinationPrefix,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $NextHop,
+        [String]
+        $NextHop,
 
         [ValidateSet('Present', 'Absent')]
-        [String] $Ensure = 'Present',
+        [String]
+        $Ensure = 'Present',
 
-        [Uint16] $RouteMetric = 256,
+        [Uint16]
+        $RouteMetric = 256,
 
         [ValidateSet('No', 'Yes', 'Age')]
-        [String] $Publish = 'No',
+        [String]
+        $Publish = 'No',
 
-        [Double] $PreferredLifetime
+        [Double]
+        $PreferredLifetime
     )
 
     # Remove any parameters that can't be splatted.
     $null = $PSBoundParameters.Remove('Ensure')
 
     # Lookup the existing Route
-    $Route = Get-Route @PSBoundParameters
+    $route = Get-Route @PSBoundParameters
 
     if ($Ensure -eq 'Present')
     {
@@ -138,13 +177,12 @@ function Set-TargetResource
                 -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
             ) -join '' )
 
-        if ($Route)
+        if ($route)
         {
             # The Route exists - update it
             Set-NetRoute @PSBoundParameters `
                 -Confirm:$false `
                 -ErrorAction Stop
-
 
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
@@ -173,7 +211,7 @@ function Set-TargetResource
                 -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
             ) -join '' )
 
-        if ($Route)
+        if ($route)
         {
             <#
             The Route exists - remove it
@@ -198,37 +236,74 @@ function Set-TargetResource
     } # if
 } # Set-TargetResource
 
+<#
+    .SYNOPSIS
+    Tests the state of a Route on an interface.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface.
+
+    .PARAMETER AddressFamily
+    Specify the IP address family.
+
+    .PARAMETER DestinationPrefix
+    Specifies a destination prefix of an IP route.
+    A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/).
+
+    .PARAMETER NextHop
+    Specifies the next hop for the IP route.
+
+    .PARAMETER Ensure
+    Specifies whether the route should exist.
+
+    .PARAMETER RouteMetric
+    Specifies an integer route metric for an IP route.
+
+    .PARAMETER Publish
+    Specifies the publish setting of an IP route.
+
+    .PARAMETER PreferredLifetime
+    Specifies a preferred lifetime in seconds of an IP route.
+#>
 function Test-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $DestinationPrefix,
+        [String]
+        $DestinationPrefix,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $NextHop,
+        [String]
+        $NextHop,
 
         [ValidateSet('Present', 'Absent')]
-        [String] $Ensure = 'Present',
+        [String]
+        $Ensure = 'Present',
 
-        [Uint16] $RouteMetric = 256,
+        [Uint16]
+        $RouteMetric = 256,
 
         [ValidateSet('No', 'Yes', 'Age')]
-        [String] $Publish = 'No',
+        [String]
+        $Publish = 'No',
 
-        [Double] $PreferredLifetime
+        [Double]
+        $PreferredLifetime
     )
 
     Write-Verbose -Message ( @(
@@ -244,19 +319,19 @@ function Test-TargetResource
     $null = $PSBoundParameters.Remove('Ensure')
 
     # Check the parameters
-    Test-ResourceProperty @PSBoundParameters
+    Assert-ResourceProperty @PSBoundParameters
 
     # Lookup the existing Route
-    $Route = Get-Route @PSBoundParameters
+    $route = Get-Route @PSBoundParameters
 
     if ($Ensure -eq 'Present')
     {
         # The route should exist
-        if ($Route)
+        if ($route)
         {
             # The route exists and does - but check the parameters
             if (($PSBoundParameters.ContainsKey('RouteMetric')) `
-                -and ($Route.RouteMetric -ne $RouteMetric))
+                -and ($route.RouteMetric -ne $RouteMetric))
             {
                 Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
@@ -267,7 +342,7 @@ function Test-TargetResource
             }
 
             if (($PSBoundParameters.ContainsKey('Publish')) `
-                -and ($Route.Publish -ne $Publish))
+                -and ($route.Publish -ne $Publish))
             {
                 Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
@@ -278,7 +353,7 @@ function Test-TargetResource
             }
 
             if (($PSBoundParameters.ContainsKey('PreferredLifetime')) `
-                -and ($Route.PreferredLifetime.TotalSeconds -ne $PreferredLifetime))
+                -and ($route.PreferredLifetime.TotalSeconds -ne $PreferredLifetime))
             {
                 Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
@@ -302,7 +377,7 @@ function Test-TargetResource
     else
     {
         # The route should not exist
-        if ($Route)
+        if ($route)
         {
             # The route exists but should not
             Write-Verbose -Message ( @(
@@ -326,43 +401,78 @@ function Test-TargetResource
 } # Test-TargetResource
 
 <#
-.Synopsis
+    .SYNOPSIS
     This function looks up the route using the parameters and returns
     it. If the route is not found $null is returned.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface.
+
+    .PARAMETER AddressFamily
+    Specify the IP address family.
+
+    .PARAMETER DestinationPrefix
+    Specifies a destination prefix of an IP route.
+    A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/).
+
+    .PARAMETER NextHop
+    Specifies the next hop for the IP route.
+
+    .PARAMETER Ensure
+    Specifies whether the route should exist.
+
+    .PARAMETER RouteMetric
+    Specifies an integer route metric for an IP route.
+
+    .PARAMETER Publish
+    Specifies the publish setting of an IP route.
+
+    .PARAMETER PreferredLifetime
+    Specifies a preferred lifetime in seconds of an IP route.
+
 #>
-Function Get-Route {
+Function Get-Route
+{
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $DestinationPrefix,
+        [String]
+        $DestinationPrefix,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $NextHop,
+        [String]
+        $NextHop,
 
         [ValidateSet('Present', 'Absent')]
-        [String] $Ensure = 'Present',
+        [String]
+        $Ensure = 'Present',
 
-        [Uint16] $RouteMetric = 256,
+        [Uint16]
+        $RouteMetric = 256,
 
         [ValidateSet('No', 'Yes', 'Age')]
-        [String] $Publish = 'No',
+        [String]
+        $Publish = 'No',
 
-        [Double] $PreferredLifetime
+        [Double]
+        $PreferredLifetime
     )
 
     try
     {
-        $Route = Get-NetRoute `
+        $route = Get-NetRoute `
             -InterfaceAlias $InterfaceAlias `
             -AddressFamily $AddressFamily `
             -DestinationPrefix $DestinationPrefix `
@@ -371,48 +481,83 @@ Function Get-Route {
     }
     catch [Microsoft.PowerShell.Cmdletization.Cim.CimJobException]
     {
-        $Route = $null
+        $route = $null
     }
     catch
     {
         Throw $_
     }
-    Return $Route
+    Return $route
 }
+
 <#
-.Synopsis
+    .SYNOPSIS
     This function validates the parameters passed. Called by Test-Resource.
     Will throw an error if any parameters are invalid.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface.
+
+    .PARAMETER AddressFamily
+    Specify the IP address family.
+
+    .PARAMETER DestinationPrefix
+    Specifies a destination prefix of an IP route.
+    A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/).
+
+    .PARAMETER NextHop
+    Specifies the next hop for the IP route.
+
+    .PARAMETER Ensure
+    Specifies whether the route should exist.
+
+    .PARAMETER RouteMetric
+    Specifies an integer route metric for an IP route.
+
+    .PARAMETER Publish
+    Specifies the publish setting of an IP route.
+
+    .PARAMETER PreferredLifetime
+    Specifies a preferred lifetime in seconds of an IP route.
 #>
-Function Test-ResourceProperty {
+Function Assert-ResourceProperty
+{
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $DestinationPrefix,
+        [String]
+        $DestinationPrefix,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $NextHop,
+        [String]
+        $NextHop,
 
         [ValidateSet('Present', 'Absent')]
-        [String] $Ensure = 'Present',
+        [String]
+        $Ensure = 'Present',
 
-        [Uint16] $RouteMetric = 256,
+        [Uint16]
+        $RouteMetric = 256,
 
         [ValidateSet('No', 'Yes', 'Age')]
-        [String] $Publish = 'No',
+        [String]
+        $Publish = 'No',
 
-        [Double] $PreferredLifetime
+        [Double]
+        $PreferredLifetime
     )
 
     # Validate the Adapter exists

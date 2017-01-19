@@ -1,33 +1,28 @@
-#region localizeddata
-if (Test-Path "${PSScriptRoot}\${PSUICulture}")
-{
-    Import-LocalizedData `
-        -BindingVariable LocalizedData `
-        -Filename MSFT_xDnsClientGlobalSetting.psd1 `
-        -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
-}
-else
-{
-    #fallback to en-US
-    Import-LocalizedData `
-        -BindingVariable LocalizedData `
-        -Filename MSFT_xDnsClientGlobalSetting.psd1 `
-        -BaseDirectory "${PSScriptRoot}\en-US"
-}
-#endregion
+$script:ResourceRootPath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)
+
+# Import the xNetworking Resource Module (to import the common modules)
+Import-Module -Name (Join-Path -Path $script:ResourceRootPath -ChildPath 'xNetworking.psd1')
+
+# Import Localization Strings
+$localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xDnsClientGlobalSetting' `
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
     This is an array of all the parameters used by this resource.
 #>
-data ParameterList
-{
-    @(
-        @{ Name = 'SuffixSearchList'; Type = 'String'  },
-        @{ Name = 'UseDevolution';    Type = 'Boolean' },
-        @{ Name = 'DevolutionLevel';  Type = 'Uint32'  }
-    )
-}
+$script:resourceData = Import-LocalizedData `
+    -BaseDirectory $PSScriptRoot `
+    -FileName 'MSFT_xDnsClientGlobalSetting.data.psd1'
+$script:parameterList = $script:resourceData.ParameterList
 
+<#
+    .SYNOPSIS
+    Returns the current DNS Client Global Settings.
+
+    .PARAMETER IsSingleInstance
+    Specifies the resource is a single instance, the value must be 'Yes'.
+#>
 function Get-TargetResource
 {
     [CmdletBinding()]
@@ -46,21 +41,38 @@ function Get-TargetResource
         ) -join '' )
 
     # Get the current Dns Client Global Settings
-    $DnsClientGlobalSetting = Get-DnsClientGlobalSetting `
+    $dnsClientGlobalSetting = Get-DnsClientGlobalSetting `
         -ErrorAction Stop
 
     # Generate the return object.
-    $ReturnValue = @{
+    $returnValue = @{
         IsSingleInstance = 'Yes'
     }
-    foreach ($parameter in $ParameterList)
+    foreach ($parameter in $script:parameterList)
     {
-        $ReturnValue += @{ $parameter.Name = $DnsClientGlobalSetting.$($parameter.name) }
+        $returnValue += @{ $parameter.Name = $dnsClientGlobalSetting.$($parameter.name) }
     } # foreach
 
-    return $ReturnValue
+    return $returnValue
 } # Get-TargetResource
 
+<#
+    .SYNOPSIS
+    Sets the DNS Client Global Settings.
+
+    .PARAMETER IsSingleInstance
+    Specifies the resource is a single instance, the value must be 'Yes'.
+
+    .PARAMETER SuffixSearchList
+    Specifies a list of global suffixes that can be used in the specified order by the DNS client
+    for resolving the IP address of the computer name.
+
+    .PARAMETER UseDevolution.
+    Specifies that devolution is activated.
+
+    .PARAMETER DevolutionLevel
+    Specifies the number of labels up to which devolution should occur.
+#>
 function Set-TargetResource
 {
     [CmdletBinding()]
@@ -87,29 +99,29 @@ function Set-TargetResource
         ) -join '' )
 
     # Get the current Dns Client Global Settings
-    $DnsClientGlobalSetting = Get-DnsClientGlobalSetting `
+    $dnsClientGlobalSetting = Get-DnsClientGlobalSetting `
         -ErrorAction Stop
 
     # Generate a list of parameters that will need to be changed.
-    $ChangeParameters = @{}
-    foreach ($parameter in $ParameterList)
+    $changeParameters = @{}
+    foreach ($parameter in $script:parameterList)
     {
-        $ParameterSource = $DnsClientGlobalSetting.$($parameter.name)
-        $ParameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
+        $parameterSource = $dnsClientGlobalSetting.$($parameter.name)
+        $parameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
         if ($PSBoundParameters.ContainsKey($parameter.Name) `
-            -and (Compare-Object -ReferenceObject $ParameterSource -DifferenceObject $ParameterNew -SyncWindow 0))
+            -and (Compare-Object -ReferenceObject $parameterSource -DifferenceObject $parameterNew -SyncWindow 0))
         {
-            $ChangeParameters += @{
-                $($parameter.name) = $ParameterNew
+            $changeParameters += @{
+                $($parameter.name) = $parameterNew
             }
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($LocalizedData.DnsClientGlobalSettingUpdateParameterMessage) `
-                    -f $parameter.Name,$ParameterNew
+                    -f $parameter.Name,$parameterNew
                 ) -join '' )
         } # if
     } # foreach
-    if ($ChangeParameters.Count -gt 0)
+    if ($changeParameters.Count -gt 0)
     {
         # Update any parameters that were identified as different
         $null = Set-DnsClientGlobalSetting `
@@ -123,6 +135,23 @@ function Set-TargetResource
     } # if
 } # Set-TargetResource
 
+<#
+    .SYNOPSIS
+    Tests the state of DNS Client Global Settings.
+
+    .PARAMETER IsSingleInstance
+    Specifies the resource is a single instance, the value must be 'Yes'.
+
+    .PARAMETER SuffixSearchList
+    Specifies a list of global suffixes that can be used in the specified order by the DNS client
+    for resolving the IP address of the computer name.
+
+    .PARAMETER UseDevolution.
+    Specifies that devolution is activated.
+
+    .PARAMETER DevolutionLevel
+    Specifies the number of labels up to which devolution should occur.
+#>
 function Test-TargetResource
 {
     [CmdletBinding()]
@@ -150,54 +179,29 @@ function Test-TargetResource
         ) -join '' )
 
     # Flag to signal whether settings are correct
-    [Boolean] $DesiredConfigurationMatch = $true
+    [Boolean] $desiredConfigurationMatch = $true
 
     # Get the current Dns Client Global Settings
     $DnsClientGlobalSetting = Get-DnsClientGlobalSetting `
         -ErrorAction Stop
 
     # Check each parameter
-    foreach ($parameter in $ParameterList)
+    foreach ($parameter in $script:parameterList)
     {
-        $ParameterSource = $DnsClientGlobalSetting.$($parameter.name)
-        $ParameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
+        $parameterSource = $DnsClientGlobalSetting.$($parameter.name)
+        $parameterNew = (Invoke-Expression -Command "`$$($parameter.name)")
         if ($PSBoundParameters.ContainsKey($parameter.Name) `
-            -and (Compare-Object -ReferenceObject $ParameterSource -DifferenceObject $ParameterNew -SyncWindow 0)) {
+            -and (Compare-Object -ReferenceObject $parameterSource -DifferenceObject $parameterNew -SyncWindow 0)) {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($LocalizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
-                    -f $parameter.Name,$ParameterSource,$ParameterNew
+                    -f $parameter.Name,$parameterSource,$parameterNew
                 ) -join '' )
             $desiredConfigurationMatch = $false
         } # if
     } # foreach
 
-    return $DesiredConfigurationMatch
+    return $desiredConfigurationMatch
 } # Test-TargetResource
-
-# Helper Functions
-function New-TerminatingError
-{
-    [CmdletBinding()]
-    param
-    (
-        [Parameter(Mandatory)]
-        [String] $ErrorId,
-
-        [Parameter(Mandatory)]
-        [String] $ErrorMessage,
-
-        [Parameter(Mandatory)]
-        [System.Management.Automation.ErrorCategory] $ErrorCategory
-    )
-
-    $exception = New-Object `
-        -TypeName System.InvalidOperationException `
-        -ArgumentList $errorMessage
-    $errorRecord = New-Object `
-        -TypeName System.Management.Automation.ErrorRecord `
-        -ArgumentList $exception, $errorId, $errorCategory, $null
-    $PSCmdlet.ThrowTerminatingError($errorRecord)
-}
 
 Export-ModuleMember -Function *-TargetResource

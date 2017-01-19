@@ -3,10 +3,8 @@ function Invoke-xNetworkingTest
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory = $false)]
         [System.String] $TestResultsFile,
-        
-        [Parameter(Mandatory = $false)]
+
         [System.String] $DscTestsPath
     )
 
@@ -15,9 +13,9 @@ function Invoke-xNetworkingTest
     $repoDir = Join-Path -Path $PSScriptRoot -ChildPath "..\" -Resolve
 
     $testCoverageFiles = @()
-    Get-ChildItem -Path "$repoDir\modules\xNetworking\DSCResources\**\*.psm1" -Recurse | ForEach-Object { 
+    Get-ChildItem -Path "$repoDir\modules\xNetworking\DSCResources\**\*.psm1" -Recurse | ForEach-Object {
         if ($_.FullName -notlike '*\DSCResource.Tests\*') {
-            $testCoverageFiles += $_.FullName    
+            $testCoverageFiles += $_.FullName
         }
     }
 
@@ -26,14 +24,14 @@ function Invoke-xNetworkingTest
         $testResultSettings.Add('OutputFormat', 'NUnitXml' )
         $testResultSettings.Add('OutputFile', $TestResultsFile)
     }
-    
+
     Import-Module -Name "$repoDir\modules\xNetworking\xNetworking.psd1"
     $testsToRun = @()
-    
+
     # Helper tests
 
     $helperTests = (Get-ChildItem -Path (Join-Path -Path $repoDir -ChildPath '\Tests\Helper\')).Name
-    
+
     $helperTests | ForEach-Object {
         $testsToRun += @(@{
             'Path' = "$repoDir\Tests\Helper\$_"
@@ -42,16 +40,16 @@ function Invoke-xNetworkingTest
 
     # Run Unit Tests
     $unitTests = (Get-ChildItem (Join-Path -Path $repoDir -ChildPath '\Tests\Unit\')).Name
-    
+
     $unitTests | ForEach-Object {
         $testsToRun += @(@{
             'Path' = "$repoDir\Tests\Unit\$_"
         })
     }
-    
+
     # Integration Tests
     $integrationTests = (Get-ChildItem -Path (Join-Path -Path $repoDir -ChildPath '\Tests\Integration\') -Filter '*.Tests.ps1').Name
-    
+
     $integrationTests | ForEach-Object {
         $testsToRun += @(@{
             'Path' = "$repoDir\Tests\Integration\$_"

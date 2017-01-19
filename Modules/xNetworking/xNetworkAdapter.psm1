@@ -32,7 +32,7 @@ function Get-xNetworkAdapterName
         [ValidateSet('Up','Disconnected','Disabled')]
         [String]$Status = 'Up',
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]$Name
     )
@@ -42,13 +42,13 @@ function Get-xNetworkAdapterName
         ) -join '')
 
     Test-xNetworkAdapterNameProperty -PhysicalMediaType $PhysicalMediaType -Status $Status -Name $Name
-    
+
     $Adapter  =  @(Get-NetAdapter | Where-Object {$_.Status -eq $Status})
     if(![string]::IsNullOrWhiteSpace($PhysicalMediaType))
     {
          $Adapter = @($Adapter| Where-Object {$_.PhysicalMediaType -eq $PhysicalMediaType})
     }
-    
+
     $exactAdapter = @($Adapter | Where-Object {$_.Name -eq $Name} )
     if($exactAdapter.Count -eq 0)
     {
@@ -58,8 +58,8 @@ function Get-xNetworkAdapterName
     {
         $Adapter = $exactAdapter
     }
-    
-    
+
+
     if($Adapter.Count -gt 0)
     {
         $returnValue = [PSCustomObject] @{
@@ -98,16 +98,16 @@ function Set-xNetworkAdapterName
         [String]$Status = 'Up',
 
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]$Name,
-        
+
         [Switch] $IgnoreMultipleMatchingAdapters
     )
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
         $($LocalizedData.ApplyingNetAdapterMessage)
         ) -join '')
-    
+
     Test-xNetworkAdapterNameProperty -PhysicalMediaType $PhysicalMediaType -Status $Status -Name $Name
 
     # Get the current NetAdapter based on the parameters given.
@@ -120,7 +120,7 @@ function Set-xNetworkAdapterName
         }
     }
     $getResults = Get-xNetworkAdapterName @getParameters
-    
+
     # Test if no adapter was found, if so return false
     if(!$getResults.Name)
     {
@@ -132,13 +132,13 @@ function Set-xNetworkAdapterName
         $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
             -ArgumentList $exception, $errorId, $errorCategory, $null
 
-        $PSCmdlet.ThrowTerminatingError($errorRecord)        
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
-    elseif($getResults.MatchingAdapterCount -ne 1 -and !$IgnoreMultipleMatchingAdapters) 
+    elseif($getResults.MatchingAdapterCount -ne 1 -and !$IgnoreMultipleMatchingAdapters)
     {
         # Mulitple matching adapters, and IgnoreMultipleMatchingAdapters is not specified
         # throw an error to indicating we found multiple adapters
-        
+
         $errorId = 'MultipleMatchingNetAdapterFound'
         $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
         $errorMessage = $LocalizedData.MultipleMatchingNetAdapterFound
@@ -147,7 +147,7 @@ function Set-xNetworkAdapterName
         $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
             -ArgumentList $exception, $errorId, $errorCategory, $null
 
-        $PSCmdlet.ThrowTerminatingError($errorRecord)        
+        $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
     elseif($getResults.name -ne $Name)
     {
@@ -178,7 +178,7 @@ function Test-xNetworkAdapterName
         [ValidateSet('Up','Disconnected','Disabled')]
         [String]$Status = 'Up',
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]$Name
     )
@@ -193,7 +193,7 @@ function Test-xNetworkAdapterName
 
     # Get the current NetAdapter based on the parameters given.
     $getResults = Get-xNetworkAdapterName @PSBoundParameters
-    
+
     # Test if no adapter was found, if so return false
     if(!$getResults.Name)
     {
@@ -203,8 +203,8 @@ function Test-xNetworkAdapterName
     {
         $desiredConfigurationMatch = $false
     }
-    
-    # return desiredConfigurationMatch     
+
+    # return desiredConfigurationMatch
     return $desiredConfigurationMatch
 } # Test-xNetworkAdapterName
 
@@ -212,7 +212,7 @@ function Test-xNetworkAdapterName
 #  Helper functions
 #######################################################################################
 function Test-xNetworkAdapterNameProperty {
-    # Function will check the propertes to find a network adapter 
+    # Function will check the propertes to find a network adapter
     # are valid.
     # If any problems are detected an exception will be thrown.
     [CmdletBinding()]
@@ -220,18 +220,18 @@ function Test-xNetworkAdapterNameProperty {
     (
         [String]$PhysicalMediaType,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [ValidateSet('Up','Disconnected','Disabled')]
         [String]$Status,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]$Name,
-        
+
         [Switch] $IgnoreMultipleMatchingAdapters
     )
-    
+
     # TODO add any parameter validation
 
 } # Test-ResourceProperty

@@ -1,17 +1,23 @@
-#region localizeddata
-if (Test-Path "${PSScriptRoot}\${PSUICulture}")
-{
-    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeamInterface.psd1 `
-                         -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
-} 
-else
-{
-    #fallback to en-US
-    Import-LocalizedData -BindingVariable LocalizedData -filename MSFT_xNetworkTeamInterface.psd1 `
-                         -BaseDirectory "${PSScriptRoot}\en-US"
-}
-#endregion
+$script:ResourceRootPath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)
 
+# Import the xNetworking Resource Module (to import the common modules)
+Import-Module -Name (Join-Path -Path $script:ResourceRootPath -ChildPath 'xNetworking.psd1')
+
+# Import Localization Strings
+$localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xNetworkTeamInterface' `
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+
+<#
+    .SYNOPSIS
+    Returns the current state of a Network Team Interface in a Network Team.
+
+    .PARAMETER Name
+    Specifies the name of the network team interface to create.
+
+    .PARAMETER TeamName
+    Specifies the name of the network team on which this particular interface should exist.
+#>
 function Get-TargetResource
 {
     [CmdletBinding()]
@@ -28,7 +34,7 @@ function Get-TargetResource
     )
 
     $configuration = @{
-        name = $Name
+        name     = $Name
         teamName = $TeamName
     }
 
@@ -47,9 +53,25 @@ function Get-TargetResource
         $configuration.Add("ensure", "Absent")
     }
 
-    $configuration
+    return $configuration
 }
 
+<#
+    .SYNOPSIS
+    Adds, updates or removes a Network Team Interface from a Network Team.
+
+    .PARAMETER Name
+    Specifies the name of the network team interface to create.
+
+    .PARAMETER TeamName
+    Specifies the name of the network team on which this particular interface should exist.
+
+    .PARAMETER VlanID
+    Specifies VlanID to be set on network team interface.
+
+    .PARAMETER Ensure
+    Specifies if the network team interface should be created or deleted.
+#>
 function Set-TargetResource
 {
     [CmdletBinding()]
@@ -135,7 +157,22 @@ function Set-TargetResource
     }
 }
 
+<#
+    .SYNOPSIS
+    Tests is a specified Network Team Interface is in the correct state.
 
+    .PARAMETER Name
+    Specifies the name of the network team interface to create.
+
+    .PARAMETER TeamName
+    Specifies the name of the network team on which this particular interface should exist.
+
+    .PARAMETER VlanID
+    Specifies VlanID to be set on network team interface.
+
+    .PARAMETER Ensure
+    Specifies if the network team interface should be created or deleted.
+#>
 function Test-TargetResource
 {
     [CmdletBinding()]

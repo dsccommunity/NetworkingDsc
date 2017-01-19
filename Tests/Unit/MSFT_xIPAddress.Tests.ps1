@@ -252,7 +252,7 @@ try
             }
         }
 
-        Describe "MSFT_xIPAddress\Test-ResourceProperty" {
+        Describe "MSFT_xIPAddress\Assert-ResourceProperty" {
 
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
 
@@ -272,7 +272,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $errorRecord
                 }
             }
 
@@ -292,7 +292,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $errorRecord
                 }
             }
 
@@ -312,7 +312,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $errorRecord
                 }
             }
 
@@ -324,7 +324,7 @@ try
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    { Test-ResourceProperty @Splat } | Should Not Throw
+                    { Assert-ResourceProperty @Splat } | Should Not Throw
                 }
             }
 
@@ -337,7 +337,7 @@ try
                         PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
-                    { Test-ResourceProperty @Splat } | Should Not Throw
+                    { Assert-ResourceProperty @Splat } | Should Not Throw
                 }
             }
 
@@ -358,7 +358,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $errorRecord
                 }
                 It 'should throw an Argument error when less than 0' {
                     $Splat = @{
@@ -367,7 +367,7 @@ try
                         PrefixLength = -1
                         AddressFamily = 'IPv4'
                     }
-                    { Test-ResourceProperty @Splat } `
+                    { Assert-ResourceProperty @Splat } `
                         | Should Throw 'Value was either too large or too small for a UInt32.'
                 }
             }
@@ -390,7 +390,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $errorRecord
                 }
                 It 'should throw an Argument error when less than 0' {
                     $Splat = @{
@@ -400,7 +400,7 @@ try
                         AddressFamily = 'IPv6'
                     }
 
-                    { Test-ResourceProperty @Splat } `
+                    { Assert-ResourceProperty @Splat } `
                         | Should Throw 'Value was either too large or too small for a UInt32.'
                 }
             }
@@ -414,7 +414,7 @@ try
                         PrefixLength = '64'
                         AddressFamily = 'IPv6'
                     }
-                    { Test-ResourceProperty @Splat } | Should Not Throw
+                    { Assert-ResourceProperty @Splat } | Should Not Throw
                 }
             }
         }

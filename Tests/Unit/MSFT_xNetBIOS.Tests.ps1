@@ -92,14 +92,13 @@ try
 
             Context 'Invoking with NonExisting Network Adapter' {
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { }
-                $ErrorRecord = New-Object System.Management.Automation.ErrorRecord 'Interface BogusAdapter was not found.', 'NICNotFound', 'ObjectNotFound', $null
+                $errorMessage = ($LocalizedData.NICNotFound -f 'BogusAdapter')
                 It 'should throw ObjectNotFound exception' {
-                    {Test-TargetResource -InterfaceAlias 'BogusAdapter' -Setting 'Enable'} | Should Throw $ErrorRecord
+                    {Test-TargetResource -InterfaceAlias 'BogusAdapter' -Setting 'Enable'} | Should Throw $errorMessage
                 }
             }
         }
         #endregion
-
 
         #region Function Set-TargetResource
         Describe "MSFT_xNetBIOS\Set-TargetResource" {

@@ -1,63 +1,60 @@
-#######################################################################################
-#  xDefaultGatewayAddress : DSC Resource that will set/test/get the current default gateway
-#  Address, by accepting values among those given in xDefaultGatewayAddress.schema.mof
-#######################################################################################
+$script:ResourceRootPath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)
 
-data LocalizedData
-{
-    # culture="en-US"
-    ConvertFrom-StringData -StringData @'
-GettingDefaultGatewayAddressMessage=Getting the Default Gateway Address.
-ApplyingDefaultGatewayAddressMessage=Applying the Default Gateway Address.
-DefaultGatewayAddressSetToDesiredStateMessage=Default Gateway address was set to the desired state.
-DefaultGatewayRemovedMessage=Default Gateway address has been removed.
-CheckingDefaultGatewayAddressMessage=Checking the Default Gateway Address.
-DefaultGatewayNotMatchMessage=Default gateway does NOT match desired state. Expected "{0}", actual "{1}".
-DefaultGatewayCorrectMessage=Default gateway is correct.
-DefaultGatewayDoesNotExistMessage=Default gateway does not exist. Expected "{0}".
-DefaultGatewayExistsButShouldNotMessage=Default gateway exists but it should not.
-DefaultGatewayExistsAndShouldMessage=Default Gateway does not exist which is correct.
-InterfaceNotAvailableError=Interface "{0}" is not available. Please select a valid interface and try again.
-AddressFormatError=Address "{0}" is not in the correct format. Please correct the Address parameter in the configuration and try again.
-AddressIPv4MismatchError=Address "{0}" is in IPv4 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
-AddressIPv6MismatchError=Address "{0}" is in IPv6 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
-'@
-}
+# Import the xNetworking Resource Module (to import the common modules)
+Import-Module -Name (Join-Path -Path $script:ResourceRootPath -ChildPath 'xNetworking.psd1')
 
-######################################################################################
-# The Get-TargetResource cmdlet.
-# This function will get the current Default Gateway Address
-######################################################################################
+# Import Localization Strings
+$localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xDefaultGatewayAddress' `
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+
+<#
+    .SYNOPSIS
+    Returns the current state of the Default Gateway for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the default gateway address is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER Address
+    The desired default gateway address - if not provided default gateway will be removed.
+#>
 function Get-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
-    (        
-        [String]$Address,
-
-        [Parameter(Mandatory)]
+    (
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily
+        [String]
+        $AddressFamily,
+
+        [String]
+        $Address
     )
-    
+
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
         $($LocalizedData.GettingDefaultGatewayAddressMessage)
         ) -join '' )
-    
+
     # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
-    $DestinationPrefix = '0.0.0.0/0'
+    $destinationPrefix = '0.0.0.0/0'
     if ($AddressFamily -eq 'IPv6')
     {
-        $DestinationPrefix = '::/0'
+        $destinationPrefix = '::/0'
     }
     # Get all the default routes
     $defaultRoutes = Get-NetRoute -InterfaceAlias $InterfaceAlias -AddressFamily `
         $AddressFamily -ErrorAction Stop | `
-        Where-Object { $_.DestinationPrefix -eq $DestinationPrefix }
+        Where-Object { $_.DestinationPrefix -eq $destinationPrefix }
 
     $returnValue = @{
         AddressFamily = $AddressFamily
@@ -66,7 +63,7 @@ function Get-TargetResource
     # If there is a Default Gateway defined for this interface/address family add it
     # to the return value.
     if ($defaultRoutes) {
-        $returnValue += @{ Address = $DefaultRoutes.NextHop }
+        $returnValue += @{ Address = $defaultRoutes.NextHop }
     } else {
         $returnValue += @{ Address = $null }
     }
@@ -74,43 +71,54 @@ function Get-TargetResource
     $returnValue
 }
 
-######################################################################################
-# The Set-TargetResource cmdlet.
-# This function will set the Default Gateway Address for the Interface/Family in the
-# current node
-######################################################################################
+<#
+    .SYNOPSIS
+    Sets the Default Gateway for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the default gateway address is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER Address
+    The desired default gateway address - if not provided default gateway will be removed.
+#>
 function Set-TargetResource
 {
+    [CmdletBinding()]
     param
     (
-        [String]$Address,
-
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily
+        [String]
+        $AddressFamily,
+
+        [String]
+        $Address
     )
-    # Validate the parameters
-    
+
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
         $($LocalizedData.ApplyingDefaultGatewayAddressMessage)
         ) -join '' )
 
     # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
-    $DestinationPrefix = '0.0.0.0/0'
+    $destinationPrefix = '0.0.0.0/0'
     if ($AddressFamily -eq 'IPv6')
     {
-        $DestinationPrefix = '::/0'
+        $destinationPrefix = '::/0'
     }
 
     # Get all the default routes
     $defaultRoutes = @(Get-NetRoute `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily `
-        -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
+        -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $destinationPrefix } )
 
     # Remove any existing default route
     foreach ($defaultRoute in $defaultRoutes) {
@@ -127,7 +135,7 @@ function Set-TargetResource
         # Set the correct Default Route
         # Build parameter hash table
         $parameters = @{
-            DestinationPrefix = $DestinationPrefix
+            DestinationPrefix = $destinationPrefix
             InterfaceAlias = $InterfaceAlias
             AddressFamily = $AddressFamily
             NextHop = $Address
@@ -147,26 +155,39 @@ function Set-TargetResource
     }
 }
 
-######################################################################################
-# The Test-TargetResource cmdlet.
-# This will test if the given Address is set as the Gateway Server address for the
-# Interface/Family in the current node
-######################################################################################
+<#
+    .SYNOPSIS
+    Tests the state of the Default Gateway for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the default gateway address is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER Address
+    The desired default gateway address - if not provided default gateway will be removed.
+#>
 function Test-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
     (
-        [String]$Address,
-
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily
+        [String]
+        $AddressFamily,
+
+        [String]
+        $Address
     )
+
     # Flag to signal whether settings are correct
     [Boolean] $desiredConfigurationMatch = $true
 
@@ -174,19 +195,19 @@ function Test-TargetResource
         $($LocalizedData.CheckingDefaultGatewayAddressMessage)
         ) -join '' )
 
-    Test-ResourceProperty @PSBoundParameters
+    Assert-ResourceProperty @PSBoundParameters
 
     # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
-    $DestinationPrefix = '0.0.0.0/0'
+    $destinationPrefix = '0.0.0.0/0'
     if ($AddressFamily -eq 'IPv6')
     {
-        $DestinationPrefix = '::/0'
+        $destinationPrefix = '::/0'
     }
     # Get all the default routes
     $defaultRoutes = @(Get-NetRoute `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily `
-        -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
+        -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $destinationPrefix } )
 
     # Test if the Default Gateway passed is equal to the current default gateway
     if ($Address)
@@ -236,24 +257,36 @@ function Test-TargetResource
     return $desiredConfigurationMatch
 }
 
-#######################################################################################
-#  Helper functions
-#######################################################################################
-function Test-ResourceProperty {
-    # Function will check the Address details are valid and do not conflict with
-    # Address family. Ensures interface exists.
-    # If any problems are detected an exception will be thrown.
+<#
+    .SYNOPSIS
+    Check the Address details are valid and do not conflict with Address family.
+    Ensures interface exists. If any problems are detected an exception will be thrown.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the default gateway address is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER Address
+    The desired default gateway address - if not provided default gateway will be removed.
+#>
+function Assert-ResourceProperty
+{
     [CmdletBinding()]
     param
     (
-        [String]$Address,
-
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily = 'IPv4'
+        [String]
+        $AddressFamily = 'IPv4',
+
+        [String]
+        $Address
     )
 
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
@@ -312,8 +345,6 @@ function Test-ResourceProperty {
             $PSCmdlet.ThrowTerminatingError($errorRecord)
         }
     }
-} # Test-ResourceProperty
-#######################################################################################
+} # Assert-ResourceProperty
 
-#  FUNCTIONS TO BE EXPORTED 
-Export-ModuleMember -function Get-TargetResource, Set-TargetResource, Test-TargetResource
+Export-ModuleMember -function *-TargetResource

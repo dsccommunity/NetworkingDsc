@@ -19,6 +19,48 @@
   - Fixed integration tests so that values being set are correctly tested.
   - Added integration tests for Removal of Firewall rule.
 - Added NetworkingDsc.Common module to contain shared networking functions.
+- MSFT_xDNSServerAddress:
+  - Separated Localization strings into strings file.
+- MSFT_xDefaultGatewayAddress:
+  - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
+- MSFT_xDhcpClient:
+  - Separated Localization strings into strings file.
+  - Fix parameter descriptions in MOF file.
+  - Style changes to meet HQRM standards.
+- MSFT_xDnsClientGlobalSetting:
+  - Renamed Localization strings file to be standard naming format.
+  - Moved ParameterList into a new file (MSFT_xDnsClientGlobalSetting.data.psd1).
+  - Style changes to meet HQRM standards.
+  - Removed New-TerminatingError function because never called.
+- MSFT_xDnsConnectionSuffix:
+  - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
+- MSFT_xHostsFile:
+  - Renamed Localization strings file to be standard naming format.
+  - Style changes to meet HQRM standards.
+- MSFT_xIPAddress:
+  - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
+- MSFT_xNetAdapterBinding:
+  - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
+- MSFT_xNetAdapterRDMA:
+  - Renamed Localization strings file to be standard naming format.
+  - Style changes to meet HQRM standards.
+- MSFT_xNetBIOS:
+  - Renamed Localization strings file to be standard naming format.
+  - Style changes to meet HQRM standards.
+- MSFT_xNetConnectionProfile:
+  - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
+- MSFT_xNetworkTeam:
+  - Style changes to meet HQRM standards.
+- MSFT_xNetworkTeamInterface:
+  - Style changes to meet HQRM standards.
+- MSFT_xRoute:
+  - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
 
 ## 3.1.0.0
 

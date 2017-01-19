@@ -1,52 +1,51 @@
-#######################################################################################
-#  xIPAddress : DSC Resource that will set/test/get the current IP
-#  Address, by accepting values among those given in xIPAddress.schema.mof
-#######################################################################################
+$script:ResourceRootPath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)
 
-data LocalizedData
-{
-    # culture="en-US"
-    ConvertFrom-StringData -StringData @'
-GettingIPAddressMessage=Getting the IP Address.
-ApplyingIPAddressMessage=Applying the IP Address.
-IPAddressSetStateMessage=IP Interface was set to the desired state.
-CheckingIPAddressMessage=Checking the IP Address.
-IPAddressDoesNotMatchMessage=IP Address does NOT match desired state. Expected {0}, actual {1}.
-IPAddressMatchMessage=IP Address is in desired state.
-PrefixLengthDoesNotMatchMessage=Prefix Length does NOT match desired state. Expected {0}, actual {1}.
-PrefixLengthMatchMessage=Prefix Length is in desired state.
-DHCPIsNotDisabledMessage=DHCP is NOT disabled.
-DHCPIsAlreadyDisabledMessage=DHCP is already disabled.
-DHCPIsNotTestedMessage=DHCP status is ignored when Address Family is IPv6.
-InterfaceNotAvailableError=Interface "{0}" is not available. Please select a valid interface and try again.
-AddressFormatError=Address "{0}" is not in the correct format. Please correct the Address parameter in the configuration and try again.
-AddressIPv4MismatchError=Address "{0}" is in IPv4 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
-AddressIPv6MismatchError=Address "{0}" is in IPv6 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
-PrefixLengthError=A Prefix Length of {0} is not valid for {1} addresses. Please correct the Prefix Length and try again.
-'@
-}
+# Import the xNetworking Resource Module (to import the common modules)
+Import-Module -Name (Join-Path -Path $script:ResourceRootPath -ChildPath 'xNetworking.psd1')
 
-######################################################################################
-# The Get-TargetResource cmdlet.
-# This function will get the present list of IP Address DSC Resource schema variables on the system
-######################################################################################
+# Import Localization Strings
+$localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xIPAddress' `
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+
+<#
+    .SYNOPSIS
+    Returns the current state of an IP address assigned to an interface.
+
+    .PARAMETER IPAddress
+    The desired IP address.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the IP address should be set.
+
+    .PARAMETER PrefixLength
+    The prefix length of the IP Address.
+
+    .PARAMETER AddressFamily
+    IP address family.
+#>
 function Get-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$IPAddress,
+        [String]
+        $IPAddress,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [uInt32]$PrefixLength = 16,
+        [uInt32]
+        $PrefixLength = 16,
 
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily = 'IPv4'
+        [String]
+        $AddressFamily = 'IPv4'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -67,27 +66,43 @@ function Get-TargetResource
     $returnValue
 }
 
-######################################################################################
-# The Set-TargetResource cmdlet.
-# This function will set a new IP Address in the current node
-######################################################################################
+<#
+    .SYNOPSIS
+    Sets an IP address on an interface.
+
+    .PARAMETER IPAddress
+    The desired IP address.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the IP address should be set.
+
+    .PARAMETER PrefixLength
+    The prefix length of the IP Address.
+
+    .PARAMETER AddressFamily
+    IP address family.
+#>
 function Set-TargetResource
 {
+    [CmdletBinding()]
     param
     (
-        #IP Address that has to be set
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$IPAddress,
+        [String]
+        $IPAddress,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [uInt32]$PrefixLength,
+        [uInt32]
+        $PrefixLength,
 
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily = 'IPv4'
+        [String]
+        $AddressFamily = 'IPv4'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -158,27 +173,44 @@ function Set-TargetResource
         ) -join '' )
 } # Set-TargetResource
 
-######################################################################################
-# The Test-TargetResource cmdlet.
-# This will test if the given IP Address is among the current node's IP Address collection
-######################################################################################
+<#
+    .SYNOPSIS
+    Tests the IP address on the interface.
+
+    .PARAMETER IPAddress
+    The desired IP address.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the IP address should be set.
+
+    .PARAMETER PrefixLength
+    The prefix length of the IP Address.
+
+    .PARAMETER AddressFamily
+    IP address family.
+#>
 function Test-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$IPAddress,
+        [String]
+        $IPAddress,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [uInt32]$PrefixLength = 16,
+        [uInt32]
+        $PrefixLength = 16,
 
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily = 'IPv4'
+        [String]
+        $AddressFamily = 'IPv4'
     )
 
     # Flag to signal whether settings are correct
@@ -188,7 +220,7 @@ function Test-TargetResource
         $($LocalizedData.CheckingIPAddressMessage)
         ) -join '')
 
-    Test-ResourceProperty @PSBoundParameters
+    Assert-ResourceProperty @PSBoundParameters
 
     # Get the current IP Address based on the parameters given.
      # First make sure that adapter is available
@@ -248,28 +280,45 @@ function Test-TargetResource
     return $desiredConfigurationMatch
 } # Test-TargetResource
 
-#######################################################################################
-#  Helper functions
-#######################################################################################
-function Test-ResourceProperty {
-    # Function will check the IP Address details are valid and do not conflict with
-    # Address family. Also checks the prefix length and ensures the interface exists.
-    # If any problems are detected an exception will be thrown.
+<#
+    .SYNOPSIS
+    Check the IP Address details are valid and do not conflict with Address family.
+    Also checks the prefix length and ensures the interface exists.
+    If any problems are detected an exception will be thrown.
+
+    .PARAMETER IPAddress
+    The desired IP address.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the IP address should be set.
+
+    .PARAMETER PrefixLength
+    The prefix length of the IP Address.
+
+    .PARAMETER AddressFamily
+    IP address family.
+#>
+function Assert-ResourceProperty
+{
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$IPAddress,
+        [String]
+        $IPAddress,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [uInt32]$PrefixLength = 16,
+        [uInt32]
+        $PrefixLength = 16,
 
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily = 'IPv4'
+        [String]
+        $AddressFamily = 'IPv4'
     )
 
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
@@ -344,9 +393,6 @@ function Test-ResourceProperty {
 
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
+} # Assert-ResourceProperty
 
-} # Test-ResourceProperty
-#######################################################################################
-
-#  FUNCTIONS TO BE EXPORTED
-Export-ModuleMember -function Get-TargetResource, Set-TargetResource, Test-TargetResource
+Export-ModuleMember -function *-TargetResource

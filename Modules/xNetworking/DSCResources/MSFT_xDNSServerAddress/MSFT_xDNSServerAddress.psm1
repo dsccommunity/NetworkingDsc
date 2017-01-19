@@ -1,49 +1,48 @@
-#######################################################################################
-#  xDNSServerAddress : DSC Resource that will set/test/get the current DNS Server
-#  Address, by accepting values among those given in xDNSServerAddress.schema.mof
-#######################################################################################
+$script:ResourceRootPath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)
 
-data LocalizedData
-{
-    # culture="en-US"
-    ConvertFrom-StringData -StringData @'
-GettingDNSServerAddressesMessage=Getting the DNS Server Addresses.
-ApplyingDNSServerAddressesMessage=Applying the DNS Server Addresses.
-DNSServersSetCorrectlyMessage=DNS Servers are set correctly.
-DNSServersAlreadySetMessage=DNS Servers are already set correctly.
-CheckingDNSServerAddressesMessage=Checking the DNS Server Addresses.
-DNSServersNotCorrectMessage=DNS Servers are not correct. Expected "{0}", actual "{1}".
-DNSServersHaveBeenSetCorrectlyMessage=DNS Servers were set to the desired state.
-InterfaceNotAvailableError=Interface "{0}" is not available. Please select a valid interface and try again.
-AddressFormatError=Address "{0}" is not in the correct format. Please correct the Address parameter in the configuration and try again.
-AddressIPv4MismatchError=Address "{0}" is in IPv4 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
-AddressIPv6MismatchError=Address "{0}" is in IPv6 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
-'@
-}
+# Import the xNetworking Resource Module (to import the common modules)
+Import-Module -Name (Join-Path -Path $script:ResourceRootPath -ChildPath 'xNetworking.psd1')
 
-######################################################################################
-# The Get-TargetResource cmdlet.
-# This function will get the present list of DNS ServerAddress DSC Resource
-# schema variables on the system
-######################################################################################
+# Import Localization Strings
+$localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xDNSServerAddress' `
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+
+<#
+    .SYNOPSIS
+    Returns the current DNS Server Addresses for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DNS server address is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER Address
+    The desired DNS Server address(es).
+#>
 function Get-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
-    (        
-        [Parameter(Mandatory)]
+    (
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String[]]$Address,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
-
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily
+        [String]
+        $AddressFamily,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]
+        $Address
     )
-    
+
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
         $($LocalizedData.GettingDNSServerAddressesMessage)
         ) -join '')
@@ -56,31 +55,49 @@ function Get-TargetResource
         InterfaceAlias = $InterfaceAlias
     }
 
-    $returnValue
+    return $returnValue
 }
 
-######################################################################################
-# The Set-TargetResource cmdlet.
-# This function will set a new Server Address in the current node
-######################################################################################
+<#
+    .SYNOPSIS
+    Sets the DNS Server Address for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DNS server address is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER Address
+    The desired DNS Server address(es).
+
+    .PARAMETER Validate
+    Requires that the DNS Server addresses be validated if they are updated.
+    It will cause the resouce to throw a 'A general error occurred that is not covered by a more
+    specific error code.' error if set to True and specified DNS Servers are not accessible.
+#>
 function Set-TargetResource
 {
+    [CmdletBinding()]
     param
-    (    
-        #IP Address that has to be set    
-        [Parameter(Mandatory)]
+    (
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String[]]$Address,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
-
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily,
-        
-        [Boolean]$Validate = $false
+        [String]
+        $AddressFamily,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]
+        $Address,
+
+        [Boolean]
+        $Validate = $false
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
@@ -114,8 +131,8 @@ function Set-TargetResource
             $($LocalizedData.DNSServersHaveBeenSetCorrectlyMessage)
             ) -join '' )
     }
-    else 
-    { 
+    else
+    {
         #Test will return true in this case
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($LocalizedData.DNSServersAlreadySetMessage)
@@ -123,28 +140,47 @@ function Set-TargetResource
     }
 }
 
-######################################################################################
-# The Test-TargetResource cmdlet.
-# This will test if the given Server Address is among the current node's Server Address collection
-######################################################################################
+<#
+    .SYNOPSIS
+    Tests the current state of a DNS Server Address for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DNS server address is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER Address
+    The desired DNS Server address(es).
+
+    .PARAMETER Validate
+    Requires that the DNS Server addresses be validated if they are updated.
+    It will cause the resouce to throw a 'A general error occurred that is not covered by a more
+    specific error code.' error if set to True and specified DNS Servers are not accessible.
+#>
 function Test-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
-    (        
-        [Parameter(Mandatory)]
+    (
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String[]]$Address,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
-
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily,
-        
-        [Boolean]$Validate = $false        
+        [String]
+        $AddressFamily,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]
+        $Address,
+
+        [Boolean]
+        $Validate = $false
     )
     # Flag to signal whether settings are correct
     [Boolean] $desiredConfigurationMatch = $true
@@ -154,8 +190,8 @@ function Test-TargetResource
         ) -join '' )
 
     #Validate the Settings passed
-    Foreach ($ServerAddress in $Address) {       
-        Test-ResourceProperty `
+    Foreach ($ServerAddress in $Address) {
+        Assert-ResourceProperty `
             -Address $ServerAddress `
             -AddressFamily $AddressFamily `
             -InterfaceAlias $InterfaceAlias
@@ -181,8 +217,8 @@ function Test-TargetResource
                 -f ($Address -join ','),($currentAddress -join ',')
             ) -join '' )
     }
-    else 
-    { 
+    else
+    {
         #Test will return true in this case
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($LocalizedData.DNSServersSetCorrectlyMessage)
@@ -191,25 +227,40 @@ function Test-TargetResource
     return $desiredConfigurationMatch
 }
 
-#######################################################################################
-#  Helper functions
-#######################################################################################
-function Test-ResourceProperty
+<#
+    .SYNOPSIS
+    Checks the Address details are valid and do not conflict with Address family.
+    Ensures interface exists. If any problems are detected an exception will be thrown.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DNS server address is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER Address
+    The desired DNS Server address.
+#>
+
+function Assert-ResourceProperty
 {
-    # Function will check the Address details are valid and do not conflict with
-    # Address family. Ensures interface exists.
-    # If any problems are detected an exception will be thrown.
     [CmdletBinding()]
     param
     (
-        [String]$Address,
-
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]$InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]$AddressFamily = 'IPv4'
+        [String]
+        $AddressFamily,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $Address
     )
 
     if ( -not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
@@ -266,8 +317,6 @@ function Test-ResourceProperty
 
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
-} # Test-ResourceProperty
-#######################################################################################
+} # Assert-ResourceProperty
 
-#  FUNCTIONS TO BE EXPORTED 
-Export-ModuleMember -function Get-TargetResource, Set-TargetResource, Test-TargetResource
+Export-ModuleMember -function *-TargetResource

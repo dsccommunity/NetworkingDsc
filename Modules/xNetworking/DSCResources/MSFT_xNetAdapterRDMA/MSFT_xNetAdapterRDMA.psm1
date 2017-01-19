@@ -1,16 +1,12 @@
-﻿#region localizeddata
-if (Test-Path "${PSScriptRoot}\${PSUICulture}")
-{
-    Import-LocalizedData -BindingVariable localizedData -filename MSFT_xNetAdapterRDMA.psd1 `
-                         -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
-} 
-else
-{
-    #fallback to en-US
-    Import-LocalizedData -BindingVariable localizedData -filename MSFT_xNetAdapterRDMA.psd1 `
-                         -BaseDirectory "${PSScriptRoot}\en-US"
-}
-#endregion
+﻿$script:ResourceRootPath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)
+
+# Import the xNetworking Resource Module (to import the common modules)
+Import-Module -Name (Join-Path -Path $script:ResourceRootPath -ChildPath 'xNetworking.psd1')
+
+# Import Localization Strings
+$localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xNetAdapterRDMA' `
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
 .SYNOPSIS
@@ -56,11 +52,11 @@ function Get-TargetResource
     Sets MSFT_xVMNetAdapterRDMA resource state.
 
 .PARAMETER Name
-    Specifies the name of the network adapter for which the 
+    Specifies the name of the network adapter for which the
     RDMA configuration needs to be retrieved.
 
 .PARAMETER Enabled
-    Specifies if the RDMA configuration should be enabled or disabled. 
+    Specifies if the RDMA configuration should be enabled or disabled.
     This is a boolean value and the default is $true.
 #>
 function Set-TargetResource
@@ -72,7 +68,6 @@ function Set-TargetResource
         [String]
         $Name,
 
-        [parameter()]
         [Boolean]
         $Enabled = $true
     )
@@ -107,11 +102,11 @@ function Set-TargetResource
     Tests if MSFT_xVMNetAdapterRDMA resource state is indeed desired state or not.
 
 .PARAMETER Name
-    Specifies the name of the network adapter for which the 
+    Specifies the name of the network adapter for which the
     RDMA configuration needs to be retrieved.
 
 .PARAMETER Enabled
-    Specifies if the RDMA configuration should be enabled or disabled. 
+    Specifies if the RDMA configuration should be enabled or disabled.
     This is a boolean value and the default is $true.
 #>
 function Test-TargetResource
@@ -124,7 +119,6 @@ function Test-TargetResource
         [String]
         $Name,
 
-        [parameter()]
         [Boolean]
         $Enabled = $true
     )

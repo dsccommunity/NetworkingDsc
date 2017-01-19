@@ -1,32 +1,45 @@
-data LocalizedData
-{
-    # culture="en-US"
-    ConvertFrom-StringData -StringData @'
-GettingDHCPClientMessage=Getting the DHCP Client on {1} interface "{0}".
-ApplyingDHCPClientMessage=Applying the DHCP Client on {1} interface "{0}".
-DHCPClientSetStateMessage=DHCP Client was set to the desired state {2} on {1} interface "{0}".
-CheckingDHCPClientMessage=Checking the DHCP Client on {1} interface "{0}".
-DHCPClientDoesNotMatchMessage=DHCP Client is not in the desired state {2} on {1} interface "{0}".
-InterfaceNotAvailableError=Interface "{0}" is not available. Please select a valid interface and try again.
-'@
-}
+$script:ResourceRootPath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent)
 
+# Import the xNetworking Resource Module (to import the common modules)
+Import-Module -Name (Join-Path -Path $script:ResourceRootPath -ChildPath 'xNetworking.psd1')
+
+# Import Localization Strings
+$localizedData = Get-LocalizedData `
+    -ResourceName 'MSFT_xDhcpClient' `
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+
+<#
+    .SYNOPSIS
+    Returns the current state of the DHCP Client for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DHCP Client is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER State
+    The desired state of the DHCP Client.
+#>
 function Get-TargetResource
 {
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String] $State
+        [String]
+        $State
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -34,8 +47,8 @@ function Get-TargetResource
         -f $InterfaceAlias,$AddressFamily `
         ) -join '')
 
-    Test-ResourceProperty @PSBoundParameters
-    
+    Assert-ResourceProperty @PSBoundParameters
+
     $CurrentDHCPClient = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily
@@ -49,21 +62,37 @@ function Get-TargetResource
     $returnValue
 }
 
+<#
+    .SYNOPSIS
+    Sets the DHCP Client for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DHCP Client is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER State
+    The desired state of the DHCP Client.
+#>
 function Set-TargetResource
 {
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String] $State
+        [String]
+        $State
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -71,12 +100,12 @@ function Set-TargetResource
         -f $InterfaceAlias,$AddressFamily `
         ) -join '')
 
-    Test-ResourceProperty @PSBoundParameters
-    
+    Assert-ResourceProperty @PSBoundParameters
+
     $CurrentDHCPClient = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily
-        
+
     # The DHCP Client is in a different state - so change it.
     Set-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
@@ -88,25 +117,41 @@ function Set-TargetResource
         $($LocalizedData.DHCPClientSetStateMessage) `
         -f $InterfaceAlias,$AddressFamily,$State `
         ) -join '' )
-        
+
 } # Set-TargetResource
 
+<#
+    .SYNOPSIS
+    Tests the state of the DHCP Client for an interface.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DHCP Client is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER State
+    The desired state of the DHCP Client.
+#>
 function Test-TargetResource
 {
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String] $State
+        [String]
+        $State
     )
 
     # Flag to signal whether settings are correct
@@ -117,12 +162,12 @@ function Test-TargetResource
         -f $InterfaceAlias,$AddressFamily `
         ) -join '')
 
-    Test-ResourceProperty @PSBoundParameters
+    Assert-ResourceProperty @PSBoundParameters
 
     $CurrentDHCPClient = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily
-        
+
     # The DHCP Client is in a different state - so change it.
     if ($CurrentDHCPClient.DHCP -ne $State)
     {
@@ -136,23 +181,39 @@ function Test-TargetResource
     return $desiredConfigurationMatch
 } # Test-TargetResource
 
-function Test-ResourceProperty {
-    # Function will check the interface exists.
-    # If any problems are detected an exception will be thrown.
+<#
+    .SYNOPSIS
+    Function will check the interface exists.
+    If any problems are detected an exception will be thrown.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface for which the DHCP Client is set.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER State
+    The desired state of the DHCP Client.
+#>
+function Assert-ResourceProperty
+{
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [String]
+        $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [String]
+        $AddressFamily,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String] $State
+        [String]
+        $State
     )
 
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
@@ -167,6 +228,6 @@ function Test-ResourceProperty {
 
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
-} # Test-ResourceProperty
+} # Assert-ResourceProperty
 
 Export-ModuleMember -function *-TargetResource

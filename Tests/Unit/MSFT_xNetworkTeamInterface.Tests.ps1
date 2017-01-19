@@ -27,12 +27,12 @@ try
             Name                = 'HostTeamNic'
             Team                = 'HostTeam'
         }
-        
+
         $TestTeamNic = [PSObject] @{
             Name                = $MockNetTeamNic.Name
             TeamName            = $MockNetTeamNic.Team
         }
-        
+
         $MockTeamNic = [PSObject] @{
             Name                = $TestTeamNic.Name
             Team                = $TestTeamNic.TeamName
@@ -164,7 +164,7 @@ try
                     Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
                 }
             }
-            
+
             Context 'Team Interface exists but should not exist' {
                 Mock Get-NetLbfoTeamNic -MockWith { $MockTeamNic }
 
