@@ -33,6 +33,7 @@
   - Moved ParameterList into a new file (MSFT_xDnsClientGlobalSetting.data.psd1).
   - Style changes to meet HQRM standards.
   - Removed New-TerminatingError function because never called.
+  - Converted to remove Invoke-Expression.
 - MSFT_xDnsConnectionSuffix:
   - Separated Localization strings into strings file.
   - Style changes to meet HQRM standards.
@@ -57,10 +58,13 @@
 - MSFT_xNetworkTeam:
   - Style changes to meet HQRM standards.
 - MSFT_xNetworkTeamInterface:
+  - Updated integration tests to remove Invoke-Expression.
   - Style changes to meet HQRM standards.
 - MSFT_xRoute:
   - Separated Localization strings into strings file.
   - Style changes to meet HQRM standards.
+- MSFT_xFirewall:
+  - Converted to remove Invoke-Expression.
 
 ## 3.1.0.0
 
