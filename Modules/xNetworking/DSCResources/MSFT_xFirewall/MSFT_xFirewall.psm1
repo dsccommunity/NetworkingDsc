@@ -1043,11 +1043,11 @@ function Test-RuleProperties
             'String'
             {
                 # Perform a plain string comparison.
-                if ($parameterNew -and ($parameterSource -ne $parameterNew))
+                if ($parameterNew -and ($parameterValue -ne $parameterNew))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                         $($script:localizedData.PropertyNoMatchMessage) `
-                            -f $parameter.Name,$parameterSource,$parameterNew
+                            -f $parameter.Name,$parameterValue,$parameterNew
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
@@ -1055,11 +1055,11 @@ function Test-RuleProperties
             'Boolean'
             {
                 # Perform a boolean comparison.
-                if ($parameterNew -and ($parameterSource -ne $parameterNew))
+                if ($parameterNew -and ($parameterValue -ne $parameterNew))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                         $($script:localizedData.PropertyNoMatchMessage) `
-                            -f $parameter.Name,$parameterSource,$parameterNew
+                            -f $parameter.Name,$parameterValue,$parameterNew
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
@@ -1067,13 +1067,13 @@ function Test-RuleProperties
             'Array*'
             {
                 # Array comparison uses Compare-Object
-                if ($null -eq $parameterSource)
+                if ($null -eq $parameterValue)
                 {
-                    $parameterSource = @()
+                    $parameterValue = @()
                 }
                 if ($parameter.Delimiter)
                 {
-                    $parameterSource = $parameterSource -split $parameter.Delimiter
+                    $parameterValue = $parameterValue -split $parameter.Delimiter
                 }
                 if ($parameter.Type -eq 'IPArray') {
                     <#
@@ -1087,12 +1087,12 @@ function Test-RuleProperties
 
                 if ($parameterNew `
                     -and ((Compare-Object `
-                        -ReferenceObject $parameterSource `
+                        -ReferenceObject $parameterValue `
                         -DifferenceObject $parameterNew).Count -ne 0))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                         $($script:localizedData.PropertyNoMatchMessage) `
-                            -f $parameter.Name,($parameterSource -join ','),($parameterNew -join ',')
+                            -f $parameter.Name,($parameterValue -join ','),($parameterNew -join ',')
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
