@@ -51,7 +51,7 @@ try
             }
 
             Context 'Present should return correctly' {
-                $result = Get-TargetResource -Name $FirewallRule.Name -Verbose
+                $result = Get-TargetResource -Name $FirewallRule.Name
 
                 # Looping these tests
                 foreach ($parameter in $ParameterList)
@@ -652,7 +652,7 @@ try
             Context 'testing with a rule with no property differences' {
                 $CompareRule = $Splat.Clone()
                 It "should return True on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $True
                 }
             }
@@ -660,7 +660,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Name = 'Different'
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -668,7 +668,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.DisplayName = 'Different'
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -676,7 +676,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Group = 'Different'
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -690,7 +690,7 @@ try
                     $CompareRule.Enabled = 'True'
                 }
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -704,7 +704,7 @@ try
                     $CompareRule.Action = 'Allow'
                 }
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -718,7 +718,7 @@ try
                     $CompareRule.Profile = @('Domain','Public')
                 }
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -732,7 +732,7 @@ try
                     $CompareRule.Direction = 'Inbound'
                 }
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -740,7 +740,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.RemotePort = 1
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -748,7 +748,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.LocalPort = 1
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -762,7 +762,7 @@ try
                     $CompareRule.Protocol = 'TCP'
                 }
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -770,7 +770,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Description = 'Different'
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -778,7 +778,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Program = 'Different'
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -786,7 +786,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Service = 'Different'
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -800,7 +800,7 @@ try
                     $CompareRule.Authentication = 'Required'
                 }
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -814,7 +814,7 @@ try
                     $CompareRule.Encryption = 'Required'
                 }
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -822,7 +822,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.InterfaceAlias = 'Different'
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -836,7 +836,7 @@ try
                     $CompareRule.InterfaceType = 'Wired'
                 }
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -844,7 +844,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.LocalAddress = @('10.0.0.1/255.0.0.0','10.1.1.0-10.1.2.0')
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -852,7 +852,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.LocalUser = 'Different'
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -860,7 +860,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Package = 'Different'
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -868,7 +868,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Platform = @('6.2')
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -876,7 +876,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.RemoteAddress = @('10.0.0.1/255.0.0.0','10.1.1.0-10.1.2.0')
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -884,7 +884,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.RemoteMachine = 'Different'
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -892,7 +892,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.RemoteUser = 'Different'
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -900,7 +900,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.DynamicTransport = 'WifiDirectDevices'
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -908,7 +908,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.EdgeTraversalPolicy = 'DeferToApp'
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -916,7 +916,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.IcmpType = @('53','54')
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -924,7 +924,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.LocalOnlyMapping = ! $CompareRule.LocalOnlyMapping
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -932,7 +932,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.LooseSourceMapping = ! $CompareRule.LooseSourceMapping
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -940,7 +940,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.OverrideBlockRules = ! $CompareRule.OverrideBlockRules
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
@@ -948,7 +948,7 @@ try
                 $CompareRule = $Splat.Clone()
                 $CompareRule.Owner = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
                 It "should return False on firewall rule $($FirewallRule.Name)" {
-                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule -Verbose
+                    $Result = Test-RuleProperties -FirewallRule $FirewallRule @CompareRule
                     $Result | Should be $False
                 }
             }
