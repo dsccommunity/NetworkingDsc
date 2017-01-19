@@ -79,7 +79,7 @@ function Get-TargetResource
         {
             $parameterValue = @(Get-FirewallPropertyValue `
                 -FirewallRule $firewallRule `
-                -Propeties $properties `
+                -Properties $properties `
                 -Parameter $parameter)
             if ($parameter.Delimiter)
             {
@@ -98,7 +98,7 @@ function Get-TargetResource
         {
             $parameterValue = Get-FirewallPropertyValue `
                 -FirewallRule $firewallRule `
-                -Propeties $properties `
+                -Properties $properties `
                 -Parameter $parameter
 
             $result += @{
@@ -416,7 +416,7 @@ function Set-TargetResource
                         {
                             $parameterValue = Get-FirewallPropertyValue `
                                 -FirewallRule $firewallRule `
-                                -Propeties $properties `
+                                -Properties $properties `
                                 -Parameter $parameter
 
                             if ($ParameterValue) {
@@ -1034,7 +1034,7 @@ function Test-RuleProperties
     {
         $parameterValue = Get-FirewallPropertyValue `
             -FirewallRule $firewallRule `
-            -Propeties $properties `
+            -Properties $properties `
             -Parameter $parameter
 
         $parameterNew = (Get-Variable -Name ($parameter.Name)).Value
