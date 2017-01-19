@@ -41,49 +41,22 @@ function Get-TargetResource
 
     Write-Verbose -Message ($LocalizedData.StartingGet -f $HostName)
 
-    $hosts = Get-Content -Path "$env:windir\System32\drivers\etc\hosts"
-    $allHosts = $hosts `
-           | Where-Object { [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false } `
-           | ForEach-Object {
-                $data = $_ -split '\s+'
-                if ($data.Length -gt 2)
-                {
-                    # Account for host entries that have multiple entries on a single line
-                    $result = @()
-                    for ($i = 1; $i -lt $data.Length; $i++)
-                    {
-                        $result += @{
-                            Host = $data[$i]
-                            IP = $data[0]
-                        }
-                    }
-                    return $result
-                }
-                else
-                {
-                    return @{
-                        Host = $data[1]
-                        IP = $data[0]
-                    }
-                }
-        } | Select-Object @{ Name="Host"; Expression={$_.Host}}, @{Name="IP"; Expression={$_.IP}}
+    $result = Get-HostEntry -HostName $HostName
 
-    $hostEntry = $allHosts | Where-Object { $_.Host -eq $HostName }
-
-    if ($null -eq $hostEntry)
+    if ($null -ne $result)
     {
         return @{
-            HostName = $HostName
-            IPAddress = $null
-            Ensure = "Absent"
+            HostName  = $result.HostName
+            IPAddress = $result.IPAddress
+            Ensure    = "Present"
         }
     }
     else
     {
         return @{
-            HostName = $hostEntry.Host
-            IPAddress = $hostEntry.IP
-            Ensure = "Present"
+            HostName = $HostName
+            IPAddress = $null
+            Ensure    = "Absent"
         }
     }
 }
@@ -118,34 +91,29 @@ function Set-TargetResource
         $Ensure = "Present"
     )
 
+    $hostPath = "$env:windir\System32\drivers\etc\hosts"
     $currentValues = Get-TargetResource @PSBoundParameters
 
     Write-Verbose -Message ($LocalizedData.StartingSet -f $HostName)
 
     if ($Ensure -eq "Present" -and $PSBoundParameters.ContainsKey("IPAddress") -eq $false)
     {
-        $errorId = 'IPAddressNotPresentError'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-        $errorMessage = $($LocalizedData.UnableToEnsureWithoutIP) -f $Address,$AddressFamily
-        $exception = New-Object -TypeName System.InvalidOperationException `
-                                -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                                  -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
+        New-InvalidArgumentException `
+            -Message $($($LocalizedData.UnableToEnsureWithoutIP) -f $Address,$AddressFamily) `
+            -ArgumentName 'IPAddress'
     }
 
     if ($currentValues.Ensure -eq "Absent" -and $Ensure -eq "Present")
     {
         Write-Verbose -Message ($LocalizedData.CreateNewEntry -f $HostName)
-        Add-Content -Path "$env:windir\System32\drivers\etc\hosts" -Value "`r`n$IPAddress`t$HostName"
+        Add-Content -Path $hostPath -Value "`r`n$IPAddress`t$HostName"
     }
     else
     {
-        $hosts = Get-Content -Path "$env:windir\System32\drivers\etc\hosts"
+        $hosts = Get-Content -Path $hostPath
         $replace = $hosts | Where-Object {
             [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false
-        } | Where-Object { $_ -like "*$HostName" }
+        } | Where-Object { $_ -like "*$HostName*" }
 
         $multiLineEntry = $false
         $data = $replace -split '\s+'
@@ -154,7 +122,7 @@ function Set-TargetResource
             $multiLineEntry = $true
         }
 
-        if ($currentValues.Ensure -eq "Present" -and $Ensure -eq "Present")
+        if ($Ensure -eq "Present")
         {
             Write-Verbose -Message ($LocalizedData.UpdateExistingEntry -f $HostName)
             if ($multiLineEntry -eq $true)
@@ -168,7 +136,7 @@ function Set-TargetResource
                 $hosts = $hosts -replace $replace, "$IPAddress`t$HostName"
             }
         }
-        if ($Ensure -eq "Absent")
+        else
         {
             Write-Verbose -Message ($LocalizedData.RemoveEntry -f $HostName)
             if ($multiLineEntry -eq $true)
@@ -181,7 +149,8 @@ function Set-TargetResource
                 $hosts = $hosts -replace $replace, ""
             }
         }
-        $hosts | Set-Content -Path "$env:windir\System32\drivers\etc\hosts"
+
+        Set-Content -Path $hostPath -Value $hosts
     }
 }
 
@@ -229,4 +198,62 @@ function Test-TargetResource
         return $false
     }
     return $true
+}
+
+function Get-HostEntry
+{
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $HostName
+    )
+
+    $allHosts = Get-Content -Path "$env:windir\System32\drivers\etc\hosts" | `
+        Where-Object { [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false }
+    foreach ($hosts in $allHosts)
+    {
+        $data = $hosts -split '\s+'
+        if ($data.Length -gt 2)
+        {
+            # Account for host entries that have multiple entries on a single line
+            $result = @()
+            $array = @()
+            for ($i = 1; $i -lt $data.Length; $i++)
+            {
+                <#
+                    Filter commments on the line.
+                    Example: 0.0.0.0 s.gateway.messenger.live.com # breaks Skype GH-183
+                    becomes:
+                    0.0.0.0 s.gateway.messenger.live.com
+                #>
+                if ($data[$i] -eq '#')
+                {
+                    break
+                }
+
+                $array += $data[$i]
+            }
+
+            $result = @{
+                Host = $array
+                IPAddress = $data[0]
+            }
+        }
+        else
+        {
+            $result = @{
+                Host = $data[1]
+                IPAddress = $data[0]
+            }
+        }
+
+        if ($result.Host -eq $HostName)
+        {
+            return @{
+                HostName  = $result.Host
+                IPAddress = $result.IPAddress
+            }
+        }
+    }
 }
