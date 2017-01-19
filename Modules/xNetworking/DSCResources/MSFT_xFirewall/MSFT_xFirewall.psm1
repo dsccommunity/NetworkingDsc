@@ -77,15 +77,10 @@ function Get-TargetResource
     {
         if ($parameter.Type -in @('Array','ArrayIP'))
         {
-            if ($parameter.Property) {
-                $parameterValue = @((Get-Variable `
-                    -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name))
-            }
-            else
-            {
-                $parameterValue = @((Get-Variable `
-                    -Name ($parameter.Variable)).value.$($parameter.Name))
-            }
+            $parameterValue = @(Get-FirewallPropertyValue `
+                -FirewallRule $firewallRule `
+                -Propeties $properties `
+                -Parameter $parameter)
             if ($parameter.Delimiter)
             {
                 $parameterValue = $parameterValue -split $parameter.Delimiter
@@ -101,15 +96,11 @@ function Get-TargetResource
         }
         else
         {
-            if ($parameter.Property) {
-                $parameterValue = (Get-Variable `
-                    -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
-            }
-            else
-            {
-                $parameterValue = (Get-Variable `
-                    -Name ($parameter.Variable)).value.$($parameter.Name)
-            }
+            $parameterValue = Get-FirewallPropertyValue `
+                -FirewallRule $firewallRule `
+                -Propeties $properties `
+                -Parameter $parameter
+
             $result += @{
                 $parameter.Name = $parameterValue
             }
@@ -423,15 +414,11 @@ function Set-TargetResource
                     Foreach ($parameter in $ParametersList) {
                         if (-not $PSBoundParameters.ContainsKey($parameter.Name))
                         {
-                            if ($parameter.Property) {
-                                $parameterValue = (Get-Variable `
-                                    -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
-                            }
-                            else
-                            {
-                                $parameterValue = (Get-Variable `
-                                    -Name ($parameter.Variable)).value.$($parameter.Name)
-                            }
+                            $parameterValue = Get-FirewallPropertyValue `
+                                -FirewallRule $firewallRule `
+                                -Propeties $properties `
+                                -Parameter $parameter
+
                             if ($ParameterValue) {
                                 $null = $PSBoundParameters.Add($parameter.Name,$ParameterValue)
                             }
@@ -1045,15 +1032,11 @@ function Test-RuleProperties
     # set $desiredConfigurationMatch to false.
     foreach ($parameter in $script:parameterList)
     {
-        if ($parameter.Property) {
-            $parameterValue = (Get-Variable `
-                -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
-        }
-        else
-        {
-            $parameterValue = (Get-Variable `
-                -Name ($parameter.Variable)).value.$($parameter.Name)
-        }
+        $parameterValue = Get-FirewallPropertyValue `
+            -FirewallRule $firewallRule `
+            -Propeties $properties `
+            -Parameter $parameter
+
         $parameterNew = (Get-Variable -Name ($parameter.Name)).Value
         switch -Wildcard ($parameter.Type)
         {
@@ -1172,8 +1155,8 @@ function Get-FirewallRule
     .SYNOPSIS
     Returns a Hashtable containing the component Firewall objects for the specified Firewall Rule.
 
-    .PARAMETER Name
-    The name of the Firewall Rule to retrieve the Firewall objects for.
+    .PARAMETER FirewallRule
+    The firewall rule object to pull the additional firewall objects for.
 #>
 function Get-FirewallRuleProperty
 {
@@ -1198,6 +1181,46 @@ function Get-FirewallRuleProperty
         ServiceFilters       = @(Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule)
     }
 }
+
+<#
+    .SYNOPSIS
+    Looks up a Firewall Property value using the specified parameterList entry.
+
+    .PARAMETER FirewallRule
+    The firewall rule object to pull the property from.
+
+    .PARAMETER Properties
+    The additional firewall objects to pull the property from.
+
+    .PARAMETER Parameter
+    The entry from the ParameterList table used to retireve the parameter for.
+#>
+function Get-FirewallPropertyValue
+{
+    [CmdletBinding()]
+    [OutputType([HashTable])]
+    param (
+        [Parameter(Mandatory = $true)]
+        $FirewallRule,
+
+        [Parameter(Mandatory = $true)]
+        $Properties,
+
+        [Parameter(Mandatory = $true)]
+        $Parameter
+     )
+
+    if ($Parameter.Property) {
+        return (Get-Variable `
+            -Name ($Parameter.Variable)).value.$($Parameter.Property).$($Parameter.Name)
+    }
+    else
+    {
+        return (Get-Variable `
+            -Name ($Parameter.Variable)).value.$($Parameter.Name)
+    }
+}
+
 #endregion
 
 Export-ModuleMember -Function *-TargetResource,Convert-CIDRToSubhetMask
