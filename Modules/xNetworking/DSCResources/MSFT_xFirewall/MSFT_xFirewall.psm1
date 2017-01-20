@@ -1117,7 +1117,8 @@ function Get-FirewallRule
 {
     [CmdletBinding()]
     [OutputType([Microsoft.Management.Infrastructure.CimInstance])]
-    param (
+    param
+    (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
@@ -1162,7 +1163,8 @@ function Get-FirewallRuleProperty
 {
     [CmdletBinding()]
     [OutputType([HashTable])]
-    param (
+    param
+    (
         [Parameter(Mandatory = $true)]
         $FirewallRule
      )
@@ -1198,7 +1200,8 @@ function Get-FirewallRuleProperty
 function Get-FirewallPropertyValue
 {
     [CmdletBinding()]
-    param (
+    param
+    (
         [Parameter(Mandatory = $true)]
         $FirewallRule,
 
@@ -1222,4 +1225,4 @@ function Get-FirewallPropertyValue
 
 #endregion
 
-Export-ModuleMember -Function *-TargetResource,Convert-CIDRToSubhetMask
+Export-ModuleMember -Function *-TargetResource
