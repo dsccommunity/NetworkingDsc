@@ -9,8 +9,8 @@ install:
 
     - ps: |
         $moduleName = 'xNetworking'
-        $mainModuleFolder = (Join-Path -Path $env:APPVEYOR_BUILD_FOLDER -ChildPath "\Modules\$moduleName")
-        $harnessModulePath = (Join-Path -Path $env:APPVEYOR_BUILD_FOLDER -ChildPath "Tests\$($moduleName).TestHarness.psm1")
+        $mainModuleFolder = "\Modules\$moduleName"
+        $harnessModulePath = "Tests\$($moduleName).TestHarness.psm1"
         $harnessFunctionName = "Invoke-$($moduleName)Test"
         Import-Module "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
         Start-AppveyorInstallTask
