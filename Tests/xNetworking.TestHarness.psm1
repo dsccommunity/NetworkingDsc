@@ -30,34 +30,20 @@ function Invoke-xNetworkingTest
 
     # Helper tests
     $helperTestsPath = Join-Path -Path $repoDir -ChildPath 'Tests\Helper'
-    (Get-ChildItem -Path $helperTestsPath).FullName | ForEach-Object {
-        $testsToRun += @(@{
-            'Path' = $_
-        })
-    }
+    $testsToRun += @( (Get-ChildItem -Path $helperTestsPath).FullName )
 
     # Run Unit Tests
     $unitTestsPath = Join-Path -Path $repoDir -ChildPath 'Tests\Unit'
-    (Get-ChildItem -Path $unitTestsPath).FullName | ForEach-Object {
-        $testsToRun += @(@{
-            'Path' = $_
-        })
-    }
+    $testsToRun += @( (Get-ChildItem -Path $unitTestsPath).FullName )
 
     # Integration Tests
     $integrationTestsPath = Join-Path -Path $repoDir -ChildPath 'Tests\Integration'
-    (Get-ChildItem -Path $integrationTestsPath -Filter '*.Tests.ps1').FullName | ForEach-Object {
-        $testsToRun += @(@{
-            'Path' = $_
-        })
-    }
+    $testsToRun += @( (Get-ChildItem -Path $integrationTestsPath -Filter '*.Tests.ps1').FullName )
 
     # DSC Common Tests
     if ($PSBoundParameters.ContainsKey('DscTestsPath') -eq $true)
     {
-        $testsToRun += @(@{
-            'Path' = $DscTestsPath
-        })
+        $testsToRun += @( $DscTestsPath )
     }
 
     $results = Invoke-Pester -Script $testsToRun `
