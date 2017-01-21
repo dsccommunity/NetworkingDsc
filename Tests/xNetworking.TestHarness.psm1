@@ -29,30 +29,26 @@ function Invoke-xNetworkingTest
     $testsToRun = @()
 
     # Helper tests
-
-    $helperTests = (Get-ChildItem -Path (Join-Path -Path $repoDir -ChildPath '\Tests\Helper\')).Name
-
-    $helperTests | ForEach-Object {
+    $helperTestsPath = Join-Path -Path $repoDir -ChildPath 'Tests\Helper')
+    Get-ChildItem -Path $helperTestsPath | ForEach-Object {
         $testsToRun += @(@{
-            'Path' = "$repoDir\Tests\Helper\$_"
+            'Path' = $_.FullName
         })
     }
 
     # Run Unit Tests
-    $unitTests = (Get-ChildItem (Join-Path -Path $repoDir -ChildPath '\Tests\Unit\')).Name
-
-    $unitTests | ForEach-Object {
+    $unitTestsPath = Join-Path -Path $repoDir -ChildPath 'Tests\Unit'
+    Get-ChildItem -Path $unitTestsPath | ForEach-Object {
         $testsToRun += @(@{
-            'Path' = "$repoDir\Tests\Unit\$_"
+            'Path' = $_.FullName
         })
     }
 
     # Integration Tests
-    $integrationTests = (Get-ChildItem -Path (Join-Path -Path $repoDir -ChildPath '\Tests\Integration\') -Filter '*.Tests.ps1').Name
-
-    $integrationTests | ForEach-Object {
+    $integrationTestsPath = Join-Path -Path $repoDir -ChildPath 'Tests\Integration'
+    Get-ChildItem -Path $integrationTestsPath -Filter '*.Tests.ps1' | ForEach-Object {
         $testsToRun += @(@{
-            'Path' = "$repoDir\Tests\Integration\$_"
+            'Path' = $_.FullName
         })
     }
 
