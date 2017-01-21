@@ -9,7 +9,7 @@ install:
 
     - ps: |
         $moduleName = 'xNetworking'
-        $mainModuleFolder = "\Modules\$moduleName"
+        $mainModuleFolder = "Modules\$moduleName"
         $harnessModulePath = "Tests\$($moduleName).TestHarness.psm1"
         $harnessFunctionName = "Invoke-$($moduleName)Test"
         Import-Module "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
