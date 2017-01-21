@@ -29,7 +29,7 @@ function Invoke-xNetworkingTest
     $testsToRun = @()
 
     # Helper tests
-    $helperTestsPath = Join-Path -Path $repoDir -ChildPath 'Tests\Helper')
+    $helperTestsPath = Join-Path -Path $repoDir -ChildPath 'Tests\Helper'
     Get-ChildItem -Path $helperTestsPath | ForEach-Object {
         $testsToRun += @(@{
             'Path' = $_.FullName
