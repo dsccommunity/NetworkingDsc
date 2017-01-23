@@ -40,6 +40,10 @@
 - MSFT_xHostsFile:
   - Renamed Localization strings file to be standard naming format.
   - Style changes to meet HQRM standards.
+  - Refactored for performance
+    - Code now reads 38k lines in > 1 second vs 4
+  - Now ignores inline comments
+  - Added more integration tests
 - MSFT_xIPAddress:
   - Separated Localization strings into strings file.
   - Style changes to meet HQRM standards.
