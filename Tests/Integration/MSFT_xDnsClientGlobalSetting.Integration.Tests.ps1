@@ -80,10 +80,11 @@ try
         # Use the Parameters List to perform these tests
         foreach ($parameter in $parameterList)
         {
-            $parameterSource = (Invoke-Expression -Command "`$DnsClientGlobalSettingNew.$($parameter.name)")
-            $parameterNew = (Invoke-Expression -Command "`$configData.AllNodes[0].$($parameter.name)")
+            $parameterValue = (Get-Variable -Name 'DnsClientGlobalSettingNew').value.$($parameter.name)
+            $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$($parameter.Name)
+
             It "Should have set the '$parameterName' to '$parameterNew'" {
-                $parameterSource | Should Be $parameterNew
+                $parameterValue | Should Be $parameterNew
             }
         }
     }

@@ -56,14 +56,23 @@ try
                 # Looping these tests
                 foreach ($parameter in $ParameterList)
                 {
-                    $parameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
-                    $parameterNew = (Invoke-Expression -Command "`$result.$($parameter.name)")
+                    if ($parameter.Property) {
+                        $parameterValue = (Get-Variable `
+                            -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
+                    }
+                    else
+                    {
+                        $parameterValue = (Get-Variable `
+                            -Name ($parameter.Variable)).value.$($parameter.Name)
+                    }
+
+                    $parameterNew = (Get-Variable -Name 'Result').Value.$($parameter.Name)
                     It "should have the correct $($parameter.Name) on firewall rule $($FirewallRule.Name)" {
-                        if ($parameter.delimiter)
+                        if ($parameter.Delimiter)
                         {
                             $parameterNew = $parameterNew -join ','
                         }
-                        $parameterNew | Should Be $parameterSource
+                        $parameterNew | Should Be $parameterValue
                     }
                 }
             }
@@ -619,12 +628,21 @@ try
             $Splat = @{}
             foreach ($parameter in $ParameterList)
             {
-                $parameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
-                if ($parameter.delimiter)
-                {
-                    $parameterSource = $parameterSource -split $parameter.delimiter
+                if ($parameter.Property) {
+                    $parameterValue = (Get-Variable `
+                        -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
                 }
-                $Splat += @{ $parameter.name = $parameterSource }
+                else
+                {
+                    $parameterValue = (Get-Variable `
+                        -Name ($parameter.Variable)).value.$($parameter.Name)
+                }
+
+                if ($parameter.Delimiter)
+                {
+                    $parameterValue = $parameterValue -split $parameter.Delimiter
+                }
+                $Splat += @{ $parameter.Name = $parameterValue }
             }
 
             # To speed up all these tests create Mocks so that these functions are not repeatedly called

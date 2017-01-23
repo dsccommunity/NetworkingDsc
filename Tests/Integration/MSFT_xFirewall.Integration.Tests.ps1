@@ -115,27 +115,35 @@ try
         {
             $parameterName = $parameter.Name
             if ($parameterName -ne 'Name') {
-                $parameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
-                $parameterNew = (Invoke-Expression -Command "`$configData.AllNodes[0].$($parameter.name)")
-                if ($parameter.type -eq 'Array' -and $parameter.Delimiter) {
+                if ($parameter.Property) {
+                    $parameterValue = (Get-Variable `
+                        -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
+                }
+                else
+                {
+                    $parameterValue = (Get-Variable `
+                        -Name ($parameter.Variable)).value.$($parameter.Name)
+                }
+                $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$($parameter.Name)
+                if ($parameter.Type -eq 'Array' -and $parameter.Delimiter) {
                     $parameterNew = $parameterNew -join $parameter.Delimiter
                     It "Should have set the '$parameterName' to '$parameterNew'" {
-                        $parameterSource | Should Be $parameterNew
+                        $parameterValue | Should Be $parameterNew
                     }
                 }
-                elseif ($parameter.type -eq 'ArrayIP')
+                elseif ($parameter.Type -eq 'ArrayIP')
                 {
                     for ([int] $entry = 0; $entry -lt $parameterNew.Count; $entry++)
                     {
                         It "Should have set the '$parameterName' arry item $entry to '$($parameterNew[$entry])'" {
-                            $parameterSource[$entry] | Should Be (Convert-CIDRToSubhetMask -Address $parameterNew[$entry])
+                            $parameterValue[$entry] | Should Be (Convert-CIDRToSubhetMask -Address $parameterNew[$entry])
                         }
                     }
                 }
                 else
                 {
                     It "Should have set the '$parameterName' to '$parameterNew'" {
-                        $parameterSource | Should Be $parameterNew
+                        $parameterValue | Should Be $parameterNew
                     }
                 }
             }
