@@ -62,7 +62,8 @@ try
         Describe "$($script:DSCResourceName)\Set-TargetResource" {
             function Get-NetAdapterRdma { }
             function Set-NetAdapterRdma {
-                param (
+                param
+                (
                     [String] $Name,
                     [Boolean] $Enabled = $true
                 )
