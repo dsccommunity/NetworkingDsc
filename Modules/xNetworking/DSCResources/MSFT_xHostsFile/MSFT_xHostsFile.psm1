@@ -209,7 +209,7 @@ function Get-HostEntry
         $HostName
     )
 
-    $allHosts = Get-Content -Path "$env:windir\System32\drivers\etc\hosts" | `
+    $allHosts = Get-Content -Path "$env:windir\System32\drivers\etc\hosts" |
         Where-Object { [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false }
     foreach ($hosts in $allHosts)
     {
@@ -236,14 +236,14 @@ function Get-HostEntry
             }
 
             $result = @{
-                Host = $array
+                Host      = $array
                 IPAddress = $data[0]
             }
         }
         else
         {
             $result = @{
-                Host = $data[1]
+                Host      = $data[1]
                 IPAddress = $data[0]
             }
         }
