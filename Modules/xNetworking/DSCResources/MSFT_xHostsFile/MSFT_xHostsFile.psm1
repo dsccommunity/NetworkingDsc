@@ -54,7 +54,7 @@ function Get-TargetResource
     else
     {
         return @{
-            HostName = $HostName
+            HostName  = $HostName
             IPAddress = $null
             Ensure    = "Absent"
         }
