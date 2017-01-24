@@ -6,7 +6,8 @@ configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [string[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking
@@ -15,9 +16,9 @@ configuration Example
     {
         xHostsFile HostEntry
         {
-          HostName  = 'Host01'
-          IPAddress = '192.168.0.1'
-          Ensure    = 'Present'
+            HostName  = 'Host01'
+            IPAddress = '192.168.0.1'
+            Ensure    = 'Present'
         }
     }
  }

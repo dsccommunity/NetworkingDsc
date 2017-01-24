@@ -33,12 +33,17 @@
   - Moved ParameterList into a new file (MSFT_xDnsClientGlobalSetting.data.psd1).
   - Style changes to meet HQRM standards.
   - Removed New-TerminatingError function because never called.
+  - Converted to remove Invoke-Expression.
 - MSFT_xDnsConnectionSuffix:
   - Separated Localization strings into strings file.
   - Style changes to meet HQRM standards.
 - MSFT_xHostsFile:
   - Renamed Localization strings file to be standard naming format.
   - Style changes to meet HQRM standards.
+  - Refactored for performance
+    - Code now reads 38k lines in > 1 second vs 4
+  - Now ignores inline comments
+  - Added more integration tests
 - MSFT_xIPAddress:
   - Separated Localization strings into strings file.
   - Style changes to meet HQRM standards.
@@ -57,10 +62,13 @@
 - MSFT_xNetworkTeam:
   - Style changes to meet HQRM standards.
 - MSFT_xNetworkTeamInterface:
+  - Updated integration tests to remove Invoke-Expression.
   - Style changes to meet HQRM standards.
 - MSFT_xRoute:
   - Separated Localization strings into strings file.
   - Style changes to meet HQRM standards.
+- MSFT_xFirewall:
+  - Converted to remove Invoke-Expression.
 
 ## 3.1.0.0
 

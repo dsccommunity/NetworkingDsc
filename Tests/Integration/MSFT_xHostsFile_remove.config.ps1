@@ -1,14 +1,14 @@
-$HostEntry = [PSObject]@{
+$HostEntry = [PSObject] @{
     HostName      = 'Host01'
     IPAddress     = '192.168.0.1'
-    Ensure        = 'Present'
+    Ensure        = 'Absent'
 }
 
-Configuration MSFT_xHostsFile_Config
+Configuration MSFT_xHostsFile_Config_Remove
 {
     param
     (
-        [string[]]$NodeName = 'localhost'
+        [string[]] $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking
