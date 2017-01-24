@@ -28,10 +28,6 @@ function Invoke-xNetworkingTest
     Import-Module -Name "$repoDir\modules\xNetworking\xNetworking.psd1"
     $testsToRun = @()
 
-    # Helper tests
-    $helperTestsPath = Join-Path -Path $repoDir -ChildPath 'Tests\Helper'
-    $testsToRun += @( (Get-ChildItem -Path $helperTestsPath).FullName )
-
     # Run Unit Tests
     $unitTestsPath = Join-Path -Path $repoDir -ChildPath 'Tests\Unit'
     $testsToRun += @( (Get-ChildItem -Path $unitTestsPath).FullName )
