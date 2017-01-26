@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.2.0.0
+
 - Fixed typo in the example's Action property from "Blocked" (which isn't a valid
   value) to "Block"
 - Added support for auto generating wiki, help files, markdown linting
