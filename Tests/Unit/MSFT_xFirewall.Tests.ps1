@@ -3,7 +3,7 @@ $script:DSCResourceName    = 'MSFT_xFirewall'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
-[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -56,10 +56,23 @@ try
                 # Looping these tests
                 foreach ($parameter in $ParameterList)
                 {
-                    $ParameterSource = (Invoke-Expression -Command "`$($($parameter.source))")
-                    $ParameterNew = (Invoke-Expression -Command "`$result.$($parameter.name)")
+                    if ($parameter.Property) {
+                        $parameterValue = (Get-Variable `
+                            -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
+                    }
+                    else
+                    {
+                        $parameterValue = (Get-Variable `
+                            -Name ($parameter.Variable)).value.$($parameter.Name)
+                    }
+
+                    $parameterNew = (Get-Variable -Name 'Result').Value.$($parameter.Name)
                     It "should have the correct $($parameter.Name) on firewall rule $($FirewallRule.Name)" {
-                        $ParameterSource | Should Be $ParameterNew
+                        if ($parameter.Delimiter)
+                        {
+                            $parameterNew = $parameterNew -join ','
+                        }
+                        $parameterNew | Should Be $parameterValue
                     }
                 }
             }
@@ -612,38 +625,24 @@ try
         #region Function Test-RuleProperties
         Describe 'MSFT_xFirewall\Test-RuleProperties' {
             # Make an object that can be splatted onto the function
-            $Splat = @{
-                Name                = $FirewallRule.Name
-                DisplayGroup        = $FirewallRule.DisplayGroup
-                Group               = $FirewallRule.Group
-                Enabled             = $FirewallRule.Enabled
-                Profile             = $FirewallRule.Profile -split ', '
-                Direction           = $FirewallRule.Direction
-                Action              = $FirewallRule.Action
-                RemotePort          = $Properties.PortFilters.RemotePort
-                LocalPort           = $Properties.PortFilters.LocalPort
-                Protocol            = $Properties.PortFilters.Protocol
-                Description         = $FirewallRule.Description
-                Program             = $Properties.ApplicationFilters.Program
-                Service             = $Properties.ServiceFilters.Service
-                Authentication      = $properties.SecurityFilters.Authentication
-                Encryption          = $properties.SecurityFilters.Encryption
-                InterfaceAlias      = $properties.InterfaceFilters.InterfaceAlias
-                InterfaceType       = $properties.InterfaceTypeFilters.InterfaceType
-                LocalAddress        = $properties.AddressFilters.LocalAddress
-                LocalUser           = $properties.SecurityFilters.LocalUser
-                Package             = $properties.ApplicationFilters.Package
-                Platform            = $firewallRule.Platform
-                RemoteAddress       = $properties.AddressFilters.RemoteAddress
-                RemoteMachine       = $properties.SecurityFilters.RemoteMachine
-                RemoteUser          = $properties.SecurityFilters.RemoteUser
-                DynamicTransport    = $properties.PortFilters.DynamicTransport
-                EdgeTraversalPolicy = $FirewallRule.EdgeTraversalPolicy
-                IcmpType            = $properties.PortFilters.IcmpType
-                LocalOnlyMapping    = $FirewallRule.LocalOnlyMapping
-                LooseSourceMapping  = $FirewallRule.LooseSourceMapping
-                OverrideBlockRules  = $properties.SecurityFilters.OverrideBlockRules
-                Owner               = $FirewallRule.Owner
+            $Splat = @{}
+            foreach ($parameter in $ParameterList)
+            {
+                if ($parameter.Property) {
+                    $parameterValue = (Get-Variable `
+                        -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
+                }
+                else
+                {
+                    $parameterValue = (Get-Variable `
+                        -Name ($parameter.Variable)).value.$($parameter.Name)
+                }
+
+                if ($parameter.Delimiter)
+                {
+                    $parameterValue = $parameterValue -split $parameter.Delimiter
+                }
+                $Splat += @{ $parameter.Name = $parameterValue }
             }
 
             # To speed up all these tests create Mocks so that these functions are not repeatedly called
@@ -1053,7 +1052,6 @@ try
             }
         }
         #endregion
-
     } #end InModuleScope $DSCResourceName
     #endregion
 }

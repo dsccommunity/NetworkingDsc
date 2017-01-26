@@ -3,14 +3,14 @@ $Global:DSCResourceName = 'MSFT_xNetworkTeamInterface'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
-[String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
-if ( (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
+if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
-Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
     -DSCResourceName $Global:DSCResourceName `
@@ -27,12 +27,12 @@ try
             Name                = 'HostTeamNic'
             Team                = 'HostTeam'
         }
-        
+
         $TestTeamNic = [PSObject] @{
             Name                = $MockNetTeamNic.Name
             TeamName            = $MockNetTeamNic.Team
         }
-        
+
         $MockTeamNic = [PSObject] @{
             Name                = $TestTeamNic.Name
             Team                = $TestTeamNic.TeamName
@@ -164,7 +164,7 @@ try
                     Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
                 }
             }
-            
+
             Context 'Team Interface exists but should not exist' {
                 Mock Get-NetLbfoTeamNic -MockWith { $MockTeamNic }
 

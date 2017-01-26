@@ -3,7 +3,8 @@ $script:DSCResourceName    = 'MSFT_xFirewall'
 
 #region HEADER
 # Integration Test Template Version: 1.1.0
-[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
+
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -20,16 +21,74 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    #region Integration Tests
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
-    . $ConfigFile
+    # Import the Common Networking functions
+    Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'Modules\NetworkingDsc.Common\NetworkingDsc.Common.psm1') -Force
 
-    Describe "$($script:DSCResourceName)_Integration" {
+    # Load the ParameterList from the data file.
+    $resourceDataPath = Join-Path `
+        -Path $script:moduleRoot `
+        -ChildPath (Join-Path -Path 'DSCResources' -ChildPath $script:DSCResourceName)
+    $resourceData = Import-LocalizedData `
+        -BaseDirectory $resourceDataPath `
+        -FileName "$($script:DSCResourceName).data.psd1"
+    $parameterList = $resourceData.ParameterList
+
+    # Create a config data object to pass to the Add Rule Config
+    $ruleName = [Guid]::NewGuid()
+    $configData = @{
+        AllNodes = @(
+            @{
+                NodeName              = 'localhost'
+                RuleName              = $ruleName
+                Ensure                = 'Present'
+                DisplayName           = 'Test Rule'
+                Group                 = 'Test Group'
+                DisplayGroup          = 'Test Group'
+                Enabled               = 'False'
+                Profile               = @('Domain','Private')
+                Action                = 'Allow'
+                Description           = 'MSFT_xFirewall Test Firewall Rule'
+                Direction             = 'Inbound'
+                RemotePort            = @('8080', '8081')
+                LocalPort             = @('9080', '9081')
+                Protocol              = 'TCP'
+                Program               = 'c:\windows\system32\notepad.exe'
+                Service               = 'WinRM'
+                Authentication        = 'NotRequired'
+                Encryption            = 'NotRequired'
+                InterfaceAlias        = (Get-NetAdapter -Physical | Select-Object -First 1).Name
+                InterfaceType         = 'Wired'
+                LocalAddress          = @('192.168.2.0-192.168.2.128','192.168.1.0/255.255.255.0','10.0.240.1/8')
+                LocalUser             = 'Any'
+                Package               = 'S-1-15-2-3676279713-3632409675-756843784-3388909659-2454753834-4233625902-1413163418'
+                Platform              = @('6.1')
+                RemoteAddress         = @('192.168.2.0-192.168.2.128','192.168.1.0/255.255.255.0')
+                RemoteMachine         = 'Any'
+                RemoteUser            = 'Any'
+                DynamicTransport      = 'Any'
+                EdgeTraversalPolicy   = 'Allow'
+                LocalOnlyMapping      = $false
+                LooseSourceMapping    = $false
+                OverrideBlockRules    = $false
+                Owner                 = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
+                IcmpType              = 'Any'
+            }
+        )
+    }
+
+    #region Integration Tests for Add Firewall Rule
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_add.config.ps1"
+    . $configFile
+
+    Describe "$($script:DSCResourceName)_Add_Integration" {
         #region DEFAULT TESTS
         It 'Should compile without throwing' {
             {
-                & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
-                Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+                & "$($script:DSCResourceName)_Add_Config" `
+                    -OutputPath $TestDrive `
+                    -ConfigurationData $configData
+                Start-DscConfiguration `
+                    -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw
         }
 
@@ -38,37 +97,100 @@ try
         }
         #endregion
 
-        It 'Should have set the resource and all the parameters should match' {
-            # Get the Rule details
-            $firewallRule = Get-NetFireWallRule -Name $rule.Name
-            $Properties = @{
-                AddressFilters       = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
-                ApplicationFilters   = @(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $FirewallRule)
-                InterfaceFilters     = @(Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $FirewallRule)
-                InterfaceTypeFilters = @(Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $FirewallRule)
-                PortFilters          = @(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $FirewallRule)
-                Profile              = @(Get-NetFirewallProfile -AssociatedNetFirewallRule $FirewallRule)
-                SecurityFilters      = @(Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $FirewallRule)
-                ServiceFilters       = @(Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule)
-            }
+        # Get the Rule details
+        $firewallRule = Get-NetFireWallRule -Name $ruleName
+        $properties = @{
+            AddressFilters       = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
+            ApplicationFilters   = @(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $FirewallRule)
+            InterfaceFilters     = @(Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $FirewallRule)
+            InterfaceTypeFilters = @(Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $FirewallRule)
+            PortFilters          = @(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $FirewallRule)
+            Profile              = @(Get-NetFirewallProfile -AssociatedNetFirewallRule $FirewallRule)
+            SecurityFilters      = @(Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $FirewallRule)
+            ServiceFilters       = @(Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule)
+        }
 
-            # Use the Parameters List to perform these tests
-            foreach ($parameters in $ParameterList)
-            {
-                $ParameterSource = (Invoke-Expression -Command "`$($($parameters.source))")
-                $ParameterNew = (Invoke-Expression -Command "`$rule.$($parameters.name)")
-                $ParameterSource | Should Be $ParameterNew
+        # Use the Parameters List to perform these tests
+        foreach ($parameter in $parameterList)
+        {
+            $parameterName = $parameter.Name
+            if ($parameterName -ne 'Name') {
+                if ($parameter.Property) {
+                    $parameterValue = (Get-Variable `
+                        -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
+                }
+                else
+                {
+                    $parameterValue = (Get-Variable `
+                        -Name ($parameter.Variable)).value.$($parameter.Name)
+                }
+                $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$($parameter.Name)
+                if ($parameter.Type -eq 'Array' -and $parameter.Delimiter) {
+                    $parameterNew = $parameterNew -join $parameter.Delimiter
+                    It "Should have set the '$parameterName' to '$parameterNew'" {
+                        $parameterValue | Should Be $parameterNew
+                    }
+                }
+                elseif ($parameter.Type -eq 'ArrayIP')
+                {
+                    for ([int] $entry = 0; $entry -lt $parameterNew.Count; $entry++)
+                    {
+                        It "Should have set the '$parameterName' arry item $entry to '$($parameterNew[$entry])'" {
+                            $parameterValue[$entry] | Should Be (Convert-CIDRToSubhetMask -Address $parameterNew[$entry])
+                        }
+                    }
+                }
+                else
+                {
+                    It "Should have set the '$parameterName' to '$parameterNew'" {
+                        $parameterValue | Should Be $parameterNew
+                    }
+                }
             }
         }
 
-        # Cleanup the Rule
-        Remove-NetFirewallRule -Name $rule.Name
+    }
+    #endregion
+
+    # Modify the config data object to pass to the Remove Rule Config
+    $configData.AllNodes[0].Ensure = 'Absent'
+
+    #region Integration Tests for Remove Firewall Rule
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_remove.config.ps1"
+    . $configFile
+
+    Describe "$($script:DSCResourceName)_Remove_Integration" {
+        #region DEFAULT TESTS
+        It 'Should compile without throwing' {
+            {
+                & "$($script:DSCResourceName)_Remove_Config" `
+                    -OutputPath $TestDrive `
+                    -ConfigurationData $configData
+                Start-DscConfiguration `
+                    -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+            } | Should not throw
+        }
+
+        It 'should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+        }
+        #endregion
+
+        It 'The rule should not exist' {
+            # Get the Rule details
+            $firewallRule = Get-NetFireWallRule -Name $ruleName -ErrorAction SilentlyContinue
+            $firewallRule | Should BeNullOrEmpty
+        }
     }
     #endregion
 }
 finally
 {
     #region FOOTER
+    if (Get-NetFirewallRule -Name $ruleName -ErrorAction SilentlyContinue) {
+        Remove-NetFirewallRule -Name $ruleName
+    }
+
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
 }

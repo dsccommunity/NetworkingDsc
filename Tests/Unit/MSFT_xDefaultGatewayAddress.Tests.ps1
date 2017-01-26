@@ -2,17 +2,14 @@ $script:DSCModuleName      = 'xNetworking'
 $script:DSCResourceName    = 'MSFT_xDefaultGatewayAddress'
 
 #region HEADER
-[String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
-if ( (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
+if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
-else
-{
-    & git @('-C',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'),'pull')
-}
-Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+
+Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:DSCModuleName `
     -DSCResourceName $script:DSCResourceName `
@@ -189,7 +186,7 @@ try
             }
         }
 
-        Describe "MSFT_xDefaultGatewayAddress\Test-ResourceProperty" {
+        Describe "MSFT_xDefaultGatewayAddress\Assert-ResourceProperty" {
 
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
 
@@ -209,7 +206,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -229,7 +226,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -249,7 +246,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -269,7 +266,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -281,7 +278,7 @@ try
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    { Test-ResourceProperty @Splat } | Should Not Throw
+                    { Assert-ResourceProperty @Splat } | Should Not Throw
                 }
             }
 
@@ -293,7 +290,7 @@ try
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv6'
                     }
-                    { Test-ResourceProperty @Splat } | Should Not Throw
+                    { Assert-ResourceProperty @Splat } | Should Not Throw
                 }
             }
         }

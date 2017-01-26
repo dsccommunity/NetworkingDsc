@@ -1,7 +1,8 @@
 function New-IntegrationLoopbackAdapter
 {
     [cmdletbinding()]
-    param (
+    param
+    (
         [String]
         $AdapterName
     )
@@ -39,7 +40,8 @@ function New-IntegrationLoopbackAdapter
 function Remove-IntegrationLoopbackAdapter
 {
     [cmdletbinding()]
-    param (
+    param
+    (
         [String]
         $AdapterName
     )

@@ -3,7 +3,7 @@ $script:DSCResourceName = 'MSFT_xRoute'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
-[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -363,7 +363,7 @@ try
             }
         }
 
-        Describe "MSFT_xRoute\Test-ResourceProperty" {
+        Describe "MSFT_xRoute\Assert-ResourceProperty" {
 
             Context 'invoking with bad interface alias' {
 
@@ -378,7 +378,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @TestRoute } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @TestRoute } | Should Throw $ErrorRecord
                 }
             }
 
@@ -400,7 +400,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -422,7 +422,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -444,7 +444,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -466,7 +466,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -488,7 +488,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -510,7 +510,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -532,7 +532,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
 
@@ -554,7 +554,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
                 }
             }
         }

@@ -1,1 +1,11 @@
-DSCResource.Tests
+*.suo
+*.user
+*.coverage
+.vs
+.psproj
+.sln
+Modules/xNetworking/DscResource.Tests
+Modules/xNetworking/DscResource.Tests/*
+node_modules
+node_modules/*
+markdownissues.txt

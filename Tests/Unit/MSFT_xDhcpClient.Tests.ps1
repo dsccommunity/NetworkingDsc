@@ -3,7 +3,7 @@ $script:DSCResourceName    = 'MSFT_xDhcpClient'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
-[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -192,7 +192,7 @@ try
             }
         }
 
-        Describe "MSFT_xDhcpClient\Test-ResourceProperty" {
+        Describe "MSFT_xDhcpClient\Assert-ResourceProperty" {
 
             Mock Get-NetAdapter
 
@@ -207,7 +207,7 @@ try
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
                         -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Test-ResourceProperty @TestNetIPInterfaceEnabled } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @TestNetIPInterfaceEnabled } | Should Throw $ErrorRecord
                 }
             }
         }

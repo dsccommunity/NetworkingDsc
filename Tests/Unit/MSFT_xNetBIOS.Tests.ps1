@@ -3,7 +3,7 @@ $script:DSCResourceName = 'MSFT_xNetBIOS'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
-[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -92,14 +92,13 @@ try
 
             Context 'Invoking with NonExisting Network Adapter' {
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { }
-                $ErrorRecord = New-Object System.Management.Automation.ErrorRecord 'Interface BogusAdapter was not found.', 'NICNotFound', 'ObjectNotFound', $null
+                $errorMessage = ($LocalizedData.NICNotFound -f 'BogusAdapter')
                 It 'should throw ObjectNotFound exception' {
-                    {Test-TargetResource -InterfaceAlias 'BogusAdapter' -Setting 'Enable'} | Should Throw $ErrorRecord
+                    {Test-TargetResource -InterfaceAlias 'BogusAdapter' -Setting 'Enable'} | Should Throw $errorMessage
                 }
             }
         }
         #endregion
-
 
         #region Function Set-TargetResource
         Describe "MSFT_xNetBIOS\Set-TargetResource" {
