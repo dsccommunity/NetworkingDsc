@@ -1,8 +1,0 @@
-{
-    "default": true,
-    "MD029": {
-        "style": "ordered"
-    },
-    "MD034": false,
-    "no-hard-tabs": true
-}
