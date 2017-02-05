@@ -11,7 +11,7 @@ install:
         $harnessModulePath = "Tests\$($moduleName).TestHarness.psm1"
         $harnessFunctionName = "Invoke-$($moduleName)Test"
         Import-Module "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
-        Start-AppveyorInstallTask
+        Invoke-AppveyorInstallTask
 
 #---------------------------------#
 #      build configuration        #
@@ -25,7 +25,7 @@ build: false
 
 test_script:
     - ps: |
-        Start-AppveyorTestScriptTask `
+        Invoke-AppveyorTestScriptTask `
             -Type 'Harness' `
             -MainModulePath $mainModuleFolder `
             -HarnessModulePath $harnessModulePath `
@@ -38,7 +38,7 @@ test_script:
 # scripts to run before deployment
 deploy_script:
     - ps: |
-        Start-AppveyorAfterTestTask `
+        Invoke-AppveyorAfterTestTask `
             -Type 'Wiki' `
             -MainModulePath $mainModuleFolder `
             -ResourceModuleName $moduleName
