@@ -1,12 +1,12 @@
 ﻿# Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+-ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+-ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData `
-    -ResourceName 'NetworkingDsc.Common' `
-    -ResourcePath $PSScriptRoot
+-ResourceName 'NetworkingDsc.Common' `
+-ResourcePath $PSScriptRoot
 
 <#
         .SYNOPSIS
@@ -44,11 +44,11 @@ function Convert-CIDRToSubhetMask
                     $Cidr = [Int] $Postfix
                     $SubnetMaskInt64 = ([convert]::ToInt64(('1' * $Cidr + '0' * (32 - $Cidr)), 2))
                     $SubnetMask = @(
-                            ([math]::Truncate($SubnetMaskInt64 / 16777216))
-                            ([math]::Truncate(($SubnetMaskInt64 % 16777216) / 65536))
-                            ([math]::Truncate(($SubnetMaskInt64 % 65536)/256))
-                            ([math]::Truncate($SubnetMaskInt64 % 256))
-                        )
+                        ([math]::Truncate($SubnetMaskInt64 / 16777216))
+                        ([math]::Truncate(($SubnetMaskInt64 % 16777216) / 65536))
+                        ([math]::Truncate(($SubnetMaskInt64 % 65536)/256))
+                        ([math]::Truncate($SubnetMaskInt64 % 256))
+                    )
                 }
                 else
                 {

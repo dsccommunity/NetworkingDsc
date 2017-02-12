@@ -33,13 +33,16 @@ function Get-TargetResource
     param
     (
         [Parameter(Mandatory)]
-        [string]$InterfaceAlias,
+        [string]
+        $InterfaceAlias,
 
         [Parameter(Mandatory)]
         [ValidateSet('Default','Enable','Disable')]
-        [string]$Setting,
+        [string]
+        $Setting,
 
-        [bool]$EnableLmhostsLookup
+        [bool]
+        $EnableLmhostsLookup
     )
                 
     $filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
@@ -76,13 +79,16 @@ function Set-TargetResource
     param
     (
         [Parameter(Mandatory)]
-        [string]$InterfaceAlias,
+        [string]
+        $InterfaceAlias,
 
         [Parameter(Mandatory)]
         [ValidateSet('Default','Enable','Disable')]
-        [string]$Setting,
+        [string]
+        $Setting,
 
-        [bool]$EnableLmhostsLookup
+        [bool]
+        $EnableLmhostsLookup
     )
 
     $filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
@@ -129,16 +135,20 @@ function Test-TargetResource
 {
     [CmdletBinding()]
     [OutputType([bool])]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     param
     (
         [Parameter(Mandatory)]
-        [string]$InterfaceAlias,
+        [string]
+        $InterfaceAlias,
 
         [Parameter(Mandatory)]
-        [ValidateSet('Default','Enable','Disable')]
-        [string]$Setting,
+        [ValidateSet('Default', 'Enable', 'Disable')]
+        [string]
+        $Setting,
 
-        [bool]$EnableLmhostsLookup
+        [bool]
+        $EnableLmhostsLookup
     )
 
     $currentState = Get-TargetResource @PSBoundParameters
