@@ -76,35 +76,35 @@ function Test-DscParameterState
     (
         [Parameter(Mandatory)] 
         [HashTable]$CurrentValues,
-	
+
         [Parameter(Mandatory)] 
         [Object]
         $DesiredValues,
         
         [string[]]$ValuesToCheck
     )
-	
+
     $returnValue = $true
-	
+
     $types = 'System.Management.Automation.PSBoundParametersDictionary', 'System.Collections.Hashtable', 'Microsoft.Management.Infrastructure.CimInstance'
     
     if ($DesiredValues.GetType().FullName -notin $types)
     {
         throw ("Property 'DesiredValues' in Test-SPDscParameterState must be either a Hashtable or CimInstance. Type detected was $($DesiredValues.GetType().Name)")
     }
-	
+
     if ($DesiredValues.GetType().FullName -eq 'Microsoft.Management.Infrastructure.CimInstance' -and -not $ValuesToCheck)
     {
         throw ("If 'DesiredValues' is a CimInstance then property 'ValuesToCheck' must contain a value")
     }
     
     if ($DesiredValues.ContainsKey('Verbose')) { $null = $DesiredValues.Remove('Verbose') }
-	
+
     if (-not $ValuesToCheck)
     { $keyList = $DesiredValues.Keys } 
     else
     { $keyList = $ValuesToCheck }
-	
+
     foreach ($key in $keyList)
     {
         #check for verbose key?
@@ -177,11 +177,11 @@ function Test-DSCObjectHasProperty
     (
         [Parameter(Mandatory)] 
         [object]$Object,
-	
+
         [Parameter(Mandatory)]
         [string]$PropertyName
     )
-	
+
     if ($Object.PSObject.Properties.Name -contains $PropertyName) 
     {
         return [bool]$Object.$PropertyName
