@@ -117,12 +117,10 @@ function Set-TargetResource
     if ($PSBoundParameters.ContainsKey('EnableLmhostsLookup'))
     {
         Write-Verbose -Message ($localizedData.SetLmhostLookup -f $EnableLmhostsLookup)
-        if ($EnableLmhostsLookup -ne $nicConfig.WINSEnableLMHostsLookup)
-        {
-            Invoke-CimMethod -ClassName Win32_NetworkAdapterConfiguration -MethodName EnableWINS -Arguments @{ 
-                DNSEnabledForWINSResolution = $nic.DNSEnabledForWINSResolution
-                WINSEnableLMHostsLookup = $true
-            }
+        
+        Invoke-CimMethod -ClassName Win32_NetworkAdapterConfiguration -MethodName EnableWINS -Arguments @{ 
+            DNSEnabledForWINSResolution = $nic.DNSEnabledForWINSResolution
+            WINSEnableLMHostsLookup = $true
         }
     }
 }
