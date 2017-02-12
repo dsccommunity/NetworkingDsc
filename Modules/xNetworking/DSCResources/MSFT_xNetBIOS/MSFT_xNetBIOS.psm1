@@ -39,7 +39,6 @@ function Get-TargetResource
         [ValidateSet('Default','Enable','Disable')]
         [string]$Setting,
 
-        [Parameter(Mandatory)]
         [bool]$EnableLmhostLookup
     )
                 
@@ -83,7 +82,6 @@ function Set-TargetResource
         [ValidateSet('Default','Enable','Disable')]
         [string]$Setting,
 
-        [Parameter(Mandatory)]
         [bool]$EnableLmhostLookup
     )
 
@@ -150,7 +148,6 @@ function Test-TargetResource
         [ValidateSet('Default','Enable','Disable')]
         [string]$Setting,
 
-        [Parameter(Mandatory)]
         [bool]$EnableLmhostLookup
     )
 
