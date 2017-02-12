@@ -14,23 +14,18 @@ catch
 '@
 }
 
-$adapter = (
-    Get-CimInstance -ClassName Win32_NetworkAdapter `
-        -Filter 'NetEnabled="True"'
-)[0]
+$adapter = Get-CimInstance -ClassName Win32_NetworkAdapter -Filter 'NetEnabled = "True"' | Select-Object -First 1
 
-$Current = [NETBIOSSetting].GetEnumValues()[(
-    $adapter |
-    Get-CimAssociatedInstance `
-        -ResultClassName Win32_NetworkAdapterConfiguration
-).TcpipNetbiosOptions]
+$current = [NetBiosSetting]($adapter | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration).TcpipNetbiosOptions
 
-configuration MSFT_xNetBIOS_Config {
+Configuration MSFT_xNetBIOS_Config {
     Import-DscResource -ModuleName xNetworking
+    
     node localhost {
         xNetBIOS Integration_Test {
-            InterfaceAlias   = $adapter.NetConnectionID
-            Setting = $Current
+            InterfaceAlias = $adapter.NetConnectionID
+            Setting = $current
+            EnableLmhostLookup = $true
         }
     }
 }
