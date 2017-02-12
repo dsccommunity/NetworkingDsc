@@ -35,7 +35,7 @@ try
             }
 
             It 'Returns a hashtable' {
-                $targetResource = Get-TargetResource -InterfaceAlias $interfaceAlias -Setting Default -EnableLmhostLookup $true
+                $targetResource = Get-TargetResource -InterfaceAlias $interfaceAlias -Setting Default -EnableLmhostsLookup $true
                 $targetResource -is [System.Collections.Hashtable] | Should Be $true
             }
 
@@ -45,9 +45,9 @@ try
             }
 
             It "NetBIOS over TCP/IP should be 'Default' and WINSEnableLMHostsLookup should be true" {
-                $result = Get-TargetResource -InterfaceAlias $interfaceAlias -Setting Enable -EnableLmhostLookup $false
+                $result = Get-TargetResource -InterfaceAlias $interfaceAlias -Setting Enable -EnableLmhostsLookup $false
                 $result.Setting | should be Default
-                $result.EnableLmhostLookup | should be $true
+                $result.EnableLmhostsLookup | should be $true
             }
             
             #Context 'TcpipNetbiosOptions = 2, WINSEnableLMHostsLookup = $false' {
@@ -60,9 +60,9 @@ try
             }
 
             It "NetBIOS over TCP/IP should be 'Disable' and WINSEnableLMHostsLookup should be false" {
-                $result = Get-TargetResource -InterfaceAlias $interfaceAlias -Setting Enable -EnableLmhostLookup $false
+                $result = Get-TargetResource -InterfaceAlias $interfaceAlias -Setting Enable -EnableLmhostsLookup $false
                 $result.Setting | should be Disable
-                $result.EnableLmhostLookup | should be $false
+                $result.EnableLmhostsLookup | should be $false
             }
         }
         #endregion
@@ -70,7 +70,7 @@ try
 
         #region Function Test-TargetResource
         Describe "MSFT_xNetBIOS\Test-TargetResource" {
-            Context "Invoking with NetBIOS over TCP/IP set to 'Default' and EnableLmhostLookup untouched" {
+            Context "Invoking with NetBIOS over TCP/IP set to 'Default' and EnableLmhostsLookup untouched" {
 
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { 
                     [PSCustomObject]@{                    
@@ -87,7 +87,7 @@ try
                 }
             }
 
-            Context "Invoking with NetBIOS over TCP/IP set to 'Disable' and EnableLmhostLookup untouched" {
+            Context "Invoking with NetBIOS over TCP/IP set to 'Disable' and EnableLmhostsLookup untouched" {
 
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { 
                     [PSCustomObject]@{                    
@@ -104,7 +104,7 @@ try
                 }
             }
 
-            Context "Invoking with NetBIOS over TCP/IP set to 'Enable' and EnableLmhostLookup untouched" {
+            Context "Invoking with NetBIOS over TCP/IP set to 'Enable' and EnableLmhostsLookup untouched" {
 
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { 
                     [PSCustomObject]@{                    
@@ -121,7 +121,7 @@ try
                 }
             }
             
-            Context "Invoking with NetBIOS over TCP/IP set to 'Enable' and EnableLmhostLookup 'true'" {
+            Context "Invoking with NetBIOS over TCP/IP set to 'Enable' and EnableLmhostsLookup 'true'" {
 
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { 
                     [PSCustomObject]@{                    
@@ -131,15 +131,15 @@ try
                     }
                 }
 
-                It "Should return true when Setting is 'Enable' and EnableLmhostLookup is 'true'" {
-                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting Enable -EnableLmhostLookup $true| Should Be $true
+                It "Should return true when Setting is 'Enable' and EnableLmhostsLookup is 'true'" {
+                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting Enable -EnableLmhostsLookup $true| Should Be $true
                 }
-                It "Should return false when Setting is 'Enable' but EnableLmhostLookup is 'false'" {
-                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting Enable -EnableLmhostLookup $false | Should Be $false
+                It "Should return false when Setting is 'Enable' but EnableLmhostsLookup is 'false'" {
+                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting Enable -EnableLmhostsLookup $false | Should Be $false
                 }
             }
             
-            Context "Invoking with NetBIOS over TCP/IP set to 'Disable' and EnableLmhostLookup 'false'" {
+            Context "Invoking with NetBIOS over TCP/IP set to 'Disable' and EnableLmhostsLookup 'false'" {
 
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { 
                     [PSCustomObject]@{                    
@@ -149,11 +149,11 @@ try
                     }
                 }
 
-                It "Should return true when Setting is 'Enable' and EnableLmhostLookup is 'true'" {
-                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting Disable -EnableLmhostLookup $false | Should Be $true
+                It "Should return true when Setting is 'Enable' and EnableLmhostsLookup is 'true'" {
+                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting Disable -EnableLmhostsLookup $false | Should Be $true
                 }
-                It "Should return false when Setting is 'Enable' but EnableLmhostLookup is 'false'" {
-                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting Disable -EnableLmhostLookup $true | Should Be $false
+                It "Should return false when Setting is 'Enable' but EnableLmhostsLookup is 'false'" {
+                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting Disable -EnableLmhostsLookup $true | Should Be $false
                 }
             }
 
@@ -183,13 +183,13 @@ try
                 }
             }
 
-            Context "Setting NetBIOS to 'Default' and disable EnableLmhostLookup" {
+            Context "Setting NetBIOS to 'Default' and disable EnableLmhostsLookup" {
 
                 Mock -CommandName Invoke-CimMethod
                 Mock -CommandName Set-ItemProperty
 
                 It "Should call 'Set-ItemProperty'" {
-                    $null = Set-TargetResource -InterfaceAlias $interfaceAlias -Setting Default -EnableLmhostLookup $true
+                    $null = Set-TargetResource -InterfaceAlias $interfaceAlias -Setting Default -EnableLmhostsLookup $true
 
                     Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 1
                     Assert-MockCalled -CommandName Invoke-CimMethod -Exactly -Times 1

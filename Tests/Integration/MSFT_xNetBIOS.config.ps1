@@ -25,7 +25,7 @@ Configuration MSFT_xNetBIOS_Config {
         xNetBIOS Integration_Test {
             InterfaceAlias = $adapter.NetConnectionID
             Setting = $current
-            EnableLmhostLookup = $true
+            EnableLmhostsLookup = $true
         }
     }
 }

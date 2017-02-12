@@ -39,7 +39,7 @@ function Get-TargetResource
         [ValidateSet('Default','Enable','Disable')]
         [string]$Setting,
 
-        [bool]$EnableLmhostLookup
+        [bool]$EnableLmhostsLookup
     )
                 
     $filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
@@ -65,7 +65,7 @@ function Get-TargetResource
     return @{
         InterfaceAlias = $InterfaceAlias
         Setting = [NetBiosSetting]$nicConfig.TcpipNetbiosOptions
-        EnableLmhostLookup = $nicConfig.WINSEnableLMHostsLookup
+        EnableLmhostsLookup = $nicConfig.WINSEnableLMHostsLookup
     }
 }
 
@@ -82,7 +82,7 @@ function Set-TargetResource
         [ValidateSet('Default','Enable','Disable')]
         [string]$Setting,
 
-        [bool]$EnableLmhostLookup
+        [bool]$EnableLmhostsLookup
     )
 
     $filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
@@ -114,10 +114,10 @@ function Set-TargetResource
     }
     $null = Set-ItemProperty @regParam
 
-    if ($PSBoundParameters.ContainsKey('EnableLmhostLookup'))
+    if ($PSBoundParameters.ContainsKey('EnableLmhostsLookup'))
     {
-        Write-Verbose -Message ($localizedData.SetLmhostLookup -f $EnableLmhostLookup)
-        if ($EnableLmhostLookup -ne $nicConfig.WINSEnableLMHostsLookup)
+        Write-Verbose -Message ($localizedData.SetLmhostLookup -f $EnableLmhostsLookup)
+        if ($EnableLmhostsLookup -ne $nicConfig.WINSEnableLMHostsLookup)
         {
             Invoke-CimMethod -ClassName Win32_NetworkAdapterConfiguration -MethodName EnableWINS -Arguments @{ 
                 DNSEnabledForWINSResolution = $nic.DNSEnabledForWINSResolution
@@ -140,7 +140,7 @@ function Test-TargetResource
         [ValidateSet('Default','Enable','Disable')]
         [string]$Setting,
 
-        [bool]$EnableLmhostLookup
+        [bool]$EnableLmhostsLookup
     )
 
     $currentState = Get-TargetResource @PSBoundParameters
