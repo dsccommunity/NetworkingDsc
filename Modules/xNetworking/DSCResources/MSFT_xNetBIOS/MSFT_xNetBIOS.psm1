@@ -5,8 +5,8 @@ Import-Module -Name (Join-Path -Path $script:ResourceRootPath -ChildPath 'xNetwo
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_xNetBIOS' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+-ResourceName 'MSFT_xNetBIOS' `
+-ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 #region check NetBIOSSetting enum loaded, if not load
 try
@@ -105,32 +105,24 @@ function Set-TargetResource
 
     $nicConfig = $nic | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
 
-    if ($Setting -eq [NetBiosSetting]::Default)
-    {
-        Write-Verbose -Message $localizedData.ResetToDefaut
-        #If DHCP is not enabled, Win32_NetworkAdapterConfiguration.SetTcpipNetbios CIM Method won't take 0 so overwrite registry entry instead.
-        $regParam = @{
-            Path = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($nicConfig.SettingID)"
-            Name = 'NetbiosOptions'
-            Value = 0
-        }
-        $null = Set-ItemProperty @regParam
+    #The setting can be changed with Win32_NetworkAdapterConfiguration.SetTcpipNetbios, but not if DHCP is disabled. Hence setting this via regsitry instead.
+    Write-Verbose -Message ($localizedData.SetNetBIOS -f $Setting)
+    $regParam = @{
+        Path = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($nicConfig.SettingID)"
+        Name = 'NetbiosOptions'
+        Value = [uint32][NetBiosSetting]$Setting
     }
-    else
-    {
-        Write-Verbose -Message ($localizedData.SetNetBIOS -f $Setting)
-        $null = $nicConfig | 
-        Invoke-CimMethod -MethodName SetTcpipNetbios -ErrorAction Stop -Arguments @{
-            TcpipNetbiosOptions = [uint32][NetBiosSetting]$Setting
-        }
-    }
+    $null = Set-ItemProperty @regParam
 
     if ($PSBoundParameters.ContainsKey('EnableLmhostLookup'))
     {
-        $networkAdapterConfigClass = [wmiclass]'Win32_NetworkAdapterConfiguration'
+        Write-Verbose -Message ($localizedData.SetLmhostLookup -f $EnableLmhostLookup)
         if ($EnableLmhostLookup -ne $nicConfig.WINSEnableLMHostsLookup)
         {
-            $networkAdapterConfigClass.EnableWINS($networkAdapterConfigClass.DNSEnabledForWINSResolution, $EnableLmhostLookup)
+            Invoke-CimMethod -ClassName Win32_NetworkAdapterConfiguration -MethodName EnableWINS -Arguments @{ 
+                DNSEnabledForWINSResolution = $nic.DNSEnabledForWINSResolution
+                WINSEnableLMHostsLookup = $true
+            }
         }
     }
 }
@@ -157,5 +149,3 @@ function Test-TargetResource
     
     return $result
 }
-
-Export-ModuleMember -Function *-TargetResource
