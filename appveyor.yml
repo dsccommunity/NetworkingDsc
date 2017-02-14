@@ -3,7 +3,7 @@
 #---------------------------------#
 version: 3.1.{build}.0
 install:
-    - git clone https://github.com/PowerShell/DscResource.Tests
+    - git clone https://github.com/PlagueHO/DscResource.Tests
 
     - ps: |
         $moduleName = 'xNetworking'
