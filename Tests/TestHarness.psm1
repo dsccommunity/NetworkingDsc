@@ -1,16 +1,18 @@
-function Invoke-xNetworkingTest
+function Invoke-TestHarness
 {
     [CmdletBinding()]
     param
     (
-        [System.String] $TestResultsFile,
+        [System.String]
+        $TestResultsFile,
 
-        [System.String] $DscTestsPath
+        [System.String]
+        $DscTestsPath
     )
 
     Write-Verbose -Message 'Commencing all xNetworking tests'
 
-    $repoDir = Join-Path -Path $PSScriptRoot -ChildPath "..\" -Resolve
+    $repoDir = Join-Path -Path $PSScriptRoot -ChildPath '..\' -Resolve
 
     $testCoverageFiles = @()
     Get-ChildItem -Path "$repoDir\modules\xNetworking\DSCResources\**\*.psm1" -Recurse | ForEach-Object {
