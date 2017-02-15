@@ -25,7 +25,8 @@ test_script:
     - ps: |
         Invoke-AppveyorTestScriptTask `
             -Type 'Harness' `
-            -MainModulePath $mainModuleFolder
+            -MainModulePath $mainModuleFolder `
+            -CodeCovIo
 
 #---------------------------------#
 #      deployment configuration   #
