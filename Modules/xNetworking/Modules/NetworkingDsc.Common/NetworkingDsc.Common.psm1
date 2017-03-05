@@ -69,6 +69,28 @@ function Convert-CIDRToSubhetMask
     return $results
 }
 
+function Remove-CommonParameter
+{
+    [OutputType([hashtable])]
+    [cmdletbinding()]
+    param
+    (
+        [Parameter(Mandatory)]
+        [hashtable]
+        $Hashtable
+    )
+
+    $inputClone = $Hashtable.Clone()
+    $commonParameters = [System.Management.Automation.PSCmdlet]::CommonParameters
+    $commonParameters += [System.Management.Automation.PSCmdlet]::OptionalCommonParameters
+
+    $Hashtable.Keys | Where-Object { $_ -in $commonParameters } | ForEach-Object {
+        $inputClone.Remove($_)
+    }
+
+    $inputClone
+}
+
 function Test-DscParameterState
 {
     [CmdletBinding()]
@@ -175,7 +197,7 @@ function Test-DscParameterState
                     }
                     else
                     {
-                    Write-Verbose -Message "`tMATCH: $($desiredType.Name)[$i] value for property '$key' does not match. Current state is '$($currentArrayValues[$i])' and desired state is '$($desiredArrayValues[$i])'"
+                        Write-Verbose -Message "`tMATCH: $($desiredType.Name)[$i] value for property '$key' does not match. Current state is '$($currentArrayValues[$i])' and desired state is '$($desiredArrayValues[$i])'"
                     }
                 }
                 
