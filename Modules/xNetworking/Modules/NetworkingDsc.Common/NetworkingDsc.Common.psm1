@@ -75,7 +75,8 @@ function Test-DscParameterState
     param
     (
         [Parameter(Mandatory)] 
-        [hashtable]$CurrentValues,
+        [hashtable]
+        $CurrentValues,
 
         [Parameter(Mandatory)] 
         [object]
@@ -91,7 +92,7 @@ function Test-DscParameterState
     
     if ($DesiredValues.GetType().FullName -notin $types)
     {
-        throw ("Property 'DesiredValues' in Test-SPDscParameterState must be either a Hashtable or CimInstance. Type detected was $($DesiredValues.GetType().Name)")
+        throw ("Property 'DesiredValues' in Test-DscParameterState must be either a Hashtable or CimInstance. Type detected was $($DesiredValues.GetType().Name)")
     }
 
     if ($DesiredValues.GetType().FullName -eq 'Microsoft.Management.Infrastructure.CimInstance' -and -not $ValuesToCheck)
@@ -99,67 +100,91 @@ function Test-DscParameterState
         throw ("If 'DesiredValues' is a CimInstance then property 'ValuesToCheck' must contain a value")
     }
     
-    if ($DesiredValues.ContainsKey('Verbose')) { $null = $DesiredValues.Remove('Verbose') }
+    $DesiredValuesClean = Remove-CommonParameter -Hashtable $DesiredValues
 
     if (-not $ValuesToCheck)
-    { $keyList = $DesiredValues.Keys } 
+    {
+        $keyList = $DesiredValuesClean.Keys
+    } 
     else
-    { $keyList = $ValuesToCheck }
+    {
+        $keyList = $ValuesToCheck
+    }
 
     foreach ($key in $keyList)
     {
-        #check for verbose key?
-        
-        if ($CurrentValues.$key -eq $DesiredValues.$key)
+        if ($null -ne $DesiredValuesClean.$key)
         {
-            Write-Verbose -Message "MATCH: $($desiredType.Name) value for property '$key' does match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValues.$key)'"
+            $desiredType = $DesiredValuesClean.$key.GetType()
+        }
+        else
+        {
+            $desiredType = [psobject]@{ Name = 'Unknown' }
+        }
+
+        if ($CurrentValues.$key -eq $DesiredValuesClean.$key -and -not $desiredType.IsArray)
+        {
+            Write-Verbose -Message "MATCH: $($desiredType.Name) value for property '$key' does match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValuesClean.$key)'"
             continue
         }
                     
-        if ($DesiredValues.GetType().Name -in 'HashTable', 'PSBoundParametersDictionary')
+        if ($DesiredValuesClean.GetType().Name -in 'HashTable', 'PSBoundParametersDictionary')
         {
-            $checkDesiredValue = $DesiredValues.ContainsKey($key)
+            $checkDesiredValue = $DesiredValuesClean.ContainsKey($key)
         } 
         else
         {
-            $checkDesiredValue = Test-DSCObjectHasProperty -Object $DesiredValues -PropertyName $key
+            $checkDesiredValue = Test-DSCObjectHasProperty -Object $DesiredValuesClean -PropertyName $key
         }
         
         if (-not $checkDesiredValue)
         {
-            Write-Verbose -Message "MATCH: $($desiredType.Name) value for property '$key' does match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValues.$key)'"
+            Write-Verbose -Message "MATCH: $($desiredType.Name) value for property '$key' does match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValuesClean.$key)'"
             continue
         }
         
- 
-        $desiredType = $DesiredValues.$key.GetType()
-            
         if ($desiredType.IsArray)
         {
             if (-not $CurrentValues.ContainsKey($key) -or -not $CurrentValues.$key)
             {
-                Write-Verbose -Message "Expected to find an array value for property '$key' in the current values, but it was either not present or was null. This has caused the test method to return false."
+                Write-Verbose -Message "NOTMATCH: $($desiredType.Name) value for property '$key' does not match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValuesClean.$key)'"
                 $returnValue = $false
             } 
             else
             {
-                $arrayCompare = Compare-Object -ReferenceObject $CurrentValues.$key -DifferenceObject $DesiredValues.$key
-                if (-not $arrayCompare) 
+                $desiredArrayValues = $DesiredValues.$key
+                $currentArrayValues = $CurrentValues.$key
+
+                for ($i = 0; $i -lt $desiredArrayValues.Count; $i++)
                 {
-                    Write-Verbose -Message "Found an array for property '$key' in the current values, but this array does not match the desired state. Details of the changes are below."
-                    foreach ($entry in $arrayCompare)
+                    if ($null -ne $desiredArrayValues[$i])
+                        {
+                            $desiredType = $desiredArrayValues[$i].GetType()
+                        }
+                        else
+                        {
+                            $desiredType = [psobject]@{ Name = 'Unknown' }
+                        }
+                        
+                    if ($desiredArrayValues[$i] -ne $currentArrayValues[$i])
                     {
-                        #does this work?
-                        Write-Verbose -Message "$($entry.InputObject) - $($key.SideIndicator)"
+                        
+                        
+                        Write-Verbose -Message "`tNOTMATCH: $($desiredType.Name)[$i] value for property '$key' does match. Current state is '$($currentArrayValues[$i])' and desired state is '$($desiredArrayValues[$i])'"
+                        $returnValue = $false
                     }
-                    $returnValue = $false
+                    else
+                    {
+                    Write-Verbose -Message "`tMATCH: $($desiredType.Name)[$i] value for property '$key' does not match. Current state is '$($currentArrayValues[$i])' and desired state is '$($desiredArrayValues[$i])'"
+                    }
                 }
+                
             }
         } 
         else {
-            if ($DesiredValues.$key -ne $CurrentValues.$key)
+            if ($DesiredValuesClean.$key -ne $CurrentValues.$key)
             {
-                Write-Verbose -Message "NOTMATCH: $($desiredType.Name) value for property '$key' does not match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValues.$key)'"
+                Write-Verbose -Message "NOTMATCH: $($desiredType.Name) value for property '$key' does not match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValuesClean.$key)'"
                 $returnValue = $false
             }
         
@@ -173,7 +198,7 @@ function Test-DscParameterState
 function Test-DSCObjectHasProperty
 {
     [CmdletBinding()]
-    [OutputType([System.Boolean])]
+    [OutputType([bool])]
     param
     (
         [Parameter(Mandatory)] 
