@@ -105,7 +105,9 @@ function Test-DscParameterState
         $DesiredValues,
         
         [string[]]
-        $ValuesToCheck
+        $ValuesToCheck,
+        
+        [switch]$TurnOffTypeChecking
     )
 
     $returnValue = $true
@@ -152,12 +154,15 @@ function Test-DscParameterState
         {
             $currentType = [psobject]@{ Name = 'Unknown' }
         }
-        
-        if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and
-        $desiredType.FullName -ne $currentType.FullName)
-        {
-            Write-Verbose -Message "NOTMATCH: Type mismatch for property '$key' Current state type is '$($currentType.Name)' and desired type is '$($desiredType.Name)'"
-            continue
+     
+        if (-not $TurnOffTypeChecking)
+        {   
+            if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and
+            $desiredType.FullName -ne $currentType.FullName)
+            {
+                Write-Verbose -Message "NOTMATCH: Type mismatch for property '$key' Current state type is '$($currentType.Name)' and desired type is '$($desiredType.Name)'"
+                continue
+            }
         }
 
         if ($CurrentValues.$key -eq $DesiredValuesClean.$key -and -not $desiredType.IsArray)
@@ -183,6 +188,7 @@ function Test-DscParameterState
         
         if ($desiredType.IsArray)
         {
+            Write-Verbose "Comparing values in property '$key'"
             if (-not $CurrentValues.ContainsKey($key) -or -not $CurrentValues.$key)
             {
                 Write-Verbose -Message "NOTMATCH: Value (type $($desiredType.Name)) for property '$key' does not match. Current state is '$($CurrentValues.$key)' and desired state is '$($DesiredValuesClean.$key)'"
@@ -220,19 +226,22 @@ function Test-DscParameterState
                         $currentType = [psobject]@{ Name = 'Unknown' }
                     }
                     
-                    if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and
-                    $desiredType.FullName -ne $currentType.FullName)
+                    if (-not $TurnOffTypeChecking)
                     {
-                        Write-Verbose -Message "`tNOTMATCH: Type mismatch for property '$key' Current state type of element [$i] is '$($currentType.Name)' and desired type is '$($desiredType.Name)'"
-                        $returnValue = $false
-                        continue
+                        if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and
+                        $desiredType.FullName -ne $currentType.FullName)
+                        {
+                            Write-Verbose -Message "`tNOTMATCH: Type mismatch for property '$key' Current state type of element [$i] is '$($currentType.Name)' and desired type is '$($desiredType.Name)'"
+                            $returnValue = $false
+                            continue
+                        }
                     }
                         
                     if ($desiredArrayValues[$i] -ne $currentArrayValues[$i])
                     {
                         Write-Verbose -Message "`tNOTMATCH: Value [$i] (type $($desiredType.Name)) for property '$key' does match. Current state is '$($currentArrayValues[$i])' and desired state is '$($desiredArrayValues[$i])'"
                         $returnValue = $false
-                        contine
+                        continue
                     }
                     else
                     {
