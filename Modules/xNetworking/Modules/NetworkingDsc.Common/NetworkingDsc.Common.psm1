@@ -143,6 +143,21 @@ function Test-DscParameterState
         {
             $desiredType = [psobject]@{ Name = 'Unknown' }
         }
+        
+        if ($null -ne $CurrentValues.$key)
+        {
+            $currentType = $CurrentValues.$key.GetType()
+        }
+        else
+        {
+            $currentType = [psobject]@{ Name = 'Unknown' }
+        }
+        
+        if ($desiredType.FullName -ne $currentType.FullName)
+        {
+            Write-Verbose -Message "NOTMATCH: Type mismatch for property '$key' Current state type is '$($currentType.Name)' and desired type is '$($desiredType.Name)'"
+            continue
+        }
 
         if ($CurrentValues.$key -eq $DesiredValuesClean.$key -and -not $desiredType.IsArray)
         {
@@ -180,18 +195,31 @@ function Test-DscParameterState
                 for ($i = 0; $i -lt $desiredArrayValues.Count; $i++)
                 {
                     if ($null -ne $desiredArrayValues[$i])
-                        {
-                            $desiredType = $desiredArrayValues[$i].GetType()
-                        }
-                        else
-                        {
-                            $desiredType = [psobject]@{ Name = 'Unknown' }
-                        }
+                    {
+                        $desiredType = $desiredArrayValues[$i].GetType()
+                    }
+                    else
+                    {
+                        $desiredType = [psobject]@{ Name = 'Unknown' }
+                    }
+                    
+                    if ($null -ne $currentArrayValues[$i])
+                    {
+                        $currentType = $currentArrayValues[$i].GetType()
+                    }
+                    else
+                    {
+                        $currentType = [psobject]@{ Name = 'Unknown' }
+                    }
+                    
+                    if ($desiredType.FullName -ne $currentType.FullName)
+                    {
+                        Write-Verbose -Message "`tNOTMATCH: Type mismatch for property '$key' Current state type of element [$i] is '$($currentType.Name)' and desired type is '$($desiredType.Name)'"
+                        $returnValue = $false
+                    }
                         
                     if ($desiredArrayValues[$i] -ne $currentArrayValues[$i])
                     {
-                        
-                        
                         Write-Verbose -Message "`tNOTMATCH: $($desiredType.Name)[$i] value for property '$key' does match. Current state is '$($currentArrayValues[$i])' and desired state is '$($desiredArrayValues[$i])'"
                         $returnValue = $false
                     }
