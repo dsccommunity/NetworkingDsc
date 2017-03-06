@@ -67,7 +67,7 @@ function Get-TargetResource
     
     return @{
         InterfaceAlias = $InterfaceAlias
-        Setting = [NetBiosSetting]$nicConfig.TcpipNetbiosOptions
+        Setting = [string][NetBiosSetting]$nicConfig.TcpipNetbiosOptions
         EnableLmhostsLookup = $nicConfig.WINSEnableLMHostsLookup
     }
 }
