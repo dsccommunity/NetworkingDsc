@@ -126,7 +126,7 @@ function Set-TargetResource
         
         Invoke-CimMethod -ClassName Win32_NetworkAdapterConfiguration -MethodName EnableWINS -Arguments @{ 
             DNSEnabledForWINSResolution = $nic.DNSEnabledForWINSResolution
-            WINSEnableLMHostsLookup = $true
+            WINSEnableLMHostsLookup = $EnableLmhostsLookup
         }
     }
 }
@@ -153,7 +153,7 @@ function Test-TargetResource
 
     $currentState = Get-TargetResource @PSBoundParameters
     
-    $result = Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters -Verbose:$VerbosePreference #-ValuesToCheck -ValuesToCheck ([array]@("Ensure"))
+    $result = Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters -Verbose:$VerbosePreference
     
     return $result
 }
