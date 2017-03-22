@@ -2,8 +2,7 @@
     .EXAMPLE
     This configuration enables RDMA setting on the network adapter.
 #>
-
-configuration Example
+Configuration Example
 {
     param
     (
@@ -20,4 +19,4 @@ configuration Example
             Enabled = $true
         }
     }
- }
+}

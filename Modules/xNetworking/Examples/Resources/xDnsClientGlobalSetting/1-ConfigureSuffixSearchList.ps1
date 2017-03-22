@@ -2,7 +2,7 @@
     .EXAMPLE
     Configure only contoso.com for the DNS Suffix
 #>
-configuration Example
+Configuration Example
 {
     param
     (
