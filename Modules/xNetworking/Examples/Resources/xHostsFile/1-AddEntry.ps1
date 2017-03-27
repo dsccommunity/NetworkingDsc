@@ -2,7 +2,7 @@
     .EXAMPLE
     Add a new host to the host file
 #>
-configuration Example
+Configuration Example
 {
     param
     (
@@ -21,4 +21,4 @@ configuration Example
             Ensure    = 'Present'
         }
     }
- }
+}

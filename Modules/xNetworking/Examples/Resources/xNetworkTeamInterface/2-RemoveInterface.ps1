@@ -2,7 +2,7 @@
     .EXAMPLE
     Remove a Network Team Interface
 #>
-configuration Example
+Configuration Example
 {
     param
     (
@@ -30,4 +30,4 @@ configuration Example
             DependsOn = '[xNetworkTeam]HostTeam'
         }
     }
- }
+}

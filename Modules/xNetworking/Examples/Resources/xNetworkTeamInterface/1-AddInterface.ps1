@@ -2,7 +2,7 @@
     .EXAMPLE
     Add New Network Team Interface
 #>
-configuration Example
+Configuration Example
 {
     param
     (
@@ -31,4 +31,4 @@ configuration Example
             DependsOn = '[xNetworkTeam]HostTeam'
         }
     }
- }
+}

@@ -2,7 +2,7 @@
     .EXAMPLE
     Disabling DHCP and adding a static IP Address for IPv6
 #>
-configuration Example
+Configuration Example
 {
     param
     (

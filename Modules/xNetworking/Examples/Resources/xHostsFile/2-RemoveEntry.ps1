@@ -2,7 +2,7 @@
     .EXAMPLE
     Remove a host from the hosts file
 #>
-configuration Example
+Configuration Example
 {
     param
     (
@@ -21,4 +21,4 @@ configuration Example
             Ensure    = 'Absent'
         }
     }
- }
+}

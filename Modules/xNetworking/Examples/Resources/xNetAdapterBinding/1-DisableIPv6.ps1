@@ -2,8 +2,7 @@
     .EXAMPLE
     Disabling IPv6 for the Ethernet adapter
 #>
-
-configuration Example
+Configuration Example
 {
     param
     (

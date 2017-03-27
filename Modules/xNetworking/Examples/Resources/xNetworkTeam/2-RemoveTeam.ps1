@@ -2,7 +2,7 @@
     .EXAMPLE
     Removes the NIC Team for the listed interfacess.
 #>
-configuration Example
+Configuration Example
 {
     param
     (
@@ -20,4 +20,4 @@ configuration Example
             TeamMembers = 'NIC1','NIC2','NIC3'
         }
     }
- }
+}

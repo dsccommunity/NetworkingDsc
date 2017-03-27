@@ -2,7 +2,7 @@
     .EXAMPLE
     Disable NetBios on Adapter
 #>
-configuration Example
+Configuration Example
 {
     param
     (

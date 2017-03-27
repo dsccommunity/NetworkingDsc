@@ -2,8 +2,7 @@
     .EXAMPLE
     Adding a firewall to an existing Firewall group 'My Firewall Rule'
 #>
-
-configuration Example
+Configuration Example
 {
     param
     (
@@ -31,4 +30,4 @@ configuration Example
             Profile               = ('Domain', 'Private')
         }
     }
- }
+}

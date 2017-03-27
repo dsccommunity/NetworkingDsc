@@ -2,7 +2,7 @@
     .EXAMPLE
     Creates the Host Team with the NIC1 and NIC1 Interfaces
 #>
-configuration Example
+Configuration Example
 {
     param
     (
@@ -22,4 +22,4 @@ configuration Example
             Ensure = 'Present'
         }
     }
- }
+}

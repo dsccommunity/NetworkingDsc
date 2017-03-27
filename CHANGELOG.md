@@ -5,6 +5,7 @@
 - Converted to use AppVeyor.psm1 in DSCResource.Tests repository.
 - Converted to use Example and Markdown tests in DSCResource.Tests repository.
 - Added CodeCov.io support.
+- Fix examples to correct display in auto documentation generation.
 
 ## 3.2.0.0
 
