@@ -2,7 +2,7 @@
     .EXAMPLE
     Configure primary and secondary DNS Server addresses on the Ethernet adapter
 #>
-configuration Example
+Configuration Example
 {
     param
     (
