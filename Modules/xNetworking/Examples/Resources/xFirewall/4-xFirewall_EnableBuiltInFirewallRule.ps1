@@ -3,8 +3,7 @@
     DSC configuration that enables the built-in Firewall Rule
     'World Wide Web Services (HTTP Traffic-In)'
 #>
-
-configuration Example
+Configuration Example
 {
     param
     (
@@ -22,4 +21,4 @@ configuration Example
             Enabled               = 'True'
         }
     }
- }
+}

@@ -2,7 +2,7 @@
     .EXAMPLE
     Configure DNS Server for the Ethernet adapter
 #>
-configuration Example
+Configuration Example
 {
     param
     (

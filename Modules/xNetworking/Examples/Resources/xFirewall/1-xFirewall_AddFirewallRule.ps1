@@ -2,7 +2,7 @@
     .EXAMPLE
     Allow notepad to access ports on the Domain and Private Profiles
 #>
-configuration Example
+Configuration Example
 {
     param
     (

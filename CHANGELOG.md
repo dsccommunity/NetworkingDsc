@@ -6,6 +6,7 @@
 - Converted to use Example and Markdown tests in DSCResource.Tests repository.
 - Added CodeCov.io support.
 - Added a new example to xDNSServerAddress to clarify setting multiple DNS Servers.
+- Fix examples to correct display in auto documentation generation.
 
 ## 3.2.0.0
 

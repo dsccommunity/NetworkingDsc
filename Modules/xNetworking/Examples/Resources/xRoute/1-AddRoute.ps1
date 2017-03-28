@@ -2,7 +2,7 @@
     .EXAMPLE
     Add a net route to the Ethernet interface
 #>
-configuration Example
+Configuration Example
 {
     param
     (
@@ -23,4 +23,4 @@ configuration Example
             RouteMetric = 200
         }
     }
- }
+}

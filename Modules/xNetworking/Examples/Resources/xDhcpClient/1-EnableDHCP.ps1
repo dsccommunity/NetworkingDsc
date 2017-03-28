@@ -2,8 +2,7 @@
     .EXAMPLE
     Enabling DHCP Client for the Ethernet Alias
 #>
-
-configuration Example
+Configuration Example
 {
     param
     (
