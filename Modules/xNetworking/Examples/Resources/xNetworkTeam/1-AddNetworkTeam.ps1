@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-    Creates the Host Team with the NIC1 and NIC1 Interfaces
+    Creates the Host Team with the NIC1 and NIC2 Interfaces
 #>
 Configuration Example
 {
