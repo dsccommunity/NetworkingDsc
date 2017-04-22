@@ -26,43 +26,43 @@ try
         $TestV1IPv4LsoEnable = @{
             Name     = 'Ethernet'
             Protocol = 'V1IPv4'
-            Status   = $true
+            State    = $true
         }
 
         $TestV1IPv4LsoDisable = @{
             Name     = 'Ethernet'
             Protocol = 'V1IPv4'
-            Status   = $false
+            State    = $false
         }
 
         $TestIPv4LsoEnable = @{
             Name     = 'Ethernet'
             Protocol = 'IPv4'
-            Status   = $true
+            State    = $true
         }
 
         $TestIPv4LsoDisable = @{
             Name     = 'Ethernet'
             Protocol = 'IPv4'
-            Status   = $false
+            State    = $false
         }
 
         $TestIPv6LsoEnable = @{
             Name     = 'Ethernet'
             Protocol = 'IPv6'
-            Status   = $true
+            State    = $true
         }
 
         $TestIPv6LsoDisable = @{
             Name     = 'Ethernet'
             Protocol = 'IPv4'
-            Status   = $false
+            State    = $false
         }
 
         $TestAdapterNotFound = @{
             Name     = 'Eth'
             Protocol = 'IPv4'
-            Status   = $true
+            State    = $true
         }
 
 
