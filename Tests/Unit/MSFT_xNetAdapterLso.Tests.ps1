@@ -23,13 +23,13 @@ try
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
 
-        $TestV1IPv4LsoEnable = @{
+        $TestV1IPv4LsoEnabled = @{
             Name     = 'Ethernet'
             Protocol = 'V1IPv4'
             State    = $true
         }
 
-        $TestV1IPv4LsoDisable = @{
+        $TestV1IPv4LsoDisabled = @{
             Name     = 'Ethernet'
             Protocol = 'V1IPv4'
             State    = $false
@@ -67,7 +67,35 @@ try
 
 
         Describe "$($script:DSCResourceName)\Get-TargetResource" {
-            
+            Context 'Adapter exist and LSO for V1IPv4 is enabled' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestV1IPv4LsoEnabled.State }
+                }
+                
+                It 'Should return the LSO state of V1IPv4' {
+                    $result = Get-TargetResource @TestV1IPv4LsoEnabled
+                    $result.V1IPv4Enabled | Should Be $TestV1IPv4LsoEnabled.State
+                }
+
+                It 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
+
+            Context 'Adapter exist and LSO for V1IPv4 is disabled' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestV1IPv4LsoDisabled.State }
+                }
+
+                t 'Should return the LSO state of V1IPv4' {
+                    $result = Get-TargetResource @TestV1IPv4LsoDisabled
+                    $result.V1IPv4Enabled | Should Be $TestV1IPv4LsoDisabled.State
+                }
+
+                It 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
         }
 
         Describe "$($script:DSCResourceName)\Set-TargetResource" {
