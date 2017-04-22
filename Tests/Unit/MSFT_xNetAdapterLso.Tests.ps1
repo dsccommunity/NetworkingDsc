@@ -87,7 +87,7 @@ try
                     @{ V1IPv4Enabled = $TestV1IPv4LsoDisabled.State }
                 }
 
-                t 'Should return the LSO state of V1IPv4' {
+                It 'Should return the LSO state of V1IPv4' {
                     $result = Get-TargetResource @TestV1IPv4LsoDisabled
                     $result.V1IPv4Enabled | Should Be $TestV1IPv4LsoDisabled.State
                 }
