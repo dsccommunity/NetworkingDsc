@@ -43,11 +43,20 @@ function Get-TargetResource
 
     try 
     {
-        Write-Verbose -Message $localizedData.CheckNetAdapter
+        Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $localizedData.CheckingNetAdapterMessage
+        ) -join '')
+
         $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+
         if ($netAdapter)
         {
-            Write-Verbose -Message $($LocalizedData.CheckingLsoProtocolState -f $Name, $Protocol)
+            Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.CheckingLsoProtocolStateMessage -f $Name, $Protocol)
+            ) -join '')
+
             $result = @{ }
             switch ($Protocol) {
                 "V1IPv4" { $result.add('V1IPv4Enabled', $netAdapter.V1IPv4Enabled) }
@@ -60,7 +69,7 @@ function Get-TargetResource
     }
     catch 
     {
-        throw $localizedData.NetAdapterNotFound
+        throw $localizedData.NetAdapterNotFoundMessage
     }
 
 }
@@ -97,7 +106,45 @@ function Set-TargetResource
         $State
     )
 
+    try 
+    {
+        Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $localizedData.CheckingNetAdapterMessage
+        ) -join '')
 
+        $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+
+        if ($netAdapter)
+        {
+            if ($Protocol -eq "V1IPv4" -and $State -ne $netAdapter.V1IPv4Enabled) 
+            {
+                 
+            }
+            elseif ($Protocol -eq "IPv4" -and $State -ne $netAdapter.IPv4Enabled) 
+            {
+
+                
+            }
+            elseif ($Protocol -eq "IPv6" -and $State -ne $netAdapter.IPv6Enabled) 
+            {
+                
+            }
+            else
+            {
+                Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    
+                ) -join '')
+            }
+
+        }
+
+    }
+    catch 
+    {
+        throw $LocalizedData.NetAdapterNotFoundMessage
+    }
 
 }
 
