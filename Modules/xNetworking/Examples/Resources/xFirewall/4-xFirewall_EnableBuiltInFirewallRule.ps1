@@ -7,7 +7,8 @@ Configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [string[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking
