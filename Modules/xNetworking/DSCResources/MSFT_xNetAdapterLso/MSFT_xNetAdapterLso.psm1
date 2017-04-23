@@ -41,6 +41,28 @@ function Get-TargetResource
         $State
     )
 
+    try 
+    {
+        Write-Verbose -Message $localizedData.CheckNetAdapter
+        $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+        if ($netAdapter)
+        {
+            Write-Verbose -Message $($LocalizedData.CheckingLsoProtocolState -f $Name, $Protocol)
+            $result = @{ }
+            switch ($Protocol) {
+                "V1IPv4" { $result.add('V1IPv4Enabled', $netAdapter.V1IPv4Enabled) }
+                "IPv4"   { $result.add('IPv4Enabled', $netAdapter.IPv4Enabled) }
+                "IPv6"   { $result.add('IPv6Enabled', $netAdapter.IPv4Enabled) }
+                Default {"Should not be called."}
+            }
+            return $result
+        }
+    }
+    catch 
+    {
+        throw $localizedData.NetAdapterNotFound
+    }
+
 }
 
 <#
