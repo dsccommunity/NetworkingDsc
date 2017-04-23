@@ -55,7 +55,7 @@ try
 
         $TestIPv6LsoDisabled = @{
             Name     = 'Ethernet'
-            Protocol = 'IPv4'
+            Protocol = 'IPv6'
             State    = $false
         }
 
@@ -161,10 +161,10 @@ try
                 Mock -CommandName Get-NetAdapterLso -MockWith { throw 'Network adapter not found' }
 
                 It 'Should throw error' {
-                    Get-TargetResource @TestAdapterNotFound | Should throw
+                    { Get-TargetResource @TestAdapterNotFound } | Should throw
                 }
 
-                It 'Should cann all mocks' {
+                It 'Should call all mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1 
                 }
             }
