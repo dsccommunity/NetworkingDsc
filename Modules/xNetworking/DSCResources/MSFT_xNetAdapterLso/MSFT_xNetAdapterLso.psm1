@@ -52,7 +52,7 @@ function Get-TargetResource
             switch ($Protocol) {
                 "V1IPv4" { $result.add('V1IPv4Enabled', $netAdapter.V1IPv4Enabled) }
                 "IPv4"   { $result.add('IPv4Enabled', $netAdapter.IPv4Enabled) }
-                "IPv6"   { $result.add('IPv6Enabled', $netAdapter.IPv4Enabled) }
+                "IPv6"   { $result.add('IPv6Enabled', $netAdapter.IPv6Enabled) }
                 Default {"Should not be called."}
             }
             return $result
