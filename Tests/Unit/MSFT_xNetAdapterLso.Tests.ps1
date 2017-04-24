@@ -372,7 +372,7 @@ try
                 Mock -CommandName Get-NetAdapterLso -MockWith { throw 'Network adapter not found' }
 
                 It 'Should throw an exception' {
-                    { Get-TargetResource @TestAdapterNotFound } | Should throw
+                    { Set-TargetResource @TestAdapterNotFound } | Should throw
                 }
 
                 It 'Should call all mocks' {
@@ -383,7 +383,189 @@ try
         }
 
         Describe "$($script:DSCResourceName)\Test-TargetResource" {
+            # V1IPv4
+            Context 'Adapter exist, LSO is enabled for V1IPv4, no action required' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestV1IPv4LsoEnabled.State }
+                }
+                
+                It 'Should return false' {
+                    { Test-TargetResource @TestV1IPv4LsoEnabled } | Should Be $false
+                }
 
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
+
+            Context 'Adapter exist, LSO is enabled for V1IPv4, should be disabled' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestV1IPv4LsoEnabled.State }
+                }
+                
+                It 'Should return true' {
+                    { Test-TargetResource @TestV1IPv4LsoDisabled } | Should Be $true
+                }
+
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
+
+            Context 'Adapter exist, LSO is disabled for V1IPv4, no action required' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestV1IPv4LsoDisabled.State }
+                }
+                
+                It 'Should return false' {
+                    { Test-TargetResource @TestV1IPv4LsoDisabled } | Should Be $false
+                }
+
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
+
+            Context 'Adapter exist, LSO is disabled for V1IPv4, should be enabled.' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestV1IPv4LsoDisabled.State }
+                }
+                
+                It 'Should return true' {
+                    { Test-TargetResource @TestV1IPv4LsoEnabled } | Should Be $true
+                }
+
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
+
+            # IPv4
+            Context 'Adapter exist, LSO is enabled for IPv4, no action required' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestIPv4LsoEnabled.State }
+                }
+                
+                It 'Should return false' {
+                    { Test-TargetResource @TestIPv4LsoEnabled } | Should Be $false
+                }
+
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
+
+            Context 'Adapter exist, LSO is enabled for IPv4, should be disabled' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestIPv4LsoEnabled.State }
+                }
+                
+                It 'Should return true' {
+                    { Test-TargetResource @TestIPv4LsoDisabled } | Should Be $true
+                }
+
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
+
+            Context 'Adapter exist, LSO is disabled for IPv4, no action required' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestIPv4LsoDisabled.State }
+                }
+                
+                It 'Should return false' {
+                    { Test-TargetResource @TestIPv4LsoDisabled } | Should Be $false
+                }
+
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
+
+            Context 'Adapter exist, LSO is disabled for IPv4, should be enabled.' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestIPv4LsoDisabled.State }
+                }
+                
+                It 'Should return true' {
+                    { Test-TargetResource @TestIPv4LsoEnabled } | Should Be $true
+                }
+
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
+
+            # IPv6
+            Context 'Adapter exist, LSO is enabled for IPv6, no action required' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestIPv6LsoEnabled.State }
+                }
+                
+                It 'Should return false' {
+                    { Test-TargetResource @TestIPv6LsoEnabled } | Should Be $false
+                }
+
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
+
+            Context 'Adapter exist, LSO is enabled for IPv6, should be disabled' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestIPv6LsoEnabled.State }
+                }
+                
+                It 'Should return true' {
+                    { Test-TargetResource @TestIPv6LsoDisabled } | Should Be $true
+                }
+
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
+
+            Context 'Adapter exist, LSO is disabled for IPv6, no action required' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestIPv6LsoDisabled.State }
+                }
+                
+                It 'Should return false' {
+                    { Test-TargetResource @TestIPv6LsoDisabled } | Should Be $false
+                }
+
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
+
+            Context 'Adapter exist, LSO is disabled for IPv6, should be enabled.' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { 
+                    @{ V1IPv4Enabled = $TestIPv6LsoDisabled.State }
+                }
+                
+                It 'Should return true' {
+                    { Test-TargetResource @TestIPv6LsoEnabled } | Should Be $true
+                }
+
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1
+                }
+            }
+
+            # Adapter
+            Context 'Adapter does not exist' {
+                Mock -CommandName Get-NetAdapterLso -MockWith { throw 'Network adapter not found' }
+
+                It 'Should throw an exception' {
+                    { Set-TargetResource @TestAdapterNotFound } | Should throw
+                }
+
+                It 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1 
+                }
+            }
         }
     }
     #endregion
