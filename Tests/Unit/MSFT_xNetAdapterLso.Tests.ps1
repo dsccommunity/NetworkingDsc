@@ -191,7 +191,7 @@ try
 
             Context 'Adapter exist, LSO is enabled for V1IPv4, should be disabled' {
                 Mock -CommandName Get-NetAdapterLso -MockWith {
-                    @{ V1IPv4Enabled = $TestV1IPv4LsoEnabled.State }
+                    @{ V1IPv4Enabled = $TestV1IPv4LsoEnabled.State }
                 }
                 Mock -CommandName Set-NetAdapterLso
 
@@ -207,7 +207,7 @@ try
 
             Context 'Adapter exist, LSO is disabled for V1IPv4, no action required' {
                 Mock -CommandName Get-NetAdapterLso -MockWith {
-                    @{ V1IPv4Enabled = $TestV1IPv4LsoDisabled.State }
+                    @{ V1IPv4Enabled = $TestV1IPv4LsoDisabled.State }
                 }
                 Mock -CommandName Set-NetAdapterLso
 
@@ -223,7 +223,7 @@ try
 
             Context 'Adapter exist, LSO is disabled for V1IPv4, should be enabled.' {
                 Mock -CommandName Get-NetAdapterLso -MockWith {
-                    @{ V1IPv4Enabled = $TestV1IPv4LsoDisabled }
+                    @{ V1IPv4Enabled = $TestV1IPv4LsoDisabled.State }
                 }
                 Mock -CommandName Set-NetAdapterLso
 
