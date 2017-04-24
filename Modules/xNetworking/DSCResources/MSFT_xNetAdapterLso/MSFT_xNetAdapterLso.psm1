@@ -206,13 +206,12 @@ function Test-TargetResource
         if ($netAdapter) 
         {
             switch ($Protocol) {
-                "V1IPv4" { return $($State -eq $netAdapter.V1IPv4Enabled) }
-                "IPv4"   { return $($State -eq $netAdapter.IPv4Enabled) }
-                "IPv6"   { return $($State -eq $netAdapter.IPv6Enabled) }
+                "V1IPv4" { return ($State -eq $netAdapter.V1IPv4Enabled) }
+                "IPv4"   { return ($State -eq $netAdapter.IPv4Enabled) }
+                "IPv6"   { return ($State -eq $netAdapter.IPv6Enabled) }
                 Default {"Should not be called."}
             }
         }
-        return $false
     }
     catch 
     {

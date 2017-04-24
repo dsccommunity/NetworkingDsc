@@ -161,14 +161,13 @@ try
                 Mock -CommandName Get-NetAdapterLso -MockWith { throw 'Network adapter not found' }
 
                 It 'Should throw an exception' {
-                    { Get-TargetResource @TestAdapterNotFound } | Should throw
+                    { Get-TargetResource @TestAdapterNotFound } | Should throw
                 }
 
                 It 'Should call all mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1 
                 }
             }
-        }
 
         Describe "$($script:DSCResourceName)\Set-TargetResource" {
             
