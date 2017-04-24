@@ -130,7 +130,7 @@ function Set-TargetResource
                     $Name, $Protocol, $($netAdapter.V1IPv4Enabled.ToString()), $($State.ToString()) )
             )    -join '')
                 
-                Set-NetAdapterLso -Name -V1IPv4Enabled $State
+                Set-NetAdapterLso -Name $Name -V1IPv4Enabled $State
             }
             elseif ($Protocol -eq "IPv4" -and $State -ne $netAdapter.IPv4Enabled) 
             {
@@ -193,5 +193,30 @@ function Test-TargetResource
         [Boolean]
         $State
     )
+
+    try 
+    {
+        Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $localizedData.CheckingNetAdapterMessage
+        ) -join '')
+
+        $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+
+        if ($netAdapter) 
+        {
+            switch ($Protocol) {
+                "V1IPv4" { return $($State -eq $netAdapter.V1IPv4Enabled) }
+                "IPv4"   { return $($State -eq $netAdapter.IPv4Enabled) }
+                "IPv6"   { return $($State -eq $netAdapter.IPv6Enabled) }
+                Default {"Should not be called."}
+            }
+        }
+        return $false
+    }
+    catch 
+    {
+        throw $LocalizedData.NetAdapterNotFoundMessage
+    }
 
 }
