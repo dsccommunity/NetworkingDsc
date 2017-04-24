@@ -390,7 +390,7 @@ try
                 }
                 
                 It 'Should return true' {
-                    { Test-TargetResource @TestV1IPv4LsoEnabled } | Should Be $true
+                    Test-TargetResource @TestV1IPv4LsoEnabled | Should Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -404,7 +404,7 @@ try
                 }
                 
                 It 'Should return false' {
-                    { Test-TargetResource @TestV1IPv4LsoDisabled } | Should Be $false
+                    Test-TargetResource @TestV1IPv4LsoDisabled | Should Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -418,7 +418,7 @@ try
                 }
                 
                 It 'Should return true' {
-                    { Test-TargetResource @TestV1IPv4LsoDisabled } | Should Be $true
+                    Test-TargetResource @TestV1IPv4LsoDisabled | Should Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -432,7 +432,7 @@ try
                 }
                 
                 It 'Should return false' {
-                    { Test-TargetResource @TestV1IPv4LsoEnabled } | Should Be $false
+                    Test-TargetResource @TestV1IPv4LsoEnabled | Should Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -447,7 +447,7 @@ try
                 }
                 
                 It 'Should return true' {
-                    { Test-TargetResource @TestIPv4LsoEnabled } | Should Be $true
+                    Test-TargetResource @TestIPv4LsoEnabled | Should Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -461,7 +461,7 @@ try
                 }
                 
                 It 'Should return false' {
-                    { Test-TargetResource @TestIPv4LsoDisabled } | Should Be $false
+                    Test-TargetResource @TestIPv4LsoDisabled | Should Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -475,7 +475,7 @@ try
                 }
                 
                 It 'Should return true' {
-                    { Test-TargetResource @TestIPv4LsoDisabled } | Should Be $true
+                    Test-TargetResource @TestIPv4LsoDisabled | Should Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -489,7 +489,7 @@ try
                 }
                 
                 It 'Should return false' {
-                    { Test-TargetResource @TestIPv4LsoEnabled } | Should Be $false
+                    Test-TargetResource @TestIPv4LsoEnabled | Should Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -504,7 +504,7 @@ try
                 }
                 
                 It 'Should return true' {
-                    { Test-TargetResource @TestIPv6LsoEnabled } | Should Be $true
+                    Test-TargetResource @TestIPv6LsoEnabled | Should Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -518,7 +518,7 @@ try
                 }
                 
                 It 'Should return false' {
-                    { Test-TargetResource @TestIPv6LsoDisabled } | Should Be $false
+                    Test-TargetResource @TestIPv6LsoDisabled | Should Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -532,7 +532,7 @@ try
                 }
                 
                 It 'Should return true' {
-                    { Test-TargetResource @TestIPv6LsoDisabled } | Should Be $true
+                    Test-TargetResource @TestIPv6LsoDisabled | Should Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -546,7 +546,7 @@ try
                 }
                 
                 It 'Should return false' {
-                    { Test-TargetResource @TestIPv6LsoEnabled } | Should Be $false
+                    Test-TargetResource @TestIPv6LsoEnabled | Should Be $false
                 }
 
                 it 'Should call all mocks' {
