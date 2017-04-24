@@ -117,29 +117,42 @@ function Set-TargetResource
 
         if ($netAdapter)
         {
-            if ($Protocol -eq "V1IPv4" -and $State -ne $netAdapter.V1IPv4Enabled) 
-            {
-                 
-            }
-            elseif ($Protocol -eq "IPv4" -and $State -ne $netAdapter.IPv4Enabled) 
-            {
+            Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.CheckingLsoProtocolStateMessage -f $Name, $Protocol)
+            ) -join '')
 
-                
-            }
-            elseif ($Protocol -eq "IPv6" -and $State -ne $netAdapter.IPv6Enabled) 
-            {
-                
-            }
-            else
+            if ($Protocol -eq "V1IPv4" -and $State -ne $netAdapter.V1IPv4Enabled) 
             {
                 Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    
-                ) -join '')
+                    $($LocalizedData.NetAdapterApplyingChangesMessage -f `
+                    $Name, $Protocol, $($netAdapter.V1IPv4Enabled.ToString()), $($State.ToString()) )
+            )    -join '')
+                
+                Set-NetAdapterLso -Name -V1IPv4Enabled $State
             }
+            elseif ($Protocol -eq "IPv4" -and $State -ne $netAdapter.IPv4Enabled) 
+            {
+                Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.NetAdapterApplyingChangesMessage -f `
+                    $Name, $Protocol, $($netAdapter.IPv4Enabled.ToString()), $($State.ToString()) )
+                ) -join '')
 
+                Set-NetAdapterLso -Name $Name -IPv4Enabled $State
+            }
+            elseif ($Protocol -eq "IPv6" -and $State -ne $netAdapter.IPv6Enabled) 
+            {
+                Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.NetAdapterApplyingChangesMessage -f `
+                    $Name, $Protocol, $($netAdapter.IPv6Enabled.ToString()), $($State.ToString()) )
+                ) -join '')
+
+                Set-NetAdapterLso -Name $Name -IPv6Enabled $State
+            }
         }
-
     }
     catch 
     {
