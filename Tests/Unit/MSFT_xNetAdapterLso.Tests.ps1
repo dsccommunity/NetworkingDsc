@@ -175,7 +175,7 @@ try
             # V1IPv4
             Context 'Adapter exist, LSO is enabled for V1IPv4, no action required' {
                 Mock -CommandName Get-NetAdapterLso -MockWith { 
-                    @{ V1IPv4Enabled =  $TestV1IPv4LsoEnabled.State }
+                    @{ V1IPv4Enabled = $TestV1IPv4LsoEnabled.State }
                 }
                 Mock -CommandName Set-NetAdapterLso
 
@@ -389,8 +389,8 @@ try
                     @{ V1IPv4Enabled = $TestV1IPv4LsoEnabled.State }
                 }
                 
-                It 'Should return false' {
-                    { Test-TargetResource @TestV1IPv4LsoEnabled } | Should Be $false
+                It 'Should return true' {
+                    { Test-TargetResource @TestV1IPv4LsoEnabled } | Should Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -403,8 +403,8 @@ try
                     @{ V1IPv4Enabled = $TestV1IPv4LsoEnabled.State }
                 }
                 
-                It 'Should return true' {
-                    { Test-TargetResource @TestV1IPv4LsoDisabled } | Should Be $true
+                It 'Should return false' {
+                    { Test-TargetResource @TestV1IPv4LsoDisabled } | Should Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -417,8 +417,8 @@ try
                     @{ V1IPv4Enabled = $TestV1IPv4LsoDisabled.State }
                 }
                 
-                It 'Should return false' {
-                    { Test-TargetResource @TestV1IPv4LsoDisabled } | Should Be $false
+                It 'Should return true' {
+                    { Test-TargetResource @TestV1IPv4LsoDisabled } | Should Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -431,8 +431,8 @@ try
                     @{ V1IPv4Enabled = $TestV1IPv4LsoDisabled.State }
                 }
                 
-                It 'Should return true' {
-                    { Test-TargetResource @TestV1IPv4LsoEnabled } | Should Be $true
+                It 'Should return false' {
+                    { Test-TargetResource @TestV1IPv4LsoEnabled } | Should Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -446,8 +446,8 @@ try
                     @{ V1IPv4Enabled = $TestIPv4LsoEnabled.State }
                 }
                 
-                It 'Should return false' {
-                    { Test-TargetResource @TestIPv4LsoEnabled } | Should Be $false
+                It 'Should return true' {
+                    { Test-TargetResource @TestIPv4LsoEnabled } | Should Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -460,8 +460,8 @@ try
                     @{ V1IPv4Enabled = $TestIPv4LsoEnabled.State }
                 }
                 
-                It 'Should return true' {
-                    { Test-TargetResource @TestIPv4LsoDisabled } | Should Be $true
+                It 'Should return false' {
+                    { Test-TargetResource @TestIPv4LsoDisabled } | Should Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -474,8 +474,8 @@ try
                     @{ V1IPv4Enabled = $TestIPv4LsoDisabled.State }
                 }
                 
-                It 'Should return false' {
-                    { Test-TargetResource @TestIPv4LsoDisabled } | Should Be $false
+                It 'Should return true' {
+                    { Test-TargetResource @TestIPv4LsoDisabled } | Should Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -488,8 +488,8 @@ try
                     @{ V1IPv4Enabled = $TestIPv4LsoDisabled.State }
                 }
                 
-                It 'Should return true' {
-                    { Test-TargetResource @TestIPv4LsoEnabled } | Should Be $true
+                It 'Should return false' {
+                    { Test-TargetResource @TestIPv4LsoEnabled } | Should Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -503,8 +503,8 @@ try
                     @{ V1IPv4Enabled = $TestIPv6LsoEnabled.State }
                 }
                 
-                It 'Should return false' {
-                    { Test-TargetResource @TestIPv6LsoEnabled } | Should Be $false
+                It 'Should return true' {
+                    { Test-TargetResource @TestIPv6LsoEnabled } | Should Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -517,8 +517,8 @@ try
                     @{ V1IPv4Enabled = $TestIPv6LsoEnabled.State }
                 }
                 
-                It 'Should return true' {
-                    { Test-TargetResource @TestIPv6LsoDisabled } | Should Be $true
+                It 'Should return false' {
+                    { Test-TargetResource @TestIPv6LsoDisabled } | Should Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -531,8 +531,8 @@ try
                     @{ V1IPv4Enabled = $TestIPv6LsoDisabled.State }
                 }
                 
-                It 'Should return false' {
-                    { Test-TargetResource @TestIPv6LsoDisabled } | Should Be $false
+                It 'Should return true' {
+                    { Test-TargetResource @TestIPv6LsoDisabled } | Should Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -545,8 +545,8 @@ try
                     @{ V1IPv4Enabled = $TestIPv6LsoDisabled.State }
                 }
                 
-                It 'Should return true' {
-                    { Test-TargetResource @TestIPv6LsoEnabled } | Should Be $true
+                It 'Should return false' {
+                    { Test-TargetResource @TestIPv6LsoEnabled } | Should Be $false
                 }
 
                 it 'Should call all mocks' {
