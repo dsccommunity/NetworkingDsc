@@ -54,7 +54,7 @@ function Get-TargetResource
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.CheckingLsoProtocolStateMessage -f $Name, $Protocol)
+                $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $Protocol)
             ) -join '')
 
             $result = @{ }
@@ -119,7 +119,7 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.CheckingLsoProtocolStateMessage -f $Name, $Protocol)
+                $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $Protocol)
             ) -join '')
 
             if ($Protocol -eq "V1IPv4" -and $State -ne $netAdapter.V1IPv4Enabled) 
@@ -205,6 +205,12 @@ function Test-TargetResource
 
         if ($netAdapter) 
         {
+            Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $localizedData.NetAdapterTestingStateMessage -f `
+                $Name, $Protocol
+            ) -join '')
+
             switch ($Protocol) {
                 "V1IPv4" { return ($State -eq $netAdapter.V1IPv4Enabled) }
                 "IPv4"   { return ($State -eq $netAdapter.IPv4Enabled) }
