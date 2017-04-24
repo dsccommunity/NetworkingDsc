@@ -168,6 +168,7 @@ try
                     Assert-MockCalled -CommandName Get-NetAdapterLso -Exactly 1 
                 }
             }
+        }
 
         Describe "$($script:DSCResourceName)\Set-TargetResource" {
             
@@ -222,7 +223,7 @@ try
 
             Context 'Adapter exist, LSO is disabled for V1IPv4, should be enabled.' {
                 Mock -CommandName Get-NetAdapterLso -MockWith {
-                    @{ V1IPv4Enabled = $TestV1IPv4LsoDisabled.State }
+                    @{ V1IPv4Enabled = $TestV1IPv4LsoDisabled.State }
                 }
                 Mock -CommandName Set-NetAdapterLso
 
