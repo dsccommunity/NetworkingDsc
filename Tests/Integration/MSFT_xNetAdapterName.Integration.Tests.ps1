@@ -33,6 +33,7 @@ try
             $adapterName = 'xNetworkingLBA'
             New-IntegrationLoopbackAdapter -AdapterName $adapterName
             $adapter = Get-NetAdapter -Name $adapterName
+            Write-Verbose -Verbose -Message ($adapter | Out-String)
             $newAdapterName = 'xNetworkingLBANew'
         }
 
