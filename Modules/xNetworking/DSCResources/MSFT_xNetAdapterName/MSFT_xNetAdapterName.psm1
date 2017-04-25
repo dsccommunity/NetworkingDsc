@@ -124,6 +124,7 @@ function Get-TargetResource
         InterfaceDescription           = $adapter.InterfaceDescription
         InterfaceIndex                 = $adapter.InterfaceIndex
         InterfaceGuid                  = $adapter.InterfaceGuid
+        DriverDescription              = $adapter.DriverDescription
         InterfaceNumber                = $InterfaceNumber
         IgnoreMultipleMatchingAdapters = $IgnoreMultipleMatchingAdapters
     }
