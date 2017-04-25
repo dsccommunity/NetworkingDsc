@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-    Removing the default gateway from an interface
+    Configure primary and secondary DNS Server addresses on the Ethernet adapter
 #>
 Configuration Example
 {
@@ -12,12 +12,15 @@ Configuration Example
     )
 
     Import-DscResource -Module xNetworking
+
     Node $NodeName
     {
-        xDefaultGatewayAddress RemoveDefaultGateway
+        xDnsServerAddress DnsServerAddress
         {
+            Address        = '10.0.0.2','10.0.0.40'
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPv4'
+            Validate       = $true
         }
     }
 }
