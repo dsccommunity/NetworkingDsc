@@ -6,6 +6,12 @@
 - Converted to use Example and Markdown tests in DSCResource.Tests repository.
 - Added CodeCov.io support.
 - Fix examples to correct display in auto documentation generation.
+- Migrated xNetworkAdapter module functionality to xNetAdapterName resource.
+- Added Find-NetAdapter cmdlet to NetworkingDsc.Common to support xNetAdapterName
+  resource.
+- Added CommonTestHelper module for aiding testing.
+- MSFT_xNetAdapterName:
+  - Created new resource for renaming network adapters.
 
 ## 3.2.0.0
 

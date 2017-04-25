@@ -20,7 +20,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 
 # Configure Loopback Adapter
 . (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
-New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
 
 # Using try/finally to always cleanup even if something awful happens.
 try
@@ -30,12 +29,39 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
+        BeforeAll {
+            $adapterName = 'xNetworkingLBA'
+            New-IntegrationLoopbackAdapter -AdapterName $adapterName
+            $adapter = Get-NetAdapter -Name $adapterName
+            $newAdapterName = 'xNetworkingLBANew'
+        }
+
         #region DEFAULT TESTS
-        It 'Should compile without throwing' {
+        It 'should compile and apply the MOF without throwing' {
             {
-                & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
-                Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+                # This is to pass to the Config
+                $configData = @{
+                    AllNodes = @(
+                        @{
+                            NodeName             = 'localhost'
+                            NewName              = $newAdapterName
+                            Name                 = $adapter.Name
+                            PhysicalMediaType    = $adapter.PhysicalMediaType
+                            Status               = $adapter.Status
+                            MacAddress           = $adapter.MacAddress
+                            InterfaceDescription = $adapter.InterfaceDescription
+                            InterfaceIndex       = $adapter.InterfaceIndex
+                            InterfaceGuid        = $adapter.InterfaceGuid
+                        }
+                    )
+                }
+
+                & "$($script:DSCResourceName)_Config" `
+                    -OutputPath $TestDrive `
+                    -ConfigurationData $configData
+                Start-DscConfiguration -Path $TestDrive `
+                    -ComputerName localhost -Wait -Verbose -Force
+            } | Should Not Throw
         }
 
         It 'should be able to call Get-DscConfiguration without throwing' {
@@ -45,18 +71,18 @@ try
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
-            $current.InterfaceAlias           | Should Be $TestDisableIPv4.InterfaceAlias
-            $current.ComponentId              | Should Be $TestDisableIPv4.ComponentId
-            $current.State                    | Should Be $TestDisableIPv4.State
+            $current.Name                     | Should Be $newAdapterName
+        }
+
+        AfterAll {
+            # Remove Loopback Adapter
+            Remove-IntegrationLoopbackAdapter -AdapterName $newAdapterName
         }
     }
     #endregion
 }
 finally
 {
-    # Remove Loopback Adapter
-    Remove-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
-
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
