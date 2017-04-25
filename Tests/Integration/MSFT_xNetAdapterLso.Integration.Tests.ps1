@@ -19,8 +19,8 @@ $TestEnvironment = Initialize-TestEnvironment `
 #endregion
 
 # Configure Loopback Adapter
-#. (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
-#New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
+. (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
+New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
 
 # Using try/finally to always cleanup even if something awful happens.
 try
@@ -30,9 +30,7 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        Mock -CommandName Get-NetAdapterLso -MockWith { 
-                    @{ IPv6Enabled = $TestDisableLsoIPv6.State }
-                }
+        
         #region DEFAULT TESTS
         It 'Should compile without throwing' {
             {
@@ -56,7 +54,7 @@ try
 finally
 {
     # Remove Loopback Adapter
-    #Remove-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
+    Remove-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
 
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
