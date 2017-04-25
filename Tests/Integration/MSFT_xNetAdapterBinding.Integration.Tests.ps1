@@ -1,5 +1,5 @@
 $script:DSCModuleName      = 'xNetworking'
-$script:DSCResourceName    = 'MSFT_xNetAdapterName'
+$script:DSCResourceName    = 'MSFT_xNetAdapterBinding'
 
 #region HEADER
 # Integration Test Template Version: 1.1.0
