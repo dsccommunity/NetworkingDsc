@@ -1,5 +1,5 @@
 $TestDisableLsoIPv6 = [PSObject]@{
-    Name     = 'Ethernet'
+    Name     = 'xNetworkingLBA'
     Protocol = 'IPv6'
     State    = $false
 }
