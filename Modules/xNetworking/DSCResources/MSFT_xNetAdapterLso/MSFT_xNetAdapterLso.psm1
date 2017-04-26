@@ -57,7 +57,9 @@ function Get-TargetResource
                 $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $Protocol)
             ) -join '')
 
-            $result = @{ }
+            $result = @{ 
+                Name = $Name
+            }
             switch ($Protocol) {
                 "V1IPv4" { $result.add('V1IPv4Enabled', $netAdapter.V1IPv4Enabled) }
                 "IPv4"   { $result.add('IPv4Enabled', $netAdapter.IPv4Enabled) }
