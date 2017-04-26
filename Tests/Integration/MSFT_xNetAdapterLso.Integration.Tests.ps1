@@ -42,7 +42,9 @@ try
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
-            $current.IPv6Enabled | Should Be $TestDisableLsoIPv6.IPv6Enabled
+            $current.Name           | Should Be $TestEnableLsoIPv6.Name
+            $current.Protocol       | Should Be $TestEnableLsoIPv6.Protocol
+            $current.State          | Should Be $TestEnableLsoIPv6.State
         }
     }
     #endregion
