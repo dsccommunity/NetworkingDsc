@@ -74,7 +74,7 @@ try
                 
                 It 'Should return the LSO state of V1IPv4' {
                     $result = Get-TargetResource @TestV1IPv4LsoEnabled
-                    $result.V1IPv4Enabled | Should Be $TestV1IPv4LsoEnabled.State
+                    $result.State | Should Be $TestV1IPv4LsoEnabled.State
                 }
 
                 It 'Should call all mocks' {
@@ -89,7 +89,7 @@ try
 
                 It 'Should return the LSO state of V1IPv4' {
                     $result = Get-TargetResource @TestV1IPv4LsoDisabled
-                    $result.V1IPv4Enabled | Should Be $TestV1IPv4LsoDisabled.State
+                    $result.State | Should Be $TestV1IPv4LsoDisabled.State
                 }
 
                 It 'Should call all mocks' {
@@ -104,7 +104,7 @@ try
 
                 It 'Should return the LSO state of IPv4' {
                     $result = Get-TargetResource @TestIPv4LsoEnabled
-                    $result.IPv4Enabled | Should Be $TestIPv4LsoEnabled.State
+                    $result.State | Should Be $TestIPv4LsoEnabled.State
                 }
 
                 It 'Should call all mocks' {
@@ -119,7 +119,7 @@ try
 
                 It 'Should return the LSO state of IPv4' {
                     $result = Get-TargetResource @TestIPv4LsoDisabled
-                    $result.IPv4Enabled | Should Be $TestIPv4LsoDisabled.State
+                    $result.State | Should Be $TestIPv4LsoDisabled.State
                 }
 
                 It 'Should call all mocks' {
@@ -134,7 +134,7 @@ try
 
                 It 'Should return the LSO state of IPv6' {
                     $result = Get-TargetResource @TestIPv6LsoEnabled
-                    $result.IPv6Enabled | Should Be $TestIPv6LsoEnabled.State
+                    $result.State | Should Be $TestIPv6LsoEnabled.State
                 }
 
                 It 'Should call all mocks' {
@@ -149,7 +149,7 @@ try
 
                 It 'Should return the LSO state of IPv6' {
                     $result = Get-TargetResource @TestIPv6LsoDisabled
-                    $result.IPv6Enabled | Should Be $TestIPv6LsoDisabled.State
+                    $result.State | Should Be $TestIPv6LsoDisabled.State
                 }
 
                 It 'Should call all mocks' {

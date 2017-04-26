@@ -57,11 +57,14 @@ function Get-TargetResource
                 $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $Protocol)
             ) -join '')
 
-            $result = @{ }
+            $result = @{ 
+                Name = $Name
+                Protocol = $Protocol
+            }
             switch ($Protocol) {
-                "V1IPv4" { $result.add('V1IPv4Enabled', $netAdapter.V1IPv4Enabled) }
-                "IPv4"   { $result.add('IPv4Enabled', $netAdapter.IPv4Enabled) }
-                "IPv6"   { $result.add('IPv6Enabled', $netAdapter.IPv6Enabled) }
+                "V1IPv4" { $result.add('State', $netAdapter.V1IPv4Enabled) }
+                "IPv4"   { $result.add('State', $netAdapter.IPv4Enabled) }
+                "IPv6"   { $result.add('State', $netAdapter.IPv6Enabled) }
                 Default {"Should not be called."}
             }
             return $result

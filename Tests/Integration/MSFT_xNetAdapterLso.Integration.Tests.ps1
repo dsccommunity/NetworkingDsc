@@ -18,10 +18,6 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Integration
 #endregion
 
-# Configure Loopback Adapter
-. (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
-New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
-
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
@@ -46,16 +42,15 @@ try
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
-            $current.IPv6Enabled | Should Be $TestDisableLsoIPv6.IPv6Enabled
+            $current.Name           | Should Be $TestEnableLsoIPv6.Name
+            $current.Protocol       | Should Be $TestEnableLsoIPv6.Protocol
+            $current.State          | Should Be $TestEnableLsoIPv6.State
         }
     }
     #endregion
 }
 finally
 {
-    # Remove Loopback Adapter
-    Remove-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
-
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
