@@ -6,7 +6,8 @@ Configuration Example
 {
     param
     (
-        [string[]]
+        [Parameter()]
+        [System.String[]]
         $NodeName = 'localhost'
     )
 
