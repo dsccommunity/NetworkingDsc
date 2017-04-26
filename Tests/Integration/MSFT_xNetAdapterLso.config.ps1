@@ -1,5 +1,6 @@
+$NetAdapter = Get-NetAdapter | Where-Object {$_.NdisVersion -ge 6} | Select-Object -First 1
 $TestDisableLsoIPv6 = [PSObject]@{
-    Name     = 'xNetworkingLBA'
+    Name     = $NetAdapter.Name
     Protocol = 'IPv6'
     State    = $false
 }
