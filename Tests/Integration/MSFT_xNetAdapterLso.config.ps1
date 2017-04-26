@@ -2,7 +2,7 @@ $NetAdapter = Get-NetAdapter | Where-Object {$_.NdisVersion -ge 6} | Select-Obje
 $TestDisableLsoIPv6 = [PSObject]@{
     Name     = $NetAdapter.Name
     Protocol = 'IPv6'
-    State    = $false
+    State    = $true
 }
 
 configuration MSFT_xNetAdapterLso_Config {
