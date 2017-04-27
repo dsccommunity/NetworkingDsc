@@ -96,7 +96,7 @@ try
 
             Context 'invoking with valid IP Address' {
 
-                It 'should rerturn $null' {
+                It 'should return $null' {
                     $Splat = @{
                         IPAddress = '10.0.0.2'
                         InterfaceAlias = 'Ethernet'
@@ -112,6 +112,27 @@ try
                     Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
                     Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
                     Assert-MockCalled -commandName New-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with multiple valid IP Address' {
+
+                It 'should return $null' {
+                    $Splat = @{
+                        IPAddress = @('10.0.0.2', '10.0.0.3')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    { $Result = Set-TargetResource @Splat } | Should Not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                It 'should call all the mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 2
                 }
             }
         }
