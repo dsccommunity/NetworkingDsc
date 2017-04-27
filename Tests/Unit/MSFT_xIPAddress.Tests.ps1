@@ -210,6 +210,64 @@ try
             Mock Get-NetIPAddress -MockWith {
 
                 [PSCustomObject]@{
+                    IPAddress = @('192.168.0.15', '192.168.0.16')
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    PrefixLength = [byte]16
+                    AddressFamily = 'IPv4'
+                }
+            }
+            Context 'invoking with multiple different IPv4 Addresses' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = @('192.168.0.1', '192.168.0.2')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with the same IPv4 Addresses' {
+
+                It 'should be $true' {
+                    $Splat = @{
+                        IPAddress = @('192.168.0.15', '192.168.0.16')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $true
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with the combination of same and different IPv4 Addresses' {
+
+                It 'should be $true' {
+                    $Splat = @{
+                        IPAddress = @('192.168.0.1', '192.168.0.16')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Mock Get-NetIPAddress -MockWith {
+
+                [PSCustomObject]@{
                     IPAddress = 'fe80::15'
                     InterfaceAlias = 'Ethernet'
                     InterfaceIndex = 1
@@ -342,6 +400,18 @@ try
                 It 'should not throw an error' {
                     $Splat = @{
                         IPAddress = '192.168.0.1'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    { Assert-ResourceProperty @Splat } | Should Not Throw
+                }
+            }
+
+            Context 'invoking with multiple valid IPv4 Addresses' {
+
+                It 'should not throw an error' {
+                    $Splat = @{
+                        IPAddress = @('192.168.0.1', '192.168.0.2')
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
