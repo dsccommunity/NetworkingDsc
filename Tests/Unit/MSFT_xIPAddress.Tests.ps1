@@ -258,6 +258,21 @@ try
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
                 }
             }
+            Context 'invoking with a single different IPv4 Address' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = '192.168.0.1'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
 
             Context 'invoking with the same IPv4 Addresses' {
 
@@ -350,6 +365,84 @@ try
                     }
                     $Result = Test-TargetResource @Splat
                     $Result | Should Be $true
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Mock Get-NetIPAddress -MockWith {
+
+                [PSCustomObject]@{
+                    IPAddress = @('fe80::15', 'fe80::16')
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    PrefixLength = [byte]64
+                    AddressFamily = 'IPv6'
+                }
+            }
+
+            Context 'invoking with multiple different IPv6 Addresses' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = @('fe80::1', 'fe80::2')
+                        InterfaceAlias = 'Ethernet'
+                        PrefixLength = 64
+                        AddressFamily = 'IPv6'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with a single different IPv6 Address' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = 'fe80::1'
+                        InterfaceAlias = 'Ethernet'
+                        PrefixLength = 64
+                        AddressFamily = 'IPv6'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with the same IPv6 Addresses' {
+
+                It 'should be $true' {
+                    $Splat = @{
+                        IPAddress = @('fe80::15', 'fe80::16')
+                        InterfaceAlias = 'Ethernet'
+                        PrefixLength = 64
+                        AddressFamily = 'IPv6'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $true
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+            Context 'invoking with a mix of the same and different IPv6 Addresses' {
+
+                It 'should be $true' {
+                    $Splat = @{
+                        IPAddress = @('fe80::1', 'fe80::16')
+                        InterfaceAlias = 'Ethernet'
+                        PrefixLength = 64
+                        AddressFamily = 'IPv6'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
                 }
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
