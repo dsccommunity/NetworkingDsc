@@ -62,6 +62,32 @@ try
                         | Should Throw 'Value was either too large or too small for a UInt32.'
                 }
             }
+
+            #region Mocks
+            Mock Get-NetIPAddress -MockWith {
+                $IPAddresses = @('192.168.0.1', '192.168.0.2')
+                [PSCustomObject]@{
+                    IPAddress = $IPAddresses
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    PrefixLength = [byte]24
+                    AddressFamily = 'IPv4'
+                }
+            }
+            #endregion
+
+            Context 'invoking with multiple IP addresses' {
+                It 'should return existing IP details' {
+                    $Splat = @{
+                        IPAddress = @('192.168.0.1', '192.168.0.2')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Get-TargetResource @Splat
+                    $Result.IPAddress | Should Be $Splat.IPAddress
+                    $Result.PrefixLength | Should Be 24
+                }
+            }
         }
 
         Describe "MSFT_xIPAddress\Set-TargetResource" {
