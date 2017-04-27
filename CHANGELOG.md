@@ -8,6 +8,8 @@
 - Added a new example to xDNSServerAddress to clarify setting multiple DNS Servers.
 - Fix examples to correct display in auto documentation generation.
 - Correct example parameters format to meet style guidelines.
+- MSFT_xIPAddress:
+  - Adding support for multiple IP addresses being assigned.
 
 ## 3.2.0.0
 
