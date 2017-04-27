@@ -32,7 +32,6 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $IPAddress,
@@ -91,7 +90,6 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $IPAddress,
@@ -213,7 +211,6 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $IPAddress,
