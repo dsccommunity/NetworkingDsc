@@ -4,10 +4,12 @@ $script:ResourceRootPath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Par
 Import-Module -Name (Join-Path -Path $script:ResourceRootPath -ChildPath 'xNetworking.psd1')
 
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_xIPAddress' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
-
+$localizedDataSplat = @{
+    ResourceName = 'MSFT_xIPAddress'
+    ResourcePath = (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+}
+$localizedData = Get-LocalizedData @localizedDataSplat
+    
 <#
     .SYNOPSIS
     Returns the current state of an IP address assigned to an interface.
@@ -52,9 +54,11 @@ function Get-TargetResource
         $($LocalizedData.GettingIPAddressMessage)
         ) -join '')
 
-    $CurrentIPAddress = Get-NetIPAddress `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily
+    $GetNetIPAddressSplat = @{
+        InterfaceAlias = $InterfaceAlias
+        AddressFamily = $AddressFamily
+    }
+    $CurrentIPAddress = Get-NetIPAddress @GetNetIPAddressSplat
 
     $returnValue = @{
         IPAddress      = [System.String]::Join(', ',$CurrentIPAddress.IPAddress)
@@ -118,10 +122,12 @@ function Set-TargetResource
 
     # Get all the default routes - this has to be done in case the IP Address is
     # being Removed
-    $defaultRoutes = @(Get-NetRoute `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily `
-        -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
+    $GetNetRouteSplat = @{
+        InterfaceAlias = $InterfaceAlias
+        AddressFamily = $AddressFamily
+        ErrorAction = 'Stop'
+    }
+    $defaultRoutes = @(Get-NetRoute @GetNetRouteSplat).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
 
     # Remove any default routes on the specified interface -- it is important to do
     # this *before* removing the IP address, particularly in the case where the IP
@@ -129,33 +135,41 @@ function Set-TargetResource
     if ($defaultRoutes)
     {
         foreach ($defaultRoute in $defaultRoutes) {
-            Remove-NetRoute `
-                -DestinationPrefix $defaultRoute.DestinationPrefix `
-                -NextHop $defaultRoute.NextHop `
-                -InterfaceIndex $defaultRoute.InterfaceIndex `
-                -AddressFamily $defaultRoute.AddressFamily `
-                -Confirm:$false `
-                -ErrorAction Stop
+            $RemoveNetRouteSplat = @{
+                DestinationPrefix = $defaultRoute.DestinationPrefix
+                NextHop = $defaultRoute.NextHop
+                InterfaceIndex = $defaultRoute.InterfaceIndex
+                AddressFamily = $defaultRoute.AddressFamily
+                Confirm = $false
+                ErrorAction = 'Stop'
+            }
+            Remove-NetRoute @RemoveNetRouteSplat
         }
     }
 
     # Get the current IP Address based on the parameters given.
-    $currentIPs = @(Get-NetIPAddress `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily `
-        -ErrorAction Stop)
+    $GetNetIPAddressSplat = @{
+        InterfaceAlias = $InterfaceAlias
+        AddressFamily = $AddressFamily
+        ErrorAction = 'Stop'
+    }
+    $currentIPs = @(Get-NetIPAddress @GetNetIPAddressSplat)
 
     # Remove any IP addresses on the specified interface
     if ($currentIPs)
     {
         foreach ($CurrentIP in $CurrentIPs) {
             if ($CurrentIP -notin $IPAddress) {
-                Remove-NetIPAddress `
-                    -IPAddress $CurrentIP.IPAddress `
-                    -InterfaceIndex $CurrentIP.InterfaceIndex `
-                    -AddressFamily $CurrentIP.AddressFamily `
-                    -Confirm:$false `
-                    -ErrorAction Stop
+                $RemoveNetIPAddressSplat = @{
+                    IPAddress = $CurrentIP.IPAddress
+                    InterfaceIndex = $CurrentIP.InterfaceIndex
+                    AddressFamily = $CurrentIP.AddressFamily
+                    Confirm = $false
+                    ErrorAction = 'Stop'
+                }
+
+                Remove-NetIPAddress @RemoveNetIPAddressSplat
+                    
             }
         }
     }
@@ -233,10 +247,14 @@ function Test-TargetResource
 
     while (-not $adapterBindingReady -and (((Get-Date) - $startTime).TotalSeconds) -lt 30)
     {
-        $currentIPs = @(Get-NetIPAddress `
-            -InterfaceAlias $InterfaceAlias `
-            -AddressFamily $AddressFamily `
-            -ErrorAction SilentlyContinue)
+        $GetNetIPAddressSplat = @{
+            InterfaceAlias = $InterfaceAlias
+            AddressFamily = $AddressFamily
+            ErrorAction = 'SilentlyContinue'
+        }
+
+        $currentIPs = @(Get-NetIPAddress @GetNetIPAddressSplat)
+
         if ($currentIPs)
         {
             $adapterBindingReady = $true
