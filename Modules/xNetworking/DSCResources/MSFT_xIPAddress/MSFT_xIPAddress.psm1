@@ -60,8 +60,8 @@ function Get-TargetResource
     $CurrentIPAddress = Get-NetIPAddress @GetNetIPAddressSplat
 
     $returnValue = @{
-        IPAddress      = $CurrentIPAddress.IPAddress
-        PrefixLength   = [System.String]::Join(', ',$CurrentIPAddress.PrefixLength)
+        IPAddress      = @($CurrentIPAddress.IPAddress)
+        PrefixLength   = [uint32]@($CurrentIPAddress.PrefixLength)[0]
         AddressFamily  = $AddressFamily
         InterfaceAlias = $InterfaceAlias
     }
