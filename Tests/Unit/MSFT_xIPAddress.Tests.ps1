@@ -161,6 +161,76 @@ try
                     Assert-MockCalled -commandName New-NetIPAddress -Exactly 2
                 }
             }
+
+            #region Mocks
+            Mock Get-NetIPAddress -MockWith {
+                [PSCustomObject]@{
+                    IPAddress = 'fe80::15'
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    PrefixLength = [byte]64
+                    AddressFamily = 'IPv6'
+                }
+            }
+
+            Mock New-NetIPAddress
+
+            Mock Get-NetRoute {
+                [PSCustomObject]@{
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    AddressFamily = 'IPv6'
+                    NextHop = 'fe80::16'
+                    DestinationPrefix = '::/0'
+                }
+            }
+
+            Mock Remove-NetIPAddress
+
+            Mock Remove-NetRoute
+            #endregion
+
+            Context 'invoking with valid IPv6 Address' {
+
+                It 'should return $null' {
+                    $Splat = @{
+                        IPAddress = 'fe80::17'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv6'
+                    }
+                    { $Result = Set-TargetResource @Splat } | Should Not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                It 'should call all the mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with multiple valid IPv6 Addresses' {
+
+                It 'should return $null' {
+                    $Splat = @{
+                        IPAddress = @('fe80::17', 'fe80::18')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv6'
+                    }
+                    { $Result = Set-TargetResource @Splat } | Should Not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                It 'should call all the mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 2
+                }
+            }
         }
 
         Describe "MSFT_xIPAddress\Test-TargetResource" {
@@ -227,6 +297,23 @@ try
                     }
                     $Result = Test-TargetResource @Splat
                     $Result | Should Be $true
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with the same IPv4 Address but different prefix length' {
+
+                It 'should be $true' {
+                    $Splat = @{
+                        IPAddress = '192.168.0.15'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                        PrefixLength = 24
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
                 }
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
@@ -494,7 +581,7 @@ try
                 }
             }
 
-            Context 'invoking with IP Address and family mismatch' {
+            Context 'invoking with IPv4 Address and IPv6 family mismatch' {
 
                 It 'should throw an AddressMismatchError error' {
                     $Splat = @{
@@ -505,6 +592,26 @@ try
                     $errorId = 'AddressMismatchError'
                     $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
                     $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f $Splat.IPAddress,$Splat.AddressFamily
+                    $exception = New-Object -TypeName System.InvalidOperationException `
+                        -ArgumentList $errorMessage
+                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                        -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                    { Assert-ResourceProperty @Splat } | Should Throw $errorRecord
+                }
+            }
+
+             Context 'invoking with IPv6 Address and IPv4 family mismatch' {
+
+                It 'should throw an AddressMismatchError error' {
+                    $Splat = @{
+                        IPAddress = 'fe80::15'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $errorId = 'AddressMismatchError'
+                    $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                    $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f $Splat.IPAddress,$Splat.AddressFamily
                     $exception = New-Object -TypeName System.InvalidOperationException `
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
