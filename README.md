@@ -24,7 +24,6 @@ The **xNetworking** module contains the following resources:
 - **xNetAdapterLso**: Enable or disable Lso for different protocols
     on a network adapter.
 
-
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)
 or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any
