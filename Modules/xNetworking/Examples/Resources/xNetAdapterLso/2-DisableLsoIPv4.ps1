@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-    This configuration disables LSO for IPv6 on the network adapter.
+    This configuration disables LSO for IPv4 on the network adapter.
 #>
 Configuration Example
 {
@@ -15,10 +15,10 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetAdapterLso DisableLsoIPv6
+        xNetAdapterLso DisableLsoIPv4
         {
             Name = 'Ethernet'
-            Protocol = 'IPv6'
+            Protocol = 'IPv4'
             State = $false
         }
     }
