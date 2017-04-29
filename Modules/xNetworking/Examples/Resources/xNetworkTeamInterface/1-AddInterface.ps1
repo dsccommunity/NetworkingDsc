@@ -6,7 +6,9 @@ Configuration Example
 {
     param
     (
-        [string[]]$NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking
