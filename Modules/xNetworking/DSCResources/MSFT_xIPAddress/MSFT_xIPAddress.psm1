@@ -100,7 +100,7 @@ function Set-TargetResource
         $InterfaceAlias,
 
         [uInt32]
-        $PrefixLength,
+        $PrefixLength =16,
 
         [ValidateSet('IPv4', 'IPv6')]
         [String]
@@ -116,6 +116,7 @@ function Set-TargetResource
     if ($AddressFamily -eq 'IPv6')
     {
         $DestinationPrefix = '::/0'
+        $PrefixLength = 64
     }
 
     # Get all the default routes - this has to be done in case the IP Address is
@@ -157,11 +158,12 @@ function Set-TargetResource
     if ($currentIPs)
     {
         foreach ($CurrentIP in $CurrentIPs) {
-            if ($CurrentIP -notin $IPAddress) {
+            if ($CurrentIP -notin $IPAddress -and $CurrentIP.PrefixLength -eq $PrefixLength) {
                 $RemoveNetIPAddressSplat = @{
                     IPAddress = $CurrentIP.IPAddress
                     InterfaceIndex = $CurrentIP.InterfaceIndex
                     AddressFamily = $CurrentIP.AddressFamily
+                    PrefixLength = $CurrentIP.PrefixLength
                     Confirm = $false
                     ErrorAction = 'Stop'
                 }

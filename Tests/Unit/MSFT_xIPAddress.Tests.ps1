@@ -231,6 +231,63 @@ try
                     Assert-MockCalled -commandName New-NetIPAddress -Exactly 2
                 }
             }
+
+            #region mocks
+            Mock Get-NetIPAddress -MockWith {
+                $CurrentIPs = @(([PSCustomObject]@{
+                        IPAddress = '192.168.0.1'
+                        InterfaceAlias = 'Ethernet'
+                        InterfaceIndex = 1
+                        PrefixLength = [byte]24
+                        AddressFamily = 'IPv4'
+                    }),([PSCustomObject]@{
+                        IPAddress = '172.16.4.19'
+                        InterfaceAlias = 'Ethernet'
+                        InterfaceIndex = 1
+                        PrefixLength = [byte]16
+                        AddressFamily = 'IPv4'
+                    }))
+                    Return $CurrentIPs
+            }
+
+            Mock New-NetIPAddress
+
+            Mock Get-NetRoute {
+                [PSCustomObject]@{
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    AddressFamily = 'IPv4'
+                    NextHop = '192.168.0.254'
+                    DestinationPrefix = '0.0.0.0/0'
+                }
+            }
+
+            Mock Remove-NetIPAddress
+
+            Mock Remove-NetRoute
+            #endregion
+
+            Context "Invoking with different prefixes" {
+                it "should return null" {
+                    $Splat = @{
+                        IPAddress = '10.0.0.2'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                        PrefixLength = 24
+                    }
+                    { $Result = Set-TargetResource @Splat} | Should not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                it "should call all mocks" {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 1
+                }
+            }
+            
         }
 
         Describe "MSFT_xIPAddress\Test-TargetResource" {
