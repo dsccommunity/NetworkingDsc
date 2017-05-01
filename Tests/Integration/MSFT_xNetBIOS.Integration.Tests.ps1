@@ -22,26 +22,25 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     #region Integration Tests
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+    . $configFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
         #region DEFAULT TESTS
         It 'Should compile without throwing' {
             {
                 & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
-                Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+                Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force } | Should Not Throw
         }
 
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
         }
         #endregion
 
         It 'Should have set the resource and all setting should match current state' {
-            $Live = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
-            $Live.Setting | should be $Current #Current is defined in MSFT_NetBIOS.config.ps1
+            $live = Get-DscConfiguration | Where-Object ConfigurationName -eq "$($script:DSCResourceName)_Config"
+            $live.Setting | should be $Current #Current is defined in MSFT_NetBIOS.config.ps1
         }
     }
     #endregion
