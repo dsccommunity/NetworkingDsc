@@ -343,12 +343,13 @@ function Test-TargetResource
 
     $NewName = $PSBoundParameters.NewName
     $null = $PSBoundParameters.Remove('NewName')
-
-    $adapter = Find-NetworkAdapter `
-        @PSBoundParameters `
-        -ErrorAction SilentlyContinue
-    
-    if (-not ($adapter))
+    try 
+    { 
+        $adapter = Find-NetworkAdapter `
+            @PSBoundParameters `
+            -ErrorAction Stop
+    }    
+    Catch
     {
         $PSBoundParameters.Name = $NewName
         $adapter = Find-NetworkAdapter `
