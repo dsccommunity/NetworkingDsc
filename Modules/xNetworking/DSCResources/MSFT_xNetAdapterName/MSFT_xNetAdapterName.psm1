@@ -350,6 +350,7 @@ function Test-TargetResource
     
     if (-not ($adapter))
     {
+        $PSBoundParameters.Name = $NewName
         $adapter = Find-NetworkAdapter `
             @PSBoundParameters `
             -ErrorAction Stop
