@@ -61,6 +61,8 @@ try
                     -ConfigurationData $configData
                 Start-DscConfiguration -Path $TestDrive `
                     -ComputerName localhost -Wait -Verbose -Force
+                Start-DscConfiguration -Path $TestDrive `
+                    -ComputerName localhost -Wait -Verbose -Force
             } | Should Not Throw
         }
 
@@ -72,33 +74,6 @@ try
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
             $current.Name                     | Should Be $newAdapterName
-        }
-
-        It 'should compile and apply the MOF a second time without throwing' {
-            {
-                # This is to pass to the Config
-                $configData = @{
-                    AllNodes = @(
-                        @{
-                            NodeName             = 'localhost'
-                            NewName              = $newAdapterName
-                            Name                 = $adapter.Name
-                            PhysicalMediaType    = $adapter.PhysicalMediaType
-                            Status               = $adapter.Status
-                            MacAddress           = $adapter.MacAddress
-                            InterfaceDescription = $adapter.InterfaceDescription
-                            InterfaceIndex       = $adapter.InterfaceIndex
-                            InterfaceGuid        = $adapter.InterfaceGuid
-                        }
-                    )
-                }
-
-                & "$($script:DSCResourceName)_Config" `
-                    -OutputPath $TestDrive `
-                    -ConfigurationData $configData
-                Start-DscConfiguration -Path $TestDrive `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should Not Throw
         }
 
         AfterAll {
