@@ -341,12 +341,19 @@ function Test-TargetResource
         $($LocalizedData.TestingNetAdapterNameMessage)
         ) -join '')
 
+    $NewName = $PSBoundParameters.NewName
     $null = $PSBoundParameters.Remove('NewName')
 
     $adapter = Find-NetworkAdapter `
         @PSBoundParameters `
-        -ErrorAction Stop
-
+        -ErrorAction SilentlyContinue
+    
+    if (-not ($adapter))
+    {
+        $adapter = Find-NetworkAdapter `
+            @PSBoundParameters `
+            -ErrorAction Stop
+    }
     if ($adapter.Name -eq $NewName)
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
