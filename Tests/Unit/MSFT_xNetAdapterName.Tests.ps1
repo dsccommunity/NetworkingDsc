@@ -168,7 +168,7 @@ try
                 }
 
                 It 'Should call all the mocks' {
-                    Assert-MockCalled -commandName Find-NetworkAdapter -Exactly 1
+                    Assert-MockCalled -commandName Find-NetworkAdapter -Exactly 2
                 }
             }
         }
