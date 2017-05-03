@@ -29,7 +29,7 @@ FunctionsToExport = '*'
 # Cmdlets to export from this module
 CmdletsToExport = '*'
 
-NestedModules = @('Modules\NetworkingDsc.Common\NetworkingDsc.Common.psm1','Modules\NetworkingDsc.ResourceHelper\NetworkingDsc.ResourceHelper.psm1','xNetworkAdapter.psm1')
+NestedModules = @('Modules\NetworkingDsc.Common\NetworkingDsc.Common.psm1','Modules\NetworkingDsc.ResourceHelper\NetworkingDsc.ResourceHelper.psm1')
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 PrivateData = @{

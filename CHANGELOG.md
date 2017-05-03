@@ -7,6 +7,12 @@
 - Added CodeCov.io support.
 - Added a new example to xDNSServerAddress to clarify setting multiple DNS Servers.
 - Fix examples to correct display in auto documentation generation.
+- BREAKING CHANGE: Migrated xNetworkAdapter module functionality to xNetAdapterName
+  resource.
+- Added CommonTestHelper module for aiding testing.
+- MSFT_xNetAdapterName:
+  - Created new resource for renaming network adapters.
+  - Added Find-NetAdapter cmdlet to NetworkingDsc.Common.
 - Correct example parameters format to meet style guidelines.
 
 ## 3.2.0.0
