@@ -155,16 +155,16 @@ try
                 }
             }
 
-            Context 'Matching adapter can be found and has wrong Name' {
+            Context 'Adapter name changed by Set-TargetResource' {
                 Mock -CommandName Find-NetworkAdapter -MockWith { $PSCmdlet.ThrowTerminatingError('Wrong Adapter') } -ParameterFilter {$Name -and $Name -eq $script:adapterName}
-                Mock -CommandName Find-NetworkAdapter -MockWith { $script:mockAdapter } -ParameterFilter {$Name -and $Name -eq $script:newAdapterName}
+                Mock -CommandName Find-NetworkAdapter -MockWith { $script:mockRenamedAdapter } -ParameterFilter {$Name -and $Name -eq $script:newAdapterName}
 
                 It 'should not throw' {
                     { $script:result = Test-TargetResource @adapterParameters -Verbose } | Should Not Throw
                 }
 
                 It 'should return false' {
-                    $script:result                      | Should Be $false
+                    $script:result                      | Should Be $True
                 }
 
                 It 'Should call all the mocks' {
