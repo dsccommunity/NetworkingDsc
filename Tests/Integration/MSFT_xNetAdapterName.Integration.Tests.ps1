@@ -61,9 +61,12 @@ try
                     -ConfigurationData $configData
                 Start-DscConfiguration -Path $TestDrive `
                     -ComputerName localhost -Wait -Verbose -Force
-                Start-DscConfiguration -Path $TestDrive `
-                    -ComputerName localhost -Wait -Verbose -Force
             } | Should Not Throw
+        }
+
+        it 'should reapply the MOF without throwing' {
+            {Start-DscConfiguration -Path $TestDrive `
+                -ComputerName localhost -Wait -Verbose -Force} | Should Not Throw
         }
 
         It 'should be able to call Get-DscConfiguration without throwing' {

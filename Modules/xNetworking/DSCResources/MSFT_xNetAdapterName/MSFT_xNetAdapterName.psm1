@@ -341,7 +341,6 @@ function Test-TargetResource
         $($LocalizedData.TestingNetAdapterNameMessage)
         ) -join '')
 
-    $NewName = $PSBoundParameters.NewName
     $null = $PSBoundParameters.Remove('NewName')
     try 
     { 
@@ -349,7 +348,7 @@ function Test-TargetResource
             @PSBoundParameters `
             -ErrorAction Stop
     }    
-    Catch
+    catch
     {
         $PSBoundParameters.Name = $NewName
         $adapter = Find-NetworkAdapter `
