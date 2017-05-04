@@ -64,6 +64,11 @@ try
             } | Should Not Throw
         }
 
+        it 'should reapply the MOF without throwing' {
+            {Start-DscConfiguration -Path $TestDrive `
+                -ComputerName localhost -Wait -Verbose -Force} | Should Not Throw
+        }
+
         It 'should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
