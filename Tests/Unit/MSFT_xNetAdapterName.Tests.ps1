@@ -76,11 +76,39 @@ try
         }
 
         Describe "MSFT_xNetAdapterName\Get-TargetResource" {
-            Context 'Matching adapter can be found' {
-                Mock -CommandName Find-NetworkAdapter -MockWith { $script:mockAdapter }
+            Context 'Renamed adapter can be found' {
+                Mock -CommandName Find-NetworkAdapter -MockWith { $script:mockRenamedAdapter } `
+                    -ParameterFilter { $Name -eq $script:newAdapterName }
 
                 It 'should not throw' {
                     { $script:result = Get-TargetResource @adapterParameters -Verbose } | Should Not Throw
+                }
+
+                It 'should return existing adapter' {
+                    $script:result.Name                 | Should Be $script:mockRenamedAdapter.Name
+                    $script:result.PhysicalMediaType    | Should Be $script:mockRenamedAdapter.PhysicalMediaType
+                    $script:result.Status               | Should Be $script:mockRenamedAdapter.Status
+                    $script:result.MacAddress           | Should Be $script:mockRenamedAdapter.MacAddress
+                    $script:result.InterfaceDescription | Should Be $script:mockRenamedAdapter.InterfaceDescription
+                    $script:result.InterfaceIndex       | Should Be $script:mockRenamedAdapter.InterfaceIndex
+                    $script:result.InterfaceGuid        | Should Be $script:mockRenamedAdapter.InterfaceGuid
+                    $script:result.DriverDescription    | Should Be $script:mockRenamedAdapter.DriverDescription
+                }
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Find-NetworkAdapter -Exactly 1 `
+                        -ParameterFilter { $Name -eq $script:newAdapterName }
+                }
+            }
+
+            Context 'Renamed adapter not found but matching adapter can be found' {
+                Mock -CommandName Find-NetworkAdapter `
+                    -ParameterFilter { $Name -eq $script:newAdapterName }
+                Mock -CommandName Find-NetworkAdapter -MockWith { $script:mockAdapter } `
+                    -ParameterFilter { $Name -eq $script:adapterName }
+
+                It 'should not throw' {
+                    { $script:result = Get-TargetResource -Name $script:adapterName -NewName $script:newAdapterName -Verbose } | Should Not Throw
                 }
 
                 It 'should return existing adapter' {
@@ -95,7 +123,10 @@ try
                 }
 
                 It 'Should call all the mocks' {
-                    Assert-MockCalled -commandName Find-NetworkAdapter -Exactly 1
+                    Assert-MockCalled -commandName Find-NetworkAdapter -Exactly 1 `
+                        -ParameterFilter { $Name -eq $script:adapterName }
+                    Assert-MockCalled -commandName Find-NetworkAdapter -Exactly 1 `
+                        -ParameterFilter { $Name -eq $script:newAdapterName }
                 }
             }
         }
