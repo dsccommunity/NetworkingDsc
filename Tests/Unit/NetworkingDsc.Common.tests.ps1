@@ -106,23 +106,6 @@ try
             $adapterArray = @( $nomatchAdapter, $matchAdapter )
             $multipleMatchingAdapterArray = @( $matchAdapter, $matchAdapter )
 
-            Context 'No parameters are passed' {
-                Mock `
-                    -CommandName Get-NetAdapter `
-                    -MockWith { $adapterArray }
-
-                $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetAdapterParameterError)
-
-                It 'should throw exception' {
-                    { $script:result = Find-NetworkAdapter -Verbose } | Should Throw $errorRecord
-                }
-
-                It 'should call expected mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 0
-                }
-            }
-
             Context 'Name is passed and one adapter matches' {
                 Mock `
                     -CommandName Get-NetAdapter `
@@ -396,6 +379,41 @@ try
 
                 It 'should throw exception' {
                     { $script:result = Find-NetworkAdapter -DriverDescription 'NOMATCH' -Verbose } | Should Throw $errorRecord
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                }
+            }
+
+            Context 'No parameters are passed and multiple Adapters adapters match but IgnoreMultipleMatchingAdapters is not set' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $adapterArray }
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.MultipleMatchingNetAdapterFound -f 2)
+
+                It 'should throw exception' {
+                    { $script:result = Find-NetworkAdapter -Verbose } | Should Throw $errorRecord
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                }
+            }
+
+            Context 'No parameters are passed and multiple Adapters adapters match and IgnoreMultipleMatchingAdapters is set and interface number is 2' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $adapterArray }
+
+                It 'should throw exception' {
+                    { $script:result = Find-NetworkAdapter -IgnoreMultipleMatchingAdapters:$true -InterfaceNumber 2 -Verbose } | Should Not Throw
+                }
+
+                It 'should return expected adapter' {
+                    $script:result.Name | Should Be $adapterName
                 }
 
                 It 'should call expected mocks' {

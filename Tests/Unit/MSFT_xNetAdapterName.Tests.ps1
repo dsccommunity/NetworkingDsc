@@ -139,8 +139,11 @@ try
                 }
             }
 
-            Context 'Matching adapter can be found and has wrong Name' {
-                Mock -CommandName Find-NetworkAdapter -MockWith { $script:mockAdapter }
+            Context 'Renamed adapter does not exist, but matching adapter can be found and has wrong Name' {
+                Mock -CommandName Find-NetworkAdapter -MockWith { $script:mockAdapter } `
+                    -ParameterFilter {$Name -and $Name -eq $script:AdapterName}
+                Mock -CommandName Find-NetworkAdapter -MockWith { } `
+                    -ParameterFilter {$Name -and $Name -eq $script:newAdapterName}
 
                 It 'should not throw' {
                     { $script:result = Test-TargetResource @adapterParameters -Verbose } | Should Not Throw
@@ -151,13 +154,16 @@ try
                 }
 
                 It 'Should call all the mocks' {
-                    Assert-MockCalled -commandName Find-NetworkAdapter -Exactly 1
+                    Assert-MockCalled -commandName Find-NetworkAdapter -Exactly 1 `
+                        -ParameterFilter {$Name -and $Name -eq $script:AdapterName}
+                    Assert-MockCalled -commandName Find-NetworkAdapter -Exactly 1 `
+                        -ParameterFilter {$Name -and $Name -eq $script:newAdapterName}
                 }
             }
 
             Context 'Adapter name changed by Set-TargetResource' {
-                Mock -CommandName Find-NetworkAdapter -MockWith { $PSCmdlet.ThrowTerminatingError('Wrong Adapter') } -ParameterFilter {$Name -and $Name -eq $script:adapterName}
-                Mock -CommandName Find-NetworkAdapter -MockWith { $script:mockRenamedAdapter } -ParameterFilter {$Name -and $Name -eq $script:newAdapterName}
+                Mock -CommandName Find-NetworkAdapter -MockWith { $script:mockRenamedAdapter } `
+                    -ParameterFilter {$Name -and $Name -eq $script:newAdapterName}
 
                 It 'should not throw' {
                     { $script:result = Test-TargetResource @adapterParameters -Verbose } | Should Not Throw
@@ -168,7 +174,8 @@ try
                 }
 
                 It 'Should call all the mocks' {
-                    Assert-MockCalled -commandName Find-NetworkAdapter -Exactly 2
+                    Assert-MockCalled -commandName Find-NetworkAdapter -Exactly 1 `
+                        -ParameterFilter {$Name -and $Name -eq $script:newAdapterName}
                 }
             }
         }

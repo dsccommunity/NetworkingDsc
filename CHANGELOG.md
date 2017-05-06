@@ -14,6 +14,12 @@
   - Created new resource for renaming network adapters.
   - Added Find-NetAdapter cmdlet to NetworkingDsc.Common.
 - Correct example parameters format to meet style guidelines.
+- Find-NetworkAdapter:
+  - Fixed to return null if exception thrown.
+  - Allowed passing no selection parameters.
+- MSFT_xNetAdapterName:
+  - Fixed bug in Get-TargetResource when Name is the only adapter selector parameter.
+  - Improved verbose logging.
 
 ## 3.2.0.0
 
