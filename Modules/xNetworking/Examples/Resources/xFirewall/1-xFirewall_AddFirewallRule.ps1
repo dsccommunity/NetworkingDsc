@@ -2,11 +2,13 @@
     .EXAMPLE
     Allow notepad to access ports on the Domain and Private Profiles
 #>
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking

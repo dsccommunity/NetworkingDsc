@@ -2,11 +2,13 @@
     .EXAMPLE
     Disable NetBios on Adapter
 #>
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DscResource -ModuleName xNetworking

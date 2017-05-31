@@ -2,12 +2,13 @@
     .EXAMPLE
     Adding a firewall to an existing Firewall group 'My Firewall Rule'
 #>
-
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking
@@ -31,4 +32,4 @@ configuration Example
             Profile               = ('Domain', 'Private')
         }
     }
- }
+}

@@ -2,12 +2,13 @@
     .EXAMPLE
     Disabling IPv6 for the Ethernet adapter
 #>
-
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]]$NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking

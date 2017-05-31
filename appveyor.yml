@@ -3,13 +3,13 @@
 #---------------------------------#
 version: 3.1.{build}.0
 install:
-    - appveyor DownloadFile https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
-    - npm install -g gulp
-    - npm install
-    
+    - git clone https://github.com/PowerShell/DscResource.Tests
+
     - ps: |
-        Import-Module "$env:APPVEYOR_BUILD_FOLDER\.appveyor\appveyor.psm1"
-        Start-AppveyorInstallTask
+        $moduleName = 'xNetworking'
+        $mainModuleFolder = "Modules\$moduleName"
+        Import-Module "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
+        Invoke-AppveyorInstallTask
 
 #---------------------------------#
 #      build configuration        #
@@ -23,7 +23,10 @@ build: false
 
 test_script:
     - ps: |
-        Start-AppveyorTestScriptTask
+        Invoke-AppveyorTestScriptTask `
+            -Type 'Harness' `
+            -MainModulePath $mainModuleFolder `
+            -CodeCovIo
 
 #---------------------------------#
 #      deployment configuration   #
@@ -32,4 +35,7 @@ test_script:
 # scripts to run before deployment
 deploy_script:
     - ps: |
-        Start-AppveyorAfterTestTask
+        Invoke-AppveyorAfterTestTask `
+            -Type 'Wiki' `
+            -MainModulePath $mainModuleFolder `
+            -ResourceModuleName $moduleName

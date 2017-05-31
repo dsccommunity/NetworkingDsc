@@ -1,6 +1,7 @@
 # xNetworking
 
 [![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xnetworking/branch/master)
+[![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking)
 
 The **xNetworking** module contains the following resources:
 
@@ -20,6 +21,8 @@ The **xNetworking** module contains the following resources:
 - **xNetAdapterBinding**: Bind or unbind transport or filters to a network interface.
 - **xDnsClientGlobalSetting**: Configure DNS client global settings.
 - **xNetAdapterRDMA**: Enable or disable RDMA on a network adapter.
+- **xNetAdapterLso**: Enable or disable Lso for different protocols
+    on a network adapter.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)

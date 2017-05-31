@@ -2,11 +2,13 @@
     .EXAMPLE
     Sets the Ethernet adapter to Public and IPv4/6 to Internet Connectivity
 #>
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DscResource -Module xNetworking

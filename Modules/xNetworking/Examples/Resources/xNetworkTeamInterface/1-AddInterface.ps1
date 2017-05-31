@@ -2,11 +2,13 @@
     .EXAMPLE
     Add New Network Team Interface
 #>
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]]$NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking
@@ -31,4 +33,4 @@ configuration Example
             DependsOn = '[xNetworkTeam]HostTeam'
         }
     }
- }
+}

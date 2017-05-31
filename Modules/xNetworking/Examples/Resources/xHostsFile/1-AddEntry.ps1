@@ -2,11 +2,12 @@
     .EXAMPLE
     Add a new host to the host file
 #>
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]]
+        [Parameter()]
+        [System.String[]]
         $NodeName = 'localhost'
     )
 
@@ -21,4 +22,4 @@ configuration Example
             Ensure    = 'Present'
         }
     }
- }
+}

@@ -2,11 +2,13 @@
     .EXAMPLE
     Disabling DHCP and adding a static IP Address for IPv6
 #>
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DscResource -Module xNetworking

@@ -2,11 +2,12 @@
     .EXAMPLE
     Remove a host from the hosts file
 #>
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]]
+        [Parameter()]
+        [System.String[]]
         $NodeName = 'localhost'
     )
 
@@ -21,4 +22,4 @@ configuration Example
             Ensure    = 'Absent'
         }
     }
- }
+}

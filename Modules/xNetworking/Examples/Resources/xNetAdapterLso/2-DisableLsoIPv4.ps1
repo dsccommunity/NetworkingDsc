@@ -1,13 +1,13 @@
 <#
     .EXAMPLE
-    This configuration enables RDMA setting on the network adapter.
+    This configuration disables LSO for IPv4 on the network adapter.
 #>
 Configuration Example
 {
     param
     (
         [Parameter()]
-        [System.String[]]
+        [System.String[]] 
         $NodeName = 'localhost'
     )
 
@@ -15,10 +15,11 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetAdapterRDMA SMBAdapter1
+        xNetAdapterLso DisableLsoIPv4
         {
-            Name = 'SMB1_1'
-            Enabled = $true
+            Name = 'Ethernet'
+            Protocol = 'IPv4'
+            State = $false
         }
     }
 }
