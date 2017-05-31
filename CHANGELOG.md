@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.0.0
+
 - Converted to use AppVeyor.psm1 in DSCResource.Tests repository.
 - Converted to use Example and Markdown tests in DSCResource.Tests repository.
 - Added CodeCov.io support.
