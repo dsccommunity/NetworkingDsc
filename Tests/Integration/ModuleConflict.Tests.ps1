@@ -3,7 +3,7 @@ $script:DSCModuleName      = 'xNetworking'
     These integration tests ensure that exported cmdlets names do not conflict
     with any other names that are exposed by other common resource kit modules.
 #>
-$script:ModulesToTest = @( 'xStorage','xCertificate','xComputerManagement','xDFS' )
+$script:ModulesToTest = @( 'xStorage','xComputerManagement','xDFS' )
 
 #region HEADER
 # Integration Test Template Version: 1.1.0
@@ -33,7 +33,7 @@ try
         {
             It "Should be able to install DSC Resource module '$moduleToTest'" {
                 {
-                    Install-Module -Name $moduleToTest -Verbose -ErrorAction Stop
+                    Install-Module -Name $moduleToTest -ErrorAction Stop
                 } | Should not throw
             }
         }
