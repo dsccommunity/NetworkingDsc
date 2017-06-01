@@ -33,7 +33,7 @@ try
         {
             It "Should not contain any conlficting cmdlet names with '$moduleToTest'" {
                 {
-                    Install-Module -Name $moduleToTest -Force -ErrorAction Stop
+                    Install-Module -Name $moduleToTest -ErrorAction Stop
                 } | Should not throw
             }
         }
