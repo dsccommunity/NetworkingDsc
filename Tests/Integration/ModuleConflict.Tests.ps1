@@ -34,7 +34,7 @@ try
             It "Should be able to install DSC Resource module '$moduleToTest'" {
                 {
                     Install-Module -Name $moduleToTest -ErrorAction Stop
-                } | Should not throw
+                } | Should Not Throw
             }
         }
     }
