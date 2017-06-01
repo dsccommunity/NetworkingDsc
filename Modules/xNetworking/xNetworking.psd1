@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '4.0.0.0'
+ModuleVersion = '4.1.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -50,18 +50,9 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- Converted to use AppVeyor.psm1 in DSCResource.Tests repository.
-- Converted to use Example and Markdown tests in DSCResource.Tests repository.
-- Added CodeCov.io support.
-- Added a new example to xDNSServerAddress to clarify setting multiple DNS Servers.
-- Fix examples to correct display in auto documentation generation.
-- BREAKING CHANGE: Migrated xNetworkAdapter module functionality to xNetAdapterName
-  resource.
-- Added CommonTestHelper module for aiding testing.
-- MSFT_xNetAdapterName:
-  - Created new resource for renaming network adapters.
-  - Added Find-NetAdapter cmdlet to NetworkingDsc.Common.
-- Correct example parameters format to meet style guidelines.
+        ReleaseNotes = '- Added integration test to test for conflicts with other common resource kit modules.
+- Prevented ResourceHelper and Common module cmdlets from being exported to resolve
+  conflicts with other resource modules.
 
 '
 
@@ -69,6 +60,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 

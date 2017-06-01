@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.1.0.0
+
 - Added integration test to test for conflicts with other common resource kit modules.
 - Prevented ResourceHelper and Common module cmdlets from being exported to resolve
   conflicts with other resource modules.
