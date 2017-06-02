@@ -111,15 +111,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -Name $adapterName -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -132,11 +132,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -Name 'NOMATCH' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -146,15 +146,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -167,11 +167,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType 'NOMATCH' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -181,15 +181,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -Status $adapterStatus -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -202,11 +202,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -Status 'Disabled' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -216,15 +216,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -MacAddress $adapterMacAddress -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -237,11 +237,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -MacAddress '00-00-00-00-00-00' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -251,15 +251,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceDescription $adapterInterfaceDescription -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -272,11 +272,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceDescription 'NOMATCH' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -286,15 +286,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceIndex $adapterInterfaceIndex -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -307,11 +307,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceIndex 99 -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -321,15 +321,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceGuid $adapterInterfaceGuid -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -342,11 +342,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceGuid 'NOMATCH' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -356,15 +356,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -DriverDescription $adapterDriverDescription -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -377,11 +377,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -DriverDescription 'NOMATCH' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -394,11 +394,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.MultipleMatchingNetAdapterFound -f 2)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -408,15 +408,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -IgnoreMultipleMatchingAdapters:$true -InterfaceNumber 2 -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -429,11 +429,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.MultipleMatchingNetAdapterFound -f 2)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -443,15 +443,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $multipleMatchingAdapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -IgnoreMultipleMatchingAdapters:$true -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -464,11 +464,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.InvalidNetAdapterNumberError -f 2,3)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -IgnoreMultipleMatchingAdapters:$true -InterfaceNumber 3 -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }

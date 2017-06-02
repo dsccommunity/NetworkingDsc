@@ -119,7 +119,12 @@ function Get-TargetResource
 
     if (-not $adapter)
     {
-        $PSBoundParameters.Remove('NewName')
+        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+            $($LocalizedData.FindNetAdapterMessage)
+            ) -join '')
+
+        $null = $PSBoundParameters.Remove('NewName')
+
         $adapter = Find-NetworkAdapter `
             @PSBoundParameters `
             -ErrorAction Stop
@@ -375,6 +380,10 @@ function Test-TargetResource
     else
     {
         # Find an adapter matching the parameters - throw if none can be found
+        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+            $($LocalizedData.FindNetAdapterMessage)
+            ) -join '')
+
         $adapter = Find-NetworkAdapter `
             @PSBoundParameters `
             -ErrorAction Stop

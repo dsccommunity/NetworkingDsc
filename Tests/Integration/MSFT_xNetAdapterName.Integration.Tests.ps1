@@ -37,7 +37,7 @@ try
         }
 
         #region DEFAULT TESTS
-        It 'should compile and apply the MOF without throwing' {
+        It 'Should compile and apply the MOF without throwing' {
             {
                 # This is to pass to the Config
                 $configData = @{
@@ -59,6 +59,7 @@ try
                 & "$($script:DSCResourceName)_Config_All" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
+
                 Start-DscConfiguration -Path $TestDrive `
                     -ComputerName localhost -Wait -Verbose -Force
             } | Should Not Throw
@@ -69,7 +70,7 @@ try
                 -ComputerName localhost -Wait -Verbose -Force } | Should Not Throw
         }
 
-        It 'should be able to call Get-DscConfiguration without throwing' {
+        It 'Should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
         #endregion
@@ -100,7 +101,7 @@ try
         }
 
         #region DEFAULT TESTS
-        It 'should compile and apply the MOF without throwing' {
+        It 'Should compile and apply the MOF without throwing' {
             {
                 # This is to pass to the Config
                 $configData = @{
@@ -116,6 +117,7 @@ try
                 & "$($script:DSCResourceName)_Config_NameOnly" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
+
                 Start-DscConfiguration -Path $TestDrive `
                     -ComputerName localhost -Wait -Verbose -Force
             } | Should Not Throw
@@ -126,7 +128,7 @@ try
                 -ComputerName localhost -Wait -Verbose -Force } | Should Not Throw
         }
 
-        It 'should be able to call Get-DscConfiguration without throwing' {
+        It 'Should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
         #endregion

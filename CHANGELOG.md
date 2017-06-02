@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- MSFT_xNetAdapterName:
+  - More improvements to verbose logging.
+
 ## 4.1.0.0
 
 - Added integration test to test for conflicts with other common resource kit modules.

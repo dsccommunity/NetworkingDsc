@@ -220,6 +220,8 @@ function Find-NetworkAdapter
     {
         New-InvalidOperationException `
             -Message ($LocalizedData.NetAdapterNotFoundError)
+        
+        # Return a null so that ErrorAction SilentlyContinue works correctly
         return $null
     }
     else
@@ -238,6 +240,8 @@ function Find-NetworkAdapter
                     New-InvalidOperationException `
                         -Message ($LocalizedData.InvalidNetAdapterNumberError `
                             -f $matchingAdapters.Count,$InterfaceNumber)
+                    
+                    # Return a null so that ErrorAction SilentlyContinue works correctly
                     return $null
                 } # if
             }
@@ -246,6 +250,8 @@ function Find-NetworkAdapter
                 New-InvalidOperationException `
                     -Message ($LocalizedData.MultipleMatchingNetAdapterFound `
                         -f $matchingAdapters.Count)
+
+                # Return a null so that ErrorAction SilentlyContinue works correctly
                 return $null
             } # if
         } # if
