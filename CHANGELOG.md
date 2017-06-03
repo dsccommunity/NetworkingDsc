@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added Get-DnsClientServerStaticAddress to NetworkingDsc.Common to return statically
+  assigned DNS server addresses to support fix for [issue 113](https://github.com/PowerShell/xNetworking/issues/113).
+
 ## 4.1.0.0
 
 - Added integration test to test for conflicts with other common resource kit modules.

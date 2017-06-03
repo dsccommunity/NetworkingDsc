@@ -69,7 +69,7 @@ try
     <#
         InModuleScope has to be used to enable the Get-NetAdapter Mock
         This is because forcing the ModuleName in the Mock command throws
-        an exception because the GetAdapter module has not manifest
+        an exception because the GetAdapter module has no manifest
     #>
     InModuleScope $script:ModuleName {
         Describe "NetworkingDsc.Common\Find-NetworkAdapter" {
@@ -452,6 +452,199 @@ try
 
                 It 'should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region Function Get-DnsClientServerStaticAddress
+    <#
+        InModuleScope has to be used to enable the Get-NetAdapter Mock
+        This is because forcing the ModuleName in the Mock command throws
+        an exception because the GetAdapter module has no manifest
+    #>
+    InModuleScope $script:ModuleName {
+        Describe "NetworkingDsc.Common\Get-DnsClientServerStaticAddress" {
+
+            # Generate the adapter data to be used for Mocking
+            $interfaceAlias = 'Adapter'
+            $interfaceGuid = [Guid]::NewGuid().ToString()
+            $nomatchAdapter = $null
+            $matchAdapter = [PSObject]@{
+                InterfaceGuid        = $interfaceGuid
+            }
+            $ipv4Parameters = @{
+                InterfaceAlias = $interfaceAlias
+                AddressFamily  = 'IPv4'
+            }
+            $ipv6Parameters = @{
+                InterfaceAlias = $interfaceAlias
+                AddressFamily  = 'IPv6'
+            }
+            $noIpv4StaticAddressString = ''
+            $oneIpv4StaticAddressString = '8.8.8.8'
+            $secondIpv4StaticAddressString = '4.4.4.4'
+            $twoIpv4StaticAddressString = "$oneIpv4StaticAddressString,$secondIpv4StaticAddressString"
+            $noIpv6StaticAddressString = ''
+            $oneIpv6StaticAddressString = '::1'
+            $secondIpv6StaticAddressString = '::2'
+            $twoIpv6StaticAddressString = "$oneIpv6StaticAddressString,$secondIpv6StaticAddressString"
+
+            Context 'Interface Alias does not match adapter in system' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $nomatchAdapter }
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.InterfaceAliasNotFoundError -f $interfaceAlias)
+
+                It 'should throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Throw $errorRecord
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                }
+            }
+
+            Context 'Interface Alias was found in system but IPv4 NameServer is empty' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $matchAdapter }
+
+                Mock `
+                    -CommandName Get-ItemPropertyValue `
+                    -MockWith { $noIpv4StaticAddressString }
+
+                It 'should not throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
+                }
+
+                It 'should return null' {
+                    $script:result | Should BeNullOrEmpty
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemPropertyValue -Exactly -Times 1
+                }
+            }
+
+            Context 'Interface Alias was found in system but IPv4 NameServer contains one DNS entry' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $matchAdapter }
+
+                Mock `
+                    -CommandName Get-ItemPropertyValue `
+                    -MockWith { $oneIpv4StaticAddressString }
+
+                It 'should not throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
+                }
+
+                It 'should return expected address' {
+                    $script:result | Should Be $oneIpv4StaticAddressString
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemPropertyValue -Exactly -Times 1
+                }
+            }
+
+            Context 'Interface Alias was found in system but IPv4 NameServer contains two DNS entries' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $matchAdapter }
+
+                Mock `
+                    -CommandName Get-ItemPropertyValue `
+                    -MockWith { $twoIpv4StaticAddressString }
+
+                It 'should not throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
+                }
+
+                It 'should return two expected addresses' {
+                    $script:result[0] | Should Be $oneIpv4StaticAddressString
+                    $script:result[1] | Should Be $secondIpv4StaticAddressString
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemPropertyValue -Exactly -Times 1
+                }
+            }
+
+            Context 'Interface Alias was found in system but IPv6 NameServer is empty' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $matchAdapter }
+
+                Mock `
+                    -CommandName Get-ItemPropertyValue `
+                    -MockWith { $noIpv6StaticAddressString }
+
+                It 'should not throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
+                }
+
+                It 'should return null' {
+                    $script:result | Should BeNullOrEmpty
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemPropertyValue -Exactly -Times 1
+                }
+            }
+
+            Context 'Interface Alias was found in system but IPv6 NameServer contains one DNS entry' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $matchAdapter }
+
+                Mock `
+                    -CommandName Get-ItemPropertyValue `
+                    -MockWith { $oneIpv6StaticAddressString }
+
+                It 'should not throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
+                }
+
+                It 'should return expected address' {
+                    $script:result | Should Be $oneIpv6StaticAddressString
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemPropertyValue -Exactly -Times 1
+                }
+            }
+
+            Context 'Interface Alias was found in system but IPv6 NameServer contains two DNS entries' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $matchAdapter }
+
+                Mock `
+                    -CommandName Get-ItemPropertyValue `
+                    -MockWith { $twoIpv6StaticAddressString }
+
+                It 'should not throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
+                }
+
+                It 'should return two expected addresses' {
+                    $script:result[0] | Should Be $oneIpv6StaticAddressString
+                    $script:result[1] | Should Be $secondIpv6StaticAddressString
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemPropertyValue -Exactly -Times 1
                 }
             }
         }

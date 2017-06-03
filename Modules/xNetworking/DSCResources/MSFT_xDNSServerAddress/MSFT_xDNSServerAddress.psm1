@@ -111,13 +111,13 @@ function Set-TargetResource
         $($LocalizedData.ApplyingDNSServerAddressesMessage)
         ) -join '')
 
-    #Get the current DNS Server Addresses based on the parameters given.
+    # Get the current DNS Server Addresses based on the parameters given.
     $PSBoundParameters.Remove('Address')
     $PSBoundParameters.Remove('Validate')
     $currentAddress = (Get-DnsClientServerAddress @PSBoundParameters `
         -ErrorAction Stop).ServerAddresses
 
-    #Check if the Server addresses are the same as the desired addresses.
+    # Check if the Server addresses are the same as the desired addresses.
     [Boolean] $addressDifferent = (@(Compare-Object `
             -ReferenceObject $currentAddress `
             -DifferenceObject $Address `
@@ -140,7 +140,7 @@ function Set-TargetResource
     }
     else
     {
-        #Test will return true in this case
+        # Test will return true in this case
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($LocalizedData.DNSServersAlreadySetMessage)
             ) -join '' )
@@ -196,7 +196,7 @@ function Test-TargetResource
         $($LocalizedData.CheckingDNSServerAddressesMessage)
         ) -join '' )
 
-    #Validate the Settings passed
+    # Validate the Settings passed
     Foreach ($ServerAddress in $Address) {
         Assert-ResourceProperty `
             -Address $ServerAddress `
@@ -204,13 +204,13 @@ function Test-TargetResource
             -InterfaceAlias $InterfaceAlias
     }
 
-    #Get the current DNS Server Addresses based on the parameters given.
+    # Get the current DNS Server Addresses based on the parameters given.
     $currentAddress = (Get-DnsClientServerAddress `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily `
         -ErrorAction Stop).ServerAddresses
 
-    #Check if the Server addresses are the same as the desired addresses.
+    # Check if the Server addresses are the same as the desired addresses.
     [Boolean] $addressDifferent = (@(Compare-Object `
             -ReferenceObject $currentAddress `
             -DifferenceObject $Address `
@@ -226,7 +226,7 @@ function Test-TargetResource
     }
     else
     {
-        #Test will return true in this case
+        # Test will return true in this case
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($LocalizedData.DNSServersSetCorrectlyMessage)
             ) -join '' )
