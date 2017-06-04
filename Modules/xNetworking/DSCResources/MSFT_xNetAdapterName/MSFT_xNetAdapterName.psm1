@@ -57,6 +57,7 @@ $localizedData = Get-LocalizedData `
 #>
 function Get-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
@@ -109,15 +110,25 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.GettingNetAdapterNameMessage)
+        $($LocalizedData.GettingNetAdapterNameMessage -f $NewName)
         ) -join '')
 
-    $null = $PSBoundParameters.Remove('Name')
-    $null = $PSBoundParameters.Remove('NewName')
-
     $adapter = Find-NetworkAdapter `
-        @PSBoundParameters `
-        -ErrorAction Stop
+        -Name $NewName `
+        -ErrorAction SilentlyContinue
+
+    if (-not $adapter)
+    {
+        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+            $($LocalizedData.FindNetAdapterMessage)
+            ) -join '')
+
+        $null = $PSBoundParameters.Remove('NewName')
+
+        $adapter = Find-NetworkAdapter `
+            @PSBoundParameters `
+            -ErrorAction Stop
+    }
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
         $($LocalizedData.NetAdapterNameFoundMessage -f $adapter.Name)
@@ -180,6 +191,7 @@ function Get-TargetResource
 #>
 function Set-TargetResource
 {
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -231,7 +243,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.SettingNetAdapterNameMessage)
+        $($LocalizedData.SettingNetAdapterNameMessage -f $NewName)
         ) -join '')
 
     $null = $PSBoundParameters.Remove('NewName')
@@ -293,6 +305,7 @@ function Set-TargetResource
 #>
 function Test-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
     (
@@ -345,32 +358,37 @@ function Test-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.TestingNetAdapterNameMessage)
+        $($LocalizedData.TestingNetAdapterNameMessage -f $NewName)
         ) -join '')
 
     $null = $PSBoundParameters.Remove('NewName')
-    try 
-    { 
-        $adapter = Find-NetworkAdapter `
-            @PSBoundParameters `
-            -ErrorAction Stop
-    }    
-    catch
+
+    # Can an adapter be found with the new name?
+    $adapterWithNewName = Find-NetworkAdapter `
+        -Name $NewName `
+        -Verbose:$Verbose `
+        -ErrorAction SilentlyContinue
+
+    if ($adapterWithNewName)
     {
-        $PSBoundParameters.Name = $NewName
-        $adapter = Find-NetworkAdapter `
-            @PSBoundParameters `
-            -ErrorAction Stop
-    }
-    if ($adapter.Name -eq $NewName)
-    {
+        # An adapter was found matching the new name
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.NetAdapterNameMatchMessage -f $adapter.Name)
+            $($LocalizedData.NetAdapterWithNewNameExistsMessage -f $adapterWithNewName.Name)
             ) -join '')
         return $true
     }
     else
     {
+        # Find an adapter matching the parameters - throw if none can be found
+        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+            $($LocalizedData.FindNetAdapterMessage)
+            ) -join '')
+
+        $adapter = Find-NetworkAdapter `
+            @PSBoundParameters `
+            -ErrorAction Stop
+
+        # An adapter was found that needs to be changed to the new name
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             $($LocalizedData.NetAdapterNameNotMatchMessage -f $adapter.Name,$NewName)
             ) -join '')

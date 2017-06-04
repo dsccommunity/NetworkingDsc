@@ -24,11 +24,11 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    #region Integration Tests
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
+    #region Integration Tests with all parameters
+    Describe "$($script:DSCResourceName)_Integration using all parameters" {
+        $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_all.config.ps1"
+        . $ConfigFile -Verbose -ErrorAction Stop
 
-    Describe "$($script:DSCResourceName)_Integration" {
         BeforeAll {
             $adapterName = 'xNetworkingLBA'
             New-IntegrationLoopbackAdapter -AdapterName $adapterName
@@ -37,7 +37,7 @@ try
         }
 
         #region DEFAULT TESTS
-        It 'should compile and apply the MOF without throwing' {
+        It 'Should compile and apply the MOF without throwing' {
             {
                 # This is to pass to the Config
                 $configData = @{
@@ -56,31 +56,91 @@ try
                     )
                 }
 
-                & "$($script:DSCResourceName)_Config" `
+                & "$($script:DSCResourceName)_Config_All" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
+
                 Start-DscConfiguration -Path $TestDrive `
                     -ComputerName localhost -Wait -Verbose -Force
             } | Should Not Throw
         }
 
         it 'should reapply the MOF without throwing' {
-            {Start-DscConfiguration -Path $TestDrive `
-                -ComputerName localhost -Wait -Verbose -Force} | Should Not Throw
+            { Start-DscConfiguration -Path $TestDrive `
+                -ComputerName localhost -Wait -Verbose -Force } | Should Not Throw
         }
 
-        It 'should be able to call Get-DscConfiguration without throwing' {
+        It 'Should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
+            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config_All"}
             $current.Name                     | Should Be $newAdapterName
         }
 
         AfterAll {
             # Remove Loopback Adapter
+            Remove-IntegrationLoopbackAdapter -AdapterName $adapterName
+            Remove-IntegrationLoopbackAdapter -AdapterName $newAdapterName
+        }
+    }
+    #endregion
+
+    #region Integration Tests with name parameter only
+    Describe "$($script:DSCResourceName)_Integration using name parameter only" {
+        $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_nameonly.config.ps1"
+        . $ConfigFile -Verbose -ErrorAction Stop
+
+        BeforeAll {
+            $adapterName = 'xNetworkingLBA'
+            New-IntegrationLoopbackAdapter -AdapterName $adapterName
+            $adapter = Get-NetAdapter -Name $adapterName
+            $newAdapterName = 'xNetworkingLBANew'
+        }
+
+        #region DEFAULT TESTS
+        It 'Should compile and apply the MOF without throwing' {
+            {
+                # This is to pass to the Config
+                $configData = @{
+                    AllNodes = @(
+                        @{
+                            NodeName             = 'localhost'
+                            NewName              = $newAdapterName
+                            Name                 = $adapter.Name
+                        }
+                    )
+                }
+
+                & "$($script:DSCResourceName)_Config_NameOnly" `
+                    -OutputPath $TestDrive `
+                    -ConfigurationData $configData
+
+                Start-DscConfiguration -Path $TestDrive `
+                    -ComputerName localhost -Wait -Verbose -Force
+            } | Should Not Throw
+        }
+
+        it 'should reapply the MOF without throwing' {
+            { Start-DscConfiguration -Path $TestDrive `
+                -ComputerName localhost -Wait -Verbose -Force } | Should Not Throw
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+        }
+        #endregion
+
+        It 'Should have set the resource and all the parameters should match' {
+            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config_NameOnly"}
+            $current.Name                     | Should Be $newAdapterName
+        }
+
+        AfterAll {
+            # Remove Loopback Adapter
+            Remove-IntegrationLoopbackAdapter -AdapterName $adapterName
             Remove-IntegrationLoopbackAdapter -AdapterName $newAdapterName
         }
     }
