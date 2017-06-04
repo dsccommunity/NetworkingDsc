@@ -1,4 +1,4 @@
-configuration MSFT_xNetAdapterName_Config {
+configuration MSFT_xNetAdapterName_Config_All {
     Import-DscResource -ModuleName xNetworking
 
     node localhost {

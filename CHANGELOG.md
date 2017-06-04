@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Find-NetworkAdapter:
+  - Fixed to return null if exception thrown.
+  - Allowed passing no selection parameters.
+- MSFT_xNetAdapterName:
+  - Fixed bug in Get-TargetResource when Name is the only adapter selector parameter.
+  - Improved verbose logging.
+  - More improvements to verbose logging.
 - Added Get-DnsClientServerStaticAddress to NetworkingDsc.Common to return statically
   assigned DNS server addresses to support fix for [issue 113](https://github.com/PowerShell/xNetworking/issues/113).
 - MSFT_xDNSserverAddress:

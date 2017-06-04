@@ -108,6 +108,7 @@ function Convert-CIDRToSubhetMask
 #>
 function Find-NetworkAdapter
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
@@ -200,21 +201,28 @@ function Find-NetworkAdapter
 
     if ($adapterFilters.Count -eq 0)
     {
-        New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterParameterError)
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+            $($LocalizedData.AllNetAdaptersFoundMessage)
+            ) -join '')
+
+        $matchingAdapters = @(Get-NetAdapter)
     }
-
-    # Join all the filters together
-    $adapterFilterScript = '(' + ($adapterFilters -join ' -and ') + ')'
-
-    $matchingAdapters = @(Get-NetAdapter |
-        Where-Object -FilterScript ([ScriptBlock]::Create($adapterFilterScript)))
+    else
+    {
+        # Join all the filters together
+        $adapterFilterScript = '(' + ($adapterFilters -join ' -and ') + ')'
+        $matchingAdapters = @(Get-NetAdapter |
+            Where-Object -FilterScript ([ScriptBlock]::Create($adapterFilterScript)))
+    }
 
     # Were any adapters found matching the criteria?
     if ($matchingAdapters.Count -eq 0)
     {
         New-InvalidOperationException `
             -Message ($LocalizedData.NetAdapterNotFoundError)
+        
+        # Return a null so that ErrorAction SilentlyContinue works correctly
+        return $null
     }
     else
     {
@@ -232,6 +240,9 @@ function Find-NetworkAdapter
                     New-InvalidOperationException `
                         -Message ($LocalizedData.InvalidNetAdapterNumberError `
                             -f $matchingAdapters.Count,$InterfaceNumber)
+                    
+                    # Return a null so that ErrorAction SilentlyContinue works correctly
+                    return $null
                 } # if
             }
             else
@@ -239,6 +250,9 @@ function Find-NetworkAdapter
                 New-InvalidOperationException `
                     -Message ($LocalizedData.MultipleMatchingNetAdapterFound `
                         -f $matchingAdapters.Count)
+
+                # Return a null so that ErrorAction SilentlyContinue works correctly
+                return $null
             } # if
         } # if
     } # if
@@ -257,7 +271,7 @@ function Find-NetworkAdapter
         MatchingAdapterCount = $matchingAdapters.Count
     }
 
-    $returnValue
+    return $returnValue
 } # Find-NetworkAdapter
 
 <#
