@@ -7,7 +7,8 @@
 - MSFT_xDNSserverAddress:
   - Added support for setting DNS Client to DHCP for [issue 113](https://github.com/PowerShell/xNetworking/issues/113).
   - Added new examples to show how to enable DHCP on DNS Client.
-  - Improved integration test coverage to enable testing of multiple addresses and DHCP.
+  - Improved integration test coverage to enable testing of multiple addresses and
+    DHCP.
   - Converted exception creation to use common exception functions.
 - MSFT_xDhcpClient:
   - Updated example to also cover setting DNS Client to DHCP.
