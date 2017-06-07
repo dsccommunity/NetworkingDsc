@@ -1,12 +1,14 @@
 <#
     .EXAMPLE
-    Creates the Host Team with the NIC1 and NIC1 Interfaces
+    Creates the Host Team with the NIC1 and NIC2 Interfaces
 #>
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]]$NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking
@@ -22,4 +24,4 @@ configuration Example
             Ensure = 'Present'
         }
     }
- }
+}

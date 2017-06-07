@@ -2,12 +2,13 @@
     .EXAMPLE
     Enabling DHCP Client for the Ethernet Alias
 #>
-
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[] ]$NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DscResource -Module xNetworking

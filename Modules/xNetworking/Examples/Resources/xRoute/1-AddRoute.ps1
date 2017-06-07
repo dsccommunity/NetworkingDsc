@@ -2,11 +2,13 @@
     .EXAMPLE
     Add a net route to the Ethernet interface
 #>
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking
@@ -23,4 +25,4 @@ configuration Example
             RouteMetric = 200
         }
     }
- }
+}

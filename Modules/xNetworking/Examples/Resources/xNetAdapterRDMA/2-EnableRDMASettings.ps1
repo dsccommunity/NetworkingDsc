@@ -2,12 +2,13 @@
     .EXAMPLE
     This configuration enables RDMA setting on the network adapter.
 #>
-
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking
@@ -20,4 +21,4 @@ configuration Example
             Enabled = $true
         }
     }
- }
+}

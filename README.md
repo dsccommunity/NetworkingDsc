@@ -21,6 +21,9 @@ The **xNetworking** module contains the following resources:
 - **xNetAdapterBinding**: Bind or unbind transport or filters to a network interface.
 - **xDnsClientGlobalSetting**: Configure DNS client global settings.
 - **xNetAdapterRDMA**: Enable or disable RDMA on a network adapter.
+- **xNetAdapterLso**: Enable or disable Lso for different protocols
+    on a network adapter.
+- **xNetAdapterName**: Rename a network interface that matches specified search parameters.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)

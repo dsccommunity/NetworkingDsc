@@ -2,11 +2,13 @@
     .EXAMPLE
     Remove a Network Team Interface
 #>
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking
@@ -30,4 +32,4 @@ configuration Example
             DependsOn = '[xNetworkTeam]HostTeam'
         }
     }
- }
+}

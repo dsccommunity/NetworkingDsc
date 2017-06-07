@@ -2,11 +2,13 @@
     .EXAMPLE
     Configure only contoso.com for the DNS Suffix
 #>
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DscResource -Module xNetworking

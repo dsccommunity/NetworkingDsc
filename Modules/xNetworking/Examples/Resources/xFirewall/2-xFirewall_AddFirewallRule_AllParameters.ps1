@@ -4,11 +4,13 @@
     Note: This configuration sample uses all Firewall rule parameters.
     It is only used to show example usage and should not be created.
 #>
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking

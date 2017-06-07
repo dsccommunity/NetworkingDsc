@@ -3,12 +3,13 @@
     DSC configuration that enables the built-in Firewall Rule
     'World Wide Web Services (HTTP Traffic-In)'
 #>
-
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking
@@ -22,4 +23,4 @@ configuration Example
             Enabled               = 'True'
         }
     }
- }
+}

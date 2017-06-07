@@ -2,11 +2,13 @@
     .EXAMPLE
     Removes the NIC Team for the listed interfacess.
 #>
-configuration Example
+Configuration Example
 {
     param
     (
-        [string[]] $NodeName = 'localhost'
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
     )
 
     Import-DSCResource -ModuleName xNetworking
@@ -20,4 +22,4 @@ configuration Example
             TeamMembers = 'NIC1','NIC2','NIC3'
         }
     }
- }
+}
