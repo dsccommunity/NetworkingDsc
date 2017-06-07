@@ -15,7 +15,7 @@ $localizedData = Get-LocalizedData `
 -ResourceName 'MSFT_xNetBIOS' `
 -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
-#region check NetBIOSSetting enum loaded, if not load
+# region check NetBIOSSetting enum loaded, if not load
 try
 {
     [void][Reflection.Assembly]::GetAssembly([NetBiosSetting])
@@ -33,21 +33,35 @@ catch
 }
 #endregion 
 
+<#
+    .SYNOPSIS
+    Returns the current state of the Net Bios on an interface.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface. Supports the use of '*'.
+
+    .PARAMETER Setting
+    Default - Use NetBios settings from the DHCP server. If static IP, Enable NetBIOS.
+
+    .PARAMETER EnableLmhostsLookup
+    Indicates wheather the LMHosts lookup is enabled or disabled
+#>
 function Get-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Default','Enable','Disable')]
         [string]
         $Setting,
 
+        [Parameter()]
         [bool]
         $EnableLmhostsLookup
     )
@@ -79,21 +93,35 @@ function Get-TargetResource
     }
 }
 
+<#
+    .SYNOPSIS
+    Sets the state of the Net Bios on an interface.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface. Supports the use of '*'.
+
+    .PARAMETER Setting
+    Default - Use NetBios settings from the DHCP server. If static IP, Enable NetBIOS.
+
+    .PARAMETER EnableLmhostsLookup
+    Enables or disables the LMHosts lookup
+#>
 
 function Set-TargetResource
 {
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Default','Enable','Disable')]
         [string]
         $Setting,
 
+        [Parameter()]
         [bool]
         $EnableLmhostsLookup
     )
@@ -118,7 +146,7 @@ function Set-TargetResource
 
     $nicConfig = $nic | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
 
-    #The setting can be changed with Win32_NetworkAdapterConfiguration.SetTcpipNetbios, but not if DHCP is disabled. Hence setting this via regsitry instead.
+    # The setting can be changed with Win32_NetworkAdapterConfiguration.SetTcpipNetbios, but not if DHCP is disabled. Hence setting this via regsitry instead.
     Write-Verbose -Message ($localizedData.SetNetBIOS -f $Setting)
     $regParam = @{
         Path = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($nicConfig.SettingID)"
@@ -138,6 +166,19 @@ function Set-TargetResource
     }
 }
 
+<#
+    .SYNOPSIS
+    Tests the current state the Net Bios on an interface.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias of a network interface. Supports the use of '*'.
+
+    .PARAMETER Setting
+    Default - Use NetBios settings from the DHCP server. If static IP, Enable NetBIOS.
+
+    .PARAMETER EnableLmhostsLookup
+    Enables or disables the LMHosts lookup
+#>
 function Test-TargetResource
 {
     [CmdletBinding()]
@@ -145,22 +186,23 @@ function Test-TargetResource
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [string]
         $InterfaceAlias,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Default', 'Enable', 'Disable')]
         [string]
         $Setting,
 
+        [Parameter()]
         [bool]
         $EnableLmhostsLookup
     )
 
     $currentState = Get-TargetResource @PSBoundParameters
     
-    $result = Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters -Verbose:$VerbosePreference
+    $result = Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
     
     return $result
 }
