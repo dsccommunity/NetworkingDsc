@@ -1,13 +1,13 @@
 ﻿# Import the Networking Resource Helper Module
-	Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
-	-ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-	-ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
-	
-	# Import Localization Strings
-	$script:localizedData = Get-LocalizedData `
-	-ResourceName 'NetworkingDsc.Common' `
-	-ResourcePath $PSScriptRoot
-	
+Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
+-ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+-ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+-ResourceName 'NetworkingDsc.Common' `
+-ResourcePath $PSScriptRoot
+
 <#
         .SYNOPSIS
         Converts any IP Addresses containing CIDR notation filters in an array to use Subnet Mask
@@ -499,25 +499,25 @@ function Test-DSCObjectHasProperty
 
 function New-TerminatingError
 {
-	[CmdletBinding()]
-	param
-	(
-	[Parameter(Mandatory)]
-	[string]
-	$ErrorId,
-	
-	[Parameter(Mandatory)]
-	[string]
-	$ErrorMessage,
-	
-	[Parameter(Mandatory)]
-	[System.Management.Automation.ErrorCategory]
-	$ErrorCategory
-	)
-	
-	$exception = New-Object System.InvalidOperationException $errorMessage
-	$errorRecord = New-Object System.Management.Automation.ErrorRecord $exception, $errorId, $errorCategory, $null
-	throw $errorRecord
+[CmdletBinding()]
+param
+(
+[Parameter(Mandatory)]
+[string]
+$ErrorId,
+
+[Parameter(Mandatory)]
+[string]
+$ErrorMessage,
+
+[Parameter(Mandatory)]
+[System.Management.Automation.ErrorCategory]
+$ErrorCategory
+)
+
+$exception = New-Object System.InvalidOperationException $errorMessage
+$errorRecord = New-Object System.Management.Automation.ErrorRecord $exception, $errorId, $errorCategory, $null
+throw $errorRecord
 }
 
 Export-ModuleMember -Function Convert-CIDRToSubhetMask,
