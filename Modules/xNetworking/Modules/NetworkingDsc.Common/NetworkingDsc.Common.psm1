@@ -464,7 +464,6 @@ function Test-DscParameterState
     return $returnValue
 }
 
-
 function Test-DSCObjectHasProperty
 {
     [CmdletBinding()]
@@ -488,8 +487,32 @@ function Test-DSCObjectHasProperty
     return $false
 }
 
+function New-TerminatingError
+{
+	[CmdletBinding()]
+	param
+	(
+	[Parameter(Mandatory)]
+	[string]
+	$ErrorId,
+	
+	[Parameter(Mandatory)]
+	[string]
+	$ErrorMessage,
+	
+	[Parameter(Mandatory)]
+	[System.Management.Automation.ErrorCategory]
+	$ErrorCategory
+	)
+	
+	$exception = New-Object System.InvalidOperationException $errorMessage
+	$errorRecord = New-Object System.Management.Automation.ErrorRecord $exception, $errorId, $errorCategory, $null
+	throw $errorRecord
+}
+
 Export-ModuleMember -Function Convert-CIDRToSubhetMask,
 Find-NetworkAdapter,
 Test-DSCObjectHasProperty,
 Test-DscParameterState,
-Remove-CommonParameter
+Remove-CommonParameter,
+New-TerminatingError
