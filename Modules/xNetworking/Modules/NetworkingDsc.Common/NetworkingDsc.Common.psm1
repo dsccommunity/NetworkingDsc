@@ -251,6 +251,20 @@ function Find-NetworkAdapter {
     return $returnValue
 } # Find-NetworkAdapter
 
+<#
+.SYNOPSIS
+Remove all common parameters form a hashtable
+
+.DESCRIPTION
+Remove all common parameters form a hashtable
+
+.PARAMETER Hashtable
+The hashtable with the parameters
+
+.EXAMPLE
+$DesiredValuesClean = Remove-CommonParameter -Hashtable $DesiredValues
+#>
+
 function Remove-CommonParameter {
     [OutputType([hashtable])]
     [cmdletbinding()]
@@ -272,6 +286,30 @@ function Remove-CommonParameter {
     $inputClone
 }
 
+<#
+.SYNOPSIS
+This function compares the current and the desired state
+
+.DESCRIPTION
+This function compares the current and the desired state.
+
+.PARAMETER CurrentValues
+The current state that is taken from Get-TargetResource
+
+.PARAMETER DesiredValues
+The desired state that is taken from PSBoundParameters
+
+.PARAMETER ValuesToCheck
+If you provide a CIM instance as the DesiredValues, you need to specify the properties to compare
+
+.PARAMETER TurnOffTypeChecking
+By default this function compares the values and the types. If you do not want to compare types, you can turn it off here.
+
+.EXAMPLE
+$currentState = Get-TargetResource @PSBoundParameters
+$result = Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
+return $result
+#>
 function Test-DscParameterState {
     [CmdletBinding()]
     param
@@ -418,6 +456,22 @@ function Test-DscParameterState {
     return $returnValue
 }
 
+<#
+.SYNOPSIS
+Tests if an object has a property
+
+.DESCRIPTION
+Tests if an object has a property
+
+.PARAMETER Object
+The object to look for the property
+
+.PARAMETER PropertyName
+The name of the property to look for
+
+.EXAMPLE
+$checkDesiredValue = Test-DSCObjectHasProperty -Object $DesiredValuesClean -PropertyName $key
+#>
 function Test-DSCObjectHasProperty {
     [CmdletBinding()]
     [OutputType([bool])]
@@ -438,6 +492,32 @@ function Test-DSCObjectHasProperty {
 
     return $false
 }
+
+<#
+.SYNOPSIS
+Throws a terminating error
+
+.DESCRIPTION
+Throws a terminating error
+
+.PARAMETER ErrorId
+The error ID
+
+.PARAMETER ErrorMessage
+The error desciption
+
+.PARAMETER ErrorCategory
+The error category
+
+.EXAMPLE
+$errorParam = @{
+    ErrorId = 'NicNotFound'
+    ErrorMessage = ($localizedData.NicNotFound -f $InterfaceAlias)
+    ErrorCategory = 'ObjectNotFound'
+    ErrorAction = 'Stop'
+}
+New-TerminatingError @errorParam
+#>
 
 function New-TerminatingError {
     [CmdletBinding()]
