@@ -3,6 +3,5 @@ class MSFT_xIPAddress : OMI_BaseResource
 {
     [Write, Description("The desired IP address.")] string IPAddress[];
     [Key, Description("Alias of the network interface for which the IP address should be set.")] string InterfaceAlias;
-    [Write, Description("The prefix length of the IP Address.")] uint32 PrefixLength;
-    [Write, Description("IP address family.") ,ValueMap{"IPv4", "IPv6"},Values{"IPv4", "IPv6"}] string AddressFamily;
+    [Key, Description("IP address family.") ,ValueMap{"IPv4", "IPv6"},Values{"IPv4", "IPv6"}] string AddressFamily;
 };

@@ -48,7 +48,6 @@ try
             $current.InterfaceAlias             | Should Be $TestIPAddress.InterfaceAlias
             $current.AddressFamily              | Should Be $TestIPAddress.AddressFamily
             $current.IPAddress                  | Should Be $TestIPAddress.IPAddress
-            $current.PrefixLength               | Should Be $TestIPAddress.PrefixLength
         }
     }
     #endregion

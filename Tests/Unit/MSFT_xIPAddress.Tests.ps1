@@ -23,7 +23,7 @@ try
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
 
-        Describe "MSFT_xIPAddress\Get-TargetResource" {
+        Describe "MSFT_xIPAddress\Get-TargetResource" -Tag 'Get' {
 
             #region Mocks
             Mock Get-NetIPAddress -MockWith {
@@ -40,22 +40,20 @@ try
             Context 'invoking' {
                 It 'should return existing IP details' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/24'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
                     $Result = Get-TargetResource @Splat
                     $Result.IPAddress | Should Be $Splat.IPAddress
-                    $Result.PrefixLength | Should Be 24
                 }
             }
 
             Context 'Prefix Length' {
                 It 'should fail if passed a negative number' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/-16'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = -16
                     }
 
                     { Get-TargetResource @Splat } `
@@ -65,13 +63,14 @@ try
 
             #region Mocks
             Mock Get-NetIPAddress -MockWith {
-                $IPAddresses = @('192.168.0.1', '192.168.0.2')
-                [PSCustomObject]@{
-                    IPAddress = $IPAddresses
-                    InterfaceAlias = 'Ethernet'
-                    InterfaceIndex = 1
-                    PrefixLength = [byte]24
-                    AddressFamily = 'IPv4'
+                @('192.168.0.1', '192.168.0.2') | foreach-object {
+                    [PSCustomObject]@{
+                        IPAddress = $_
+                        InterfaceAlias = 'Ethernet'
+                        InterfaceIndex = 1
+                        PrefixLength = [byte]24
+                        AddressFamily = 'IPv4'
+                    }
                 }
             }
             #endregion
@@ -79,18 +78,17 @@ try
             Context 'invoking with multiple IP addresses' {
                 It 'should return existing IP details' {
                     $Splat = @{
-                        IPAddress = @('192.168.0.1', '192.168.0.2')
+                        IPAddress = @('192.168.0.1/24', '192.168.0.2/24')
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
                     $Result = Get-TargetResource @Splat
                     $Result.IPAddress | Should Be $Splat.IPAddress
-                    $Result.PrefixLength | Should Be 24
                 }
             }
         }
 
-        Describe "MSFT_xIPAddress\Set-TargetResource" {
+        Describe "MSFT_xIPAddress\Set-TargetResource" -Tag 'Set' {
 
             #region Mocks
             Mock Get-NetIPAddress -MockWith {
@@ -124,7 +122,7 @@ try
 
                 It 'should return $null' {
                     $Splat = @{
-                        IPAddress = '10.0.0.2'
+                        IPAddress = '10.0.0.2/24'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -145,7 +143,7 @@ try
 
                 It 'should return $null' {
                     $Splat = @{
-                        IPAddress = @('10.0.0.2', '10.0.0.3')
+                        IPAddress = @('10.0.0.2/24', '10.0.0.3/24')
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -194,7 +192,7 @@ try
 
                 It 'should return $null' {
                     $Splat = @{
-                        IPAddress = 'fe80::17'
+                        IPAddress = 'fe80::17/64'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv6'
                     }
@@ -215,7 +213,7 @@ try
 
                 It 'should return $null' {
                     $Splat = @{
-                        IPAddress = @('fe80::17', 'fe80::18')
+                        IPAddress = @('fe80::17/64', 'fe80::18/64')
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv6'
                     }
@@ -270,10 +268,9 @@ try
             Context "Invoking with different prefixes" {
                 it "should return null" {
                     $Splat = @{
-                        IPAddress = '10.0.0.2'
+                        IPAddress = '10.0.0.2/24','172.16.4.19/16'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
-                        PrefixLength = 24
                     }
                     { $Result = Set-TargetResource @Splat} | Should not Throw
                     $Result | Should BeNullOrEmpty
@@ -284,13 +281,33 @@ try
                     Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                     Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
                     Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 2
+                }
+            }
+
+            Context "Invoking with existing IP with different prefix" {
+                it "should return null" {
+                    $Splat = @{
+                        IPAddress = '172.16.4.19/24'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    { $Result = Set-TargetResource @Splat} | Should not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                it "should call all mocks" {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 2
                     Assert-MockCalled -commandName New-NetIPAddress -Exactly 1
                 }
             }
             
         }
 
-        Describe "MSFT_xIPAddress\Test-TargetResource" {
+        Describe "MSFT_xIPAddress\Test-TargetResource" -Tag 'Test' {
 
 
             #region Mocks
@@ -332,7 +349,7 @@ try
 
                 It 'should be $false' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/16'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -348,7 +365,7 @@ try
 
                 It 'should be $true' {
                     $Splat = @{
-                        IPAddress = '192.168.0.15'
+                        IPAddress = '192.168.0.15/16'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -364,10 +381,9 @@ try
 
                 It 'should be $true' {
                     $Splat = @{
-                        IPAddress = '192.168.0.15'
+                        IPAddress = '192.168.0.15/24'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
-                        PrefixLength = 24
                     }
                     $Result = Test-TargetResource @Splat
                     $Result | Should Be $false
@@ -391,7 +407,7 @@ try
 
                 It 'should be $false' {
                     $Splat = @{
-                        IPAddress = @('192.168.0.1', '192.168.0.2')
+                        IPAddress = @('192.168.0.1/16', '192.168.0.2/16')
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -406,7 +422,7 @@ try
 
                 It 'should be $false' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/16'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -422,7 +438,7 @@ try
 
                 It 'should be $true' {
                     $Splat = @{
-                        IPAddress = @('192.168.0.15', '192.168.0.16')
+                        IPAddress = @('192.168.0.15/16', '192.168.0.16/16')
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -436,9 +452,9 @@ try
 
             Context 'invoking with the combination of same and different IPv4 Addresses' {
 
-                It 'should be $true' {
+                It 'should be $false' {
                     $Splat = @{
-                        IPAddress = @('192.168.0.1', '192.168.0.16')
+                        IPAddress = @('192.168.0.1/16', '192.168.0.16/16')
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -466,7 +482,6 @@ try
                     $Splat = @{
                         IPAddress = 'BadAddress'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     $errorId = 'AddressFormatError'
@@ -485,9 +500,8 @@ try
 
                 It 'should be $false' {
                     $Splat = @{
-                        IPAddress = 'fe80::1'
+                        IPAddress = 'fe80::1/64'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     $Result = Test-TargetResource @Splat
@@ -502,9 +516,8 @@ try
 
                 It 'should be $true' {
                     $Splat = @{
-                        IPAddress = 'fe80::15'
+                        IPAddress = 'fe80::15/64'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     $Result = Test-TargetResource @Splat
@@ -530,9 +543,8 @@ try
 
                 It 'should be $false' {
                     $Splat = @{
-                        IPAddress = @('fe80::1', 'fe80::2')
+                        IPAddress = @('fe80::1/64', 'fe80::2/64')
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     $Result = Test-TargetResource @Splat
@@ -547,9 +559,8 @@ try
 
                 It 'should be $false' {
                     $Splat = @{
-                        IPAddress = 'fe80::1'
+                        IPAddress = 'fe80::1/64'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     $Result = Test-TargetResource @Splat
@@ -564,9 +575,8 @@ try
 
                 It 'should be $true' {
                     $Splat = @{
-                        IPAddress = @('fe80::15', 'fe80::16')
+                        IPAddress = @('fe80::15/64', 'fe80::16/64')
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     $Result = Test-TargetResource @Splat
@@ -580,9 +590,8 @@ try
 
                 It 'should be $true' {
                     $Splat = @{
-                        IPAddress = @('fe80::1', 'fe80::16')
+                        IPAddress = @('fe80::1/64', 'fe80::16/64')
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     $Result = Test-TargetResource @Splat
@@ -602,7 +611,7 @@ try
 
                 It 'should throw an InterfaceNotAvailable error' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/16'
                         InterfaceAlias = 'NotReal'
                         AddressFamily = 'IPv4'
                     }
@@ -642,7 +651,7 @@ try
 
                 It 'should throw an AddressMismatchError error' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/16'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv6'
                     }
@@ -682,7 +691,7 @@ try
 
                 It 'should not throw an error' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/16'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -694,7 +703,7 @@ try
 
                 It 'should not throw an error' {
                     $Splat = @{
-                        IPAddress = @('192.168.0.1', '192.168.0.2')
+                        IPAddress = @('192.168.0.1/24', '192.168.0.2/24')
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -706,9 +715,8 @@ try
 
                 It 'should not throw an error' {
                     $Splat = @{
-                        IPAddress = 'fe80:ab04:30F5:002b::1'
+                        IPAddress = 'fe80:ab04:30F5:002b::1/64'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     { Assert-ResourceProperty @Splat } | Should Not Throw
@@ -719,9 +727,8 @@ try
 
                 It 'should throw a PrefixLengthError when greater than 32' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/33'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 33
                         AddressFamily = 'IPv4'
                     }
                     $errorId = 'PrefixLengthError'
@@ -736,9 +743,8 @@ try
                 }
                 It 'should throw an Argument error when less than 0' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/-1'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = -1
                         AddressFamily = 'IPv4'
                     }
                     { Assert-ResourceProperty @Splat } `
@@ -750,9 +756,8 @@ try
 
                 It 'should throw a PrefixLengthError error when greater than 128' {
                     $Splat = @{
-                        IPAddress = 'fe80::1'
+                        IPAddress = 'fe80::1/129'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 129
                         AddressFamily = 'IPv6'
                     }
 
@@ -768,9 +773,8 @@ try
                 }
                 It 'should throw an Argument error when less than 0' {
                     $Splat = @{
-                        IPAddress = 'fe80::1'
+                        IPAddress = 'fe80::1/-1'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = -1
                         AddressFamily = 'IPv6'
                     }
 
@@ -783,9 +787,8 @@ try
 
                 It 'should not throw an error' {
                     $Splat = @{
-                        IPAddress = 'fe80::1'
+                        IPAddress = 'fe80::1/64'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = '64'
                         AddressFamily = 'IPv6'
                     }
                     { Assert-ResourceProperty @Splat } | Should Not Throw
