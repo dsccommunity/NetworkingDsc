@@ -58,7 +58,7 @@ function Get-TargetResource
         Foreach-Object { "$($_.IPAddress)/$($_.PrefixLength)" }
 
     $returnValue = @{
-        IPAddress      = $CurrentIPAddressWithPrefix
+        IPAddress      = @($CurrentIPAddressWithPrefix)
         AddressFamily  = $AddressFamily
         InterfaceAlias = $InterfaceAlias
     }
