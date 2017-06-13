@@ -24,7 +24,7 @@ Configuration Example
 
         xIPAddress NewIPAddress
         {
-            IPAddress      = '2001:4898:200:7:6c71:a102:ebd8:f482','2001:4598:210:7:6d71:a102:ebe8:f483'
+            IPAddress      = '2001:4898:200:7:6c71:a102:ebd8:f482/64','2001:4598:210:7:6d71:a102:ebe8:f483/64'
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPV6'
         }
