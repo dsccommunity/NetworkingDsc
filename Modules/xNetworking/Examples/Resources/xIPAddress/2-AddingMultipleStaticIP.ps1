@@ -26,7 +26,6 @@ Configuration Example
         {
             IPAddress      = '2001:4898:200:7:6c71:a102:ebd8:f482','2001:4598:210:7:6d71:a102:ebe8:f483'
             InterfaceAlias = 'Ethernet'
-            PrefixLength   = 24
             AddressFamily  = 'IPV6'
         }
     }
