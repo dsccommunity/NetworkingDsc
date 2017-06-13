@@ -49,18 +49,6 @@ try
                 }
             }
 
-            Context 'Prefix Length' {
-                It 'should fail if passed a negative number' {
-                    $Splat = @{
-                        IPAddress = '192.168.0.1/-16'
-                        InterfaceAlias = 'Ethernet'
-                    }
-
-                    { Get-TargetResource @Splat } `
-                        | Should Throw 'Value was either too large or too small for a UInt32.'
-                }
-            }
-
             #region Mocks
             Mock Get-NetIPAddress -MockWith {
                 @('192.168.0.1', '192.168.0.2') | foreach-object {
@@ -731,9 +719,10 @@ try
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
+                    $PrefixLength = ($Splat.IPAddress -split '/')[-1]
                     $errorId = 'PrefixLengthError'
                     $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-                    $errorMessage = $($LocalizedData.PrefixLengthError) -f $Splat.PrefixLength,$Splat.AddressFamily
+                    $errorMessage = $($LocalizedData.PrefixLengthError) -f $PrefixLength,$Splat.AddressFamily
                     $exception = New-Object -TypeName System.InvalidOperationException `
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
@@ -761,9 +750,10 @@ try
                         AddressFamily = 'IPv6'
                     }
 
+                    $PrefixLength = ($Splat.IPAddress -split '/')[-1]
                     $errorId = 'PrefixLengthError'
                     $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-                    $errorMessage = $($LocalizedData.PrefixLengthError) -f $Splat.PrefixLength,$Splat.AddressFamily
+                    $errorMessage = $($LocalizedData.PrefixLengthError) -f $PrefixLength,$Splat.AddressFamily
                     $exception = New-Object -TypeName System.InvalidOperationException `
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
