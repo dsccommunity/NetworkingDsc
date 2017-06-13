@@ -20,9 +20,6 @@ $localizedData = Get-LocalizedData @localizedDataSplat
     .PARAMETER InterfaceAlias
     Alias of the network interface for which the IP address should be set.
 
-    .PARAMETER PrefixLength
-    The prefix length of the IP Address.
-
     .PARAMETER AddressFamily
     IP address family.
 #>
@@ -41,6 +38,7 @@ function Get-TargetResource
         [String]
         $InterfaceAlias,
 
+        [Parameter(Mandatory = $True)]
         [ValidateSet('IPv4', 'IPv6')]
         [String]
         $AddressFamily = 'IPv4'
@@ -78,9 +76,6 @@ function Get-TargetResource
     .PARAMETER InterfaceAlias
     Alias of the network interface for which the IP address should be set.
 
-    .PARAMETER PrefixLength
-    The prefix length of the IP Address.
-
     .PARAMETER AddressFamily
     IP address family.
 #>
@@ -98,6 +93,7 @@ function Set-TargetResource
         [String]
         $InterfaceAlias,
 
+        [Parameter(Mandatory = $True)]
         [ValidateSet('IPv4', 'IPv6')]
         [String]
         $AddressFamily = 'IPv4'
@@ -214,9 +210,6 @@ function Set-TargetResource
     .PARAMETER InterfaceAlias
     Alias of the network interface for which the IP address should be set.
 
-    .PARAMETER PrefixLength
-    The prefix length of the IP Address.
-
     .PARAMETER AddressFamily
     IP address family.
 #>
@@ -235,6 +228,7 @@ function Test-TargetResource
         [String]
         $InterfaceAlias,
 
+        [Parameter(Mandatory = $True)]
         [ValidateSet('IPv4', 'IPv6')]
         [String]
         $AddressFamily = 'IPv4'
@@ -327,9 +321,6 @@ function Test-TargetResource
 
     .PARAMETER InterfaceAlias
     Alias of the network interface for which the IP address should be set.
-
-    .PARAMETER PrefixLength
-    The prefix length of the IP Address.
 
     .PARAMETER AddressFamily
     IP address family.
