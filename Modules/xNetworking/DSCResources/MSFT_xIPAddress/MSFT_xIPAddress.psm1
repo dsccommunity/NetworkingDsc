@@ -184,10 +184,19 @@ function Set-TargetResource
 
     foreach ($SingleIP in $IPAddress)
     {
+        $PrefixLength = ($SingleIP -split '/')[1]
+        If (-not ($PrefixLength) -and $AddressFamily -eq 'IPv4')
+        {
+            $PrefixLength = 24
+        }
+        elseif (-not ($PrefixLength) -and $AddressFamily -eq 'IPv6')
+        {
+            $PrefixLength = 64
+        }
         # Build parameter hash table
         $Parameters = @{
             IPAddress = ($SingleIP -split '/')[0]
-            PrefixLength = ($SingleIP -split '/')[-1]
+            PrefixLength = $PrefixLength
             InterfaceAlias = $InterfaceAlias
         }
 
@@ -271,7 +280,17 @@ function Test-TargetResource
     # Test if the IP Address passed is present
     foreach ($SingleIP in $IPAddress)
     {
-        $PrefixLength = ($SingleIP -split '/')[-1]
+        $PrefixLength = ($SingleIP -split '/')[1]
+
+        If (-not ($PrefixLength) -and $AddressFamily -eq 'IPv4')
+        {
+            $PrefixLength = 24
+        }
+        elseif (-not ($PrefixLength) -and $AddressFamily -eq 'IPv6')
+        {
+            $PrefixLength = 64
+        }
+
         $SingleIP = ($SingleIP -split '/')[0]
         if ($SingleIP -notin $currentIPs.IPAddress)
         {
@@ -345,7 +364,25 @@ function Assert-ResourceProperty
         $AddressFamily = 'IPv4'
     )
 
-    $PrefixLengthArray = ($IPAddress -split '/')[-1]
+    $PrefixLengthArray = ($IPAddress -split '/')[1]
+    If ($PrefixLengthArray.Count -ne $IPAddress.Count)
+    {
+        $PrefixLengthArray = $IPAddress | Foreach-Object {
+            if ($_ -match '\/\d{1,3}')
+            { 
+                ($_ -split '/')[1]
+            }
+            else
+            {
+                $Value = 24
+                if ($AddressFamily -eq 'IPv6')
+                {
+                    $value = 64
+                }
+                $value
+            }
+        }
+    }
 
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
