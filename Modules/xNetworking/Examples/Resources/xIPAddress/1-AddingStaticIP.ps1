@@ -28,5 +28,14 @@ Configuration Example
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPV6'
         }
+
+        # If no prefix is supplied then it will default to /24 for IPv4
+        # IPv6 will default to /64.
+        xIPAddress NewIPv4Address
+        {
+            IPAddress      = '192.168.10.5'
+            InterfaceAlias = 'Ethernet'
+            AddressFamily  = 'IPV4'
+        }
     }
 }
