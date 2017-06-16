@@ -274,6 +274,95 @@ function Find-NetworkAdapter
     return $returnValue
 } # Find-NetworkAdapter
 
+<#
+    .SYNOPSIS
+    Returns the DNS Client Server static address that are assigned to a network
+    adapter. This is required because Get-DnsClientServerAddress always returns
+    the currently assigned server addresses whether regardless if they were
+    assigned as static or by DHCP.
+
+    The only way that could be found to do this is to query the registry.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface to get the static DNS Server addresses from.
+
+    .PARAMETER AddressFamily
+    IP address family.
+#>
+function Get-DnsClientServerStaticAddress
+{
+    [CmdletBinding()]
+    [OutputType([String[]])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $InterfaceAlias,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('IPv4', 'IPv6')]
+        [String]
+        $AddressFamily
+    )
+
+    Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+        $($LocalizedData.GettingDNSServerStaticAddressMessage) -f $AddressFamily,$InterfaceAlias
+        ) -join '')
+
+    # Look up the interface Guid
+    $adapter = Get-NetAdapter `
+        -InterfaceAlias $InterfaceAlias `
+        -ErrorAction SilentlyContinue
+
+    if (-not $adapter)
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.InterfaceAliasNotFoundError `
+                -f $InterfaceAlias)
+
+        # Return null to support ErrorAction Silently Continue
+        return $null
+    } # if
+
+    $interfaceGuid = $adapter.InterfaceGuid.ToLower()
+
+    if ($AddressFamily -eq 'IPv4')
+    {
+        $interfaceRegKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\$interfaceGuid\"
+    }
+    else
+    {
+        $interfaceRegKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\Interfaces\$interfaceGuid\"
+    } # if
+
+    $nameServerAddressString = Get-ItemPropertyValue `
+        -Path $interfaceRegKeyPath `
+        -Name NameServer `
+        -ErrorAction SilentlyContinue
+
+    # Are any statically assigned addresses for this adapter?
+    if ([String]::IsNullOrWhiteSpace($nameServerAddressString))
+    {
+        # Static DNS Server addresses not found so return empty array
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+            $($LocalizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily,$InterfaceAlias
+            ) -join '')
+
+        return $null
+    }
+    else
+    {
+        # Static DNS Server addresses found so split them into an array using comma
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+            $($LocalizedData.DNSServerStaticAddressFoundMessage) -f $AddressFamily,$InterfaceAlias,$nameServerAddressString
+            ) -join '')
+
+        return @($nameServerAddressString -split ',')
+    } # if
+} # Get-DnsClientServerStaticAddress
+
 Export-ModuleMember -Function `
     Convert-CIDRToSubhetMask, `
-    Find-NetworkAdapter
+    Find-NetworkAdapter,
+    Get-DnsClientServerStaticAddress
