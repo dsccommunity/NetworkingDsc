@@ -187,7 +187,18 @@ function Set-TargetResource
         $PrefixLength = ($SingleIP -split '/')[1]
         If (-not ($PrefixLength) -and $AddressFamily -eq 'IPv4')
         {
-            $PrefixLength = 24
+            if ($SingleIP.split('.')[0] -in (0..127))
+            {
+                $PrefixLength = 8
+            }
+            elseif ($SingleIP.split('.')[0] -in (128..191))
+            {
+                $PrefixLength = 16
+            }
+            elseif ($SingleIP.split('.')[0] -in (192..223))
+            {
+                $PrefixLength = 24
+            }
         }
         elseif (-not ($PrefixLength) -and $AddressFamily -eq 'IPv6')
         {
@@ -284,7 +295,18 @@ function Test-TargetResource
 
         If (-not ($PrefixLength) -and $AddressFamily -eq 'IPv4')
         {
-            $PrefixLength = 24
+            if ($SingleIP.split('.')[0] -in (0..127))
+            {
+                $PrefixLength = 8
+            }
+            elseif ($SingleIP.split('.')[0] -in (128..191))
+            {
+                $PrefixLength = 16
+            }
+            elseif ($SingleIP.split('.')[0] -in (192..223))
+            {
+                $PrefixLength = 24
+            }
         }
         elseif (-not ($PrefixLength) -and $AddressFamily -eq 'IPv6')
         {
@@ -374,7 +396,18 @@ function Assert-ResourceProperty
             }
             else
             {
-                $Value = 24
+                if ($_.split('.')[0] -in (0..127))
+                {
+                    $Value = 8
+                }
+                elseif ($_.split('.')[0] -in (128..191))
+                {
+                    $Value = 16
+                }
+                elseif ($_.split('.')[0] -in (192..223))
+                {
+                    $Value = 24
+                }
                 if ($AddressFamily -eq 'IPv6')
                 {
                     $value = 64

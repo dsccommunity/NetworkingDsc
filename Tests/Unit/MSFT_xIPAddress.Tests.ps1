@@ -148,6 +148,75 @@ try
                 }
             }
 
+            Context "Invoking IPv4 Class A with no prefix" {
+                it "should return null" {
+                    $Splat = @{
+                        IPAddress = '10.11.12.13'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    { $Result = Set-TargetResource @Splat} | Should not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                it "should call all mocks" {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 1 -ParameterFilter {
+                        $PrefixLength -eq 8
+                    }
+                    
+                }
+            }
+
+            Context "Invoking IPv4 Class B with no prefix" {
+                it "should return null" {
+                    $Splat = @{
+                        IPAddress = '172.16.4.19'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    { $Result = Set-TargetResource @Splat} | Should not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                it "should call all mocks" {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 1 -ParameterFilter {
+                        $PrefixLength -eq 16
+                    }
+                    
+                }
+            }
+
+            Context "Invoking IPv4 Class C with no prefix" {
+                it "should return null" {
+                    $Splat = @{
+                        IPAddress = '192.168.10.19'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    { $Result = Set-TargetResource @Splat} | Should not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                it "should call all mocks" {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 1 -ParameterFilter {
+                        $PrefixLength -eq 24
+                    }
+                    
+                }
+            }
+
             #region Mocks
             Mock Get-NetIPAddress -MockWith {
                 [PSCustomObject]@{
@@ -311,27 +380,6 @@ try
                     Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
                     Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 2
                     Assert-MockCalled -commandName New-NetIPAddress -Exactly 1
-                }
-            }
-            
-            Context "Invoking IPv4 with no prefix" {
-                it "should return null" {
-                    $Splat = @{
-                        IPAddress = '172.16.4.19'
-                        InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
-                    }
-                    { $Result = Set-TargetResource @Splat} | Should not Throw
-                    $Result | Should BeNullOrEmpty
-                }
-
-                it "should call all mocks" {
-                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
-                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
-                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
-                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 2
-                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 1
-                    
                 }
             }
         }
