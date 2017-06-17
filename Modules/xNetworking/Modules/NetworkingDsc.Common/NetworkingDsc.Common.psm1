@@ -578,7 +578,7 @@ $errorParam = @{
 }
 New-TerminatingError @errorParam
 #>
-g
+
 function New-TerminatingError
 {
     [CmdletBinding()]
