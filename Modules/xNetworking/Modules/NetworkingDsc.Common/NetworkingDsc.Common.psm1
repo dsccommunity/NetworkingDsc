@@ -10,57 +10,66 @@ $script:localizedData = Get-LocalizedData `
 
 <#
 .SYNOPSIS
-Converts any IP Addresses containing CIDR notation filters in an array to use Subnet Mask
+Converts any IP Addresses containing cIDR notation filters in an array to use Subnet Mask
 notation.
 
 .PARAMETER Address
 The array of addresses to that need to be converted.
 #>
-function Convert-CIDRToSubhetMask {
+function Convert-CidrToSubhetMask
+{
     [CmdletBinding()]
-    [OutputType([ Microsoft.Management.Infrastructure.CimInstance])]
+    [OutputType([Microsoft.Management.Infrastructure.CimInstance])]
     param
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String[]] $Address
+        [string[]]
+        $Address
     )
 
-    $Results = @()
-    foreach ($Entry in $Address) {
-        if (-not $Entry.Contains(':') -and -not $Entry.Contains('-')) {
-            $EntrySplit = $Entry -split '/'
-            if (-not [String]::IsNullOrEmpty($EntrySplit[1])) {
-                # There was a / so this contains a Subnet Mask or CIDR
-                $Prefix = $EntrySplit[0]
-                $Postfix = $EntrySplit[1]
-                if ($Postfix -match '^[0-9]*$') {
-                    # The postfix contains CIDR notation so convert this to Subnet Mask
-                    $Cidr = [Int] $Postfix
-                    $SubnetMaskInt64 = ([convert]::ToInt64(('1' * $Cidr + '0' * (32 - $Cidr)), 2))
-                    $SubnetMask = @(
-                        ([math]::Truncate($SubnetMaskInt64 / 16777216))
-                        ([math]::Truncate(($SubnetMaskInt64 % 16777216) / 65536))
-                        ([math]::Truncate(($SubnetMaskInt64 % 65536) / 256))
-                        ([math]::Truncate($SubnetMaskInt64 % 256))
+    $results = @()
+    
+    foreach ($entry in $Address)
+    {
+        if (-not $entry.Contains(':') -and -not $entry.Contains('-'))
+        {
+            $entrySplit = $entry -split '/'
+            if (-not [String]::IsNullOrEmpty($entrySplit[1]))
+            {
+                # There was a / so this contains a Subnet Mask or cIDR
+                $prefix = $entrySplit[0]
+                $postfix = $entrySplit[1]
+                if ($postfix -match '^[0-9]*$')
+                {
+                    # The postfix contains cIDR notation so convert this to Subnet Mask
+                    $cidr = [Int] $postfix
+                    $subnetMaskInt64 = ([convert]::ToInt64(('1' * $cidr + '0' * (32 - $cidr)), 2))
+                    $subnetMask = @(
+                        ([System.Math]::Truncate($subnetMaskInt64 / 16777216))
+                        ([System.Math]::Truncate(($subnetMaskInt64 % 16777216) / 65536))
+                        ([System.Math]::Truncate(($subnetMaskInt64 % 65536) / 256))
+                        ([System.Math]::Truncate($subnetMaskInt64 % 256))
                     )
                 }
-                else {
-                    $SubnetMask = $Postfix -split '\.'
+                else
+                {
+                    $subnetMask = $postfix -split '\.'
                 }
                 # Apply the Subnet Mast to the IP Address so that we end up with a correctly
                 # masked IP Address that will match what the Firewall rule returns.
-                $MaskedIp = $Prefix -split '\.'
-                for ([int] $Octet = 0; $Octet -lt 4; $Octet++) {
-                    $MaskedIp[$Octet] = $MaskedIp[$Octet] -band $SubnetMask[$Octet]
+                $maskedIp = $prefix -split '\.'
+                for ([int] $octet = 0; $octet -lt 4; $octet++)
+                {
+                    $maskedIp[$octet] = $maskedIp[$octet] -band $subnetMask[$octet]
                 }
-                $Entry = '{0}/{1}' -f ($MaskedIp -join '.'), ($SubnetMask -join '.')
+                $entry = '{0}/{1}' -f ($maskedIp -join '.'), ($subnetMask -join '.')
             }
         }
-        $Results += $Entry
+        $results += $entry
     }
-    return $Results
-} # Convert-CIDRToSubhetMask
+    return $results
+} # Convert-cIDRToSubhetMask
 
 <#
 .SYNOPSIS
@@ -99,7 +108,8 @@ are returned by the parameters.
 This switch will suppress an error occurring if more than one matching
 adapter matches the parameters passed.
 #>
-function Find-NetworkAdapter {
+function Find-NetworkAdapter
+{
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
@@ -148,50 +158,60 @@ function Find-NetworkAdapter {
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.FindingNetAdapterMessage)
+            $($localizedData.FindingNetAdapterMessage)
         ) -join '')
 
     $adapterFilters = @()
-    if ($PSBoundParameters.ContainsKey('Name')) {
+    if ($PSBoundParameters.ContainsKey('Name'))
+    {
         $adapterFilters += @('($_.Name -eq $Name)')
     } # if
 
-    if ($PSBoundParameters.ContainsKey('PhysicalMediaType')) {
+    if ($PSBoundParameters.ContainsKey('PhysicalMediaType'))
+    {
         $adapterFilters += @('($_.PhysicalMediaType -eq $PhysicalMediaType)')
     } # if
 
-    if ($PSBoundParameters.ContainsKey('Status')) {
+    if ($PSBoundParameters.ContainsKey('Status'))
+    {
         $adapterFilters += @('($_.Status -eq $Status)')
     } # if
 
-    if ($PSBoundParameters.ContainsKey('MacAddress')) {
+    if ($PSBoundParameters.ContainsKey('MacAddress'))
+    {
         $adapterFilters += @('($_.MacAddress -eq $MacAddress)')
     } # if
 
-    if ($PSBoundParameters.ContainsKey('InterfaceDescription')) {
+    if ($PSBoundParameters.ContainsKey('InterfaceDescription'))
+    {
         $adapterFilters += @('($_.InterfaceDescription -eq $InterfaceDescription)')
     } # if
 
-    if ($PSBoundParameters.ContainsKey('InterfaceIndex')) {
+    if ($PSBoundParameters.ContainsKey('InterfaceIndex'))
+    {
         $adapterFilters += @('($_.InterfaceIndex -eq $InterfaceIndex)')
     } # if
 
-    if ($PSBoundParameters.ContainsKey('InterfaceGuid')) {
+    if ($PSBoundParameters.ContainsKey('InterfaceGuid'))
+    {
         $adapterFilters += @('($_.InterfaceGuid -eq $InterfaceGuid)')
     } # if
 
-    if ($PSBoundParameters.ContainsKey('DriverDescription')) {
+    if ($PSBoundParameters.ContainsKey('DriverDescription'))
+    {
         $adapterFilters += @('($_.DriverDescription -eq $DriverDescription)')
     } # if
 
-    if ($adapterFilters.Count -eq 0) {
+    if ($adapterFilters.Count -eq 0)
+    {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.AllNetAdaptersFoundMessage)
+                $($localizedData.AllNetAdaptersFoundMessage)
             ) -join '')
 
         $matchingAdapters = @(Get-NetAdapter)
     }
-    else {
+    else
+    {
         # Join all the filters together
         $adapterFilterScript = '(' + ($adapterFilters -join ' -and ') + ')'
         $matchingAdapters = @(Get-NetAdapter |
@@ -199,33 +219,39 @@ function Find-NetworkAdapter {
     }
 
     # Were any adapters found matching the criteria?
-    if ($matchingAdapters.Count -eq 0) {
+    if ($matchingAdapters.Count -eq 0)
+    {
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundError)
+            -Message ($localizedData.NetAdapterNotFoundError)
 
         # Return a null so that ErrorAction SilentlyContinue works correctly
         return $null
     }
-    else {
+    else
+    {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterFoundMessage -f $matchingAdapters.Count)
+                $($localizedData.NetAdapterFoundMessage -f $matchingAdapters.Count)
             ) -join '')
 
-        if ($matchingAdapters.Count -gt 1) {
-            if ($IgnoreMultipleMatchingAdapters) {
+        if ($matchingAdapters.Count -gt 1)
+        {
+            if ($IgnoreMultipleMatchingAdapters)
+            {
                 # Was the number of matching adapters found matching the adapter number?
-                if (($InterfaceNumber -gt 1) -and ($InterfaceNumber -gt $matchingAdapters.Count)) {
+                if (($InterfaceNumber -gt 1) -and ($InterfaceNumber -gt $matchingAdapters.Count))
+                {
                     New-InvalidOperationException `
-                        -Message ($LocalizedData.InvalidNetAdapterNumberError `
+                        -Message ($localizedData.InvalidNetAdapterNumberError `
                             -f $matchingAdapters.Count, $InterfaceNumber)
 
                     # Return a null so that ErrorAction SilentlyContinue works correctly
                     return $null
                 } # if
             }
-            else {
+            else
+            {
                 New-InvalidOperationException `
-                    -Message ($LocalizedData.MultipleMatchingNetAdapterFound `
+                    -Message ($localizedData.MultipleMatchingNetAdapterFound `
                         -f $matchingAdapters.Count)
 
                 # Return a null so that ErrorAction SilentlyContinue works correctly
@@ -265,7 +291,8 @@ The hashtable with the parameters
 $DesiredValuesClean = Remove-CommonParameter -Hashtable $DesiredValues
 #>
 
-function Remove-CommonParameter {
+function Remove-CommonParameter
+{
     [OutputType([hashtable])]
     [cmdletbinding()]
     param
@@ -310,7 +337,8 @@ $currentState = Get-TargetResource @PSBoundParameters
 $result = Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
 return $result
 #>
-function Test-DscParameterState {
+function Test-DscParameterState
+{
     [CmdletBinding()]
     param
     (
@@ -335,118 +363,148 @@ function Test-DscParameterState {
 
     $types = 'System.Management.Automation.PSBoundParametersDictionary', 'System.Collections.Hashtable', 'Microsoft.Management.Infrastructure.CimInstance'
 
-    if ($DesiredValues.GetType().FullName -notin $types) {
-        throw ($LocalizedData.TestDscParameterState_DesiredValueWrongType -f $DesiredValues.GetType().Name)
+    if ($DesiredValues.GetType().FullName -notin $types)
+    {
+        throw ($localizedData.TestDscParameterState_DesiredValueWrongType -f $DesiredValues.GetType().Name)
     }
 
-    if ($DesiredValues.GetType().FullName -eq 'Microsoft.Management.Infrastructure.CimInstance' -and -not $ValuesToCheck) {
-        throw $LocalizedData.TestDscParameterState_DesiredValueIsCimInstanceAndNotValueToCheck
+    if ($DesiredValues.GetType().FullName -eq 'Microsoft.Management.Infrastructure.CimInstance' -and -not $ValuesToCheck)
+    {
+        throw $localizedData.TestDscParameterState_DesiredValueIsCimInstanceAndNotValueToCheck
     }
 
     $DesiredValuesClean = Remove-CommonParameter -Hashtable $DesiredValues
 
-    if (-not $ValuesToCheck) {
+    if (-not $ValuesToCheck)
+    {
         $keyList = $DesiredValuesClean.Keys
     } 
-    else {
+    else
+    {
         $keyList = $ValuesToCheck
     }
 
-    foreach ($key in $keyList) {
-        if ($null -ne $DesiredValuesClean.$key) {
+    foreach ($key in $keyList)
+    {
+        if ($null -ne $DesiredValuesClean.$key)
+        {
             $desiredType = $DesiredValuesClean.$key.GetType()
         }
-        else {
+        else
+        {
             $desiredType = [psobject]@{ Name = 'Unknown' }
         }
 
-        if ($null -ne $CurrentValues.$key) {
+        if ($null -ne $CurrentValues.$key)
+        {
             $currentType = $CurrentValues.$key.GetType()
         }
-        else {
+        else
+        {
             $currentType = [psobject]@{ Name = 'Unknown' }
         }
 
-        if (-not $TurnOffTypeChecking) {   
+        if (-not $TurnOffTypeChecking)
+        {   
             if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and 
-                $desiredType.FullName -ne $currentType.FullName) {
-                Write-Verbose -Message ($LocalizedData.TestDscParameterState_NotMatchTypeMismatch -f $key, $currentType.Name, $desiredType.Name)
+                $desiredType.FullName -ne $currentType.FullName)
+            {
+                Write-Verbose -Message ($localizedData.TestDscParameterState_NotMatchTypeMismatch -f $key, $currentType.Name, $desiredType.Name)
                 continue
             }
         }
 
-        if ($CurrentValues.$key -eq $DesiredValuesClean.$key -and -not $desiredType.IsArray) {
-            Write-Verbose -Message ($LocalizedData.TestDscParameterState_Match -f $desiredType.Name, $key, $CurrentValues.$key, $DesiredValuesClean.$key)
+        if ($CurrentValues.$key -eq $DesiredValuesClean.$key -and -not $desiredType.IsArray)
+        {
+            Write-Verbose -Message ($localizedData.TestDscParameterState_Match -f $desiredType.Name, $key, $CurrentValues.$key, $DesiredValuesClean.$key)
             continue
         }
 
-        if ($DesiredValuesClean.GetType().Name -in 'HashTable', 'PSBoundParametersDictionary') {
+        if ($DesiredValuesClean.GetType().Name -in 'HashTable', 'PSBoundParametersDictionary')
+        {
             $checkDesiredValue = $DesiredValuesClean.ContainsKey($key)
         } 
-        else {
+        else
+        {
             $checkDesiredValue = Test-DSCObjectHasProperty -Object $DesiredValuesClean -PropertyName $key
         }
 
-        if (-not $checkDesiredValue) {
-            Write-Verbose -Message ($LocalizedData.TestDscParameterState_Match -f $desiredType.Name, $key, $CurrentValues.$key, $DesiredValuesClean.$key)
+        if (-not $checkDesiredValue)
+        {
+            Write-Verbose -Message ($localizedData.TestDscParameterState_Match -f $desiredType.Name, $key, $CurrentValues.$key, $DesiredValuesClean.$key)
             continue
         }
 
-        if ($desiredType.IsArray) {
+        if ($desiredType.IsArray)
+        {
             Write-Verbose "Comparing values in property '$key'"
-            if (-not $CurrentValues.ContainsKey($key) -or -not $CurrentValues.$key) {
-                Write-Verbose -Message ($LocalizedData.TestDscParameterState_NotMatch -f $desiredType.Name, $key, $CurrentValues.$key, $DesiredValuesClean.$key)
+            if (-not $CurrentValues.ContainsKey($key) -or -not $CurrentValues.$key)
+            {
+                Write-Verbose -Message ($localizedData.TestDscParameterState_NotMatch -f $desiredType.Name, $key, $CurrentValues.$key, $DesiredValuesClean.$key)
                 $returnValue = $false
                 continue
             }
-            elseif ($CurrentValues.$key.Count -ne $DesiredValues.$key.Count) {
-                Write-Verbose -Message ($LocalizedData.TestDscParameterState_NotMatchDifferentCount -f $desiredType.Name, $key, $CurrentValues.$key.Count, $DesiredValuesClean.$key.Count)
+            elseif ($CurrentValues.$key.Count -ne $DesiredValues.$key.Count)
+            {
+                Write-Verbose -Message ($localizedData.TestDscParameterState_NotMatchDifferentCount -f $desiredType.Name, $key, $CurrentValues.$key.Count, $DesiredValuesClean.$key.Count)
                 $returnValue = $false
                 continue
             }
-            else {
+            else
+            {
                 $desiredArrayValues = $DesiredValues.$key
                 $currentArrayValues = $CurrentValues.$key
 
-                for ($i = 0; $i -lt $desiredArrayValues.Count; $i++) {
-                    if ($null -ne $desiredArrayValues[$i]) {
+                for ($i = 0; $i -lt $desiredArrayValues.Count; $i++)
+                {
+                    if ($null -ne $desiredArrayValues[$i])
+                    {
                         $desiredType = $desiredArrayValues[$i].GetType()
                     }
-                    else {
+                    else
+                    {
                         $desiredType = [psobject]@{ Name = 'Unknown' }
                     }
 
-                    if ($null -ne $currentArrayValues[$i]) {
+                    if ($null -ne $currentArrayValues[$i])
+                    {
                         $currentType = $currentArrayValues[$i].GetType()
                     }
-                    else {
+                    else
+                    {
                         $currentType = [psobject]@{ Name = 'Unknown' }
                     }
 
-                    if (-not $TurnOffTypeChecking) {
+                    if (-not $TurnOffTypeChecking)
+                    {
                         if (($desiredType.Name -ne 'Unknown' -and $currentType.Name -ne 'Unknown') -and 
-                            $desiredType.FullName -ne $currentType.FullName) {
-                            Write-Verbose -Message ($LocalizedData.TestDscParameterState_NotMatchArrayElementTypeMismatch -f $key, $i, $currentType.Name, $desiredType.Name)
+                            $desiredType.FullName -ne $currentType.FullName)
+                        {
+                            Write-Verbose -Message ($localizedData.TestDscParameterState_NotMatchArrayElementTypeMismatch -f $key, $i, $currentType.Name, $desiredType.Name)
                             $returnValue = $false
                             continue
                         }
                     }
 
-                    if ($desiredArrayValues[$i] -ne $currentArrayValues[$i]) {
-                        Write-Verbose -Message ($LocalizedData.TestDscParameterState_NotMatchArrayElement -f $i, $desiredType.Name, $key, $currentArrayValues[$i], $desiredArrayValues[$i])
+                    if ($desiredArrayValues[$i] -ne $currentArrayValues[$i])
+                    {
+                        Write-Verbose -Message ($localizedData.TestDscParameterState_NotMatchArrayElement -f $i, $desiredType.Name, $key, $currentArrayValues[$i], $desiredArrayValues[$i])
                         $returnValue = $false
                         continue
                     }
-                    else {
-                        Write-Verbose -Message ($LocalizedData.TestDscParameterState_MatchArrayElement -f $i, $desiredType.Name, $key, $currentArrayValues[$i], $desiredArrayValues[$i])
+                    else
+                    {
+                        Write-Verbose -Message ($localizedData.TestDscParameterState_MatchArrayElement -f $i, $desiredType.Name, $key, $currentArrayValues[$i], $desiredArrayValues[$i])
                         continue
                     }
                 }
             }
         } 
-        else {
-            if ($DesiredValuesClean.$key -ne $CurrentValues.$key) {
-                Write-Verbose -Message ($LocalizedData.TestDscParameterState_NotMatch -f $desiredType.Name, $key, $CurrentValues.$key, $DesiredValuesClean.$key)
+        else
+        {
+            if ($DesiredValuesClean.$key -ne $CurrentValues.$key)
+            {
+                Write-Verbose -Message ($localizedData.TestDscParameterState_NotMatch -f $desiredType.Name, $key, $CurrentValues.$key, $DesiredValuesClean.$key)
                 $returnValue = $false
             }
         } 
@@ -472,7 +530,8 @@ The name of the property to look for
 .EXAMPLE
 $checkDesiredValue = Test-DSCObjectHasProperty -Object $DesiredValuesClean -PropertyName $key
 #>
-function Test-DSCObjectHasProperty {
+function Test-DSCObjectHasProperty
+{
     [CmdletBinding()]
     [OutputType([bool])]
     param
@@ -486,7 +545,8 @@ function Test-DSCObjectHasProperty {
         $PropertyName
     )
 
-    if ($Object.PSObject.Properties.Name -contains $PropertyName) {
+    if ($Object.PSObject.Properties.Name -contains $PropertyName)
+    {
         return [bool]$Object.$PropertyName
     }
 
@@ -519,7 +579,8 @@ $errorParam = @{
 New-TerminatingError @errorParam
 #>
 
-function New-TerminatingError {
+function New-TerminatingError
+{
     [CmdletBinding()]
     param
     (
@@ -541,7 +602,7 @@ function New-TerminatingError {
     throw $errorRecord
 }
 
-Export-ModuleMember -Function Convert-CIDRToSubhetMask,
+Export-ModuleMember -Function Convert-cIDRToSubhetMask,
 Find-NetworkAdapter,
 Test-DSCObjectHasProperty,
 Test-DscParameterState,

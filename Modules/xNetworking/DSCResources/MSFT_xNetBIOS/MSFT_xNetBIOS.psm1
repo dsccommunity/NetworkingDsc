@@ -2,18 +2,18 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
--ResourceName 'MSFT_xNetBIOS' `
--ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+    -ResourceName 'MSFT_xNetBIOS' `
+    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 # region check NetBIOSSetting enum loaded, if not load
 try
@@ -57,7 +57,7 @@ function Get-TargetResource
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('Default','Enable','Disable')]
+        [ValidateSet('Default', 'Enable', 'Disable')]
         [string]
         $Setting,
 
@@ -76,10 +76,10 @@ function Get-TargetResource
     else
     {
         $errorParam = @{
-            ErrorId = 'NicNotFound'
-            ErrorMessage = ($localizedData.NicNotFound -f $InterfaceAlias)
+            ErrorId       = 'NicNotFound'
+            ErrorMessage  = ($localizedData.NicNotFound -f $InterfaceAlias)
             ErrorCategory = 'ObjectNotFound'
-            ErrorAction = 'Stop'
+            ErrorAction   = 'Stop'
         }
         New-TerminatingError @errorParam
     }
@@ -87,8 +87,8 @@ function Get-TargetResource
     $nicConfig = $nic | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
     
     return @{
-        InterfaceAlias = $InterfaceAlias
-        Setting = [string][NetBiosSetting]$nicConfig.TcpipNetbiosOptions
+        InterfaceAlias      = $InterfaceAlias
+        Setting             = [string][NetBiosSetting]$nicConfig.TcpipNetbiosOptions
         EnableLmhostsLookup = $nicConfig.WINSEnableLMHostsLookup
     }
 }
@@ -117,7 +117,7 @@ function Set-TargetResource
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('Default','Enable','Disable')]
+        [ValidateSet('Default', 'Enable', 'Disable')]
         [string]
         $Setting,
 
@@ -136,10 +136,10 @@ function Set-TargetResource
     else
     {
         $errorParam = @{
-            ErrorId = 'NicNotFound'
-            ErrorMessage = ($localizedData.NicNotFound -f $InterfaceAlias)
+            ErrorId       = 'NicNotFound'
+            ErrorMessage  = ($localizedData.NicNotFound -f $InterfaceAlias)
             ErrorCategory = 'ObjectNotFound'
-            ErrorAction = 'Stop'
+            ErrorAction   = 'Stop'
         }
         New-TerminatingError @errorParam
     }
@@ -149,8 +149,8 @@ function Set-TargetResource
     # The setting can be changed with Win32_NetworkAdapterConfiguration.SetTcpipNetbios, but not if DHCP is disabled. Hence setting this via regsitry instead.
     Write-Verbose -Message ($localizedData.SetNetBIOS -f $Setting)
     $regParam = @{
-        Path = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($nicConfig.SettingID)"
-        Name = 'NetbiosOptions'
+        Path  = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($nicConfig.SettingID)"
+        Name  = 'NetbiosOptions'
         Value = [uint32][NetBiosSetting]$Setting
     }
     $null = Set-ItemProperty @regParam
@@ -161,7 +161,7 @@ function Set-TargetResource
         
         Invoke-CimMethod -ClassName Win32_NetworkAdapterConfiguration -MethodName EnableWINS -Arguments @{ 
             DNSEnabledForWINSResolution = $nic.DNSEnabledForWINSResolution
-            WINSEnableLMHostsLookup = $EnableLmhostsLookup
+            WINSEnableLMHostsLookup     = $EnableLmhostsLookup
         }
     }
 }
