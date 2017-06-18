@@ -8,5 +8,7 @@
     "powershell.codeFormatting.whitespaceAroundOperator": true,
     "powershell.codeFormatting.whitespaceAfterSeparator": true,
     "powershell.codeFormatting.ignoreOneLineBlock": false,
-    "powershell.codeFormatting.alignPropertyValuePairs": true
+    "powershell.codeFormatting.alignPropertyValuePairs": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true
 }
