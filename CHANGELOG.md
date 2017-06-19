@@ -19,8 +19,8 @@
   - Converted exception creation to use common exception functions.
 - MSFT_xDhcpClient:
   - Updated example to also cover setting DNS Client to DHCP.
-- Added .vscode\settings.json with default VS Code PowerShell extension formatting
-  settings.
+- Added the VS Code PowerShell extension formatting settings that cause PowerShell
+  files to be formatted as per the DSC Resource kit style guidelines.
 
 ## 4.1.0.0
 
