@@ -2,23 +2,23 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_xNetBIOS' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
-#region check NetBIOSSetting enum loaded, if not load
+# region check NetBIOSSetting enum loaded, if not load
 try
 {
-    [void][reflection.assembly]::GetAssembly([NetBIOSSetting])
+    [void][Reflection.Assembly]::GetAssembly([NetBiosSetting])
 }
 catch
 {
@@ -31,7 +31,7 @@ catch
     }
 '@
 }
-#endregion
+#endregion 
 
 <#
     .SYNOPSIS
@@ -42,6 +42,9 @@ catch
 
     .PARAMETER Setting
     Default - Use NetBios settings from the DHCP server. If static IP, Enable NetBIOS.
+
+    .PARAMETER EnableLmhostsLookup
+    Indicates wheather the LMHosts lookup is enabled or disabled
 #>
 function Get-TargetResource
 {
@@ -49,31 +52,44 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
-        [System.String]
+        [Parameter(Mandatory = $true)]
+        [string]
         $InterfaceAlias,
 
-        [parameter(Mandatory = $true)]
-        [ValidateSet("Default","Enable","Disable")]
-        [System.String]
-        $Setting
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Default', 'Enable', 'Disable')]
+        [string]
+        $Setting,
+
+        [Parameter()]
+        [bool]
+        $EnableLmhostsLookup
     )
-
-    Write-Verbose -Message ($LocalizedData.GettingNetBiosSetting -f $InterfaceAlias)
-
-    $netadapterparams = @{
-        ClassName = 'Win32_NetworkAdapter'
-        Filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
+                
+    $filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
+    
+    $nic = Get-CimInstance -ClassName Win32_NetworkAdapter -Filter $filter
+    if ($nic)
+    {
+        Write-Verbose -Message ($localizedData.InterfaceDetected -f $InterfaceAlias, $nic.InterfaceIndex)
+    }
+    else
+    {
+        $errorParam = @{
+            ErrorId       = 'NicNotFound'
+            ErrorMessage  = ($localizedData.NicNotFound -f $InterfaceAlias)
+            ErrorCategory = 'ObjectNotFound'
+            ErrorAction   = 'Stop'
+        }
+        New-TerminatingError @errorParam
     }
 
-    $netAdapterConfig = Get-CimInstance @netadapterparams -ErrorAction Stop |
-            Get-CimAssociatedInstance `
-                -ResultClassName Win32_NetworkAdapterConfiguration `
-                -ErrorAction Stop
-
+    $nicConfig = $nic | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
+    
     return @{
-        InterfaceAlias = $InterfaceAlias
-        Setting = $([NETBIOSSetting].GetEnumValues()[$netAdapterConfig.TcpipNetbiosOptions])
+        InterfaceAlias      = $InterfaceAlias
+        Setting             = [string][NetBiosSetting]$nicConfig.TcpipNetbiosOptions
+        EnableLmhostsLookup = $nicConfig.WINSEnableLMHostsLookup
     }
 }
 
@@ -86,49 +102,67 @@ function Get-TargetResource
 
     .PARAMETER Setting
     Default - Use NetBios settings from the DHCP server. If static IP, Enable NetBIOS.
+
+    .PARAMETER EnableLmhostsLookup
+    Enables or disables the LMHosts lookup
 #>
+
 function Set-TargetResource
 {
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory = $true)]
-        [System.String]
+        [Parameter(Mandatory = $true)]
+        [string]
         $InterfaceAlias,
 
-        [parameter(Mandatory = $true)]
-        [ValidateSet("Default","Enable","Disable")]
-        [System.String]
-        $Setting
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Default', 'Enable', 'Disable')]
+        [string]
+        $Setting,
+
+        [Parameter()]
+        [bool]
+        $EnableLmhostsLookup
     )
 
-    $netadapterparams = @{
-        ClassName = 'Win32_NetworkAdapter'
-        Filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
-    }
-    $netAdapterConfig = Get-CimInstance @netadapterparams -ErrorAction Stop |
-            Get-CimAssociatedInstance `
-                -ResultClassName Win32_NetworkAdapterConfiguration `
-                -ErrorAction Stop
-
-    if ($Setting -eq [NETBIOSSetting]::Default)
+    $filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
+    
+    $nic = Get-CimInstance -ClassName Win32_NetworkAdapter -Filter $filter
+    if ($nic)
     {
-        Write-Verbose -Message $LocalizedData.ResetToDefaut
-        #If DHCP is not enabled, settcpipnetbios CIM Method won't take 0 so overwrite registry entry instead.
-        $regParam = @{
-            Path = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetAdapterConfig.SettingID)"
-            Name = 'NetbiosOptions'
-            Value = 0
-        }
-        $null = Set-ItemProperty @regParam
+        Write-Verbose -Message ($localizedData.InterfaceDetected -f $InterfaceAlias, $nic.InterfaceIndex)
     }
     else
     {
-        Write-Verbose -Message ($LocalizedData.SetNetBIOS -f $Setting)
-        $null = $netAdapterConfig |
-            Invoke-CimMethod -MethodName SetTcpipNetbios -ErrorAction Stop -Arguments @{
-                TcpipNetbiosOptions = [uint32][NETBIOSSetting]::$Setting.value__
-            }
+        $errorParam = @{
+            ErrorId       = 'NicNotFound'
+            ErrorMessage  = ($localizedData.NicNotFound -f $InterfaceAlias)
+            ErrorCategory = 'ObjectNotFound'
+            ErrorAction   = 'Stop'
+        }
+        New-TerminatingError @errorParam
+    }
+
+    $nicConfig = $nic | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
+
+    # The setting can be changed with Win32_NetworkAdapterConfiguration.SetTcpipNetbios, but not if DHCP is disabled. Hence setting this via regsitry instead.
+    Write-Verbose -Message ($localizedData.SetNetBIOS -f $Setting)
+    $regParam = @{
+        Path  = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($nicConfig.SettingID)"
+        Name  = 'NetbiosOptions'
+        Value = [uint32][NetBiosSetting]$Setting
+    }
+    $null = Set-ItemProperty @regParam
+
+    if ($PSBoundParameters.ContainsKey('EnableLmhostsLookup'))
+    {
+        Write-Verbose -Message ($localizedData.SetLmhostLookup -f $EnableLmhostsLookup)
+        
+        Invoke-CimMethod -ClassName Win32_NetworkAdapterConfiguration -MethodName EnableWINS -Arguments @{ 
+            DNSEnabledForWINSResolution = $nic.DNSEnabledForWINSResolution
+            WINSEnableLMHostsLookup     = $EnableLmhostsLookup
+        }
     }
 }
 
@@ -141,56 +175,34 @@ function Set-TargetResource
 
     .PARAMETER Setting
     Default - Use NetBios settings from the DHCP server. If static IP, Enable NetBIOS.
+
+    .PARAMETER EnableLmhostsLookup
+    Enables or disables the LMHosts lookup
 #>
 function Test-TargetResource
 {
     [CmdletBinding()]
-    [OutputType([System.Boolean])]
+    [OutputType([bool])]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSDSCUseVerboseMessageInDSCResource', '')]
     param
     (
-        [parameter(Mandatory = $true)]
-        [System.String]
+        [Parameter(Mandatory = $true)]
+        [string]
         $InterfaceAlias,
 
-        [parameter(Mandatory = $true)]
-        [ValidateSet("Default","Enable","Disable")]
-        [System.String]
-        $Setting
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Default', 'Enable', 'Disable')]
+        [string]
+        $Setting,
+
+        [Parameter()]
+        [bool]
+        $EnableLmhostsLookup
     )
 
-    $nic = Get-CimInstance `
-        -ClassName Win32_NetworkAdapter `
-        -Filter "NetConnectionID=`"$InterfaceAlias`""
-    if ($null -ne $nic)
-    {
-        Write-Verbose -Message ($LocalizedData.InterfaceDetected -f $InterfaceAlias,$nic.InterfaceIndex)
-    }
-    else
-    {
-        $errorParam = @{
-            Message = ($LocalizedData.NICNotFound -f $InterfaceAlias)
-            ArgumentName = 'InterfaceAlias'
-        }
-        New-InvalidArgumentException @errorParam
-    }
-
-    $nicConfig = $NIC | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
-
-    Write-Verbose -Message ($LocalizedData.CurrentNetBiosSetting -f [NETBIOSSetting].GetEnumValues()[$NICConfig.TcpipNetbiosOptions])
-
-    $desiredSetting = ([NETBIOSSetting]::$($Setting)).value__
-    Write-Verbose -Message ($LocalizedData.DesiredSetting -f $Setting)
-
-    if ($nicConfig.TcpipNetbiosOptions -eq $desiredSetting)
-    {
-        Write-Verbose -Message $LocalizedData.InDesiredState
-        return $true
-    }
-    else
-    {
-        Write-Verbose -Message $LocalizedData.NotInDesiredState
-        return $false
-    }
+    $currentState = Get-TargetResource @PSBoundParameters
+    
+    $result = Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
+    
+    return $result
 }
-
-Export-ModuleMember -Function *-TargetResource
