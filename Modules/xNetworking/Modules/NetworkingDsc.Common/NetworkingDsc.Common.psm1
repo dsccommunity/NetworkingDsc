@@ -69,5 +69,63 @@ function Convert-CIDRToSubhetMask
     return $Results
 }
 
+<#
+.SYNOPSIS
+    Gets the IP Address prefix from a provided IP Address in CIDR notation.
+
+.PARAMETER IPAddress
+    IP Address to get prefix for, can be in CIDR notation.
+
+.PARAMETER AddressFamily
+    Address family for provided IP Address, defaults to IPv4.
+
+#>
+function Get-IPAddressPrefix
+{
+    [cmdletbinding()]
+    param
+    (
+        [parameter(Mandatory=$True, ValueFromPipeline)]
+        [string[]]$IPAddress,
+
+        [parameter()]
+        [ValidateSet('IPv4','IPv6')]
+        [string]$AddressFamily = 'IPv4'
+    )
+
+    process
+    {
+        foreach ($SingleIp in $IPAddress)
+        {
+            $PrefixLength = ($SingleIP -split '/')[1]
+
+            If (-not ($PrefixLength) -and $AddressFamily -eq 'IPv4')
+            {
+                if ($SingleIP.split('.')[0] -in (0..127))
+                {
+                    $PrefixLength = 8
+                }
+                elseif ($SingleIP.split('.')[0] -in (128..191))
+                {
+                    $PrefixLength = 16
+                }
+                elseif ($SingleIP.split('.')[0] -in (192..223))
+                {
+                    $PrefixLength = 24
+                }
+            }
+            elseif (-not ($PrefixLength) -and $AddressFamily -eq 'IPv6')
+            {
+                $PrefixLength = 64
+            }
+
+            [PSCustomObject]@{
+                IPAddress = $SingleIp.split('/')[0] 
+                PrefixLength = $PrefixLength
+            }
+        }
+    }
+}
+
 Export-ModuleMember -Function `
-    Convert-CIDRToSubhetMask
+    Convert-CIDRToSubhetMask, Get-IPAddressPrefix

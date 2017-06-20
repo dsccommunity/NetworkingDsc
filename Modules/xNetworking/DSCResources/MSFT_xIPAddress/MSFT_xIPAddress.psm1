@@ -29,6 +29,7 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $IPAddress,
@@ -84,6 +85,7 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $IPAddress,
@@ -182,31 +184,15 @@ function Set-TargetResource
         }
     }
 
-    foreach ($SingleIP in $IPAddress)
+    $IPAddressObject = Get-IPAddressPrefix -IPAddress $IPAddress -AddressFamily $AddressFamily
+
+    foreach ($SingleIP in $IPAddressObject)
     {
-        $PrefixLength = ($SingleIP -split '/')[1]
-        If (-not ($PrefixLength) -and $AddressFamily -eq 'IPv4')
-        {
-            if ($SingleIP.split('.')[0] -in (0..127))
-            {
-                $PrefixLength = 8
-            }
-            elseif ($SingleIP.split('.')[0] -in (128..191))
-            {
-                $PrefixLength = 16
-            }
-            elseif ($SingleIP.split('.')[0] -in (192..223))
-            {
-                $PrefixLength = 24
-            }
-        }
-        elseif (-not ($PrefixLength) -and $AddressFamily -eq 'IPv6')
-        {
-            $PrefixLength = 64
-        }
+        $PrefixLength = $SingleIP.PrefixLength
+        
         # Build parameter hash table
         $Parameters = @{
-            IPAddress = ($SingleIP -split '/')[0]
+            IPAddress = $SingleIP.IPAddress
             PrefixLength = $PrefixLength
             InterfaceAlias = $InterfaceAlias
         }
@@ -239,6 +225,7 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $IPAddress,
@@ -288,33 +275,12 @@ function Test-TargetResource
         }
     } # while
 
+    $IPAddressObject = Get-IPAddressPrefix -IPAddress $IPAddress -AddressFamily $AddressFamily
     # Test if the IP Address passed is present
-    foreach ($SingleIP in $IPAddress)
+    foreach ($SingleIP in $IPAddressObject)
     {
-        $PrefixLength = ($SingleIP -split '/')[1]
-
-        If (-not ($PrefixLength) -and $AddressFamily -eq 'IPv4')
-        {
-            if ($SingleIP.split('.')[0] -in (0..127))
-            {
-                $PrefixLength = 8
-            }
-            elseif ($SingleIP.split('.')[0] -in (128..191))
-            {
-                $PrefixLength = 16
-            }
-            elseif ($SingleIP.split('.')[0] -in (192..223))
-            {
-                $PrefixLength = 24
-            }
-        }
-        elseif (-not ($PrefixLength) -and $AddressFamily -eq 'IPv6')
-        {
-            $PrefixLength = 64
-        }
-
-        $SingleIP = ($SingleIP -split '/')[0]
-        if ($SingleIP -notin $currentIPs.IPAddress)
+        $PrefixLength = $SingleIP.PrefixLength
+        if ($SingleIP.IPAddress -notin $currentIPs.IPAddress)
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
@@ -329,7 +295,7 @@ function Test-TargetResource
                 ) -join '')
 
             # Filter the IP addresses for the IP address to check
-            $filterIP = $currentIPs.Where( { $_.IPAddress -eq $SingleIP } )
+            $filterIP = $currentIPs.Where( { $_.IPAddress -eq $SingleIP.IPAddress } )
 
             # Only test the Prefix Length if the IP address is present
             if (-not $filterIP.PrefixLength.Equals([byte]$PrefixLength))
@@ -381,6 +347,7 @@ function Assert-ResourceProperty
         [String]
         $InterfaceAlias,
 
+        [Parameter()]
         [ValidateSet('IPv4', 'IPv6')]
         [String]
         $AddressFamily = 'IPv4'
