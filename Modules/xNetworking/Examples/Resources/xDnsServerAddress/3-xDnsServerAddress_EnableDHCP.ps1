@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-    Enabling DHCP Client for the Ethernet Alias
+    Enabling DHCP for the IP Address and DNS on the adapter with alias 'Ethernet'.
 #>
 Configuration Example
 {
@@ -21,5 +21,12 @@ Configuration Example
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPv4'
         }
+
+        xDnsServerAddress EnableDhcpDNS
+        {
+            InterfaceAlias = 'Ethernet'
+            AddressFamily  = 'IPv4'
+        }
+        
     }
 }

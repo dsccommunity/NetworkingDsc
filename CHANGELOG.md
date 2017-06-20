@@ -2,11 +2,45 @@
 
 ## Unreleased
 
+- Find-NetworkAdapter:
+  - Fixed to return null if exception thrown.
+  - Allowed passing no selection parameters.
+- MSFT_xNetAdapterName:
+  - Fixed bug in Get-TargetResource when Name is the only adapter selector parameter.
+  - Improved verbose logging.
+  - More improvements to verbose logging.
+- Added Get-DnsClientServerStaticAddress to NetworkingDsc.Common to return statically
+  assigned DNS server addresses to support fix for [issue 113](https://github.com/PowerShell/xNetworking/issues/113).
+- MSFT_xDNSserverAddress:
+  - Added support for setting DNS Client to DHCP for [issue 113](https://github.com/PowerShell/xNetworking/issues/113).
+  - Added new examples to show how to enable DHCP on DNS Client.
+  - Improved integration test coverage to enable testing of multiple addresses and
+    DHCP.
+  - Converted exception creation to use common exception functions.
+- MSFT_xDhcpClient:
+  - Updated example to also cover setting DNS Client to DHCP.
+- Added the VS Code PowerShell extension formatting settings that cause PowerShell
+  files to be formatted as per the DSC Resource kit style guidelines.
+
+## 4.1.0.0
+
+- Added integration test to test for conflicts with other common resource kit modules.
+- Prevented ResourceHelper and Common module cmdlets from being exported to resolve
+  conflicts with other resource modules.
+
+## 4.0.0.0
+
 - Converted to use AppVeyor.psm1 in DSCResource.Tests repository.
 - Converted to use Example and Markdown tests in DSCResource.Tests repository.
 - Added CodeCov.io support.
 - Added a new example to xDNSServerAddress to clarify setting multiple DNS Servers.
 - Fix examples to correct display in auto documentation generation.
+- BREAKING CHANGE: Migrated xNetworkAdapter module functionality to xNetAdapterName
+  resource.
+- Added CommonTestHelper module for aiding testing.
+- MSFT_xNetAdapterName:
+  - Created new resource for renaming network adapters.
+  - Added Find-NetAdapter cmdlet to NetworkingDsc.Common.
 - Correct example parameters format to meet style guidelines.
 - MSFT_xIPAddress:
   - BREAKING CHANGE: Adding support for multiple IP addresses being assigned.
