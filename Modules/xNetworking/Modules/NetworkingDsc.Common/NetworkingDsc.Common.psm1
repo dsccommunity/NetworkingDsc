@@ -220,7 +220,7 @@ function Find-NetworkAdapter
     {
         New-InvalidOperationException `
             -Message ($LocalizedData.NetAdapterNotFoundError)
-        
+
         # Return a null so that ErrorAction SilentlyContinue works correctly
         return $null
     }
@@ -240,7 +240,7 @@ function Find-NetworkAdapter
                     New-InvalidOperationException `
                         -Message ($LocalizedData.InvalidNetAdapterNumberError `
                             -f $matchingAdapters.Count,$InterfaceNumber)
-                    
+
                     # Return a null so that ErrorAction SilentlyContinue works correctly
                     return $null
                 } # if
@@ -362,7 +362,66 @@ function Get-DnsClientServerStaticAddress
     } # if
 } # Get-DnsClientServerStaticAddress
 
+<#
+.SYNOPSIS
+    Gets the IP Address prefix from a provided IP Address in CIDR notation.
+
+.PARAMETER IPAddress
+    IP Address to get prefix for, can be in CIDR notation.
+
+.PARAMETER AddressFamily
+    Address family for provided IP Address, defaults to IPv4.
+
+#>
+function Get-IPAddressPrefix
+{
+    [cmdletbinding()]
+    param
+    (
+        [parameter(Mandatory=$True, ValueFromPipeline)]
+        [string[]]$IPAddress,
+
+        [parameter()]
+        [ValidateSet('IPv4','IPv6')]
+        [string]$AddressFamily = 'IPv4'
+    )
+
+    process
+    {
+        foreach ($singleIP in $IPAddress)
+        {
+            $prefixLength = ($singleIP -split '/')[1]
+
+            If (-not ($prefixLength) -and $AddressFamily -eq 'IPv4')
+            {
+                if ($singleIP.split('.')[0] -in (0..127))
+                {
+                    $prefixLength = 8
+                }
+                elseif ($singleIP.split('.')[0] -in (128..191))
+                {
+                    $prefixLength = 16
+                }
+                elseif ($singleIP.split('.')[0] -in (192..223))
+                {
+                    $prefixLength = 24
+                }
+            }
+            elseif (-not ($prefixLength) -and $AddressFamily -eq 'IPv6')
+            {
+                $prefixLength = 64
+            }
+
+            [PSCustomObject]@{
+                IPAddress = $singleIP.split('/')[0]
+                prefixLength = $prefixLength
+            }
+        }
+    }
+}
+
 Export-ModuleMember -Function `
     Convert-CIDRToSubhetMask, `
     Find-NetworkAdapter,
-    Get-DnsClientServerStaticAddress
+    Get-DnsClientServerStaticAddress,
+    Get-IPAddressPrefix

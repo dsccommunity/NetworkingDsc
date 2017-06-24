@@ -42,6 +42,8 @@
   - Created new resource for renaming network adapters.
   - Added Find-NetAdapter cmdlet to NetworkingDsc.Common.
 - Correct example parameters format to meet style guidelines.
+- MSFT_xIPAddress:
+  - BREAKING CHANGE: Adding support for multiple IP addresses being assigned.
 
 ## 3.2.0.0
 

@@ -668,6 +668,63 @@ try
         }
     }
     #endregion
+
+    #region Function Get-IPAddressPrefix
+    Describe "NetworkingDsc.Common\Get-IPAddressPrefix" {
+        Context 'IPv4 CIDR notation provided' {
+            it 'Should return the provided IP and prefix as separate properties' {
+                $IPaddress = Get-IPAddressPrefix -IPAddress '192.168.10.0/24'
+
+                $IPaddress.IPaddress | Should be '192.168.10.0'
+                $IPaddress.PrefixLength | Should be 24
+            }
+        }
+
+        Context 'IPv4 Class A address with no CIDR notation' {
+            it 'Should return correct prefix when Class A address provided' {
+                $IPaddress = Get-IPAddressPrefix -IPAddress '10.1.2.3'
+
+                $IPaddress.IPaddress | Should be '10.1.2.3'
+                $IPaddress.PrefixLength | Should be 8
+            }
+        }
+
+        Context 'IPv4 Class B address with no CIDR notation' {
+            it 'Should return correct prefix when Class B address provided' {
+                $IPaddress = Get-IPAddressPrefix -IPAddress '172.16.2.3'
+
+                $IPaddress.IPaddress | Should be '172.16.2.3'
+                $IPaddress.PrefixLength | Should be 16
+            }
+        }
+
+        Context 'IPv4 Class C address with no CIDR notation' {
+            it 'Should return correct prefix when Class C address provided' {
+                $IPaddress = Get-IPAddressPrefix -IPAddress '192.168.20.3'
+
+                $IPaddress.IPaddress | Should be '192.168.20.3'
+                $IPaddress.PrefixLength | Should be 24
+            }
+        }
+
+        Context 'IPv6 CIDR notation provided' {
+            it 'Should return provided IP and prefix as separate properties' {
+                $IPaddress = Get-IPAddressPrefix -IPAddress 'FF12::12::123/64' -AddressFamily IPv6
+
+                $IPaddress.IPaddress | Should be 'FF12::12::123'
+                $IPaddress.PrefixLength | Should be 64
+            }
+        }
+
+        Context 'IPv6 with no CIDR notation provided' {
+            it 'Should return provided IP and correct IPv6 prefix' {
+                $IPaddress = Get-IPAddressPrefix -IPAddress 'FF12::12::123' -AddressFamily IPv6
+
+                $IPaddress.IPaddress | Should be 'FF12::12::123'
+                $IPaddress.PrefixLength | Should be 64
+            }
+        }
+    }
 }
 finally
 {
