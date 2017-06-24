@@ -388,33 +388,33 @@ function Get-IPAddressPrefix
 
     process
     {
-        foreach ($SingleIp in $IPAddress)
+        foreach ($singleIP in $IPAddress)
         {
-            $PrefixLength = ($SingleIP -split '/')[1]
+            $prefixLength = ($singleIP -split '/')[1]
 
-            If (-not ($PrefixLength) -and $AddressFamily -eq 'IPv4')
+            If (-not ($prefixLength) -and $AddressFamily -eq 'IPv4')
             {
-                if ($SingleIP.split('.')[0] -in (0..127))
+                if ($singleIP.split('.')[0] -in (0..127))
                 {
-                    $PrefixLength = 8
+                    $prefixLength = 8
                 }
-                elseif ($SingleIP.split('.')[0] -in (128..191))
+                elseif ($singleIP.split('.')[0] -in (128..191))
                 {
-                    $PrefixLength = 16
+                    $prefixLength = 16
                 }
-                elseif ($SingleIP.split('.')[0] -in (192..223))
+                elseif ($singleIP.split('.')[0] -in (192..223))
                 {
-                    $PrefixLength = 24
+                    $prefixLength = 24
                 }
             }
-            elseif (-not ($PrefixLength) -and $AddressFamily -eq 'IPv6')
+            elseif (-not ($prefixLength) -and $AddressFamily -eq 'IPv6')
             {
-                $PrefixLength = 64
+                $prefixLength = 64
             }
 
             [PSCustomObject]@{
-                IPAddress = $SingleIp.split('/')[0]
-                PrefixLength = $PrefixLength
+                IPAddress = $singleIP.split('/')[0]
+                prefixLength = $prefixLength
             }
         }
     }
