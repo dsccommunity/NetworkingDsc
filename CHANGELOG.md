@@ -21,6 +21,9 @@
   - Updated example to also cover setting DNS Client to DHCP.
 - Added the VS Code PowerShell extension formatting settings that cause PowerShell
   files to be formatted as per the DSC Resource kit style guidelines.
+- MSFT_xDefaultGatewayAddress:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
 
 ## 4.1.0.0
 
