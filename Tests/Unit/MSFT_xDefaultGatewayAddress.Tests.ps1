@@ -180,6 +180,8 @@ try
 
             Context 'Checking return with default gateway but none are currently set' {
                 #region Mocks
+                Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+
                 Mock Get-NetRoute -MockWith {}
                 #endregion
 
@@ -196,6 +198,8 @@ try
 
             Context 'Checking return with no gateway and none are currently set' {
                 #region Mocks
+                Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+
                 Mock Get-NetRoute -MockWith {}
                 #endregion
 
