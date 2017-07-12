@@ -35,17 +35,17 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String]
+        [System.String]
         $State
     )
 
@@ -88,17 +88,17 @@ function Set-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String]
+        [System.String]
         $State
     )
 
@@ -147,22 +147,22 @@ function Test-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String]
+        [System.String]
         $State
     )
 
     # Flag to signal whether settings are correct
-    [Boolean] $desiredConfigurationMatch = $true
+    [System.Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             $($LocalizedData.CheckingDHCPClientMessage) `
@@ -209,17 +209,17 @@ function Assert-ResourceProperty
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String]
+        [System.String]
         $State
     )
 
