@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 4.2.0.0
+## 5.0.0.0
 
 - Find-NetworkAdapter:
   - Fixed to return null if exception thrown.
@@ -27,6 +27,8 @@
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
 - Updated badges in README.MD to match the layout from PSDscResources.
+- MSFT_xIPAddress:
+  - BREAKING CHANGE: Adding support for multiple IP addresses being assigned.
 
 ## 4.1.0.0
 
@@ -48,8 +50,6 @@
   - Created new resource for renaming network adapters.
   - Added Find-NetAdapter cmdlet to NetworkingDsc.Common.
 - Correct example parameters format to meet style guidelines.
-- MSFT_xIPAddress:
-  - BREAKING CHANGE: Adding support for multiple IP addresses being assigned.
 
 ## 3.2.0.0
 
