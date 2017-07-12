@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.2.0.0
+
 - Find-NetworkAdapter:
   - Fixed to return null if exception thrown.
   - Allowed passing no selection parameters.
