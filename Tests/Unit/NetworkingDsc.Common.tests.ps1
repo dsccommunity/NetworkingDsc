@@ -69,7 +69,7 @@ try
     <#
         InModuleScope has to be used to enable the Get-NetAdapter Mock
         This is because forcing the ModuleName in the Mock command throws
-        an exception because the GetAdapter module has not manifest
+        an exception because the GetAdapter module has no manifest
     #>
     InModuleScope $script:ModuleName {
         Describe "NetworkingDsc.Common\Find-NetworkAdapter" {
@@ -106,37 +106,20 @@ try
             $adapterArray = @( $nomatchAdapter, $matchAdapter )
             $multipleMatchingAdapterArray = @( $matchAdapter, $matchAdapter )
 
-            Context 'No parameters are passed' {
-                Mock `
-                    -CommandName Get-NetAdapter `
-                    -MockWith { $adapterArray }
-
-                $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetAdapterParameterError)
-
-                It 'should throw exception' {
-                    { $script:result = Find-NetworkAdapter -Verbose } | Should Throw $errorRecord
-                }
-
-                It 'should call expected mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 0
-                }
-            }
-
             Context 'Name is passed and one adapter matches' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -Name $adapterName -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -149,11 +132,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -Name 'NOMATCH' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -163,15 +146,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -184,11 +167,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType 'NOMATCH' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -198,15 +181,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -Status $adapterStatus -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -219,11 +202,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -Status 'Disabled' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -233,15 +216,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -MacAddress $adapterMacAddress -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -254,11 +237,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -MacAddress '00-00-00-00-00-00' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -268,15 +251,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceDescription $adapterInterfaceDescription -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -289,11 +272,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceDescription 'NOMATCH' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -303,15 +286,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceIndex $adapterInterfaceIndex -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -324,11 +307,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceIndex 99 -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -338,15 +321,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceGuid $adapterInterfaceGuid -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -359,11 +342,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceGuid 'NOMATCH' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -373,15 +356,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -DriverDescription $adapterDriverDescription -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -394,11 +377,46 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -DriverDescription 'NOMATCH' -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                }
+            }
+
+            Context 'No parameters are passed and multiple Adapters adapters match but IgnoreMultipleMatchingAdapters is not set' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $adapterArray }
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.MultipleMatchingNetAdapterFound -f 2)
+
+                It 'Should throw the correct exception' {
+                    { $script:result = Find-NetworkAdapter -Verbose } | Should Throw $errorRecord
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                }
+            }
+
+            Context 'No parameters are passed and multiple Adapters adapters match and IgnoreMultipleMatchingAdapters is set and interface number is 2' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $adapterArray }
+
+                It 'Should not throw exception' {
+                    { $script:result = Find-NetworkAdapter -IgnoreMultipleMatchingAdapters:$true -InterfaceNumber 2 -Verbose } | Should Not Throw
+                }
+
+                It 'Should return expected adapter' {
+                    $script:result.Name | Should Be $adapterName
+                }
+
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -411,11 +429,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.MultipleMatchingNetAdapterFound -f 2)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -425,15 +443,15 @@ try
                     -CommandName Get-NetAdapter `
                     -MockWith { $multipleMatchingAdapterArray }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -IgnoreMultipleMatchingAdapters:$true -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected adapter' {
+                It 'Should return expected adapter' {
                     $script:result.Name | Should Be $adapterName
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -446,17 +464,267 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.InvalidNetAdapterNumberError -f 2,3)
 
-                It 'should throw exception' {
+                It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -IgnoreMultipleMatchingAdapters:$true -InterfaceNumber 3 -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
         }
     }
     #endregion
+
+    #region Function Get-DnsClientServerStaticAddress
+    <#
+        InModuleScope has to be used to enable the Get-NetAdapter Mock
+        This is because forcing the ModuleName in the Mock command throws
+        an exception because the GetAdapter module has no manifest
+    #>
+    InModuleScope $script:ModuleName {
+        Describe "NetworkingDsc.Common\Get-DnsClientServerStaticAddress" {
+
+            # Generate the adapter data to be used for Mocking
+            $interfaceAlias = 'Adapter'
+            $interfaceGuid = [Guid]::NewGuid().ToString()
+            $nomatchAdapter = $null
+            $matchAdapter = [PSObject]@{
+                InterfaceGuid        = $interfaceGuid
+            }
+            $ipv4Parameters = @{
+                InterfaceAlias = $interfaceAlias
+                AddressFamily  = 'IPv4'
+            }
+            $ipv6Parameters = @{
+                InterfaceAlias = $interfaceAlias
+                AddressFamily  = 'IPv6'
+            }
+            $noIpv4StaticAddressString = ''
+            $oneIpv4StaticAddressString = '8.8.8.8'
+            $secondIpv4StaticAddressString = '4.4.4.4'
+            $twoIpv4StaticAddressString = "$oneIpv4StaticAddressString,$secondIpv4StaticAddressString"
+            $noIpv6StaticAddressString = ''
+            $oneIpv6StaticAddressString = '::1'
+            $secondIpv6StaticAddressString = '::2'
+            $twoIpv6StaticAddressString = "$oneIpv6StaticAddressString,$secondIpv6StaticAddressString"
+
+            Context 'Interface Alias does not match adapter in system' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $nomatchAdapter }
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.InterfaceAliasNotFoundError -f $interfaceAlias)
+
+                It 'should throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Throw $errorRecord
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                }
+            }
+
+            Context 'Interface Alias was found in system but IPv4 NameServer is empty' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $matchAdapter }
+
+                Mock `
+                    -CommandName Get-ItemPropertyValue `
+                    -MockWith { $noIpv4StaticAddressString }
+
+                It 'should not throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
+                }
+
+                It 'should return null' {
+                    $script:result | Should BeNullOrEmpty
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemPropertyValue -Exactly -Times 1
+                }
+            }
+
+            Context 'Interface Alias was found in system but IPv4 NameServer contains one DNS entry' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $matchAdapter }
+
+                Mock `
+                    -CommandName Get-ItemPropertyValue `
+                    -MockWith { $oneIpv4StaticAddressString }
+
+                It 'should not throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
+                }
+
+                It 'should return expected address' {
+                    $script:result | Should Be $oneIpv4StaticAddressString
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemPropertyValue -Exactly -Times 1
+                }
+            }
+
+            Context 'Interface Alias was found in system but IPv4 NameServer contains two DNS entries' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $matchAdapter }
+
+                Mock `
+                    -CommandName Get-ItemPropertyValue `
+                    -MockWith { $twoIpv4StaticAddressString }
+
+                It 'should not throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
+                }
+
+                It 'should return two expected addresses' {
+                    $script:result[0] | Should Be $oneIpv4StaticAddressString
+                    $script:result[1] | Should Be $secondIpv4StaticAddressString
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemPropertyValue -Exactly -Times 1
+                }
+            }
+
+            Context 'Interface Alias was found in system but IPv6 NameServer is empty' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $matchAdapter }
+
+                Mock `
+                    -CommandName Get-ItemPropertyValue `
+                    -MockWith { $noIpv6StaticAddressString }
+
+                It 'should not throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
+                }
+
+                It 'should return null' {
+                    $script:result | Should BeNullOrEmpty
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemPropertyValue -Exactly -Times 1
+                }
+            }
+
+            Context 'Interface Alias was found in system but IPv6 NameServer contains one DNS entry' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $matchAdapter }
+
+                Mock `
+                    -CommandName Get-ItemPropertyValue `
+                    -MockWith { $oneIpv6StaticAddressString }
+
+                It 'should not throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
+                }
+
+                It 'should return expected address' {
+                    $script:result | Should Be $oneIpv6StaticAddressString
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemPropertyValue -Exactly -Times 1
+                }
+            }
+
+            Context 'Interface Alias was found in system but IPv6 NameServer contains two DNS entries' {
+                Mock `
+                    -CommandName Get-NetAdapter `
+                    -MockWith { $matchAdapter }
+
+                Mock `
+                    -CommandName Get-ItemPropertyValue `
+                    -MockWith { $twoIpv6StaticAddressString }
+
+                It 'should not throw exception' {
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
+                }
+
+                It 'should return two expected addresses' {
+                    $script:result[0] | Should Be $oneIpv6StaticAddressString
+                    $script:result[1] | Should Be $secondIpv6StaticAddressString
+                }
+
+                It 'should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemPropertyValue -Exactly -Times 1
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region Function Get-IPAddressPrefix
+    Describe "NetworkingDsc.Common\Get-IPAddressPrefix" {
+        Context 'IPv4 CIDR notation provided' {
+            it 'Should return the provided IP and prefix as separate properties' {
+                $IPaddress = Get-IPAddressPrefix -IPAddress '192.168.10.0/24'
+
+                $IPaddress.IPaddress | Should be '192.168.10.0'
+                $IPaddress.PrefixLength | Should be 24
+            }
+        }
+
+        Context 'IPv4 Class A address with no CIDR notation' {
+            it 'Should return correct prefix when Class A address provided' {
+                $IPaddress = Get-IPAddressPrefix -IPAddress '10.1.2.3'
+
+                $IPaddress.IPaddress | Should be '10.1.2.3'
+                $IPaddress.PrefixLength | Should be 8
+            }
+        }
+
+        Context 'IPv4 Class B address with no CIDR notation' {
+            it 'Should return correct prefix when Class B address provided' {
+                $IPaddress = Get-IPAddressPrefix -IPAddress '172.16.2.3'
+
+                $IPaddress.IPaddress | Should be '172.16.2.3'
+                $IPaddress.PrefixLength | Should be 16
+            }
+        }
+
+        Context 'IPv4 Class C address with no CIDR notation' {
+            it 'Should return correct prefix when Class C address provided' {
+                $IPaddress = Get-IPAddressPrefix -IPAddress '192.168.20.3'
+
+                $IPaddress.IPaddress | Should be '192.168.20.3'
+                $IPaddress.PrefixLength | Should be 24
+            }
+        }
+
+        Context 'IPv6 CIDR notation provided' {
+            it 'Should return provided IP and prefix as separate properties' {
+                $IPaddress = Get-IPAddressPrefix -IPAddress 'FF12::12::123/64' -AddressFamily IPv6
+
+                $IPaddress.IPaddress | Should be 'FF12::12::123'
+                $IPaddress.PrefixLength | Should be 64
+            }
+        }
+
+        Context 'IPv6 with no CIDR notation provided' {
+            it 'Should return provided IP and correct IPv6 prefix' {
+                $IPaddress = Get-IPAddressPrefix -IPAddress 'FF12::12::123' -AddressFamily IPv6
+
+                $IPaddress.IPaddress | Should be 'FF12::12::123'
+                $IPaddress.PrefixLength | Should be 64
+            }
+        }
+    }
 }
 finally
 {

@@ -108,6 +108,7 @@ function Convert-CIDRToSubhetMask
 #>
 function Find-NetworkAdapter
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
@@ -200,21 +201,28 @@ function Find-NetworkAdapter
 
     if ($adapterFilters.Count -eq 0)
     {
-        New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterParameterError)
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+            $($LocalizedData.AllNetAdaptersFoundMessage)
+            ) -join '')
+
+        $matchingAdapters = @(Get-NetAdapter)
     }
-
-    # Join all the filters together
-    $adapterFilterScript = '(' + ($adapterFilters -join ' -and ') + ')'
-
-    $matchingAdapters = @(Get-NetAdapter |
-        Where-Object -FilterScript ([ScriptBlock]::Create($adapterFilterScript)))
+    else
+    {
+        # Join all the filters together
+        $adapterFilterScript = '(' + ($adapterFilters -join ' -and ') + ')'
+        $matchingAdapters = @(Get-NetAdapter |
+            Where-Object -FilterScript ([ScriptBlock]::Create($adapterFilterScript)))
+    }
 
     # Were any adapters found matching the criteria?
     if ($matchingAdapters.Count -eq 0)
     {
         New-InvalidOperationException `
             -Message ($LocalizedData.NetAdapterNotFoundError)
+
+        # Return a null so that ErrorAction SilentlyContinue works correctly
+        return $null
     }
     else
     {
@@ -232,6 +240,9 @@ function Find-NetworkAdapter
                     New-InvalidOperationException `
                         -Message ($LocalizedData.InvalidNetAdapterNumberError `
                             -f $matchingAdapters.Count,$InterfaceNumber)
+
+                    # Return a null so that ErrorAction SilentlyContinue works correctly
+                    return $null
                 } # if
             }
             else
@@ -239,6 +250,9 @@ function Find-NetworkAdapter
                 New-InvalidOperationException `
                     -Message ($LocalizedData.MultipleMatchingNetAdapterFound `
                         -f $matchingAdapters.Count)
+
+                # Return a null so that ErrorAction SilentlyContinue works correctly
+                return $null
             } # if
         } # if
     } # if
@@ -257,9 +271,157 @@ function Find-NetworkAdapter
         MatchingAdapterCount = $matchingAdapters.Count
     }
 
-    $returnValue
+    return $returnValue
 } # Find-NetworkAdapter
+
+<#
+    .SYNOPSIS
+    Returns the DNS Client Server static address that are assigned to a network
+    adapter. This is required because Get-DnsClientServerAddress always returns
+    the currently assigned server addresses whether regardless if they were
+    assigned as static or by DHCP.
+
+    The only way that could be found to do this is to query the registry.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface to get the static DNS Server addresses from.
+
+    .PARAMETER AddressFamily
+    IP address family.
+#>
+function Get-DnsClientServerStaticAddress
+{
+    [CmdletBinding()]
+    [OutputType([String[]])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $InterfaceAlias,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('IPv4', 'IPv6')]
+        [String]
+        $AddressFamily
+    )
+
+    Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+        $($LocalizedData.GettingDNSServerStaticAddressMessage) -f $AddressFamily,$InterfaceAlias
+        ) -join '')
+
+    # Look up the interface Guid
+    $adapter = Get-NetAdapter `
+        -InterfaceAlias $InterfaceAlias `
+        -ErrorAction SilentlyContinue
+
+    if (-not $adapter)
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.InterfaceAliasNotFoundError `
+                -f $InterfaceAlias)
+
+        # Return null to support ErrorAction Silently Continue
+        return $null
+    } # if
+
+    $interfaceGuid = $adapter.InterfaceGuid.ToLower()
+
+    if ($AddressFamily -eq 'IPv4')
+    {
+        $interfaceRegKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\$interfaceGuid\"
+    }
+    else
+    {
+        $interfaceRegKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\Interfaces\$interfaceGuid\"
+    } # if
+
+    $nameServerAddressString = Get-ItemPropertyValue `
+        -Path $interfaceRegKeyPath `
+        -Name NameServer `
+        -ErrorAction SilentlyContinue
+
+    # Are any statically assigned addresses for this adapter?
+    if ([String]::IsNullOrWhiteSpace($nameServerAddressString))
+    {
+        # Static DNS Server addresses not found so return empty array
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+            $($LocalizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily,$InterfaceAlias
+            ) -join '')
+
+        return $null
+    }
+    else
+    {
+        # Static DNS Server addresses found so split them into an array using comma
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+            $($LocalizedData.DNSServerStaticAddressFoundMessage) -f $AddressFamily,$InterfaceAlias,$nameServerAddressString
+            ) -join '')
+
+        return @($nameServerAddressString -split ',')
+    } # if
+} # Get-DnsClientServerStaticAddress
+
+<#
+.SYNOPSIS
+    Gets the IP Address prefix from a provided IP Address in CIDR notation.
+
+.PARAMETER IPAddress
+    IP Address to get prefix for, can be in CIDR notation.
+
+.PARAMETER AddressFamily
+    Address family for provided IP Address, defaults to IPv4.
+
+#>
+function Get-IPAddressPrefix
+{
+    [cmdletbinding()]
+    param
+    (
+        [parameter(Mandatory=$True, ValueFromPipeline)]
+        [string[]]$IPAddress,
+
+        [parameter()]
+        [ValidateSet('IPv4','IPv6')]
+        [string]$AddressFamily = 'IPv4'
+    )
+
+    process
+    {
+        foreach ($singleIP in $IPAddress)
+        {
+            $prefixLength = ($singleIP -split '/')[1]
+
+            If (-not ($prefixLength) -and $AddressFamily -eq 'IPv4')
+            {
+                if ($singleIP.split('.')[0] -in (0..127))
+                {
+                    $prefixLength = 8
+                }
+                elseif ($singleIP.split('.')[0] -in (128..191))
+                {
+                    $prefixLength = 16
+                }
+                elseif ($singleIP.split('.')[0] -in (192..223))
+                {
+                    $prefixLength = 24
+                }
+            }
+            elseif (-not ($prefixLength) -and $AddressFamily -eq 'IPv6')
+            {
+                $prefixLength = 64
+            }
+
+            [PSCustomObject]@{
+                IPAddress = $singleIP.split('/')[0]
+                prefixLength = $prefixLength
+            }
+        }
+    }
+}
 
 Export-ModuleMember -Function `
     Convert-CIDRToSubhetMask, `
-    Find-NetworkAdapter
+    Find-NetworkAdapter,
+    Get-DnsClientServerStaticAddress,
+    Get-IPAddressPrefix

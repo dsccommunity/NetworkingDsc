@@ -11,9 +11,11 @@ Import-Module -Name (Join-Path -Path $modulePath `
                                                      -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_xIPAddress' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$localizedDataSplat = @{
+    ResourceName = 'MSFT_xIPAddress'
+    ResourcePath = (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+}
+$localizedData = Get-LocalizedData @localizedDataSplat
 
 <#
     .SYNOPSIS
@@ -25,9 +27,6 @@ $localizedData = Get-LocalizedData `
     .PARAMETER InterfaceAlias
     Alias of the network interface for which the IP address should be set.
 
-    .PARAMETER PrefixLength
-    The prefix length of the IP Address.
-
     .PARAMETER AddressFamily
     IP address family.
 #>
@@ -37,9 +36,9 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [String[]]
         $IPAddress,
 
         [Parameter(Mandatory = $true)]
@@ -47,9 +46,7 @@ function Get-TargetResource
         [String]
         $InterfaceAlias,
 
-        [uInt32]
-        $PrefixLength = 16,
-
+        [Parameter(Mandatory = $True)]
         [ValidateSet('IPv4', 'IPv6')]
         [String]
         $AddressFamily = 'IPv4'
@@ -59,13 +56,17 @@ function Get-TargetResource
         $($LocalizedData.GettingIPAddressMessage)
         ) -join '')
 
-    $CurrentIPAddress = Get-NetIPAddress `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily
+    $GetNetIPAddressSplat = @{
+        InterfaceAlias = $InterfaceAlias
+        AddressFamily = $AddressFamily
+    }
+    $currentIPAddress = Get-NetIPAddress @GetNetIPAddressSplat
+
+    $currentIPAddressWithPrefix = $currentIPAddress |
+        Foreach-Object { "$($_.IPAddress)/$($_.prefixLength)" }
 
     $returnValue = @{
-        IPAddress      = [System.String]::Join(', ',$CurrentIPAddress.IPAddress)
-        PrefixLength     = [System.String]::Join(', ',$CurrentIPAddress.PrefixLength)
+        IPAddress      = @($currentIPAddressWithPrefix)
         AddressFamily  = $AddressFamily
         InterfaceAlias = $InterfaceAlias
     }
@@ -83,9 +84,6 @@ function Get-TargetResource
     .PARAMETER InterfaceAlias
     Alias of the network interface for which the IP address should be set.
 
-    .PARAMETER PrefixLength
-    The prefix length of the IP Address.
-
     .PARAMETER AddressFamily
     IP address family.
 #>
@@ -94,9 +92,9 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [String[]]
         $IPAddress,
 
         [Parameter(Mandatory = $true)]
@@ -104,9 +102,7 @@ function Set-TargetResource
         [String]
         $InterfaceAlias,
 
-        [uInt32]
-        $PrefixLength,
-
+        [Parameter(Mandatory = $True)]
         [ValidateSet('IPv4', 'IPv6')]
         [String]
         $AddressFamily = 'IPv4'
@@ -121,63 +117,100 @@ function Set-TargetResource
     if ($AddressFamily -eq 'IPv6')
     {
         $DestinationPrefix = '::/0'
+        $prefixLength = 64
     }
 
     # Get all the default routes - this has to be done in case the IP Address is
-    # beng Removed
-    $defaultRoutes = @(Get-NetRoute `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily `
-        -ErrorAction Stop).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
+    # being Removed
+    $GetNetRouteSplat = @{
+        InterfaceAlias = $InterfaceAlias
+        AddressFamily = $AddressFamily
+        ErrorAction = 'Stop'
+    }
+    $defaultRoutes = @(Get-NetRoute @GetNetRouteSplat).Where( { $_.DestinationPrefix -eq $DestinationPrefix } )
 
     # Remove any default routes on the specified interface -- it is important to do
     # this *before* removing the IP address, particularly in the case where the IP
     # address was auto-configured by DHCP
     if ($defaultRoutes)
     {
-        foreach ($defaultRoute in $defaultRoutes) {
-            Remove-NetRoute `
-                -DestinationPrefix $defaultRoute.DestinationPrefix `
-                -NextHop $defaultRoute.NextHop `
-                -InterfaceIndex $defaultRoute.InterfaceIndex `
-                -AddressFamily $defaultRoute.AddressFamily `
-                -Confirm:$false `
-                -ErrorAction Stop
+        foreach ($defaultRoute in $defaultRoutes)
+        {
+            $RemoveNetRouteSplat = @{
+                DestinationPrefix = $defaultRoute.DestinationPrefix
+                NextHop = $defaultRoute.NextHop
+                InterfaceIndex = $defaultRoute.InterfaceIndex
+                AddressFamily = $defaultRoute.AddressFamily
+                Confirm = $false
+                ErrorAction = 'Stop'
+            }
+            Remove-NetRoute @RemoveNetRouteSplat
         }
     }
 
     # Get the current IP Address based on the parameters given.
-    $currentIPs = @(Get-NetIPAddress `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily `
-        -ErrorAction Stop)
+    $GetNetIPAddressSplat = @{
+        InterfaceAlias = $InterfaceAlias
+        AddressFamily = $AddressFamily
+        ErrorAction = 'Stop'
+    }
+    $currentIPs = @(Get-NetIPAddress @GetNetIPAddressSplat)
 
     # Remove any IP addresses on the specified interface
     if ($currentIPs)
     {
-        foreach ($CurrentIP in $CurrentIPs) {
-            Remove-NetIPAddress `
-                -IPAddress $CurrentIP.IPAddress `
-                -InterfaceIndex $CurrentIP.InterfaceIndex `
-                -AddressFamily $CurrentIP.AddressFamily `
-                -Confirm:$false `
-                -ErrorAction Stop
+        foreach ($CurrentIP in $CurrentIPs)
+        {
+            $RemoveIP = $False
+            if ($CurrentIP.IPAddress -notin ($IPAddress -replace '\/\S*',''))
+            {
+                $RemoveIP = $True
+            }
+            elseif ($CurrentIP.IPAddress -in ($IPAddress -replace '\/\S*',''))
+            {
+                $ExistingIP = $IPAddress | Where-Object {$_ -match $CurrentIP.IPAddress}
+                if ($ExistingIP -ne "$($CurrentIP.IPAddress)/$($CurrentIP.prefixLength)")
+                {
+                    $RemoveIP = $True
+                }
+            }
+
+            if ($RemoveIP)
+            {
+                $RemoveNetIPAddressSplat = @{
+                    IPAddress = $CurrentIP.IPAddress
+                    InterfaceIndex = $CurrentIP.InterfaceIndex
+                    AddressFamily = $CurrentIP.AddressFamily
+                    prefixLength = $CurrentIP.prefixLength
+                    Confirm = $false
+                    ErrorAction = 'Stop'
+                }
+
+                Remove-NetIPAddress @RemoveNetIPAddressSplat
+            }
         }
     }
 
-    # Build parameter hash table
-    $Parameters = @{
-        IPAddress = $IPAddress
-        PrefixLength = $PrefixLength
-        InterfaceAlias = $InterfaceAlias
+    $ipAddressObject = Get-IPAddressPrefix -IPAddress $IPAddress -AddressFamily $AddressFamily
+
+    foreach ($singleIP in $ipAddressObject)
+    {
+        $prefixLength = $singleIP.prefixLength
+
+        # Build parameter hash table
+        $Parameters = @{
+            IPAddress = $singleIP.IPAddress
+            prefixLength = $prefixLength
+            InterfaceAlias = $InterfaceAlias
+        }
+
+        # Apply the specified IP configuration
+        $null = New-NetIPAddress @Parameters -ErrorAction Stop
+
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+            $($LocalizedData.IPAddressSetStateMessage)
+            ) -join '' )
     }
-
-    # Apply the specified IP configuration
-    $null = New-NetIPAddress @Parameters -ErrorAction Stop
-
-    Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.IPAddressSetStateMessage)
-        ) -join '' )
 } # Set-TargetResource
 
 <#
@@ -190,9 +223,6 @@ function Set-TargetResource
     .PARAMETER InterfaceAlias
     Alias of the network interface for which the IP address should be set.
 
-    .PARAMETER PrefixLength
-    The prefix length of the IP Address.
-
     .PARAMETER AddressFamily
     IP address family.
 #>
@@ -202,9 +232,9 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [String[]]
         $IPAddress,
 
         [Parameter(Mandatory = $true)]
@@ -212,9 +242,7 @@ function Test-TargetResource
         [String]
         $InterfaceAlias,
 
-        [uInt32]
-        $PrefixLength = 16,
-
+        [Parameter(Mandatory = $True)]
         [ValidateSet('IPv4', 'IPv6')]
         [String]
         $AddressFamily = 'IPv4'
@@ -236,10 +264,14 @@ function Test-TargetResource
 
     while (-not $adapterBindingReady -and (((Get-Date) - $startTime).TotalSeconds) -lt 30)
     {
-        $currentIPs = @(Get-NetIPAddress `
-            -InterfaceAlias $InterfaceAlias `
-            -AddressFamily $AddressFamily `
-            -ErrorAction SilentlyContinue)
+        $GetNetIPAddressSplat = @{
+            InterfaceAlias = $InterfaceAlias
+            AddressFamily = $AddressFamily
+            ErrorAction = 'SilentlyContinue'
+        }
+
+        $currentIPs = @(Get-NetIPAddress @GetNetIPAddressSplat)
+
         if ($currentIPs)
         {
             $adapterBindingReady = $true
@@ -250,38 +282,43 @@ function Test-TargetResource
         }
     } # while
 
+    $ipAddressObject = Get-IPAddressPrefix -IPAddress $IPAddress -AddressFamily $AddressFamily
     # Test if the IP Address passed is present
-    if ($IPAddress -notin $currentIPs.IPAddress)
+    foreach ($singleIP in $ipAddressObject)
     {
-        Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($LocalizedData.IPAddressDoesNotMatchMessage) -f $IPAddress,$currentIPs.IPAddress
-            ) -join '' )
-        $desiredConfigurationMatch = $false
-    }
-    else
-    {
-        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.IPAddressMatchMessage)
-            ) -join '')
-
-        # Filter the IP addresses for the IP address to check
-        $filterIP = $currentIPs.Where( { $_.IPAddress -eq $IPAddress } )
-
-        # Only test the Prefix Length if the IP address is present
-        if (-not $filterIP.PrefixLength.Equals([byte]$PrefixLength))
+        $prefixLength = $singleIP.prefixLength
+        if ($singleIP.IPAddress -notin $currentIPs.IPAddress)
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.PrefixLengthDoesNotMatchMessage) -f $PrefixLength,$currentIPs.PrefixLength
+                $($LocalizedData.IPAddressDoesNotMatchMessage) -f $singleIP,$currentIPs.IPAddress
                 ) -join '' )
             $desiredConfigurationMatch = $false
         }
         else
         {
-            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.PrefixLengthMatchMessage)
-                ) -join '' )
+            Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                $($LocalizedData.IPAddressMatchMessage)
+                ) -join '')
+
+            # Filter the IP addresses for the IP address to check
+            $filterIP = $currentIPs.Where( { $_.IPAddress -eq $singleIP.IPAddress } )
+
+            # Only test the Prefix Length if the IP address is present
+            if (-not $filterIP.prefixLength.Equals([byte]$prefixLength))
+            {
+                Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.prefixLengthDoesNotMatchMessage) -f $prefixLength,$currentIPs.prefixLength
+                    ) -join '' )
+                $desiredConfigurationMatch = $false
+            }
+            else
+            {
+                Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.prefixLengthMatchMessage)
+                    ) -join '' )
+            }
         }
     }
     return $desiredConfigurationMatch
@@ -299,9 +336,6 @@ function Test-TargetResource
     .PARAMETER InterfaceAlias
     Alias of the network interface for which the IP address should be set.
 
-    .PARAMETER PrefixLength
-    The prefix length of the IP Address.
-
     .PARAMETER AddressFamily
     IP address family.
 #>
@@ -312,7 +346,7 @@ function Assert-ResourceProperty
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [String[]]
         $IPAddress,
 
         [Parameter(Mandatory = $true)]
@@ -320,13 +354,42 @@ function Assert-ResourceProperty
         [String]
         $InterfaceAlias,
 
-        [uInt32]
-        $PrefixLength = 16,
-
+        [Parameter()]
         [ValidateSet('IPv4', 'IPv6')]
         [String]
         $AddressFamily = 'IPv4'
     )
+
+    $prefixLengthArray = ($IPAddress -split '/')[1]
+    If ($prefixLengthArray.Count -ne $IPAddress.Count)
+    {
+        $prefixLengthArray = $IPAddress | Foreach-Object {
+            if ($_ -match '\/\d{1,3}')
+            {
+                ($_ -split '/')[1]
+            }
+            else
+            {
+                if ($_.split('.')[0] -in (0..127))
+                {
+                    $Value = 8
+                }
+                elseif ($_.split('.')[0] -in (128..191))
+                {
+                    $Value = 16
+                }
+                elseif ($_.split('.')[0] -in (192..223))
+                {
+                    $Value = 24
+                }
+                if ($AddressFamily -eq 'IPv6')
+                {
+                    $value = 64
+                }
+                $value
+            }
+        }
+    }
 
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
@@ -340,65 +403,73 @@ function Assert-ResourceProperty
 
         $PSCmdlet.ThrowTerminatingError($errorRecord)
     }
-    if (-not ([System.Net.Ipaddress]::TryParse($IPAddress, [ref]0)))
+    foreach ($singleIPAddress in $IPAddress)
     {
-        $errorId = 'AddressFormatError'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-        $errorMessage = $($LocalizedData.AddressFormatError) -f $IPAddress
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
+        $singleIP = ($singleIPAddress -split '/')[0]
 
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
+        if (-not ([System.Net.Ipaddress]::TryParse($singleIP, [ref]0)))
+        {
+            $errorId = 'AddressFormatError'
+            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+            $errorMessage = $($LocalizedData.AddressFormatError) -f $singleIPAddress
+            $exception = New-Object -TypeName System.InvalidOperationException `
+                -ArgumentList $errorMessage
+            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                -ArgumentList $exception, $errorId, $errorCategory, $null
+
+            $PSCmdlet.ThrowTerminatingError($errorRecord)
+        }
+
+        $detectedAddressFamily = ([System.Net.IPAddress]$singleIP).AddressFamily.ToString()
+        if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
+            -and ($AddressFamily -ne 'IPv4'))
+        {
+            $errorId = 'AddressMismatchError'
+            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+            $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f $singleIPAddress,$AddressFamily
+            $exception = New-Object -TypeName System.InvalidOperationException `
+                -ArgumentList $errorMessage
+            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                -ArgumentList $exception, $errorId, $errorCategory, $null
+
+            $PSCmdlet.ThrowTerminatingError($errorRecord)
+        }
+
+        if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6.ToString()) `
+            -and ($AddressFamily -ne 'IPv6'))
+        {
+            $errorId = 'AddressMismatchError'
+            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+            $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f $singleIPAddress,$AddressFamily
+            $exception = New-Object -TypeName System.InvalidOperationException `
+                -ArgumentList $errorMessage
+            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                -ArgumentList $exception, $errorId, $errorCategory, $null
+
+            $PSCmdlet.ThrowTerminatingError($errorRecord)
+        }
     }
-
-    $detectedAddressFamily = ([System.Net.IPAddress]$IPAddress).AddressFamily.ToString()
-    if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
-        -and ($AddressFamily -ne 'IPv4'))
+    foreach ($prefixLength in $prefixLengthArray)
     {
-        $errorId = 'AddressMismatchError'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-        $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f $IPAddress,$AddressFamily
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
-    }
-
-    if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6.ToString()) `
-        -and ($AddressFamily -ne 'IPv6'))
-    {
-        $errorId = 'AddressMismatchError'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-        $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f $IPAddress,$AddressFamily
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
-    }
-
-    if ((
+        $prefixLength = [uint32]::Parse($prefixLength)
+        if ((
             ($AddressFamily -eq 'IPv4') `
-                -and (($PrefixLength -lt [uint32]0) -or ($PrefixLength -gt [uint32]32))
+                -and (($prefixLength -lt [uint32]0) -or ($prefixLength -gt [uint32]32))
             ) -or (
             ($AddressFamily -eq 'IPv6') `
-                -and (($PrefixLength -lt [uint32]0) -or ($PrefixLength -gt [uint32]128))
+                -and (($prefixLength -lt [uint32]0) -or ($prefixLength -gt [uint32]128))
         ))
-    {
-        $errorId = 'PrefixLengthError'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-        $errorMessage = $($LocalizedData.PrefixLengthError) -f $PrefixLength,$AddressFamily
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
+        {
+            $errorId = 'prefixLengthError'
+            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+            $errorMessage = $($LocalizedData.prefixLengthError) -f $prefixLength,$AddressFamily
+            $exception = New-Object -TypeName System.InvalidOperationException `
+                -ArgumentList $errorMessage
+            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                -ArgumentList $exception, $errorId, $errorCategory, $null
 
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
+            $PSCmdlet.ThrowTerminatingError($errorRecord)
+        }
     }
 } # Assert-ResourceProperty
 

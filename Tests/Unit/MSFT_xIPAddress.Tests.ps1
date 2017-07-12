@@ -11,6 +11,7 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:DSCModuleName `
     -DSCResourceName $script:DSCResourceName `
@@ -20,10 +21,13 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
+    # Import the Common Networking functions
+    Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'Modules\NetworkingDsc.Common\NetworkingDsc.Common.psm1') -Force
+
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
 
-        Describe "MSFT_xIPAddress\Get-TargetResource" {
+        Describe "MSFT_xIPAddress\Get-TargetResource" -Tag 'Get' {
 
             #region Mocks
             Mock Get-NetIPAddress -MockWith {
@@ -40,31 +44,43 @@ try
             Context 'invoking' {
                 It 'should return existing IP details' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/24'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
                     $Result = Get-TargetResource @Splat
                     $Result.IPAddress | Should Be $Splat.IPAddress
-                    $Result.PrefixLength | Should Be 24
                 }
             }
 
-            Context 'Prefix Length' {
-                It 'should fail if passed a negative number' {
-                    $Splat = @{
-                        IPAddress = '192.168.0.1'
+            #region Mocks
+            Mock Get-NetIPAddress -MockWith {
+                @('192.168.0.1', '192.168.0.2') | foreach-object {
+                    [PSCustomObject]@{
+                        IPAddress = $_
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = -16
+                        InterfaceIndex = 1
+                        PrefixLength = [byte]24
+                        AddressFamily = 'IPv4'
                     }
+                }
+            }
+            #endregion
 
-                    { Get-TargetResource @Splat } `
-                        | Should Throw 'Value was either too large or too small for a UInt32.'
+            Context 'invoking with multiple IP addresses' {
+                It 'should return existing IP details' {
+                    $Splat = @{
+                        IPAddress = @('192.168.0.1/24', '192.168.0.2/24')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Get-TargetResource @Splat
+                    $Result.IPAddress | Should Be $Splat.IPAddress
                 }
             }
         }
 
-        Describe "MSFT_xIPAddress\Set-TargetResource" {
+        Describe "MSFT_xIPAddress\Set-TargetResource" -Tag 'Set' {
 
             #region Mocks
             Mock Get-NetIPAddress -MockWith {
@@ -96,9 +112,9 @@ try
 
             Context 'invoking with valid IP Address' {
 
-                It 'should rerturn $null' {
+                It 'should return $null' {
                     $Splat = @{
-                        IPAddress = '10.0.0.2'
+                        IPAddress = '10.0.0.2/24'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -114,9 +130,265 @@ try
                     Assert-MockCalled -commandName New-NetIPAddress -Exactly 1
                 }
             }
+
+            Context 'invoking with multiple valid IP Address' {
+
+                It 'should return $null' {
+                    $Splat = @{
+                        IPAddress = @('10.0.0.2/24', '10.0.0.3/24')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    { $Result = Set-TargetResource @Splat } | Should Not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                It 'should call all the mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 2
+                }
+            }
+
+            Context "Invoking IPv4 Class A with no prefix" {
+                it "should return null" {
+                    $Splat = @{
+                        IPAddress = '10.11.12.13'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    { $Result = Set-TargetResource @Splat} | Should not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                it "should call all mocks" {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 1 -ParameterFilter {
+                        $PrefixLength -eq 8
+                    }
+                    
+                }
+            }
+
+            Context "Invoking IPv4 Class B with no prefix" {
+                it "should return null" {
+                    $Splat = @{
+                        IPAddress = '172.16.4.19'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    { $Result = Set-TargetResource @Splat} | Should not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                it "should call all mocks" {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 1 -ParameterFilter {
+                        $PrefixLength -eq 16
+                    }
+                    
+                }
+            }
+
+            Context "Invoking IPv4 Class C with no prefix" {
+                it "should return null" {
+                    $Splat = @{
+                        IPAddress = '192.168.10.19'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    { $Result = Set-TargetResource @Splat} | Should not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                it "should call all mocks" {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 1 -ParameterFilter {
+                        $PrefixLength -eq 24
+                    }
+                    
+                }
+            }
+
+            #region Mocks
+            Mock Get-NetIPAddress -MockWith {
+                [PSCustomObject]@{
+                    IPAddress = 'fe80::15'
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    PrefixLength = [byte]64
+                    AddressFamily = 'IPv6'
+                }
+            }
+
+            Mock New-NetIPAddress
+
+            Mock Get-NetRoute {
+                [PSCustomObject]@{
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    AddressFamily = 'IPv6'
+                    NextHop = 'fe80::16'
+                    DestinationPrefix = '::/0'
+                }
+            }
+
+            Mock Remove-NetIPAddress
+
+            Mock Remove-NetRoute
+            #endregion
+
+            Context 'invoking with valid IPv6 Address' {
+
+                It 'should return $null' {
+                    $Splat = @{
+                        IPAddress = 'fe80::17/64'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv6'
+                    }
+                    { $Result = Set-TargetResource @Splat } | Should Not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                It 'should call all the mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with multiple valid IPv6 Addresses' {
+
+                It 'should return $null' {
+                    $Splat = @{
+                        IPAddress = @('fe80::17/64', 'fe80::18/64')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv6'
+                    }
+                    { $Result = Set-TargetResource @Splat } | Should Not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                It 'should call all the mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 2
+                }
+            }
+
+            Context "Invoking IPv6 with no prefix" {
+                it "should return null" {
+                    $Splat = @{
+                        IPAddress = 'fe80::17'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv6'
+                    }
+                    { $Result = Set-TargetResource @Splat} | Should not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                it "should call all mocks" {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 1
+                    
+                }
+            }
+
+            #region mocks
+            Mock Get-NetIPAddress -MockWith {
+                $CurrentIPs = @(([PSCustomObject]@{
+                        IPAddress = '192.168.0.1'
+                        InterfaceAlias = 'Ethernet'
+                        InterfaceIndex = 1
+                        PrefixLength = [byte]24
+                        AddressFamily = 'IPv4'
+                    }),([PSCustomObject]@{
+                        IPAddress = '172.16.4.19'
+                        InterfaceAlias = 'Ethernet'
+                        InterfaceIndex = 1
+                        PrefixLength = [byte]16
+                        AddressFamily = 'IPv4'
+                    }))
+                    Return $CurrentIPs
+            }
+
+            Mock New-NetIPAddress
+
+            Mock Get-NetRoute {
+                [PSCustomObject]@{
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    AddressFamily = 'IPv4'
+                    NextHop = '192.168.0.254'
+                    DestinationPrefix = '0.0.0.0/0'
+                }
+            }
+
+            Mock Remove-NetIPAddress
+
+            Mock Remove-NetRoute
+            #endregion
+
+            Context "Invoking with different prefixes" {
+                it "should return null" {
+                    $Splat = @{
+                        IPAddress = '10.0.0.2/24','172.16.4.19/16'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    { $Result = Set-TargetResource @Splat} | Should not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                it "should call all mocks" {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 2
+                }
+            }
+
+            Context "Invoking with existing IP with different prefix" {
+                it "should return null" {
+                    $Splat = @{
+                        IPAddress = '172.16.4.19/24'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    { $Result = Set-TargetResource @Splat} | Should not Throw
+                    $Result | Should BeNullOrEmpty
+                }
+
+                it "should call all mocks" {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                    Assert-MockCalled -commandName Get-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
+                    Assert-MockCalled -commandName Remove-NetIPAddress -Exactly 2
+                    Assert-MockCalled -commandName New-NetIPAddress -Exactly 1
+                }
+            }
         }
 
-        Describe "MSFT_xIPAddress\Test-TargetResource" {
+        Describe "MSFT_xIPAddress\Test-TargetResource" -Tag 'Test' {
 
 
             #region Mocks
@@ -158,7 +430,7 @@ try
 
                 It 'should be $false' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/16'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -174,7 +446,7 @@ try
 
                 It 'should be $true' {
                     $Splat = @{
-                        IPAddress = '192.168.0.15'
+                        IPAddress = '192.168.0.15/16'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -185,6 +457,225 @@ try
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
                 }
             }
+
+            Context 'invoking with the same IPv4 Address but different prefix length' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = '192.168.0.15/24'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Mock Get-NetIPAddress -MockWith {
+
+                [PSCustomObject]@{
+                    IPAddress = @('192.168.0.15', '192.168.0.16')
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    PrefixLength = [byte]16
+                    AddressFamily = 'IPv4'
+                }
+            }
+            Context 'invoking with multiple different IPv4 Addresses' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = @('192.168.0.1/16', '192.168.0.2/16')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+            Context 'invoking with a single different IPv4 Address' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = '192.168.0.1/16'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with the same IPv4 Addresses' {
+
+                It 'should be $true' {
+                    $Splat = @{
+                        IPAddress = @('192.168.0.15/16', '192.168.0.16/16')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $true
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with the combination of same and different IPv4 Addresses' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = @('192.168.0.1/16', '192.168.0.16/16')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with a single different Class A IPv4 Address with no prefix' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = '10.1.0.1'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with a single different Class B IPv4 Address with no prefix' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = '172.16.0.1'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with a single different Class C IPv4 Address with no prefix' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = '192.168.0.1'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Mock Get-NetIPAddress -MockWith {
+
+                [PSCustomObject]@{
+                    IPAddress = @('10.1.0.1')
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    PrefixLength = [byte]8
+                    AddressFamily = 'IPv4'
+                }
+            }
+
+            Context 'invoking with the same Class A IPv4 Address with no prefix' {
+
+                It 'should be $true' {
+                    $Splat = @{
+                        IPAddress = '10.1.0.1'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $true
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Mock Get-NetIPAddress -MockWith {
+
+                [PSCustomObject]@{
+                    IPAddress = @('172.16.0.1')
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    PrefixLength = [byte]16
+                    AddressFamily = 'IPv4'
+                }
+            }
+
+            Context 'invoking with the same Class B IPv4 Address with no prefix' {
+
+                It 'should be $true' {
+                    $Splat = @{
+                        IPAddress = '172.16.0.1'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $true
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Mock Get-NetIPAddress -MockWith {
+
+                [PSCustomObject]@{
+                    IPAddress = @('192.168.0.1')
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    PrefixLength = [byte]24
+                    AddressFamily = 'IPv4'
+                }
+            }
+
+            Context 'invoking with the same Class C IPv4 Address with no prefix' {
+
+                It 'should be $true' {
+                    $Splat = @{
+                        IPAddress = '192.168.0.1'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $true
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
 
             Mock Get-NetIPAddress -MockWith {
 
@@ -202,7 +693,6 @@ try
                     $Splat = @{
                         IPAddress = 'BadAddress'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     $errorId = 'AddressFormatError'
@@ -221,9 +711,8 @@ try
 
                 It 'should be $false' {
                     $Splat = @{
-                        IPAddress = 'fe80::1'
+                        IPAddress = 'fe80::1/64'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     $Result = Test-TargetResource @Splat
@@ -238,13 +727,118 @@ try
 
                 It 'should be $true' {
                     $Splat = @{
-                        IPAddress = 'fe80::15'
+                        IPAddress = 'fe80::15/64'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     $Result = Test-TargetResource @Splat
                     $Result | Should Be $true
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with the same IPv6 Address with no prefix' {
+
+                It 'should be $true' {
+                    $Splat = @{
+                        IPAddress = 'fe80::15'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv6'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $true
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Mock Get-NetIPAddress -MockWith {
+
+                [PSCustomObject]@{
+                    IPAddress = @('fe80::15', 'fe80::16')
+                    InterfaceAlias = 'Ethernet'
+                    InterfaceIndex = 1
+                    PrefixLength = [byte]64
+                    AddressFamily = 'IPv6'
+                }
+            }
+
+            Context 'invoking with multiple different IPv6 Addresses' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = @('fe80::1/64', 'fe80::2/64')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv6'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with a single different IPv6 Address' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = 'fe80::1/64'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv6'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with the same IPv6 Addresses' {
+
+                It 'should be $true' {
+                    $Splat = @{
+                        IPAddress = @('fe80::15/64', 'fe80::16/64')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv6'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $true
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+            Context 'invoking with a mix of the same and different IPv6 Addresses' {
+
+                It 'should be $true' {
+                    $Splat = @{
+                        IPAddress = @('fe80::1/64', 'fe80::16/64')
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv6'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
+                }
+                It 'should call appropriate mocks' {
+                    Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
+                }
+            }
+
+            Context 'invoking with a single different IPv6 Address with no prefix' {
+
+                It 'should be $false' {
+                    $Splat = @{
+                        IPAddress = 'fe80::1'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv6'
+                    }
+                    $Result = Test-TargetResource @Splat
+                    $Result | Should Be $false
                 }
                 It 'should call appropriate mocks' {
                     Assert-MockCalled -commandName Get-NetIPAddress -Exactly 1
@@ -260,7 +854,7 @@ try
 
                 It 'should throw an InterfaceNotAvailable error' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/16'
                         InterfaceAlias = 'NotReal'
                         AddressFamily = 'IPv4'
                     }
@@ -296,11 +890,11 @@ try
                 }
             }
 
-            Context 'invoking with IP Address and family mismatch' {
+            Context 'invoking with IPv4 Address and IPv6 family mismatch' {
 
                 It 'should throw an AddressMismatchError error' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/16'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv6'
                     }
@@ -316,11 +910,43 @@ try
                 }
             }
 
+             Context 'invoking with IPv6 Address and IPv4 family mismatch' {
+
+                It 'should throw an AddressMismatchError error' {
+                    $Splat = @{
+                        IPAddress = 'fe80::15'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    $errorId = 'AddressMismatchError'
+                    $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
+                    $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f $Splat.IPAddress,$Splat.AddressFamily
+                    $exception = New-Object -TypeName System.InvalidOperationException `
+                        -ArgumentList $errorMessage
+                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                        -ArgumentList $exception, $errorId, $errorCategory, $null
+
+                    { Assert-ResourceProperty @Splat } | Should Throw $errorRecord
+                }
+            }
+
             Context 'invoking with valid IPv4 Address' {
 
                 It 'should not throw an error' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/16'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily = 'IPv4'
+                    }
+                    { Assert-ResourceProperty @Splat } | Should Not Throw
+                }
+            }
+
+            Context 'invoking with multiple valid IPv4 Addresses' {
+
+                It 'should not throw an error' {
+                    $Splat = @{
+                        IPAddress = @('192.168.0.1/24', '192.168.0.2/24')
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
@@ -332,9 +958,8 @@ try
 
                 It 'should not throw an error' {
                     $Splat = @{
-                        IPAddress = 'fe80:ab04:30F5:002b::1'
+                        IPAddress = 'fe80:ab04:30F5:002b::1/64'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 64
                         AddressFamily = 'IPv6'
                     }
                     { Assert-ResourceProperty @Splat } | Should Not Throw
@@ -345,14 +970,14 @@ try
 
                 It 'should throw a PrefixLengthError when greater than 32' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/33'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 33
                         AddressFamily = 'IPv4'
                     }
+                    $PrefixLength = ($Splat.IPAddress -split '/')[-1]
                     $errorId = 'PrefixLengthError'
                     $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-                    $errorMessage = $($LocalizedData.PrefixLengthError) -f $Splat.PrefixLength,$Splat.AddressFamily
+                    $errorMessage = $($LocalizedData.PrefixLengthError) -f $PrefixLength,$Splat.AddressFamily
                     $exception = New-Object -TypeName System.InvalidOperationException `
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
@@ -362,9 +987,8 @@ try
                 }
                 It 'should throw an Argument error when less than 0' {
                     $Splat = @{
-                        IPAddress = '192.168.0.1'
+                        IPAddress = '192.168.0.1/-1'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = -1
                         AddressFamily = 'IPv4'
                     }
                     { Assert-ResourceProperty @Splat } `
@@ -376,15 +1000,15 @@ try
 
                 It 'should throw a PrefixLengthError error when greater than 128' {
                     $Splat = @{
-                        IPAddress = 'fe80::1'
+                        IPAddress = 'fe80::1/129'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = 129
                         AddressFamily = 'IPv6'
                     }
 
+                    $PrefixLength = ($Splat.IPAddress -split '/')[-1]
                     $errorId = 'PrefixLengthError'
                     $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-                    $errorMessage = $($LocalizedData.PrefixLengthError) -f $Splat.PrefixLength,$Splat.AddressFamily
+                    $errorMessage = $($LocalizedData.PrefixLengthError) -f $PrefixLength,$Splat.AddressFamily
                     $exception = New-Object -TypeName System.InvalidOperationException `
                         -ArgumentList $errorMessage
                     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
@@ -394,9 +1018,8 @@ try
                 }
                 It 'should throw an Argument error when less than 0' {
                     $Splat = @{
-                        IPAddress = 'fe80::1'
+                        IPAddress = 'fe80::1/-1'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = -1
                         AddressFamily = 'IPv6'
                     }
 
@@ -409,9 +1032,8 @@ try
 
                 It 'should not throw an error' {
                     $Splat = @{
-                        IPAddress = 'fe80::1'
+                        IPAddress = 'fe80::1/64'
                         InterfaceAlias = 'Ethernet'
-                        PrefixLength = '64'
                         AddressFamily = 'IPv6'
                     }
                     { Assert-ResourceProperty @Splat } | Should Not Throw

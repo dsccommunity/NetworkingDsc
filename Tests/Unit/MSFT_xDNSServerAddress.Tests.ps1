@@ -1,6 +1,8 @@
 $script:DSCModuleName      = 'xNetworking'
 $script:DSCResourceName    = 'MSFT_xDNSServerAddress'
 
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
+
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
@@ -22,366 +24,466 @@ try
 {
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
-
         Describe "MSFT_xDNSServerAddress\Get-TargetResource" {
-
             # Test IPv4
 
             #region Mocks
-            Mock Get-DnsClientServerAddress -MockWith {
-
-                [PSCustomObject]@{
-                    ServerAddresses = '192.168.0.1'
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-            }
+            Mock Get-DnsClientServerStaticAddress -MockWith { '192.168.0.1' }
             #endregion
 
-            Context 'invoking with an IPv4 address' {
-                It 'should return true' {
-
-                    $Splat = @{
-                        Address = '192.168.0.1'
+            Context 'Invoking with an IPv4 address and one address is currently set' {
+                It 'Should return true' {
+                    $getTargetResourceSplat = @{
+                        Address        = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
                     }
-                    $Result = Get-TargetResource @Splat
-                    $Result.IPAddress | Should Be $Splat.IPAddress
+
+                    $Result = Get-TargetResource @getTargetResourceSplat
+                    $Result.Address | Should Be '192.168.0.1'
+                }
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                 }
             }
 
             # Test IPv6
 
             #region Mocks
-            Mock Get-DnsClientServerAddress -MockWith {
-
-                [PSCustomObject]@{
-                    ServerAddresses = 'fe80:ab04:30F5:002b::1'
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv6'
-                }
-            }
+            Mock Get-DnsClientServerStaticAddress -MockWith { 'fe80:ab04:30F5:002b::1' }
             #endregion
 
-            Context 'invoking with an IPv6 address' {
-                It 'should return true' {
-
-                    $Splat = @{
-                        Address = 'fe80:ab04:30F5:002b::1'
+            Context 'Invoking with an IPv6 address and one address is currently set' {
+                It 'Should return true' {
+                    $getTargetResourceSplat = @{
+                        Address        = 'fe80:ab04:30F5:002b::1'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv6'
+                        AddressFamily  = 'IPv6'
+                        Verbose        = $true
                     }
-                    $Result = Get-TargetResource @Splat
-                    $Result.IPAddress | Should Be $Splat.IPAddress
+
+                    $Result = Get-TargetResource @getTargetResourceSplat
+                    $Result.Address | Should Be 'fe80:ab04:30F5:002b::1'
+                }
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                }
+            }
+
+            # Test DHCP
+
+            #region Mocks
+            Mock Get-DnsClientServerStaticAddress -MockWith { $null }
+            #endregion
+
+            Context 'Invoking with an IPv4 address and DHCP is currently set' {
+                It 'Should return true' {
+                    $getTargetResourceSplat = @{
+                        Address        = '192.168.0.1'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
+                    }
+
+                    $Result = Get-TargetResource @getTargetResourceSplat
+                    $Result.Address | Should BeNullOrEmpty
+                }
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                 }
             }
         }
 
         Describe "MSFT_xDNSServerAddress\Set-TargetResource" {
-
             # Test IPv4
 
             #region Mocks
-            Mock Get-DnsClientServerAddress -MockWith {
-
-                [PSCustomObject]@{
-                    ServerAddresses = @('192.168.0.1')
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-            }
+            Mock Get-DnsClientServerStaticAddress -MockWith { '192.168.0.1' }
             Mock Set-DnsClientServerAddress -ParameterFilter { $Validate -eq $true }
             Mock Set-DnsClientServerAddress -ParameterFilter { $Validate -eq $false }
+            Mock Set-DnsClientServerAddress -ParameterFilter { $ResetServerAddresses -eq $true }
             #endregion
 
-            Context 'invoking with single IPv4 Server Address that is the same as current' {
-                It 'should not throw an exception' {
-
-                    $Splat = @{
-                        Address = @('192.168.0.1')
+            Context 'Invoking with single IPv4 server address that is the same as current' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        Address        = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
                     }
-                    { Set-TargetResource @Splat } | Should Not Throw
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
                 }
             }
-            Context 'invoking with single IPv4 Server Address that is different to current' {
-                It 'should not throw an exception' {
 
-                    $Splat = @{
-                        Address = @('192.168.0.2')
+            Context 'Invoking with single IPv4 server address that is different to current' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        Address        = '192.168.0.99'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
                     }
-                    { Set-TargetResource @Splat } | Should Not Throw
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
                 }
             }
-            Context 'invoking with single IPv4 Server Address that is different to current and validate true' {
-                It 'should not throw an exception' {
 
-                    $Splat = @{
-                        Address = @('192.168.0.2')
+            Context 'Invoking with single IPv4 server address that is different to current and validate true' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        Address        = '192.168.0.99'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
-                        Validate = $True
+                        AddressFamily  = 'IPv4'
+                        Validate       = $true
+                        Verbose        = $true
                     }
-                    { Set-TargetResource @Splat } | Should Not Throw
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $true }
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
                 }
             }
-            Context 'invoking with multiple IPv4 Server Addresses that are different to current' {
-                It 'should not throw an exception' {
 
-                    $Splat = @{
-                        Address = @('192.168.0.2','192.168.0.3')
+            Context 'Invoking with multiple IPv4 server addresses that are different to current' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        Address        = @( '192.168.0.99','192.168.0.100' )
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
                     }
-                    { Set-TargetResource @Splat } | Should Not Throw
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
+                }
+            }
+
+            Context 'Invoking with IPv4 server addresses set to DHCP but one address is currently assigned' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
+                    }
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                }
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $ResetServerAddresses -eq $true }
                 }
             }
 
             #region Mocks
-            Mock Get-DnsClientServerAddress -MockWith {
-
-                [PSCustomObject]@{
-                    ServerAddresses = @()
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-            }
+            Mock Get-DnsClientServerStaticAddress -MockWith { @( '192.168.0.1','192.168.0.2' ) }
             #endregion
 
-            Context 'invoking with multiple IPv4 Server Addresses When there are no address assiged' {
-                It 'should not throw an exception' {
-
-                    $Splat = @{
-                        Address = @('192.168.0.2','192.168.0.3')
+            Context 'Invoking with multiple IPv4 server addresses when there are different ones currently assigned' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        Address        = @( '192.168.0.3','192.168.0.4' )
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
                     }
-                    { Set-TargetResource @Splat } | Should Not Throw
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
+                }
+            }
+
+            #region Mocks
+            Mock Get-DnsClientServerStaticAddress -MockWith { $null }
+            #endregion
+
+            Context 'Invoking with multiple IPv4 server addresses when DHCP is currently set' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        Address        = @( '192.168.0.2','192.168.0.3' )
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
+                    }
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                }
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
                 }
             }
 
             # Test IPv6
 
             #region Mocks
-            Mock Get-DnsClientServerAddress -MockWith {
-
-                [PSCustomObject]@{
-                    ServerAddresses = @('fe80:ab04:30F5:002b::1')
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv6'
-                }
-            }
+            Mock Get-DnsClientServerStaticAddress -MockWith { 'fe80:ab04:30F5:002b::1' }
             Mock Set-DnsClientServerAddress -ParameterFilter { $Validate -eq $true }
             Mock Set-DnsClientServerAddress -ParameterFilter { $Validate -eq $false }
+            Mock Set-DnsClientServerAddress -ParameterFilter { $ResetServerAddresses -eq $true }
             #endregion
 
-            Context 'invoking with single IPv6 Server Address that is the same as current' {
-                It 'should not throw an exception' {
-
-                    $Splat = @{
-                        Address = @('fe80:ab04:30F5:002b::1')
+            Context 'Invoking with single IPv6 server address that is the same as current' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        Address        = 'fe80:ab04:30F5:002b::1'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv6'
+                        AddressFamily  = 'IPv6'
+                        Verbose        = $true
                     }
-                    { Set-TargetResource @Splat } | Should Not Throw
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
                 }
             }
-            Context 'invoking with single IPv6 Server Address that is different to current' {
-                It 'should not throw an exception' {
 
-                    $Splat = @{
-                        Address = @('fe80:ab04:30F5:002b::2')
+            Context 'Invoking with single IPv6 server address that is different to current' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        Address        = 'fe80:ab04:30F5:002b::2'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv6'
+                        AddressFamily  = 'IPv6'
+                        Verbose        = $true
                     }
-                    { Set-TargetResource @Splat } | Should Not Throw
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
                 }
             }
-            Context 'invoking with single IPv6 Server Address that is different to current and validate true' {
-                It 'should not throw an exception' {
 
-                    $Splat = @{
-                        Address = @('fe80:ab04:30F5:002b::2')
+            Context 'Invoking with single IPv6 server address that is different to current and validate true' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        Address        = 'fe80:ab04:30F5:002b::2'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv6'
-                        Validate = $True
+                        AddressFamily  = 'IPv6'
+                        Validate       = $true
+                        Verbose        = $true
                     }
-                    { Set-TargetResource @Splat } | Should Not Throw
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $true }
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
                 }
             }
-            Context 'invoking with multiple IPv6 Server Addresses that are different to current' {
-                It 'should not throw an exception' {
 
-                    $Splat = @{
-                        Address = @('fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2')
+            Context 'Invoking with multiple IPv6 server addresses that are different to current' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        Address        = @( 'fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2' )
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv6'
+                        AddressFamily  = 'IPv6'
+                        Verbose        = $true
                     }
-                    { Set-TargetResource @Splat } | Should Not Throw
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
+                }
+            }
+
+            Context 'Invoking with IPv6 server addresses set to DHCP but one address is currently assigned' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily  = 'IPv6'
+                        Verbose        = $true
+                    }
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                }
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $ResetServerAddresses -eq $true }
                 }
             }
 
             #region Mocks
-            Mock Get-DnsClientServerAddress -MockWith {
-
-                [PSCustomObject]@{
-                    ServerAddresses = @()
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv6'
-                }
-            }
+            Mock Get-DnsClientServerStaticAddress -MockWith { $null }
             #endregion
 
-            Context 'invoking with multiple IPv6 Server Addresses When there are no address assiged' {
-                It 'should not throw an exception' {
-
-                    $Splat = @{
-                        Address = @('fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::1')
+            Context 'Invoking with multiple IPv6 server addresses when DHCP is currently set' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        Address        = @( 'fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::1' )
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv6'
+                        AddressFamily  = 'IPv6'
+                        Verbose        = $true
                     }
-                    { Set-TargetResource @Splat } | Should Not Throw
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                     Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
                 }
             }
         }
 
         Describe "MSFT_xDNSServerAddress\Test-TargetResource" {
-
             # Test IPv4
 
             #region Mocks
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
-            Mock Get-DnsClientServerAddress -MockWith {
-
-                [PSCustomObject]@{
-                    ServerAddresses = @('192.168.0.1')
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-            }
+            Mock Get-DnsClientServerStaticAddress -MockWith { '192.168.0.1' }
             #endregion
 
-            Context 'invoking with single IPv4 Server Address that is the same as current' {
-                It 'should return true' {
-
-                    $Splat = @{
-                        Address = @('192.168.0.1')
+            Context 'Invoking with single IPv4 server address that is the same as current' {
+                It 'Should return true' {
+                    $testTargetResourceSplat = @{
+                        Address        = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
                     }
-                    Test-TargetResource @Splat | Should Be $True
+
+                    Test-TargetResource @testTargetResourceSplat | Should Be $true
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                 }
             }
-            Context 'invoking with single IPv4 Server Address that is different to current' {
-                It 'should return false' {
 
-                    $Splat = @{
-                        Address = @('192.168.0.2')
+            Context 'Invoking with single IPv4 server address that is different to current' {
+                It 'Should return false' {
+                    $testTargetResourceSplat = @{
+                        Address        = '192.168.0.2'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
                     }
-                    Test-TargetResource @Splat | Should Be $False
+
+                    Test-TargetResource @testTargetResourceSplat | Should Be $False
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                 }
             }
-            Context 'invoking with multiple IPv4 Server Addresses that are different to current' {
-                It 'should return false' {
 
-                    $Splat = @{
-                        Address = @('192.168.0.2','192.168.0.3')
+            Context 'Invoking with multiple IPv4 server addresses that are different to current' {
+                It 'Should return false' {
+                    $testTargetResourceSplat = @{
+                        Address        = @( '192.168.0.2','192.168.0.3' )
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
                     }
-                    Test-TargetResource @Splat | Should Be $False
+
+                    Test-TargetResource @testTargetResourceSplat | Should Be $False
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                }
+            }
+
+            Context 'Invoking with IPv4 server addresses set to DHCP but one address is currently assigned' {
+                It 'Should return false' {
+                    $testTargetResourceSplat = @{
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
+                    }
+
+                    Test-TargetResource @testTargetResourceSplat | Should Be $False
+                }
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                 }
             }
 
             #region Mocks
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
-            Mock Get-DnsClientServerAddress -MockWith {
-
-                [PSCustomObject]@{
-                    ServerAddresses = @()
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv4'
-                }
-            }
+            Mock Get-DnsClientServerStaticAddress -MockWith { $null }
             #endregion
 
-            Context 'invoking with multiple IPv4 Server Addresses that are no addresses assigned' {
-                It 'should return false' {
-
-                    $Splat = @{
-                        Address = @('192.168.0.2','192.168.0.3')
+            Context 'Invoking with multiple IPv4 server addresses but DHCP is currently enabled' {
+                It 'Should return false' {
+                    $testTargetResourceSplat = @{
+                        Address        = @( '192.168.0.2','192.168.0.3' )
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
                     }
-                    Test-TargetResource @Splat | Should Be $False
+
+                    Test-TargetResource @testTargetResourceSplat | Should Be $False
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                 }
             }
 
@@ -389,197 +491,196 @@ try
 
             #region Mocks
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
-            Mock Get-DnsClientServerAddress -MockWith {
-
-                [PSCustomObject]@{
-                    ServerAddresses = @('fe80:ab04:30F5:002b::1')
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv6'
-                }
-            }
+            Mock Get-DnsClientServerStaticAddress -MockWith { 'fe80:ab04:30F5:002b::1' }
             #endregion
 
-            Context 'invoking with single IPv6 Server Address that is the same as current' {
-                It 'should return true' {
-
-                    $Splat = @{
-                        Address = @('fe80:ab04:30F5:002b::1')
+            Context 'Invoking with single IPv6 server address that is the same as current' {
+                It 'Should return true' {
+                    $testTargetResourceSplat = @{
+                        Address        = 'fe80:ab04:30F5:002b::1'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv6'
+                        AddressFamily  = 'IPv6'
+                        Verbose        = $true
                     }
-                    Test-TargetResource @Splat | Should Be $True
+
+                    Test-TargetResource @testTargetResourceSplat | Should Be $true
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                 }
             }
-            Context 'invoking with single IPv6 Server Address that is different to current' {
-                It 'should return false' {
 
-                    $Splat = @{
-                        Address = @('fe80:ab04:30F5:002b::2')
+            Context 'Invoking with single IPv6 server address that is different to current' {
+                It 'Should return false' {
+                    $testTargetResourceSplat = @{
+                        Address        = 'fe80:ab04:30F5:002b::2'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv6'
+                        AddressFamily  = 'IPv6'
+                        Verbose        = $true
                     }
-                    Test-TargetResource @Splat | Should Be $False
+
+                    Test-TargetResource @testTargetResourceSplat | Should Be $False
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                 }
             }
-            Context 'invoking with multiple IPv6 Server Addresses that are different to current' {
-                It 'should return false' {
 
-                    $Splat = @{
-                        Address = @('fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2')
+            Context 'Invoking with multiple IPv6 server addresses that are different to current' {
+                It 'Should return false' {
+                    $testTargetResourceSplat = @{
+                        Address        = @( 'fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2' )
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv6'
+                        AddressFamily  = 'IPv6'
+                        Verbose        = $true
                     }
-                    Test-TargetResource @Splat | Should Be $False
+
+                    Test-TargetResource @testTargetResourceSplat | Should Be $False
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                }
+            }
+
+            Context 'Invoking with IPv6 server addresses set to DHCP but one address is currently assigned' {
+                It 'Should return false' {
+                    $testTargetResourceSplat = @{
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily  = 'IPv6'
+                        Verbose        = $true
+                    }
+
+                    Test-TargetResource @testTargetResourceSplat | Should Be $False
+                }
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                 }
             }
 
             #region Mocks
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
-            Mock Get-DnsClientServerAddress -MockWith {
-
-                [PSCustomObject]@{
-                    ServerAddresses = @()
-                    InterfaceAlias = 'Ethernet'
-                    AddressFamily = 'IPv6'
-                }
-            }
+            Mock Get-DnsClientServerStaticAddress -MockWith { $null }
             #endregion
 
-            Context 'invoking with multiple IPv6 Server Addresses that are no addresses assigned' {
-                It 'should return false' {
-
-                    $Splat = @{
-                        Address = @('fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2')
+            Context 'Invoking with multiple IPv6 server addresses but DHCP is currently enabled' {
+                It 'Should return false' {
+                    $testTargetResourceSplat = @{
+                        Address        = @( 'fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2' )
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv6'
+                        AddressFamily  = 'IPv6'
+                        Verbose        = $true
                     }
-                    Test-TargetResource @Splat | Should Be $False
+
+                    Test-TargetResource @testTargetResourceSplat | Should Be $False
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientServerAddress -Exactly 1
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                 }
             }
-
         }
 
         Describe "MSFT_xDNSServerAddress\Assert-ResourceProperty" {
-
             Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
 
-            Context 'invoking with bad interface alias' {
-
-                It 'should throw an InterfaceNotAvailable error' {
-                    $Splat = @{
-                        Address = '192.168.0.1'
+            Context 'Invoking with bad interface alias' {
+                It 'Should throw the expected exception' {
+                    $assertResourcePropertySplat = @{
+                        Address        = '192.168.0.1'
                         InterfaceAlias = 'NotReal'
-                        AddressFamily = 'IPv4'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
                     }
-                    $errorId = 'InterfaceNotAvailable'
-                    $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
-                    $errorMessage = $($LocalizedData.InterfaceNotAvailableError) -f $Splat.InterfaceAlias
-                    $exception = New-Object -TypeName System.InvalidOperationException `
-                        -ArgumentList $errorMessage
-                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                        -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.InterfaceNotAvailableError -f $assertResourcePropertySplat.InterfaceAlias) `
+                        -ArgumentName 'InterfaceAlias'
+
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should Throw $ErrorRecord
                 }
             }
 
-            Context 'invoking with invalid IP Address' {
-
-                It 'should throw an AddressFormatError error' {
-                    $Splat = @{
-                        Address = 'NotReal'
+            Context 'Invoking with invalid IP Address' {
+                It 'Should throw the expected exception' {
+                    $assertResourcePropertySplat = @{
+                        Address        = 'NotReal'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
                     }
-                    $errorId = 'AddressFormatError'
-                    $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-                    $errorMessage = $($LocalizedData.AddressFormatError) -f $Splat.Address
-                    $exception = New-Object -TypeName System.InvalidOperationException `
-                        -ArgumentList $errorMessage
-                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                        -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.AddressFormatError -f $assertResourcePropertySplat.Address) `
+                        -ArgumentName 'Address'
+
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should Throw $ErrorRecord
                 }
             }
 
-            Context 'invoking with IPv4 Address and family mismatch' {
-
-                It 'should throw an AddressMismatchError error' {
-                    $Splat = @{
-                        Address = '192.168.0.1'
+            Context 'Invoking with IPv4 Address and family mismatch' {
+                It 'Should throw the expected exception' {
+                    $assertResourcePropertySplat = @{
+                        Address        = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv6'
+                        AddressFamily  = 'IPv6'
+                        Verbose        = $true
                     }
-                    $errorId = 'AddressMismatchError'
-                    $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-                    $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f $Splat.Address,$Splat.AddressFamily
-                    $exception = New-Object -TypeName System.InvalidOperationException `
-                        -ArgumentList $errorMessage
-                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                        -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.AddressIPv4MismatchError -f $assertResourcePropertySplat.Address,$assertResourcePropertySplat.AddressFamily) `
+                        -ArgumentName 'Address'
+
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should Throw $ErrorRecord
                 }
             }
 
-            Context 'invoking with IPv6 Address and family mismatch' {
-
-                It 'should throw an AddressMismatchError error' {
-                    $Splat = @{
-                        Address = 'fe80::'
+            Context 'Invoking with IPv6 Address and family mismatch' {
+                It 'Should throw the expected exception' {
+                    $assertResourcePropertySplat = @{
+                        Address        = 'fe80::'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
                     }
-                    $errorId = 'AddressMismatchError'
-                    $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-                    $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f $Splat.Address,$Splat.AddressFamily
-                    $exception = New-Object -TypeName System.InvalidOperationException `
-                        -ArgumentList $errorMessage
-                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                        -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.AddressIPv6MismatchError -f $assertResourcePropertySplat.Address,$assertResourcePropertySplat.AddressFamily) `
+                        -ArgumentName 'Address'
+
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should Throw $ErrorRecord
                 }
             }
 
-            Context 'invoking with valid IPv4 Addresses' {
-
-                It 'should not throw an error' {
-                    $Splat = @{
-                        Address = '192.168.0.1'
+            Context 'Invoking with valid IPv4 Addresses' {
+                It 'Should not throw an error' {
+                    $assertResourcePropertySplat = @{
+                        Address        = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv4'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
                     }
-                    { Assert-ResourceProperty @Splat } | Should Not Throw
+
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should Not Throw
                 }
             }
 
-            Context 'invoking with valid IPv6 Addresses' {
-
-                It 'should not throw an error' {
-                    $Splat = @{
-                        Address = 'fe80:ab04:30F5:002b::1'
+            Context 'Invoking with valid IPv6 Addresses' {
+                It 'Should not throw an error' {
+                    $assertResourcePropertySplat = @{
+                        Address        = 'fe80:ab04:30F5:002b::1'
                         InterfaceAlias = 'Ethernet'
-                        AddressFamily = 'IPv6'
+                        AddressFamily  = 'IPv6'
+                        Verbose        = $true
                     }
-                    { Assert-ResourceProperty @Splat } | Should Not Throw
+
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should Not Throw
                 }
             }
         }
-
     } #end InModuleScope $DSCResourceName
     #endregion
 }
