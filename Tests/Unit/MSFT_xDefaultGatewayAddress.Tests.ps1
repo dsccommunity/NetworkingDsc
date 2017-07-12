@@ -1,6 +1,8 @@
 $script:DSCModuleName      = 'xNetworking'
 $script:DSCResourceName    = 'MSFT_xDefaultGatewayAddress'
 
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
+
 #region HEADER
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
@@ -21,97 +23,102 @@ try
 {
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
-
-        Describe "MSFT_xDefaultGatewayAddress\Get-TargetResource" {
-
-            #region Mocks
-            Mock Get-NetRoute -MockWith {
-                [PSCustomObject]@{
-                    NextHop = '192.168.0.1'
-                    DestinationPrefix = '0.0.0.0/0'
-                    InterfaceAlias = 'Ethernet'
-                    InterfaceIndex = 1
-                    AddressFamily = 'IPv4'
+        Describe 'MSFT_xDefaultGatewayAddress\Get-TargetResource' {
+            Context 'Checking return with default gateway' {
+                #region Mocks
+                Mock Get-NetRoute -MockWith {
+                    [PSCustomObject]@{
+                        NextHop = '192.168.0.1'
+                        DestinationPrefix = '0.0.0.0/0'
+                        InterfaceAlias = 'Ethernet'
+                        InterfaceIndex = 1
+                        AddressFamily = 'IPv4'
+                    }
                 }
-            }
-            #endregion
+                #endregion
 
-            Context 'checking return with default gateway' {
-                It 'should return current default gateway' {
-
-                    $Splat = @{
+                It 'Should return current default gateway' {
+                    $getTargetResourceParameters = @{
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    $Result = Get-TargetResource @Splat
-                    $Result.Address | Should Be '192.168.0.1'
+
+                    $result = Get-TargetResource @getTargetResourceParameters
+
+                    $result.Address | Should Be '192.168.0.1'
                 }
             }
 
-            #region Mocks
-            Mock Get-NetRoute -MockWith {}
-            #endregion
+            Context 'Checking return with no default gateway' {
+                #region Mocks
+                Mock Get-NetRoute -MockWith {}
+                #endregion
 
-            Context 'checking return with no default gateway' {
-                It 'should return no default gateway' {
-
-                    $Splat = @{
+                It 'Should return no default gateway' {
+                    $getTargetResourceParameters = @{
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    $Result = Get-TargetResource @Splat
-                    $Result.Address | Should BeNullOrEmpty
+
+                    $result = Get-TargetResource @getTargetResourceParameters
+
+                    $result.Address | Should BeNullOrEmpty
                 }
             }
         }
 
-        Describe "MSFT_xDefaultGatewayAddress\Set-TargetResource" {
-
-            #region Mocks
-            Mock Get-NetRoute -MockWith {
-                [PSCustomObject]@{
-                    NextHop = '192.168.0.1'
-                    DestinationPrefix = '0.0.0.0/0'
-                    InterfaceAlias = 'Ethernet'
-                    InterfaceIndex = 1
-                    AddressFamily = 'IPv4'
+        Describe 'MSFT_xDefaultGatewayAddress\Set-TargetResource' {
+            BeforeEach {
+                #region Mocks
+                Mock Get-NetRoute -MockWith {
+                    [PSCustomObject]@{
+                        NextHop = '192.168.0.1'
+                        DestinationPrefix = '0.0.0.0/0'
+                        InterfaceAlias = 'Ethernet'
+                        InterfaceIndex = 1
+                        AddressFamily = 'IPv4'
+                    }
                 }
+
+                Mock Remove-NetRoute
+
+                Mock New-NetRoute
+                #endregion
             }
 
-            Mock Remove-NetRoute
-
-            Mock New-NetRoute
-            #endregion
-
-            Context 'invoking with no Default Gateway Address' {
-                It 'should return $null' {
-                    $Splat = @{
+            Context 'Invoking with no Default Gateway Address' {
+                It 'Should return $null' {
+                    $setTargetResourceParameters = @{
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    { $Result = Set-TargetResource @Splat } | Should Not Throw
-                    $Result | Should BeNullOrEmpty
+
+                    { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
+
+                    $result | Should BeNullOrEmpty
                 }
 
-                It 'should call all the mocks' {
+                It 'Should call all the mocks' {
                     Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                     Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
                     Assert-MockCalled -commandName New-NetRoute -Exactly 0
                 }
             }
 
-            Context 'invoking with valid Default Gateway Address' {
-                It 'should return $null' {
-                    $Splat = @{
+            Context 'Invoking with valid Default Gateway Address' {
+                It 'Should return $null' {
+                    $setTargetResourceParameters = @{
                         Address = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    { $Result = Set-TargetResource @Splat } | Should Not Throw
-                    $Result | Should BeNullOrEmpty
+
+                    { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
+
+                    $result | Should BeNullOrEmpty
                 }
 
-                It 'should call all the mocks' {
+                It 'Should call all the mocks' {
                     Assert-MockCalled -commandName Get-NetRoute -Exactly 1
                     Assert-MockCalled -commandName Remove-NetRoute -Exactly 1
                     Assert-MockCalled -commandName New-NetRoute -Exactly 1
@@ -119,178 +126,181 @@ try
             }
         }
 
-        Describe "MSFT_xDefaultGatewayAddress\Test-TargetResource" {
-
-            #region Mocks
-            Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
-
-            Mock Get-NetRoute -MockWith {
-                [PSCustomObject]@{
-                    NextHop = '192.168.0.1'
-                    DestinationPrefix = '0.0.0.0/0'
-                    InterfaceAlias = 'Ethernet'
-                    InterfaceIndex = 1
-                    AddressFamily = 'IPv4'
-                }
+        Describe 'MSFT_xDefaultGatewayAddress\Test-TargetResource' {
+            BeforeEach {
+                #region Mocks
+                Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+                #endregion
             }
-            #endregion
 
-            Context 'checking return with default gateway that matches currently set one' {
-                It 'should return true' {
+            Context 'Checking return with default gateway that matches currently set one' {
+                #region Mocks
+                Mock Get-NetRoute -MockWith {
+                    [PSCustomObject]@{
+                        NextHop = '192.168.0.1'
+                        DestinationPrefix = '0.0.0.0/0'
+                        InterfaceAlias = 'Ethernet'
+                        InterfaceIndex = 1
+                        AddressFamily = 'IPv4'
+                    }
+                }
+                #endregion
 
-                    $Splat = @{
+                It 'Should return true' {
+                    $testTargetResourceParameters = @{
                         Address = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    Test-TargetResource @Splat | Should Be $True
+
+                    Test-TargetResource @testTargetResourceParameters | Should Be $True
                 }
             }
 
-            Context 'checking return with no gateway but one is currently set' {
-                It 'should return false' {
+            Context 'Checking return with no gateway but one is currently set' {
+                #region Mocks
+                Mock Get-NetRoute -MockWith {
+                    [PSCustomObject]@{
+                        NextHop = '192.168.0.1'
+                        DestinationPrefix = '0.0.0.0/0'
+                        InterfaceAlias = 'Ethernet'
+                        InterfaceIndex = 1
+                        AddressFamily = 'IPv4'
+                    }
+                }
+                #endregion
 
-                    $Splat = @{
+                It 'Should return false' {
+                    $testTargetResourceParameters = @{
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    Test-TargetResource @Splat | Should Be $False
+
+                    Test-TargetResource @testTargetResourceParameters | Should Be $False
                 }
             }
 
-            #region Mocks
-            Mock Get-NetRoute -MockWith {}
-            #endregion
+            Context 'Checking return with default gateway but none are currently set' {
+                #region Mocks
+                Mock Get-NetRoute -MockWith {}
+                #endregion
 
-            Context 'checking return with default gateway but none are currently set' {
-                It 'should return false' {
-
-                    $Splat = @{
+                It 'Should return false' {
+                    $testTargetResourceParameters = @{
                         Address = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    Test-TargetResource @Splat | Should Be $False
+
+                    Test-TargetResource @testTargetResourceParameters | Should Be $False
                 }
             }
 
-            Context 'checking return with no gateway and none are currently set' {
-                It 'should return true' {
+            Context 'Checking return with no gateway and none are currently set' {
+                #region Mocks
+                Mock Get-NetRoute -MockWith {}
+                #endregion
 
-                    $Splat = @{
+                It 'Should return true' {
+                    $testTargetResourceParameters = @{
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    Test-TargetResource @Splat | Should Be $True
+
+                    Test-TargetResource @testTargetResourceParameters | Should Be $True
                 }
             }
         }
 
-        Describe "MSFT_xDefaultGatewayAddress\Assert-ResourceProperty" {
+        Describe 'MSFT_xDefaultGatewayAddress\Assert-ResourceProperty' {
+            BeforeEach {
+                Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+            }
 
-            Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
-
-            Context 'invoking with bad interface alias' {
-
-                It 'should throw an InterfaceNotAvailable error' {
-                    $Splat = @{
+            Context 'Invoking with bad interface alias' {
+                It 'Should throw an InterfaceNotAvailable error' {
+                    $assertResourcePropertyParameters = @{
                         Address = '192.168.0.1'
                         InterfaceAlias = 'NotReal'
                         AddressFamily = 'IPv4'
                     }
-                    $errorId = 'InterfaceNotAvailable'
-                    $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
-                    $errorMessage = $($LocalizedData.InterfaceNotAvailableError) -f $Splat.InterfaceAlias
-                    $exception = New-Object -TypeName System.InvalidOperationException `
-                        -ArgumentList $errorMessage
-                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                        -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($LocalizedData.InterfaceNotAvailableError -f $assertResourcePropertyParameters.InterfaceAlias)
+
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $ErrorRecord
                 }
             }
 
-            Context 'invoking with invalid IP Address' {
-
-                It 'should throw an AddressFormatError error' {
-                    $Splat = @{
+            Context 'Invoking with invalid IP Address' {
+                It 'Should throw an AddressFormatError error' {
+                    $assertResourcePropertyParameters = @{
                         Address = 'NotReal'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    $errorId = 'AddressFormatError'
-                    $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-                    $errorMessage = $($LocalizedData.AddressFormatError) -f $Splat.Address
-                    $exception = New-Object -TypeName System.InvalidOperationException `
-                        -ArgumentList $errorMessage
-                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                        -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.AddressFormatError -f $assertResourcePropertyParameters.Address) `
+                        -ArgumentName 'Address'
+
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $ErrorRecord
                 }
             }
 
-            Context 'invoking with IPv4 Address and family mismatch' {
-
-                It 'should throw an AddressMismatchError error' {
-                    $Splat = @{
+            Context 'Invoking with IPv4 Address and family mismatch' {
+                It 'Should throw an AddressMismatchError error' {
+                    $assertResourcePropertyParameters = @{
                         Address = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv6'
                     }
-                    $errorId = 'AddressMismatchError'
-                    $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-                    $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f $Splat.Address,$Splat.AddressFamily
-                    $exception = New-Object -TypeName System.InvalidOperationException `
-                        -ArgumentList $errorMessage
-                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                        -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.AddressIPv4MismatchError -f $assertResourcePropertyParameters.Address,$assertResourcePropertyParameters.AddressFamily) `
+                        -ArgumentName 'AddressFamily'
+
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $ErrorRecord
                 }
             }
 
-            Context 'invoking with IPv6 Address and family mismatch' {
-
-                It 'should throw an AddressMismatchError error' {
-                    $Splat = @{
+            Context 'Invoking with IPv6 Address and family mismatch' {
+                It 'Should throw an AddressMismatchError error' {
+                    $assertResourcePropertyParameters = @{
                         Address = 'fe80::'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    $errorId = 'AddressMismatchError'
-                    $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-                    $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f $Splat.Address,$Splat.AddressFamily
-                    $exception = New-Object -TypeName System.InvalidOperationException `
-                        -ArgumentList $errorMessage
-                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                        -ArgumentList $exception, $errorId, $errorCategory, $null
 
-                    { Assert-ResourceProperty @Splat } | Should Throw $ErrorRecord
+                    $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($LocalizedData.AddressIPv6MismatchError -f $assertResourcePropertyParameters.Address,$assertResourcePropertyParameters.AddressFamily) `
+                        -ArgumentName 'AddressFamily'
+
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $ErrorRecord
                 }
             }
 
-            Context 'invoking with valid IPv4 Address' {
-
-                It 'should not throw an error' {
-                    $Splat = @{
+            Context 'Invoking with valid IPv4 Address' {
+                It 'Should not throw an error' {
+                    $assertResourcePropertyParameters = @{
                         Address = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv4'
                     }
-                    { Assert-ResourceProperty @Splat } | Should Not Throw
+
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Not Throw
                 }
             }
 
-            Context 'invoking with valid IPv6 Address' {
-
-                It 'should not throw an error' {
-                    $Splat = @{
+            Context 'Invoking with valid IPv6 Address' {
+                It 'Should not throw an error' {
+                    $assertResourcePropertyParameters = @{
                         Address = 'fe80:ab04:30F5:002b::1'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily = 'IPv6'
                     }
-                    { Assert-ResourceProperty @Splat } | Should Not Throw
+
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Not Throw
                 }
             }
         }
