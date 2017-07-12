@@ -127,10 +127,14 @@ try
         }
 
         Describe 'MSFT_xDefaultGatewayAddress\Test-TargetResource' {
-            Context 'Checking return with default gateway that matches currently set one' {
+            BeforeEach {
                 #region Mocks
                 Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
+                #endregion
+            }
 
+            Context 'Checking return with default gateway that matches currently set one' {
+                #region Mocks
                 Mock Get-NetRoute -MockWith {
                     [PSCustomObject]@{
                         NextHop = '192.168.0.1'
@@ -155,8 +159,6 @@ try
 
             Context 'Checking return with no gateway but one is currently set' {
                 #region Mocks
-                Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
-
                 Mock Get-NetRoute -MockWith {
                     [PSCustomObject]@{
                         NextHop = '192.168.0.1'
@@ -180,8 +182,6 @@ try
 
             Context 'Checking return with default gateway but none are currently set' {
                 #region Mocks
-                Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
-
                 Mock Get-NetRoute -MockWith {}
                 #endregion
 
@@ -198,8 +198,6 @@ try
 
             Context 'Checking return with no gateway and none are currently set' {
                 #region Mocks
-                Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
-
                 Mock Get-NetRoute -MockWith {}
                 #endregion
 
