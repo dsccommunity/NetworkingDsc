@@ -24,6 +24,7 @@
 - MSFT_xDefaultGatewayAddress:
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
+- Updated badges in README.MD to match the layout from PSDscResources.
 
 ## 4.1.0.0
 
