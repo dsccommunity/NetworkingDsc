@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '4.2.0.0'
+ModuleVersion = '5.0.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -73,7 +73,9 @@ PrivateData = @{
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
 - Updated badges in README.MD to match the layout from PSDscResources.
-
+- MSFT_xIPAddress:
+  - BREAKING CHANGE: Adding support for multiple IP addresses being assigned.
+ 
 '
 
     } # End of PSData hashtable
