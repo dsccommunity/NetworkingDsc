@@ -6,7 +6,8 @@ $TestDefaultGatewayAddress = [PSObject]@{
 
 configuration MSFT_xDefaultGatewayAddress_Config {
     Import-DscResource -ModuleName xNetworking
-    node localhost {
+
+    Node localhost {
         xDefaultGatewayAddress Integration_Test
         {
             InterfaceAlias = $TestDefaultGatewayAddress.InterfaceAlias

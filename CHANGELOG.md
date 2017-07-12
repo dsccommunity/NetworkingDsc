@@ -25,6 +25,9 @@
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
 - Updated badges in README.MD to match the layout from PSDscResources.
+- MSFT_xDhcpClient:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
 
 ## 4.1.0.0
 
