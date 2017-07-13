@@ -297,6 +297,7 @@ function Assert-ResourceProperty
         [String]
         $InterfaceAlias,
 
+        [Parameter()]
         [ValidateSet('IPv4', 'IPv6')]
         [String]
         $AddressFamily = 'IPv4',

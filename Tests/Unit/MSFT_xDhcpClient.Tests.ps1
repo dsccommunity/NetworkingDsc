@@ -1,13 +1,15 @@
-﻿$script:DSCModuleName      = 'xNetworking'
-$script:DSCResourceName    = 'MSFT_xDhcpClient'
+﻿$script:DSCModuleName = 'xNetworking'
+$script:DSCResourceName = 'MSFT_xDhcpClient'
+
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -24,190 +26,207 @@ try
     InModuleScope $script:DSCResourceName {
 
         # Create the Mock Objects that will be used for running tests
-        $MockNetAdapter = [PSCustomObject] @{
-            Name                    = 'Ethernet'
+        $mockNetAdapter = [PSCustomObject] @{
+            Name = 'Ethernet'
         }
 
-        $TestNetIPInterfaceEnabled = [PSObject]@{
-            State                   = 'Enabled'
-            InterfaceAlias          = $MockNetAdapter.Name
-            AddressFamily           = 'IPv4'
+        $testNetIPInterfaceEnabled = [PSObject]@{
+            State          = 'Enabled'
+            InterfaceAlias = $mockNetAdapter.Name
+            AddressFamily  = 'IPv4'
         }
 
-        $TestNetIPInterfaceDisabled = [PSObject]@{
-            State                   = 'Disabled'
-            InterfaceAlias          = $MockNetAdapter.Name
-            AddressFamily           = 'IPv4'
+        $testNetIPInterfaceDisabled = [PSObject]@{
+            State          = 'Disabled'
+            InterfaceAlias = $mockNetAdapter.Name
+            AddressFamily  = 'IPv4'
         }
 
-        $MockNetIPInterfaceEnabled = [PSObject]@{
-            Dhcp                    = $TestNetIPInterfaceEnabled.State
-            InterfaceAlias          = $TestNetIPInterfaceEnabled.Name
-            AddressFamily           = $TestNetIPInterfaceEnabled.AddressFamily
+        $mockNetIPInterfaceEnabled = [PSObject]@{
+            Dhcp           = $testNetIPInterfaceEnabled.State
+            InterfaceAlias = $testNetIPInterfaceEnabled.Name
+            AddressFamily  = $testNetIPInterfaceEnabled.AddressFamily
         }
 
-        $MockNetIPInterfaceDisabled = [PSObject]@{
-            Dhcp                    = $TestNetIPInterfaceDisabled.State
-            InterfaceAlias          = $TestNetIPInterfaceDisabled.Name
-            AddressFamily           = $TestNetIPInterfaceDisabled.AddressFamily
+        $mockNetIPInterfaceDisabled = [PSObject]@{
+            Dhcp           = $testNetIPInterfaceDisabled.State
+            InterfaceAlias = $testNetIPInterfaceDisabled.Name
+            AddressFamily  = $testNetIPInterfaceDisabled.AddressFamily
         }
 
-        Describe "MSFT_xDhcpClient\Get-TargetResource" {
+        Describe 'MSFT_xDhcpClient\Get-TargetResource' {
+            BeforeEach {
+                Mock -CommandName Get-NetAdapter -MockWith { $mockNetAdapter }
+            }
 
-            Mock Get-NetAdapter -MockWith { $MockNetAdapter }
-            Mock Get-NetIPInterface -MockWith { $MockNetIPInterfaceEnabled }
+            Context 'Invoking with when DHCP is enabled' {
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
 
-            Context 'invoking with when DHCP is enabled' {
-                It 'should return DHCP state of enabled' {
-                    $Result = Get-TargetResource @TestNetIPInterfaceEnabled
-                    $Result.State          | Should Be $TestNetIPInterfaceEnabled.State
-                    $Result.InterfaceAlias | Should Be $TestNetIPInterfaceEnabled.InterfaceAlias
-                    $Result.AddressFamily  | Should Be $TestNetIPInterfaceEnabled.AddressFamily
+                It 'Should return DHCP state of enabled' {
+                    $Result = Get-TargetResource @testNetIPInterfaceEnabled
+                    $Result.State          | Should Be $testNetIPInterfaceEnabled.State
+                    $Result.InterfaceAlias | Should Be $testNetIPInterfaceEnabled.InterfaceAlias
+                    $Result.AddressFamily  | Should Be $testNetIPInterfaceEnabled.AddressFamily
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
+
+                It 'Should call the expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-NetIPInterface -Exactly -Times 1
                 }
             }
 
-            Mock Get-NetIPInterface -MockWith { $MockNetIPInterfaceDisabled }
+            Context 'Invoking with when DHCP is disabled' {
+                Mock Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
 
-            Context 'invoking with when DHCP is disabled' {
-                It 'should return DHCP state of disabled' {
-                    $Result = Get-TargetResource @TestNetIPInterfaceDisabled
-                    $Result.State          | Should Be $TestNetIPInterfaceDisabled.State
-                    $Result.InterfaceAlias | Should Be $TestNetIPInterfaceDisabled.InterfaceAlias
-                    $Result.AddressFamily  | Should Be $TestNetIPInterfaceDisabled.AddressFamily
+                It 'Should return DHCP state of disabled' {
+                    $Result = Get-TargetResource @testNetIPInterfaceDisabled
+                    $Result.State          | Should Be $testNetIPInterfaceDisabled.State
+                    $Result.InterfaceAlias | Should Be $testNetIPInterfaceDisabled.InterfaceAlias
+                    $Result.AddressFamily  | Should Be $testNetIPInterfaceDisabled.AddressFamily
                 }
-                It 'should call all the mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
+
+                It 'Should call the expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-NetIPInterface -Exactly -Times 1
                 }
             }
         }
 
-        Describe "MSFT_xDhcpClient\Set-TargetResource" {
+        Describe 'MSFT_xDhcpClient\Set-TargetResource' {
+            BeforeEach {
+                Mock -CommandName Get-NetAdapter -MockWith { $mockNetAdapter }
+                Mock -CommandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Enabled' }
+                Mock -CommandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Disabled' }
+            }
 
-            Mock Get-NetAdapter -MockWith { $MockNetAdapter }
-            Mock Get-NetIPInterface -MockWith { $MockNetIPInterfaceDisabled }
-            Mock Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Enabled' }
-            Mock Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Disabled' }
+            Context 'Invoking with state enabled but DHCP is currently disabled' {
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
 
-            Context 'invoking with state enabled but DHCP is currently disabled' {
-                It 'should not throw an exception' {
-                    { Set-TargetResource @TestNetIPInterfaceEnabled } | Should Not Throw
+                It 'Should not throw an exception' {
+                    { Set-TargetResource @testNetIPInterfaceEnabled } | Should Not Throw
                 }
-                It 'should call appropriate mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
-                    Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Enabled' } -Exactly 1
-                    Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Disabled' } -Exactly 0
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-NetIPInterface -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Enabled' } -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Disabled' } -Exactly -Times 0
                 }
             }
 
             Context 'invoking with state disabled and DHCP is currently disabled' {
-                It 'should not throw an exception' {
-                    { Set-TargetResource @TestNetIPInterfaceDisabled } | Should Not Throw
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
+
+                It 'Should not throw an exception' {
+                    { Set-TargetResource @testNetIPInterfaceDisabled } | Should Not Throw
                 }
-                It 'should call appropriate mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
-                    Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Enabled' } -Exactly 0
-                    Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Disabled' } -Exactly 1
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-NetIPInterface -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Enabled' } -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Disabled' } -Exactly -Times 1
                 }
             }
 
-            Mock Get-NetIPInterface -MockWith { $MockNetIPInterfaceEnabled }
-
             Context 'invoking with state enabled and DHCP is currently enabled' {
-                It 'should not throw an exception' {
-                    { Set-TargetResource @TestNetIPInterfaceEnabled } | Should Not Throw
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
+
+                It 'Should not throw an exception' {
+                    { Set-TargetResource @testNetIPInterfaceEnabled } | Should Not Throw
                 }
-                It 'should call appropriate mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
-                    Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Enabled' } -Exactly 1
-                    Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Disabled' } -Exactly 0
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-NetIPInterface -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Enabled' } -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Disabled' } -Exactly -Times 0
                 }
             }
 
             Context 'invoking with state disabled but DHCP is currently enabled' {
-                It 'should not throw an exception' {
-                    { Set-TargetResource @TestNetIPInterfaceDisabled } | Should Not Throw
-                }
-                It 'should call appropriate mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
-                    Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Enabled' } -Exactly 0
-                    Assert-MockCalled -commandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Disabled' } -Exactly 1
-                }
-            }
-        }
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
 
-        Describe "MSFT_xDhcpClient\Test-TargetResource" {
+                It 'Should not throw an exception' {
+                    { Set-TargetResource @testNetIPInterfaceDisabled } | Should Not Throw
+                }
 
-            Mock Get-NetAdapter -MockWith { $MockNetAdapter }
-            Mock Get-NetIPInterface -MockWith { $MockNetIPInterfaceDisabled }
-
-            Context 'invoking with state enabled but DHCP is currently disabled' {
-                It 'should return false' {
-                    Test-TargetResource @TestNetIPInterfaceEnabled | Should Be $False
-                }
-                It 'should call all mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
-                }
-            }
-
-            Context 'invoking with state disabled and DHCP is currently disabled' {
-                It 'should return true' {
-                    Test-TargetResource @TestNetIPInterfaceDisabled | Should Be $True
-                }
-                It 'should call all mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
-                }
-            }
-
-            Mock Get-NetIPInterface -MockWith { $MockNetIPInterfaceEnabled }
-
-            Context 'invoking with state enabled and DHCP is currently enabled' {
-                It 'should return true' {
-                    Test-TargetResource @TestNetIPInterfaceEnabled | Should Be $True
-                }
-                It 'should call all mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
-                }
-            }
-
-            Context 'invoking with state disabled but DHCP is currently enabled' {
-                It 'should return false' {
-                    Test-TargetResource @TestNetIPInterfaceDisabled | Should Be $False
-                }
-                It 'should call all mocks' {
-                    Assert-MockCalled -commandName Get-NetAdapter -Exactly 1
-                    Assert-MockCalled -commandName Get-NetIPInterface -Exactly 1
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-NetIPInterface -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Enabled' } -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-NetIPInterface -ParameterFilter { $dhcp -eq 'Disabled' } -Exactly -Times 1
                 }
             }
         }
 
-        Describe "MSFT_xDhcpClient\Assert-ResourceProperty" {
+        Describe 'MSFT_xDhcpClient\Test-TargetResource' {
+            BeforeEach {
+                Mock -CommandName Get-NetAdapter -MockWith { $mockNetAdapter }
+            }
 
-            Mock Get-NetAdapter
+            Context 'Invoking with state enabled but DHCP is currently disabled' {
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
 
-            Context 'invoking with bad interface alias' {
+                It 'Should return false' {
+                    Test-TargetResource @testNetIPInterfaceEnabled | Should Be $False
+                }
 
-                It 'should throw an InterfaceNotAvailable error' {
-                    $errorId = 'InterfaceNotAvailable'
-                    $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
-                    $errorMessage = $($LocalizedData.InterfaceNotAvailableError) -f $TestNetIPInterfaceEnabled.InterfaceAlias
-                    $exception = New-Object -TypeName System.InvalidOperationException `
-                        -ArgumentList $errorMessage
-                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                        -ArgumentList $exception, $errorId, $errorCategory, $null
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-NetIPInterface -Exactly -Times 1
+                }
+            }
 
-                    { Assert-ResourceProperty @TestNetIPInterfaceEnabled } | Should Throw $ErrorRecord
+            Context 'Invoking with state disabled and DHCP is currently disabled' {
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
+
+                It 'Should return true' {
+                    Test-TargetResource @testNetIPInterfaceDisabled | Should Be $True
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-NetIPInterface -Exactly -Times 1
+                }
+            }
+
+            Context 'Invoking with state enabled and DHCP is currently enabled' {
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
+
+                It 'Should return true' {
+                    Test-TargetResource @testNetIPInterfaceEnabled | Should Be $True
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-NetIPInterface -Exactly -Times 1
+                }
+            }
+
+            Context 'Invoking with state disabled but DHCP is currently enabled' {
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
+
+                It 'Should return false' {
+                    Test-TargetResource @testNetIPInterfaceDisabled | Should Be $False
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-NetIPInterface -Exactly -Times 1
+                }
+            }
+        }
+
+        Describe 'MSFT_xDhcpClient\Assert-ResourceProperty' {
+            Context 'Invoking with bad interface alias' {
+                Mock -CommandName Get-NetAdapter
+
+                It 'Should throw an InterfaceNotAvailable error' {
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($LocalizedData.InterfaceNotAvailableError -f $testNetIPInterfaceEnabled.InterfaceAlias)
+
+                    { Assert-ResourceProperty @testNetIPInterfaceEnabled } | Should Throw $errorRecord
                 }
             }
         }

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- MSFT_xDhcpClient:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+
 ## 5.0.0.0
 
 - Find-NetworkAdapter:

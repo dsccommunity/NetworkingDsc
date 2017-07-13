@@ -2,13 +2,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
@@ -35,38 +35,38 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String]
+        [System.String]
         $State
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.GettingDHCPClientMessage) `
-        -f $InterfaceAlias,$AddressFamily `
+            $($LocalizedData.GettingDHCPClientMessage) `
+                -f $InterfaceAlias, $AddressFamily `
         ) -join '')
 
     Assert-ResourceProperty @PSBoundParameters
 
-    $CurrentDHCPClient = Get-NetIPInterface `
+    $currentDHCPClient = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily
 
     $returnValue = @{
-        State          = $CurrentDHCPClient.Dhcp
+        State          = $currentDHCPClient.Dhcp
         AddressFamily  = $AddressFamily
         InterfaceAlias = $InterfaceAlias
     }
 
-    $returnValue
+    return $returnValue
 }
 
 <#
@@ -88,28 +88,28 @@ function Set-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String]
+        [System.String]
         $State
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.ApplyingDHCPClientMessage) `
-        -f $InterfaceAlias,$AddressFamily `
+            $($LocalizedData.ApplyingDHCPClientMessage) `
+                -f $InterfaceAlias, $AddressFamily `
         ) -join '')
 
     Assert-ResourceProperty @PSBoundParameters
 
-    $CurrentDHCPClient = Get-NetIPInterface `
+    $null = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily
 
@@ -121,8 +121,8 @@ function Set-TargetResource
         -ErrorAction Stop
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.DHCPClientSetStateMessage) `
-        -f $InterfaceAlias,$AddressFamily,$State `
+            $($LocalizedData.DHCPClientSetStateMessage) `
+                -f $InterfaceAlias, $AddressFamily, $State `
         ) -join '' )
 
 } # Set-TargetResource
@@ -147,40 +147,40 @@ function Test-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String]
+        [System.String]
         $State
     )
 
     # Flag to signal whether settings are correct
-    [Boolean] $desiredConfigurationMatch = $true
+    [System.Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.CheckingDHCPClientMessage) `
-        -f $InterfaceAlias,$AddressFamily `
+            $($LocalizedData.CheckingDHCPClientMessage) `
+                -f $InterfaceAlias, $AddressFamily `
         ) -join '')
 
     Assert-ResourceProperty @PSBoundParameters
 
-    $CurrentDHCPClient = Get-NetIPInterface `
+    $currentDHCPClient = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily
 
     # The DHCP Client is in a different state - so change it.
-    if ($CurrentDHCPClient.DHCP -ne $State)
+    if ($currentDHCPClient.DHCP -ne $State)
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.DHCPClientDoesNotMatchMessage) `
-            -f $InterfaceAlias,$AddressFamily,$State `
+                $($LocalizedData.DHCPClientDoesNotMatchMessage) `
+                    -f $InterfaceAlias, $AddressFamily, $State `
             ) -join '' )
         $desiredConfigurationMatch = $false
     }
@@ -209,31 +209,24 @@ function Assert-ResourceProperty
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
-        [String]
+        [System.String]
         $State
     )
 
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
-        $errorId = 'InterfaceNotAvailable'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
-        $errorMessage = $($LocalizedData.InterfaceNotAvailableError) -f $InterfaceAlias
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
+        New-InvalidOperationException `
+            -Message ($LocalizedData.InterfaceNotAvailableError -f $InterfaceAlias)
     }
 } # Assert-ResourceProperty
 
