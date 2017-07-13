@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '4.1.0.0'
+ModuleVersion = '5.0.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -50,16 +50,39 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- Added integration test to test for conflicts with other common resource kit modules.
-- Prevented ResourceHelper and Common module cmdlets from being exported to resolve
-  conflicts with other resource modules.
-
+        ReleaseNotes = '- Find-NetworkAdapter:
+  - Fixed to return null if exception thrown.
+  - Allowed passing no selection parameters.
+- MSFT_xNetAdapterName:
+  - Fixed bug in Get-TargetResource when Name is the only adapter selector parameter.
+  - Improved verbose logging.
+  - More improvements to verbose logging.
+- Added Get-DnsClientServerStaticAddress to NetworkingDsc.Common to return statically
+  assigned DNS server addresses to support fix for [issue 113](https://github.com/PowerShell/xNetworking/issues/113).
+- MSFT_xDNSserverAddress:
+  - Added support for setting DNS Client to DHCP for [issue 113](https://github.com/PowerShell/xNetworking/issues/113).
+  - Added new examples to show how to enable DHCP on DNS Client.
+  - Improved integration test coverage to enable testing of multiple addresses and
+    DHCP.
+  - Converted exception creation to use common exception functions.
+- MSFT_xDhcpClient:
+  - Updated example to also cover setting DNS Client to DHCP.
+- Added the VS Code PowerShell extension formatting settings that cause PowerShell
+  files to be formatted as per the DSC Resource kit style guidelines.
+- MSFT_xDefaultGatewayAddress:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- Updated badges in README.MD to match the layout from PSDscResources.
+- MSFT_xIPAddress:
+  - BREAKING CHANGE: Adding support for multiple IP addresses being assigned.
+ 
 '
 
     } # End of PSData hashtable
 
 } # End of PrivateData hashtable
 }
+
 
 
 
