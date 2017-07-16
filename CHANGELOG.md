@@ -5,6 +5,11 @@
 - MSFT_xDhcpClient:
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
+- README.MD:
+  - Cleaned up badges by putting them into a table.
+- MSFT_xDnsConnectionSuffix:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
 
 ## 5.0.0.0
 

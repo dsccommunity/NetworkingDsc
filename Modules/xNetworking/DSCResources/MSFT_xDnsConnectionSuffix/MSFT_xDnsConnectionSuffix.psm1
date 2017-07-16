@@ -2,13 +2,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
@@ -51,28 +51,34 @@ function Get-TargetResource
         [System.String]
         $ConnectionSpecificSuffix,
 
+        [Parameter()]
         [System.Boolean]
         $RegisterThisConnectionsAddress = $true,
 
+        [Parameter()]
         [System.Boolean]
         $UseSuffixWhenRegistering = $false,
 
-        [ValidateSet('Present','Absent')]
+        [Parameter()]
+        [ValidateSet('Present', 'Absent')]
         [System.String]
         $Ensure = 'Present'
     )
 
     $dnsClient = Get-DnsClient -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
+
     $targetResource = @{
         InterfaceAlias                 = $dnsClient.InterfaceAlias
         ConnectionSpecificSuffix       = $dnsClient.ConnectionSpecificSuffix
         RegisterThisConnectionsAddress = $dnsClient.RegisterThisConnectionsAddress
         UseSuffixWhenRegistering       = $dnsClient.UseSuffixWhenRegistering
     }
+
     if ($Ensure -eq 'Present')
     {
-        ## Test to see if the connection-specific suffix matches
+        # Test to see if the connection-specific suffix matches
         Write-Verbose -Message ($LocalizedData.CheckingConnectionSuffix -f $ConnectionSpecificSuffix)
+
         if ($dnsClient.ConnectionSpecificSuffix -eq $ConnectionSpecificSuffix)
         {
             $Ensure = 'Present'
@@ -84,8 +90,9 @@ function Get-TargetResource
     }
     else
     {
-        ## ($Ensure -eq 'Absent'). Test to see if there is a connection-specific suffix
+        # ($Ensure -eq 'Absent'). Test to see if there is a connection-specific suffix
         Write-Verbose -Message ($LocalizedData.CheckingConnectionSuffix -f '')
+
         if ([System.String]::IsNullOrEmpty($dnsClient.ConnectionSpecificSuffix))
         {
             $Ensure = 'Absent'
@@ -95,7 +102,9 @@ function Get-TargetResource
             $Ensure = 'Present'
         }
     }
+
     $targetResource['Ensure'] = $Ensure
+
     return $targetResource
 }
 
@@ -134,34 +143,41 @@ function Set-TargetResource
         [System.String]
         $ConnectionSpecificSuffix,
 
+        [Parameter()]
         [System.Boolean]
         $RegisterThisConnectionsAddress = $true,
 
+        [Parameter()]
         [System.Boolean]
         $UseSuffixWhenRegistering = $false,
 
-        [ValidateSet('Present','Absent')]
+        [Parameter()]
+        [ValidateSet('Present', 'Absent')]
         [System.String]
         $Ensure = 'Present'
     )
 
     $setDnsClientParams = @{
-        InterfaceAlias = $InterfaceAlias
+        InterfaceAlias                 = $InterfaceAlias
         RegisterThisConnectionsAddress = $RegisterThisConnectionsAddress
-        UseSuffixWhenRegistering = $UseSuffixWhenRegistering
+        UseSuffixWhenRegistering       = $UseSuffixWhenRegistering
     }
+
     if ($Ensure -eq 'Present')
     {
         $setDnsClientParams['ConnectionSpecificSuffix'] = $ConnectionSpecificSuffix
+
         Write-Verbose -Message ($LocalizedData.SettingConnectionSuffix `
-            -f $ConnectionSpecificSuffix, $InterfaceAlias)
+                -f $ConnectionSpecificSuffix, $InterfaceAlias)
     }
     else
     {
         $setDnsClientParams['ConnectionSpecificSuffix'] = ''
+
         Write-Verbose -Message ($LocalizedData.RemovingConnectionSuffix `
-            -f $ConnectionSpecificSuffix, $InterfaceAlias)
+                -f $ConnectionSpecificSuffix, $InterfaceAlias)
     }
+
     Set-DnsClient @setDnsClientParams
 }
 
@@ -201,37 +217,47 @@ function Test-TargetResource
         [System.String]
         $ConnectionSpecificSuffix,
 
+        [Parameter()]
         [System.Boolean]
         $RegisterThisConnectionsAddress = $true,
 
+        [Parameter()]
         [System.Boolean]
         $UseSuffixWhenRegistering = $false,
 
-        [ValidateSet('Present','Absent')]
+        [Parameter()]
+        [ValidateSet('Present', 'Absent')]
         [System.String]
         $Ensure = 'Present'
     )
 
     $targetResource = Get-TargetResource @PSBoundParameters
     $inDesiredState = $true
+
     if ($targetResource.Ensure -ne $Ensure)
     {
         Write-Verbose -Message ($LocalizedData.PropertyMismatch `
-            -f 'Ensure', $Ensure, $targetResource.Ensure)
+                -f 'Ensure', $Ensure, $targetResource.Ensure)
+
         $inDesiredState = $false
     }
+
     if ($targetResource.RegisterThisConnectionsAddress -ne $RegisterThisConnectionsAddress)
     {
         Write-Verbose -Message ($LocalizedData.PropertyMismatch `
-            -f 'RegisterThisConnectionsAddress', $RegisterThisConnectionsAddress, $targetResource.RegisterThisConnectionsAddress)
+                -f 'RegisterThisConnectionsAddress', $RegisterThisConnectionsAddress, $targetResource.RegisterThisConnectionsAddress)
+
         $inDesiredState = $false
     }
+
     if ($targetResource.UseSuffixWhenRegistering -ne $UseSuffixWhenRegistering)
     {
         Write-Verbose -Message ($LocalizedData.PropertyMismatch `
-            -f 'UseSuffixWhenRegistering', $UseSuffixWhenRegistering, $targetResource.UseSuffixWhenRegistering)
+                -f 'UseSuffixWhenRegistering', $UseSuffixWhenRegistering, $targetResource.UseSuffixWhenRegistering)
+
         $inDesiredState = $false
     }
+
     if ($inDesiredState)
     {
         Write-Verbose -Message $LocalizedData.ResourceInDesiredState
@@ -240,6 +266,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message $LocalizedData.ResourceNotInDesiredState
     }
+
     return $inDesiredState
 }
 
