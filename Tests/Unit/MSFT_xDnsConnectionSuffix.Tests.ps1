@@ -1,13 +1,13 @@
-$script:DSCModuleName      = 'xNetworking'
-$script:DSCResourceName    = 'MSFT_xDnsConnectionSuffix'
+$script:DSCModuleName = 'xNetworking'
+$script:DSCResourceName = 'MSFT_xDnsConnectionSuffix'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -23,75 +23,75 @@ try
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
 
-        $testDnsSuffix = 'example.local';
-        $testInterfaceAlias = 'Ethernet';
+        $testDnsSuffix = 'example.local'
+        $testInterfaceAlias = 'Ethernet'
         $testDnsSuffixParams = @{
-            InterfaceAlias = $testInterfaceAlias;
-            ConnectionSpecificSuffix = $testDnsSuffix;
+            InterfaceAlias           = $testInterfaceAlias
+            ConnectionSpecificSuffix = $testDnsSuffix
         }
 
         $fakeDnsSuffixPresent = @{
-            InterfaceAlias = $testInterfaceAlias;
-            ConnectionSpecificSuffix = $testDnsSuffix;
-            RegisterThisConnectionsAddress = $true;
-            UseSuffixWhenRegistering = $false;
+            InterfaceAlias                 = $testInterfaceAlias
+            ConnectionSpecificSuffix       = $testDnsSuffix
+            RegisterThisConnectionsAddress = $true
+            UseSuffixWhenRegistering       = $false
         }
 
-        $fakeDnsSuffixMismatch = $fakeDnsSuffixPresent.Clone();
-        $fakeDnsSuffixMismatch['ConnectionSpecificSuffix'] = 'mismatch.local';
+        $fakeDnsSuffixMismatch = $fakeDnsSuffixPresent.Clone()
+        $fakeDnsSuffixMismatch['ConnectionSpecificSuffix'] = 'mismatch.local'
 
-        $fakeDnsSuffixAbsent = $fakeDnsSuffixPresent.Clone();
-        $fakeDnsSuffixAbsent['ConnectionSpecificSuffix'] = '';
+        $fakeDnsSuffixAbsent = $fakeDnsSuffixPresent.Clone()
+        $fakeDnsSuffixAbsent['ConnectionSpecificSuffix'] = ''
 
 
-       Describe "MSFT_xDnsConnectionSuffix\Get-TargetResource" {
+        Describe "MSFT_xDnsConnectionSuffix\Get-TargetResource" {
             Context 'Validates "Get-TargetResource" method' {
-                It 'Returns a "System.Collections.Hashtable" object type' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent; }
+                It 'Should return a "System.Collections.Hashtable" object type' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
 
-                    $targetResource = Get-TargetResource @testDnsSuffixParams;
+                    $targetResource = Get-TargetResource @testDnsSuffixParams
 
-                    $targetResource -is [System.Collections.Hashtable] | Should Be $true;
+                    $targetResource -is [System.Collections.Hashtable] | Should Be $true
                 }
 
-                It 'Returns "Present" when DNS suffix matches and "Ensure" = "Present"' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent; }
+                It 'Should return "Present" when DNS suffix matches and "Ensure" = "Present"' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
 
-                    $targetResource = Get-TargetResource @testDnsSuffixParams;
+                    $targetResource = Get-TargetResource @testDnsSuffixParams
 
-                    $targetResource.Ensure | Should Be 'Present';
+                    $targetResource.Ensure | Should Be 'Present'
                 }
 
-                It 'Returns "Absent" when DNS suffix does not match and "Ensure" = "Present"' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixMismatch; }
+                It 'Should return "Absent" when DNS suffix does not match and "Ensure" = "Present"' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixMismatch }
 
-                    $targetResource = Get-TargetResource @testDnsSuffixParams;
+                    $targetResource = Get-TargetResource @testDnsSuffixParams
 
-                    $targetResource.Ensure | Should Be 'Absent';
+                    $targetResource.Ensure | Should Be 'Absent'
                 }
 
-                It 'Returns "Absent" when no DNS suffix is defined and "Ensure" = "Present"' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixAbsent; }
+                It 'Should return "Absent" when no DNS suffix is defined and "Ensure" = "Present"' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixAbsent }
 
-                    $targetResource = Get-TargetResource @testDnsSuffixParams;
+                    $targetResource = Get-TargetResource @testDnsSuffixParams
 
-                    $targetResource.Ensure | Should Be 'Absent';
+                    $targetResource.Ensure | Should Be 'Absent'
                 }
 
-                It 'Returns "Absent" when no DNS suffix is defined and "Ensure" = "Absent"' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixAbsent; }
+                It 'Should return "Absent" when no DNS suffix is defined and "Ensure" = "Absent"' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixAbsent }
 
-                    $targetResource = Get-TargetResource @testDnsSuffixParams -Ensure Absent;
+                    $targetResource = Get-TargetResource @testDnsSuffixParams -Ensure Absent
 
-                    $targetResource.Ensure | Should Be 'Absent';
+                    $targetResource.Ensure | Should Be 'Absent'
                 }
 
-                It 'Returns "Present" when DNS suffix is defined and "Ensure" = "Absent"' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent; }
+                It 'Should return "Present" when DNS suffix is defined and "Ensure" = "Absent"' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
 
-                    $targetResource = Get-TargetResource @testDnsSuffixParams -Ensure Absent;
+                    $targetResource = Get-TargetResource @testDnsSuffixParams -Ensure Absent
 
-                    $targetResource.Ensure | Should Be 'Present';
+                    $targetResource.Ensure | Should Be 'Present'
                 }
 
             } #end Context 'Validates "Get-TargetResource" method'
@@ -99,89 +99,97 @@ try
 
         Describe "MSFT_xDnsConnectionSuffix\Test-TargetResource" {
             Context 'Validates "Test-TargetResource" method' {
+                It 'Should pass when all properties match and "Ensure" = "Present"' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
 
-                It 'Passes when all properties match and "Ensure" = "Present"' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent; }
+                    $targetResource = Test-TargetResource @testDnsSuffixParams
 
-                    $targetResource = Test-TargetResource @testDnsSuffixParams;
-
-                    $targetResource | Should Be $true;
-                }
-                It 'Passes when no DNS suffix is registered and "Ensure" = "Absent"' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixAbsent; }
-
-                    $targetResource = Test-TargetResource @testDnsSuffixParams -Ensure Absent;
-
-                    $targetResource | Should Be $true;
-                }
-                It 'Passes when "RegisterThisConnectionsAddress" setting is correct' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent; }
-
-                    $targetResource = Test-TargetResource @testDnsSuffixParams -RegisterThisConnectionsAddress $true;
-
-                    $targetResource | Should Be $true;
-                }
-                It 'Passes when "UseSuffixWhenRegistering" setting is correct' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent; }
-
-                    $targetResource = Test-TargetResource @testDnsSuffixParams -UseSuffixWhenRegistering $false;
-
-                    $targetResource | Should Be $true;
+                    $targetResource | Should Be $true
                 }
 
-                It 'Fails when no DNS suffix is registered and "Ensure" = "Present"' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixAbsent; }
+                It 'Should pass when no DNS suffix is registered and "Ensure" = "Absent"' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixAbsent }
 
-                    $targetResource = Test-TargetResource @testDnsSuffixParams;
+                    $targetResource = Test-TargetResource @testDnsSuffixParams -Ensure Absent
 
-                    $targetResource | Should Be $false;
+                    $targetResource | Should Be $true
                 }
-                It 'Fails when the registered DNS suffix is incorrect and "Ensure" = "Present"' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixMismatch; }
 
-                    $targetResource = Test-TargetResource @testDnsSuffixParams;
+                It 'Should pass when "RegisterThisConnectionsAddress" setting is correct' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
 
-                    $targetResource | Should Be $false;
+                    $targetResource = Test-TargetResource @testDnsSuffixParams -RegisterThisConnectionsAddress $true
+
+                    $targetResource | Should Be $true
                 }
-                It 'Fails when a DNS suffix is registered and "Ensure" = "Absent"' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent; }
 
-                    $targetResource = Test-TargetResource @testDnsSuffixParams -Ensure Absent;
+                It 'Should pass when "UseSuffixWhenRegistering" setting is correct' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
 
-                    $targetResource | Should Be $false;
+                    $targetResource = Test-TargetResource @testDnsSuffixParams -UseSuffixWhenRegistering $false
+
+                    $targetResource | Should Be $true
                 }
-                It 'Fails when "RegisterThisConnectionsAddress" setting is incorrect' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent; }
 
-                    $targetResource = Test-TargetResource @testDnsSuffixParams -RegisterThisConnectionsAddress $false;
 
-                    $targetResource | Should Be $false;
+                It 'Should fail when no DNS suffix is registered and "Ensure" = "Present"' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixAbsent }
+
+                    $targetResource = Test-TargetResource @testDnsSuffixParams
+
+                    $targetResource | Should Be $false
                 }
-                It 'Fails when "UseSuffixWhenRegistering" setting is incorrect' {
-                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent; }
 
-                    $targetResource = Test-TargetResource @testDnsSuffixParams -UseSuffixWhenRegistering $true;
+                It 'Should fail when the registered DNS suffix is incorrect and "Ensure" = "Present"' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixMismatch }
 
-                    $targetResource | Should Be $false;
+                    $targetResource = Test-TargetResource @testDnsSuffixParams
+
+                    $targetResource | Should Be $false
+                }
+
+                It 'Should fail when a DNS suffix is registered and "Ensure" = "Absent"' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
+
+                    $targetResource = Test-TargetResource @testDnsSuffixParams -Ensure Absent
+
+                    $targetResource | Should Be $false
+                }
+
+                It 'Should fail when "RegisterThisConnectionsAddress" setting is incorrect' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
+
+                    $targetResource = Test-TargetResource @testDnsSuffixParams -RegisterThisConnectionsAddress $false
+
+                    $targetResource | Should Be $false
+                }
+
+                It 'Should fail when "UseSuffixWhenRegistering" setting is incorrect' {
+                    Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
+
+                    $targetResource = Test-TargetResource @testDnsSuffixParams -UseSuffixWhenRegistering $true
+
+                    $targetResource | Should Be $false
                 }
             } #end Context 'Validates "Test-TargetResource" method'
         }
 
         Describe "MSFT_xDnsConnectionSuffix\Test-TargetResource" {
             Context 'Validates "Set-TargetResource" method' {
-                It 'Calls "Set-DnsClient" with specified DNS suffix when "Ensure" = "Present"' {
+                It 'Should call "Set-DnsClient" with specified DNS suffix when "Ensure" = "Present"' {
                     Mock Set-DnsClient -ParameterFilter { $InterfaceAlias -eq $testInterfaceAlias -and $ConnectionSpecificSuffix -eq $testDnsSuffix } { }
 
-                    Set-TargetResource @testDnsSuffixParams;
+                    Set-TargetResource @testDnsSuffixParams
 
-                    Assert-MockCalled Set-DnsClient -ParameterFilter { $InterfaceAlias -eq $testInterfaceAlias -and $ConnectionSpecificSuffix -eq $testDnsSuffix } -Scope It;
+                    Assert-MockCalled Set-DnsClient -ParameterFilter { $InterfaceAlias -eq $testInterfaceAlias -and $ConnectionSpecificSuffix -eq $testDnsSuffix } -Scope It
                 }
-                It 'Calls "Set-DnsClient" with no DNS suffix when "Ensure" = "Absent"' {
+
+                It 'Should call "Set-DnsClient" with no DNS suffix when "Ensure" = "Absent"' {
                     Mock Set-DnsClient -ParameterFilter { $InterfaceAlias -eq $testInterfaceAlias -and $ConnectionSpecificSuffix -eq '' } { }
 
-                    Set-TargetResource @testDnsSuffixParams -Ensure Absent;
+                    Set-TargetResource @testDnsSuffixParams -Ensure Absent
 
-                    Assert-MockCalled Set-DnsClient -ParameterFilter { $InterfaceAlias -eq $testInterfaceAlias -and $ConnectionSpecificSuffix -eq '' } -Scope It;
+                    Assert-MockCalled Set-DnsClient -ParameterFilter { $InterfaceAlias -eq $testInterfaceAlias -and $ConnectionSpecificSuffix -eq '' } -Scope It
                 }
             } #end Context 'Validates "Set-TargetResource" method'
         }
