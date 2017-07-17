@@ -10,6 +10,10 @@
 - MSFT_xDnsConnectionSuffix:
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
+- README.MD:
+  - Converted badges to use branch header as used in xSQLServer.
+- Added standard .markdownlint.json to configure rules to run on
+  Markdown files.
 
 ## 5.0.0.0
 
@@ -283,11 +287,12 @@
 - MSFT_xFirewall: Set-TargetResource now updates firewall rules instead of
   recreating them.
 - MSFT_xFirewall: Added message localization support.
-- MSFT_xFirewall: Removed unessesary code for handling multiple rules with same name.
-- MSFT_xDefaultGatewayAddress: Removed unessesary try/catch logic from around
+- MSFT_xFirewall: Removed unnecessary code for handling multiple rules with same
+  name.
+- MSFT_xDefaultGatewayAddress: Removed unnecessary try/catch logic from around
   networking cmdlets.
-- MSFT_xIPAddress: Removed unessesary try/catch logic from around networking cmdlets.
-- MSFT_xDNSServerAddress: Removed unessesary try/catch logic from around
+- MSFT_xIPAddress: Removed unnecessary try/catch logic from around networking cmdlets.
+- MSFT_xDNSServerAddress: Removed unnecessary try/catch logic from around
   networking cmdlets.
 - MSFT_xDefaultGatewayAddress: Refactored to add more unit tests and cleanup logic.
 - MSFT_xIPAddress: Network Connection Profile no longer forced to Private when
