@@ -1,10 +1,5 @@
 # xNetworking
 
-| Branch | Build Status | Code Coverage |
-| --- | --- | --- |
-| master | [![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/master) | [![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking/branch/master) |
-| dev | [![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/dev) | [![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking/branch/dev) |
-
 The **xNetworking** module contains the following resources:
 
 - **xFirewall**: Sets a node's firewall rules.
@@ -32,6 +27,24 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any
 additional questions or comments.
 
+## Branches
+
+### master
+
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/master)
+[![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking/branch/master)
+
+This is the branch containing the latest release - no contributions should be made
+directly to this branch.
+
+### dev
+
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/dev)[![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking/branch/dev)
+
+This is the development branch to which contributions should be proposed by contributors
+as pull requests. This development branch will periodically be merged to the master
+branch, and be released to [PowerShell Gallery](https://www.powershellgallery.com/).
+
 ## Contributing
 
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
@@ -50,7 +63,7 @@ not installed. Please ensure this update is installed if this error occurs.
     preference via -Debug switch or $DebugPreference variable, and try again.
 ````
 
-### Known Invalid Configuraiton
+### Known Invalid Configuration
 
 - The exception 'One of the port keywords is invalid' will be thrown if a rule
     is created with the LocalPort set to PlayToDiscovery and the Protocol is not
