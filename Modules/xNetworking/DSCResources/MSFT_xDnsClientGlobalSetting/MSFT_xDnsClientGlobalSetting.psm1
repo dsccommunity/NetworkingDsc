@@ -11,17 +11,19 @@ Import-Module -Name (Join-Path -Path $modulePath `
                                                      -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
+$LocalizedData = Get-LocalizedData `
     -ResourceName 'MSFT_xDnsClientGlobalSetting' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
     This is an array of all the parameters used by this resource.
 #>
-$script:resourceData = Import-LocalizedData `
+$resourceData = Import-LocalizedData `
     -BaseDirectory $PSScriptRoot `
     -FileName 'MSFT_xDnsClientGlobalSetting.data.psd1'
-$script:parameterList = $script:resourceData.ParameterList
+
+# This must be a script parameter so that it is accessible
+$script:parameterList = $resourceData.ParameterList
 
 <#
     .SYNOPSIS
@@ -36,9 +38,9 @@ function Get-TargetResource
     [OutputType([Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Yes')]
-        [String]
+        [System.String]
         $IsSingleInstance
     )
 
@@ -55,9 +57,12 @@ function Get-TargetResource
     $returnValue = @{
         IsSingleInstance = 'Yes'
     }
+
     foreach ($parameter in $script:parameterList)
     {
-        $returnValue += @{ $parameter.Name = $dnsClientGlobalSetting.$($parameter.name) }
+        $returnValue += @{
+            $parameter.Name = $dnsClientGlobalSetting.$($parameter.name)
+        }
     } # foreach
 
     return $returnValue
@@ -85,18 +90,21 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Yes')]
-        [String]
+        [System.String]
         $IsSingleInstance,
 
-        [String[]]
+        [Parameter()]
+        [System.String[]]
         $SuffixSearchList,
 
-        [Boolean]
+        [Parameter()]
+        [System.Boolean]
         $UseDevolution,
 
-        [Uint32]
+        [Parameter()]
+        [System.Uint32]
         $DevolutionLevel
     )
 
@@ -111,23 +119,27 @@ function Set-TargetResource
 
     # Generate a list of parameters that will need to be changed.
     $changeParameters = @{}
+
     foreach ($parameter in $script:parameterList)
     {
-        $parameterSource = $dnsClientGlobalSetting.$($parameter.name)
-        $parameterNew = (Get-Variable -Name ($parameter.name)).Value
+        $parameterSourceValue = $dnsClientGlobalSetting.$($parameter.name)
+        $parameterNewValue = (Get-Variable -Name ($parameter.name)).Value
+
         if ($PSBoundParameters.ContainsKey($parameter.Name) `
-            -and (Compare-Object -ReferenceObject $parameterSource -DifferenceObject $parameterNew -SyncWindow 0))
+            -and (Compare-Object -ReferenceObject $parameterSourceValue -DifferenceObject $parameterNewValue -SyncWindow 0))
         {
             $changeParameters += @{
-                $($parameter.name) = $parameterNew
+                $($parameter.name) = $parameterNewValue
             }
+
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($LocalizedData.DnsClientGlobalSettingUpdateParameterMessage) `
-                    -f $parameter.Name,$parameterNew
+                    -f $parameter.Name,$parameterNewValue
                 ) -join '' )
         } # if
     } # foreach
+
     if ($changeParameters.Count -gt 0)
     {
         # Update any parameters that were identified as different
@@ -165,18 +177,21 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Yes')]
-        [String]
+        [System.String]
         $IsSingleInstance,
 
-        [String[]]
+        [Parameter()]
+        [System.String[]]
         $SuffixSearchList,
 
-        [Boolean]
+        [Parameter()]
+        [System.Boolean]
         $UseDevolution,
 
-        [Uint32]
+        [Parameter()]
+        [System.Uint32]
         $DevolutionLevel
     )
 
@@ -189,21 +204,24 @@ function Test-TargetResource
     [Boolean] $desiredConfigurationMatch = $true
 
     # Get the current Dns Client Global Settings
-    $DnsClientGlobalSetting = Get-DnsClientGlobalSetting `
+    $dnsClientGlobalSetting = Get-DnsClientGlobalSetting `
         -ErrorAction Stop
 
     # Check each parameter
     foreach ($parameter in $script:parameterList)
     {
-        $parameterSource = $DnsClientGlobalSetting.$($parameter.name)
-        $parameterNew = (Get-Variable -Name ($parameter.name)).Value
+        $parameterSourceValue = $dnsClientGlobalSetting.$($parameter.name)
+        $parameterNewValue = (Get-Variable -Name ($parameter.name)).Value
+
         if ($PSBoundParameters.ContainsKey($parameter.Name) `
-            -and (Compare-Object -ReferenceObject $parameterSource -DifferenceObject $parameterNew -SyncWindow 0)) {
+            -and (Compare-Object -ReferenceObject $parameterSourceValue -DifferenceObject $parameterNewValue -SyncWindow 0))
+        {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($LocalizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
-                    -f $parameter.Name,$parameterSource,$parameterNew
+                    -f $parameter.Name,$parameterSourceValue,$parameterNewValue
                 ) -join '' )
+
             $desiredConfigurationMatch = $false
         } # if
     } # foreach

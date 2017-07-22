@@ -45,10 +45,10 @@ try
     $configData = @{
         AllNodes = @(
             @{
-                NodeName              = 'localhost'
-                SuffixSearchList             = 'contoso.com'
-                UseDevolution                = $True
-                DevolutionLevel              = 2
+                NodeName         = 'localhost'
+                SuffixSearchList = 'contoso.com'
+                UseDevolution    = $True
+                DevolutionLevel  = 2
             }
         )
     }
@@ -59,7 +59,7 @@ try
 
     Describe "$($script:DSCResourceName)_Integration" {
         #region DEFAULT TESTS
-        It 'Should compile without throwing' {
+        It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:DSCResourceName)_Config" `
                     -OutputPath $TestDrive `
@@ -69,22 +69,22 @@ try
             } | Should not throw
         }
 
-        It 'should be able to call Get-DscConfiguration without throwing' {
+        It 'Should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
         #endregion
 
         # Get the DNS Client Global Settings details
-        $DnsClientGlobalSettingNew = Get-DnsClientGlobalSetting
+        $dnsClientGlobalSettingNew = Get-DnsClientGlobalSetting
 
         # Use the Parameters List to perform these tests
         foreach ($parameter in $parameterList)
         {
-            $parameterValue = (Get-Variable -Name 'DnsClientGlobalSettingNew').value.$($parameter.name)
-            $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$($parameter.Name)
+            $parameterCurrentValue = (Get-Variable -Name 'dnsClientGlobalSettingNew').value.$($parameter.name)
+            $parameterNewValue = (Get-Variable -Name configData).Value.AllNodes[0].$($parameter.Name)
 
-            It "Should have set the '$parameterName' to '$parameterNew'" {
-                $parameterValue | Should Be $parameterNew
+            It "Should have set the '$parameterName' to '$parameterNewValue'" {
+                $parameterCurrentValue | Should Be $parameterNewValue
             }
         }
     }

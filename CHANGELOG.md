@@ -14,6 +14,9 @@
   - Converted badges to use branch header as used in xSQLServer.
 - Added standard .markdownlint.json to configure rules to run on
   Markdown files.
+- MSFT_xDnsClientGlobalSetting:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
 
 ## 5.0.0.0
 
