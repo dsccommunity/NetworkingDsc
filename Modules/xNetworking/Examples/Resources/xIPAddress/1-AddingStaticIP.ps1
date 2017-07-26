@@ -1,6 +1,7 @@
 <#
     .EXAMPLE
     Disabling DHCP and adding a static IP Address for IPv6 and IPv4
+    using default prefix lengths for the matching address classes
 #>
 Configuration Example
 {
@@ -25,7 +26,7 @@ Configuration Example
         # If no prefix is supplied IPv6 will default to /64.
         xIPAddress NewIPv6Address
         {
-            IPAddress      = '2001:4898:200:7:6c71:a102:ebd8:f482/64'
+            IPAddress      = '2001:4898:200:7:6c71:a102:ebd8:f482'
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPV6'
         }
