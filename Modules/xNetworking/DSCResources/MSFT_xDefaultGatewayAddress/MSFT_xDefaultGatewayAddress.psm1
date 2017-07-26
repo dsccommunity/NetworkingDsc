@@ -44,6 +44,7 @@ function Get-TargetResource
         [String]
         $AddressFamily,
 
+        [Parameter()]
         [String]
         $Address
     )
