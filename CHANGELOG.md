@@ -17,6 +17,11 @@
 - MSFT_xDnsClientGlobalSetting:
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
+- Updated year to 2017 in LICENSE and module manifest.
+- MSFT_xDnsServerAddress:
+  - Fix error when setting address on adapter where NameServer
+    Property does not exist in registry for interface - see
+    [issue #237](https://github.com/PowerShell/xNetworking/issues/237)
 
 ## 5.0.0.0
 

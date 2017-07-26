@@ -12,7 +12,7 @@ Author = 'Microsoft Corporation'
 CompanyName = 'Microsoft Corporation'
 
 # Copyright statement for this module
-Copyright = '(c) 2013 Microsoft Corporation. All rights reserved.'
+Copyright = '(c) 2017 Microsoft Corporation. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Module with DSC Resources for Networking area'
@@ -75,7 +75,7 @@ PrivateData = @{
 - Updated badges in README.MD to match the layout from PSDscResources.
 - MSFT_xIPAddress:
   - BREAKING CHANGE: Adding support for multiple IP addresses being assigned.
- 
+
 '
 
     } # End of PSData hashtable
