@@ -443,7 +443,7 @@ function Set-TargetResource
                         $null = $PSBoundParameters.Remove('DisplayName')
                         if ($DisplayName -ne $FirewallRule.DisplayName)
                         {
-                            $null = $PSBoundParameters.Add('NewDisplayName',$Name)
+                            $null = $PSBoundParameters.Add('NewDisplayName',$DisplayName)
                         }
                     }
 
