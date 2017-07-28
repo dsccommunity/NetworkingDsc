@@ -88,6 +88,7 @@ try
         }
     } #end InModuleScope $DSCResourceName
     #endregion
+	}
 }
 finally
 {
