@@ -7,16 +7,15 @@
 
 #>
 
-function Get-TargetResource
-{
-     [CmdletBinding()]
-     [OutputType([System.Collections.Hashtable])]
-     param
-     (
-          [parameter(Mandatory = $true)]
-          [System.String]
-          $AdapterType
-     )
+function Get-TargetResource {
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param
+    (
+        [parameter(Mandatory = $true)]
+        [System.String]
+        $AdapterType
+    )
 
     Write-Verbose "Getting the power setting on the network adpater."
 
@@ -24,17 +23,18 @@ function Get-TargetResource
     $nic = Get-CimClass Win32_NetworkAdapter | where-object {$_.AdapterType -eq 'Ethernet 802.3'}
     $powerMgmt = Get-CimClass MSPower_DeviceEnable -Namespace root\wmi | where-object {$_.InstanceName.ToUpper().Contains($nic.PNPDeviceID)}
 
-    If ($powerMgmt.Enable -eq $true){
+    If ($powerMgmt.Enable -eq $true) {
         $State = $False
-    }ELSE{
+    }
+    ELSE {
         $State = $true
     }
 
 
     $returnValue = @{
         NICPowerSaving = $powerMgmt.Enable
-        AdapterType = $AdapterType
-        State = $State
+        AdapterType    = $AdapterType
+        State          = $State
     }
 
     $returnValue
@@ -50,30 +50,29 @@ function Get-TargetResource
     .PARAMETER State
     Allows to set the state of the Network Adapter power management settings to disable to enable. 
 #>
-function Set-TargetResource
-{
-     [CmdletBinding()]
-     param
-     (
-          [parameter(Mandatory = $true)]
-          [System.String]
-          $AdapterType,
+function Set-TargetResource {
+    [CmdletBinding()]
+    param
+    (
+        [parameter(Mandatory = $true)]
+        [System.String]
+        $AdapterType,
 
-          [ValidateSet("Enabled","Disabled")]
-          [System.String]
-          $State
-     )
+        [ValidateSet("Enabled", "Disabled")]
+        [System.String]
+        $State
+    )
 
 
     $nics = Get-CimClass Win32_NetworkAdapter | where-object {$_.AdapterType -eq $AdapterType}
-    foreach ($nic in $nics)
-    {
+    foreach ($nic in $nics) {
         $powerMgmt = Get-CimClass MSPower_DeviceEnable -Namespace root\wmi | where-object {$_.InstanceName.ToUpper().Contains($nic.PNPDeviceID)}
             
-        If ($State -eq 'Disabled'){
+        If ($State -eq 'Disabled') {
             Write-Verbose "Disabling the NIC power management setting."
             $powerMgmt.Enable = $False #Turn off PowerManagement feature
-        }ELSE{
+        }
+        ELSE {
             Write-Verbose "Enabling the NIC power management setting."
             $powerMgmt.Enable = $true #Turn on PowerManagement feature
         }
@@ -94,20 +93,19 @@ function Set-TargetResource
     .PARAMETER State
     Allows to Check the state of the Network Adapter power management settings to disable to enable to see if it needs to be changed. 
 #>
-function Test-TargetResource
-{
-     [CmdletBinding()]
-     [OutputType([System.Boolean])]
-     param
-     (
-          [parameter(Mandatory = $true)]
-          [System.String]
-          $AdapterType,
+function Test-TargetResource {
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [parameter(Mandatory = $true)]
+        [System.String]
+        $AdapterType,
 
-          [ValidateSet("Enabled","Disabled")]
-          [System.String]
-          $State
-     )
+        [ValidateSet("Enabled", "Disabled")]
+        [System.String]
+        $State
+    )
 
     Write-Verbose "Checking to see if the power setting on the NIC for Adapter Type $AdapterType."
 
@@ -116,27 +114,29 @@ function Test-TargetResource
     $nic = Get-CimClass Win32_NetworkAdapter | where-object {$_.AdapterType -eq 'Ethernet 802.3'}
     $powerMgmt = Get-CimClass MSPower_DeviceEnable -Namespace root\wmi | where-object {$_.InstanceName.ToUpper().Contains($nic.PNPDeviceID)}
 
-    If ($State -eq 'Disabled'){
-        If ($powerMgmt.Enable -eq $false){
+    If ($State -eq 'Disabled') {
+        If ($powerMgmt.Enable -eq $false) {
             Write-Verbose "NIC Power Management setting is disabled."
             $result = $true
-        }ELSE{
+        }
+        ELSE {
             Write-Verbose "NIC Power Management setting is not disabled. - Disabling"
             $result = $false
         }
     }
 
-    If ($State -eq 'Enabled'){
+    If ($State -eq 'Enabled') {
         If ($powerMgmt.Enable -eq $false) {
             Write-Verbose "NIC Power Management setting is disabled. - Enabling."
             $result = $false
-        }ELSE{
+        }
+        ELSE {
             Write-Verbose "NIC Power Management setting is not disabled."
             $result = $true
         }
     }
 
-$result
+    $result
 }
 
 
