@@ -517,11 +517,11 @@ try
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.InterfaceAliasNotFoundError -f $interfaceAlias)
 
-                It 'should throw exception' {
+                It 'Should throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                 }
             }
@@ -539,15 +539,15 @@ try
                         }
                     }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
                 }
 
-                It 'should return null' {
+                It 'Should return null' {
                     $script:result | Should BeNullOrEmpty
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
                 }
@@ -566,15 +566,15 @@ try
                         }
                     }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
                 }
 
-                It 'should return null' {
+                It 'Should return null' {
                     $script:result | Should BeNullOrEmpty
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
                 }
@@ -593,15 +593,15 @@ try
                         }
                     }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected address' {
+                It 'Should return expected address' {
                     $script:result | Should Be $oneIpv4StaticAddressString
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
                 }
@@ -620,16 +620,16 @@ try
                         }
                     }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
                 }
 
-                It 'should return two expected addresses' {
+                It 'Should return two expected addresses' {
                     $script:result[0] | Should Be $oneIpv4StaticAddressString
                     $script:result[1] | Should Be $secondIpv4StaticAddressString
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
                 }
@@ -648,15 +648,15 @@ try
                         }
                     }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
                 }
 
-                It 'should return null' {
+                It 'Should return null' {
                     $script:result | Should BeNullOrEmpty
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
                 }
@@ -675,15 +675,15 @@ try
                         }
                     }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
                 }
 
-                It 'should return null' {
+                It 'Should return null' {
                     $script:result | Should BeNullOrEmpty
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
                 }
@@ -702,15 +702,15 @@ try
                         }
                     }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
                 }
 
-                It 'should return expected address' {
+                It 'Should return expected address' {
                     $script:result | Should Be $oneIpv6StaticAddressString
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
                 }
@@ -729,16 +729,16 @@ try
                         }
                     }
 
-                It 'should not throw exception' {
+                It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
                 }
 
-                It 'should return two expected addresses' {
+                It 'Should return two expected addresses' {
                     $script:result[0] | Should Be $oneIpv6StaticAddressString
                     $script:result[1] | Should Be $secondIpv6StaticAddressString
                 }
 
-                It 'should call expected mocks' {
+                It 'Should call expected mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
                 }
