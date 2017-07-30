@@ -1,6 +1,7 @@
 <#
     .EXAMPLE
-    Disabling DHCP and adding multiple static IP Addresses for IPv4 and IPv6
+    Disabling DHCP and adding a static IP Address for IPv6 and IPv4
+    using specified prefixes in CIDR notation.
 #>
 Configuration Example
 {
@@ -24,14 +25,14 @@ Configuration Example
 
         xIPAddress NewIPv6Address
         {
-            IPAddress      = '2001:4898:200:7:6c71:a102:ebd8:f482/64','2001:4598:210:7:6d71:a102:ebe8:f483/64'
+            IPAddress      = '2001:4898:200:7:6c71:a102:ebd8:f482/64'
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPV6'
         }
 
         xIPAddress NewIPv4Address
         {
-            IPAddress      = '192.168.10.5/24','192.168.10.6/24'
+            IPAddress      = '192.168.10.5/24'
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPV4'
         }
