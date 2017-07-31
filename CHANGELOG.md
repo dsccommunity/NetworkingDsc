@@ -28,6 +28,11 @@
 - MSFT_xFirewall:
   - Fixed bug with DisplayName not being set correctly in some
     situations - see [issue #234](https://github.com/PowerShell/xNetworking/issues/234).
+- Added .github support files:
+  - CONTRIBUTING.md
+  - ISSUE_TEMPLATE.md
+  - PULL_REQUEST_TEMPLATE.md
+
 
 ## 5.0.0.0
 
