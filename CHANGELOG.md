@@ -21,10 +21,13 @@
 - MSFT_xDnsServerAddress:
   - Fix error when setting address on adapter where NameServer
     Property does not exist in registry for interface - see
-    [issue #237](https://github.com/PowerShell/xNetworking/issues/237)
+    [issue #237](https://github.com/PowerShell/xNetworking/issues/237).
 - MSFT_xIPAddress:
   - Improved examples to clarify how to set IP Address prefix -
-    see [issue #239](https://github.com/PowerShell/xNetworking/issues/239)
+    see [issue #239](https://github.com/PowerShell/xNetworking/issues/239).
+- MSFT_xFirewall:
+  - Fixed bug with DisplayName not being set correctly in some
+    situations - see [issue #234](https://github.com/PowerShell/xNetworking/issues/234).
 
 ## 5.0.0.0
 
