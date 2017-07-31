@@ -33,7 +33,6 @@
   - ISSUE_TEMPLATE.md
   - PULL_REQUEST_TEMPLATE.md
 
-
 ## 5.0.0.0
 
 - Find-NetworkAdapter:
