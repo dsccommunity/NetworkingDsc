@@ -25,6 +25,9 @@
 - MSFT_xIPAddress:
   - Improved examples to clarify how to set IP Address prefix -
     see [issue #239](https://github.com/PowerShell/xNetworking/issues/239)
+- MSFT_xFirewall:
+  - Fixed bug with DisplayName not being set correctly in some
+    situations - see [issue #234](https://github.com/PowerShell/xNetworking/issues/234)
 
 ## 5.0.0.0
 
