@@ -33,6 +33,8 @@
   - CONTRIBUTING.md
   - ISSUE_TEMPLATE.md
   - PULL_REQUEST_TEMPLATE.md
+- Opted into Common Tests 'Validate Module Files' and 'Validate Script Files'.
+- Converted files with UTF8 with BOM over to UTF8 - fixes [Issue 250](https://github.com/PowerShell/xNetworking/issues/250).
 
 ## 5.0.0.0
 
