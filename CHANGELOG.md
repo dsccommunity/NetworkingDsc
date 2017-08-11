@@ -22,6 +22,7 @@
   - Fix error when setting address on adapter where NameServer
     Property does not exist in registry for interface - see
     [issue #237](https://github.com/PowerShell/xNetworking/issues/237).
+  - Corrected style and formatting to meet HQRM guidelines.
 - MSFT_xIPAddress:
   - Improved examples to clarify how to set IP Address prefix -
     see [issue #239](https://github.com/PowerShell/xNetworking/issues/239).

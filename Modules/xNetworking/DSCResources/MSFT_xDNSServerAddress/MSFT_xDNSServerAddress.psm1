@@ -44,6 +44,7 @@ function Get-TargetResource
         [String]
         $AddressFamily,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $Address
@@ -103,10 +104,12 @@ function Set-TargetResource
         [String]
         $AddressFamily,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $Address,
 
+        [Parameter()]
         [Boolean]
         $Validate = $false
     )
@@ -215,10 +218,12 @@ function Test-TargetResource
         [String]
         $AddressFamily,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $Address,
 
+        [Parameter()]
         [Boolean]
         $Validate = $false
     )
