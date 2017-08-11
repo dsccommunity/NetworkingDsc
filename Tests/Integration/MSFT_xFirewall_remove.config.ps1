@@ -4,10 +4,12 @@
 #>
 Configuration MSFT_xFirewall_Remove_Config {
     Import-DscResource -ModuleName xNetworking
+
     node localhost {
-       xFirewall Integration_Test {
-            Name                  = $Node.RuleName
-            Ensure                = $Node.Ensure
+        xFirewall Integration_Test
+        {
+            Name   = $Node.RuleName
+            Ensure = $Node.Ensure
         }
     }
 }
