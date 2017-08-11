@@ -29,6 +29,8 @@
 - MSFT_xFirewall:
   - Fixed bug with DisplayName not being set correctly in some
     situations - see [issue #234](https://github.com/PowerShell/xNetworking/issues/234).
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
 - Added .github support files:
   - CONTRIBUTING.md
   - ISSUE_TEMPLATE.md
