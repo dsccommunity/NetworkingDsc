@@ -1,4 +1,4 @@
-﻿<#
+<#
     .SYNOPSIS
     Tests if the specified command can be found.
 
