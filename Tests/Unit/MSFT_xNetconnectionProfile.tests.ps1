@@ -23,85 +23,166 @@ try
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
 
-        Describe "MSFT_xNetConnectionProfile\Get-TargetResource" {
-            Mock Get-NetConnectionProfile {
-                return @{
-                    InterfaceAlias   = 'InterfaceAlias'
-                    NetworkCategory  = 'Wired'
-                    IPv4Connectivity = 'IPv4'
-                    IPv6Connectivity = 'IPv6'
-                }
+        # Create the Mock Objects that will be used for running tests
+        $mockNetAdapter = [PSCustomObject] @{
+            Name = 'Ethernet'
+        }
+
+        $mockNetConnnectionProfileAll = [PSObject] @{
+            InterfaceAlias   = $mockNetAdapter.Name
+            NetworkCategory  = 'Public'
+            IPv4Connectivity = 'Internet'
+            IPv6Connectivity = 'Internet'
+        }
+
+        $testValidInterfaceAliasOnlyPassed = [PSObject] @{
+            InterfaceAlias   = $mockNetAdapter.Name
+        }
+
+        $testNetworkCategoryMatches = [PSObject] @{
+            InterfaceAlias   = $mockNetAdapter.Name
+            NetworkCategory  = 'Public'
+        }
+
+        $testNetworkCategoryNoMatches = [PSObject] @{
+            InterfaceAlias   = $mockNetAdapter.Name
+            NetworkCategory  = 'Private'
+        }
+
+        $testIPv4ConnectivityMatches = [PSObject] @{
+            InterfaceAlias   = $mockNetAdapter.Name
+            IPv4Connectivity = 'Internet'
+        }
+
+        $testIPv4ConnectivityNoMatches = [PSObject] @{
+            InterfaceAlias   = $mockNetAdapter.Name
+            IPv4Connectivity = 'Disconnected'
+        }
+
+        $testIPv6ConnectivityMatches = [PSObject] @{
+            InterfaceAlias   = $mockNetAdapter.Name
+            IPv6Connectivity = 'Internet'
+        }
+
+        $testIPv6ConnectivityNoMatches = [PSObject] @{
+            InterfaceAlias   = $mockNetAdapter.Name
+            IPv6Connectivity = 'Disconnected'
+        }
+
+        Describe 'MSFT_xNetConnectionProfile\Get-TargetResource' {
+            Mock -CommandName Get-NetConnectionProfile {
+                return $mockNetConnnectionProfileAll
             }
-            $expected = Get-NetConnectionProfile | select -first 1
-            $result = Get-TargetResource -InterfaceAlias $expected.InterfaceAlias
+
+            $result = Get-TargetResource -InterfaceAlias $mockNetAdapter.Name
 
             It 'Should return the correct values' {
-                $expected.InterfaceAlias   | Should Be $result.InterfaceAlias
-                $expected.NetworkCategory  | Should Be $result.NetworkCategory
-                $expected.IPv4Connectivity | Should Be $result.IPv4Connectivity
-                $expected.IPv6Connectivity | Should Be $result.IPv6Connectivity
+                $result.InterfaceAlias   | Should Be $mockNetConnnectionProfileAll.InterfaceAlias
+                $result.NetworkCategory  | Should Be $mockNetConnnectionProfileAll.NetworkCategory
+                $result.IPv4Connectivity | Should Be $mockNetConnnectionProfileAll.IPv4Connectivity
+                $result.IPv6Connectivity | Should Be $mockNetConnnectionProfileAll.IPv6Connectivity
             }
         }
 
-        Describe "MSFT_xNetConnectionProfile\Test-TargetResource" {
-            $Splat = @{
-                InterfaceAlias   = 'Test'
-                NetworkCategory  = 'Private'
-                IPv4Connectivity = 'Internet'
-                IPv6Connectivity = 'Disconnected'
-            }
-
-            Context 'IPv4Connectivity is incorrect' {
-                $incorrect = $Splat.Clone()
-                $incorrect.IPv4Connectivity = 'Disconnected'
-                Mock Get-TargetResource {
-                    return $incorrect
-                }
-
-                It 'should return false' {
-                    Test-TargetResource @Splat | should be $false
+        Describe 'MSFT_xNetConnectionProfile\Test-TargetResource' {
+            BeforeEach {
+                Mock -CommandName Get-TargetResource {
+                    return $mockNetConnnectionProfileAll
                 }
             }
 
-            Context 'IPv6Connectivity is incorrect' {
-                $incorrect = $Splat.Clone()
-                $incorrect.IPv6Connectivity = 'Internet'
-                Mock Get-TargetResource {
-                    return $incorrect
-                }
-
-                It 'should return false' {
-                    Test-TargetResource @Splat | should be $false
+            Context 'NetworkCategory matches' {
+                It 'Should return false' {
+                    Test-TargetResource @testNetworkCategoryMatches | should be $true
                 }
             }
 
-            Context 'NetworkCategory is incorrect' {
-                $incorrect = $Splat.Clone()
-                $incorrect.NetworkCategory = 'Public'
-                Mock Get-TargetResource {
-                    return $incorrect
+            Context 'NetworkCategory does not match' {
+                It 'Should return false' {
+                    Test-TargetResource @testNetworkCategoryNoMatches | should be $false
                 }
+            }
 
-                It 'should return false' {
-                    Test-TargetResource @Splat | should be $false
+            Context 'IPv4Connectivity matches' {
+                It 'Should return false' {
+                    Test-TargetResource @testIPv4ConnectivityMatches | should be $true
+                }
+            }
+
+            Context 'IPv4Connectivity does not match' {
+                It 'Should return false' {
+                    Test-TargetResource @testIPv4ConnectivityNoMatches | should be $false
+                }
+            }
+
+            Context 'IPv6Connectivity matches' {
+                It 'Should return false' {
+                    Test-TargetResource @testIPv6ConnectivityMatches | should be $true
+                }
+            }
+
+            Context 'IPv6Connectivity does not match' {
+                It 'Should return false' {
+                    Test-TargetResource @testIPv6ConnectivityNoMatches | should be $false
                 }
             }
         }
 
-        Describe "MSFT_xNetConnectionProfile\Set-TargetResource" {
-            It 'Should do call all the mocks' {
-                $Splat = @{
-                    InterfaceAlias   = 'Test'
-                    NetworkCategory  = 'Private'
-                    IPv4Connectivity = 'Internet'
-                    IPv6Connectivity = 'Disconnected'
+        Describe 'MSFT_xNetConnectionProfile\Set-TargetResource' {
+            It 'Should call all the mocks' {
+                Mock -CommandName Set-NetConnectionProfile
+
+                Set-TargetResource @testNetworkCategoryMatches
+
+                Assert-MockCalled -CommandName Set-NetConnectionProfile
+            }
+        }
+
+        Describe 'MSFT_xNetConnectionProfile\Assert-ResourceProperty' {
+            Context 'Invoking with bad interface alias' {
+                Mock -CommandName Get-NetAdapter
+
+                It 'Should throw testValidInterfaceAliasOnlyPassed exception' {
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($LocalizedData.InterfaceNotAvailableError -f $testValidInterfaceAliasOnlyPassed.InterfaceAlias)
+
+                    { Assert-ResourceProperty @testValidInterfaceAliasOnlyPassed } | Should Throw $errorRecord
                 }
+            }
 
-                Mock Set-NetConnectionProfile {}
+            Context 'Invoking with valid interface alias but all empty parameters' {
+                Mock -CommandName Get-NetAdapter -MockWith { return $mockNetAdapter }
 
-                Set-TargetResource @Splat
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.ParameterCombinationError)
 
-                Assert-MockCalled Set-NetConnectionProfile
+                It 'Should not ParameterCombinationError exception' {
+                    { Assert-ResourceProperty @testValidInterfaceAliasOnlyPassed } | Should Throw $errorRecord
+                }
+            }
+
+            Context 'Invoking with valid interface alias and one NetworkCategory' {
+                Mock -CommandName Get-NetAdapter -MockWith { return $mockNetAdapter }
+
+                It 'Should not throw an exception' {
+                    { Assert-ResourceProperty @testNetworkCategoryMatches } | Should Not Throw
+                }
+            }
+
+            Context 'Invoking with valid interface alias and one IPv4Connectivity' {
+                Mock -CommandName Get-NetAdapter -MockWith { return $mockNetAdapter }
+
+                It 'Should not throw an exception' {
+                    { Assert-ResourceProperty @testIPv4ConnectivityMatches } | Should Not Throw
+                }
+            }
+
+            Context 'Invoking with valid interface alias and one IPv6Connectivity' {
+                Mock -CommandName Get-NetAdapter -MockWith { return $mockNetAdapter }
+
+                It 'Should not throw an exception' {
+                    { Assert-ResourceProperty @testIPv6ConnectivityMatches } | Should Not Throw
+                }
             }
         }
     } #end InModuleScope $DSCResourceName
