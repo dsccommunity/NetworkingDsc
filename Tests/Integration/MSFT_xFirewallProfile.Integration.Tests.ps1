@@ -22,7 +22,8 @@ $TestEnvironment = Initialize-TestEnvironment `
 . (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
 
 # Backup the existing settings
-$currentFirewallProfile = Get-NetFirewallProfile -Name Private
+$firewallProfileName = 'Public'
+$currentFirewallProfile = Get-NetFirewallProfile -Name $firewallProfileName
 
 # Using try/finally to always cleanup even if something awful happens.
 try
@@ -45,9 +46,9 @@ try
     $adapter = Get-NetAdapter -Name $adapterName
     $interfaceAlias = $adapter.InterfaceAlias
 
-    # Set the Private Firewall Profile to known values
+    # Set the Firewall Profile to known values
     Set-NetFirewallProfile `
-        -Name 'Private' `
+        -Name $firewallProfileName `
         -Enabled 'False' `
         -DefaultInboundAction 'Allow' `
         -DefaultOutboundAction 'Allow' `
@@ -70,7 +71,7 @@ try
         AllNodes = @(
             @{
                 NodeName                        = 'localhost'
-                Name                            = 'Private'
+                Name                            = $firewallProfileName
                 Enabled                         = 'False'
                 DefaultInboundAction            = 'Block'
                 DefaultOutboundAction           = 'Block'
@@ -114,7 +115,7 @@ try
         #endregion
 
         # Get the DNS Client Global Settings details
-        $firewallProfileNew = Get-NetFirewallProfile -Name 'Private'
+        $firewallProfileNew = Get-NetFirewallProfile -Name $firewallProfileName
 
         # Use the Parameters List to perform these tests
         foreach ($parameter in $parameterList)
@@ -134,7 +135,7 @@ finally
 {
     # Clean up
     Set-NetFirewallProfile `
-        -Name 'Private' `
+        -Name $firewallProfileName `
         -Enabled $currentFirewallProfile.Enabled `
         -DefaultInboundAction $currentFirewallProfile.DefaultInboundAction `
         -DefaultOutboundAction $currentFirewallProfile.DefaultOutboundAction `
