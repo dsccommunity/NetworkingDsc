@@ -17,12 +17,20 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Unit
 #endregion HEADER
 
+# Load the ParameterList from the data file.
+$resourceDataPath = Join-Path `
+    -Path $script:moduleRoot `
+    -ChildPath (Join-Path -Path 'DSCResources' -ChildPath $script:DSCResourceName)
+$resourceData = Import-LocalizedData `
+    -BaseDirectory $resourceDataPath `
+    -FileName "$($script:DSCResourceName).data.psd1"
+$script:parameterList = $resourceData.ParameterList
+
 # Begin Testing
 try
 {
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
-
         # Create the Mock Objects that will be used for running tests
         $firewallProfile = [PSObject] @{
             Name                            = 'Private'
@@ -66,13 +74,36 @@ try
             DisabledInterfaceAliases        = $firewallProfile.DisabledInterfaceAliases
         }
 
-        Describe 'MSFT_xDnsClientGlobalSetting\Get-TargetResource' {
+        $gpoTypeParameters = $script:parameterList | Where-Object {
+            $_.Name -in @(
+                'AllowInboundRules'
+                'AllowLocalFirewallRules'
+                'AllowLocalIPsecRules'
+                'AllowUnicastResponseToMulticast'
+                'AllowUserApps'
+                'AllowUserPorts'
+                'Enabled'
+                'EnableStealthModeForIPsec'
+                'LogAllowed'
+                'LogBlocked'
+                'LogIgnored'
+                'NotifyOnListen'
+            )
+        }
+        $actionTypeParameters = $script:parameterList | Where-Object {
+            $_.Name -in @(
+                'DefaultInboundAction'
+                'DefaultOutboundAction'
+            )
+        }
+
+        Describe 'MSFT_xFirewallProfile\Get-TargetResource' {
             BeforeEach {
                 Mock -CommandName Get-NetFirewallProfile -MockWith { $firewallProfile }
             }
 
             Context 'Firewall Profile Exists' {
-                It 'Should return correct DNS Client Global Settings values' {
+                It 'Should return correct Firewall Profile values' {
                     $getTargetResourceParameters = Get-TargetResource -Name 'Private'
                     $getTargetResourceParameters.Name                            | Should Be $firewallProfile.Name
                     $getTargetResourceParameters.Enabled                         | Should Be $firewallProfile.Enabled
@@ -100,12 +131,12 @@ try
             }
         }
 
-        Describe 'MSFT_xDnsClientGlobalSetting\Set-TargetResource' {
+        Describe 'MSFT_xFirewallProfile\Set-TargetResource' {
             BeforeEach {
                 Mock -CommandName Get-NetFirewallProfile -MockWith { $firewallProfile }
             }
 
-            Context 'DNS Client Global Settings all parameters are the same' {
+            Context 'Firewall Profile all parameters are the same' {
                 Mock -CommandName Set-NetFirewallProfile
 
                 It 'Should not throw error' {
@@ -121,13 +152,55 @@ try
                 }
             }
 
-            Context 'DNS Client Global Settings SuffixSearchList is different' {
+            foreach ($parameter in $gpoTypeParameters)
+            {
+                $parameterName = $parameter.Name
+                Context "Firewall Profile $parameterName is different" {
+                    Mock -CommandName Set-NetFirewallProfile
+
+                    It 'Should not throw error' {
+                        {
+                            $setTargetResourceParameters = $firewallProfileSplat.Clone()
+                            $setTargetResourceParameters.$parameterName = 'True'
+                            Set-TargetResource @setTargetResourceParameters
+                        } | Should Not Throw
+                    }
+
+                    It 'Should call expected Mocks' {
+                        Assert-MockCalled -commandName Get-NetFirewallProfile -Exactly -Times 1
+                        Assert-MockCalled -commandName Set-NetFirewallProfile -Exactly -Times 1
+                    }
+                }
+            }
+
+            foreach ($parameter in $actionTypeParameters)
+            {
+                $parameterName = $parameter.Name
+                Context "Firewall Profile $parameterName is different" {
+                    Mock -CommandName Set-NetFirewallProfile
+
+                    It 'Should not throw error' {
+                        {
+                            $setTargetResourceParameters = $firewallProfileSplat.Clone()
+                            $setTargetResourceParameters.$parameterName = 'Allow'
+                            Set-TargetResource @setTargetResourceParameters
+                        } | Should Not Throw
+                    }
+
+                    It 'Should call expected Mocks' {
+                        Assert-MockCalled -commandName Get-NetFirewallProfile -Exactly -Times 1
+                        Assert-MockCalled -commandName Set-NetFirewallProfile -Exactly -Times 1
+                    }
+                }
+            }
+
+            Context 'Firewall Profile LogFileName is different' {
                 Mock -CommandName Set-NetFirewallProfile
 
                 It 'Should not throw error' {
                     {
                         $setTargetResourceParameters = $firewallProfileSplat.Clone()
-                        $setTargetResourceParameters.SuffixSearchList = 'fabrikam.com'
+                        $setTargetResourceParameters.LogFileName = 'c:\differentfile.txt'
                         Set-TargetResource @setTargetResourceParameters
                     } | Should Not Throw
                 }
@@ -138,53 +211,13 @@ try
                 }
             }
 
-            Context 'DNS Client Global Settings SuffixSearchList Array is different' {
-                $suffixSearchListArray = @('fabrikam.com', 'fourthcoffee.com')
-
-                $setDnsClientGlobalMockParameterFilter = {
-                    (Compare-Object -ReferenceObject $suffixSearchList -DifferenceObject $suffixSearchListArray -SyncWindow 0).Length -eq 0
-                }
-
-                Mock -CommandName Set-NetFirewallProfile -ParameterFilter $setDnsClientGlobalMockParameterFilter
-
-                It 'Should not throw error' {
-                    {
-                        $setTargetResourceParameters = $firewallProfileSplat.Clone()
-                        $setTargetResourceParameters.SuffixSearchList = $suffixSearchListArray
-                        Set-TargetResource @setTargetResourceParameters
-                    } | Should Not Throw
-                }
-
-                It 'Should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetFirewallProfile -Exactly -Times 1
-                    Assert-MockCalled -commandName Set-NetFirewallProfile -ParameterFilter $setDnsClientGlobalMockParameterFilter -Exactly -Times 1
-                }
-            }
-
-            Context 'DNS Client Global Settings DevolutionLevel is different' {
+            Context 'Firewall Profile DisabledInterfaceAliases is different' {
                 Mock -CommandName Set-NetFirewallProfile
 
                 It 'Should not throw error' {
                     {
                         $setTargetResourceParameters = $firewallProfileSplat.Clone()
-                        $setTargetResourceParameters.DevolutionLevel = $setTargetResourceParameters.DevolutionLevel + 1
-                        Set-TargetResource @setTargetResourceParameters
-                    } | Should Not Throw
-                }
-
-                It 'Should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetFirewallProfile -Exactly -Times 1
-                    Assert-MockCalled -commandName Set-NetFirewallProfile -Exactly -Times 1
-                }
-            }
-
-            Context 'DNS Client Global Settings UseDevolution is different' {
-                Mock -CommandName Set-NetFirewallProfile
-
-                It 'Should not throw error' {
-                    {
-                        $setTargetResourceParameters = $firewallProfileSplat.Clone()
-                        $setTargetResourceParameters.UseDevolution = -not $setTargetResourceParameters.UseDevolution
+                        $setTargetResourceParameters.DisabledInterfaceAliases = 'DifferentInterface'
                         Set-TargetResource @setTargetResourceParameters
                     } | Should Not Throw
                 }
@@ -196,51 +229,29 @@ try
             }
         }
 
-        Describe 'MSFT_xDnsClientGlobalSetting\Test-TargetResource' {
-            Context 'Single suffix is in the search list' {
-                BeforeEach {
-                    Mock -CommandName Get-NetFirewallProfile -MockWith { $firewallProfile }
+        Describe 'MSFT_xFirewallProfile\Test-TargetResource' {
+            BeforeEach {
+                Mock -CommandName Get-NetFirewallProfile -MockWith { $firewallProfile }
+            }
+
+            Context 'Firewall Profile all parameters are the same' {
+                It 'Should return true' {
+                    $testTargetResourceParameters = $firewallProfileSplat.Clone()
+                    Test-TargetResource @testTargetResourceParameters | Should Be $True
                 }
 
-                Context 'DNS Client Global Settings all parameters are the same' {
-                    It 'Should return true' {
-                        $testTargetResourceParameters = $firewallProfileSplat.Clone()
-                        Test-TargetResource @testTargetResourceParameters | Should Be $True
-                    }
-
-                    It 'Should call expected Mocks' {
-                        Assert-MockCalled -commandName Get-NetFirewallProfile -Exactly -Times 1
-                    }
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-NetFirewallProfile -Exactly -Times 1
                 }
+            }
 
-                Context 'DNS Client Global Settings SuffixSearchList is different' {
+            foreach ($parameter in $gpoTypeParameters)
+            {
+                $parameterName = $parameter.Name
+                Context "Firewall Profile $parameterName is different" {
                     It 'Should return false' {
                         $testTargetResourceParameters = $firewallProfileSplat.Clone()
-                        $testTargetResourceParameters.SuffixSearchList = 'fabrikam.com'
-                        Test-TargetResource @testTargetResourceParameters | Should Be $False
-                    }
-
-                    It 'Should call expected Mocks' {
-                        Assert-MockCalled -commandName Get-NetFirewallProfile -Exactly -Times 1
-                    }
-                }
-
-                Context 'DNS Client Global Settings DevolutionLevel is different' {
-                    It 'Should return false' {
-                        $testTargetResourceParameters = $firewallProfileSplat.Clone()
-                        $testTargetResourceParameters.DevolutionLevel = $testTargetResourceParameters.DevolutionLevel + 1
-                        Test-TargetResource @testTargetResourceParameters | Should Be $False
-                    }
-
-                    It 'Should call expected Mocks' {
-                        Assert-MockCalled -commandName Get-NetFirewallProfile -Exactly -Times 1
-                    }
-                }
-
-                Context 'DNS Client Global Settings UseDevolution is different' {
-                    It 'Should return false' {
-                        $testTargetResourceParameters = $firewallProfileSplat.Clone()
-                        $testTargetResourceParameters.UseDevolution = -not $testTargetResourceParameters.UseDevolution
+                        $testTargetResourceParameters.$parameterName = 'True'
                         Test-TargetResource @testTargetResourceParameters | Should Be $False
                     }
 
@@ -250,15 +261,13 @@ try
                 }
             }
 
-            Context 'Mulitple suffixes are in the search list' {
-                BeforeEach {
-                    Mock -CommandName Get-NetFirewallProfile -MockWith { $dnsClientGlobalMultiSuffixSettings }
-                }
-
-                Context 'DNS Client Global Settings SuffixSearchList Array is different' {
+            foreach ($parameter in $actionTypeParameters)
+            {
+                $parameterName = $parameter.Name
+                Context "Firewall Profile $parameterName is different" {
                     It 'Should return false' {
                         $testTargetResourceParameters = $firewallProfileSplat.Clone()
-                        $testTargetResourceParameters.SuffixSearchList = @('fabrikam.com', 'contoso.com')
+                        $testTargetResourceParameters.$parameterName = 'Allow'
                         Test-TargetResource @testTargetResourceParameters | Should Be $False
                     }
 
@@ -266,29 +275,29 @@ try
                         Assert-MockCalled -commandName Get-NetFirewallProfile -Exactly -Times 1
                     }
                 }
+            }
 
-                Context 'DNS Client Global Settings SuffixSearchList Array Order is same' {
-                    It 'Should return true' {
-                        $testTargetResourceParameters = $firewallProfileSplat.Clone()
-                        $testTargetResourceParameters.SuffixSearchList = @('fabrikam.com', 'fourthcoffee.com')
-                        Test-TargetResource @testTargetResourceParameters | Should Be $True
-                    }
-
-                    It 'Should call expected Mocks' {
-                        Assert-MockCalled -commandName Get-NetFirewallProfile -Exactly -Times 1
-                    }
+            Context 'Firewall Profile LogFileName is different' {
+                It 'Should return false' {
+                    $testTargetResourceParameters = $firewallProfileSplat.Clone()
+                    $testTargetResourceParameters.LogFileName = 'c:\differentfile.txt'
+                    Test-TargetResource @testTargetResourceParameters | Should Be $False
                 }
 
-                Context 'DNS Client Global Settings SuffixSearchList Array Order is different' {
-                    It 'Should return false' {
-                        $testTargetResourceParameters = $firewallProfileSplat.Clone()
-                        $testTargetResourceParameters.SuffixSearchList = @('fourthcoffee.com', 'fabrikam.com')
-                        Test-TargetResource @testTargetResourceParameters | Should Be $False
-                    }
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-NetFirewallProfile -Exactly -Times 1
+                }
+            }
 
-                    It 'Should call expected Mocks' {
-                        Assert-MockCalled -commandName Get-NetFirewallProfile -Exactly -Times 1
-                    }
+            Context 'Firewall Profile DisabledInterfaceAliases is different' {
+                It 'Should return false' {
+                    $testTargetResourceParameters = $firewallProfileSplat.Clone()
+                    $testTargetResourceParameters.DisabledInterfaceAliases = 'DifferentInterface'
+                    Test-TargetResource @testTargetResourceParameters | Should Be $False
+                }
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-NetFirewallProfile -Exactly -Times 1
                 }
             }
         }
