@@ -265,7 +265,7 @@ function Set-TargetResource
     if ($changeParameters.Count -gt 0)
     {
         # Update any parameters that were identified as different
-        $null = Set-NetFirewallProfile `
+        $null = Set-NetFirewallProfile -Name $Name `
             @ChangeParameters `
             -ErrorAction Stop
 
