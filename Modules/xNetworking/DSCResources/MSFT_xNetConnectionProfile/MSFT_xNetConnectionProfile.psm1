@@ -28,7 +28,7 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Position = 0, Mandatory = $true)]
+        [Parameter(Position = 0, Mandatory = $true)]
         [string]
         $InterfaceAlias
     )
@@ -55,21 +55,20 @@ function Get-TargetResource
     Specifies the alias for the Interface that is being changed.
 
     .PARAMETER IPv4Connectivity
-    Specifies the network interfaces that should be a part of the network team.
-    This is a comma-separated list.
+    Specifies the IPv4 Connection Value.
 
     .PARAMETER IPv6Connectivity
-    Specifies the teaming mode configuration.
+    Specifies the IPv6 Connection Value.
 
     .PARAMETER NetworkCategory
-    Specifies the load balancing algorithm for the network team.
+    Sets the Network Category for the interface
 #>
 function Set-TargetResource
 {
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $InterfaceAlias,
 
@@ -90,6 +89,8 @@ function Set-TargetResource
         $($LocalizedData.SetNetConnectionProfile) -f $InterfaceAlias
     ) -join '')
 
+    Assert-ResourceProperty @PSBoundParameters
+
     Set-NetConnectionProfile @PSBoundParameters
 }
 
@@ -101,14 +102,13 @@ function Set-TargetResource
     Specifies the alias for the Interface that is being changed.
 
     .PARAMETER IPv4Connectivity
-    Specifies the network interfaces that should be a part of the network team.
-    This is a comma-separated list.
+    Specifies the IPv4 Connection Value.
 
     .PARAMETER IPv6Connectivity
-    Specifies the teaming mode configuration.
+    Specifies the IPv6 Connection Value.
 
     .PARAMETER NetworkCategory
-    Specifies the load balancing algorithm for the network team.
+    Sets the NetworkCategory for the interface
 #>
 function Test-TargetResource
 {
@@ -116,26 +116,32 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $InterfaceAlias,
 
+        [Parameter()]
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
         [string]
         $IPv4Connectivity,
 
+        [Parameter()]
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
         [string]
         $IPv6Connectivity,
 
+        [Parameter()]
         [ValidateSet('Public', 'Private')]
         [string]
         $NetworkCategory
     )
 
+    Assert-ResourceProperty @PSBoundParameters
+
     $current = Get-TargetResource -InterfaceAlias $InterfaceAlias
 
-    if ($IPv4Connectivity -ne $current.IPv4Connectivity)
+    if (-not [String]::IsNullOrEmpty($IPv4Connectivity) -and `
+        ($IPv4Connectivity -ne $current.IPv4Connectivity))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($LocalizedData.TestIPv4Connectivity) -f $IPv4Connectivity, $current.IPv4Connectivity
@@ -144,7 +150,8 @@ function Test-TargetResource
         return $false
     }
 
-    if ($IPv6Connectivity -ne $current.IPv6Connectivity)
+    if (-not [String]::IsNullOrEmpty($IPv6Connectivity) -and `
+        ($IPv6Connectivity -ne $current.IPv6Connectivity))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($LocalizedData.TestIPv6Connectivity) -f $IPv6Connectivity, $current.IPv6Connectivity
@@ -153,7 +160,8 @@ function Test-TargetResource
         return $false
     }
 
-    if ($NetworkCategory -ne $current.NetworkCategory)
+    if (-not [String]::IsNullOrEmpty($NetworkCategory) -and `
+        ($NetworkCategory -ne $current.NetworkCategory))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($LocalizedData.TestNetworkCategory) -f $NetworkCategory, $current.NetworkCategory
@@ -164,3 +172,61 @@ function Test-TargetResource
 
     return $true
 }
+
+<#
+    .SYNOPSIS
+    Check the parameter combination that was passed was valid.
+    Ensures interface exists. If any problems are detected an
+    exception will be thrown.
+
+    .PARAMETER InterfaceAlias
+    Specifies the alias for the Interface that is being changed.
+
+    .PARAMETER IPv4Connectivity
+    Specifies the IPv4 Connection Value.
+
+    .PARAMETER IPv6Connectivity
+    Specifies the IPv6 Connection Value.
+
+    .PARAMETER NetworkCategory
+    Sets the NetworkCategory for the interface
+#>
+function Assert-ResourceProperty
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $InterfaceAlias,
+
+        [Parameter()]
+        [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
+        [string]
+        $IPv4Connectivity,
+
+        [Parameter()]
+        [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
+        [string]
+        $IPv6Connectivity,
+
+        [Parameter()]
+        [ValidateSet('Public', 'Private')]
+        [string]
+        $NetworkCategory
+    )
+
+    if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.InterfaceNotAvailableError -f $InterfaceAlias)
+    }
+
+    if ([String]::IsNullOrEmpty($IPv4Connectivity) -and `
+        [String]::IsNullOrEmpty($IPv6Connectivity) -and `
+        [String]::IsNullOrEmpty($NetworkCategory))
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.ParameterCombinationError)
+    }
+} # Assert-ResourceProperty
