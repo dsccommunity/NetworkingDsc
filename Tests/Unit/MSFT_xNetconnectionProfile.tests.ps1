@@ -25,7 +25,7 @@ try
 
         # Create the Mock Objects that will be used for running tests
         $mockNetAdapter = [PSCustomObject] @{
-            Name = 'Ethernet'
+            Name = 'TestAdapter'
         }
 
         $mockNetConnnectionProfileAll = [PSObject] @{
@@ -86,9 +86,11 @@ try
 
         Describe 'MSFT_xNetConnectionProfile\Test-TargetResource' {
             BeforeEach {
-                Mock -CommandName Get-TargetResource {
+                Mock -CommandName Get-TargetResource -MockWith {
                     return $mockNetConnnectionProfileAll
                 }
+
+                Mock -CommandName Assert-ResourceProperty
             }
 
             Context 'NetworkCategory matches' {
@@ -131,6 +133,7 @@ try
         Describe 'MSFT_xNetConnectionProfile\Set-TargetResource' {
             It 'Should call all the mocks' {
                 Mock -CommandName Set-NetConnectionProfile
+                Mock -CommandName Assert-ResourceProperty
 
                 Set-TargetResource @testNetworkCategoryMatches
 
