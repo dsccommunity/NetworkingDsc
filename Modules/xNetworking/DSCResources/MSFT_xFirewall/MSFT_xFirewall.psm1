@@ -71,7 +71,7 @@ function Get-TargetResource
             ) -join '')
         return @{
             Ensure = 'Absent'
-            Name = $Name
+            Name   = $Name
         }
     }
 
@@ -1297,14 +1297,14 @@ function Get-FirewallRuleProperty
         ) -join '')
 
     return @{
-        AddressFilters = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
-        ApplicationFilters = @(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $FirewallRule)
-        InterfaceFilters = @(Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $FirewallRule)
+        AddressFilters       = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
+        ApplicationFilters   = @(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $FirewallRule)
+        InterfaceFilters     = @(Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $FirewallRule)
         InterfaceTypeFilters = @(Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $FirewallRule)
-        PortFilters = @(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $FirewallRule)
-        Profile = @(Get-NetFirewallProfile -AssociatedNetFirewallRule $FirewallRule)
-        SecurityFilters = @(Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $FirewallRule)
-        ServiceFilters = @(Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule)
+        PortFilters          = @(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $FirewallRule)
+        Profile              = @(Get-NetFirewallProfile -AssociatedNetFirewallRule $FirewallRule)
+        SecurityFilters      = @(Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $FirewallRule)
+        ServiceFilters       = @(Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule)
     }
 }
 
