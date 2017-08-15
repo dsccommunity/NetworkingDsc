@@ -37,6 +37,12 @@
 - Converted files with UTF8 with BOM over to UTF8 - fixes [Issue 250](https://github.com/PowerShell/xNetworking/issues/250).
 - MSFT_xFirewallProfile:
   - Created new resource configuring firewall profiles.
+- MSFT_xNetConnectionProfile:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Added validation for provided parameters.
+  - Prevent testing parameter values of connection that aren't set in resource -
+    fixes [Issue 254](https://github.com/PowerShell/xNetworking/issues/254).
+  - Improved unit test coverage for this resource.
 
 ## 5.0.0.0
 
