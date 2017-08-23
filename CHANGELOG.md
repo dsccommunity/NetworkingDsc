@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.1.0.0
+
 - MSFT_xDhcpClient:
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.

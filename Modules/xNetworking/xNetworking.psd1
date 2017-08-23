@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '5.0.0.0'
+ModuleVersion = '5.1.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -50,31 +50,49 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- Find-NetworkAdapter:
-  - Fixed to return null if exception thrown.
-  - Allowed passing no selection parameters.
-- MSFT_xNetAdapterName:
-  - Fixed bug in Get-TargetResource when Name is the only adapter selector parameter.
-  - Improved verbose logging.
-  - More improvements to verbose logging.
-- Added Get-DnsClientServerStaticAddress to NetworkingDsc.Common to return statically
-  assigned DNS server addresses to support fix for [issue 113](https://github.com/PowerShell/xNetworking/issues/113).
-- MSFT_xDNSserverAddress:
-  - Added support for setting DNS Client to DHCP for [issue 113](https://github.com/PowerShell/xNetworking/issues/113).
-  - Added new examples to show how to enable DHCP on DNS Client.
-  - Improved integration test coverage to enable testing of multiple addresses and
-    DHCP.
-  - Converted exception creation to use common exception functions.
-- MSFT_xDhcpClient:
-  - Updated example to also cover setting DNS Client to DHCP.
-- Added the VS Code PowerShell extension formatting settings that cause PowerShell
-  files to be formatted as per the DSC Resource kit style guidelines.
-- MSFT_xDefaultGatewayAddress:
+        ReleaseNotes = '- MSFT_xDhcpClient:
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
-- Updated badges in README.MD to match the layout from PSDscResources.
+- README.MD:
+  - Cleaned up badges by putting them into a table.
+- MSFT_xDnsConnectionSuffix:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- README.MD:
+  - Converted badges to use branch header as used in xSQLServer.
+- Added standard .markdownlint.json to configure rules to run on
+  Markdown files.
+- MSFT_xDnsClientGlobalSetting:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- Updated year to 2017 in LICENSE and module manifest.
+- MSFT_xDnsServerAddress:
+  - Fix error when setting address on adapter where NameServer
+    Property does not exist in registry for interface - see
+    [issue 237](https://github.com/PowerShell/xNetworking/issues/237).
+  - Corrected style and formatting to meet HQRM guidelines.
 - MSFT_xIPAddress:
-  - BREAKING CHANGE: Adding support for multiple IP addresses being assigned.
+  - Improved examples to clarify how to set IP Address prefix -
+    see [issue 239](https://github.com/PowerShell/xNetworking/issues/239).
+- MSFT_xFirewall:
+  - Fixed bug with DisplayName not being set correctly in some
+    situations - see [issue 234](https://github.com/PowerShell/xNetworking/issues/234).
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- Added .github support files:
+  - CONTRIBUTING.md
+  - ISSUE_TEMPLATE.md
+  - PULL_REQUEST_TEMPLATE.md
+- Opted into Common Tests "Validate Module Files" and "Validate Script Files".
+- Converted files with UTF8 with BOM over to UTF8 - fixes [Issue 250](https://github.com/PowerShell/xNetworking/issues/250).
+- MSFT_xFirewallProfile:
+  - Created new resource configuring firewall profiles.
+- MSFT_xNetConnectionProfile:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Added validation for provided parameters.
+  - Prevent testing parameter values of connection that aren"t set in resource -
+    fixes [Issue 254](https://github.com/PowerShell/xNetworking/issues/254).
+  - Improved unit test coverage for this resource.
 
 '
 
@@ -82,6 +100,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 
