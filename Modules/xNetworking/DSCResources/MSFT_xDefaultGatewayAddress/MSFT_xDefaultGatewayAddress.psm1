@@ -11,7 +11,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
+$LocalizedData = Get-LocalizedData `
     -ResourceName 'MSFT_xDefaultGatewayAddress' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
@@ -44,6 +44,7 @@ function Get-TargetResource
         [String]
         $AddressFamily,
 
+        [Parameter()]
         [String]
         $Address
     )
@@ -297,6 +298,7 @@ function Assert-ResourceProperty
         [String]
         $InterfaceAlias,
 
+        [Parameter()]
         [ValidateSet('IPv4', 'IPv6')]
         [String]
         $AddressFamily = 'IPv4',

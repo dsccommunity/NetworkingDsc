@@ -1,14 +1,14 @@
-$script:DSCModuleName      = 'xNetworking'
-$script:DSCResourceName    = 'MSFT_xDhcpClient'
+$script:DSCModuleName = 'xNetworking'
+$script:DSCResourceName = 'MSFT_xDhcpClient'
 
 #region HEADER
 # Integration Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -31,14 +31,14 @@ try
 
     Describe "$($script:DSCResourceName)_Integration" {
         #region DEFAULT TESTS
-        It 'Should compile without throwing' {
+        It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
                 Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw
         }
 
-        It 'should be able to call Get-DscConfiguration without throwing' {
+        It 'Should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
         #endregion

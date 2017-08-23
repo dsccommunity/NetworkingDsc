@@ -2,13 +2,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
@@ -52,20 +52,22 @@ function Get-TargetResource
         [String]
         $Name
     )
+
     $ErrorActionPreference = 'Stop'
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($script:localizedData.GettingFirewallRuleMessage) -f $Name
+            $($script:localizedData.GettingFirewallRuleMessage) -f $Name
         ) -join '')
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($script:localizedData.FindFirewallRuleMessage) -f $Name
+            $($script:localizedData.FindFirewallRuleMessage) -f $Name
         ) -join '')
+
     $firewallRule = Get-FirewallRule -Name $Name
 
     if (-not $firewallRule)
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($script:localizedData.FirewallRuleDoesNotExistMessage) -f $Name
+                $($script:localizedData.FirewallRuleDoesNotExistMessage) -f $Name
             ) -join '')
         return @{
             Ensure = 'Absent'
@@ -78,27 +80,31 @@ function Get-TargetResource
     $result = @{
         Ensure = 'Present'
     }
-    # Populate the properties for get target resource by looping through
-    # the parameter array list and adding the values to
+
+    <#
+        Populate the properties for get target resource by looping through
+        the parameter array list and adding the values to
+    #>
     foreach ($parameter in $script:parameterList)
     {
-        if ($parameter.Type -in @('Array','ArrayIP'))
+        if ($parameter.Type -in @('Array', 'ArrayIP'))
         {
             $parameterValue = @(Get-FirewallPropertyValue `
-                -FirewallRule $firewallRule `
-                -Properties $properties `
-                -Parameter $parameter)
+                    -FirewallRule $firewallRule `
+                    -Properties $properties `
+                    -Parameter $parameter)
             if ($parameter.Delimiter)
             {
                 $parameterValue = $parameterValue -split $parameter.Delimiter
             }
+
             $result += @{
                 $parameter.Name = $parameterValue
             }
 
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($script:localizedData.FirewallParameterValueMessage) -f `
-                    $Name,$parameter.Name,($parameterValue -join ',')
+                    $($script:localizedData.FirewallParameterValueMessage) -f `
+                        $Name, $parameter.Name, ($parameterValue -join ',')
                 ) -join '')
         }
         else
@@ -113,10 +119,9 @@ function Get-TargetResource
             }
 
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($script:localizedData.FirewallParameterValueMessage) -f `
-                    $Name,$parameter.Name,$parameterValue
+                    $($script:localizedData.FirewallParameterValueMessage) -f `
+                        $Name, $parameter.Name, $parameterValue
                 ) -join '')
-
         }
     }
     return $result
@@ -249,135 +254,166 @@ function Set-TargetResource
         [String]
         $Name,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $DisplayName,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Group,
 
+        [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [String]
         $Ensure = 'Present',
 
+        [Parameter()]
         [ValidateSet('True', 'False')]
         [String]
         $Enabled,
 
+        [Parameter()]
         [ValidateSet('NotConfigured', 'Allow', 'Block')]
         [String]
         $Action,
 
+        [Parameter()]
         [String[]]
         $Profile,
 
+        [Parameter()]
         [ValidateSet('Inbound', 'Outbound')]
         [String]
         $Direction,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $RemotePort,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $LocalPort,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Protocol,
 
+        [Parameter()]
         [String]
         $Description,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Program,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Service,
 
+        [Parameter()]
         [ValidateSet('NotRequired', 'Required', 'NoEncap')]
         [String]
         $Authentication,
 
+        [Parameter()]
         [ValidateSet('NotRequired', 'Required', 'Dynamic')]
         [String]
         $Encryption,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $InterfaceAlias,
 
+        [Parameter()]
         [ValidateSet('Any', 'Wired', 'Wireless', 'RemoteAccess')]
         [String]
         $InterfaceType,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $LocalAddress,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $LocalUser,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Package,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $Platform,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $RemoteAddress,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $RemoteMachine,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $RemoteUser,
 
-        [ValidateSet('Any','ProximityApps','ProximitySharing','WifiDirectPrinting','WifiDirectDisplay','WifiDirectDevices')]
+        [Parameter()]
+        [ValidateSet('Any', 'ProximityApps', 'ProximitySharing', 'WifiDirectPrinting', 'WifiDirectDisplay', 'WifiDirectDevices')]
         [String]
         $DynamicTransport,
 
-        [ValidateSet('Block','Allow','DeferToUser','DeferToApp')]
+        [Parameter()]
+        [ValidateSet('Block', 'Allow', 'DeferToUser', 'DeferToApp')]
         [String]
         $EdgeTraversalPolicy,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $IcmpType,
 
+        [Parameter()]
         [Boolean]
         $LocalOnlyMapping,
 
+        [Parameter()]
         [Boolean]
         $LooseSourceMapping,
 
+        [Parameter()]
         [Boolean]
         $OverrideBlockRules,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Owner
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($script:localizedData.ApplyingFirewallRuleMessage) -f $Name
+            $($script:localizedData.ApplyingFirewallRuleMessage) -f $Name
         ) -join '')
 
     # Remove any parameters not used in Splats
     $null = $PSBoundParameters.Remove('Ensure')
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($script:localizedData.FindFirewallRuleMessage) -f $Name
+            $($script:localizedData.FindFirewallRuleMessage) -f $Name
         ) -join '')
     $firewallRule = Get-FirewallRule -Name $Name
 
@@ -386,39 +422,43 @@ function Set-TargetResource
     if ($Ensure -eq 'Present')
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($script:localizedData.FirewallRuleShouldExistMessage) -f $Name,$Ensure
+                $($script:localizedData.FirewallRuleShouldExistMessage) -f $Name, $Ensure
             ) -join '')
 
         if ($exists)
         {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($script:localizedData.FirewallRuleShouldExistAndDoesMessage) -f $Name
+                    $($script:localizedData.FirewallRuleShouldExistAndDoesMessage) -f $Name
                 ) -join '')
+
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($script:localizedData.CheckFirewallRuleParametersMessage) -f $Name
+                    $($script:localizedData.CheckFirewallRuleParametersMessage) -f $Name
                 ) -join '')
 
             if (-not (Test-RuleProperties -FirewallRule $firewallRule @PSBoundParameters))
             {
                 Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.UpdatingExistingFirewallMessage) -f $Name
+                        $($script:localizedData.UpdatingExistingFirewallMessage) -f $Name
                     ) -join '')
 
                 # If the Group is being changed the the rule needs to be recreated
                 if ($PSBoundParameters.ContainsKey('Group') `
-                    -and ($Group -ne $FirewallRule.Group))
+                        -and ($Group -ne $FirewallRule.Group))
                 {
-
                     Remove-NetFirewallRule -Name $Name
 
-                    # Merge the existing rule values into the PSBoundParameters
-                    # so that it can be splatted.
-
+                    <#
+                        Merge the existing rule values into the PSBoundParameters
+                        so that it can be splatted.
+                    #>
                     $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
 
-                    # Loop through each possible property and if it is not passed as a parameter
-                    # then set the PSBoundParameter property to the exiting rule value.
-                    Foreach ($parameter in $ParametersList) {
+                    <#
+                        Loop through each possible property and if it is not passed as a parameter
+                        then set the PSBoundParameter property to the exiting rule value.
+                    #>
+                    foreach ($parameter in $ParametersList)
+                    {
                         if (-not $PSBoundParameters.ContainsKey($parameter.Name))
                         {
                             $parameterValue = Get-FirewallPropertyValue `
@@ -426,8 +466,9 @@ function Set-TargetResource
                                 -Properties $properties `
                                 -Parameter $parameter
 
-                            if ($ParameterValue) {
-                                $null = $PSBoundParameters.Add($parameter.Name,$ParameterValue)
+                            if ($ParameterValue)
+                            {
+                                $null = $PSBoundParameters.Add($parameter.Name, $ParameterValue)
                             }
                         }
                     }
@@ -436,14 +477,16 @@ function Set-TargetResource
                 }
                 else
                 {
-                    # If the DisplayName is provided then need to remove it
-                    # And change it to NewDisplayName if it is different.
+                    <#
+                        If the DisplayName is provided then need to remove it
+                        And change it to NewDisplayName if it is different.
+                    #>
                     if ($PSBoundParameters.ContainsKey('DisplayName'))
                     {
                         $null = $PSBoundParameters.Remove('DisplayName')
                         if ($DisplayName -ne $FirewallRule.DisplayName)
                         {
-                            $null = $PSBoundParameters.Add('NewDisplayName',$Name)
+                            $null = $PSBoundParameters.Add('NewDisplayName', $DisplayName)
                         }
                     }
 
@@ -455,14 +498,18 @@ function Set-TargetResource
         else
         {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($script:localizedData.FirewallRuleShouldExistAndDoesNotMessage) -f $Name
+                    $($script:localizedData.FirewallRuleShouldExistAndDoesNotMessage) -f $Name
                 ) -join '')
 
             # Set any default parameter values
-            if (-not $DisplayName) {
-                if (-not $PSBoundParameters.ContainsKey('DisplayName')) {
-                    $null = $PSBoundParameters.Add('DisplayName',$Name)
-                } else {
+            if (-not $DisplayName)
+            {
+                if (-not $PSBoundParameters.ContainsKey('DisplayName'))
+                {
+                    $null = $PSBoundParameters.Add('DisplayName', $Name)
+                }
+                else
+                {
                     $PSBoundParameters.DisplayName = $Name
                 }
             }
@@ -474,13 +521,13 @@ function Set-TargetResource
     else
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($script:localizedData.FirewallRuleShouldNotExistMessage) -f $Name,$Ensure
+                $($script:localizedData.FirewallRuleShouldNotExistMessage) -f $Name, $Ensure
             ) -join '')
 
         if ($exists)
         {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($script:localizedData.FirewallRuleShouldNotExistButDoesMessage) -f $Name
+                    $($script:localizedData.FirewallRuleShouldNotExistButDoesMessage) -f $Name
                 ) -join '')
 
             # Remove the existing Firewall rule
@@ -489,7 +536,7 @@ function Set-TargetResource
         else
         {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($script:localizedData.FirewallRuleShouldNotExistAndDoesNotMessage) -f $Name
+                    $($script:localizedData.FirewallRuleShouldNotExistAndDoesNotMessage) -f $Name
                 ) -join '')
             # Do Nothing
         }
@@ -624,136 +671,168 @@ function Test-TargetResource
         [String]
         $Name,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $DisplayName,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Group,
 
+        [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [String]
         $Ensure = 'Present',
 
+        [Parameter()]
         [ValidateSet('True', 'False')]
         [String]
         $Enabled,
 
+        [Parameter()]
         [ValidateSet('NotConfigured', 'Allow', 'Block')]
         [String]
         $Action,
 
+        [Parameter()]
         [String[]]
         $Profile,
 
+        [Parameter()]
         [ValidateSet('Inbound', 'Outbound')]
         [String]
         $Direction,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $RemotePort,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $LocalPort,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Protocol,
 
+        [Parameter()]
         [String]
         $Description,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Program,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Service,
 
+        [Parameter()]
         [ValidateSet('NotRequired', 'Required', 'NoEncap')]
         [String]
         $Authentication,
 
+        [Parameter()]
         [ValidateSet('NotRequired', 'Required', 'Dynamic')]
         [String]
         $Encryption,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $InterfaceAlias,
 
+        [Parameter()]
         [ValidateSet('Any', 'Wired', 'Wireless', 'RemoteAccess')]
         [String]
         $InterfaceType,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $LocalAddress,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $LocalUser,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Package,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $Platform,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $RemoteAddress,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $RemoteMachine,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $RemoteUser,
 
-        [ValidateSet('Any','ProximityApps','ProximitySharing','WifiDirectPrinting','WifiDirectDisplay','WifiDirectDevices')]
+        [Parameter()]
+        [ValidateSet('Any', 'ProximityApps', 'ProximitySharing', 'WifiDirectPrinting', 'WifiDirectDisplay', 'WifiDirectDevices')]
         [String]
         $DynamicTransport,
 
-        [ValidateSet('Block','Allow','DeferToUser','DeferToApp')]
+        [Parameter()]
+        [ValidateSet('Block', 'Allow', 'DeferToUser', 'DeferToApp')]
         [String]
         $EdgeTraversalPolicy,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $IcmpType,
 
+        [Parameter()]
         [Boolean]
         $LocalOnlyMapping,
 
+        [Parameter()]
         [Boolean]
         $LooseSourceMapping,
 
+        [Parameter()]
         [Boolean]
         $OverrideBlockRules,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Owner
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($script:localizedData.CheckingFirewallRuleMessage) -f $Name
+            $($script:localizedData.CheckingFirewallRuleMessage) -f $Name
         ) -join '')
 
     # Remove any parameters not used in Splats
     $null = $PSBoundParameters.Remove('Ensure')
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($script:localizedData.FindFirewallRuleMessage) -f $Name
+            $($script:localizedData.FindFirewallRuleMessage) -f $Name
         ) -join '')
+
     $firewallRule = Get-FirewallRule -Name $Name
 
     $exists = ($null -ne $firewallRule)
@@ -761,29 +840,30 @@ function Test-TargetResource
     if (-not $exists)
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($script:localizedData.FirewallRuleDoesNotExistMessage) -f $Name
+                $($script:localizedData.FirewallRuleDoesNotExistMessage) -f $Name
             ) -join '')
 
         # Returns whether complies with $Ensure
         $returnValue = ($false -eq ($Ensure -eq 'Present'))
 
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($script:localizedData.CheckingFirewallReturningMessage) -f $Name,$returnValue
+                $($script:localizedData.CheckingFirewallReturningMessage) -f $Name, $returnValue
             ) -join '')
 
         return $returnValue
     }
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($script:localizedData.CheckFirewallRuleParametersMessage) -f $Name
+            $($script:localizedData.CheckFirewallRuleParametersMessage) -f $Name
         ) -join '')
+
     $desiredConfigurationMatch = Test-RuleProperties -FirewallRule $firewallRule @PSBoundParameters
 
     # Returns whether or not $exists complies with $Ensure
     $returnValue = ($desiredConfigurationMatch -and $exists -eq ($Ensure -eq 'Present'))
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($script:localizedData.CheckingFirewallReturningMessage) -f $Name,$returnValue
+            $($script:localizedData.CheckingFirewallReturningMessage) -f $Name, $returnValue
         ) -join '')
 
     return $returnValue
@@ -924,108 +1004,140 @@ function Test-RuleProperties
         [String]
         $Name,
 
+        [Parameter()]
         [String]
         $DisplayName,
 
+        [Parameter()]
         [String]
         $Group,
 
+        [Parameter()]
         [String]
         $DisplayGroup,
 
+        [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [String]
         $Ensure = 'Present',
 
+        [Parameter()]
         [ValidateSet('True', 'False')]
         [String]
         $Enabled,
 
+        [Parameter()]
         [ValidateSet('NotConfigured', 'Allow', 'Block')]
         [String]
         $Action,
 
+        [Parameter()]
         [String[]]
         $Profile,
 
+        [Parameter()]
         [ValidateSet('Inbound', 'Outbound')]
         [String]
         $Direction,
 
+        [Parameter()]
         [String[]]
         $RemotePort,
 
+        [Parameter()]
         [String[]]
         $LocalPort,
 
+        [Parameter()]
         [String]
         $Protocol,
 
+        [Parameter()]
         [String]
         $Description,
 
+        [Parameter()]
         [String]
         $Program,
 
+        [Parameter()]
         [String]
         $Service,
 
+        [Parameter()]
         [ValidateSet('NotRequired', 'Required', 'NoEncap')]
         [String]
         $Authentication,
 
+        [Parameter()]
         [ValidateSet('NotRequired', 'Required', 'Dynamic')]
         [String]
         $Encryption,
 
+        [Parameter()]
         [String[]]
         $InterfaceAlias,
 
+        [Parameter()]
         [ValidateSet('Any', 'Wired', 'Wireless', 'RemoteAccess')]
         [String]
         $InterfaceType,
 
+        [Parameter()]
         [String[]]
         $LocalAddress,
 
+        [Parameter()]
         [String]
         $LocalUser,
 
+        [Parameter()]
         [String]
         $Package,
 
+        [Parameter()]
         [String[]]
         $Platform,
 
+        [Parameter()]
         [String[]]
         $RemoteAddress,
 
+        [Parameter()]
         [String]
         $RemoteMachine,
 
+        [Parameter()]
         [String]
         $RemoteUser,
 
-        [ValidateSet('Any','ProximityApps','ProximitySharing','WifiDirectPrinting','WifiDirectDisplay','WifiDirectDevices')]
+        [Parameter()]
+        [ValidateSet('Any', 'ProximityApps', 'ProximitySharing', 'WifiDirectPrinting', 'WifiDirectDisplay', 'WifiDirectDevices')]
         [String]
         $DynamicTransport,
 
-        [ValidateSet('Block','Allow','DeferToUser','DeferToApp')]
+        [Parameter()]
+        [ValidateSet('Block', 'Allow', 'DeferToUser', 'DeferToApp')]
         [String]
         $EdgeTraversalPolicy,
 
+        [Parameter()]
         [String[]]
         $IcmpType,
 
+        [Parameter()]
         [Boolean]
         $LocalOnlyMapping,
 
+        [Parameter()]
         [Boolean]
         $LooseSourceMapping,
 
+        [Parameter()]
         [Boolean]
         $OverrideBlockRules,
 
+        [Parameter()]
         [String]
         $Owner
     )
@@ -1045,6 +1157,7 @@ function Test-RuleProperties
             -Parameter $parameter
 
         $parameterNew = (Get-Variable -Name ($parameter.Name)).Value
+
         switch -Wildcard ($parameter.Type)
         {
             'String'
@@ -1053,24 +1166,27 @@ function Test-RuleProperties
                 if ($parameterNew -and ($parameterValue -ne $parameterNew))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                        $($script:localizedData.PropertyNoMatchMessage) `
-                            -f $parameter.Name,$parameterValue,$parameterNew
+                            $($script:localizedData.PropertyNoMatchMessage) `
+                                -f $parameter.Name, $parameterValue, $parameterNew
                         ) -join '')
+
                     $desiredConfigurationMatch = $false
                 }
             }
+
             'Boolean'
             {
                 # Perform a boolean comparison.
                 if ($parameterNew -and ($parameterValue -ne $parameterNew))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                        $($script:localizedData.PropertyNoMatchMessage) `
-                            -f $parameter.Name,$parameterValue,$parameterNew
+                            $($script:localizedData.PropertyNoMatchMessage) `
+                                -f $parameter.Name, $parameterValue, $parameterNew
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
             }
+
             'Array*'
             {
                 # Array comparison uses Compare-Object
@@ -1078,11 +1194,14 @@ function Test-RuleProperties
                 {
                     $parameterValue = @()
                 }
+
                 if ($parameter.Delimiter)
                 {
                     $parameterValue = $parameterValue -split $parameter.Delimiter
                 }
-                if ($parameter.Type -eq 'IPArray') {
+
+                if ($parameter.Type -eq 'IPArray')
+                {
                     <#
                         IPArray comparison uses Compare-Object, except needs to convert any IP addresses
                         that use CIDR notation to use Subnet Mask notification because this is the
@@ -1093,13 +1212,13 @@ function Test-RuleProperties
                 }
 
                 if ($parameterNew `
-                    -and ((Compare-Object `
-                        -ReferenceObject $parameterValue `
-                        -DifferenceObject $parameterNew).Count -ne 0))
+                        -and ((Compare-Object `
+                                -ReferenceObject $parameterValue `
+                                -DifferenceObject $parameterNew).Count -ne 0))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                        $($script:localizedData.PropertyNoMatchMessage) `
-                            -f $parameter.Name,($parameterValue -join ','),($parameterNew -join ',')
+                            $($script:localizedData.PropertyNoMatchMessage) `
+                                -f $parameter.Name, ($parameterValue -join ','), ($parameterNew -join ',')
                         ) -join '')
                     $desiredConfigurationMatch = $false
                 }
@@ -1108,7 +1227,7 @@ function Test-RuleProperties
     }
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($script:localizedData.TestFirewallRuleReturningMessage) -f $Name,$desiredConfigurationMatch
+            $($script:localizedData.TestFirewallRuleReturningMessage) -f $Name, $desiredConfigurationMatch
         ) -join '')
     return $desiredConfigurationMatch
 }
@@ -1137,22 +1256,19 @@ function Get-FirewallRule
     if (-not $firewallRule)
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($script:localizedData.FirewallRuleNotFoundMessage) -f $Name
+                $($script:localizedData.FirewallRuleNotFoundMessage) -f $Name
             ) -join '')
         return $null
     }
-    # If more than one rule is returned for a name, then throw an exception
-    # because this should not be possible.
-    if ($firewallRule.Count -gt 1) {
-        $errorId = 'RuleNotUnique'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-        $errorMessage = $($script:localizedData.RuleNotUniqueError) -f $firewallRule.Count,$Name
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
 
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
+    <#
+        If more than one rule is returned for a name, then throw an exception
+        because this should not be possible.
+    #>
+    if ($firewallRule.Count -gt 1)
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.RuleNotUniqueError -f $firewallRule.Count, $Name)
     }
 
     # The array will only contain a single rule so only return the first one (not the array)
@@ -1174,11 +1290,12 @@ function Get-FirewallRuleProperty
     (
         [Parameter(Mandatory = $true)]
         $FirewallRule
-     )
+    )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($script:localizedData.GetAllPropertiesMessage)
+            $($script:localizedData.GetAllPropertiesMessage)
         ) -join '')
+
     return @{
         AddressFilters       = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
         ApplicationFilters   = @(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $FirewallRule)
@@ -1217,19 +1334,19 @@ function Get-FirewallPropertyValue
 
         [Parameter(Mandatory = $true)]
         $Parameter
-     )
+    )
 
-    if ($Parameter.Property) {
+    if ($Parameter.Property)
+    {
         return (Get-Variable `
-            -Name ($Parameter.Variable)).value.$($Parameter.Property).$($Parameter.Name)
+                -Name ($Parameter.Variable)).value.$($Parameter.Property).$($Parameter.Name)
     }
     else
     {
         return (Get-Variable `
-            -Name ($Parameter.Variable)).value.$($Parameter.Name)
+                -Name ($Parameter.Variable)).value.$($Parameter.Name)
     }
 }
-
 #endregion
 
 Export-ModuleMember -Function *-TargetResource

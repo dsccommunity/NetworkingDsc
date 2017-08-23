@@ -27,6 +27,6 @@ Configuration Example
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPv4'
         }
-        
+
     }
 }

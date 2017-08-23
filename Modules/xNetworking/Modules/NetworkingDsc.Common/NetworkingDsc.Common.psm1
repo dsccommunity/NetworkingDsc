@@ -1,4 +1,4 @@
-﻿# Import the Networking Resource Helper Module
+# Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
                                -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
                                                      -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
@@ -336,10 +336,11 @@ function Get-DnsClientServerStaticAddress
         $interfaceRegKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\Interfaces\$interfaceGuid\"
     } # if
 
-    $nameServerAddressString = Get-ItemPropertyValue `
+
+    $interfaceInformation = Get-ItemProperty `
         -Path $interfaceRegKeyPath `
-        -Name NameServer `
         -ErrorAction SilentlyContinue
+    $nameServerAddressString = $interfaceInformation.NameServer
 
     # Are any statically assigned addresses for this adapter?
     if ([String]::IsNullOrWhiteSpace($nameServerAddressString))

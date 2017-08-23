@@ -1,11 +1,5 @@
 # xNetworking
 
-master: [![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/master)
-[![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking)
-
-dev: [![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/dev)
-[![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking)
-
 The **xNetworking** module contains the following resources:
 
 - **xFirewall**: Sets a node's firewall rules.
@@ -27,11 +21,30 @@ The **xNetworking** module contains the following resources:
 - **xNetAdapterLso**: Enable or disable Lso for different protocols
     on a network adapter.
 - **xNetAdapterName**: Rename a network interface that matches specified search parameters.
+- **xFirewallProfile**: Configures a node's private, public or domain firewall profile.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)
 or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any
 additional questions or comments.
+
+## Branches
+
+### master
+
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/master)
+[![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking/branch/master)
+
+This is the branch containing the latest release - no contributions should be made
+directly to this branch.
+
+### dev
+
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/dev)[![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking/branch/dev)
+
+This is the development branch to which contributions should be proposed by contributors
+as pull requests. This development branch will periodically be merged to the master
+branch, and be released to [PowerShell Gallery](https://www.powershellgallery.com/).
 
 ## Contributing
 
@@ -51,7 +64,7 @@ not installed. Please ensure this update is installed if this error occurs.
     preference via -Debug switch or $DebugPreference variable, and try again.
 ````
 
-### Known Invalid Configuraiton
+### Known Invalid Configuration
 
 - The exception 'One of the port keywords is invalid' will be thrown if a rule
     is created with the LocalPort set to PlayToDiscovery and the Protocol is not

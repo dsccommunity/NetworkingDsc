@@ -24,244 +24,233 @@ try
     InModuleScope $script:DSCResourceName {
 
         # Create the Mock Objects that will be used for running tests
-        $DnsClientGlobalSettings = [PSObject]@{
-            SuffixSearchList             = 'contoso.com'
-            DevolutionLevel              = 1
-            UseDevolution                = $True
+        $dnsClientGlobalSettings = [PSObject]@{
+            SuffixSearchList = 'contoso.com'
+            DevolutionLevel  = 1
+            UseDevolution    = $True
         }
-        $DnsClientGlobalSettingsSplat = [PSObject]@{
-            IsSingleInstance             = 'Yes'
-            SuffixSearchList             = $DnsClientGlobalSettings.SuffixSearchList
-            DevolutionLevel              = $DnsClientGlobalSettings.DevolutionLevel
-            UseDevolution                = $DnsClientGlobalSettings.UseDevolution
+
+        $dnsClientGlobalMultiSuffixSettings = [PSObject]@{
+            SuffixSearchList = @('fabrikam.com', 'fourthcoffee.com')
+            DevolutionLevel  = 1
+            UseDevolution    = $True
+        }
+
+        $dnsClientGlobalSettingsSplat = [PSObject]@{
+            IsSingleInstance = 'Yes'
+            SuffixSearchList = $dnsClientGlobalSettings.SuffixSearchList
+            DevolutionLevel  = $dnsClientGlobalSettings.DevolutionLevel
+            UseDevolution    = $dnsClientGlobalSettings.UseDevolution
         }
 
         Describe "MSFT_xDnsClientGlobalSetting\Get-TargetResource" {
+            BeforeEach {
+                Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalSettings }
+            }
 
             Context 'DNS Client Global Settings Exists' {
-
-                Mock Get-DnsClientGlobalSetting -MockWith { $DnsClientGlobalSettings }
-
-                It 'should return correct DNS Client Global Settings values' {
+                It 'Should return correct DNS Client Global Settings values' {
                     $getTargetResourceParameters = Get-TargetResource -IsSingleInstance 'Yes'
-                    $getTargetResourceParameters.SuffixSearchList | Should Be $DnsClientGlobalSettings.SuffixSearchList
-                    $getTargetResourceParameters.DevolutionLevel  | Should Be $DnsClientGlobalSettings.DevolutionLevel
-                    $getTargetResourceParameters.UseDevolution    | Should Be $DnsClientGlobalSettings.UseDevolution
+                    $getTargetResourceParameters.SuffixSearchList | Should Be $dnsClientGlobalSettings.SuffixSearchList
+                    $getTargetResourceParameters.DevolutionLevel  | Should Be $dnsClientGlobalSettings.DevolutionLevel
+                    $getTargetResourceParameters.UseDevolution    | Should Be $dnsClientGlobalSettings.UseDevolution
                 }
-                It 'should call the expected mocks' {
-                    Assert-MockCalled -CommandName Get-DnsClientGlobalSetting -Exactly 1
+
+                It 'Should call the expected mocks' {
+                    Assert-MockCalled -CommandName Get-DnsClientGlobalSetting -Exactly -Times 1
                 }
             }
         }
 
         Describe "MSFT_xDnsClientGlobalSetting\Set-TargetResource" {
-
-            Mock Get-DnsClientGlobalSetting -MockWith { $DnsClientGlobalSettings }
-            Mock Set-DnsClientGlobalSetting
+            BeforeEach {
+                Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalSettings }
+            }
 
             Context 'DNS Client Global Settings all parameters are the same' {
-                It 'should not throw error' {
+                Mock -CommandName Set-DnsClientGlobalSetting
+
+                It 'Should not throw error' {
                     {
-                        $setTargetResourceParameters = $DnsClientGlobalSettingsSplat.Clone()
+                        $setTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         Set-TargetResource @setTargetResourceParameters
                     } | Should Not Throw
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
-                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -Exactly 0
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -Exactly -Times 0
                 }
             }
 
             Context 'DNS Client Global Settings SuffixSearchList is different' {
-                It 'should not throw error' {
+                Mock -CommandName Set-DnsClientGlobalSetting
+
+                It 'Should not throw error' {
                     {
-                        $setTargetResourceParameters = $DnsClientGlobalSettingsSplat.Clone()
+                        $setTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $setTargetResourceParameters.SuffixSearchList = 'fabrikam.com'
                         Set-TargetResource @setTargetResourceParameters
                     } | Should Not Throw
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
-                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -Exactly -Times 1
                 }
             }
 
             Context 'DNS Client Global Settings SuffixSearchList Array is different' {
                 $suffixSearchListArray = @('fabrikam.com', 'fourthcoffee.com')
 
-                Mock -CommandName Set-DnsClientGlobalSetting -ParameterFilter {
+                $setDnsClientGlobalMockParameterFilter = {
                     (Compare-Object -ReferenceObject $suffixSearchList -DifferenceObject $suffixSearchListArray -SyncWindow 0).Length -eq 0
-                } -MockWith {
-                    return $null
-                }
-                Mock -CommandName Set-DnsClientGlobalSetting -MockWith {
-                    throw
                 }
 
-                It 'should not throw error' {
+                Mock -CommandName Set-DnsClientGlobalSetting -ParameterFilter $setDnsClientGlobalMockParameterFilter
+
+                It 'Should not throw error' {
                     {
-                        $setTargetResourceParameters = $DnsClientGlobalSettingsSplat.Clone()
+                        $setTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $setTargetResourceParameters.SuffixSearchList = $suffixSearchListArray
                         Set-TargetResource @setTargetResourceParameters
                     } | Should Not Throw
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
-                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -ParameterFilter {
-                        (Compare-Object -ReferenceObject $suffixSearchList -DifferenceObject $suffixSearchListArray -SyncWindow 0).Length -eq 0
-                    } -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -ParameterFilter $setDnsClientGlobalMockParameterFilter -Exactly -Times 1
                 }
             }
 
             Context 'DNS Client Global Settings DevolutionLevel is different' {
-                It 'should not throw error' {
+                Mock -CommandName Set-DnsClientGlobalSetting
+
+                It 'Should not throw error' {
                     {
-                        $setTargetResourceParameters = $DnsClientGlobalSettingsSplat.Clone()
+                        $setTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $setTargetResourceParameters.DevolutionLevel = $setTargetResourceParameters.DevolutionLevel + 1
                         Set-TargetResource @setTargetResourceParameters
                     } | Should Not Throw
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
-                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -Exactly -Times 1
                 }
             }
 
             Context 'DNS Client Global Settings UseDevolution is different' {
-                It 'should not throw error' {
+                Mock -CommandName Set-DnsClientGlobalSetting
+
+                It 'Should not throw error' {
                     {
-                        $setTargetResourceParameters = $DnsClientGlobalSettingsSplat.Clone()
+                        $setTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $setTargetResourceParameters.UseDevolution = -not $setTargetResourceParameters.UseDevolution
                         Set-TargetResource @setTargetResourceParameters
                     } | Should Not Throw
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
-                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    Assert-MockCalled -commandName Set-DnsClientGlobalSetting -Exactly -Times 1
                 }
             }
         }
 
         Describe "MSFT_xDnsClientGlobalSetting\Test-TargetResource" {
-
-            Mock Get-DnsClientGlobalSetting -MockWith { $DnsClientGlobalSettings }
-
-            Context 'DNS Client Global Settings all parameters are the same' {
-                It 'should return true' {
-                    $testTargetResourceParameters = $DnsClientGlobalSettingsSplat.Clone()
-                    Test-TargetResource @testTargetResourceParameters | Should Be $True
+            Context 'Single suffix is in the search list' {
+                BeforeEach {
+                    Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalSettings }
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
+
+                Context 'DNS Client Global Settings all parameters are the same' {
+                    It 'Should return true' {
+                        $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
+                        Test-TargetResource @testTargetResourceParameters | Should Be $True
+                    }
+
+                    It 'Should call expected Mocks' {
+                        Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    }
+                }
+
+                Context 'DNS Client Global Settings SuffixSearchList is different' {
+                    It 'Should return false' {
+                        $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
+                        $testTargetResourceParameters.SuffixSearchList = 'fabrikam.com'
+                        Test-TargetResource @testTargetResourceParameters | Should Be $False
+                    }
+
+                    It 'Should call expected Mocks' {
+                        Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    }
+                }
+
+                Context 'DNS Client Global Settings DevolutionLevel is different' {
+                    It 'Should return false' {
+                        $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
+                        $testTargetResourceParameters.DevolutionLevel = $testTargetResourceParameters.DevolutionLevel + 1
+                        Test-TargetResource @testTargetResourceParameters | Should Be $False
+                    }
+
+                    It 'Should call expected Mocks' {
+                        Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    }
+                }
+
+                Context 'DNS Client Global Settings UseDevolution is different' {
+                    It 'Should return false' {
+                        $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
+                        $testTargetResourceParameters.UseDevolution = -not $testTargetResourceParameters.UseDevolution
+                        Test-TargetResource @testTargetResourceParameters | Should Be $False
+                    }
+
+                    It 'Should call expected Mocks' {
+                        Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    }
                 }
             }
 
-            Context 'DNS Client Global Settings SuffixSearchList is different' {
-                It 'should return false' {
-                    $testTargetResourceParameters = $DnsClientGlobalSettingsSplat.Clone()
-                    $testTargetResourceParameters.SuffixSearchList = 'fabrikam.com'
-                    Test-TargetResource @testTargetResourceParameters | Should Be $False
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
-                }
-            }
-
-            Context 'DNS Client Global Settings SuffixSearchList Array is different' {
-                $suffixSearchListArray = @('fabrikam.com', 'fourthcoffee.com')
-
-                Mock -CommandName Get-DnsClientGlobalSetting -ParameterFilter {
-                    (Compare-Object -ReferenceObject $suffixSearchList -DifferenceObject $suffixSearchListArray -SyncWindow 0).Length -eq 0
-                } -MockWith {
-                    $DnsClientGlobalSettings
-                }
-                Mock -CommandName Get-DnsClientGlobalSetting -MockWith {
-                    throw
+            Context 'Mulitple suffixes are in the search list' {
+                BeforeEach {
+                    Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalMultiSuffixSettings }
                 }
 
-                It 'should return false' {
-                    $testTargetResourceParameters = $DnsClientGlobalSettingsSplat.Clone()
-                    $testTargetResourceParameters.SuffixSearchList = $suffixSearchListArray
-                    Test-TargetResource @testTargetResourceParameters | Should Be $False
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
-                }
-            }
+                Context 'DNS Client Global Settings SuffixSearchList Array is different' {
+                    It 'Should return false' {
+                        $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
+                        $testTargetResourceParameters.SuffixSearchList = @('fabrikam.com', 'contoso.com')
+                        Test-TargetResource @testTargetResourceParameters | Should Be $False
+                    }
 
-            Context 'DNS Client Global Settings SuffixSearchList Array Order is same' {
-                $suffixSearchListArray = @('fabrikam.com', 'fourthcoffee.com')
-                $DnsClientGlobalSettings = [PSObject]@{
-                    SuffixSearchList             = @('fabrikam.com', 'fourthcoffee.com')
-                    DevolutionLevel              = 1
-                    UseDevolution                = $True
+                    It 'Should call expected Mocks' {
+                        Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    }
                 }
 
-                Mock -CommandName Get-DnsClientGlobalSetting -ParameterFilter {
-                    (Compare-Object -ReferenceObject $suffixSearchList -DifferenceObject $suffixSearchListArray -SyncWindow 0).Length -eq 0
-                } -MockWith {
-                    $DnsClientGlobalSettings
-                }
-                Mock -CommandName Get-DnsClientGlobalSetting -MockWith {
-                    throw
+                Context 'DNS Client Global Settings SuffixSearchList Array Order is same' {
+                    It 'Should return true' {
+                        $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
+                        $testTargetResourceParameters.SuffixSearchList = @('fabrikam.com', 'fourthcoffee.com')
+                        Test-TargetResource @testTargetResourceParameters | Should Be $True
+                    }
+
+                    It 'Should call expected Mocks' {
+                        Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    }
                 }
 
-                It 'should return true' {
-                    $testTargetResourceParameters = $DnsClientGlobalSettingsSplat.Clone()
-                    $testTargetResourceParameters.SuffixSearchList = $suffixSearchListArray
-                    Test-TargetResource @testTargetResourceParameters | Should Be $True
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
-                }
-            }
+                Context 'DNS Client Global Settings SuffixSearchList Array Order is different' {
+                    It 'Should return false' {
+                        $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
+                        $testTargetResourceParameters.SuffixSearchList = @('fourthcoffee.com', 'fabrikam.com')
+                        Test-TargetResource @testTargetResourceParameters | Should Be $False
+                    }
 
-            Context 'DNS Client Global Settings SuffixSearchList Array Order is different' {
-                $suffixSearchListArray = @('fourthcoffee.com', 'fabrikam.com')
-                $DnsClientGlobalSettings = [PSObject]@{
-                    SuffixSearchList             = @('fabrikam.com', 'fourthcoffee.com')
-                    DevolutionLevel              = 1
-                    UseDevolution                = $True
-                }
-
-                Mock -CommandName Get-DnsClientGlobalSetting -ParameterFilter {
-                    (Compare-Object -ReferenceObject $suffixSearchList -DifferenceObject $suffixSearchListArray -SyncWindow 0).Length -eq 0
-                } -MockWith {
-                    $DnsClientGlobalSettings
-                }
-                Mock -CommandName Get-DnsClientGlobalSetting -MockWith {
-                    throw
-                }
-
-                It 'should return false' {
-                    $testTargetResourceParameters = $DnsClientGlobalSettingsSplat.Clone()
-                    $testTargetResourceParameters.SuffixSearchList = $suffixSearchListArray
-                    Test-TargetResource @testTargetResourceParameters | Should Be $False
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
-                }
-            }
-
-            Context 'DNS Client Global Settings DevolutionLevel is different' {
-                It 'should return false' {
-                    $testTargetResourceParameters = $DnsClientGlobalSettingsSplat.Clone()
-                    $testTargetResourceParameters.DevolutionLevel = $testTargetResourceParameters.DevolutionLevel + 1
-                    Test-TargetResource @testTargetResourceParameters | Should Be $False
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
-                }
-            }
-
-            Context 'DNS Client Global Settings UseDevolution is different' {
-                It 'should return false' {
-                    $testTargetResourceParameters = $DnsClientGlobalSettingsSplat.Clone()
-                    $testTargetResourceParameters.UseDevolution = -not $testTargetResourceParameters.UseDevolution
-                    Test-TargetResource @testTargetResourceParameters | Should Be $False
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly 1
+                    It 'Should call expected Mocks' {
+                        Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    }
                 }
             }
         }

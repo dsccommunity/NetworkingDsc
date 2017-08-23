@@ -4,6 +4,7 @@
 #>
 Configuration MSFT_xFirewall_Add_Config {
     Import-DscResource -ModuleName xNetworking
+
     node localhost {
        xFirewall Integration_Test {
             Name                  = $Node.RuleName

@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+## 5.1.0.0
+
+- MSFT_xDhcpClient:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- README.MD:
+  - Cleaned up badges by putting them into a table.
+- MSFT_xDnsConnectionSuffix:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- README.MD:
+  - Converted badges to use branch header as used in xSQLServer.
+- Added standard .markdownlint.json to configure rules to run on
+  Markdown files.
+- MSFT_xDnsClientGlobalSetting:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- Updated year to 2017 in LICENSE and module manifest.
+- MSFT_xDnsServerAddress:
+  - Fix error when setting address on adapter where NameServer
+    Property does not exist in registry for interface - see
+    [issue #237](https://github.com/PowerShell/xNetworking/issues/237).
+  - Corrected style and formatting to meet HQRM guidelines.
+- MSFT_xIPAddress:
+  - Improved examples to clarify how to set IP Address prefix -
+    see [issue #239](https://github.com/PowerShell/xNetworking/issues/239).
+- MSFT_xFirewall:
+  - Fixed bug with DisplayName not being set correctly in some
+    situations - see [issue #234](https://github.com/PowerShell/xNetworking/issues/234).
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- Added .github support files:
+  - CONTRIBUTING.md
+  - ISSUE_TEMPLATE.md
+  - PULL_REQUEST_TEMPLATE.md
+- Opted into Common Tests 'Validate Module Files' and 'Validate Script Files'.
+- Converted files with UTF8 with BOM over to UTF8 - fixes [Issue 250](https://github.com/PowerShell/xNetworking/issues/250).
+- MSFT_xFirewallProfile:
+  - Created new resource configuring firewall profiles.
+- MSFT_xNetConnectionProfile:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Added validation for provided parameters.
+  - Prevent testing parameter values of connection that aren't set in resource -
+    fixes [Issue 254](https://github.com/PowerShell/xNetworking/issues/254).
+  - Improved unit test coverage for this resource.
+
 ## 5.0.0.0
 
 - Find-NetworkAdapter:
@@ -274,11 +320,12 @@
 - MSFT_xFirewall: Set-TargetResource now updates firewall rules instead of
   recreating them.
 - MSFT_xFirewall: Added message localization support.
-- MSFT_xFirewall: Removed unessesary code for handling multiple rules with same name.
-- MSFT_xDefaultGatewayAddress: Removed unessesary try/catch logic from around
+- MSFT_xFirewall: Removed unnecessary code for handling multiple rules with same
+  name.
+- MSFT_xDefaultGatewayAddress: Removed unnecessary try/catch logic from around
   networking cmdlets.
-- MSFT_xIPAddress: Removed unessesary try/catch logic from around networking cmdlets.
-- MSFT_xDNSServerAddress: Removed unessesary try/catch logic from around
+- MSFT_xIPAddress: Removed unnecessary try/catch logic from around networking cmdlets.
+- MSFT_xDNSServerAddress: Removed unnecessary try/catch logic from around
   networking cmdlets.
 - MSFT_xDefaultGatewayAddress: Refactored to add more unit tests and cleanup logic.
 - MSFT_xIPAddress: Network Connection Profile no longer forced to Private when
