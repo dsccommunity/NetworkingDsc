@@ -28,6 +28,15 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any
 additional questions or comments.
 
+## Documentation and Examples
+
+For a full list of resources in xNetworking and examples on their use, check out
+the [xNetworking wiki](https://github.com/PowerShell/xNetworking/wiki).
+You can also review the `examples` directory in the xNetworking module for some
+general use scenarios for all of the resources that are in the module. The `en-US`
+directory in the xNetworking module contains locally available copies of the
+resource documentation.
+
 ## Branches
 
 ### master

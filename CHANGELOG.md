@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added `Documentation and Examples` section to Readme.md file - see
+  [issue #259](https://github.com/PowerShell/xNetworking/issues/259).
+
 ## 5.1.0.0
 
 - MSFT_xDhcpClient:
