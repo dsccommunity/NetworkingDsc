@@ -32,10 +32,11 @@ additional questions or comments.
 
 For a full list of resources in xNetworking and examples on their use, check out
 the [xNetworking wiki](https://github.com/PowerShell/xNetworking/wiki).
+
 You can also review the `examples` directory in the xNetworking module for some
-general use scenarios for all of the resources that are in the module. The `en-US`
-directory in the xNetworking module contains locally available copies of the
-resource documentation.
+general use scenarios for all of the resources that are in the module. If
+you have installed this module from the PowerShell Gallery, the `en-US`
+directory in the contains locally available copies of the resource documentation.
 
 ## Branches
 
