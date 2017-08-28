@@ -55,7 +55,7 @@ function Get-TargetResource
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
-        $netAdapter = Get-NetAdapterRsc -Name "$Name" -ErrorAction Stop
+        $netAdapter = Get-NetAdapterRsc -Name $Name -ErrorAction Stop
 
         if ($netAdapter)
         {
@@ -122,7 +122,7 @@ function Set-TargetResource
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
-        $netAdapter = Get-NetAdapterRsc -Name "$Name" -ErrorAction Stop
+        $netAdapter = Get-NetAdapterRsc -Name $Name -ErrorAction Stop
 
         if ($netAdapter)
         {
@@ -139,7 +139,7 @@ function Set-TargetResource
                     $Name, $Protocol, $($netAdapter.IPv4Enabled.ToString()), $($State.ToString()) )
                 ) -join '')
 
-                Set-NetAdapterRsc -Name "$Name" -IPv4Enabled $State
+                Set-NetAdapterRsc -Name $Name -IPv4Enabled $State
             }
             elseif ($Protocol -eq "IPv6" -and $State -ne $netAdapter.IPv6Enabled) 
             {
@@ -149,7 +149,7 @@ function Set-TargetResource
                     $Name, $Protocol, $($netAdapter.IPv6Enabled.ToString()), $($State.ToString()) )
                 ) -join '')
 
-                Set-NetAdapterRsc -Name "$Name" -IPv6Enabled $State
+                Set-NetAdapterRsc -Name $Name -IPv6Enabled $State
             }
         }
     }
@@ -200,7 +200,7 @@ function Test-TargetResource
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
-        $netAdapter = Get-NetAdapterRsc -Name "$Name" -ErrorAction Stop
+        $netAdapter = Get-NetAdapterRsc -Name $Name -ErrorAction Stop
 
         if ($netAdapter) 
         {
