@@ -404,7 +404,6 @@ try
                 }
             }
         }
-    }
     #endregion
 }
 finally
