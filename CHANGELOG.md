@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-- MSFT_xNetAdapterRsc
-  - Added
 - MSFT_xDhcpClient:
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
@@ -47,6 +45,8 @@
   - Prevent testing parameter values of connection that aren't set in resource -
     fixes [Issue 254](https://github.com/PowerShell/xNetworking/issues/254).
   - Improved unit test coverage for this resource.
+ - MSFT_xNetAdapterRsc
+  - Added
 
 ## 5.0.0.0
 
