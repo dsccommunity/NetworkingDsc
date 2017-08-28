@@ -1,8 +1,9 @@
 # Versions
 
 ## Unreleased
+
 - MSFT_xNetworkTeamInterface:
-  - Updated Test-TargetResource to substitute VLANID value 0 to $null for Default VLANs
+  - Updated Test-TargetResource to substitute VLANID value 0 to $null
 
 ## 5.1.0.0
 
