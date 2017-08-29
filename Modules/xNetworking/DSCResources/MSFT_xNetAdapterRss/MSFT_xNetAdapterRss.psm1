@@ -17,13 +17,13 @@ $localizedData = Get-LocalizedData `
 
 <#
 .SYNOPSIS
-    Gets the current state of NetAdapterLso for a adapter.
+    Gets the current state of NetAdapterRss for a adapter.
 
 .PARAMETER Name
     Specifies the Name of the network adapter to check.
 
 .PARAMETER State
-    Specifies the LSO state for the protocol.
+    Specifies the Rss state for the protocol.
 #>
 function Get-TargetResource
 {
@@ -73,13 +73,13 @@ function Get-TargetResource
 
 <#
 .SYNOPSIS
-    Sets the NetAdapterLso resource state.
+    Sets the NetAdapterRss resource state.
 
 .PARAMETER Name
     Specifies the Name of the network adapter to check.
 
 .PARAMETER State
-    Specifies the LSO state for the protocol.
+    Specifies the Rss state for the protocol.
 #>
 function Set-TargetResource
 {
@@ -133,13 +133,13 @@ function Set-TargetResource
 
 <#
 .SYNOPSIS
-    Tests if the NetAdapterLso resource state is desired state.
+    Tests if the NetAdapterRss resource state is desired state.
 
 .PARAMETER Name
     Specifies the Name of the network adapter to check.
 
 .PARAMETER State
-    Specifies the LSO state for the protocol.
+    Specifies the Rss state for the protocol.
 #>
 function Test-TargetResource
 {
