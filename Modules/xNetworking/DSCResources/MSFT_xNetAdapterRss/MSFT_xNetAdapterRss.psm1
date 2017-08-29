@@ -58,9 +58,9 @@ function Get-TargetResource
 
             $result = @{ 
                 Name = $Name
+                State = $netAdapter.Enabled
             }
-            $result.add('State', $netAdapter.Enabled) 
-            
+                        
             return $result
         }
     }
