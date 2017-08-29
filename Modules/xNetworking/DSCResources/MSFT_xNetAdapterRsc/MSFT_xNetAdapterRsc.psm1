@@ -215,7 +215,9 @@ function Test-TargetResource
             switch ($Protocol) {
                 "IPv4"   { return ($State -eq $netAdapter.IPv4Enabled) }
                 "IPv6"   { return ($State -eq $netAdapter.IPv6Enabled) }
-                Default {"Should not be called."}
+                Default {
+                # nothing to see here move along
+                }
             }
         }
     }
