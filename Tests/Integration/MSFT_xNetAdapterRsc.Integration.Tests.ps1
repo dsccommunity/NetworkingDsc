@@ -17,12 +17,14 @@ $TestEnvironment = Initialize-TestEnvironment `
     -DSCResourceName $script:DSCResourceName `
     -TestType Integration
 #endregion
-# Configure Loopback Adapter
-. (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
-New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
+
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
+BeforeAll {
+            $adapterName = 'Ethernet'
+            New-IntegrationLoopbackAdapter -AdapterName $adapterName
+         }
     #region Integration Tests
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
