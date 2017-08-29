@@ -56,7 +56,7 @@ BeforeAll {
 finally
 {
     #region FOOTER
-    Remove-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
+    Remove-IntegrationLoopbackAdapter -AdapterName $adapterName
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
 }
