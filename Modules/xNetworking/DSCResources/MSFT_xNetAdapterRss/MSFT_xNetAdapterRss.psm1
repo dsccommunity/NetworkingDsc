@@ -17,16 +17,13 @@ $localizedData = Get-LocalizedData `
 
 <#
 .SYNOPSIS
-    Gets the current state of NetAdapterRSS for a adapter.
+    Gets the current state of NetAdapterLso for a adapter.
 
 .PARAMETER Name
     Specifies the Name of the network adapter to check.
 
-.PARAMETER Protocol
-    Specifies which protocol to target.
-
 .PARAMETER State
-    Specifies the RSS state for the protocol.
+    Specifies the LSO state for the protocol.
 #>
 function Get-TargetResource
 {
@@ -50,7 +47,7 @@ function Get-TargetResource
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
-        $netAdapter = Get-NetAdapterRSS -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
 
         if ($netAdapter)
         {
@@ -62,7 +59,8 @@ function Get-TargetResource
             $result = @{ 
                 Name = $Name
             }
-            $result.add('State', $netAdapter.Enabled)
+            $result.add('State', $netAdapter.Enabled) 
+            
             return $result
         }
     }
@@ -75,16 +73,13 @@ function Get-TargetResource
 
 <#
 .SYNOPSIS
-    Sets the NetAdapterRSS resource state.
+    Sets the NetAdapterLso resource state.
 
 .PARAMETER Name
     Specifies the Name of the network adapter to check.
 
-.PARAMETER Protocol
-    Specifies which protocol to target.
-
 .PARAMETER State
-    Specifies the RSS state for the protocol.
+    Specifies the LSO state for the protocol.
 #>
 function Set-TargetResource
 {
@@ -101,7 +96,7 @@ function Set-TargetResource
     )
 
     try 
-     {
+    {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
@@ -124,30 +119,27 @@ function Set-TargetResource
                     $Name, $($netAdapter.Enabled.ToString()), $($State.ToString()) )
             )    -join '')
                 
-                Set-NetAdapterRSS -Name $Name -Enabled:$State
+                Set-NetAdapterRss -Name $Name -Enabled:$State
             }
-}    
+            
+        }
     }
     catch 
     {
         throw $LocalizedData.NetAdapterNotFoundMessage
     }
- }
-    
 
+}
 
 <#
 .SYNOPSIS
-    Tests if the NetAdapterRSS resource state is desired state.
+    Tests if the NetAdapterLso resource state is desired state.
 
 .PARAMETER Name
     Specifies the Name of the network adapter to check.
 
-.PARAMETER Protocol
-    Specifies which protocol to target.
-
 .PARAMETER State
-    Specifies the RSS state for the protocol.
+    Specifies the LSO state for the protocol.
 #>
 function Test-TargetResource
 {
@@ -171,17 +163,18 @@ function Test-TargetResource
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
-        $netAdapter = Get-NetAdapterRSS -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
 
-        
+        if ($netAdapter) 
+        {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $localizedData.NetAdapterTestingStateMessage -f `
                 $Name
             ) -join '')
-            return ($State -eq $netAdapter.Enabled)
 
-
+                return ($State -eq $netAdapter.Enabled) 
+            }
         
     }
     catch 
