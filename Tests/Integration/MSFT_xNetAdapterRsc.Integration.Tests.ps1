@@ -17,7 +17,9 @@ $TestEnvironment = Initialize-TestEnvironment `
     -DSCResourceName $script:DSCResourceName `
     -TestType Integration
 #endregion
-
+# Configure Loopback Adapter
+. (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
+New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
@@ -52,6 +54,7 @@ try
 finally
 {
     #region FOOTER
+    Remove-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA'
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
 }
