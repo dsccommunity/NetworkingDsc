@@ -1,6 +1,5 @@
-﻿$NetAdapter = Get-NetAdapter | Select-Object -First 1
 $TestEnableRscIPv6 = [PSObject]@{
-    Name     = $NetAdapter.Name
+    Name     = 'xNetworkingLBA'
     Protocol = 'IPv6'
     State    = $true
 }
