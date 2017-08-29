@@ -1,4 +1,4 @@
-﻿$script:DSCModuleName   = 'xNetworking'
+$script:DSCModuleName   = 'xNetworking'
 $script:DSCResourceName = 'MSFT_xNetAdapterRss'
 
 #region HEADER
@@ -23,7 +23,6 @@ try
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
 
-
         $TestRssEnabled = @{
             Name     = 'Ethernet'
             State    = $true
@@ -40,11 +39,12 @@ try
         }
 
 
-            Context 'Adapter exist and Rss is enabled' {
+        Describe "$($script:DSCResourceName)\Get-TargetResource" {
+            Context 'Adapter exist and RSS is enabled' {
                 Mock -CommandName Get-NetAdapterRss -MockWith { 
-                    @{ RssEnabled = $TestRssEnabled.State }
+                    @{ RSSEnabled = $TestRssEnabled.State }
                 }
-
+                
                 It 'Should return the Rss state' {
                     $result = Get-TargetResource @TestRssEnabled
                     $result.State | Should Be $TestRssEnabled.State
@@ -55,12 +55,12 @@ try
                 }
             }
 
-            Context 'Adapter exist and Rss is disabled' {
+            Context 'Adapter exist and RSS is disabled' {
                 Mock -CommandName Get-NetAdapterRss -MockWith { 
                     @{ RssEnabled = $TestRssDisabled.State }
                 }
 
-                It 'Should return the Rss state' {
+                It 'Should return the RSS state' {
                     $result = Get-TargetResource @TestRssDisabled
                     $result.State | Should Be $TestRssDisabled.State
                 }
@@ -84,9 +84,9 @@ try
         }
 
         Describe "$($script:DSCResourceName)\Set-TargetResource" {
-
+            
             # RSS
-            Context 'Adapter exist, Rss is enabled, no action required' {
+            Context 'Adapter exist, RSS is enabled, no action required' {
                 Mock -CommandName Get-NetAdapterRss -MockWith { 
                     @{ RssEnabled = $TestRssEnabled.State }
                 }
@@ -102,9 +102,9 @@ try
                 }
             }
 
-            Context 'Adapter exist, Rss is enabled, should be disabled' {
-                Mock -CommandName Get-NetAdapterRss -MockWith { 
-                    @{ RssEnabled = $TestRssEnabled.State }
+            Context 'Adapter exist, RSS is enabled, should be disabled' {
+                Mock -CommandName Get-NetAdapterRss -MockWith {
+                    @{ RSSEnabled = $TestRssEnabled.State }
                 }
                 Mock -CommandName Set-NetAdapterRss
 
@@ -118,9 +118,9 @@ try
                 }
             }
 
-            Context 'Adapter exist, Rss is disabled, no action required' {
-                Mock -CommandName Get-NetAdapterRss -MockWith { 
-                    @{ RssEnabled = $TestRssDisabled.State }
+            Context 'Adapter exist, RSS is disabled, no action required' {
+                Mock -CommandName Get-NetAdapterRss -MockWith {
+                    @{ RSSEnabled = $TestRssDisabled.State }
                 }
                 Mock -CommandName Set-NetAdapterRss
 
@@ -134,9 +134,9 @@ try
                 }
             }
 
-            Context 'Adapter exist, Rss is disabled, should be enabled.' {
-                Mock -CommandName Get-NetAdapterRss -MockWith { 
-                    @{ RssEnabled = $TestRssDisabled.State }
+            Context 'Adapter exist, RSS is disabled, should be enabled.' {
+                Mock -CommandName Get-NetAdapterRss -MockWith {
+                    @{ RSSEnabled = $TestRssDisabled.State }
                 }
                 Mock -CommandName Set-NetAdapterRss
 
@@ -166,11 +166,10 @@ try
         }
 
         Describe "$($script:DSCResourceName)\Test-TargetResource" {
-
             # RSS
-            Context 'Adapter exist, Rss is enabled, no action required' {
+            Context 'Adapter exist, RSS is enabled, no action required' {
                 Mock -CommandName Get-NetAdapterRss -MockWith { 
-                    @{ RssEnabled = $TestRssEnabled.State }
+                    @{ RSSEnabled = $TestRssEnabled.State }
                 }
                 
                 It 'Should return true' {
@@ -182,9 +181,9 @@ try
                 }
             }
 
-            Context 'Adapter exist, Rss is enabled, should be disabled' {
+            Context 'Adapter exist, RSS is enabled, should be disabled' {
                 Mock -CommandName Get-NetAdapterRss -MockWith { 
-                    @{ RssEnabled = $TestRssEnabled.State }
+                    @{ RSSEnabled = $TestRssEnabled.State }
                 }
                 
                 It 'Should return false' {
@@ -196,9 +195,9 @@ try
                 }
             }
 
-            Context 'Adapter exist, Rss is disabled, no action required' {
+            Context 'Adapter exist, RSS is disabled, no action required' {
                 Mock -CommandName Get-NetAdapterRss -MockWith { 
-                    @{ RssEnabled = $TestRssDisabled.State }
+                    @{ RSSEnabled = $TestRssDisabled.State }
                 }
                 
                 It 'Should return true' {
@@ -210,9 +209,9 @@ try
                 }
             }
 
-            Context 'Adapter exist, Rss is disabled , should be enabled.' {
+            Context 'Adapter exist, RSS is disabled, should be enabled.' {
                 Mock -CommandName Get-NetAdapterRss -MockWith { 
-                    @{ RssEnabled = $TestRssDisabled.State }
+                    @{ RSSEnabled = $TestRssDisabled.State }
                 }
                 
                 It 'Should return false' {
@@ -237,6 +236,7 @@ try
                 }
             }
         }
+    }
     #endregion
 }
 finally
