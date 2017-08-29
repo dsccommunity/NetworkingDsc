@@ -1,5 +1,5 @@
 $TestEnableRscIPv6 = [PSObject]@{
-    Name     = 'xNetworkingLBA'
+    Name     = 'Ethernet'
     Protocol = 'IPv6'
     State    = $true
 }
