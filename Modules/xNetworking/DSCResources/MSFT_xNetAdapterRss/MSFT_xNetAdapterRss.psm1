@@ -101,23 +101,40 @@ function Set-TargetResource
     )
 
     try 
-    {
+     {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
-        $netAdapter = Get-NetAdapterRSS -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
 
-			Set-NetAdapterRSS -Name $Name -Enabled:$State
+        if ($netAdapter)
+        {
+            Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.NetAdapterTestingStateMessage -f $Name)
+            ) -join '')
 
+            if ($State -ne $netAdapter.Enabled) 
+            {
+                Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.NetAdapterApplyingChangesMessage -f `
+                    $Name, $($netAdapter.Enabled.ToString()), $($State.ToString()) )
+            )    -join '')
+                
+                Set-NetAdapterRSS -Name $Name -Enabled:$State
+            }
+}    
     }
     catch 
     {
         throw $LocalizedData.NetAdapterNotFoundMessage
     }
+ }
+    
 
-}
 
 <#
 .SYNOPSIS
