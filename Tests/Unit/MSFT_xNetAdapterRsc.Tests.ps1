@@ -1,4 +1,4 @@
-﻿$script:DSCModuleName   = 'xNetworking'
+$script:DSCModuleName   = 'xNetworking'
 $script:DSCResourceName = 'MSFT_xNetAdapterRsc'
 
 #region HEADER
@@ -22,7 +22,6 @@ try
 {
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
-
 
         $TestIPv4RscEnabled = @{
             Name     = 'Ethernet'
@@ -55,6 +54,7 @@ try
         }
 
 
+        Describe "$($script:DSCResourceName)\Get-TargetResource" {
             Context 'Adapter exist and Rsc for IPv4 is enabled' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
                     @{ IPv4Enabled = $TestIPv4RscEnabled.State }
@@ -129,7 +129,7 @@ try
         }
 
         Describe "$($script:DSCResourceName)\Set-TargetResource" {
-
+            
             # IPv4
             Context 'Adapter exist, Rsc is enabled for IPv4, no action required' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
@@ -276,7 +276,6 @@ try
         }
 
         Describe "$($script:DSCResourceName)\Test-TargetResource" {
-
             # IPv4
             Context 'Adapter exist, Rsc is enabled for IPv4, no action required' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
@@ -404,6 +403,7 @@ try
                 }
             }
         }
+    }
     #endregion
 }
 finally
