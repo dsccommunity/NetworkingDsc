@@ -17,7 +17,7 @@ $localizedData = Get-LocalizedData `
 
 <#
 .SYNOPSIS
-    Gets the current state of RSS for a adapter.
+    Gets the current state of NetAdapterRSS for a adapter.
 
 .PARAMETER Name
     Specifies the Name of the network adapter to check.
@@ -61,8 +61,8 @@ function Get-TargetResource
 
             $result = @{ 
                 Name = $Name
-				State = $netAdapter.Enabled
             }
+            $result.add('State', $netAdapter.Enabled)
             return $result
         }
     }
@@ -75,7 +75,7 @@ function Get-TargetResource
 
 <#
 .SYNOPSIS
-    Sets the RSS resource state.
+    Sets the NetAdapterRSS resource state.
 
 .PARAMETER Name
     Specifies the Name of the network adapter to check.
@@ -138,7 +138,7 @@ function Set-TargetResource
 
 <#
 .SYNOPSIS
-    Tests if the RSS resource state is desired state.
+    Tests if the NetAdapterRSS resource state is desired state.
 
 .PARAMETER Name
     Specifies the Name of the network adapter to check.
@@ -179,6 +179,7 @@ function Test-TargetResource
                 $localizedData.NetAdapterTestingStateMessage -f `
                 $Name
             ) -join '')
+            return ($State -eq $netAdapter.Enabled)
 
 
         
