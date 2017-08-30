@@ -66,13 +66,13 @@ try
 
 
         Describe "$($script:DSCResourceName)\Get-TargetResource" {
-           Context 'Adapter exist and RSC for All is enabled' {
+             Context 'Adapter exist and Rsc is enabled' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
                     @{ AllEnabled = $TestAllRscEnabled.State }
                 }
-                
-                It 'Should return the RSC state of all' {
-                    $result = Get-TargetResource @TestAllRscEnabled
+
+                It 'Should return the Rsc state' {
+                    $result = Get-TargetResource @TestIPv4RscEnabled
                     $result.StateIPv4 | Should Be $TestAllRscEnabled.State
                     $result.StateIPv6 | Should Be $TestAllRscEnabled.State
                 }
@@ -82,21 +82,23 @@ try
                 }
             }
 
-            Context 'Adapter exist and RSC for all is disabled' {
+            Context 'Adapter exist and Rsc is disabled' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
                     @{ AllEnabled = $TestAllRscDisabled.State }
                 }
 
-                It 'Should return the RSC state of all' {
-                    $result = Get-TargetResource @TestAllRscDisabled
+                It 'Should return the Rsc state' {
+                    $result = Get-TargetResource @TestIPv4RscDisabled
                     $result.StateIPv4 | Should Be $TestAllRscDisabled.State
                     $result.StateIPv6 | Should Be $TestAllRscDisabled.State
+
                 }
 
                 It 'Should call all mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapterRsc -Exactly 1
                 }
             }
+
 
             Context 'Adapter exist and Rsc for IPv4 is enabled' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
@@ -174,9 +176,9 @@ try
         Describe "$($script:DSCResourceName)\Set-TargetResource" {
             
             # All
-            Context 'Adapter exist, Rsc is enabled for All, no action required' {
+            Context 'Adapter exist, Rsc is enabled, no action required' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
-                    @{ AllEnabledIPv4 = $TestAllRscEnabled.State}
+                    @{ AllEnabled = $TestAllRscEnabled.State }
                 }
                 Mock -CommandName Set-NetAdapterRsc
 
@@ -190,9 +192,9 @@ try
                 }
             }
 
-            Context 'Adapter exist, Rsc is enabled for All, should be disabled' {
-                Mock -CommandName Get-NetAdapterRsc -MockWith {
-                    @{ AllEnabledIPv4 = $TestAllRscEnabled.StateIPv4 }
+            Context 'Adapter exist, Rsc is enabled, should be disabled' {
+                Mock -CommandName Get-NetAdapterRsc -MockWith { 
+                    @{ AllEnabled = $TestAllRscEnabled.State }
                 }
                 Mock -CommandName Set-NetAdapterRsc
 
@@ -206,9 +208,9 @@ try
                 }
             }
 
-            Context 'Adapter exist, Rsc is disabled for All, no action required' {
-                Mock -CommandName Get-NetAdapterRsc -MockWith {
-                    @{ AllEnabledIPv4 = $TestAllRscDisabled.StateIPv4}
+            Context 'Adapter exist, Rsc is disabled, no action required' {
+                Mock -CommandName Get-NetAdapterRsc -MockWith { 
+                    @{ AllEnabled = $TestAllRscDisabled.State }
                 }
                 Mock -CommandName Set-NetAdapterRsc
 
@@ -222,9 +224,9 @@ try
                 }
             }
 
-            Context 'Adapter exist, Rsc is disabled for All, should be enabled.' {
-                Mock -CommandName Get-NetAdapterRsc -MockWith {
-                    @{ AllEnabledIPv4 = $TestAllRscDisabled.StateIPv4 }
+            Context 'Adapter exist, Rsc is disabled, should be enabled.' {
+                Mock -CommandName Get-NetAdapterRsc -MockWith { 
+                    @{ AllEnabled = $TestAllRscDisabled.State }
                 }
                 Mock -CommandName Set-NetAdapterRsc
 
@@ -385,9 +387,9 @@ try
 
         Describe "$($script:DSCResourceName)\Test-TargetResource" {
             # All
-            Context 'Adapter exist, Rsc is enabled for All, no action required' {
+            Context 'Adapter exist, Rsc is enabled, no action required' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
-                    @{ AllEnabledIPv4 = $TestAllRscEnabled.StateIPv4 }
+                    @{ AllEnabled = $TestAllRscEnabled.State }
                 }
                 
                 It 'Should return true' {
@@ -399,9 +401,9 @@ try
                 }
             }
 
-            Context 'Adapter exist, Rsc is enabled for All, should be disabled' {
+            Context 'Adapter exist, Rsc is enabled, should be disabled' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
-                    @{ AllEnabledIPv4 = $TestAllRscEnabled.StateIPv4 }
+                    @{ AllEnabled = $TestAllRscEnabled.State }
                 }
                 
                 It 'Should return false' {
@@ -413,9 +415,9 @@ try
                 }
             }
 
-            Context 'Adapter exist, Rsc is disabled for All, no action required' {
+            Context 'Adapter exist, Rsc is disabled, no action required' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
-                    @{ AllEnabledIPv4 = $TestAllRscDisabled.StateIPv4 }
+                    @{ AllEnabled = $TestAllRscDisabled.State }
                 }
                 
                 It 'Should return true' {
@@ -427,9 +429,9 @@ try
                 }
             }
 
-            Context 'Adapter exist, Rsc is disabled for All, should be enabled.' {
+            Context 'Adapter exist, Rsc is disabled, should be enabled.' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
-                    @{ AllEnabledIPvIPv4 = $TestAllRscDisabled.StateIPv4 }
+                    @{ AllEnabled = $TestAllRscDisabled.State }
                 }
                 
                 It 'Should return false' {
