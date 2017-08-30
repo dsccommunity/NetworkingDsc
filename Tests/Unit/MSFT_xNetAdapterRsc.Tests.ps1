@@ -72,7 +72,7 @@ try
                 }
 
                 It 'Should return the Rsc state' {
-                    $result = Get-TargetResource @TestIPv4RscEnabled
+                    $result = Get-TargetResource @TestAllRscEnabled
                     $result.State | Should Be $TestAllRscEnabled.State
                 }
 
@@ -87,7 +87,7 @@ try
                 }
 
                 It 'Should return the Rsc state' {
-                    $result = Get-TargetResource @TestIPv4RscDisabled
+                    $result = Get-TargetResource @TestAllRscDisabled
                     $result.State | Should Be $TestAllRscDisabled.State
 
                 }
