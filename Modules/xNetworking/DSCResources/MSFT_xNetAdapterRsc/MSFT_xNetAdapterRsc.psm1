@@ -39,7 +39,7 @@ function Get-TargetResource
         $Name,
 
         [parameter(Mandatory = $true)]
-        [ValidateSet("IPv4","IPv6")]
+        [ValidateSet("IPv4","IPv6","All")]
         [String]
         $Protocol,
 
@@ -69,8 +69,12 @@ function Get-TargetResource
                 Protocol = $Protocol
             }
             switch ($Protocol) {
-                "IPv4"   { $result.add('State', $netAdapter.IPv4Enabled) }
-                "IPv6"   { $result.add('State', $netAdapter.IPv6Enabled) }
+                "IPv4"   { $result.add('State', $netAdapter.IPv4Enabled) 
+                           $result.add('StateIPv4', $netAdapter.IPv4Enabled) }
+                "IPv6"   { $result.add('State', $netAdapter.IPv6Enabled) 
+                           $result.add('StateIPv6', $netAdapter.IPv6Enabled)}
+                "All"    { $result.add('StateIPv4', $netAdapter.IPv4Enabled) 
+                           $result.add('StateIPv6', $netAdapter.IPv6Enabled)}
                 Default {
                 # nothing to see here move along
                 }
@@ -108,7 +112,7 @@ function Set-TargetResource
         $Name,
 
         [parameter(Mandatory = $true)]
-        [ValidateSet("IPv4","IPv6")]
+        [ValidateSet("IPv4","IPv6","All")]
         [String]
         $Protocol,
 
@@ -153,6 +157,16 @@ function Set-TargetResource
 
                 Set-NetAdapterRsc -Name $Name -IPv6Enabled $State
             }
+            elseif ($Protocol -eq "All" -and $State -ne $netAdapter.IPv4Enabled -and $State -ne $netAdapter.IPv6Enabled) 
+             {
+                Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.NetAdapterApplyingChangesMessage -f `
+                    $Name, $Protocol, $($netAdapter.IPv4Enabled.ToString()), $($State.ToString()), $($netAdapter.IPv6Enabled.ToString()), $($State.ToString()) )
+                ) -join '')
+
+                Set-NetAdapterRsc -Name $Name -IPv4Enabled $State -IPv6Enabled $State
+            }
         }
     }
     catch 
@@ -186,7 +200,7 @@ function Test-TargetResource
         $Name,
 
         [parameter(Mandatory = $true)]
-        [ValidateSet("IPv4","IPv6")]
+        [ValidateSet("IPv4","IPv6","All")]
         [String]
         $Protocol,
 
@@ -215,6 +229,8 @@ function Test-TargetResource
             switch ($Protocol) {
                 "IPv4"   { return ($State -eq $netAdapter.IPv4Enabled) }
                 "IPv6"   { return ($State -eq $netAdapter.IPv6Enabled) }
+                "All"    { return ($State -eq $netAdapter.IPv4Enabled)
+                           return ($State -eq $netAdapter.IPv6Enabled)}
                 Default {
                 # nothing to see here move along
                 }
