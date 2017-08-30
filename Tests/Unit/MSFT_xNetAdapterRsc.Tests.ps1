@@ -176,8 +176,7 @@ try
             # All
             Context 'Adapter exist, Rsc is enabled for All, no action required' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
-                    @{ AllEnabledIPv4 = $TestAllRscEnabled.StateIPv4
-                       AllEnabledIPv6 = $TestAllRscEnabled.StateIPv6 }
+                    @{ AllEnabledIPv4 = $TestAllRscEnabled.State}
                 }
                 Mock -CommandName Set-NetAdapterRsc
 
@@ -193,8 +192,7 @@ try
 
             Context 'Adapter exist, Rsc is enabled for All, should be disabled' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith {
-                    @{ AllEnabledIPv4 = $TestAllRscEnabled.StateIPv4
-                       AllEnabledIPv6 = $TestAllRscEnabled.StateIPv6 }
+                    @{ AllEnabledIPv4 = $TestAllRscEnabled.StateIPv4 }
                 }
                 Mock -CommandName Set-NetAdapterRsc
 
@@ -210,8 +208,7 @@ try
 
             Context 'Adapter exist, Rsc is disabled for All, no action required' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith {
-                    @{ AllEnabledIPv4 = $TestAllRscDisabled.StateIPv4
-                       AllEnabledIPv6 = $TestAllRscDisabled.StateIPv6 }
+                    @{ AllEnabledIPv4 = $TestAllRscDisabled.StateIPv4}
                 }
                 Mock -CommandName Set-NetAdapterRsc
 
@@ -227,8 +224,7 @@ try
 
             Context 'Adapter exist, Rsc is disabled for All, should be enabled.' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith {
-                    @{ AllEnabledIPv4 = $TestAllRscDisabled.StateIPv4
-                       AllEnabledIPv6 = $TestAllRscDisabled.StateIPv6 }
+                    @{ AllEnabledIPv4 = $TestAllRscDisabled.StateIPv4 }
                 }
                 Mock -CommandName Set-NetAdapterRsc
 
@@ -391,8 +387,7 @@ try
             # All
             Context 'Adapter exist, Rsc is enabled for All, no action required' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
-                    @{ AllEnabledIPv4 = $TestAllRscEnabled.StateIPv4
-                       AllEnabledIPv6 = $TestAllRscEnabled.StateIPv6  }
+                    @{ AllEnabledIPv4 = $TestAllRscEnabled.StateIPv4 }
                 }
                 
                 It 'Should return true' {
@@ -406,8 +401,7 @@ try
 
             Context 'Adapter exist, Rsc is enabled for All, should be disabled' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
-                    @{ AllEnabledIPv4 = $TestAllRscEnabled.StateIPv4
-                       AllEnabledIPv6 = $TestAllRscEnabled.StateIPv6  }
+                    @{ AllEnabledIPv4 = $TestAllRscEnabled.StateIPv4 }
                 }
                 
                 It 'Should return false' {
@@ -421,8 +415,7 @@ try
 
             Context 'Adapter exist, Rsc is disabled for All, no action required' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
-                    @{ AllEnabledIPv4 = $TestAllRscDisabled.StateIPv4
-                       AllEnabledIPv6 = $TestAllRscDisabled.StateIPv6  }
+                    @{ AllEnabledIPv4 = $TestAllRscDisabled.StateIPv4 }
                 }
                 
                 It 'Should return true' {
@@ -436,8 +429,7 @@ try
 
             Context 'Adapter exist, Rsc is disabled for All, should be enabled.' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
-                    @{ AllEnabledIPvIPv4 = $TestAllRscDisabled.StateIPv4
-                       AllEnabledIPvIPv6 = $TestAllRscDisabled.StateIPv6 }
+                    @{ AllEnabledIPvIPv4 = $TestAllRscDisabled.StateIPv4 }
                 }
                 
                 It 'Should return false' {
