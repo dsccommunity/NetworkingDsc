@@ -73,7 +73,8 @@ function Get-TargetResource
                            $result.add('StateIPv4', $netAdapter.IPv4Enabled) }
                 "IPv6"   { $result.add('State', $netAdapter.IPv6Enabled) 
                            $result.add('StateIPv6', $netAdapter.IPv6Enabled)}
-                "All"    { $result.add('StateIPv4', $netAdapter.IPv4Enabled) 
+                "All"    { $result.add('State', $netAdapter.IPv4Enabled) 
+                           $result.add('StateIPv4', $netAdapter.IPv4Enabled) 
                            $result.add('StateIPv6', $netAdapter.IPv6Enabled)}
                 Default {
                 # nothing to see here move along

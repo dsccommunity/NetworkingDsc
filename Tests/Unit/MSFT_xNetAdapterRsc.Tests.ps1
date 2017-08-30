@@ -73,8 +73,7 @@ try
 
                 It 'Should return the Rsc state' {
                     $result = Get-TargetResource @TestIPv4RscEnabled
-                    $result.StateIPv4 | Should Be $TestAllRscEnabled.State
-                    $result.StateIPv6 | Should Be $TestAllRscEnabled.State
+                    $result.State | Should Be $TestAllRscEnabled.State
                 }
 
                 It 'Should call all mocks' {
@@ -89,8 +88,7 @@ try
 
                 It 'Should return the Rsc state' {
                     $result = Get-TargetResource @TestIPv4RscDisabled
-                    $result.StateIPv4 | Should Be $TestAllRscDisabled.State
-                    $result.StateIPv6 | Should Be $TestAllRscDisabled.State
+                    $result.State | Should Be $TestAllRscDisabled.State
 
                 }
 
