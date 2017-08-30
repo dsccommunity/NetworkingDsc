@@ -158,7 +158,7 @@ function Set-TargetResource
 
                 Set-NetAdapterRsc -Name $Name -IPv6Enabled $State
             }
-            elseif ($Protocol -eq "All" -and $State -ne $netAdapter.IPv4Enabled -and $State -ne $netAdapter.IPv6Enabled) 
+            elseif ($Protocol -eq "All" -and $State -ne $netAdapter.IPv4Enabled -or $State -ne $netAdapter.IPv6Enabled) 
              {
                 Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
@@ -179,7 +179,7 @@ function Set-TargetResource
 
 <#
 .SYNOPSIS
-    Tests if the NetAdapterLso resource state is desired state.
+    Tests if the NetAdapterRsc resource state is desired state.
 
 .PARAMETER Name
     Specifies the Name of the network adapter to check.
@@ -188,7 +188,7 @@ function Set-TargetResource
     Specifies which protocol to target.
 
 .PARAMETER State
-    Specifies the LSO state for the protocol.
+    Specifies the RSC state for the protocol.
 #>
 function Test-TargetResource
 {
