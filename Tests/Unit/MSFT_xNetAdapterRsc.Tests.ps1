@@ -9,7 +9,6 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 {
     & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
-Get-ChildItem (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\') -Recurse -Force | Unblock-File
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
@@ -589,27 +588,3 @@ finally
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
 }
-
-# SIG # Begin signature block
-# MIID3QYJKoZIhvcNAQcCoIIDzjCCA8oCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
-# gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU5ETul4ea5sNwkroQNZ0CFp7d
-# gomgggIDMIIB/zCCAWigAwIBAgIQ8pqz2vlvr7FO4N97cGnyUDANBgkqhkiG9w0B
-# AQUFADAQMQ4wDAYDVQQDEwVBdGRoZTAeFw0xNTEyMzEyMzAwMDBaFw0yMTEyMzEy
-# MzAwMDBaMBAxDjAMBgNVBAMTBUF0ZGhlMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCB
-# iQKBgQCiTZj/l4n4hjDCfi/lel2SRk5tyz1fnzSyJIATkfBcs9Zh4V2NUtYfYeJH
-# 31+VSlkcSBrHZ9RRsw8luuZg8CKXlbeK0tpVaAcg+ToFHC7WbJ6RQ5wxbs0jstJX
-# zc9ef8E2vEs3FScHMj8i3cnIoi551MKNy/EwYy4UKk3sS2fsowIDAQABo1owWDAT
-# BgNVHSUEDDAKBggrBgEFBQcDAzBBBgNVHQEEOjA4gBDXoxziP+sYnBed6JU7bM/7
-# oRIwEDEOMAwGA1UEAxMFQXRkaGWCEPKas9r5b6+xTuDfe3Bp8lAwDQYJKoZIhvcN
-# AQEFBQADgYEAk83se/T5WG/BhwEEezGglMfs2XrToVl4h0icJb/PQkB9/mtNRBjY
-# d0EpfZnnioGOBDRjMXFpcH79XOOm+lLZcbRWUQRA6g9AMSk15e20+Nh7u5UINwHm
-# BT3NKdtxAgsei2YKaAQc/tbvZuaZCCHMMmyiq51DKCQoMJgGblxBubcxggFEMIIB
-# QAIBATAkMBAxDjAMBgNVBAMTBUF0ZGhlAhDymrPa+W+vsU7g33twafJQMAkGBSsO
-# AwIaBQCgeDAYBgorBgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEM
-# BgorBgEEAYI3AgEEMBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMCMGCSqG
-# SIb3DQEJBDEWBBTEcBN7rLzZxlsxywXsYarPpwKp3zANBgkqhkiG9w0BAQEFAASB
-# gJvf/7BultjK0kxCwDPGW2LrmV4/3rI+dAxeZsgddryQLqsCxRivXJjZYi+wJCSl
-# WNIQU5llH9pNFQ5iDoT6Fyahl2OIJYyZ+IYAODqoq0fxbfpxfuh31e5nkJNP/c07
-# JJhanU4cUCPeYj6xHJ/u4ESl/UaKxwg3PI2NPgKlxuht
-# SIG # End signature block
