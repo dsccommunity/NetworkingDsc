@@ -158,7 +158,7 @@ function Set-TargetResource
 
                 Set-NetAdapterRsc -Name $Name -IPv6Enabled $State
             }
-            elseif ($Protocol -eq "All" -and $State -ne $netAdapter.IPv4Enabled -or $State -ne $netAdapter.IPv6Enabled) 
+            elseif ($Protocol -eq "All" -and $State -ne $netAdapter.IPv4Enabled -or $Protocol -eq "All" -and $State -ne $netAdapter.IPv6Enabled) 
              {
                 Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
