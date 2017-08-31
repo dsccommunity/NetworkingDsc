@@ -230,8 +230,7 @@ function Test-TargetResource
             switch ($Protocol) {
                 "IPv4"   { return ($State -eq $netAdapter.IPv4Enabled) }
                 "IPv6"   { return ($State -eq $netAdapter.IPv6Enabled) }
-                "All"    { return ($State -eq $netAdapter.IPv4Enabled)
-                           return ($State -eq $netAdapter.IPv6Enabled)}
+                "All"    { return ($State -eq $netAdapter.IPv4Enabled -and $State -eq $netAdapter.IPv6Enabled)}
                 Default {
                 # nothing to see here move along
                 }
