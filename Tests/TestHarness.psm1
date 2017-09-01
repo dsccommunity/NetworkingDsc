@@ -41,7 +41,21 @@ function Invoke-TestHarness
     # DSC Common Tests
     if ($PSBoundParameters.ContainsKey('DscTestsPath') -eq $true)
     {
-        $testsToRun += @( $DscTestsPath )
+        $getChildItemParameters = @{
+            Path = $DscTestsPath
+            Recurse = $true
+            Filter = '*.Tests.ps1'
+        }
+
+        # Get all tests '*.Tests.ps1'.
+        $commonTestFiles = Get-ChildItem @getChildItemParameters
+
+        # Remove DscResource.Tests unit and integration tests.
+        $commonTestFiles = $commonTestFiles | Where-Object -FilterScript {
+            $_.FullName -notmatch 'DSCResource.Tests\\Tests'
+        }
+
+        $testsToRun += @( $commonTestFiles.FullName )
     }
 
     $results = Invoke-Pester -Script $testsToRun `
