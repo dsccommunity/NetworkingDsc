@@ -572,7 +572,7 @@ try
                 Mock -CommandName Get-NetAdapterRsc -MockWith { throw 'Network adapter not found' }
 
                 It 'Should throw an exception' {
-                    { Set-TargetResource @TestAdapterNotFound } | Should throw
+                    { Test-TargetResource @TestAdapterNotFound } | Should throw
                 }
 
                 It 'Should call all mocks' {
