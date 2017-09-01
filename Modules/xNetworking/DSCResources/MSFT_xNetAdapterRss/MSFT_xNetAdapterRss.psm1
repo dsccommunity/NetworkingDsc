@@ -31,13 +31,13 @@ function Get-TargetResource
     [OutputType([Hashtable])]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [parameter(Mandatory = $true)]
         [String]
         $Name,
 
-        [Parameter(Mandatory = $true)]
+        [parameter(Mandatory = $true)]
         [Boolean]
-        $State
+        $Enabled
     )
 
     try 
@@ -53,12 +53,12 @@ function Get-TargetResource
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterTestingStateMessage -f $Name)
+                $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $Enabled)
             ) -join '')
 
             $result = @{ 
                 Name = $Name
-                State = $netAdapter.Enabled
+                Enabled = $netAdapter.Enabled
             }
                         
             return $result
@@ -86,13 +86,13 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [parameter(Mandatory = $true)]
         [String]
         $Name,
 
-        [Parameter(Mandatory = $true)]
+        [parameter(Mandatory = $true)]
         [Boolean]
-        $State
+        $Enabled
     )
 
     try 
@@ -108,20 +108,19 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterTestingStateMessage -f $Name)
+                $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $Enabled)
             ) -join '')
 
-            if ($State -ne $netAdapter.Enabled) 
+            if ($Enabled -ne $netAdapter.Enabled) 
             {
                 Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.NetAdapterApplyingChangesMessage -f `
-                    $Name, $($netAdapter.Enabled.ToString()), $($State.ToString()) )
+                    $Name, $Enabled, $($netAdapter.Enabled.ToString()), $($Enabled.ToString()) )
             )    -join '')
                 
-                Set-NetAdapterRss -Name $Name -Enabled:$State
+                Set-NetAdapterRss -Name $Name -Enabled:$Enabled
             }
-            
         }
     }
     catch 
@@ -147,13 +146,13 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [parameter(Mandatory = $true)]
         [String]
         $Name,
 
-        [Parameter(Mandatory = $true)]
+        [parameter(Mandatory = $true)]
         [Boolean]
-        $State
+        $Enabled
     )
 
     try 
@@ -170,10 +169,10 @@ function Test-TargetResource
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $localizedData.NetAdapterTestingStateMessage -f `
-                $Name
+                $Name, $Enabled
             ) -join '')
 
-                return ($State -eq $netAdapter.Enabled) 
+                return ($Enabled -eq $netAdapter.Enabled) 
             }
         
     }
