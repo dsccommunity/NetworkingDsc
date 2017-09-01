@@ -18,7 +18,7 @@ Configuration Example
         xNetAdapterRss EnableRss
         {
             Name = 'Ethernet'
-            State = $True
+            Enabled = $True
         }
     }
 }
