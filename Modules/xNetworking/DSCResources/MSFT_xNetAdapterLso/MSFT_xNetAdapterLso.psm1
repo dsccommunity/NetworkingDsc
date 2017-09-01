@@ -34,16 +34,16 @@ function Get-TargetResource
     [OutputType([Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $Name,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet("V1IPv4","IPv4","IPv6")]
         [String]
         $Protocol,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [Boolean]
         $State
     )
@@ -72,7 +72,9 @@ function Get-TargetResource
                 "V1IPv4" { $result.add('State', $netAdapter.V1IPv4Enabled) }
                 "IPv4"   { $result.add('State', $netAdapter.IPv4Enabled) }
                 "IPv6"   { $result.add('State', $netAdapter.IPv6Enabled) }
-                Default {"Should not be called."}
+                Default {
+                        # nothing to see here move along
+                        }
             }
             return $result
         }
@@ -102,16 +104,16 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $Name,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet("V1IPv4","IPv4","IPv6")]
         [String]
         $Protocol,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [Boolean]
         $State
     )
@@ -190,16 +192,16 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $Name,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet("V1IPv4","IPv4","IPv6")]
         [String]
         $Protocol,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [Boolean]
         $State
     )
@@ -225,7 +227,9 @@ function Test-TargetResource
                 "V1IPv4" { return ($State -eq $netAdapter.V1IPv4Enabled) }
                 "IPv4"   { return ($State -eq $netAdapter.IPv4Enabled) }
                 "IPv6"   { return ($State -eq $netAdapter.IPv6Enabled) }
-                Default {"Should not be called."}
+                Default {
+                # nothing to see here move along
+                }
             }
         }
     }
