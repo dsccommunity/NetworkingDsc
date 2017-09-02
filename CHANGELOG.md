@@ -4,6 +4,8 @@
 
 - Added `Documentation and Examples` section to Readme.md file - see
   [issue #259](https://github.com/PowerShell/xNetworking/issues/259).
+- Prevent unit tests from DSCResource.Tests from running during test
+  execution - fixes [Issue #264](https://github.com/PowerShell/xNetworking/issues/264).
 
 ## 5.1.0.0
 
