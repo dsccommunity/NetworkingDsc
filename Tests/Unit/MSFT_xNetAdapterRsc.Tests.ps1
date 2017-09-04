@@ -68,14 +68,14 @@ try
         Describe "$($script:DSCResourceName)\Get-TargetResource" {
              Context 'Adapter exist and Rsc is enabled' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
-                    @{ IPv4Enabled = $TestAllRscEnabled.StateIPv4
-					   IPv6Enabled = $TestAllRscEnabled.StateIPv6}
+                    @{ IPv4Enabled = $TestAllRscEnabled.State
+					   IPv6Enabled = $TestAllRscEnabled.State}
                 }
 
                 It 'Should return the Rsc state' {
                     $result = Get-TargetResource @TestAllRscEnabled
-                    $result.StateIPv4 | Should Be $TestAllRscEnabled.StateIPv4
-					$result.StateIPv6 | Should Be $TestAllRscEnabled.StateIPv6
+                    $result.StateIPv4 | Should Be $TestAllRscEnabled.State
+					$result.StateIPv6 | Should Be $TestAllRscEnabled.State
                 }
 
                 It 'Should call all mocks' {
@@ -85,14 +85,14 @@ try
 
             Context 'Adapter exist and Rsc is disabled' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 
-                    @{ IPv4Enabled = $TestAllRscDisabled.StateIPv4
-					   IPv6Enabled = $TestAllRscDisabled.StateIPv6}
+                    @{ IPv4Enabled = $TestAllRscDisabled.State
+					   IPv6Enabled = $TestAllRscDisabled.State}
                 }
 
                 It 'Should return the Rsc state' {
                     $result = Get-TargetResource @TestAllRscDisabled
-                    $result.StateIPv4 | Should Be $TestAllRscDisabled.StateIPv4
-					$result.StateIPv6 | Should Be $TestAllRscDisabled.StateIPv6
+                    $result.StateIPv4 | Should Be $TestAllRscDisabled.State
+					$result.StateIPv6 | Should Be $TestAllRscDisabled.State
 
                 }
 
