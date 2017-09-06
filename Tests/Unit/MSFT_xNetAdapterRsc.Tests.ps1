@@ -246,6 +246,40 @@ try
                 }
             }
 
+            Context 'Adapter exist, Rsc is disabled for IPv4, should be enabled.' {
+                Mock -CommandName Get-NetAdapterRsc -MockWith { 
+                    @{ IPv4Enabled = $TestAllRscDisabled.State 
+                       IPv6Enabled = $TestAllRscEnabled.State}
+                }
+                Mock -CommandName Set-NetAdapterRsc
+
+                It 'Should not throw an exception' {
+                    { Set-TargetResource @TestAllRscEnabled } | Should Not Throw
+                }
+
+                It 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterRsc -Exactly 1
+                    Assert-MockCalled -CommandName Set-NetAdapterRsc -Exactly 1
+                }
+            }
+
+            Context 'Adapter exist, Rsc is Enabled for IPv6, should be disabled.' {
+                Mock -CommandName Get-NetAdapterRsc -MockWith { 
+                    @{ IPv4Enabled = $TestAllRscDisabled.State 
+                       IPv6Enabled = $TestAllRscEnabled.State}
+                }
+                Mock -CommandName Set-NetAdapterRsc
+
+                It 'Should not throw an exception' {
+                    { Set-TargetResource @TestAllRscDisabled } | Should Not Throw
+                }
+
+                It 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterRsc -Exactly 1
+                    Assert-MockCalled -CommandName Set-NetAdapterRsc -Exactly 1
+                }
+            }
+
             # IPv4
             Context 'Adapter exist, Rsc is enabled for IPv4, no action required' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith { 

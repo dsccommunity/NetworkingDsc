@@ -138,7 +138,7 @@ function Set-TargetResource
                 $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $Protocol)
             ) -join '')
 
-            if ($Protocol -eq "IPv4" -and $State -ne $netAdapter.IPv4Enabled) 
+            if ($Protocol -eq "IPv4" -or $Protocol -eq "All" -and $State -ne $netAdapter.IPv4Enabled) 
             {
                 Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
@@ -148,7 +148,7 @@ function Set-TargetResource
 
                 Set-NetAdapterRsc -Name $Name -IPv4Enabled $State
             }
-            elseif ($Protocol -eq "IPv6" -and $State -ne $netAdapter.IPv6Enabled) 
+            if ($Protocol -eq "IPv6" -or $Protocol -eq "All" -and $State -ne $netAdapter.IPv6Enabled) 
             {
                 Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
@@ -157,16 +157,6 @@ function Set-TargetResource
                 ) -join '')
 
                 Set-NetAdapterRsc -Name $Name -IPv6Enabled $State
-            }
-            elseif ($Protocol -eq "All" -and $State -ne $netAdapter.IPv4Enabled -or $Protocol -eq "All" -and $State -ne $netAdapter.IPv6Enabled) 
-             {
-                Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.NetAdapterApplyingChangesMessage -f `
-                    $Name, $Protocol, $($netAdapter.IPv4Enabled.ToString()), $($State.ToString()), $($netAdapter.IPv6Enabled.ToString()), $($State.ToString()) )
-                ) -join '')
-
-                Set-NetAdapterRsc -Name $Name -IPv4Enabled $State -IPv6Enabled $State
             }
         }
     }
