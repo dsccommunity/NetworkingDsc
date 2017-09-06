@@ -208,7 +208,7 @@ try
 
                 It 'Should call all mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapterRsc -Exactly 1
-                    Assert-MockCalled -CommandName Set-NetAdapterRsc -Exactly 1
+                    Assert-MockCalled -CommandName Set-NetAdapterRsc -Exactly 2
                 }
             }
 
@@ -242,7 +242,7 @@ try
 
                 It 'Should call all mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapterRsc -Exactly 1
-                    Assert-MockCalled -CommandName Set-NetAdapterRsc -Exactly 1
+                    Assert-MockCalled -CommandName Set-NetAdapterRsc -Exactly 2
                 }
             }
 
