@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added `Documentation and Examples` section to Readme.md file - see
+  [issue #259](https://github.com/PowerShell/xNetworking/issues/259).
+- Prevent unit tests from DSCResource.Tests from running during test
+  execution - fixes [Issue #264](https://github.com/PowerShell/xNetworking/issues/264).
 - MSFT_xNetworkTeamInterface:
   - Updated Test-TargetResource to substitute VLANID value 0 to $null
 
