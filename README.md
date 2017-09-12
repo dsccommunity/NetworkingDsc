@@ -20,9 +20,9 @@ The **xNetworking** module contains the following resources:
 - **xNetAdapterRDMA**: Enable or disable RDMA on a network adapter.
 - **xNetAdapterLso**: Enable or disable Lso for different protocols
     on a network adapter.
-- **xNetAdapterRsc**: Enable or disable Rsc for different protocols 
+- **xNetAdapterRsc**: Enable or disable Rsc for different protocols
     on a network adapter.
-- **xNetAdapterRss**: Enable or disable Rss on a network adapter.   
+- **xNetAdapterRss**: Enable or disable Rss on a network adapter.
 - **xNetAdapterName**: Rename a network interface that matches specified search parameters.
 - **xFirewallProfile**: Configures a node's private, public or domain firewall profile.
 
