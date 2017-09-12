@@ -48,13 +48,13 @@ function Get-TargetResource
         $State
     )
 
-    try 
-    {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
+    try 
+    {
         $netAdapter = Get-NetAdapterRsc -Name $Name -ErrorAction Stop
 
         if ($netAdapter)
@@ -68,26 +68,34 @@ function Get-TargetResource
                 Name = $Name
                 Protocol = $Protocol
             }
-            switch ($Protocol) {
-                "IPv4"   { $result.add('State', $netAdapter.IPv4Enabled) 
-                           $result.add('StateIPv4', $netAdapter.IPv4Enabled) }
-                "IPv6"   { $result.add('State', $netAdapter.IPv6Enabled) 
-                           $result.add('StateIPv6', $netAdapter.IPv6Enabled)}
-                "All"    { $result.add('State', $netAdapter.IPv4Enabled) 
-                           $result.add('StateIPv4', $netAdapter.IPv4Enabled) 
-                           $result.add('StateIPv6', $netAdapter.IPv6Enabled)}
-                Default {
-                # nothing to see here move along
+            switch ($Protocol) 
+            {
+                "IPv4"   
+                { 
+                    $result.add('State', $netAdapter.IPv4Enabled) 
+                    $result.add('StateIPv4', $netAdapter.IPv4Enabled) 
+                }
+                "IPv6"   
+                { 
+                    $result.add('State', $netAdapter.IPv6Enabled) 
+                    $result.add('StateIPv6', $netAdapter.IPv6Enabled)
+                }
+                "All"    
+                { 
+                    $result.add('State', $netAdapter.IPv4Enabled) 
+                    $result.add('StateIPv4', $netAdapter.IPv4Enabled) 
+                    $result.add('StateIPv6', $netAdapter.IPv6Enabled)
                 }
             }
             return $result
         }
     }
+
     catch 
     {
-        throw $localizedData.NetAdapterNotFoundMessage
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
     }
-
 }
 
 <#
@@ -122,13 +130,13 @@ function Set-TargetResource
         $State
     )
 
-    try 
-    {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
+    try 
+    {
         $netAdapter = Get-NetAdapterRsc -Name $Name -ErrorAction Stop
 
         if ($netAdapter)
@@ -138,7 +146,7 @@ function Set-TargetResource
                 $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $Protocol)
             ) -join '')
 
-            if ($Protocol -eq "IPv4" -or $Protocol -eq "All" -and $State -ne $netAdapter.IPv4Enabled) 
+            if ($Protocol -in ('IPv4','All') -and $State -ne $netAdapter.IPv4Enabled)
             {
                 Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
@@ -148,7 +156,7 @@ function Set-TargetResource
 
                 Set-NetAdapterRsc -Name $Name -IPv4Enabled $State
             }
-            if ($Protocol -eq "IPv6" -or $Protocol -eq "All" -and $State -ne $netAdapter.IPv6Enabled) 
+            if ($Protocol -in ('IPv6','All') -and $State -ne $netAdapter.IPv6Enabled)
             {
                 Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
@@ -162,9 +170,9 @@ function Set-TargetResource
     }
     catch 
     {
-        throw $LocalizedData.NetAdapterNotFoundMessage
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
     }
-
 }
 
 <#
@@ -200,13 +208,13 @@ function Test-TargetResource
         $State
     )
 
-    try 
-    {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
+    try 
+    {
         $netAdapter = Get-NetAdapterRsc -Name $Name -ErrorAction Stop
 
         if ($netAdapter) 
@@ -217,19 +225,26 @@ function Test-TargetResource
                 $Name, $Protocol
             ) -join '')
 
-            switch ($Protocol) {
-                "IPv4"   { return ($State -eq $netAdapter.IPv4Enabled) }
-                "IPv6"   { return ($State -eq $netAdapter.IPv6Enabled) }
-                "All"    { return ($State -eq $netAdapter.IPv4Enabled -and $State -eq $netAdapter.IPv6Enabled)}
-                Default {
-                # nothing to see here move along
+            switch ($Protocol) 
+            {
+                "IPv4"   
+                { 
+                    return ($State -eq $netAdapter.IPv4Enabled) 
+                }
+                "IPv6"   
+                { 
+                    return ($State -eq $netAdapter.IPv6Enabled) 
+                }
+                "All"    
+                { 
+                    return ($State -eq $netAdapter.IPv4Enabled -and $State -eq $netAdapter.IPv6Enabled)
                 }
             }
         }
     }
     catch 
     {
-        throw $LocalizedData.NetAdapterNotFoundMessage
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
     }
-
 }

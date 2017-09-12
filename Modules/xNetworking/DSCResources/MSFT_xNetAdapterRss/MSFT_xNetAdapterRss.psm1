@@ -40,13 +40,13 @@ function Get-TargetResource
         $Enabled
     )
 
-    try 
-    {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
+    try 
+    {
         $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
 
         if ($netAdapter)
@@ -66,9 +66,9 @@ function Get-TargetResource
     }
     catch 
     {
-        throw $localizedData.NetAdapterNotFoundMessage
+         New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
     }
-
 }
 
 <#
@@ -95,13 +95,13 @@ function Set-TargetResource
         $Enabled
     )
 
-    try 
-    {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
+    try 
+    {
         $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
 
         if ($netAdapter)
@@ -118,16 +118,17 @@ function Set-TargetResource
                     $($LocalizedData.NetAdapterApplyingChangesMessage -f `
                     $Name, $Enabled, $($netAdapter.Enabled.ToString()), $($Enabled.ToString()) )
             )    -join '')
-                
+          
                 Set-NetAdapterRss -Name $Name -Enabled:$Enabled
             }
         }
     }
+
     catch 
     {
-        throw $LocalizedData.NetAdapterNotFoundMessage
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
     }
-
 }
 
 <#
@@ -155,13 +156,13 @@ function Test-TargetResource
         $Enabled
     )
 
-    try 
-    {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
+    try 
+    {
         $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
 
         if ($netAdapter) 
@@ -174,11 +175,11 @@ function Test-TargetResource
 
                 return ($Enabled -eq $netAdapter.Enabled) 
             }
-        
+ 
     }
-    catch 
+    catch
     {
-        throw $LocalizedData.NetAdapterNotFoundMessage
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
     }
-
 }

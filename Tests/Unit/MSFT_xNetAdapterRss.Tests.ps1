@@ -32,27 +32,26 @@ try
             Name     = 'Ethernet'
             Enabled    = $false
         }
-        
+
         $TestAdapterNotFound = @{
             Name     = 'Ethe'
             Enabled    = $true 
         }
 
         Describe "$($script:DSCResourceName)\Get-TargetResource" -Tag 'Get' {
-        function Get-NetAdapterRss { }
-             Context 'Adapter exist and RSS is enabled' {
+            Context 'Adapter exist and RSS is enabled' {
                 Mock Get-NetAdapterRss -Verbose -MockWith { @{ Enabled = $true } }
-                
+
                 It 'Should return the RSS Enabled' {
                     $result = Get-TargetResource @TestRssEnabled
                     $result.Enabled | Should Be $TestRSSEnabled.Enabled
                 }
 
                 It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly 1
+                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
                 }
             }
-            
+
             Context 'Adapter exist and RSS is disabled' {
                 Mock -CommandName Get-NetAdapterRSS -MockWith { 
                     @{ Enabled = $TestRSSDisabled.Enabled}
@@ -61,14 +60,14 @@ try
                 It 'Should return the RSS Enabled' {
                     $result = Get-TargetResource @TestRSSDisabled
                     $result.Enabled | Should Be $TestRSSDisabled.Enabled
-
                 }
 
                 It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly 1
+                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
                 }
             }
              Context 'Adapter does not exist' {
+
                 Mock -CommandName Get-NetAdapterRss -MockWith { throw 'Network adapter not found' }
 
                 It 'Should throw an exception' {
@@ -76,12 +75,11 @@ try
                 }
 
                 It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapterRss -Exactly 1 
+                    Assert-MockCalled -CommandName Get-NetAdapterRss -Exactly -Time 1 
                 }
             }
 
         Describe "$($script:DSCResourceName)\Set-TargetResource" {
-            
 
             Context 'Adapter exist, RSS is enabled, no action required' {
                 Mock -CommandName Get-NetAdapterRSS -MockWith { 
@@ -92,10 +90,10 @@ try
                 It 'Should not throw an exception' {
                     { Set-TargetResource @TestRSSEnabled } | Should Not Throw
                 }
-                
+
                 It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly 1
-                    Assert-MockCalled -CommandName Set-NetAdapterRSS -Exactly 0
+                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
+                    Assert-MockCalled -CommandName Set-NetAdapterRSS -Exactly -Time 0
                 }
             }
 
@@ -110,8 +108,8 @@ try
                 }
 
                 It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly 1
-                    Assert-MockCalled -CommandName Set-NetAdapterRSS -Exactly 1
+                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
+                    Assert-MockCalled -CommandName Set-NetAdapterRSS -Exactly -Time 1
                 }
             }
 
@@ -126,8 +124,8 @@ try
                 }
 
                 It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly 1
-                    Assert-MockCalled -CommandName Set-NetAdapterRSS -Exactly 0
+                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
+                    Assert-MockCalled -CommandName Set-NetAdapterRSS -Exactly -Time 0
                 }
             }
 
@@ -142,8 +140,8 @@ try
                 }
 
                 It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly 1
-                    Assert-MockCalled -CommandName Set-NetAdapterRSS -Exactly 1
+                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
+                    Assert-MockCalled -CommandName Set-NetAdapterRSS -Exactly -Time 1
                 }
             }
 
@@ -156,7 +154,7 @@ try
                 }
 
                 It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly 1 
+                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1 
                 }
             }
 
@@ -168,13 +166,13 @@ try
                 Mock -CommandName Get-NetAdapterRSS -MockWith { 
                     @{ Enabled = $TestRSSEnabled.Enabled}
                 }
-                
+
                 It 'Should return true' {
                     Test-TargetResource @TestRSSEnabled | Should Be $true
                 }
 
-                it 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly 1
+                It 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
                 }
             }
 
@@ -182,13 +180,13 @@ try
                 Mock -CommandName Get-NetAdapterRSS -MockWith { 
                     @{ Enabled = $TestRSSEnabled.Enabled}
                 }
-                
+
                 It 'Should return false' {
                     Test-TargetResource @TestRSSDisabled | Should Be $false
                 }
 
                 it 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly 1
+                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
                 }
             }
 
@@ -196,13 +194,13 @@ try
                 Mock -CommandName Get-NetAdapterRSS -MockWith { 
                     @{ Enabled = $TestRSSDisabled.Enabled}
                 }
-                
+
                 It 'Should return true' {
                     Test-TargetResource @TestRSSDisabled | Should Be $true
                 }
 
                 it 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly 1
+                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
                 }
             }
 
@@ -210,13 +208,13 @@ try
                 Mock -CommandName Get-NetAdapterRSS -MockWith { 
                     @{ Enabled = $TestRSSDisabled.Enabled}
                 }
-                
+
                 It 'Should return false' {
                     Test-TargetResource @TestRSSEnabled | Should Be $false
                 }
 
                 it 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly 1
+                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
                 }
             }
 
@@ -229,7 +227,7 @@ try
                 }
 
                 It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly 1 
+                    Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1 
                 }
             }
         }
