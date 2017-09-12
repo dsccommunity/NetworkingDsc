@@ -12,7 +12,7 @@
   - Created new resource configuring Rsc
 - MSFT_xNetAdapterRss:
   - Created new resource configuring Rss
-  
+
 ## 5.1.0.0
 
 - MSFT_xDhcpClient:
