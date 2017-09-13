@@ -56,6 +56,12 @@ function Get-TargetResource
     try 
     {
         $netAdapter = Get-NetAdapterRsc -Name $Name -ErrorAction Stop
+    }
+    catch 
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+    }
 
         if ($netAdapter)
         {
@@ -89,13 +95,6 @@ function Get-TargetResource
             }
             return $result
         }
-    }
-
-    catch 
-    {
-        New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
-    }
 }
 
 <#
@@ -138,6 +137,12 @@ function Set-TargetResource
     try 
     {
         $netAdapter = Get-NetAdapterRsc -Name $Name -ErrorAction Stop
+    }
+    catch 
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+    }
 
         if ($netAdapter)
         {
@@ -167,12 +172,6 @@ function Set-TargetResource
                 Set-NetAdapterRsc -Name $Name -IPv6Enabled $State
             }
         }
-    }
-    catch 
-    {
-        New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
-    }
 }
 
 <#
@@ -216,6 +215,12 @@ function Test-TargetResource
     try 
     {
         $netAdapter = Get-NetAdapterRsc -Name $Name -ErrorAction Stop
+    }
+    catch 
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+    }
 
         if ($netAdapter) 
         {
@@ -241,10 +246,4 @@ function Test-TargetResource
                 }
             }
         }
-    }
-    catch 
-    {
-        New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
-    }
 }

@@ -47,15 +47,21 @@ function Get-TargetResource
         [Boolean]
         $State
     )
-
-    try 
-    {
+  
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
+    try 
+    {
         $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+    }
+    catch 
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+    }
 
         if ($netAdapter)
         {
@@ -86,13 +92,6 @@ function Get-TargetResource
             }
             return $result
         }
-    }
-    catch 
-    {
-        New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
-    }
-
 }
 
 <#
@@ -127,14 +126,20 @@ function Set-TargetResource
         $State
     )
 
-    try 
-    {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
+    try 
+    {
         $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+    }
+    catch 
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+    }
 
         if ($netAdapter)
         {
@@ -174,13 +179,6 @@ function Set-TargetResource
                 Set-NetAdapterLso -Name $Name -IPv6Enabled $State
             }
         }
-    }
-    catch 
-    {
-        New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
-    }
-
 }
 
 <#
@@ -221,10 +219,17 @@ function Test-TargetResource
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
- try 
+
+    try 
     {
         $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
-   
+    }
+    catch 
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+    }
+
         if ($netAdapter) 
         {
             Write-Verbose -Message ( @(
@@ -249,11 +254,4 @@ function Test-TargetResource
                 }
             }
         }
-    }
-    catch 
-    {
-        New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
-    }
-
 }

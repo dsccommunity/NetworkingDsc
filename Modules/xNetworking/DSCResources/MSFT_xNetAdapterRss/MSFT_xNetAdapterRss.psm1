@@ -48,6 +48,12 @@ function Get-TargetResource
     try 
     {
         $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
+    }
+    catch 
+    {
+         New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+    }
 
         if ($netAdapter)
         {
@@ -63,12 +69,6 @@ function Get-TargetResource
                         
             return $result
         }
-    }
-    catch 
-    {
-         New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
-    }
 }
 
 <#
@@ -103,6 +103,12 @@ function Set-TargetResource
     try 
     {
         $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
+    }
+    catch 
+    {
+         New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+    }
 
         if ($netAdapter)
         {
@@ -122,13 +128,6 @@ function Set-TargetResource
                 Set-NetAdapterRss -Name $Name -Enabled:$Enabled
             }
         }
-    }
-
-    catch 
-    {
-        New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
-    }
 }
 
 <#
@@ -164,6 +163,12 @@ function Test-TargetResource
     try 
     {
         $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
+    }
+    catch 
+    {
+         New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+    }
 
         if ($netAdapter) 
         {
@@ -175,11 +180,4 @@ function Test-TargetResource
 
                 return ($Enabled -eq $netAdapter.Enabled) 
             }
- 
-    }
-    catch
-    {
-        New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
-    }
 }
