@@ -12,7 +12,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
 
 # Import Localization Strings
 $LocalizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_xWeakHostSend' `
+    -ResourceName 'MSFT_xWeakHostReceive' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
@@ -26,7 +26,7 @@ $LocalizedData = Get-LocalizedData `
     IP address family.
 
     .PARAMETER State
-    The desired state of the Weak Host Send setting.
+    The desired state of the Weak Host Receive setting.
 #>
 function Get-TargetResource
 {
@@ -50,18 +50,18 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingWeakHostSendMessage) `
+            $($LocalizedData.GettingWeakHostReceiveMessage) `
                 -f $InterfaceAlias, $AddressFamily `
         ) -join '')
 
     Assert-ResourceProperty @PSBoundParameters
 
-    $currentWeakHostSend = Get-NetIPInterface `
+    $currentWeakHostReceive = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily
 
     $returnValue = @{
-        State          = $currentWeakHostSend.WeakHostSend
+        State          = $currentWeakHostReceive.WeakHostReceive
         AddressFamily  = $AddressFamily
         InterfaceAlias = $InterfaceAlias
     }
@@ -70,7 +70,7 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the Weak Host Send setting for an interface.
+    Sets the Weak Host Receive setting for an interface.
 
     .PARAMETER InterfaceAlias
     Alias of the network interface for which the Weak Host Setting is set.
@@ -79,7 +79,7 @@ function Get-TargetResource
     IP address family.
 
     .PARAMETER State
-    The desired state of the Weak Host Send setting.
+    The desired state of the Weak Host Receive setting.
 #>
 function Set-TargetResource
 {
@@ -102,7 +102,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.ApplyingWeakHostSendMessage) `
+            $($LocalizedData.ApplyingWeakHostReceiveMessage) `
                 -f $InterfaceAlias, $AddressFamily `
         ) -join '')
 
@@ -112,15 +112,15 @@ function Set-TargetResource
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily
 
-    # The Weak Host Send setting is in a different state - so change it.
+    # The Weak Host Receive setting is in a different state - so change it.
     Set-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily `
-        -WeakHostSend $State `
+        -WeakHostReceive $State `
         -ErrorAction Stop
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.WeakHostSendSetStateMessage) `
+            $($LocalizedData.WeakHostReceiveSetStateMessage) `
                 -f $InterfaceAlias, $AddressFamily, $State `
         ) -join '' )
 
@@ -128,7 +128,7 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the state of the Weak Host Send setting for an interface.
+    Tests the state of the Weak Host Receive setting for an interface.
 
     .PARAMETER InterfaceAlias
     Alias of the network interface for which the DHCP Client is set.
@@ -137,7 +137,7 @@ function Set-TargetResource
     IP address family.
 
     .PARAMETER State
-    The desired state of the Weak Host Send setting.
+    The desired state of the Weak Host Receive setting.
 #>
 function Test-TargetResource
 {
@@ -164,21 +164,21 @@ function Test-TargetResource
     [System.Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.CheckingWeakHostSendMessage) `
+            $($LocalizedData.CheckingWeakHostReceiveMessage) `
                 -f $InterfaceAlias, $AddressFamily `
         ) -join '')
 
     Assert-ResourceProperty @PSBoundParameters
 
-    $currentWeakHostSend = Get-NetIPInterface `
+    $currentWeakHostReceive = Get-NetIPInterface `
         -InterfaceAlias $InterfaceAlias `
         -AddressFamily $AddressFamily
 
-    # The Weak Host Send setting is in a different state - so change it.
-    if ($currentWeakHostSend.WeakHostSend -ne $State)
+    # The Weak Host Receive setting is in a different state - so change it.
+    if ($currentWeakHostReceive.WeakHostReceive -ne $State)
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.WeakHostSendDoesNotMatchMessage) `
+                $($LocalizedData.WeakHostReceiveDoesNotMatchMessage) `
                     -f $InterfaceAlias, $AddressFamily, $State `
             ) -join '' )
         $desiredConfigurationMatch = $false
@@ -193,13 +193,13 @@ function Test-TargetResource
     If any problems are detected an exception will be thrown.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the Weak Host Send setting is set.
+    Alias of the network interface for which the Weak Host Receive setting is set.
 
     .PARAMETER AddressFamily
     IP address family.
 
     .PARAMETER State
-    The desired state of the Weak Host Send setting.
+    The desired state of the Weak Host Receive setting.
 #>
 function Assert-ResourceProperty
 {
