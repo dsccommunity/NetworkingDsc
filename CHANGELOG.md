@@ -8,6 +8,10 @@
   execution - fixes [Issue #264](https://github.com/PowerShell/xNetworking/issues/264).
 - MSFT_xNetworkTeamInterface:
   - Updated Test-TargetResource to substitute VLANID value 0 to $null
+- MSFT_xNetAdapterRsc:
+  - Created new resource configuring Rsc
+- MSFT_xNetAdapterRss:
+  - Created new resource configuring Rss
 
 ## 5.1.0.0
 
