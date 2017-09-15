@@ -8,6 +8,9 @@
   execution - fixes [Issue #264](https://github.com/PowerShell/xNetworking/issues/264).
 - MSFT_xNetworkTeamInterface:
   - Updated Test-TargetResource to substitute VLANID value 0 to $null
+- MSFT_xHostsFile:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
 
 ## 5.1.0.0
 
