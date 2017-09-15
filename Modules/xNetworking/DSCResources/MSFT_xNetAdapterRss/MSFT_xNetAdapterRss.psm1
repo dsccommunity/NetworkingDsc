@@ -2,13 +2,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
@@ -40,35 +40,35 @@ function Get-TargetResource
         $Enabled
     )
 
-        Write-Verbose -Message ( @(
+    Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
-    try 
+    try
     {
         $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
     }
-    catch 
+    catch
     {
-         New-InvalidOperationException `
+        New-InvalidOperationException `
             -Message ($LocalizedData.NetAdapterNotFoundMessage)
     }
 
-        if ($netAdapter)
-        {
-            Write-Verbose -Message ( @(
+    if ($netAdapter)
+    {
+        Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $Enabled)
             ) -join '')
 
-            $result = @{ 
-                Name = $Name
-                Enabled = $netAdapter.Enabled
-            }
-                        
-            return $result
+        $result = @{
+            Name    = $Name
+            Enabled = $netAdapter.Enabled
         }
+
+        return $result
+    }
 }
 
 <#
@@ -95,39 +95,39 @@ function Set-TargetResource
         $Enabled
     )
 
-        Write-Verbose -Message ( @(
+    Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
-    try 
+    try
     {
         $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
     }
-    catch 
+    catch
     {
-         New-InvalidOperationException `
+        New-InvalidOperationException `
             -Message ($LocalizedData.NetAdapterNotFoundMessage)
     }
 
-        if ($netAdapter)
-        {
-            Write-Verbose -Message ( @(
+    if ($netAdapter)
+    {
+        Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $Enabled)
             ) -join '')
 
-            if ($Enabled -ne $netAdapter.Enabled) 
-            {
-                Write-Verbose -Message ( @(
+        if ($Enabled -ne $netAdapter.Enabled)
+        {
+            Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.NetAdapterApplyingChangesMessage -f `
-                    $Name, $Enabled, $($netAdapter.Enabled.ToString()), $($Enabled.ToString()) )
-            )    -join '')
-          
-                Set-NetAdapterRss -Name $Name -Enabled:$Enabled
-            }
+                            $Name, $Enabled, $($netAdapter.Enabled.ToString()), $($Enabled.ToString()) )
+                ) -join '')
+
+            Set-NetAdapterRss -Name $Name -Enabled:$Enabled
         }
+    }
 }
 
 <#
@@ -155,29 +155,29 @@ function Test-TargetResource
         $Enabled
     )
 
-        Write-Verbose -Message ( @(
+    Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
-    try 
+    try
     {
         $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
     }
-    catch 
+    catch
     {
-         New-InvalidOperationException `
+        New-InvalidOperationException `
             -Message ($LocalizedData.NetAdapterNotFoundMessage)
     }
 
-        if ($netAdapter) 
-        {
-            Write-Verbose -Message ( @(
+    if ($netAdapter)
+    {
+        Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $localizedData.NetAdapterTestingStateMessage -f `
-                $Name, $Enabled
+                    $Name, $Enabled
             ) -join '')
 
-                return ($Enabled -eq $netAdapter.Enabled) 
-            }
+        return ($Enabled -eq $netAdapter.Enabled)
+    }
 }
