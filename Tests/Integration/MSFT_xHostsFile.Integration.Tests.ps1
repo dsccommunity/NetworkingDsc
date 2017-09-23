@@ -54,7 +54,9 @@ try
         }
 
         It 'Should have set the resource and all the parameters should match' {
-            $result = Get-DscConfiguration | Where-Object -FilterScript { $_.ConfigurationName -eq "$($script:DSCResourceName)_Config" }
+            $result = Get-DscConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+            }
             $result.Ensure                 | Should Be $configData.AllNodes[0].Ensure
             $result.HostName               | Should Be $configData.AllNodes[0].HostName
             $result.IPAddress              | Should Be $configData.AllNodes[0].IPAddress
@@ -91,7 +93,9 @@ try
         }
 
         It 'Should have set the resource and all the parameters should match' {
-            $result = Get-DscConfiguration | Where-Object -FilterScript { $_.ConfigurationName -eq "$($script:DSCResourceName)_Config" }
+            $result = Get-DscConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+            }
             $result.Ensure                 | Should Be $configData.AllNodes[0].Ensure
             $result.HostName               | Should Be $configData.AllNodes[0].HostName
             $result.IPAddress              | Should Be $configData.AllNodes[0].IPAddress
@@ -128,7 +132,9 @@ try
         }
 
         It 'Should have set the resource and all the parameters should match' {
-            $result = Get-DscConfiguration | Where-Object -FilterScript { $_.ConfigurationName -eq "$($script:DSCResourceName)_Config" }
+            $result = Get-DscConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+            }
             $result.Ensure                 | Should Be $configData.AllNodes[0].Ensure
             $result.HostName               | Should Be $configData.AllNodes[0].HostName
             $result.IPAddress              | Should BeNullOrEmpty

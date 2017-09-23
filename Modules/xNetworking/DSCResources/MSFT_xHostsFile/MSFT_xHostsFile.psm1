@@ -43,9 +43,9 @@ function Get-TargetResource
         $IPAddress,
 
         [Parameter()]
-        [ValidateSet("Present", "Absent")]
+        [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = "Present"
+        $Ensure = 'Present'
     )
 
     Write-Verbose -Message ($LocalizedData.StartingGet -f $HostName)
@@ -57,7 +57,7 @@ function Get-TargetResource
         return @{
             HostName  = $result.HostName
             IPAddress = $result.IPAddress
-            Ensure    = "Present"
+            Ensure    = 'Present'
         }
     }
     else
@@ -65,7 +65,7 @@ function Get-TargetResource
         return @{
             HostName  = $HostName
             IPAddress = $null
-            Ensure    = "Absent"
+            Ensure    = 'Absent'
         }
     }
 }
@@ -97,9 +97,9 @@ function Set-TargetResource
         $IPAddress,
 
         [Parameter()]
-        [ValidateSet("Present", "Absent")]
+        [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = "Present"
+        $Ensure = 'Present'
     )
 
     $hostPath = "$env:windir\System32\drivers\etc\hosts"
@@ -196,9 +196,9 @@ function Test-TargetResource
         $IPAddress,
 
         [Parameter()]
-        [ValidateSet("Present", "Absent")]
+        [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = "Present"
+        $Ensure = 'Present'
     )
 
     $currentValues = Get-TargetResource @PSBoundParameters
@@ -210,7 +210,7 @@ function Test-TargetResource
         return $false
     }
 
-    if ($Ensure -eq "Present" -and $IPAddress -ne $currentValues.IPAddress)
+    if ($Ensure -eq 'Present' -and $IPAddress -ne $currentValues.IPAddress)
     {
         return $false
     }
