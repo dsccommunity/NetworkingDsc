@@ -516,7 +516,7 @@ function Set-ComputerProxySettings
             Create the Byte Array that will be used to populate the
             DefaultConnectionSettings and SavedLegacySettings registry settings
         #>
-        $proxySettings = @(0x46, 0x0, 0x0, 0x0, 0x8, 0x0, 0x0, 0x0, 0x1)
+        $proxySettings = @(0x46, 0x0, 0x0, 0x0, 0x8, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0)
 
         if ($EnableAutoDetection)
         {
@@ -535,14 +535,22 @@ function Set-ComputerProxySettings
 
         if ($PSBoundParameters.ContainsKey('ProxyServer'))
         {
-            $proxySettings += @(0x0, 0x0, 0x0, $ProxyServer.Length, 0x0, 0x0, 0x0)
+            $proxySettings += @($ProxyServer.Length, 0x0, 0x0, 0x0)
             $proxySettings += [Byte[]][Char[]] $ProxyServer
+        }
+        else
+        {
+            $proxySettings += @(0x0, 0x0, 0x0, 0x0)
         }
 
         if ($ProxyServerBypassLocal -eq $true)
         {
             $proxySettings += @('<local>'.Length, 0x0, 0x0, 0x0)
             $proxySettings += [Byte[]][Char[]] '<local>'
+        }
+        else
+        {
+            $proxySettings += @(0x0, 0x0, 0x0, 0x0)
         }
 
         if ($PSBoundParameters.ContainsKey('AutoConfigURL'))
