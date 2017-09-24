@@ -30,6 +30,7 @@ $LocalizedData = Get-LocalizedData `
 #>
 function Get-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
@@ -84,6 +85,7 @@ function Get-TargetResource
 #>
 function Set-TargetResource
 {
+    [CmdletBinding()]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -142,6 +144,7 @@ function Set-TargetResource
 #>
 function Test-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
     (

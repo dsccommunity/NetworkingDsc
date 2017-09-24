@@ -801,26 +801,6 @@ try
                 $IPaddress.PrefixLength | Should be 64
             }
         }
-
-        InModuleScope $script:ModuleName {
-            Describe 'NetworkingDsc.Common\Get-ProxySettings' {
-                Context 'Specified registry key value is null' {
-                    $convertToStringParameters = @{
-                        RegistryKeyValue = $null
-                    }
-
-                    It 'Should not throw' {
-                        { $null = ConvertTo-String @convertToStringParameters } | Should Not Throw
-                    }
-
-                    $convertToStringResult = ConvertTo-String @convertToStringParameters
-
-                    It 'Should return an empty string' {
-                        $convertToStringResult | Should Be ([String]::Empty)
-                    }
-                }
-            }
-        }
     }
 }
 finally
