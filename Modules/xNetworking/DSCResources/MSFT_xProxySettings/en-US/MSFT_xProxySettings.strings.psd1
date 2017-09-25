@@ -5,6 +5,8 @@ ConvertFrom-StringData @'
     ApplyingDHCPClientMessage = Applying the DHCP Client on {1} interface "{0}".
     DHCPClientSetStateMessage = DHCP Client was set to the desired state {2} on {1} interface "{0}".
     CheckingDHCPClientMessage = Checking the DHCP Client on {1} interface "{0}".
-    DHCPClientDoesNotMatchMessage = DHCP Client is not in the desired state {2} on {1} interface "{0}".
-    InterfaceNotAvailableError = Interface "{0}" is not available. Please select a valid interface and try again.
+    DisablingComputerProxyMessage = Disabling computer proxy settings.
+    EnablingComputerProxyMessage = Enabling computer proxy settings.
+    WritingComputerProxyBinarySettingsMessage = Writing computer proxy settings {0} binary '{1}'.
+    ProxySettingsBinaryInvalidError = The first byte of the proxy settings binary was {0} but should have been 0x46.
 '@
