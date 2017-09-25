@@ -12,6 +12,9 @@
   - Created new resource configuring Rsc
 - MSFT_xNetAdapterRss:
   - Created new resource configuring Rss
+- MSFT_xHostsFile:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
 
 ## 5.1.0.0
 
