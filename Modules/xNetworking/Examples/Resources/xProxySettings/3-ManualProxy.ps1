@@ -20,14 +20,14 @@ Configuration Example
     {
         xProxySettings ManualProxy
         {
-            IsSingleInstance = 'Yes'
-            Ensure = 'Present'
-            EnableAutoDetection = $false
+            IsSingleInstance        = 'Yes'
+            Ensure                  = 'Present'
+            EnableAutoDetection     = $false
             EnableAutoConfiguration = $false
-            EnableManualProxy = $true
-            ProxyServer = 'proxy.contoso.com:8888'
-            ProxyServerExceptions = 'web1','web2'
-            ProxyServerBypassLocal = $true
+            EnableManualProxy       = $true
+            ProxyServer             = 'proxy.contoso.com:8888'
+            ProxyServerExceptions   = 'web1', 'web2'
+            ProxyServerBypassLocal  = $true
         }
     }
 }

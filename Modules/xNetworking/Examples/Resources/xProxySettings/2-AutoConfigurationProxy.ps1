@@ -18,12 +18,12 @@ Configuration Example
     {
         xProxySettings AutoConfigurationProxy
         {
-            IsSingleInstance = 'Yes'
-            Ensure = 'Present'
-            EnableAutoDetection = $false
+            IsSingleInstance        = 'Yes'
+            Ensure                  = 'Present'
+            EnableAutoDetection     = $false
             EnableAutoConfiguration = $true
-            EnableManualProxy = $false
-            AutoConfigURL = 'http://wpad.contoso.com/wpad.dat'
+            EnableManualProxy       = $false
+            AutoConfigURL           = 'http://wpad.contoso.com/wpad.dat'
         }
     }
 }

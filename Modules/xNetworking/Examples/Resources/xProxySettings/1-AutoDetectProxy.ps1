@@ -17,11 +17,11 @@ Configuration Example
     {
         xProxySettings AutoConfigurationProxy
         {
-            IsSingleInstance = 'Yes'
-            Ensure = 'Present'
-            EnableAutoDetection = $true
+            IsSingleInstance        = 'Yes'
+            Ensure                  = 'Present'
+            EnableAutoDetection     = $true
             EnableAutoConfiguration = $false
-            EnableManualProxy = $false
+            EnableManualProxy       = $false
         }
     }
 }
