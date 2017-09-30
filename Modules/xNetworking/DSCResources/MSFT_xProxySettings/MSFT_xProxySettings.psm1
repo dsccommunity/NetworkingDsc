@@ -17,10 +17,7 @@ $LocalizedData = Get-LocalizedData `
 
 
 # Registry key paths for proxy settings
-$script:policyInternetSettingsRegistryKeyPath = 'SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\Internet Settings'
 $script:connectionsRegistryKeyPath = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections'
-$script:internetSettingsRegistryKeyPath = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings'
-$script:controlPanelRegistryKeyPath = 'SOFTWARE\Policies\Microsoft\Internet Explorer\Control Panel'
 
 <#
     .SYNOPSIS
@@ -41,6 +38,47 @@ function Get-TargetResource
         [System.String]
         $IsSingleInstance
     )
+
+    Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+        $($LocalizedData.GettingProxySettingsMessage)
+        ) -join '')
+
+    $returnValue = @{}
+
+    # Get the registry values in the Connections registry key
+    $connectionsRegistryValues = Get-ItemProperty `
+        -Path "HKLM:\$($script:connectionsRegistryKeyPath)" `
+        -ErrorAction SilentlyContinue
+
+    $proxySettingsRegistryBinary = $null
+
+    if ($connectionsRegistryValues.DefaultConnectionSettings)
+    {
+        $proxySettingsRegistryBinary = $connectionsRegistryValues.DefaultConnectionSettings
+    }
+    elseif ($connectionsRegistryValues.SavedLegacySettings)
+    {
+        $proxySettingsRegistryBinary = $connectionsRegistryValues.SavedLegacySettings
+    }
+
+    if ($proxySettingsRegistryBinary)
+    {
+        $returnValue.Add('Ensure','Present')
+
+        $proxySettings = ConvertFrom-ProxySettingsBinary -ProxySettings $proxySettingsRegistryBinary
+
+        $returnValue.Add('EnableManualProxy',$proxySettings.EnableManualProxy)
+        $returnValue.Add('EnableAutoConfiguration',$proxySettings.EnableAutoConfiguration)
+        $returnValue.Add('EnableAutoDetection',$proxySettings.EnableAutoDetection)
+        $returnValue.Add('ProxyServer',$proxySettings.ProxyServer)
+        $returnValue.Add('ProxyServerBypassLocal',$proxySettings.ProxyServerBypassLocal)
+        $returnValue.Add('ProxyServerExceptions',$proxySettings.ProxyServerExceptions)
+        $returnValue.Add('AutoConfigURL',$proxySettings.AutoConfigURL)
+    }
+    else
+    {
+        $returnValue.Add('Ensure','Absent')
+    }
 
     return $returnValue
 }
@@ -139,6 +177,64 @@ function Set-TargetResource
         $ProxyServerBypassLocal = $false
     )
 
+    Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+        $($LocalizedData.ApplyingProxySettingsMessage -f $Ensure)
+        ) -join '')
+
+    if ($Ensure -eq 'Absent')
+    {
+        # Remove all the Proxy Settings
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+            $($LocalizedData.DisablingComputerProxyMessage)
+            ) -join '')
+
+        if ($ConnectionType -in ('All','Default'))
+        {
+            Remove-ItemProperty `
+                -Path "HKLM:\$($script:connectionsRegistryKeyPath)" `
+                -Name 'DefaultConnectionSettings' `
+                -ErrorAction SilentlyContinue
+        }
+
+        if ($ConnectionType -in ('All','Legacy'))
+        {
+            Remove-ItemProperty `
+                -Path "HKLM:\$($script:connectionsRegistryKeyPath)" `
+                -Name 'SavedLegacySettings' `
+                -ErrorAction SilentlyContinue
+        }
+    }
+    else
+    {
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+            $($LocalizedData.EnablingComputerProxyMessage)
+            ) -join '')
+
+        # Generate the Proxy Settings binary value
+        $null = $PSBoundParameters.Remove('IsSingleInstance')
+        $null = $PSBoundParameters.Remove('Ensure')
+        $null = $PSBoundParameters.Remove('ConnectionType')
+
+        $proxySettings = ConvertTo-ProxySettingsBinary @PSBoundParameters
+
+        if ($ConnectionType -in ('All','Default'))
+        {
+            Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                $($LocalizedData.WritingComputerProxyBinarySettingsMessage -f 'DefaultConnectionSettings',($proxySettings -join ','))
+                ) -join '')
+
+            $null = [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\$($script:connectionsRegistryKeyPath)", 'DefaultConnectionSettings', [Byte[]] $proxySettings, 'Binary')
+        }
+
+        if ($ConnectionType -in ('All','Legacy'))
+        {
+            Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                $($LocalizedData.WritingComputerProxyBinarySettingsMessage -f 'SavedLegacySettings',($proxySettings -join ','))
+                ) -join '')
+
+            $null = [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\$($script:connectionsRegistryKeyPath)", 'SavedLegacySettings', [Byte[]] $proxySettings, 'Binary')
+        }
+    }
 } # Set-TargetResource
 
 <#
@@ -236,176 +332,178 @@ function Test-TargetResource
         $ProxyServerBypassLocal = $false
     )
 
-} # Test-TargetResource
+    Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+        $($LocalizedData.CheckingProxySettingsMessage -f $Ensure)
+        ) -join '')
 
-<#
-    .SYNOPSIS
-        Gets the computer proxy settings.
-#>
-function Get-ComputerProxySettings
-{
-    [CmdletBinding()]
-    param
-    (
-    )
-}
+    [Boolean] $desiredConfigurationMatch = $true
 
-<#
-    .SYNOPSIS
-        Sets the computer proxy settings in the registry.
-
-    .PARAMETER Ensure
-        Specifies if computer proxy settings should be set.
-        Defaults to 'Present'.
-
-    .PARAMETER ConnectionType
-        Defines if the proxy settings should be configured
-        for default connections, legacy connections or all
-        connections. Defaults to 'All'.
-
-    .PARAMETER EnableAutoDetection
-        Enable automatic detection of the proxy settings. Defaults
-        to 'False'.
-
-    .PARAMETER EnableAutoConfiguration
-        Use automatic configuration script for specifying proxy
-        settings. Defaults to 'False'.
-
-    .PARAMETER EnableManualProxy
-        Use manual proxy server settings. Defaults to 'False'.
-
-    .PARAMETER AutoConfigURL
-        The URL of the automatic configuration script to specify
-        the proxy settings. Should be specified if 'EnableAutoConfiguration'
-        is 'True'.
-
-    .PARAMETER ProxyServer
-        The address and port of the manual proxy server to use.
-        Should be specified if 'EnableManualProxy' is 'True'.
-
-    .PARAMETER ProxyServerExceptions
-        Bypass proxy server for addresses starting with addresses
-        in this list.
-
-    .PARAMETER ProxyServerBypassLocal
-        Bypass proxy server for local addresses. Defaults to 'False'.
-#>
-function Set-ComputerProxySettings
-{
-    [CmdletBinding()]
-    param
-    (
-        [Parameter()]
-        [ValidateSet('Present','Absent')]
-        [System.String]
-        $Ensure = 'Present',
-
-        [Parameter()]
-        [ValidateSet('All','Default','Legacy')]
-        [System.String]
-        $ConnectionType = 'All',
-
-        [Parameter()]
-        [System.Boolean]
-        $EnableAutoDetection = $false,
-
-        [Parameter()]
-        [System.Boolean]
-        $EnableAutoConfiguration = $false,
-
-        [Parameter()]
-        [System.Boolean]
-        $EnableManualProxy = $false,
-
-        [Parameter()]
-        [System.String]
-        $AutoConfigURL,
-
-        [Parameter()]
-        [System.String]
-        $ProxyServer,
-
-        [Parameter()]
-        [System.String[]]
-        $ProxyServerExceptions = @(),
-
-        [Parameter()]
-        [System.Boolean]
-        $ProxyServerBypassLocal = $false
-    )
+    # Get the registry values in the Connections registry key
+    $connectionsRegistryValues = Get-ItemProperty `
+        -Path "HKLM:\$($script:connectionsRegistryKeyPath)" `
+        -ErrorAction SilentlyContinue
 
     if ($Ensure -eq 'Absent')
     {
-        # Remove all the Proxy Settings
-        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.DisablingComputerProxyMessage)
-            ) -join '')
+        # Check if any of the Proxy Settings need to be removed
+        if ($ConnectionType -in ('All','Default'))
+        {
+            # Does the Default Connection Settings need to be removed?
+            if ($connectionsRegistryValues.DefaultConnectionSettings)
+            {
+                Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                    $($LocalizedData.ComputerProxyBinarySettingsRequiresRemovalMessage -f 'DefaultConnectionSettings')
+                    ) -join '')
 
-        Remove-ItemProperty `
-            -Path "HKLM:\$($script:policyInternetSettingsRegistryKeyPath)" `
-            -Name 'ProxySettingsPerUser' `
-            -ErrorAction SilentlyContinue
-
-        'WinHttpSettings','DefaultConnectionSettings','SavedLegacySettings' | Foreach-Object -Process {
-            Remove-ItemProperty `
-                -Path "HKLM:\$($script:connectionsRegistryKeyPath)" `
-                -Name $_ `
-                -ErrorAction SilentlyContinue
+                $desiredConfigurationMatch = $false
+            }
         }
 
-        'ProxyEnable','ProxyServer','ProxyOverride','AutoConfigURL' | Foreach-Object -Process {
-            Remove-ItemProperty `
-                -Path "HKLM:\$($script:internetSettingsRegistryKeyPath)" `
-                -Name $_ `
-                -ErrorAction SilentlyContinue
-        }
+        # Does the Saved Legacy Settings need to be removed?
+        if ($ConnectionType -in ('All','Legacy'))
+        {
+            if ($connectionsRegistryValues.SavedLegacySettings)
+            {
+                Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                    $($LocalizedData.ComputerProxyBinarySettingsRequiresRemovalMessage -f 'SavedLegacySettings')
+                    ) -join '')
 
-        'Autoconfig','Proxy' | Foreach-Object -Process {
-            Remove-ItemProperty `
-                -Path "HKLM:\$($script:controlPanelRegistryKeyPath)" `
-                -Name $_ `
-                -ErrorAction SilentlyContinue
+                $desiredConfigurationMatch = $false
+            }
         }
     }
     else
     {
-        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.EnablingComputerProxyMessage)
-            ) -join '')
-
-        # Ensure per user proxy settings are disabled
-        $null = [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\$($script:policyInternetSettingsRegistryKeyPath)", 'ProxySettingsPerUser', '0', 'DWORD')
-
-        # Ensure the WinHttpSettings registry key is not set
-        Remove-ItemProperty `
-            -Path "HKLM:\$($script:connectionsRegistryKeyPath)" `
-            -Name 'WinHttpSettings' `
-            -ErrorAction SilentlyContinue
-
-        # Generate the Proxy Settings binary value
-        $null = $PSBoundParameters.Remove('Ensure')
-        $null = $PSBoundParameters.Remove('ConnectionType')
-
-        $proxySettings = ConvertTo-ProxySettingsBinary @PSBoundParameters
+        $desiredValues = $PSBoundParameters
+        $null = $desiredValues.Remove('IsSingleInstance')
+        $null = $desiredValues.Remove('Ensure')
+        $null = $desiredValues.Remove('ConnectionType')
 
         if ($ConnectionType -in ('All','Default'))
         {
+            # Check if the Default Connection proxy settings are in the desired state
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.WritingComputerProxyBinarySettingsMessage -f 'DefaultConnectionSettings',($proxySettings -join ','))
+                $($LocalizedData.CheckingComputerProxyBinarySettingsMessage -f 'DefaultConnectionSettings')
                 ) -join '')
 
-            $null = [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\$($script:connectionsRegistryKeyPath)", 'DefaultConnectionSettings', [Byte[]] $proxySettings, 'Binary')
+            if ($connectionsRegistryValues.DefaultConnectionSettings)
+            {
+                $defaultConnectionSettings = ConvertFrom-ProxySettingsBinary -ProxySettings $connectionsRegistryValues.DefaultConnectionSettings
+            }
+            else
+            {
+                $defaultConnectionSettings = @{}
+            }
+
+            $inDesiredState = Test-ProxySettings -CurrentValues $defaultConnectionSettings -DesiredValues $desiredValues
+
+            if (-not $inDesiredState)
+            {
+                Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                    $($LocalizedData.ComputerProxyBinarySettingsNoMatchMessage -f 'DefaultConnectionSettings')
+                    ) -join '')
+
+                $desiredConfigurationMatch = $false
+            }
         }
 
         if ($ConnectionType -in ('All','Legacy'))
         {
+            # Check if the Saved Legacy proxy settings are in the desired state
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.WritingComputerProxyBinarySettingsMessage -f 'SavedLegacySettings',($proxySettings -join ','))
+                $($LocalizedData.CheckingComputerProxyBinarySettingsMessage -f 'SavedLegacySettings')
                 ) -join '')
 
-            $null = [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\$($script:connectionsRegistryKeyPath)", 'SavedLegacySettings', [Byte[]] $proxySettings, 'Binary')
+            if ($connectionsRegistryValues.SavedLegacySettings)
+            {
+                $savedLegacySettings = ConvertFrom-ProxySettingsBinary -ProxySettings $connectionsRegistryValues.SavedLegacySettings
+            }
+            else
+            {
+                $savedLegacySettings = @{}
+            }
+
+            $inDesiredState = Test-ProxySettings -CurrentValues $savedLegacySettings -DesiredValues $desiredValues
+
+            if (-not $inDesiredState)
+            {
+                Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                    $($LocalizedData.ComputerProxyBinarySettingsNoMatchMessage -f 'SavedLegacySettings')
+                    ) -join '')
+
+                $desiredConfigurationMatch = $false
+            }
         }
     }
+
+    return $desiredConfigurationMatch
+} # Test-TargetResource
+
+<#
+    .SYNOPSIS
+        Checks if the Current proxy setting values are in the desired
+        state. Returns $true if in the desired state.
+
+    .PARAMETER CurrentValues
+        An object containing the current values of the Proxy Settings.
+
+    .PARAMETER DesiredValues
+        An object containing the desired values of the Proxy Settings.
+#>
+function Test-ProxySettings
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.Collections.Hashtable]
+        $CurrentValues,
+
+        [Parameter(Mandatory = $true)]
+        [System.Object]
+        $DesiredValues
+    )
+
+    [System.Boolean] $inState = $true
+
+    $proxySettingsToCompare = @(
+        'EnableManualProxy'
+        'EnableAutoConfiguration'
+        'EnableAutoDetection'
+        'ProxyServer'
+        'ProxyServerBypassLocal'
+        'AutoConfigURL'
+    )
+
+    # Test the string and boolean values
+    foreach ($proxySetting in $proxySettingsToCompare)
+    {
+        if ($DesiredValues.ContainsKey($proxySetting) -and ($DesiredValues.$proxySetting -ne $CurrentValues.$proxySetting))
+        {
+            Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                $($LocalizedData.ProxySettingMismatchMessage -f $proxySetting,$CurrentValues.$proxySetting,$DesiredValues.$proxySetting)
+                ) -join '')
+
+            $inState = $false
+        }
+    }
+
+    # Test the array value
+    if ($DesiredValues.ContainsKey('ProxyServerExceptions') `
+        -and $CurrentValues.ProxyServerExceptions `
+        -and (Compare-Object `
+            -ReferenceObject $DesiredValues.ProxyServerExceptions `
+            -DifferenceObject $CurrentValues.ProxyServerExceptions).Count -gt 0)
+    {
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+            $($LocalizedData.ProxySettingMismatchMessage -f 'ProxyServerExceptions',($CurrentValues.ProxyServerExceptions -join ';'),($DesiredValues.ProxyServerExceptions -join ';'))
+            ) -join '')
+
+        $inState = $false
+    }
+
+    return $inState
 }
 
 <#
@@ -590,23 +688,66 @@ function ConvertFrom-ProxySettingsBinary
         $proxyParameters.Add('EnableAutoConfiguration',$enableAutoConfiguration)
         $proxyParameters.Add('EnableAutoDetection',$enableAutoDetection)
 
+        $stringPointer = 12
+
         # Extract the Proxy Server string
-        $proxyServerLength = $ProxySettings[12]
-        if ($proxyServerLength -gt 0)
+        $proxyServer = ''
+        $stringLength = $ProxySettings[$stringPointer]
+        $stringPointer += 4
+
+        if ($stringLength -gt 0)
         {
-            $proxyServerBytes = New-Object -TypeName Byte[] -ArgumentList $proxyServerLength
-            $null = [System.Buffer]::BlockCopy($ProxySettings,16,$proxyServerBytes,0,$proxyServerLength)
-            $proxyServer = [System.Text.Encoding]::ASCII.GetString($proxyServerBytes)
-        }
-        else
-        {
-            $proxyServer = ''
+            $stringBytes = New-Object -TypeName Byte[] -ArgumentList $stringLength
+            $null = [System.Buffer]::BlockCopy($ProxySettings,$stringPointer,$stringBytes,0,$stringLength)
+            $proxyServer = [System.Text.Encoding]::ASCII.GetString($stringBytes)
+            $stringPointer += $stringLength
         }
 
         $proxyParameters.Add('ProxyServer',$proxyServer)
+
+        # Extract the Proxy Server Exceptions string
+        $proxyServerExceptions = @()
+        $stringLength = $ProxySettings[$stringPointer]
+        $stringPointer += 4
+
+        if ($stringLength -gt 0)
+        {
+            $stringBytes = New-Object -TypeName Byte[] -ArgumentList $stringLength
+            $null = [System.Buffer]::BlockCopy($ProxySettings,$stringPointer,$stringBytes,0,$stringLength)
+            $proxyServerExceptionsString = [System.Text.Encoding]::ASCII.GetString($stringBytes)
+            $stringPointer += $stringLength
+            $proxyServerExceptions = [System.String[]] ($proxyServerExceptionsString -split ';')
+        }
+
+        if ($proxyServerExceptions.Contains('<local>'))
+        {
+            $proxyServerExceptions = $proxyServerExceptions | Where-Object -FilterScript { $_ -ne '<local>' }
+            $proxyParameters.Add('ProxyServerBypassLocal',$true)
+        }
+        else
+        {
+            $proxyParameters.Add('ProxyServerBypassLocal',$false)
+        }
+
+        $proxyParameters.Add('ProxyServerExceptions',$proxyServerExceptions)
+
+        # Extract the Auto Config URL string
+        $autoConfigURL = ''
+        $stringLength = $ProxySettings[$stringPointer]
+        $stringPointer += 4
+
+        if ($stringLength -gt 0)
+        {
+            $stringBytes = New-Object -TypeName Byte[] -ArgumentList $stringLength
+            $null = [System.Buffer]::BlockCopy($ProxySettings,$stringPointer,$stringBytes,0,$stringLength)
+            $autoConfigURL = [System.Text.Encoding]::ASCII.GetString($stringBytes)
+            $stringPointer += $stringLength
+        }
+
+        $proxyParameters.Add('AutoConfigURL',$autoConfigURL)
     }
 
     return [PSObject] $proxyParameters
 }
 
-Export-ModuleMember -function *-TargetResource,*-ProxySettingsBinary
+Export-ModuleMember -function *-TargetResource
