@@ -223,7 +223,10 @@ function Set-TargetResource
                 $($LocalizedData.WritingComputerProxyBinarySettingsMessage -f 'DefaultConnectionSettings',($proxySettings -join ','))
                 ) -join '')
 
-            $null = [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\$($script:connectionsRegistryKeyPath)", 'DefaultConnectionSettings', [Byte[]] $proxySettings, 'Binary')
+            Set-BinaryRegistryValue `
+                -Path "HKEY_LOCAL_MACHINE\$($script:connectionsRegistryKeyPath)" `
+                -Name 'DefaultConnectionSettings' `
+                -Value $proxySettings
         }
 
         if ($ConnectionType -in ('All','Legacy'))
@@ -232,7 +235,10 @@ function Set-TargetResource
                 $($LocalizedData.WritingComputerProxyBinarySettingsMessage -f 'SavedLegacySettings',($proxySettings -join ','))
                 ) -join '')
 
-            $null = [Microsoft.Win32.Registry]::SetValue("HKEY_LOCAL_MACHINE\$($script:connectionsRegistryKeyPath)", 'SavedLegacySettings', [Byte[]] $proxySettings, 'Binary')
+            Set-BinaryRegistryValue `
+                -Path "HKEY_LOCAL_MACHINE\$($script:connectionsRegistryKeyPath)" `
+                -Name 'SavedLegacySettings' `
+                -Value $proxySettings
         }
     }
 } # Set-TargetResource
@@ -438,6 +444,40 @@ function Test-TargetResource
 
     return $desiredConfigurationMatch
 } # Test-TargetResource
+
+<#
+    .SYNOPSIS
+        Sets a binary value in a Registry Key.
+
+    .PARAMETER Path
+        The path to the registry key containing the value.
+
+    .PARAMETER Name
+        The name of the registry value.
+
+    .PARAMETER Value
+        The value to put into the binary registry value.
+#>
+function Set-BinaryRegistryValue
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Path,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Name,
+
+        [Parameter(Mandatory = $true)]
+        [System.Byte[]]
+        $Value
+    )
+
+    $null = [Microsoft.Win32.Registry]::SetValue($Path, $Name, $Value, 'Binary')
+}
 
 <#
     .SYNOPSIS

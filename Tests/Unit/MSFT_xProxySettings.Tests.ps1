@@ -95,7 +95,7 @@ try
         }
 
         Describe "$script:DSCResourceName\Get-TargetResource" {
-            Context 'The No Proxy Settings are Defined' {
+            Context 'No Proxy Settings are Defined in the Registry' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -Verifiable
@@ -113,7 +113,7 @@ try
                 }
             }
 
-            Context 'The DefaultConnectionSettings Proxy Settings are Defined' {
+            Context 'The DefaultConnectionSettings Proxy Settings are Defined in the Registry' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -147,7 +147,7 @@ try
                 }
             }
 
-            Context 'The SavedLegacySettings Proxy Settings are Defined' {
+            Context 'The SavedLegacySettings Proxy Settings are Defined in the Registry' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -178,6 +178,278 @@ try
 
                 It 'Should call expected mocks' {
                     Assert-VerifiableMock
+                }
+            }
+        }
+
+        Describe "$script:DSCResourceName\Set-TargetResource" {
+            Context 'Ensure Proxy Settings not Defined for All Connection Types' {
+                Mock `
+                    -CommandName Remove-ItemProperty `
+                    -ParameterFilter { $Name -eq 'DefaultConnectionSettings' }
+
+                Mock `
+                    -CommandName Remove-ItemProperty `
+                    -ParameterFilter { $Name -eq 'SavedLegacySettings' }
+
+                It 'Should not throw exception' {
+                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should Not Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Remove-ItemProperty `
+                        -ParameterFilter { $Name -eq 'DefaultConnectionSettings' } `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Remove-ItemProperty `
+                        -ParameterFilter { $Name -eq 'SavedLegacySettings' } `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'Ensure Proxy Settings not Defined for Default Connection Type' {
+                Mock `
+                    -CommandName Remove-ItemProperty `
+                    -ParameterFilter { $Name -eq 'DefaultConnectionSettings' }
+
+                Mock `
+                    -CommandName Remove-ItemProperty `
+                    -ParameterFilter { $Name -eq 'SavedLegacySettings' }
+
+                It 'Should not throw exception' {
+                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Default' -Verbose } | Should Not Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Remove-ItemProperty `
+                        -ParameterFilter { $Name -eq 'DefaultConnectionSettings' } `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Remove-ItemProperty `
+                        -ParameterFilter { $Name -eq 'SavedLegacySettings' } `
+                        -Exactly -Times 0
+                }
+            }
+
+            Context 'Ensure Proxy Settings not Defined for Legacy Connection Type' {
+                Mock `
+                    -CommandName Remove-ItemProperty `
+                    -ParameterFilter { $Name -eq 'DefaultConnectionSettings' }
+
+                Mock `
+                    -CommandName Remove-ItemProperty `
+                    -ParameterFilter { $Name -eq 'SavedLegacySettings' }
+
+                It 'Should not throw exception' {
+                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Remove-ItemProperty `
+                        -ParameterFilter { $Name -eq 'DefaultConnectionSettings' } `
+                        -Exactly -Times 0
+
+                    Assert-MockCalled `
+                        -CommandName Remove-ItemProperty `
+                        -ParameterFilter { $Name -eq 'SavedLegacySettings' } `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'Ensure Proxy Settings are Defined for All Connection Types' {
+                Mock `
+                    -CommandName Set-BinaryRegistryValue `
+                    -ParameterFilter { $Name -eq 'DefaultConnectionSettings' }
+
+                Mock `
+                    -CommandName Set-BinaryRegistryValue `
+                    -ParameterFilter { $Name -eq 'SavedLegacySettings' }
+
+                It 'Should not throw exception' {
+                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'All' -Verbose } | Should Not Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Set-BinaryRegistryValue `
+                        -ParameterFilter { $Name -eq 'DefaultConnectionSettings' } `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Set-BinaryRegistryValue `
+                        -ParameterFilter { $Name -eq 'SavedLegacySettings' } `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'Ensure Proxy Settings are Defined for Default Connection Type' {
+                Mock `
+                    -CommandName Set-BinaryRegistryValue `
+                    -ParameterFilter { $Name -eq 'DefaultConnectionSettings' }
+
+                Mock `
+                    -CommandName Set-BinaryRegistryValue `
+                    -ParameterFilter { $Name -eq 'SavedLegacySettings' }
+
+                It 'Should not throw exception' {
+                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should Not Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Set-BinaryRegistryValue `
+                        -ParameterFilter { $Name -eq 'DefaultConnectionSettings' } `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Set-BinaryRegistryValue `
+                        -ParameterFilter { $Name -eq 'SavedLegacySettings' } `
+                        -Exactly -Times 0
+                }
+            }
+
+            Context 'Ensure Proxy Settings are Defined for Legacy Connection Type' {
+                Mock `
+                    -CommandName Set-BinaryRegistryValue `
+                    -ParameterFilter { $Name -eq 'DefaultConnectionSettings' }
+
+                Mock `
+                    -CommandName Set-BinaryRegistryValue `
+                    -ParameterFilter { $Name -eq 'SavedLegacySettings' }
+
+                It 'Should not throw exception' {
+                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Set-BinaryRegistryValue `
+                        -ParameterFilter { $Name -eq 'DefaultConnectionSettings' } `
+                        -Exactly -Times 0
+
+                    Assert-MockCalled `
+                        -CommandName Set-BinaryRegistryValue `
+                        -ParameterFilter { $Name -eq 'SavedLegacySettings' } `
+                        -Exactly -Times 1
+                }
+            }
+        }
+
+        Describe "$script:DSCResourceName\Test-TargetResource" {
+            Context 'No Proxy Settings are Defined in the Registry and None Required for All Connection Types' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return true' {
+                    $script:testTargetResourceResult | Should Be $True
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'DefaultConnectionSettings are Defined in the Registry and None Required for All Connection Types' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -MockWith {
+                        @{ DefaultConnectionSettings = [System.Byte[]] (0x46) }
+                    } `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return false' {
+                    $script:testTargetResourceResult | Should Be $False
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'DefaultConnectionSettings are Defined in the Registry and None Required for Legacy Connection Types' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -MockWith {
+                        @{ DefaultConnectionSettings = [System.Byte[]] (0x46) }
+                    } `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return true' {
+                    $script:testTargetResourceResult | Should Be $True
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'SavedLegacySettings are Defined in the Registry and None Required for All Connection Types' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -MockWith {
+                        @{ SavedLegacySettings = [System.Byte[]] (0x46) }
+                    } `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return false' {
+                    $script:testTargetResourceResult | Should Be $False
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'SavedLegacySettings are Defined in the Registry and None Required for Default Connection Types' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -MockWith {
+                        @{ SavedLegacySettings = [System.Byte[]] (0x46) }
+                    } `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Default' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return true' {
+                    $script:testTargetResourceResult | Should Be $True
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -Exactly -Times 1
                 }
             }
         }
