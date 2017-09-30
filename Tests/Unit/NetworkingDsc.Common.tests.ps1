@@ -19,6 +19,7 @@ Import-Module (Join-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath (J
 try
 {
     #region Pester Tests
+
     $LocalizedData = InModuleScope $script:ModuleName {
         $LocalizedData
     }

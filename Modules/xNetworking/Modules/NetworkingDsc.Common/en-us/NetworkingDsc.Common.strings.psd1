@@ -9,5 +9,4 @@ ConvertFrom-StringData @'
     GettingDNSServerStaticAddressMessage = Getting staticly assigned DNS server {0} address for interface alias '{1}'.
     DNSServerStaticAddressNotSetMessage = Statically assigned DNS server {0} address for interface alias '{1}' is not set.
     DNSServerStaticAddressFoundMessage = Statically assigned DNS server {0} address for interface alias '{1}' is '{2}'.
-    WritingComputerProxySettingsMessage = Writing the Computer Proxy Settings registry binary value into '{0}'.
 '@
