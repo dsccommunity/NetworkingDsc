@@ -27,6 +27,7 @@ try
         # Create the Mock Objects that will be used for running tests
         $testProxyServer = 'testproxy:8888'
         $testProxyExeceptions = @('exception1.contoso.com', 'exception2.contoso.com')
+        $testProxyAlternateExeceptions = @('exception1.contoso.com')
         $testAutoConfigURL = 'http://wpad.contoso.com/test.wpad'
 
         $testProxyAllDisabledSettings = [PSObject] @{
@@ -47,6 +48,14 @@ try
             EnableManualProxy       = $True
             ProxyServer             = $testProxyServer
             ProxyServerExceptions   = $testProxyExeceptions
+            EnableAutoConfiguration = $False
+        }
+
+        $testProxyManualProxyWithAlternateExceptionsSettings = [PSObject] @{
+            EnableAutoDetection     = $False
+            EnableManualProxy       = $True
+            ProxyServer             = $testProxyServer
+            ProxyServerExceptions   = $testProxyAlternateExeceptions
             EnableAutoConfiguration = $False
         }
 
@@ -85,14 +94,182 @@ try
             AutoConfigURL           = $testAutoConfigURL
         }
 
+        Describe "$script:DSCResourceName\Get-TargetResource" {
+            Context 'The No Proxy Settings are Defined' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return the expected values' {
+                    $script:getTargetResourceResult.Ensure | Should Be 'Absent'
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-VerifiableMock
+                }
+            }
+
+            Context 'The DefaultConnectionSettings Proxy Settings are Defined' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -MockWith {
+                        @{ DefaultConnectionSettings = [System.Byte[]] (0x46) }
+                    } `
+                    -Verifiable
+                Mock `
+                    -CommandName ConvertFrom-ProxySettingsBinary `
+                    -MockWith {
+                        return $testProxyAllEnabledWithBypassLocalSettings
+                    } `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return the expected values' {
+                    $script:getTargetResourceResult.Ensure | Should Be 'Present'
+                    $script:getTargetResourceResult.EnableAutoDetection | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoDetection
+                    $script:getTargetResourceResult.EnableManualProxy | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableManualProxy
+                    $script:getTargetResourceResult.ProxyServer | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServer
+                    $script:getTargetResourceResult.ProxyServerBypassLocal | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerBypassLocal
+                    $script:getTargetResourceResult.ProxyServerExceptions | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerExceptions
+                    $script:getTargetResourceResult.EnableAutoConfiguration | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoConfiguration
+                    $script:getTargetResourceResult.AutoConfigURL | Should Be $testProxyAllEnabledWithBypassLocalSettings.AutoConfigURL
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-VerifiableMock
+                }
+            }
+
+            Context 'The SavedLegacySettings Proxy Settings are Defined' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -MockWith {
+                        @{ SavedLegacySettings = [System.Byte[]] (0x46) }
+                    } `
+                    -Verifiable
+                Mock `
+                    -CommandName ConvertFrom-ProxySettingsBinary `
+                    -MockWith {
+                        return $testProxyAllEnabledWithBypassLocalSettings
+                    } `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return the expected values' {
+                    $script:getTargetResourceResult.Ensure | Should Be 'Present'
+                    $script:getTargetResourceResult.EnableAutoDetection | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoDetection
+                    $script:getTargetResourceResult.EnableManualProxy | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableManualProxy
+                    $script:getTargetResourceResult.ProxyServer | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServer
+                    $script:getTargetResourceResult.ProxyServerBypassLocal | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerBypassLocal
+                    $script:getTargetResourceResult.ProxyServerExceptions | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerExceptions
+                    $script:getTargetResourceResult.EnableAutoConfiguration | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoConfiguration
+                    $script:getTargetResourceResult.AutoConfigURL | Should Be $testProxyAllEnabledWithBypassLocalSettings.AutoConfigURL
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-VerifiableMock
+                }
+            }
+        }
+
+        Describe "$script:DSCResourceName\Test-ProxySettings" {
+            Context 'All Proxy Types Disabled' {
+                It 'Should not throw exception' {
+                    { $script:testProxySettingsResult = Test-ProxySettings `
+                            -CurrentValues $testProxyAllDisabledSettings `
+                            -DesiredValues $testProxyAllDisabledSettings `
+                            -Verbose } | Should Not Throw
+                }
+
+                It 'Should return true' {
+                    $script:testProxySettingsResult | Should Be $true
+                }
+            }
+
+            Context 'All Proxy Types Enabled and Proxy Bypass Local Disabled with all Values Matching' {
+                It 'Should not throw exception' {
+                    { $script:testProxySettingsResult = Test-ProxySettings `
+                            -CurrentValues $testProxyAllEnabledWithoutBypassLocalSettings `
+                            -DesiredValues $testProxyAllEnabledWithoutBypassLocalSettings `
+                            -Verbose  } | Should Not Throw
+                }
+
+                It 'Should return true' {
+                    $script:testProxySettingsResult | Should Be $true
+                }
+            }
+
+            Context 'All Proxy Types Enabled and Proxy Bypass Local Enabled with all Values Matching' {
+                It 'Should not throw exception' {
+                    { $script:testProxySettingsResult = Test-ProxySettings `
+                            -CurrentValues $testProxyAllEnabledWithBypassLocalSettings `
+                            -DesiredValues $testProxyAllEnabledWithBypassLocalSettings `
+                            -Verbose  } | Should Not Throw
+                }
+
+                It 'Should return true' {
+                    $script:testProxySettingsResult | Should Be $true
+                }
+            }
+
+            Context 'All Proxy Types Enabled and Proxy Bypass Local Enabled with Bypass Local Not Matching' {
+                It 'Should not throw exception' {
+                    { $script:testProxySettingsResult = Test-ProxySettings `
+                            -CurrentValues $testProxyAllEnabledWithBypassLocalSettings `
+                            -DesiredValues $testProxyAllEnabledWithoutBypassLocalSettings `
+                            -Verbose  } | Should Not Throw
+                }
+
+                It 'Should return false' {
+                    $script:testProxySettingsResult | Should Be $false
+                }
+            }
+
+            Context 'Only Manual Proxy Server type Enabled with Exceptions Only that Match' {
+                It 'Should not throw exception' {
+                    { $script:testProxySettingsResult = Test-ProxySettings `
+                            -CurrentValues $testProxyManualProxyWithExceptionsSettings `
+                            -DesiredValues $testProxyManualProxyWithExceptionsSettings `
+                            -Verbose  } | Should Not Throw
+                }
+
+                It 'Should return true' {
+                    $script:testProxySettingsResult | Should Be $true
+                }
+            }
+
+            Context 'Only Manual Proxy Server type Enabled with Exceptions Only that do not Match' {
+                It 'Should not throw exception' {
+                    { $script:testProxySettingsResult = Test-ProxySettings `
+                            -CurrentValues $testProxyManualProxyWithExceptionsSettings `
+                            -DesiredValues $testProxyManualProxyWithAlternateExceptionsSettings `
+                            -Verbose  } | Should Not Throw
+                }
+
+                It 'Should return false' {
+                    $script:testProxySettingsResult | Should Be $false
+                }
+            }
+        }
+
         Describe "$script:DSCResourceName\Convert*-ProxySettingsBinary" {
             Context 'All Proxy Types Disabled' {
                 It 'Should not throw exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllDisabledSettings } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllDisabledSettings -Verbose } | Should Not Throw
                 }
 
                 It 'Should not throw exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {
@@ -108,11 +285,11 @@ try
 
             Context 'Only Manual Proxy Server type Enabled' {
                 It 'Should not throw exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxySettings } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxySettings -Verbose } | Should Not Throw
                 }
 
                 It 'Should not throw exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {
@@ -128,11 +305,11 @@ try
 
             Context 'Only Manual Proxy Server type Enabled with Exceptions Only' {
                 It 'Should not throw exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxyWithExceptionsSettings } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxyWithExceptionsSettings -Verbose } | Should Not Throw
                 }
 
                 It 'Should not throw exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {
@@ -148,11 +325,11 @@ try
 
             Context 'Only Manual Proxy Server type Enabled with Bypass Local Only' {
                 It 'Should not throw exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxyWithBypassLocalOnlySettings } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxyWithBypassLocalOnlySettings -Verbose } | Should Not Throw
                 }
 
                 It 'Should not throw exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {
@@ -168,11 +345,11 @@ try
 
             Context 'Only Auto Config Proxy type Enabled' {
                 It 'Should not throw exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAutoConfigOnlySettings } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAutoConfigOnlySettings -Verbose } | Should Not Throw
                 }
 
                 It 'Should not throw exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {
@@ -188,11 +365,11 @@ try
 
             Context 'All Proxy Types Enabled and Proxy Bypass Local Disabled' {
                 It 'Should not throw exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllEnabledWithoutBypassLocalSettings } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllEnabledWithoutBypassLocalSettings -Verbose } | Should Not Throw
                 }
 
                 It 'Should not throw exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {
@@ -208,11 +385,11 @@ try
 
             Context 'All Proxy Types Enabled and Proxy Bypass Local Enabled' {
                 It 'Should not throw exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllEnabledWithBypassLocalSettings } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllEnabledWithBypassLocalSettings -Verbose } | Should Not Throw
                 }
 
                 It 'Should not throw exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {

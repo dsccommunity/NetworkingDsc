@@ -492,7 +492,7 @@ function Test-ProxySettings
     # Test the array value
     if ($DesiredValues.ContainsKey('ProxyServerExceptions') `
         -and $CurrentValues.ProxyServerExceptions `
-        -and (Compare-Object `
+        -and @(Compare-Object `
             -ReferenceObject $DesiredValues.ProxyServerExceptions `
             -DifferenceObject $CurrentValues.ProxyServerExceptions).Count -gt 0)
     {
