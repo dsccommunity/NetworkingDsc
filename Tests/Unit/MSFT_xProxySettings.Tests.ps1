@@ -94,6 +94,8 @@ try
             AutoConfigURL           = $testAutoConfigURL
         }
 
+        [System.Byte[]] $testBinary = @(0x46, 0x0, 0x0, 0x0, 0x8, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0)
+
         Describe "$script:DSCResourceName\Get-TargetResource" {
             Context 'No Proxy Settings are Defined in the Registry' {
                 Mock `
@@ -117,7 +119,7 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ DefaultConnectionSettings = [System.Byte[]] (0x46) }
+                        @{ DefaultConnectionSettings = $testBinary }
                     } `
                     -Verifiable
                 Mock `
@@ -151,7 +153,7 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ SavedLegacySettings = [System.Byte[]] (0x46) }
+                        @{ SavedLegacySettings = $testBinary }
                     } `
                     -Verifiable
                 Mock `
@@ -365,7 +367,7 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ DefaultConnectionSettings = [System.Byte[]] (0x46) }
+                        @{ DefaultConnectionSettings = $testBinary }
                     } `
                     -Verifiable
 
@@ -388,7 +390,7 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ DefaultConnectionSettings = [System.Byte[]] (0x46) }
+                        @{ DefaultConnectionSettings = $testBinary }
                     } `
                     -Verifiable
 
@@ -411,7 +413,7 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ SavedLegacySettings = [System.Byte[]] (0x46) }
+                        @{ SavedLegacySettings = $testBinary }
                     } `
                     -Verifiable
 
@@ -434,7 +436,7 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ SavedLegacySettings = [System.Byte[]] (0x46) }
+                        @{ SavedLegacySettings = $testBinary }
                     } `
                     -Verifiable
 
@@ -449,6 +451,198 @@ try
                 It 'Should call expected mocks' {
                     Assert-MockCalled `
                         -CommandName Get-ItemProperty `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'DefaultConnectionSettings are Defined in the Registry but are Different for Default Connection Type' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -MockWith {
+                        @{ DefaultConnectionSettings = $testBinary }
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Test-ProxySettings `
+                    -MockWith { $false } `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return false' {
+                    $script:testTargetResourceResult | Should Be $False
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Test-ProxySettings `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'SavedLegacySettings are Defined in the Registry but are Different for Legacy Connection Type' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -MockWith {
+                        @{ SavedLegacySettings = $testBinary }
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Test-ProxySettings `
+                    -MockWith { $false } `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return false' {
+                    $script:testTargetResourceResult | Should Be $False
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Test-ProxySettings `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'DefaultConnectionSettings are Defined in the Registry and matches for Default Connection Type' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -MockWith {
+                        @{ DefaultConnectionSettings = $testBinary }
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Test-ProxySettings `
+                    -MockWith { $true } `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return true' {
+                    $script:testTargetResourceResult | Should Be $True
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Test-ProxySettings `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'SavedLegacySettings are Defined in the Registry and matches for Legacy Connection Type' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -MockWith {
+                        @{ SavedLegacySettings = $testBinary }
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Test-ProxySettings `
+                    -MockWith { $true } `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return true' {
+                    $script:testTargetResourceResult | Should Be $True
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Test-ProxySettings `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'DefaultConnectionSettings are Defined in the Registry but Legacy Connection Type settings required' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -MockWith {
+                        @{ DefaultConnectionSettings = $testBinary }
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Test-ProxySettings `
+                    -MockWith { $false } `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return false' {
+                    $script:testTargetResourceResult | Should Be $False
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Test-ProxySettings `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'DefaultConnectionSettings are Defined in the Registry but Default Connection Type settings required' {
+                Mock `
+                    -CommandName Get-ItemProperty `
+                    -MockWith {
+                        @{ SavedLegacySettings = $testBinary }
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Test-ProxySettings `
+                    -MockWith { $false } `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should Not Throw
+                }
+
+                It 'Should return false' {
+                    $script:testTargetResourceResult | Should Be $False
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Test-ProxySettings `
                         -Exactly -Times 1
                 }
             }
