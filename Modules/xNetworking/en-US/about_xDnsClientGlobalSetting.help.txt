@@ -1,0 +1,52 @@
+﻿.NAME
+    xDnsClientGlobalSetting
+
+# Description
+    
+    This resource is used to control global DNS client settings for a node.
+    
+.PARAMETER IsSingleInstance
+    Key - String
+    Allowed values: Yes
+    Specifies the resource is a single instance, the value must be 'Yes'.
+
+.PARAMETER SuffixSearchList
+    Write - String
+    Specifies a list of global suffixes that can be used in the specified order by the DNS client for resolving the IP address of the computer name.
+
+.PARAMETER UseDevolution
+    Write - Boolean
+    Specifies that devolution is activated.
+
+.PARAMETER DevolutionLevel
+    Write - Uint32
+    Specifies the number of labels up to which devolution should occur.
+
+
+    .EXAMPLE
+    Configure only contoso.com for the DNS Suffix
+
+Configuration Example
+{
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
+    )
+
+    Import-DscResource -Module xNetworking
+
+    Node $NodeName
+    {
+        xDnsClientGlobalSetting AddDNSSuffix
+        {
+            IsSingleInstance = 'Yes'
+            SuffixSearchList = 'contoso.com'
+            UseDevolution    = $true
+            DevolutionLevel  = 0
+        }
+    }
+}
+
+
