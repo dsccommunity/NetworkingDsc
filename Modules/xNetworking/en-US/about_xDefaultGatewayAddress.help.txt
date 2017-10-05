@@ -1,0 +1,71 @@
+﻿.NAME
+    xDefaultGatewayAddress
+
+# Description
+    
+    The resource is responsible for creating and managing the Default Gateway for
+    an interface on a node.
+    
+.PARAMETER InterfaceAlias
+    Key - string
+    Alias of the network interface for which the default gateway address is set.
+
+.PARAMETER AddressFamily
+    Key - string
+    Allowed values: IPv4,  IPv6
+    IP address family.
+
+.PARAMETER Address
+    Write - string
+    The desired default gateway address - if not provided default gateway will be removed.
+
+
+    .EXAMPLE
+    Removing the default gateway from an interface
+
+Configuration Example
+{
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
+    )
+
+    Import-DscResource -Module xNetworking
+    Node $NodeName
+    {
+        xDefaultGatewayAddress RemoveDefaultGateway
+        {
+            InterfaceAlias = 'Ethernet'
+            AddressFamily  = 'IPv4'
+        }
+    }
+}
+
+
+    .EXAMPLE
+    Adding a default gateway to the interface
+
+Configuration Example
+{
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
+    )
+
+    Import-DscResource -Module xNetworking
+    Node $NodeName
+    {
+        xDefaultGatewayAddress SetDefaultGateway
+        {
+            Address        = '192.168.1.1'
+            InterfaceAlias = 'Ethernet'
+            AddressFamily  = 'IPv6'
+        }
+    }
+}
+
+

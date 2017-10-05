@@ -1,0 +1,43 @@
+﻿.NAME
+    xNetAdapterRss
+
+# Description
+    
+    This resource is used to enable or disable RSS (Receive Side Scaling) on a network adapter.
+    Not all adapters support RSS so there may be no option for this and it will throw an exception that the network adapter is not found.
+    
+    
+.PARAMETER Name
+    Key - String
+    Specifies the Name of network adapter.
+
+.PARAMETER Enabled
+    Required - Boolean
+    Specifies whether RSS should be enabled or disabled.
+
+
+    .EXAMPLE
+    This configuration disables RSS on the network adapter.
+
+Configuration Example
+{
+    param
+    (
+        [Parameter()]
+        [System.String[]] 
+        $NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xNetAdapterRss EnableRss
+        {
+            Name = 'Ethernet'
+            Enabled = $True
+        }
+    }
+}
+
+

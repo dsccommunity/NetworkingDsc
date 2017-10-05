@@ -39,6 +39,12 @@ try
             VlanID              = 100
         }
 
+        $MockTeamNicDefaultVLAN = [PSObject] @{
+            Name                = $TestTeamNic.Name
+            Team                = $TestTeamNic.TeamName
+            VlanID              = $null
+        }
+
         Describe "$($Global:DSCResourceName)\Get-TargetResource" {
 
             Context 'Team Interface does not exist' {
@@ -197,6 +203,19 @@ try
                     $updateTeamNic = $newTeamNic.Clone()
                     $updateTeamNic.Ensure = 'Absent'
                     Test-TargetResource @updateTeamNic | Should Be $true
+                }
+                It 'should call expected Mocks' {
+                    Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
+                }
+            }
+
+            Context 'Team Interface exists on the default 0 VLAN' {
+                Mock Get-NetLbfoTeamNic -MockWith { $MockTeamNicDefaultVLAN }
+
+                It 'should return true' {
+                    $TeamNicOnDefaultVLAN = $newTeamNic.Clone()
+                    $TeamNicOnDefaultVLAN.VlanID = 0
+                    Test-TargetResource @TeamNicOnDefaultVLAN | Should Be $true
                 }
                 It 'should call expected Mocks' {
                     Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1

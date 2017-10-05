@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 5.2.0.0
+
+- Added `Documentation and Examples` section to Readme.md file - see
+  [issue #259](https://github.com/PowerShell/xNetworking/issues/259).
+- Prevent unit tests from DSCResource.Tests from running during test
+  execution - fixes [Issue #264](https://github.com/PowerShell/xNetworking/issues/264).
+- MSFT_xNetworkTeamInterface:
+  - Updated Test-TargetResource to substitute VLANID value 0 to $null
+- MSFT_xNetAdapterRsc:
+  - Created new resource configuring Rsc
+- MSFT_xNetAdapterRss:
+  - Created new resource configuring Rss
+- MSFT_xHostsFile:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+
 ## 5.1.0.0
 
 - MSFT_xDhcpClient:

@@ -205,12 +205,21 @@ function Test-TargetResource
     Write-Verbose -Message ($LocalizedData.GetTeamNicInfo -f $Name)
     $teamNic = Get-NetLbfoTeamNic -Name $Name -Team $TeamName -ErrorAction SilentlyContinue
 
+    if ($VlanID -eq 0)
+    {
+        $VlanValue = $null
+    }
+    else
+    {
+        $VlanValue = $VlanID
+    }
+
     if ($Ensure -eq "Present")
     {
         if ($teamNic)
         {
             Write-Verbose -Message ($LocalizedData.FoundTeamNic -f $Name)
-            if ($teamNic.VlanID -eq $VlanID)
+            if ($teamNic.VlanID -eq $VlanValue)
             {
                 Write-Verbose -Message ($LocalizedData.TeamNicExistsNoAction -f $Name)
                 return $true

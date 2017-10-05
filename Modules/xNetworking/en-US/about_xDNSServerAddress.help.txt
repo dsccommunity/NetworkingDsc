@@ -1,0 +1,112 @@
+﻿.NAME
+    xDNSServerAddress
+
+# Description
+    
+    This resource is used to control a node's DNS Server address(s).
+    
+.PARAMETER InterfaceAlias
+    Key - string
+    Alias of the network interface for which the DNS server address is set.
+
+.PARAMETER AddressFamily
+    Key - string
+    Allowed values: IPv4,  IPv6
+    IP address family.
+
+.PARAMETER Address
+    Write - string
+    The desired DNS Server address(es). Exclude to enable DHCP.
+
+.PARAMETER Validate
+    Write - boolean
+    Requires that the DNS Server addresses be validated if they are updated. It will cause the resource to throw a 'A general error occurred that is not covered by a more specific error code.' error if set to True and specified DNS Servers are not accessible.
+
+
+    .EXAMPLE
+    Configure DNS Server for the Ethernet adapter
+
+Configuration Example
+{
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
+    )
+
+    Import-DscResource -Module xNetworking
+
+    Node $NodeName
+    {
+        xDnsServerAddress DnsServerAddress
+        {
+            Address        = '127.0.0.1'
+            InterfaceAlias = 'Ethernet'
+            AddressFamily  = 'IPv4'
+            Validate       = $true
+        }
+    }
+}
+
+
+    .EXAMPLE
+    Configure primary and secondary DNS Server addresses on the Ethernet adapter
+
+Configuration Example
+{
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
+    )
+
+    Import-DscResource -Module xNetworking
+
+    Node $NodeName
+    {
+        xDnsServerAddress DnsServerAddress
+        {
+            Address        = '10.0.0.2','10.0.0.40'
+            InterfaceAlias = 'Ethernet'
+            AddressFamily  = 'IPv4'
+            Validate       = $true
+        }
+    }
+}
+
+
+    .EXAMPLE
+    Enabling DHCP for the IP Address and DNS on the adapter with alias 'Ethernet'.
+
+Configuration Example
+{
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
+    )
+
+    Import-DscResource -Module xNetworking
+
+    Node $NodeName
+    {
+        xDhcpClient EnableDhcpClient
+        {
+            State          = 'Enabled'
+            InterfaceAlias = 'Ethernet'
+            AddressFamily  = 'IPv4'
+        }
+
+        xDnsServerAddress EnableDhcpDNS
+        {
+            InterfaceAlias = 'Ethernet'
+            AddressFamily  = 'IPv4'
+        }
+
+    }
+}
+
+

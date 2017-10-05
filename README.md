@@ -20,6 +20,9 @@ The **xNetworking** module contains the following resources:
 - **xNetAdapterRDMA**: Enable or disable RDMA on a network adapter.
 - **xNetAdapterLso**: Enable or disable Lso for different protocols
     on a network adapter.
+- **xNetAdapterRsc**: Enable or disable Rsc for different protocols
+    on a network adapter.
+- **xNetAdapterRss**: Enable or disable Rss on a network adapter.
 - **xNetAdapterName**: Rename a network interface that matches specified search parameters.
 - **xFirewallProfile**: Configures a node's private, public or domain firewall profile.
 
@@ -27,6 +30,11 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)
 or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any
 additional questions or comments.
+
+## Documentation and Examples
+
+For a full list of resources in xNetworking and examples on their use, check out
+the [xNetworking wiki](https://github.com/PowerShell/xNetworking/wiki).
 
 ## Branches
 

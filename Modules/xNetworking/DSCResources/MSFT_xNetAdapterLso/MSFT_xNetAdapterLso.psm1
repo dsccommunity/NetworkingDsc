@@ -34,28 +34,34 @@ function Get-TargetResource
     [OutputType([Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $Name,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet("V1IPv4","IPv4","IPv6")]
         [String]
         $Protocol,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [Boolean]
         $State
     )
-
-    try 
-    {
+  
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
+    try 
+    {
         $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+    }
+    catch 
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+    }
 
         if ($netAdapter)
         {
@@ -68,20 +74,24 @@ function Get-TargetResource
                 Name = $Name
                 Protocol = $Protocol
             }
-            switch ($Protocol) {
-                "V1IPv4" { $result.add('State', $netAdapter.V1IPv4Enabled) }
-                "IPv4"   { $result.add('State', $netAdapter.IPv4Enabled) }
-                "IPv6"   { $result.add('State', $netAdapter.IPv6Enabled) }
-                Default {"Should not be called."}
+            switch ($Protocol) 
+            {
+                "V1IPv4" 
+                { 
+                    $result.add('State', $netAdapter.V1IPv4Enabled) 
+                }
+                "IPv4"   
+                { 
+                    $result.add('State', $netAdapter.IPv4Enabled) 
+                }
+                "IPv6"   
+                { 
+                    $result.add('State', $netAdapter.IPv6Enabled) 
+                }
+
             }
             return $result
         }
-    }
-    catch 
-    {
-        throw $localizedData.NetAdapterNotFoundMessage
-    }
-
 }
 
 <#
@@ -102,28 +112,34 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $Name,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet("V1IPv4","IPv4","IPv6")]
         [String]
         $Protocol,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [Boolean]
         $State
     )
 
-    try 
-    {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
+    try 
+    {
         $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+    }
+    catch 
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+    }
 
         if ($netAdapter)
         {
@@ -163,12 +179,6 @@ function Set-TargetResource
                 Set-NetAdapterLso -Name $Name -IPv6Enabled $State
             }
         }
-    }
-    catch 
-    {
-        throw $LocalizedData.NetAdapterNotFoundMessage
-    }
-
 }
 
 <#
@@ -190,28 +200,35 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [String]
         $Name,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet("V1IPv4","IPv4","IPv6")]
         [String]
         $Protocol,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [Boolean]
         $State
     )
 
-    try 
-    {
+
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
+    try 
+    {
         $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+    }
+    catch 
+    {
+        New-InvalidOperationException `
+            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+    }
 
         if ($netAdapter) 
         {
@@ -221,17 +238,20 @@ function Test-TargetResource
                 $Name, $Protocol
             ) -join '')
 
-            switch ($Protocol) {
-                "V1IPv4" { return ($State -eq $netAdapter.V1IPv4Enabled) }
-                "IPv4"   { return ($State -eq $netAdapter.IPv4Enabled) }
-                "IPv6"   { return ($State -eq $netAdapter.IPv6Enabled) }
-                Default {"Should not be called."}
+            switch ($Protocol) 
+            {
+                "V1IPv4" 
+                { 
+                    return ($State -eq $netAdapter.V1IPv4Enabled) 
+                }
+                "IPv4"   
+                { 
+                    return ($State -eq $netAdapter.IPv4Enabled) 
+                }
+                "IPv6"   
+                { 
+                    return ($State -eq $netAdapter.IPv6Enabled) 
+                }
             }
         }
-    }
-    catch 
-    {
-        throw $LocalizedData.NetAdapterNotFoundMessage
-    }
-
 }

@@ -2,13 +2,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
@@ -38,12 +38,14 @@ function Get-TargetResource
         [System.String]
         $HostName,
 
+        [Parameter()]
         [System.String]
         $IPAddress,
 
-        [ValidateSet("Present","Absent")]
+        [Parameter()]
+        [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = "Present"
+        $Ensure = 'Present'
     )
 
     Write-Verbose -Message ($LocalizedData.StartingGet -f $HostName)
@@ -55,7 +57,7 @@ function Get-TargetResource
         return @{
             HostName  = $result.HostName
             IPAddress = $result.IPAddress
-            Ensure    = "Present"
+            Ensure    = 'Present'
         }
     }
     else
@@ -63,7 +65,7 @@ function Get-TargetResource
         return @{
             HostName  = $HostName
             IPAddress = $null
-            Ensure    = "Absent"
+            Ensure    = 'Absent'
         }
     }
 }
@@ -90,12 +92,14 @@ function Set-TargetResource
         [System.String]
         $HostName,
 
+        [Parameter()]
         [System.String]
         $IPAddress,
 
-        [ValidateSet("Present","Absent")]
+        [Parameter()]
+        [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = "Present"
+        $Ensure = 'Present'
     )
 
     $hostPath = "$env:windir\System32\drivers\etc\hosts"
@@ -103,14 +107,14 @@ function Set-TargetResource
 
     Write-Verbose -Message ($LocalizedData.StartingSet -f $HostName)
 
-    if ($Ensure -eq "Present" -and $PSBoundParameters.ContainsKey("IPAddress") -eq $false)
+    if ($Ensure -eq 'Present' -and $PSBoundParameters.ContainsKey('IPAddress') -eq $false)
     {
         New-InvalidArgumentException `
-            -Message $($($LocalizedData.UnableToEnsureWithoutIP) -f $Address,$AddressFamily) `
+            -Message $($($LocalizedData.UnableToEnsureWithoutIP) -f $Address, $AddressFamily) `
             -ArgumentName 'IPAddress'
     }
 
-    if ($currentValues.Ensure -eq "Absent" -and $Ensure -eq "Present")
+    if ($currentValues.Ensure -eq 'Absent' -and $Ensure -eq 'Present')
     {
         Write-Verbose -Message ($LocalizedData.CreateNewEntry -f $HostName)
         Add-Content -Path $hostPath -Value "`r`n$IPAddress`t$HostName"
@@ -118,23 +122,25 @@ function Set-TargetResource
     else
     {
         $hosts = Get-Content -Path $hostPath
-        $replace = $hosts | Where-Object {
-            [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false
-        } | Where-Object { $_ -like "*$HostName*" }
+        $replace = $hosts | Where-Object -FilterScript {
+            [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false -and $_ -like "*$HostName*"
+        }
 
         $multiLineEntry = $false
         $data = $replace -split '\s+'
+
         if ($data.Length -gt 2)
         {
             $multiLineEntry = $true
         }
 
-        if ($Ensure -eq "Present")
+        if ($Ensure -eq 'Present')
         {
             Write-Verbose -Message ($LocalizedData.UpdateExistingEntry -f $HostName)
+
             if ($multiLineEntry -eq $true)
             {
-                $newReplaceLine = $replace -replace $HostName, ""
+                $newReplaceLine = $replace -replace $HostName, ''
                 $hosts = $hosts -replace $replace, $newReplaceLine
                 $hosts += "$IPAddress`t$HostName"
             }
@@ -146,14 +152,15 @@ function Set-TargetResource
         else
         {
             Write-Verbose -Message ($LocalizedData.RemoveEntry -f $HostName)
+
             if ($multiLineEntry -eq $true)
             {
-                $newReplaceLine = $replace -replace $HostName, ""
+                $newReplaceLine = $replace -replace $HostName, ''
                 $hosts = $hosts -replace $replace, $newReplaceLine
             }
             else
             {
-                $hosts = $hosts -replace $replace, ""
+                $hosts = $hosts -replace $replace, ''
             }
         }
 
@@ -184,15 +191,18 @@ function Test-TargetResource
         [System.String]
         $HostName,
 
+        [Parameter()]
         [System.String]
         $IPAddress,
 
-        [ValidateSet("Present","Absent")]
+        [Parameter()]
+        [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = "Present"
+        $Ensure = 'Present'
     )
 
     $currentValues = Get-TargetResource @PSBoundParameters
+
     Write-Verbose -Message ($LocalizedData.StartingTest -f $HostName)
 
     if ($Ensure -ne $currentValues.Ensure)
@@ -200,10 +210,11 @@ function Test-TargetResource
         return $false
     }
 
-    if ($Ensure -eq "Present" -and $IPAddress -ne $currentValues.IPAddress)
+    if ($Ensure -eq 'Present' -and $IPAddress -ne $currentValues.IPAddress)
     {
         return $false
     }
+
     return $true
 }
 
@@ -216,16 +227,22 @@ function Get-HostEntry
         $HostName
     )
 
-    $allHosts = Get-Content -Path "$env:windir\System32\drivers\etc\hosts" |
-        Where-Object { [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false }
+    $hostPath = "$env:windir\System32\drivers\etc\hosts"
+
+    $allHosts = Get-Content -Path $hostPath | Where-Object -FilterScript {
+        [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false
+    }
+
     foreach ($hosts in $allHosts)
     {
         $data = $hosts -split '\s+'
+
         if ($data.Length -gt 2)
         {
             # Account for host entries that have multiple entries on a single line
             $result = @()
             $array = @()
+
             for ($i = 1; $i -lt $data.Length; $i++)
             {
                 <#
