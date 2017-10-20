@@ -50,6 +50,7 @@ try
                 & "$($script:DSCResourceName)_Present_Config" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
+
                 Start-DscConfiguration `
                     -Path $TestDrive `
                     -ComputerName localhost `
@@ -57,7 +58,7 @@ try
                     -Verbose `
                     -Force `
                     -ErrorAction Stop
-            } | Should not throw
+            } | Should Not Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
@@ -93,6 +94,7 @@ try
             {
                 & "$($script:DSCResourceName)_Absent_Config" `
                     -OutputPath $TestDrive
+
                 Start-DscConfiguration `
                     -Path $TestDrive `
                     -ComputerName localhost `
@@ -100,7 +102,7 @@ try
                     -Verbose `
                     -Force `
                     -ErrorAction Stop
-            } | Should not throw
+            } | Should Not Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {

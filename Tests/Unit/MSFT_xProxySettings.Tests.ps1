@@ -102,7 +102,7 @@ try
                     -CommandName Get-ItemProperty `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should Not Throw
                 }
 
@@ -122,6 +122,7 @@ try
                         @{ DefaultConnectionSettings = $testBinary }
                     } `
                     -Verifiable
+
                 Mock `
                     -CommandName ConvertFrom-ProxySettingsBinary `
                     -MockWith {
@@ -129,7 +130,7 @@ try
                     } `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should Not Throw
                 }
 
@@ -156,6 +157,7 @@ try
                         @{ SavedLegacySettings = $testBinary }
                     } `
                     -Verifiable
+
                 Mock `
                     -CommandName ConvertFrom-ProxySettingsBinary `
                     -MockWith {
@@ -163,7 +165,7 @@ try
                     } `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should Not Throw
                 }
 
@@ -194,7 +196,7 @@ try
                     -CommandName Remove-ItemProperty `
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should Not Throw
                 }
 
@@ -220,7 +222,7 @@ try
                     -CommandName Remove-ItemProperty `
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Default' -Verbose } | Should Not Throw
                 }
 
@@ -246,7 +248,7 @@ try
                     -CommandName Remove-ItemProperty `
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
                 }
 
@@ -272,7 +274,7 @@ try
                     -CommandName Set-BinaryRegistryValue `
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'All' -Verbose } | Should Not Throw
                 }
 
@@ -298,7 +300,7 @@ try
                     -CommandName Set-BinaryRegistryValue `
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should Not Throw
                 }
 
@@ -324,7 +326,7 @@ try
                     -CommandName Set-BinaryRegistryValue `
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
                 }
 
@@ -348,7 +350,7 @@ try
                     -CommandName Get-ItemProperty `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should Not Throw
                 }
 
@@ -371,7 +373,7 @@ try
                     } `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should Not Throw
                 }
 
@@ -394,7 +396,7 @@ try
                     } `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
                 }
 
@@ -417,7 +419,7 @@ try
                     } `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should Not Throw
                 }
 
@@ -440,7 +442,7 @@ try
                     } `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Default' -Verbose } | Should Not Throw
                 }
 
@@ -468,7 +470,7 @@ try
                     -MockWith { $false } `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should Not Throw
                 }
 
@@ -500,7 +502,7 @@ try
                     -MockWith { $false } `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
                 }
 
@@ -532,7 +534,7 @@ try
                     -MockWith { $true } `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should Not Throw
                 }
 
@@ -564,7 +566,7 @@ try
                     -MockWith { $true } `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
                 }
 
@@ -596,7 +598,7 @@ try
                     -MockWith { $false } `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
                 }
 
@@ -628,7 +630,7 @@ try
                     -MockWith { $false } `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should Not Throw
                 }
 
@@ -650,7 +652,7 @@ try
 
         Describe "$script:DSCResourceName\Test-ProxySettings" {
             Context 'All Proxy Types Disabled' {
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllDisabledSettings `
                             -DesiredValues $testProxyAllDisabledSettings `
@@ -663,7 +665,7 @@ try
             }
 
             Context 'All Proxy Types Enabled and Proxy Bypass Local Disabled with all Values Matching' {
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllEnabledWithoutBypassLocalSettings `
                             -DesiredValues $testProxyAllEnabledWithoutBypassLocalSettings `
@@ -676,7 +678,7 @@ try
             }
 
             Context 'All Proxy Types Enabled and Proxy Bypass Local Enabled with all Values Matching' {
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllEnabledWithBypassLocalSettings `
                             -DesiredValues $testProxyAllEnabledWithBypassLocalSettings `
@@ -689,7 +691,7 @@ try
             }
 
             Context 'All Proxy Types Enabled and Proxy Bypass Local Enabled with Bypass Local Not Matching' {
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllEnabledWithBypassLocalSettings `
                             -DesiredValues $testProxyAllEnabledWithoutBypassLocalSettings `
@@ -702,7 +704,7 @@ try
             }
 
             Context 'Only Manual Proxy Server type Enabled with Exceptions Only that Match' {
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyManualProxyWithExceptionsSettings `
                             -DesiredValues $testProxyManualProxyWithExceptionsSettings `
@@ -715,7 +717,7 @@ try
             }
 
             Context 'Only Manual Proxy Server type Enabled with Exceptions Only that do not Match' {
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyManualProxyWithExceptionsSettings `
                             -DesiredValues $testProxyManualProxyWithAlternateExceptionsSettings `
@@ -730,11 +732,11 @@ try
 
         Describe "$script:DSCResourceName\Convert*-ProxySettingsBinary" {
             Context 'All Proxy Types Disabled' {
-                It 'Should not throw exception when converting to Proxy Settings Binary' {
+                It 'Should not throw an exception when converting to Proxy Settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllDisabledSettings -Verbose } | Should Not Throw
                 }
 
-                It 'Should not throw exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from Proxy Settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 
@@ -750,11 +752,11 @@ try
             }
 
             Context 'Only Manual Proxy Server type Enabled' {
-                It 'Should not throw exception when converting to Proxy Settings Binary' {
+                It 'Should not throw an exception when converting to Proxy Settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxySettings -Verbose } | Should Not Throw
                 }
 
-                It 'Should not throw exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from Proxy Settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 
@@ -770,11 +772,11 @@ try
             }
 
             Context 'Only Manual Proxy Server type Enabled with Exceptions Only' {
-                It 'Should not throw exception when converting to Proxy Settings Binary' {
+                It 'Should not throw an exception when converting to Proxy Settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxyWithExceptionsSettings -Verbose } | Should Not Throw
                 }
 
-                It 'Should not throw exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from Proxy Settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 
@@ -790,11 +792,11 @@ try
             }
 
             Context 'Only Manual Proxy Server type Enabled with Bypass Local Only' {
-                It 'Should not throw exception when converting to Proxy Settings Binary' {
+                It 'Should not throw an exception when converting to Proxy Settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxyWithBypassLocalOnlySettings -Verbose } | Should Not Throw
                 }
 
-                It 'Should not throw exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from Proxy Settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 
@@ -810,11 +812,11 @@ try
             }
 
             Context 'Only Auto Config Proxy type Enabled' {
-                It 'Should not throw exception when converting to Proxy Settings Binary' {
+                It 'Should not throw an exception when converting to Proxy Settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAutoConfigOnlySettings -Verbose } | Should Not Throw
                 }
 
-                It 'Should not throw exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from Proxy Settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 
@@ -830,11 +832,11 @@ try
             }
 
             Context 'All Proxy Types Enabled and Proxy Bypass Local Disabled' {
-                It 'Should not throw exception when converting to Proxy Settings Binary' {
+                It 'Should not throw an exception when converting to Proxy Settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllEnabledWithoutBypassLocalSettings -Verbose } | Should Not Throw
                 }
 
-                It 'Should not throw exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from Proxy Settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 
@@ -850,11 +852,11 @@ try
             }
 
             Context 'All Proxy Types Enabled and Proxy Bypass Local Enabled' {
-                It 'Should not throw exception when converting to Proxy Settings Binary' {
+                It 'Should not throw an exception when converting to Proxy Settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllEnabledWithBypassLocalSettings -Verbose } | Should Not Throw
                 }
 
-                It 'Should not throw exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from Proxy Settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
                 }
 

@@ -22,11 +22,11 @@ $script:connectionsRegistryKeyPath = 'SOFTWARE\Microsoft\Windows\CurrentVersion\
 <#
     .SYNOPSIS
         Returns the current state of the proxy settings for
-        the computer.
+        the computer. Not used in Get-TargetResource.
 
     .PARAMETER IsSingleInstance
         Specifies the resource is a single instance, the
-        value must be 'Yes'.
+        value must be 'Yes'. Not used in Get-TargetResource.
 #>
 function Get-TargetResource
 {
@@ -211,11 +211,13 @@ function Set-TargetResource
             ) -join '')
 
         # Generate the Proxy Settings binary value
-        $null = $PSBoundParameters.Remove('IsSingleInstance')
-        $null = $PSBoundParameters.Remove('Ensure')
-        $null = $PSBoundParameters.Remove('ConnectionType')
+        $convertToProxySettingsBinaryParameters = @{} + $PSBoundParameters
 
-        $proxySettings = ConvertTo-ProxySettingsBinary @PSBoundParameters
+        $convertToProxySettingsBinaryParameters.Remove('IsSingleInstance')
+        $convertToProxySettingsBinaryParameters.Remove('Ensure')
+        $convertToProxySettingsBinaryParameters.Remove('ConnectionType')
+
+        $proxySettings = ConvertTo-ProxySettingsBinary @convertToProxySettingsBinaryParameters
 
         if ($ConnectionType -in ('All','Default'))
         {
@@ -342,7 +344,7 @@ function Test-TargetResource
         $($LocalizedData.CheckingProxySettingsMessage -f $Ensure)
         ) -join '')
 
-    [Boolean] $desiredConfigurationMatch = $true
+    [System.Boolean] $desiredConfigurationMatch = $true
 
     # Get the registry values in the Connections registry key
     $connectionsRegistryValues = Get-ItemProperty `
@@ -380,10 +382,11 @@ function Test-TargetResource
     }
     else
     {
-        $desiredValues = $PSBoundParameters
-        $null = $desiredValues.Remove('IsSingleInstance')
-        $null = $desiredValues.Remove('Ensure')
-        $null = $desiredValues.Remove('ConnectionType')
+        $desiredValues = @{} + $PSBoundParameters
+
+        $desiredValues.Remove('IsSingleInstance')
+        $desiredValues.Remove('Ensure')
+        $desiredValues.Remove('ConnectionType')
 
         if ($ConnectionType -in ('All','Default'))
         {
@@ -481,7 +484,7 @@ function Set-BinaryRegistryValue
 
 <#
     .SYNOPSIS
-        Checks if the Current proxy setting values are in the desired
+        Checks if the current proxy setting values are in the desired
         state. Returns $true if in the desired state.
 
     .PARAMETER CurrentValues
