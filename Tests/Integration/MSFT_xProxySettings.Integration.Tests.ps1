@@ -62,7 +62,7 @@ try
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
         }
 
         It 'Should be able to call Test-DscConfiguration without throwing' {
@@ -106,7 +106,7 @@ try
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
         }
 
         It 'Should be able to call Test-DscConfiguration without throwing' {

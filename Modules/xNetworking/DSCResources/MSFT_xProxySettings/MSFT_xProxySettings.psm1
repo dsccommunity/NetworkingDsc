@@ -22,7 +22,7 @@ $script:connectionsRegistryKeyPath = 'SOFTWARE\Microsoft\Windows\CurrentVersion\
 <#
     .SYNOPSIS
         Returns the current state of the proxy settings for
-        the computer. Not used in Get-TargetResource.
+        the computer.
 
     .PARAMETER IsSingleInstance
         Specifies the resource is a single instance, the
