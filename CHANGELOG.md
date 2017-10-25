@@ -15,6 +15,8 @@
 - MSFT_xHostsFile:
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
+- MSFT_xProxySettings:
+  - Created new resource configuring proxy settings.
 
 ## 5.1.0.0
 
