@@ -1,4 +1,4 @@
-# Localized resources for MSFT_xDhcpClient
+# Localized resources for MSFT_xProxySettings
 
 ConvertFrom-StringData @'
     GettingProxySettingsMessage = Getting the computer proxy settings.
