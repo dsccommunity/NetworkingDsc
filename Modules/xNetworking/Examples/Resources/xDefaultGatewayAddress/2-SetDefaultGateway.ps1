@@ -1,6 +1,8 @@
 <#
     .EXAMPLE
-    Adding a default gateway to the interface
+    Set the IPv4 default gateway of the network interface 'Ethernet'
+    to '192.168.1.1'.
+
 #>
 Configuration Example
 {
@@ -18,7 +20,7 @@ Configuration Example
         {
             Address        = '192.168.1.1'
             InterfaceAlias = 'Ethernet'
-            AddressFamily  = 'IPv6'
+            AddressFamily  = 'IPv4'
         }
     }
 }
