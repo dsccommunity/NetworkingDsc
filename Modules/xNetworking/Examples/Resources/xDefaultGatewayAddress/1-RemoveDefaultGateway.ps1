@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-    Removee the IPv4 default gateway from the network interface
+    Remove the IPv4 default gateway from the network interface
     'Ethernet'.
 #>
 Configuration Example
