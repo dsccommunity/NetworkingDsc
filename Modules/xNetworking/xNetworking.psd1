@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '5.1.0.0'
+ModuleVersion = '5.2.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -50,49 +50,19 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- MSFT_xDhcpClient:
+        ReleaseNotes = '- Added `Documentation and Examples` section to Readme.md file - see
+  [issue 259](https://github.com/PowerShell/xNetworking/issues/259).
+- Prevent unit tests from DSCResource.Tests from running during test
+  execution - fixes [Issue 264](https://github.com/PowerShell/xNetworking/issues/264).
+- MSFT_xNetworkTeamInterface:
+  - Updated Test-TargetResource to substitute VLANID value 0 to $null
+- MSFT_xNetAdapterRsc:
+  - Created new resource configuring Rsc
+- MSFT_xNetAdapterRss:
+  - Created new resource configuring Rss
+- MSFT_xHostsFile:
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
-- README.MD:
-  - Cleaned up badges by putting them into a table.
-- MSFT_xDnsConnectionSuffix:
-  - Corrected style and formatting to meet HQRM guidelines.
-  - Converted exceptions to use ResourceHelper functions.
-- README.MD:
-  - Converted badges to use branch header as used in xSQLServer.
-- Added standard .markdownlint.json to configure rules to run on
-  Markdown files.
-- MSFT_xDnsClientGlobalSetting:
-  - Corrected style and formatting to meet HQRM guidelines.
-  - Converted exceptions to use ResourceHelper functions.
-- Updated year to 2017 in LICENSE and module manifest.
-- MSFT_xDnsServerAddress:
-  - Fix error when setting address on adapter where NameServer
-    Property does not exist in registry for interface - see
-    [issue 237](https://github.com/PowerShell/xNetworking/issues/237).
-  - Corrected style and formatting to meet HQRM guidelines.
-- MSFT_xIPAddress:
-  - Improved examples to clarify how to set IP Address prefix -
-    see [issue 239](https://github.com/PowerShell/xNetworking/issues/239).
-- MSFT_xFirewall:
-  - Fixed bug with DisplayName not being set correctly in some
-    situations - see [issue 234](https://github.com/PowerShell/xNetworking/issues/234).
-  - Corrected style and formatting to meet HQRM guidelines.
-  - Converted exceptions to use ResourceHelper functions.
-- Added .github support files:
-  - CONTRIBUTING.md
-  - ISSUE_TEMPLATE.md
-  - PULL_REQUEST_TEMPLATE.md
-- Opted into Common Tests "Validate Module Files" and "Validate Script Files".
-- Converted files with UTF8 with BOM over to UTF8 - fixes [Issue 250](https://github.com/PowerShell/xNetworking/issues/250).
-- MSFT_xFirewallProfile:
-  - Created new resource configuring firewall profiles.
-- MSFT_xNetConnectionProfile:
-  - Corrected style and formatting to meet HQRM guidelines.
-  - Added validation for provided parameters.
-  - Prevent testing parameter values of connection that aren"t set in resource -
-    fixes [Issue 254](https://github.com/PowerShell/xNetworking/issues/254).
-  - Improved unit test coverage for this resource.
 
 '
 

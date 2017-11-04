@@ -1,0 +1,52 @@
+﻿.NAME
+    xNetAdapterBinding
+
+# Description
+    
+    This resource is used to bind or unbind transport or filters to a network interface.
+    
+.PARAMETER InterfaceAlias
+    Key - string
+    Specifies the alias of a network interface. Supports the use of '*'.
+
+.PARAMETER ComponentId
+    Key - string
+    Specifies the underlying name of the transport or filter in the following form - ms_xxxx, such as ms_tcpip.
+
+.PARAMETER State
+    Write - string
+    Allowed values: Enabled,  Disabled
+    Specifies if the component ID for the Interface should be Enabled or Disabled.
+
+.PARAMETER CurrentState
+    Read - string
+    Allowed values: Enabled,  Disabled, Mixed
+    Returns the current state of the component ID for the Interfaces.
+
+
+    .EXAMPLE
+    Disabling IPv6 for the Ethernet adapter
+
+Configuration Example
+{
+    param
+    (
+        [Parameter()]
+        [System.String[]]
+        $NodeName = 'localhost'
+    )
+
+    Import-DSCResource -ModuleName xNetworking
+
+    Node $NodeName
+    {
+        xNetAdapterBinding DisableIPv6
+        {
+            InterfaceAlias = 'Ethernet'
+            ComponentId    = 'ms_tcpip6'
+            State          = 'Disabled'
+        }
+    }
+}
+
+
