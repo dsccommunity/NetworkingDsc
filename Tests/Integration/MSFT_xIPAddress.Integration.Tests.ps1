@@ -31,10 +31,17 @@ try
 
     Describe "$($script:DSCResourceName)_Integration" {
         #region DEFAULT TESTS
-        It 'Should compile without throwing' {
+        It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
-                Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+
+                Start-DscConfiguration `
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force `
+                    -ErrorAction Stop
             } | Should not throw
         }
 
@@ -44,7 +51,10 @@ try
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
+            $current = Get-DscConfiguration | Where-Object {
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+
+            }
             $current.InterfaceAlias             | Should Be $TestIPAddress.InterfaceAlias
             $current.AddressFamily              | Should Be $TestIPAddress.AddressFamily
             $current.IPAddress                  | Should Be $TestIPAddress.IPAddress

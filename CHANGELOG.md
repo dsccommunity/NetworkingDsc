@@ -20,6 +20,10 @@
 - MSFT_xDefaultGatewayAddress:
   - Correct `2-SetDefaultGateway.md` address family and improve example
     description - fixes [Issue #275](https://github.com/PowerShell/xNetworking/issues/275).
+- MSFT_xIPAddress:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Changed unit tests so that they can be run out of order.
 
 ## 5.1.0.0
 
