@@ -23,7 +23,7 @@
 - MSFT_xIPAddress:
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
-  - Changed unit tests so that they can be run out of order.
+  - Changed unit tests so that they can be run in any order.
 
 ## 5.1.0.0
 
