@@ -11,6 +11,9 @@
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
   - Changed unit tests so that they can be run in any order.
+- MSFT_xNetAdapterBinding:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
 
 ## 5.2.0.0
 

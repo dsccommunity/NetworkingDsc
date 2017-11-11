@@ -42,22 +42,21 @@ try
                     -Verbose `
                     -Force `
                     -ErrorAction Stop
-            } | Should not throw
+            } | Should Not Throw
         }
 
         It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
         }
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {
+            $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
-
             }
-            $current.InterfaceAlias             | Should Be $TestIPAddress.InterfaceAlias
-            $current.AddressFamily              | Should Be $TestIPAddress.AddressFamily
-            $current.IPAddress                  | Should Be $TestIPAddress.IPAddress
+            $current.InterfaceAlias | Should Be $TestIPAddress.InterfaceAlias
+            $current.AddressFamily  | Should Be $TestIPAddress.AddressFamily
+            $current.IPAddress      | Should Be $TestIPAddress.IPAddress
         }
     }
     #endregion
