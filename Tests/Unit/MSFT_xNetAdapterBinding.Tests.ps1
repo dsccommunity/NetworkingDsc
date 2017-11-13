@@ -56,7 +56,7 @@ try
             Enabled        = $False
         }
 
-        $MockBindingMixed = @(
+        $mockBindingMixed = @(
             @{
                 InterfaceAlias = 'Ethernet'
                 ComponentId    = 'ms_tcpip63'
@@ -74,11 +74,11 @@ try
                 Mock -CommandName Get-Binding -MockWith { $mockBindingEnabled }
 
                 It 'Should return existing binding' {
-                    $Result = Get-TargetResource @testBindingEnabled
-                    $Result.InterfaceAlias | Should Be $testBindingEnabled.InterfaceAlias
-                    $Result.ComponentId | Should Be $testBindingEnabled.ComponentId
-                    $Result.State | Should Be 'Enabled'
-                    $Result.CurrentState | Should Be 'Enabled'
+                    $result = Get-TargetResource @testBindingEnabled
+                    $result.InterfaceAlias | Should Be $testBindingEnabled.InterfaceAlias
+                    $result.ComponentId | Should Be $testBindingEnabled.ComponentId
+                    $result.State | Should Be 'Enabled'
+                    $result.CurrentState | Should Be 'Enabled'
                 }
 
                 It 'Should call all the mocks' {
@@ -90,11 +90,11 @@ try
                 Mock -CommandName Get-Binding -MockWith { $mockBindingDisabled }
 
                 It 'Should return existing binding' {
-                    $Result = Get-TargetResource @testBindingDisabled
-                    $Result.InterfaceAlias | Should Be $testBindingDisabled.InterfaceAlias
-                    $Result.ComponentId | Should Be $testBindingDisabled.ComponentId
-                    $Result.State | Should Be 'Disabled'
-                    $Result.CurrentState | Should Be 'Disabled'
+                    $result = Get-TargetResource @testBindingDisabled
+                    $result.InterfaceAlias | Should Be $testBindingDisabled.InterfaceAlias
+                    $result.ComponentId | Should Be $testBindingDisabled.ComponentId
+                    $result.State | Should Be 'Disabled'
+                    $result.CurrentState | Should Be 'Disabled'
                 }
 
                 It 'Should call all the mocks' {
@@ -103,14 +103,14 @@ try
             }
 
             Context 'More than one Adapter exists and binding is Disabled on one and Enabled on another' {
-                Mock -CommandName Get-Binding -MockWith { $MockBindingMixed }
+                Mock -CommandName Get-Binding -MockWith { $mockBindingMixed }
 
                 It 'Should return existing binding' {
-                    $Result = Get-TargetResource @testBindingMixed
-                    $Result.InterfaceAlias | Should Be $testBindingMixed.InterfaceAlias
-                    $Result.ComponentId | Should Be $testBindingMixed.ComponentId
-                    $Result.State | Should Be 'Enabled'
-                    $Result.CurrentState | Should Be 'Mixed'
+                    $result = Get-TargetResource @testBindingMixed
+                    $result.InterfaceAlias | Should Be $testBindingMixed.InterfaceAlias
+                    $result.ComponentId | Should Be $testBindingMixed.ComponentId
+                    $result.State | Should Be 'Enabled'
+                    $result.CurrentState | Should Be 'Mixed'
                 }
 
                 It 'Should call all the mocks' {
@@ -226,10 +226,10 @@ try
                 Mock -CommandName Get-NetAdapterBinding -MockWith { $mockBindingEnabled }
 
                 It 'Should return the adapter binding' {
-                    $Result = Get-Binding @testBindingEnabled
-                    $Result.InterfaceAlias | Should Be $mockBindingEnabled.InterfaceAlias
-                    $Result.ComponentId    | Should Be $mockBindingEnabled.ComponentId
-                    $Result.Enabled        | Should Be $mockBindingEnabled.Enabled
+                    $result = Get-Binding @testBindingEnabled
+                    $result.InterfaceAlias | Should Be $mockBindingEnabled.InterfaceAlias
+                    $result.ComponentId    | Should Be $mockBindingEnabled.ComponentId
+                    $result.Enabled        | Should Be $mockBindingEnabled.Enabled
                 }
 
                 It 'Should call all the mocks' {
@@ -243,10 +243,10 @@ try
                 Mock -CommandName Get-NetAdapterBinding -MockWith { $mockBindingDisabled }
 
                 It 'Should return the adapter binding' {
-                    $Result = Get-Binding @testBindingDisabled
-                    $Result.InterfaceAlias | Should Be $mockBindingDisabled.InterfaceAlias
-                    $Result.ComponentId    | Should Be $mockBindingDisabled.ComponentId
-                    $Result.Enabled        | Should Be $mockBindingDisabled.Enabled
+                    $result = Get-Binding @testBindingDisabled
+                    $result.InterfaceAlias | Should Be $mockBindingDisabled.InterfaceAlias
+                    $result.ComponentId    | Should Be $mockBindingDisabled.ComponentId
+                    $result.Enabled        | Should Be $mockBindingDisabled.Enabled
                 }
 
                 It 'Should call all the mocks' {
