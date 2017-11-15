@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 5.3.0.0
+
+- MSFT_xProxySettings:
+  - Created new resource configuring proxy settings.
+- MSFT_xDefaultGatewayAddress:
+  - Correct `2-SetDefaultGateway.md` address family and improve example
+    description - fixes [Issue #275](https://github.com/PowerShell/xNetworking/issues/275).
+- MSFT_xIPAddress:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Changed unit tests so that they can be run in any order.
+- MSFT_xNetAdapterBinding:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+
 ## 5.2.0.0
 
 - Added `Documentation and Examples` section to Readme.md file - see

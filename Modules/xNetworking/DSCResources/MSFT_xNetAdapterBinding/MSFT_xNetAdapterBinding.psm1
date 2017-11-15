@@ -2,13 +2,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
@@ -26,7 +26,7 @@ $localizedData = Get-LocalizedData `
     Specifies the underlying name of the transport or filter in the following
     form - ms_xxxx, such as ms_tcpip.
 
-    .PARAMETER Ensure
+    .PARAMETER State
     Specifies if the component ID for the Interface should be Enabled or Disabled.
 #>
 function Get-TargetResource
@@ -37,22 +37,23 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $ComponentId,
 
+        [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
-        [String]
+        [System.String]
         $State = 'Enabled'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.GettingNetAdapterBindingMessage -f `
-            $InterfaceAlias,$ComponentId)
+            $($LocalizedData.GettingNetAdapterBindingMessage -f `
+                    $InterfaceAlias, $ComponentId)
         ) -join '')
 
     $currentNetAdapterBinding = Get-Binding @PSBoundParameters
@@ -94,7 +95,7 @@ function Get-TargetResource
     Specifies the underlying name of the transport or filter in the following
     form - ms_xxxx, such as ms_tcpip.
 
-    .PARAMETER Ensure
+    .PARAMETER State
     Specifies if the component ID for the Interface should be Enabled or Disabled.
 #>
 function Set-TargetResource
@@ -104,22 +105,23 @@ function Set-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $ComponentId,
 
+        [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
-        [String]
+        [System.String]
         $State = 'Enabled'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.ApplyingNetAdapterBindingMessage -f `
-            $InterfaceAlias,$ComponentId)
+            $($LocalizedData.ApplyingNetAdapterBindingMessage -f `
+                    $InterfaceAlias, $ComponentId)
         ) -join '')
 
     $currentNetAdapterBinding = Get-Binding @PSBoundParameters
@@ -130,17 +132,19 @@ function Set-TargetResource
     if ($State -eq 'Enabled')
     {
         Enable-NetAdapterBinding @PSBoundParameters
+
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.NetAdapterBindingEnabledMessage -f `
-                $InterfaceAlias,$ComponentId)
+                $($LocalizedData.NetAdapterBindingEnabledMessage -f `
+                        $InterfaceAlias, $ComponentId)
             ) -join '' )
     }
     else
     {
         Disable-NetAdapterBinding @PSBoundParameters
+
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.NetAdapterBindingDisabledMessage -f `
-                $InterfaceAlias,$ComponentId)
+                $($LocalizedData.NetAdapterBindingDisabledMessage -f `
+                        $InterfaceAlias, $ComponentId)
             ) -join '' )
     } # if
 } # Set-TargetResource
@@ -156,7 +160,7 @@ function Set-TargetResource
     Specifies the underlying name of the transport or filter in the following
     form - ms_xxxx, such as ms_tcpip.
 
-    .PARAMETER Ensure
+    .PARAMETER State
     Specifies if the component ID for the Interface should be Enabled or Disabled.
 #>
 function Test-TargetResource
@@ -167,22 +171,23 @@ function Test-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $ComponentId,
 
+        [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
-        [String]
+        [System.String]
         $State = 'Enabled'
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.CheckingNetAdapterBindingMessage -f `
-            $InterfaceAlias,$ComponentId)
+            $($LocalizedData.CheckingNetAdapterBindingMessage -f `
+                    $InterfaceAlias, $ComponentId)
         ) -join '')
 
     $currentNetAdapterBinding = Get-Binding @PSBoundParameters
@@ -207,17 +212,19 @@ function Test-TargetResource
     if ($currentEnabled -ne $State)
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.NetAdapterBindingDoesNotMatchMessage -f `
-                $InterfaceAlias,$ComponentId,$State,$currentEnabled)
+                $($LocalizedData.NetAdapterBindingDoesNotMatchMessage -f `
+                        $InterfaceAlias, $ComponentId, $State, $currentEnabled)
             ) -join '' )
+
         return $false
     }
     else
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.NetAdapterBindingMatchMessage -f `
-                $InterfaceAlias,$ComponentId)
+                $($LocalizedData.NetAdapterBindingMatchMessage -f `
+                        $InterfaceAlias, $ComponentId)
             ) -join '' )
+
         return $true
     } # if
 } # Test-TargetResource
@@ -233,7 +240,7 @@ function Test-TargetResource
     Specifies the underlying name of the transport or filter in the following
     form - ms_xxxx, such as ms_tcpip.
 
-    .PARAMETER Ensure
+    .PARAMETER State
     Specifies if the component ID for the Interface should be Enabled or Disabled.
 #>
 function Get-Binding
@@ -244,30 +251,25 @@ function Get-Binding
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $ComponentId,
 
+        [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
-        [String]
+        [System.String]
         $State = 'Enabled'
     )
 
     if (-not (Get-NetAdapter -Name $InterfaceAlias -ErrorAction SilentlyContinue))
     {
-        $errorId = 'InterfaceNotAvailable'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
-        $errorMessage = $($LocalizedData.InterfaceNotAvailableError) -f $InterfaceAlias
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
+        New-InvalidArgumentException `
+            -Message ($LocalizedData.InterfaceNotAvailableError -f $InterfaceAlias) `
+            -ArgumentName 'InterfaceAlias'
     } # if
 
     $binding = Get-NetAdapterBinding `

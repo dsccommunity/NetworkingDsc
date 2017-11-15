@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '5.2.0.0'
+ModuleVersion = '5.3.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -50,17 +50,16 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- Added `Documentation and Examples` section to Readme.md file - see
-  [issue 259](https://github.com/PowerShell/xNetworking/issues/259).
-- Prevent unit tests from DSCResource.Tests from running during test
-  execution - fixes [Issue 264](https://github.com/PowerShell/xNetworking/issues/264).
-- MSFT_xNetworkTeamInterface:
-  - Updated Test-TargetResource to substitute VLANID value 0 to $null
-- MSFT_xNetAdapterRsc:
-  - Created new resource configuring Rsc
-- MSFT_xNetAdapterRss:
-  - Created new resource configuring Rss
-- MSFT_xHostsFile:
+        ReleaseNotes = '- MSFT_xProxySettings:
+  - Created new resource configuring proxy settings.
+- MSFT_xDefaultGatewayAddress:
+  - Correct `2-SetDefaultGateway.md` address family and improve example
+    description - fixes [Issue 275](https://github.com/PowerShell/xNetworking/issues/275).
+- MSFT_xIPAddress:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Changed unit tests so that they can be run in any order.
+- MSFT_xNetAdapterBinding:
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
 
@@ -70,6 +69,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 

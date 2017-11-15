@@ -25,6 +25,7 @@ The **xNetworking** module contains the following resources:
 - **xNetAdapterRss**: Enable or disable Rss on a network adapter.
 - **xNetAdapterName**: Rename a network interface that matches specified search parameters.
 - **xFirewallProfile**: Configures a node's private, public or domain firewall profile.
+- **xProxySettings**: Configures the proxy settings for the computer.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)
