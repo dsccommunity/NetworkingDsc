@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.3.0.0
+
 - MSFT_xProxySettings:
   - Created new resource configuring proxy settings.
 - MSFT_xDefaultGatewayAddress:
