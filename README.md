@@ -4,6 +4,7 @@ The **xNetworking** module contains the following resources:
 
 - **xFirewall**: Sets a node's firewall rules.
 - **xIPAddress**: Sets a node's IP address(s).
+- **xIPAddressOption**: Sets a IP address option.
 - **xDnsServerAddress**: Sets a node's DNS server address(s).
 - **xDnsConnectionSuffix**: Sets a node's network interface
     connection-specific DNS suffix.

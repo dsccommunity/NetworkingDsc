@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- MSFT_xIPAddressOption:
+  - Added a new resource to set the SkipAsSource option for an IP address.
+
 ## 5.3.0.0
 
 - MSFT_xProxySettings:
