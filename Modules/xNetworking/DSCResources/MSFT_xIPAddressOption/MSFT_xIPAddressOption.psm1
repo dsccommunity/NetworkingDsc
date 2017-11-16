@@ -38,7 +38,7 @@ function Get-TargetResource
         [System.String]
         $IPAddress,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter()]
         [ValidateSet('True', 'False')]
         [System.String]
         $SkipAsSource = 'False'
@@ -78,7 +78,7 @@ function Set-TargetResource
         [System.String]
         $IPAddress,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter()]
         [ValidateSet('True', 'False')]
         [System.String]
         $SkipAsSource = 'False'
@@ -118,7 +118,7 @@ function Test-TargetResource
         [System.String]
         $IPAddress,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter()]
         [ValidateSet('True', 'False')]
         [System.String]
         $SkipAsSource = 'False'
