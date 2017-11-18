@@ -18,7 +18,7 @@ Configuration Example
         xIPAddressOption SetSkipAsSource
         {
             IPAddress    = '192.168.10.5'
-            SkipAsSource = 'True'
+            SkipAsSource = $true
         }
     }
 }

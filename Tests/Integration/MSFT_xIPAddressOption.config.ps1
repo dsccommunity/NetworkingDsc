@@ -5,7 +5,7 @@ $TestIPAddress = [PSObject]@{
 }
 $TestIPAddressOption = [PSObject]@{
     IPAddress    = '10.11.12.13'
-    SkipAsSource = 'True'
+    SkipAsSource = $true
 }
 
 configuration MSFT_xIPAddressOption_Config {

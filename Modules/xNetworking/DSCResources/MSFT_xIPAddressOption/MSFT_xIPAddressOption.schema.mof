@@ -2,5 +2,5 @@
 class MSFT_xIPAddressOption : OMI_BaseResource
 {
     [Key, Description("The target IP address, must already be configured on the system.")] string IPAddress;
-    [Write, Description("Skip as source option of the ip address."),ValueMap{"True", "False"},Values{"True", "False"}] string SkipAsSource;
+    [Write, Description("Skip as source option of the ip address.")] boolean SkipAsSource;
 };

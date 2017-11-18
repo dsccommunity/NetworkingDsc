@@ -39,9 +39,8 @@ function Get-TargetResource
         $IPAddress,
 
         [Parameter()]
-        [ValidateSet('True', 'False')]
-        [System.String]
-        $SkipAsSource = 'False'
+        [System.Boolean]
+        $SkipAsSource = $false
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -52,7 +51,7 @@ function Get-TargetResource
 
     $returnValue = @{
         IPAddress    = $IPAddress
-        SkipAsSource = [String] $currentIPAddress.SkipAsSource
+        SkipAsSource = $currentIPAddress.SkipAsSource
     }
 
     return $returnValue
@@ -79,9 +78,8 @@ function Set-TargetResource
         $IPAddress,
 
         [Parameter()]
-        [ValidateSet('True', 'False')]
-        [System.String]
-        $SkipAsSource = 'False'
+        [System.Boolean]
+        $SkipAsSource = $false
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -92,8 +90,7 @@ function Set-TargetResource
 
     if ($currentConfig.SkipAsSource -ne $SkipAsSource)
     {
-        $boolSkipAsSource = $SkipAsSource -eq 'True'
-        Set-NetIPAddress -IPAddress $IPAddress -SkipAsSource $boolSkipAsSource
+        Set-NetIPAddress -IPAddress $IPAddress -SkipAsSource $SkipAsSource
     }
 }
 
@@ -119,9 +116,8 @@ function Test-TargetResource
         $IPAddress,
 
         [Parameter()]
-        [ValidateSet('True', 'False')]
-        [System.String]
-        $SkipAsSource = 'False'
+        [System.Boolean]
+        $SkipAsSource = $false
     )
 
     # Flag to signal whether settings are correct

@@ -44,7 +44,7 @@ try
                     }
                     $result = Get-TargetResource @getTargetResourceParameters
                     $result.IPAddress    | Should Be $getTargetResourceParameters.IPAddress
-                    $result.SkipAsSource | Should Be 'True'
+                    $result.SkipAsSource | Should Be $true
                 }
             }
         }
@@ -70,7 +70,7 @@ try
                     It 'Should return $null' {
                         $setTargetResourceParameters = @{
                             IPAddress    = '192.168.0.1'
-                            SkipAsSource = 'True'
+                            SkipAsSource = $true
                         }
                         { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
                         $result | Should BeNullOrEmpty
@@ -102,7 +102,7 @@ try
                     It 'Should return $true' {
                         $testGetResourceParameters = @{
                             IPAddress    = '192.168.0.1'
-                            SkipAsSource = 'True'
+                            SkipAsSource = $true
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
