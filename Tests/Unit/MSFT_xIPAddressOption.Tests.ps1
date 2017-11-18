@@ -37,6 +37,7 @@ try
                         SkipAsSource   = $true
                     }
                 }
+
                 It 'Should return existing IP options' {
                     $getTargetResourceParameters = @{
                         IPAddress = '192.168.0.1'

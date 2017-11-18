@@ -2,13 +2,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
--ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-    -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
--ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-    -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedDataSplat = @{
@@ -45,8 +45,8 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.GettingIPAddressOptionMessage)
-    ) -join '')
+            $($LocalizedData.GettingIPAddressOptionMessage)
+        ) -join '')
 
     $currentIPAddress = Get-NetIPAddress -IPAddress $IPAddress
 
