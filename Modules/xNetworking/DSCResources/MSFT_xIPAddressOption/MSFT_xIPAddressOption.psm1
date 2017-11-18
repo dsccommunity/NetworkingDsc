@@ -45,7 +45,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingIPAddressOptionMessage)
+            $($LocalizedData.GettingIPAddressOptionMessage -f $IPAddress)
         ) -join '')
 
     $currentIPAddress = Get-NetIPAddress -IPAddress $IPAddress
@@ -85,7 +85,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.ApplyingIPAddressOptionMessage)
+            $($LocalizedData.ApplyingIPAddressOptionMessage -f $IPAddress)
         ) -join '')
 
     $currentConfig = Get-TargetResource @PSBoundParameters
@@ -128,7 +128,7 @@ function Test-TargetResource
     [System.Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.CheckingIPAddressOptionMessage)
+            $($LocalizedData.CheckingIPAddressOptionMessage -f $IPAddress)
         ) -join '')
 
     $currentConfig = Get-TargetResource @PSBoundParameters
