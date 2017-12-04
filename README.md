@@ -53,7 +53,8 @@ directly to this branch.
 
 ### dev
 
-[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/dev)[![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking/branch/dev)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/dev)
+[![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking/branch/dev)
 
 This is the development branch to which contributions should be proposed by contributors
 as pull requests. This development branch will periodically be merged to the master
