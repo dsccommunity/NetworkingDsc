@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-    Disabling tbe weak host sending setting for the adapter with alias 'Ethernet'.
+    Disabling tbe weak host send setting for the network adapter with alias 'Ethernet'.
 #>
 Configuration Example
 {
@@ -19,6 +19,7 @@ Configuration Example
         {
             State          = 'Disabled'
             InterfaceAlias = 'Ethernet'
+            AddressFamily = 'IPv4'
         }
     }
 }
