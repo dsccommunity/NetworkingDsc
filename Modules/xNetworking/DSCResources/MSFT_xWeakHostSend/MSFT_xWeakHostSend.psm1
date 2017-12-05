@@ -131,7 +131,7 @@ function Set-TargetResource
     Tests the state of the Weak Host Send setting for an interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the DHCP Client is set.
+    Alias of the network interface for which the Weak Host Send setting is set.
 
     .PARAMETER AddressFamily
     IP address family.
