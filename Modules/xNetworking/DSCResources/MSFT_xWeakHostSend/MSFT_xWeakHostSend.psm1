@@ -229,4 +229,4 @@ function Assert-ResourceProperty
     }
 } # Assert-ResourceProperty
 
-Export-ModuleMember -function *-TargetResource
+Export-ModuleMember -Function *-TargetResource

@@ -1,24 +1,5 @@
-<#
-    .SYNOPSIS
-        Template for creating DSC Resource Unit Tests
-    .DESCRIPTION
-        To Use:
-        1. Copy to \Tests\Unit\ folder and rename <ResourceName>.tests.ps1 (e.g. MSFT_xFirewall.tests.ps1)
-        2. Customize TODO sections.
-        3. Delete all template comments (TODOs, etc.)
-
-    .NOTES
-        There are multiple methods for writing unit tests. This template provides a few examples
-        which you are welcome to follow but depending on your resource, you may want to
-        design it differently. Read through our TestsGuidelines.md file for an intro on how to
-        write unit tests for DSC resources: https://github.com/PowerShell/DscResources/blob/master/TestsGuidelines.md
-#>
-
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
-#region HEADER
-
-# Unit Test Template Version: 1.2.1
 $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
@@ -32,8 +13,6 @@ $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName 'xNetWorking' `
     -DSCResourceName 'MSFT_xWeakHostSend' `
     -TestType Unit
-
-#endregion HEADER
 
 function Invoke-TestSetup {
     # TODO: Optional init code goes here...
