@@ -5,7 +5,7 @@ $TestWeakHostSend = [PSObject]@{
 }
 
 configuration MSFT_xWeakHostSend_Config {
-    Import-DscResource -ModuleName xNetworking -ModuleVersion
+    Import-DscResource -ModuleName xNetworking
 
     Node localhost {
         xWeakHostSend Integration_Test

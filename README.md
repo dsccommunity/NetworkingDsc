@@ -27,7 +27,8 @@ The **xNetworking** module contains the following resources:
 - **xFirewallProfile**: Configures a node's private, public or domain firewall profile.
 - **xProxySettings**: Configures the proxy settings for the computer.
 - **xWeakHostSend**: Enable or disable the Weak Host Send setting on a network adapter.
-- **xWeakHostReceive**: Enable or disable the Weak Host Receive setting on a network adapter.
+- **xWeakHostReceive**: Enable or disable the Weak Host Receive setting
+    on a network adapter.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)
