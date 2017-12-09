@@ -15,13 +15,10 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Unit
 
 function Invoke-TestSetup {
-    # TODO: Optional init code goes here...
 }
 
 function Invoke-TestCleanup {
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
-
-    # TODO: Other Optional Cleanup Code Goes Here...
 }
 
 # Begin Testing
@@ -35,28 +32,28 @@ try
             Name = 'Ethernet'
         }
 
-        $testNetIPInterfaceEnabled = [PSObject]@{
+        $mockNetIPWeakHostReceiveDisabled = [PSObject]@{
             State          = 'Enabled'
             InterfaceAlias = $mockNetAdapter.Name
             AddressFamily  = 'IPv4'
         }
 
-        $testNetIPInterfaceDisabled = [PSObject]@{
+        $testNetIPWeakHostSendDisabled = [PSObject]@{
             State          = 'Disabled'
             InterfaceAlias = $mockNetAdapter.Name
             AddressFamily  = 'IPv4'
         }
 
-        $mockNetIPInterfaceEnabled = [PSObject]@{
-            WeakHostSend = $testNetIPInterfaceEnabled.State
-            InterfaceAlias  = $testNetIPInterfaceEnabled.Name
-            AddressFamily   = $testNetIPInterfaceEnabled.AddressFamily
+        $mockNetIPWeakHostSendEnabled = [PSObject]@{
+            WeakHostSend = $mockNetIPWeakHostReceiveDisabled.State
+            InterfaceAlias  = $mockNetIPWeakHostReceiveDisabled.Name
+            AddressFamily   = $mockNetIPWeakHostReceiveDisabled.AddressFamily
         }
 
-        $mockNetIPInterfaceDisabled = [PSObject]@{
-            WeakHostSend = $testNetIPInterfaceDisabled.State
-            InterfaceAlias  = $testNetIPInterfaceDisabled.Name
-            AddressFamily   = $testNetIPInterfaceDisabled.AddressFamily
+        $mockNetIPWeakHostSendDisabled = [PSObject]@{
+            WeakHostSend = $testNetIPWeakHostSendDisabled.State
+            InterfaceAlias  = $testNetIPWeakHostSendDisabled.Name
+            AddressFamily   = $testNetIPWeakHostSendDisabled.AddressFamily
         }
 
         Describe 'MSFT_xWeakHostSend\Get-TargetResource' {
@@ -65,13 +62,13 @@ try
             }
 
             Context 'Invoking with when Weak Host Receiving is enabled' {
-                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendEnabled }
 
                 It 'Should return Weak Host Receiving state of enabled' {
-                    $Result = Get-TargetResource @testNetIPInterfaceEnabled
-                    $Result.State          | Should Be $testNetIPInterfaceEnabled.State
-                    $Result.InterfaceAlias | Should Be $testNetIPInterfaceEnabled.InterfaceAlias
-                    $Result.AddressFamily  | Should Be $testNetIPInterfaceEnabled.AddressFamily
+                    $Result = Get-TargetResource @mockNetIPWeakHostReceiveDisabled
+                    $Result.State          | Should Be $mockNetIPWeakHostReceiveDisabled.State
+                    $Result.InterfaceAlias | Should Be $mockNetIPWeakHostReceiveDisabled.InterfaceAlias
+                    $Result.AddressFamily  | Should Be $mockNetIPWeakHostReceiveDisabled.AddressFamily
                 }
 
                 It 'Should call the expected mocks' {
@@ -81,13 +78,13 @@ try
             }
 
             Context 'Invoking with when Weak Host Receiving is disabled' {
-                Mock Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
+                Mock Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendDisabled }
 
                 It 'Should return Weak Host Receiving state of disabled' {
-                    $Result = Get-TargetResource @testNetIPInterfaceDisabled
-                    $Result.State          | Should Be $testNetIPInterfaceDisabled.State
-                    $Result.InterfaceAlias | Should Be $testNetIPInterfaceDisabled.InterfaceAlias
-                    $Result.AddressFamily  | Should Be $testNetIPInterfaceDisabled.AddressFamily
+                    $Result = Get-TargetResource @testNetIPWeakHostSendDisabled
+                    $Result.State          | Should Be $testNetIPWeakHostSendDisabled.State
+                    $Result.InterfaceAlias | Should Be $testNetIPWeakHostSendDisabled.InterfaceAlias
+                    $Result.AddressFamily  | Should Be $testNetIPWeakHostSendDisabled.AddressFamily
                 }
 
                 It 'Should call the expected mocks' {
@@ -105,10 +102,10 @@ try
             }
 
             Context 'Invoking with state enabled but Weak Host Receiving is currently disabled' {
-                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendDisabled }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @testNetIPInterfaceEnabled } | Should Not Throw
+                    { Set-TargetResource @mockNetIPWeakHostReceiveDisabled } | Should Not Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -120,10 +117,10 @@ try
             }
 
             Context 'invoking with state disabled and Weak Host Receiving is currently disabled' {
-                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendDisabled }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @testNetIPInterfaceDisabled } | Should Not Throw
+                    { Set-TargetResource @testNetIPWeakHostSendDisabled } | Should Not Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -135,10 +132,10 @@ try
             }
 
             Context 'invoking with state enabled and Weak Host Receiving is currently enabled' {
-                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendEnabled }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @testNetIPInterfaceEnabled } | Should Not Throw
+                    { Set-TargetResource @mockNetIPWeakHostReceiveDisabled } | Should Not Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -150,10 +147,10 @@ try
             }
 
             Context 'invoking with state disabled but Weak Host Receiving is currently enabled' {
-                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendEnabled }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @testNetIPInterfaceDisabled } | Should Not Throw
+                    { Set-TargetResource @testNetIPWeakHostSendDisabled } | Should Not Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -171,10 +168,10 @@ try
             }
 
             Context 'Invoking with state enabled but Weak Host Receiving is currently disabled' {
-                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendDisabled }
 
                 It 'Should return false' {
-                    Test-TargetResource @testNetIPInterfaceEnabled | Should Be $False
+                    Test-TargetResource @mockNetIPWeakHostReceiveDisabled | Should Be $False
                 }
 
                 It 'Should call expected mocks' {
@@ -184,10 +181,10 @@ try
             }
 
             Context 'Invoking with state disabled and Weak Host Receiving is currently disabled' {
-                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendDisabled }
 
                 It 'Should return true' {
-                    Test-TargetResource @testNetIPInterfaceDisabled | Should Be $True
+                    Test-TargetResource @testNetIPWeakHostSendDisabled | Should Be $True
                 }
 
                 It 'Should call expected mocks' {
@@ -197,10 +194,10 @@ try
             }
 
             Context 'Invoking with state enabled and Weak Host Receiving is currently enabled' {
-                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendEnabled }
 
                 It 'Should return true' {
-                    Test-TargetResource @testNetIPInterfaceEnabled | Should Be $True
+                    Test-TargetResource @mockNetIPWeakHostReceiveDisabled | Should Be $True
                 }
 
                 It 'Should call expected mocks' {
@@ -210,10 +207,10 @@ try
             }
 
             Context 'Invoking with state disabled but Weak Host Receiving is currently enabled' {
-                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
+                Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendEnabled }
 
                 It 'Should return false' {
-                    Test-TargetResource @testNetIPInterfaceDisabled | Should Be $False
+                    Test-TargetResource @testNetIPWeakHostSendDisabled | Should Be $False
                 }
 
                 It 'Should call expected mocks' {
@@ -229,9 +226,9 @@ try
 
                 It 'Should throw an InterfaceNotAvailable error' {
                     $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($LocalizedData.InterfaceNotAvailableError -f $testNetIPInterfaceEnabled.InterfaceAlias)
+                        -Message ($LocalizedData.InterfaceNotAvailableError -f $mockNetIPWeakHostReceiveDisabled.InterfaceAlias)
 
-                    { Assert-ResourceProperty @testNetIPInterfaceEnabled } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @mockNetIPWeakHostReceiveDisabled } | Should Throw $errorRecord
                 }
             }
         }
@@ -240,8 +237,5 @@ try
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
     Invoke-TestCleanup
 }

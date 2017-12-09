@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-- xWeakHostSend
+- MSFT_xWeakHostSend:
   - Created the new Weak Host Send resource.
-- xWeakHostReceive
+- MSFT_xWeakHostReceive:
   - Created the new Weak Host Receive resource.
 
 ## 5.3.0.0

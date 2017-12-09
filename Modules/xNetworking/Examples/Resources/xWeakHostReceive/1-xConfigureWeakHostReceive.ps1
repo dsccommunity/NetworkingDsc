@@ -19,7 +19,7 @@ Configuration Example
         {
             State          = 'Disabled'
             InterfaceAlias = 'Ethernet'
-            AddressFamily = 'IPv4'
+            AddressFamily  = 'IPv4'
         }
     }
 }

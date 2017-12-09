@@ -123,7 +123,6 @@ function Set-TargetResource
             $($LocalizedData.WeakHostSendSetStateMessage) `
                 -f $InterfaceAlias, $AddressFamily, $State `
         ) -join '' )
-
 } # Set-TargetResource
 
 <#
