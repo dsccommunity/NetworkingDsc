@@ -1,0 +1,7 @@
+[ClassVersion("1.0.0"), FriendlyName("xWeakHostSend")]
+class MSFT_xWeakHostSend : OMI_BaseResource
+{
+    [Key, Description("Alias of the network interface for which the Weak Host Sending is set.")] string InterfaceAlias;
+    [Key, Description("IP address family."), ValueMap{"IPv4", "IPv6"}, Values{"IPv4", "IPv6"}] string AddressFamily;
+    [Required, Description("The desired state of the Weak Host Sending."), ValueMap{"Enabled", "Disabled"}, Values{"Enabled", "Disabled"}] string State;
+};

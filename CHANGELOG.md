@@ -4,6 +4,10 @@
 
 - MSFT_xIPAddressOption:
   - Added a new resource to set the SkipAsSource option for an IP address.
+- MSFT_xWeakHostSend:
+  - Created the new Weak Host Send resource.
+- MSFT_xWeakHostReceive:
+  - Created the new Weak Host Receive resource.
 
 ## 5.3.0.0
 
