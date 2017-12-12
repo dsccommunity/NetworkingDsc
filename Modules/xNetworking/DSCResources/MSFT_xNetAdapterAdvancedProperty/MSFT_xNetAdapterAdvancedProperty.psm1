@@ -63,7 +63,7 @@ function Get-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $RegistryKeyword)
+                $($LocalizedData.NetAdapterTestingStateMessage -f $NetworkAdapterName, $RegistryKeyword)
             ) -join '')
 
         $result = @{
@@ -125,7 +125,7 @@ function Set-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $RegistryKeyword)
+                $($LocalizedData.NetAdapterTestingStateMessage -f $NetworkAdapterName, $RegistryKeyword)
             ) -join '')
 
         if ($RegistryValue -ne $netadapteradvprop.RegistryValue)
@@ -133,7 +133,7 @@ function Set-TargetResource
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.NetAdapterApplyingChangesMessage -f `
-                            $Name,$netadapteradvprop.RegistryValue,$RegistryValue )
+                            $NetworkAdapterName,$netadapteradvprop.RegistryValue,$RegistryValue )
                 ) -join '')
 
             Get-NetAdapterAdvancedProperty -Name $networkAdapterName  -RegistryKeyword $RegistryKeyword | Set-NetAdapterAdvancedProperty -RegistryValue $RegistryValue
@@ -190,7 +190,7 @@ function Test-TargetResource
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $localizedData.NetAdapterTestingStateMessage -f `
-                    $Name, $RegistryKeyword
+                    $NetworkAdapterName, $RegistryKeyword
             ) -join '')
 
         If ($RegistryValue -eq $netadapteradvprop.RegistryValue) {
