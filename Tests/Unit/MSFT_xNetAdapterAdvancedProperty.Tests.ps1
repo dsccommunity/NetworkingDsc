@@ -25,25 +25,30 @@ try
 
         $TestJumboPacket9014 = @{
             NetworkAdapterName    = 'Ethernet'
-            RegistryKeyword = *JumboPacket
+            RegistryKeyword = "*JumboPacket"
             RegistryValue = 9014
         }
 
         $TestJumboPacket1514 = @{
             NetworkAdapterName    = 'Ethernet'
-            RegistryKeyword = *JumboPacket
+            RegistryKeyword = '*JumboPacket'
             RegistryValue = 1514
         }
 
         $TestAdapterNotFound = @{
             NetworkAdapterName    = 'Ethe'
-            RegistryKeyword = *JumboPacket
+            RegistryKeyword = "*JumboPacket"
             RegistryValue = 1514
         }
-
+        function Get-NetAdapterAdvancedProperty { }
         Describe "$($script:DSCResourceName)\Get-TargetResource" -Tag 'Get' {
             Context 'Adapter exist and JumboPacket is enabled 9014' {
-                Mock "Get-NetAdapterAdvancedProperty -RegistryKeyword *JumboPacket" -Verbose -MockWith { @{ RegistryValue = 9014 } }
+                Mock Get-NetAdapterAdvancedProperty -Verbose -MockWith {
+                    @{
+                        RegistryValue = $TestJumboPacket9014.RegistryValue
+                        RegistryKeyword = $TestJumboPacket9014.RegistryKeyword
+                    }
+                }
 
                 It 'Should return the JumboPacket size' {
                     $result = Get-TargetResource @TestJumboPacket9014
@@ -51,13 +56,16 @@ try
                 }
 
                 It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName "Get-NetAdapterAdvancedProperty -RegistryKeyword *JumboPacket" -Regis -Exactly -Time 1
+                    Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly -Time 1
                 }
             }
 
             Context 'Adapter exist and JumboPacket is 1514' {
-                Mock "Get-NetAdapterAdvancedProperty -RegistryKeyword *JumboPacket" -Verbose -MockWith {
-                    @{ RegistryValue = $TestJumboPacket1514.RegistryValue}
+                Mock Get-NetAdapterAdvancedProperty -Verbose -MockWith {
+                    @{
+                        RegistryValue = $TestJumboPacket1514.RegistryValue
+                        RegistryKeyword = $TestJumboPacket1514.RegistryKeyword
+                    }
                 }
 
                 It 'Should return the JumboPacket size' {
@@ -66,12 +74,12 @@ try
                 }
 
                 It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName "Get-NetAdapterAdvancedProperty -RegistryKeyword *JumboPacket" -Exactly -Time 1
+                    Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly -Time 1
                 }
             }
             Context 'Adapter does not exist' {
 
-                Mock -CommandName "Get-NetAdapterAdvancedProperty -RegistryKeyword *JumboPacket" -MockWith { throw 'Network adapter not found' }
+                Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith { throw 'Network adapter not found' }
 
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.NetAdapterNotFoundMessage)
@@ -81,15 +89,18 @@ try
                 }
 
                 It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName "Get-NetAdapterAdvancedProperty -RegistryKeyword *JumboPacket" -Exactly -Time 1
+                    Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly -Time 1
                 }
             }
 
             Describe "$($script:DSCResourceName)\Set-TargetResource" {
 
-                Context 'Adapter exist, RSS is enabled, no action required' {
-                    Mock -CommandName "Get-NetAdapterAdvancedProperty -RegistryKeyword *JumboPacket" -MockWith {
-                        @{ RegistryValue = $TestJumboPacket9014.RegistryValue}
+                Context 'Adapter exist, JumboPacket is 9014, no action required' {
+                    Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith {
+                        @{
+                            RegistryValue = $TestJumboPacket9014.RegistryValue
+                            RegistryKeyword = $TestJumboPacket9014.RegistryKeyword
+                        }
                     }
                     Mock -CommandName Set-NetAdapterAdvancedProperty
 
@@ -98,14 +109,17 @@ try
                     }
 
                     It 'Should call all mocks' {
-                        Assert-MockCalled -CommandName "Get-NetAdapterAdvancedProperty -RegistryKeyword *JumboPacket" -Exactly -Time 1
+                        Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly -Time 1
                         Assert-MockCalled -CommandName Set-NetAdapterAdvancedProperty -Exactly -Time 0
                     }
                 }
 
-                Context 'Adapter exist, RSS is enabled, should be disabled' {
-                    Mock -CommandName "Get-NetAdapterAdvancedProperty -RegistryKeyword *JumboPacket" -MockWith {
-                        @{ RegistryValue = $TestJumboPacket9014.RegistryValue }
+                Context 'Adapter exist, JumboPacket is 9014, should be 1514' {
+                    Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith {
+                        @{
+                            RegistryValue = $TestJumboPacket9014.RegistryValue
+                            RegistryKeyword = $TestJumboPacket9014.RegistryKeyword
+                        }
                     }
                     Mock -CommandName Set-NetAdapterAdvancedProperty
 
@@ -114,15 +128,35 @@ try
                     }
 
                     It 'Should call all mocks' {
-                        Assert-MockCalled -CommandName "Get-NetAdapterAdvancedProperty -RegistryKeyword *JumboPacket" -Exactly -Time 1
+                        Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly -Time 1
+                        Assert-MockCalled -CommandName Set-NetAdapterAdvancedProperty -Exactly -Time 1
+                    }
+                }
+
+                Context 'Adapter exist, JumboPacket is 1514, should be 9014' {
+                    Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith {
+                        @{
+                            RegistryValue = $TestJumboPacket1514.RegistryValue
+                            RegistryKeyword = $TestJumboPacket1514.RegistryKeyword
+                        }
+                    }
+                    Mock -CommandName Set-NetAdapterAdvancedProperty
+
+                    It 'Should not throw an exception' {
+                        { Set-TargetResource @TestJumboPacket9014 } | Should Not Throw
+                    }
+
+                    It 'Should call all mocks' {
+                        Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly -Time 1
                         Assert-MockCalled -CommandName Set-NetAdapterAdvancedProperty -Exactly -Time 1
                     }
                 }
 
 
+
                 # Adapter
                 Context 'Adapter does not exist' {
-                    Mock -CommandName Get-NetAdapterRSS -MockWith { throw 'Network adapter not found' }
+                    Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith { throw 'Network adapter not found' }
 
                     $errorRecord = Get-InvalidOperationRecord `
                         -Message ($LocalizedData.NetAdapterNotFoundMessage)
@@ -132,13 +166,64 @@ try
                     }
 
                     It 'Should call all mocks' {
-                        Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
+                        Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly -Time 1
                     }
                 }
 
             }
 
-        }}
+        }
+        Describe "$($script:DSCResourceName)\Test-TargetResource" {
+            # JumboPacket
+            Context 'Adapter exist, JumboPacket is 9014, no action required' {
+                Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith {
+                    @{
+                        RegistryValue = $TestJumboPacket9014.RegistryValue
+                        RegistryKeyword = $TestJumboPacket9014.RegistryKeyword
+                    }
+                }
+
+                It 'Should return true' {
+                    Test-TargetResource @TestJumboPacket9014 | Should Be $true
+                }
+
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly 1
+                }
+            }
+
+            Context 'Adapter exist, JumboPacket is 9014 should be 1514' {
+                Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith {
+                    @{
+                        RegistryValue = $TestJumboPacket9014.RegistryValue
+                        RegistryKeyword = $TestJumboPacket9014.RegistryKeyword
+                    }
+                }
+
+                It 'Should return false' {
+                    Test-TargetResource @TestJumboPacket1514 | Should Be $false
+                }
+
+                it 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly 1
+                }
+            }
+
+
+            # Adapter
+            Context 'Adapter does not exist' {
+                Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith { throw 'Network adapter not found' }
+
+                It 'Should throw an exception' {
+                    { Test-TargetResource @TestAdapterNotFound } | Should throw
+                }
+
+                It 'Should call all mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly 1
+                }
+            }
+        }
+    }
     #endregion
 }
 finally

@@ -130,13 +130,14 @@ function Set-TargetResource
 
         if ($RegistryValue -ne $netadapteradvprop.RegistryValue)
         {
+            $netadapterRegistryValue = $netadapteradvprop.RegistryValue
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.NetAdapterApplyingChangesMessage -f `
-                            $NetworkAdapterName,$netadapteradvprop.RegistryValue,$RegistryValue )
+                            $NetworkAdapterName,$RegistryKeyword,"$netadapterRegistryValue",$RegistryValue )
                 ) -join '')
 
-            Get-NetAdapterAdvancedProperty -Name $networkAdapterName  -RegistryKeyword $RegistryKeyword | Set-NetAdapterAdvancedProperty -RegistryValue $RegistryValue
+            Set-NetAdapterAdvancedProperty -RegistryValue $RegistryValue -Name $networkAdapterName  -RegistryKeyword $RegistryKeyword
         }
     }
 }
