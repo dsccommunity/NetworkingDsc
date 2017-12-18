@@ -1,5 +1,5 @@
 # Description
 
-This resource is used to enable or disable RSS (Receive Side Scaling) on a network adapter.
-Not all adapters support RSS so there may be no option for this and it will throw an exception that the network adapter is not found.
+This resource is used to change advanced properties on a network adapter.
+Please check the supported registry values before creating a configuration.
 
