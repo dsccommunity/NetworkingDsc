@@ -1,8 +1,10 @@
 # Versions
 
 ## Unreleased
+
 - MSFT_xNetAdapterAdvancedProperty
  - Created new resource configuring AdvancedProperties for NetAdapter
+
 ## 5.3.0.0
 
 - MSFT_xProxySettings:
