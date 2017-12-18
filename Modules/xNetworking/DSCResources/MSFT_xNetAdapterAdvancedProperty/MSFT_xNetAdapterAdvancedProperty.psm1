@@ -175,6 +175,7 @@ function Test-TargetResource
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
+        [System.Boolean] $desiredConfigurationMatch = $true
 
     try
     {
@@ -196,11 +197,7 @@ function Test-TargetResource
 
         If ($RegistryValue -eq $netadapteradvprop.RegistryValue)
         {
-            return $true
-        }
-        else
-        {
-            return $false
+            return $desiredConfigurationMatch
         }
     }
 }
