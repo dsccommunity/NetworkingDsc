@@ -67,10 +67,10 @@ function Get-TargetResource
             ) -join '')
 
         $result = @{
-            Name    = $NetworkAdapterName
+            Name            = $NetworkAdapterName
             RegistryKeyword = $RegistryKeyword
-            DisplayValue = $netadapteradvprop.DisplayValue
-            RegistryValue = $netadapteradvprop.RegistryValue
+            DisplayValue    = $netadapteradvprop.DisplayValue
+            RegistryValue   = $netadapteradvprop.RegistryValue
         }
 
         return $result
@@ -134,7 +134,7 @@ function Set-TargetResource
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.NetAdapterApplyingChangesMessage -f `
-                            $NetworkAdapterName,$RegistryKeyword,"$netadapterRegistryValue",$RegistryValue )
+                            $NetworkAdapterName, $RegistryKeyword, "$netadapterRegistryValue", $RegistryValue )
                 ) -join '')
 
             Set-NetAdapterAdvancedProperty -RegistryValue $RegistryValue -Name $networkAdapterName  -RegistryKeyword $RegistryKeyword
@@ -194,10 +194,12 @@ function Test-TargetResource
                     $NetworkAdapterName, $RegistryKeyword
             ) -join '')
 
-        If ($RegistryValue -eq $netadapteradvprop.RegistryValue) {
+        If ($RegistryValue -eq $netadapteradvprop.RegistryValue)
+        {
             return $true
         }
-        else {
+        else
+        {
             return $false
         }
     }
