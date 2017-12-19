@@ -197,7 +197,6 @@ function Test-TargetResource
     {
         New-InvalidOperationException `
             -Message ($LocalizedData.NetAdapterNotFoundMessage)
-        return $false
     }
 
     if ($netAdapteradvprop)
@@ -211,6 +210,10 @@ function Test-TargetResource
         If ($RegistryValue -eq $netadapteradvprop.RegistryValue)
         {
             return $true
+        }
+        else
+        {
+            return $false
         }
     }
 }
