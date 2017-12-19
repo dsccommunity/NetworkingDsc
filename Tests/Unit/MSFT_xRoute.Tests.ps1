@@ -24,7 +24,7 @@ try
 {
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
-        # Create the Mock -CommandName Objects that will be used for running tests
+        # Create the Mock Objects that will be used for running tests
         $mockNetAdapter = [PSCustomObject] @{
             Name = 'Ethernet'
         }

@@ -1,7 +1,7 @@
 # Localized resources for MSFT_xRoute
 
 ConvertFrom-StringData @'
-    GettingRouteMessage = Getting '{0}' route on '{1}' destinationination '{2}' nexthop '{3}'.
+    GettingRouteMessage = Getting '{0}' route on '{1}' destination '{2}' nexthop '{3}'.
     RouteExistsMessage = '{0}' route on '{1}' destination '{2}' nexthop '{3}' exists.
     RouteDoesNotExistMessage = '{0}' route on '{1}' destination '{2}' nexthop '{3}' does not exist.
     SettingRouteMessage = Setting '{0}' route on '{1}' destination '{2}' nexthop '{3}'.
