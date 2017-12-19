@@ -1,14 +1,14 @@
-$script:DSCModuleName      = 'xNetworking'
-$script:DSCResourceName    = 'MSFT_xRoute'
+$script:DSCModuleName = 'xNetworking'
+$script:DSCResourceName = 'MSFT_xRoute'
 
 #region HEADER
 # Integration Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -22,84 +22,128 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     #region Integration Tests
-    $InterfaceAlias = (Get-NetAdapter -Physical | Select-Object -First 1).Name
-    $TestRoute = [PSObject]@{
-        InterfaceAlias          = $InterfaceAlias
-        AddressFamily           = 'IPv4'
-        DestinationPrefix       = '10.0.0.0/8'
-        NextHop                 = '10.0.1.0'
-        RouteMetric             = 200
-        Publish                 = 'No'
+    $interfaceAlias = (Get-NetAdapter -Physical | Select-Object -First 1).Name
+
+    $dummyRoute = [PSObject] @{
+        InterfaceAlias    = $interfaceAlias
+        AddressFamily     = 'IPv4'
+        DestinationPrefix = '11.0.0.0/8'
+        NextHop           = '11.0.1.0'
+        RouteMetric       = 200
     }
 
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Add.config.ps1"
+    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Add_Integration" {
-        #region DEFAULT TESTS
-        It 'Should compile without throwing' {
-            {
-                & "$($script:DSCResourceName)_Add_Config" -OutputPath $TestDrive
-                Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+        $configData = @{
+            AllNodes = @(
+                @{
+                    NodeName          = 'localhost'
+                    InterfaceAlias    = $interfaceAlias
+                    AddressFamily     = $dummyRoute.AddressFamily
+                    DestinationPrefix = $dummyRoute.DestinationPrefix
+                    NextHop           = $dummyRoute.NextHop
+                    Ensure            = 'Present'
+                    RouteMetric       = $dummyRoute.RouteMetric
+                    Publish           = 'No'
+                }
+            )
         }
 
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+        #region DEFAULT TESTS
+        It 'Should compile and apply the MOF without throwing' {
+            {
+                & "$($script:DSCResourceName)_Config" `
+                    -OutputPath $TestDrive `
+                    -ConfigurationData $configData
+
+                Start-DscConfiguration `
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force `
+                    -ErrorAction Stop
+            } | Should -Not -Throw
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Add_Config"}
-            $current.InterfaceAlias    | Should Be $TestRoute.InterfaceAlias
-            $current.AddressFamily     | Should Be $TestRoute.AddressFamily
-            $current.DestinationPrefix | Should Be $TestRoute.DestinationPrefix
-            $current.NextHop           | Should Be $TestRoute.NextHop
-            $current.Ensure            | Should Be 'Present'
-            $current.RouteMetric       | Should Be $TestRoute.RouteMetric
-            $current.Publish           | Should Be $TestRoute.Publish
+            $current = Get-DscConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+            }
+
+            $current.InterfaceAlias    | Should Be $configData.AllNodes[0].InterfaceAlias
+            $current.AddressFamily     | Should Be $configData.AllNodes[0].AddressFamily
+            $current.DestinationPrefix | Should Be $configData.AllNodes[0].DestinationPrefix
+            $current.NextHop           | Should Be $configData.AllNodes[0].NextHop
+            $current.Ensure            | Should Be $configData.AllNodes[0].Ensure
+            $current.RouteMetric       | Should Be $configData.AllNodes[0].RouteMetric
+            $current.Publish           | Should Be $configData.AllNodes[0].Publish
+        }
+
+        It 'Should have created the route' {
+            Get-NetRoute @dummyRoute -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty
         }
     }
-
-    # This is a dummy route that will be added to ensure that only a specific route
-    # is deleted by the resource.
-    $DummyRoute = [PSObject]@{
-        InterfaceAlias          = $InterfaceAlias
-        AddressFamily           = 'IPv4'
-        DestinationPrefix       = '11.0.0.0/8'
-        NextHop                 = '11.0.1.0'
-        RouteMetric             = 200
-    }
-    $null = New-NetRoute @DummyRoute
-
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Remove.config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Remove_Integration" {
-        #region DEFAULT TESTS
-        It 'Should compile without throwing' {
-            {
-                & "$($script:DSCResourceName)_Remove_Config" -OutputPath $TestDrive
-                Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+        $configData = @{
+            AllNodes = @(
+                @{
+                    NodeName          = 'localhost'
+                    InterfaceAlias    = $interfaceAlias
+                    AddressFamily     = $dummyRoute.AddressFamily
+                    DestinationPrefix = $dummyRoute.DestinationPrefix
+                    NextHop           = $dummyRoute.NextHop
+                    Ensure            = 'Absent'
+                    RouteMetric       = $dummyRoute.RouteMetric
+                    Publish           = 'No'
+                }
+            )
         }
 
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+        #region DEFAULT TESTS
+        It 'Should compile and apply the MOF without throwing' {
+            {
+                & "$($script:DSCResourceName)_Config" `
+                    -OutputPath $TestDrive `
+                    -ConfigurationData $configData
+
+                Start-DscConfiguration `
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force `
+                    -ErrorAction Stop
+            } | Should -Not -Throw
+        }
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Remove_Config"}
-            $current.InterfaceAlias    | Should Be $TestRoute.InterfaceAlias
-            $current.AddressFamily     | Should Be $TestRoute.AddressFamily
-            $current.DestinationPrefix | Should Be $TestRoute.DestinationPrefix
-            $current.NextHop           | Should Be $TestRoute.NextHop
-            $current.Ensure            | Should Be 'Absent'
+            $current = Get-DscConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+            }
+
+            $current.InterfaceAlias    | Should Be $configData.AllNodes[0].InterfaceAlias
+            $current.AddressFamily     | Should Be $configData.AllNodes[0].AddressFamily
+            $current.DestinationPrefix | Should Be $configData.AllNodes[0].DestinationPrefix
+            $current.NextHop           | Should Be $configData.AllNodes[0].NextHop
+            $current.Ensure            | Should Be $configData.AllNodes[0].Ensure
         }
 
-        It 'Should not delete the dummy route' {
-            Get-NetRoute @DummyRoute | Should Not BeNullOrEmpty
+        It 'Should have deleted the route' {
+            Get-NetRoute @dummyRoute -ErrorAction SilentlyContinue | Should -BeNullOrEmpty
         }
     }
     #endregion
@@ -107,14 +151,7 @@ try
 finally
 {
     # Clean up any created routes just in case the integration tests fail
-    $null = Remove-NetRoute @DummyRoute `
-        -Confirm:$false `
-        -ErrorAction SilentlyContinue
-    $null = Remove-NetRoute `
-        -InterfaceAlias $TestRoute.InterfaceAlias `
-        -AddressFamily $TestRoute.AddressFamily `
-        -DestinationPrefix $TestRoute.DestinationPrefix `
-        -NextHop $TestRoute.NextHop `
+    $null = Remove-NetRoute @dummyRoute `
         -Confirm:$false `
         -ErrorAction SilentlyContinue
 
