@@ -19,11 +19,14 @@ $localizedData = Get-LocalizedData `
 .SYNOPSIS
     Gets the current state of NetAdapterRss for a adapter.
 
-.PARAMETER Name
+.PARAMETER NetworkAdapterName
     Specifies the Name of the network adapter to check.
 
-.PARAMETER State
-    Specifies the Rss state for the protocol.
+.PARAMETER RegistryKeyword
+    Specifies the settings registrykeyword that should be in desired state.
+
+.PARAMETER RegistryValue
+    Specifies the value of the settings.
 #>
 function Get-TargetResource
 {
@@ -36,6 +39,7 @@ function Get-TargetResource
         $NetworkAdapterName,
 
         [Parameter(Mandatory = $true)]
+        [ValidateSet("*FlowControl","*InterruptModeration","*IPChecksumOffloadIPv4","*JumboPacket","*LsoV2IPv4","*LsoV2IPv6","*MaxRssProcessors","*NumaNodeId","*NumRssQueues","*PriorityVLANTag","*ReceiveBuffers","*RSS","*RssBaseProcNumber","*RssMaxProcNumber","*RSSProfile","*SpeedDuplex","*TCPChecksumOffloadIPv4","*TCPChecksumOffloadIPv6","*TransmitBuffers","*UDPChecksumOffloadIPv4","*UDPChecksumOffloadIPv6","AdaptiveIFS","ITR","LogLinkStateEvent","MasterSlave","NetworkAddress","WaitAutoNegComplete")]
         [String]
         $RegistryKeyword,
 
@@ -79,18 +83,20 @@ function Get-TargetResource
 
 <#
 .SYNOPSIS
-    Sets the NetAdapterRss resource state.
+    Gets the current state of NetAdapterRss for a adapter.
 
-.PARAMETER Name
+.PARAMETER NetworkAdapterName
     Specifies the Name of the network adapter to check.
 
-.PARAMETER State
-    Specifies the Rss state for the protocol.
+.PARAMETER RegistryKeyword
+    Specifies the settings registrykeyword that should be in desired state.
+
+.PARAMETER RegistryValue
+    Specifies the value of the settings.
 #>
 function Set-TargetResource
 {
     [CmdletBinding()]
-    [OutputType([Hashtable])]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -98,6 +104,7 @@ function Set-TargetResource
         $NetworkAdapterName,
 
         [Parameter(Mandatory = $true)]
+        [ValidateSet("*FlowControl","*InterruptModeration","*IPChecksumOffloadIPv4","*JumboPacket","*LsoV2IPv4","*LsoV2IPv6","*MaxRssProcessors","*NumaNodeId","*NumRssQueues","*PriorityVLANTag","*ReceiveBuffers","*RSS","*RssBaseProcNumber","*RssMaxProcNumber","*RSSProfile","*SpeedDuplex","*TCPChecksumOffloadIPv4","*TCPChecksumOffloadIPv6","*TransmitBuffers","*UDPChecksumOffloadIPv4","*UDPChecksumOffloadIPv6","AdaptiveIFS","ITR","LogLinkStateEvent","MasterSlave","NetworkAddress","WaitAutoNegComplete")]
         [String]
         $RegistryKeyword,
 
@@ -144,18 +151,21 @@ function Set-TargetResource
 
 <#
 .SYNOPSIS
-    Tests if the NetAdapterRss resource state is desired state.
+    Gets the current state of NetAdapterRss for a adapter.
 
-.PARAMETER Name
+.PARAMETER NetworkAdapterName
     Specifies the Name of the network adapter to check.
 
-.PARAMETER State
-    Specifies the Rss state for the protocol.
+.PARAMETER RegistryKeyword
+    Specifies the settings registrykeyword that should be in desired state.
+
+.PARAMETER RegistryValue
+    Specifies the value of the settings.
 #>
 function Test-TargetResource
 {
     [CmdletBinding()]
-    [OutputType([Hashtable])]
+    [OutputType([Boolean])]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -163,6 +173,7 @@ function Test-TargetResource
         $NetworkAdapterName,
 
         [Parameter(Mandatory = $true)]
+        [ValidateSet("*FlowControl","*InterruptModeration","*IPChecksumOffloadIPv4","*JumboPacket","*LsoV2IPv4","*LsoV2IPv6","*MaxRssProcessors","*NumaNodeId","*NumRssQueues","*PriorityVLANTag","*ReceiveBuffers","*RSS","*RssBaseProcNumber","*RssMaxProcNumber","*RSSProfile","*SpeedDuplex","*TCPChecksumOffloadIPv4","*TCPChecksumOffloadIPv6","*TransmitBuffers","*UDPChecksumOffloadIPv4","*UDPChecksumOffloadIPv6","AdaptiveIFS","ITR","LogLinkStateEvent","MasterSlave","NetworkAddress","WaitAutoNegComplete")]
         [String]
         $RegistryKeyword,
 
@@ -175,7 +186,8 @@ function Test-TargetResource
             "$($MyInvocation.MyCommand): "
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
-        [System.Boolean] $desiredConfigurationMatch = $true
+
+
 
     try
     {
@@ -185,6 +197,7 @@ function Test-TargetResource
     {
         New-InvalidOperationException `
             -Message ($LocalizedData.NetAdapterNotFoundMessage)
+        return $false
     }
 
     if ($netAdapteradvprop)
@@ -197,7 +210,7 @@ function Test-TargetResource
 
         If ($RegistryValue -eq $netadapteradvprop.RegistryValue)
         {
-            return $desiredConfigurationMatch
+            return $true
         }
     }
 }
