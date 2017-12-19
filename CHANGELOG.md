@@ -3,7 +3,7 @@
 ## Unreleased
 
 - MSFT_xNetAdapterAdvancedProperty
- - Created new resource configuring AdvancedProperties for NetAdapter
+  - Created new resource configuring AdvancedProperties for NetAdapter
 - MSFT_xIPAddressOption:
   - Added a new resource to set the SkipAsSource option for an IP address.
 - MSFT_xWeakHostSend:
