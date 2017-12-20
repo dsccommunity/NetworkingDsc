@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '5.3.0.0'
+ModuleVersion = '5.4.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -50,18 +50,19 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- MSFT_xProxySettings:
-  - Created new resource configuring proxy settings.
-- MSFT_xDefaultGatewayAddress:
-  - Correct `2-SetDefaultGateway.md` address family and improve example
-    description - fixes [Issue 275](https://github.com/PowerShell/xNetworking/issues/275).
-- MSFT_xIPAddress:
+        ReleaseNotes = '- MSFT_xIPAddressOption:
+  - Added a new resource to set the SkipAsSource option for an IP address.
+- MSFT_xWeakHostSend:
+  - Created the new Weak Host Send resource.
+- MSFT_xWeakHostReceive:
+  - Created the new Weak Host Receive resource.
+- MSFT_xRoute:
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
   - Changed unit tests so that they can be run in any order.
-- MSFT_xNetAdapterBinding:
-  - Corrected style and formatting to meet HQRM guidelines.
-  - Converted exceptions to use ResourceHelper functions.
+  - Included default values in MOF file so that they are displayed
+    in Wiki documentation.
+  - Converted tests to meet Pester V4 standards.
 
 '
 
@@ -69,6 +70,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 

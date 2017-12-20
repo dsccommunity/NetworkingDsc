@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.4.0.0
+
 - MSFT_xIPAddressOption:
   - Added a new resource to set the SkipAsSource option for an IP address.
 - MSFT_xWeakHostSend:
