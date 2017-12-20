@@ -2,13 +2,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
@@ -27,7 +27,8 @@ $localizedData = Get-LocalizedData `
 
     .PARAMETER DestinationPrefix
     Specifies a destination prefix of an IP route.
-    A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/).
+    A destination prefix consists of an IP address prefix
+    and a prefix length, separated by a slash (/).
 
     .PARAMETER NextHop
     Specifies the next hop for the IP route.
@@ -40,25 +41,29 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $InterfaceAlias,
+        [System.String]
+        $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String] $AddressFamily,
+        [System.String]
+        $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $DestinationPrefix,
+        [System.String]
+        $DestinationPrefix,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $NextHop
+        [System.String]
+        $NextHop
     )
 
     Write-Verbose -Message ( @(
-        "$($MyInvocation.MyCommand): "
-        $($LocalizedData.GettingRouteMessage) `
-            -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
+            "$($MyInvocation.MyCommand): "
+            $($LocalizedData.GettingRouteMessage) `
+                -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
         ) -join '' )
 
     # Lookup the existing Route
@@ -70,27 +75,28 @@ function Get-TargetResource
         DestinationPrefix = $DestinationPrefix
         NextHop           = $NextHop
     }
+
     if ($route)
     {
         Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($LocalizedData.RouteExistsMessage) `
-                -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.RouteExistsMessage) `
+                    -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
             ) -join '' )
 
         $returnValue += @{
             Ensure            = 'Present'
-            RouteMetric       = [Uint16] $route.RouteMetric
+            RouteMetric       = [System.Uint16] $route.RouteMetric
             Publish           = $route.Publish
-            PreferredLifetime = [Double] $route.PreferredLifetime.TotalSeconds
+            PreferredLifetime = [System.Double] $route.PreferredLifetime.TotalSeconds
         }
     }
     else
     {
         Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($LocalizedData.RouteDoesNotExistMessage) `
-                -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.RouteDoesNotExistMessage) `
+                    -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
             ) -join '' )
 
         $returnValue += @{
@@ -98,7 +104,7 @@ function Get-TargetResource
         }
     }
 
-    $returnValue
+    return $returnValue
 } # Get-TargetResource
 
 <#
@@ -113,19 +119,23 @@ function Get-TargetResource
 
     .PARAMETER DestinationPrefix
     Specifies a destination prefix of an IP route.
-    A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/).
+    A destination prefix consists of an IP address prefix
+    and a prefix length, separated by a slash (/).
 
     .PARAMETER NextHop
     Specifies the next hop for the IP route.
 
     .PARAMETER Ensure
     Specifies whether the route should exist.
+    Defaults to 'Present'.
 
     .PARAMETER RouteMetric
     Specifies an integer route metric for an IP route.
+    Defaults to 256.
 
     .PARAMETER Publish
     Specifies the publish setting of an IP route.
+    Defaults to 'No'.
 
     .PARAMETER PreferredLifetime
     Specifies a preferred lifetime in seconds of an IP route.
@@ -137,36 +147,40 @@ function Set-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $DestinationPrefix,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $NextHop,
 
+        [Parameter()]
         [ValidateSet('Present', 'Absent')]
-        [String]
+        [System.String]
         $Ensure = 'Present',
 
-        [Uint16]
+        [Parameter()]
+        [System.Uint16]
         $RouteMetric = 256,
 
+        [Parameter()]
         [ValidateSet('No', 'Yes', 'Age')]
-        [String]
+        [System.String]
         $Publish = 'No',
 
-        [Double]
+        [Parameter()]
+        [System.Double]
         $PreferredLifetime
     )
 
@@ -179,9 +193,9 @@ function Set-TargetResource
     if ($Ensure -eq 'Present')
     {
         Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($LocalizedData.EnsureRouteExistsMessage) `
-                -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.EnsureRouteExistsMessage) `
+                    -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
             ) -join '' )
 
         if ($route)
@@ -192,9 +206,9 @@ function Set-TargetResource
                 -ErrorAction Stop
 
             Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($LocalizedData.RouteUpdatedMessage) `
-                    -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.RouteUpdatedMessage) `
+                        -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
                 ) -join '' )
         }
         else
@@ -204,27 +218,27 @@ function Set-TargetResource
                 -ErrorAction Stop
 
             Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($LocalizedData.RouteCreatedMessage) `
-                    -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.RouteCreatedMessage) `
+                        -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
                 ) -join '' )
         }
     }
     else
     {
         Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($LocalizedData.EnsureRouteDoesNotExistMessage) `
-                -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.EnsureRouteDoesNotExistMessage) `
+                    -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
             ) -join '' )
 
         if ($route)
         {
             <#
-            The Route exists - remove it
-            Use the parameters passed to Set-TargetResource to delete the appropriate route.
-            Clear the Publish and PreferredLifetime parameters so they aren't passed to the
-            Remove-NetRoute cmdlet.
+                The Route exists - remove it
+                Use the parameters passed to Set-TargetResource to delete the appropriate route.
+                Clear the Publish and PreferredLifetime parameters so they aren't passed to the
+                Remove-NetRoute cmdlet.
             #>
 
             $null = $PSBoundParameters.Remove('Publish')
@@ -235,9 +249,9 @@ function Set-TargetResource
                 -ErrorAction Stop
 
             Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($LocalizedData.RouteRemovedMessage) `
-                    -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.RouteRemovedMessage) `
+                        -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
                 ) -join '' )
         } # if
     } # if
@@ -255,19 +269,23 @@ function Set-TargetResource
 
     .PARAMETER DestinationPrefix
     Specifies a destination prefix of an IP route.
-    A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/).
+    A destination prefix consists of an IP address prefix
+    and a prefix length, separated by a slash (/).
 
     .PARAMETER NextHop
     Specifies the next hop for the IP route.
 
     .PARAMETER Ensure
     Specifies whether the route should exist.
+    Defaults to 'Present'.
 
     .PARAMETER RouteMetric
     Specifies an integer route metric for an IP route.
+    Defaults to 256.
 
     .PARAMETER Publish
     Specifies the publish setting of an IP route.
+    Defaults to 'No'.
 
     .PARAMETER PreferredLifetime
     Specifies a preferred lifetime in seconds of an IP route.
@@ -280,47 +298,51 @@ function Test-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $DestinationPrefix,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $NextHop,
 
+        [Parameter()]
         [ValidateSet('Present', 'Absent')]
-        [String]
+        [System.String]
         $Ensure = 'Present',
 
-        [Uint16]
+        [Parameter()]
+        [System.Uint16]
         $RouteMetric = 256,
 
+        [Parameter()]
         [ValidateSet('No', 'Yes', 'Age')]
-        [String]
+        [System.String]
         $Publish = 'No',
 
-        [Double]
+        [Parameter()]
+        [System.Double]
         $PreferredLifetime
     )
 
     Write-Verbose -Message ( @(
-        "$($MyInvocation.MyCommand): "
-        $($LocalizedData.TestingRouteMessage) `
-           -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
+            "$($MyInvocation.MyCommand): "
+            $($LocalizedData.TestingRouteMessage) `
+                -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
         ) -join '' )
 
     # Flag to signal whether settings are correct
-    [Boolean] $desiredConfigurationMatch = $true
+    [System.Boolean] $desiredConfigurationMatch = $true
 
     # Remove any parameters that can't be splatted.
     $null = $PSBoundParameters.Remove('Ensure')
@@ -338,35 +360,38 @@ function Test-TargetResource
         {
             # The route exists and does - but check the parameters
             if (($PSBoundParameters.ContainsKey('RouteMetric')) `
-                -and ($route.RouteMetric -ne $RouteMetric))
+                    -and ($route.RouteMetric -ne $RouteMetric))
             {
                 Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.RoutePropertyNeedsUpdateMessage) `
-                       -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop,'RouteMetric' `
+                        "$($MyInvocation.MyCommand): "
+                        $($LocalizedData.RoutePropertyNeedsUpdateMessage) `
+                            -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop, 'RouteMetric' `
                     ) -join '' )
+
                 $desiredConfigurationMatch = $false
             }
 
             if (($PSBoundParameters.ContainsKey('Publish')) `
-                -and ($route.Publish -ne $Publish))
+                    -and ($route.Publish -ne $Publish))
             {
                 Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.RoutePropertyNeedsUpdateMessage) `
-                       -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop,'Publish' `
+                        "$($MyInvocation.MyCommand): "
+                        $($LocalizedData.RoutePropertyNeedsUpdateMessage) `
+                            -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop, 'Publish' `
                     ) -join '' )
+
                 $desiredConfigurationMatch = $false
             }
 
             if (($PSBoundParameters.ContainsKey('PreferredLifetime')) `
-                -and ($route.PreferredLifetime.TotalSeconds -ne $PreferredLifetime))
+                    -and ($route.PreferredLifetime.TotalSeconds -ne $PreferredLifetime))
             {
                 Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.RoutePropertyNeedsUpdateMessage) `
-                       -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop,'PreferredLifetime' `
+                        "$($MyInvocation.MyCommand): "
+                        $($LocalizedData.RoutePropertyNeedsUpdateMessage) `
+                            -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop, 'PreferredLifetime' `
                     ) -join '' )
+
                 $desiredConfigurationMatch = $false
             }
         }
@@ -374,10 +399,11 @@ function Test-TargetResource
         {
             # The route doesn't exist but should
             Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                 $($LocalizedData.RouteDoesNotExistButShouldMessage) `
-                    -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.RouteDoesNotExistButShouldMessage) `
+                        -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
                 ) -join '' )
+
             $desiredConfigurationMatch = $false
         }
     }
@@ -388,22 +414,24 @@ function Test-TargetResource
         {
             # The route exists but should not
             Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                 $($LocalizedData.RouteExistsButShouldNotMessage) `
-                    -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.RouteExistsButShouldNotMessage) `
+                        -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
                 ) -join '' )
+
             $desiredConfigurationMatch = $false
         }
         else
         {
             # The route does not exist and should not
             Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                 $($LocalizedData.RouteDoesNotExistAndShouldNotMessage) `
-                    -f $AddressFamily,$InterfaceAlias,$DestinationPrefix,$NextHop `
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.RouteDoesNotExistAndShouldNotMessage) `
+                        -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
                 ) -join '' )
         }
     } # if
+
     return $desiredConfigurationMatch
 } # Test-TargetResource
 
@@ -420,23 +448,26 @@ function Test-TargetResource
 
     .PARAMETER DestinationPrefix
     Specifies a destination prefix of an IP route.
-    A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/).
+    A destination prefix consists of an IP address prefix
+    and a prefix length, separated by a slash (/).
 
     .PARAMETER NextHop
     Specifies the next hop for the IP route.
 
     .PARAMETER Ensure
     Specifies whether the route should exist.
+    Defaults to 'Present'.
 
     .PARAMETER RouteMetric
     Specifies an integer route metric for an IP route.
+    Defaults to 256.
 
     .PARAMETER Publish
     Specifies the publish setting of an IP route.
+    Defaults to 'No'.
 
     .PARAMETER PreferredLifetime
     Specifies a preferred lifetime in seconds of an IP route.
-
 #>
 Function Get-Route
 {
@@ -444,36 +475,40 @@ Function Get-Route
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $DestinationPrefix,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $NextHop,
 
+        [Parameter()]
         [ValidateSet('Present', 'Absent')]
-        [String]
+        [System.String]
         $Ensure = 'Present',
 
-        [Uint16]
+        [Parameter()]
+        [System.Uint16]
         $RouteMetric = 256,
 
+        [Parameter()]
         [ValidateSet('No', 'Yes', 'Age')]
-        [String]
+        [System.String]
         $Publish = 'No',
 
-        [Double]
+        [Parameter()]
+        [System.Double]
         $PreferredLifetime
     )
 
@@ -492,9 +527,10 @@ Function Get-Route
     }
     catch
     {
-        Throw $_
+        throw $_
     }
-    Return $route
+
+    return $route
 }
 
 <#
@@ -510,19 +546,23 @@ Function Get-Route
 
     .PARAMETER DestinationPrefix
     Specifies a destination prefix of an IP route.
-    A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/).
+    A destination prefix consists of an IP address prefix
+    and a prefix length, separated by a slash (/).
 
     .PARAMETER NextHop
     Specifies the next hop for the IP route.
 
     .PARAMETER Ensure
     Specifies whether the route should exist.
+    Defaults to 'Present'.
 
     .PARAMETER RouteMetric
     Specifies an integer route metric for an IP route.
+    Defaults to 256.
 
     .PARAMETER Publish
     Specifies the publish setting of an IP route.
+    Defaults to 'No'.
 
     .PARAMETER PreferredLifetime
     Specifies a preferred lifetime in seconds of an IP route.
@@ -534,141 +574,104 @@ Function Assert-ResourceProperty
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $DestinationPrefix,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $NextHop,
 
+        [Parameter()]
         [ValidateSet('Present', 'Absent')]
-        [String]
+        [System.String]
         $Ensure = 'Present',
 
-        [Uint16]
+        [Parameter()]
+        [System.Uint16]
         $RouteMetric = 256,
 
+        [Parameter()]
         [ValidateSet('No', 'Yes', 'Age')]
-        [String]
+        [System.String]
         $Publish = 'No',
 
-        [Double]
+        [Parameter()]
+        [System.Double]
         $PreferredLifetime
     )
 
     # Validate the Adapter exists
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
-        $errorId = 'InterfaceNotAvailable'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::DeviceError
-        $errorMessage = $($LocalizedData.InterfaceNotAvailableError) -f $InterfaceAlias
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
+        New-InvalidArgumentException `
+            -Message $($($LocalizedData.InterfaceNotAvailableError) -f $InterfaceAlias) `
+            -ArgumentName 'InterfaceAlias'
     }
 
     # Validate the DestinationPrefix Parameter
-    $Components = $DestinationPrefix -split '/'
-    $Prefix = $Components[0]
-    $Subnet = $Components[1]
+    $components = $DestinationPrefix -split '/'
+    $prefix = $components[0]
 
-    if (-not ([System.Net.Ipaddress]::TryParse($Prefix, [ref]0)))
+    if (-not ([System.Net.Ipaddress]::TryParse($prefix, [ref]0)))
     {
-        $errorId = 'AddressFormatError'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-        $errorMessage = $($LocalizedData.AddressFormatError) -f $Prefix
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
+        New-InvalidArgumentException `
+            -Message $($($LocalizedData.AddressFormatError) -f $prefix) `
+            -ArgumentName 'DestinationPrefix'
     }
 
-    $detectedAddressFamily = ([System.Net.IPAddress] $Prefix).AddressFamily.ToString()
-    if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
-        -and ($AddressFamily -ne 'IPv4'))
-    {
-        $errorId = 'AddressMismatchError'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-        $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f $Prefix,$AddressFamily
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
+    $detectedAddressFamily = ([System.Net.IPAddress] $prefix).AddressFamily.ToString()
 
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
+    if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
+            -and ($AddressFamily -ne 'IPv4'))
+    {
+        New-InvalidArgumentException `
+            -Message $($($LocalizedData.AddressIPv4MismatchError) -f $prefix, $AddressFamily) `
+            -ArgumentName 'DestinationPrefix'
     }
 
     if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6.ToString()) `
-        -and ($AddressFamily -ne 'IPv6'))
+            -and ($AddressFamily -ne 'IPv6'))
     {
-        $errorId = 'AddressMismatchError'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-        $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f $Prefix,$AddressFamily
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
+        New-InvalidArgumentException `
+            -Message $($($LocalizedData.AddressIPv6MismatchError) -f $prefix, $AddressFamily) `
+            -ArgumentName 'DestinationPrefix'
     }
 
     # Validate the NextHop Parameter
     if (-not ([System.Net.Ipaddress]::TryParse($NextHop, [ref]0)))
     {
-        $errorId = 'AddressFormatError'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-        $errorMessage = $($LocalizedData.AddressFormatError) -f $NextHop
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
+        New-InvalidArgumentException `
+            -Message $($($LocalizedData.AddressFormatError) -f $NextHop) `
+            -ArgumentName 'NextHop'
     }
 
     $detectedAddressFamily = ([System.Net.IPAddress] $NextHop).AddressFamily.ToString()
-    if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
-        -and ($AddressFamily -ne 'IPv4'))
-    {
-        $errorId = 'AddressMismatchError'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-        $errorMessage = $($LocalizedData.AddressIPv4MismatchError) -f $NextHop,$AddressFamily
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
 
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
+    if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
+            -and ($AddressFamily -ne 'IPv4'))
+    {
+        New-InvalidArgumentException `
+            -Message $($($LocalizedData.AddressIPv4MismatchError) -f $NextHop, $AddressFamily) `
+            -ArgumentName 'NextHop'
     }
 
     if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6.ToString()) `
-        -and ($AddressFamily -ne 'IPv6'))
+            -and ($AddressFamily -ne 'IPv6'))
     {
-        $errorId = 'AddressMismatchError'
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-        $errorMessage = $($LocalizedData.AddressIPv6MismatchError) -f $NextHop,$AddressFamily
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $errorMessage
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-        $PSCmdlet.ThrowTerminatingError($errorRecord)
+        New-InvalidArgumentException `
+            -Message $($($LocalizedData.AddressIPv6MismatchError) -f $NextHop, $AddressFamily) `
+            -ArgumentName 'NextHop'
     }
 }
 

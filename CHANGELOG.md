@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 5.4.0.0
+
+- MSFT_xIPAddressOption:
+  - Added a new resource to set the SkipAsSource option for an IP address.
+- MSFT_xWeakHostSend:
+  - Created the new Weak Host Send resource.
+- MSFT_xWeakHostReceive:
+  - Created the new Weak Host Receive resource.
+- MSFT_xRoute:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Changed unit tests so that they can be run in any order.
+  - Included default values in MOF file so that they are displayed
+    in Wiki documentation.
+  - Converted tests to meet Pester V4 standards.
+
 ## 5.3.0.0
 
 - MSFT_xProxySettings:
