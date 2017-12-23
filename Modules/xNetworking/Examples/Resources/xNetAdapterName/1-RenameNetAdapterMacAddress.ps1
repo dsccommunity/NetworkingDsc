@@ -18,8 +18,8 @@ Configuration Example
     {
         xNetAdapterName RenameNetAdapterCluster
         {
-            NewName        = 'Cluster'
-            MacAddress     = '9C-D2-1E-61-B5-DA'
+            NewName    = 'Cluster'
+            MacAddress = '9C-D2-1E-61-B5-DA'
         }
 
         xDhcpClient EnableDhcpClientCluster
@@ -31,8 +31,8 @@ Configuration Example
 
         xNetAdapterName RenameNetAdapterManagement
         {
-            NewName        = 'Management'
-            MacAddress     = '9C-D2-1E-61-B5-DB'
+            NewName    = 'Management'
+            MacAddress = '9C-D2-1E-61-B5-DB'
         }
 
         xDhcpClient EnableDhcpClientManagement
@@ -44,8 +44,8 @@ Configuration Example
 
         xNetAdapterName RenameNetAdapterSMB
         {
-            NewName        = 'SMB'
-            MacAddress     = '9C-D2-1E-61-B5-DC'
+            NewName    = 'SMB'
+            MacAddress = '9C-D2-1E-61-B5-DC'
         }
 
         xDhcpClient EnableDhcpClientSMB
