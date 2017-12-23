@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- MSFT_xNetAdapterLso:
+  - Corrected style and formatting to meet HQRM guidelines.
+
 ## 5.4.0.0
 
 - MSFT_xIPAddressOption:
