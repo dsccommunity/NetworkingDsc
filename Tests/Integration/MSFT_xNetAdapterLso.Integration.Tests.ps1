@@ -37,20 +37,20 @@ try
                     -Verbose `
                     -Force `
                     -ErrorAction Stop
-            } | Should Not Throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
         }
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
-            $current.Name     | Should Be $TestEnableLsoIPv6.Name
-            $current.Protocol | Should Be $TestEnableLsoIPv6.Protocol
-            $current.State    | Should Be $TestEnableLsoIPv6.State
+            $current.Name     | Should -Be $TestEnableLsoIPv6.Name
+            $current.Protocol | Should -Be $TestEnableLsoIPv6.Protocol
+            $current.State    | Should -Be $TestEnableLsoIPv6.State
         }
     }
     #endregion

@@ -39,7 +39,7 @@ function Get-TargetResource
         $Name,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("V1IPv4", "IPv4", "IPv6")]
+        [ValidateSet('V1IPv4', 'IPv4', 'IPv6')]
         [System.String]
         $Protocol,
 
@@ -120,7 +120,7 @@ function Set-TargetResource
         $Name,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("V1IPv4", "IPv4", "IPv6")]
+        [ValidateSet('V1IPv4', 'IPv4', 'IPv6')]
         [System.String]
         $Protocol,
 
@@ -208,7 +208,7 @@ function Test-TargetResource
         $Name,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("V1IPv4", "IPv4", "IPv6")]
+        [ValidateSet('V1IPv4', 'IPv4', 'IPv6')]
         [System.String]
         $Protocol,
 
