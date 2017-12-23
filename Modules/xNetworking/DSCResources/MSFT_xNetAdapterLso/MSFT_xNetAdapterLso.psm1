@@ -74,6 +74,7 @@ function Get-TargetResource
             Name     = $Name
             Protocol = $Protocol
         }
+
         switch ($Protocol)
         {
             'V1IPv4'
@@ -215,7 +216,6 @@ function Test-TargetResource
         [System.Boolean]
         $State
     )
-
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
