@@ -159,7 +159,7 @@ try
             Context 'Adapter does not exist' {
                 Mock -CommandName Get-NetAdapterLso -MockWith { throw 'Network adapter not found' }
 
-                It 'Should throw an exception' {
+                It 'Should throw the correct exception' {
                     $errorRecord = Get-InvalidOperationRecord `
                         -Message ($LocalizedData.NetAdapterNotFoundMessage)
 
@@ -372,7 +372,7 @@ try
             Context 'Adapter does not exist' {
                 Mock -CommandName Get-NetAdapterLso -MockWith { throw 'Network adapter not found' }
 
-                It 'Should throw an exception' {
+                It 'Should throw the correct exception' {
                     $errorRecord = Get-InvalidOperationRecord `
                         -Message ($LocalizedData.NetAdapterNotFoundMessage)
 
@@ -562,7 +562,7 @@ try
             Context 'Adapter does not exist' {
                 Mock -CommandName Get-NetAdapterLso -MockWith { throw 'Network adapter not found' }
 
-                It 'Should throw an exception' {
+                It 'Should throw the correct exception' {
                     $errorRecord = Get-InvalidOperationRecord `
                         -Message ($LocalizedData.NetAdapterNotFoundMessage)
 
