@@ -1,14 +1,14 @@
-$script:DSCModuleName      = 'xNetworking'
-$script:DSCResourceName    = 'MSFT_xNetAdapterName'
+$script:DSCModuleName = 'xNetworking'
+$script:DSCResourceName = 'MSFT_xNetAdapterName'
 
 #region HEADER
 # Integration Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -60,24 +60,40 @@ try
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
 
-                Start-DscConfiguration -Path $TestDrive `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should Not Throw
+                Start-DscConfiguration `
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force `
+                    -ErrorAction Stop
+            } | Should -Not -Throw
         }
 
-        it 'should reapply the MOF without throwing' {
-            { Start-DscConfiguration -Path $TestDrive `
-                -ComputerName localhost -Wait -Verbose -Force } | Should Not Throw
+        It 'Should reapply the MOF without throwing' {
+            {
+                Start-DscConfiguration `
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force `
+                    -ErrorAction Stop
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            {
+                Get-DscConfiguration -Verbose -ErrorAction Stop
+            } | Should -Not -Throw
         }
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config_All"}
-            $current.Name                     | Should Be $newAdapterName
+            $current = Get-DscConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_All"
+            }
+            $current.Name | Should -Be $newAdapterName
         }
 
         AfterAll {
@@ -107,9 +123,9 @@ try
                 $configData = @{
                     AllNodes = @(
                         @{
-                            NodeName             = 'localhost'
-                            NewName              = $newAdapterName
-                            Name                 = $adapter.Name
+                            NodeName = 'localhost'
+                            NewName  = $newAdapterName
+                            Name     = $adapter.Name
                         }
                     )
                 }
@@ -118,24 +134,40 @@ try
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
 
-                Start-DscConfiguration -Path $TestDrive `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should Not Throw
+                Start-DscConfiguration `
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force `
+                    -ErrorAction Stop
+            } | Should -Not -Throw
         }
 
-        it 'should reapply the MOF without throwing' {
-            { Start-DscConfiguration -Path $TestDrive `
-                -ComputerName localhost -Wait -Verbose -Force } | Should Not Throw
+        It 'Should reapply the MOF without throwing' {
+            {
+                Start-DscConfiguration `
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force `
+                    -ErrorAction Stop
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            {
+                Get-DscConfiguration -Verbose -ErrorAction Stop
+            } | Should -Not -Throw
         }
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config_NameOnly"}
-            $current.Name                     | Should Be $newAdapterName
+            $current = Get-DscConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_NameOnly"
+            }
+            $current.Name | Should -Be $newAdapterName
         }
 
         AfterAll {

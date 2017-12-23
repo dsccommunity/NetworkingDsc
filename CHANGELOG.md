@@ -4,6 +4,10 @@
 
 - MSFT_xNetAdapterLso:
   - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+- MSFT_xNetAdapterName:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
 
 ## 5.4.0.0
 

@@ -2,13 +2,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
@@ -76,7 +76,7 @@ function Get-TargetResource
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet('Up','Disconnected','Disabled')]
+        [ValidateSet('Up', 'Disconnected', 'Disabled')]
         [System.String]
         $Status = 'Up',
 
@@ -110,7 +110,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.GettingNetAdapterNameMessage -f $NewName)
+            $($LocalizedData.GettingNetAdapterNameMessage -f $NewName)
         ) -join '')
 
     $adapter = Find-NetworkAdapter `
@@ -120,7 +120,7 @@ function Get-TargetResource
     if (-not $adapter)
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.FindNetAdapterMessage)
+                $($LocalizedData.FindNetAdapterMessage)
             ) -join '')
 
         $null = $PSBoundParameters.Remove('NewName')
@@ -131,7 +131,7 @@ function Get-TargetResource
     }
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.NetAdapterNameFoundMessage -f $adapter.Name)
+            $($LocalizedData.NetAdapterNameFoundMessage -f $adapter.Name)
         ) -join '')
 
     $returnValue = @{
@@ -209,7 +209,7 @@ function Set-TargetResource
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet('Up','Disconnected','Disabled')]
+        [ValidateSet('Up', 'Disconnected', 'Disabled')]
         [System.String]
         $Status = 'Up',
 
@@ -243,7 +243,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.SettingNetAdapterNameMessage -f $NewName)
+            $($LocalizedData.SettingNetAdapterNameMessage -f $NewName)
         ) -join '')
 
     $null = $PSBoundParameters.Remove('NewName')
@@ -253,13 +253,13 @@ function Set-TargetResource
         -ErrorAction Stop
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.RenamingNetAdapterNameMessage -f $adapter.Name,$NewName)
+            $($LocalizedData.RenamingNetAdapterNameMessage -f $adapter.Name, $NewName)
         ) -join '')
 
     $adapter | Rename-NetAdapter -NewName $NewName
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.NetAdapterNameRenamedMessage -f $NewName)
+            $($LocalizedData.NetAdapterNameRenamedMessage -f $NewName)
         ) -join '')
 } # Set-TargetResource
 
@@ -324,7 +324,7 @@ function Test-TargetResource
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet('Up','Disconnected','Disabled')]
+        [ValidateSet('Up', 'Disconnected', 'Disabled')]
         [System.String]
         $Status = 'Up',
 
@@ -358,7 +358,7 @@ function Test-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.TestingNetAdapterNameMessage -f $NewName)
+            $($LocalizedData.TestingNetAdapterNameMessage -f $NewName)
         ) -join '')
 
     $null = $PSBoundParameters.Remove('NewName')
@@ -373,15 +373,16 @@ function Test-TargetResource
     {
         # An adapter was found matching the new name
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.NetAdapterWithNewNameExistsMessage -f $adapterWithNewName.Name)
+                $($LocalizedData.NetAdapterWithNewNameExistsMessage -f $adapterWithNewName.Name)
             ) -join '')
+
         return $true
     }
     else
     {
         # Find an adapter matching the parameters - throw if none can be found
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.FindNetAdapterMessage)
+                $($LocalizedData.FindNetAdapterMessage)
             ) -join '')
 
         $adapter = Find-NetworkAdapter `
@@ -390,8 +391,9 @@ function Test-TargetResource
 
         # An adapter was found that needs to be changed to the new name
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.NetAdapterNameNotMatchMessage -f $adapter.Name,$NewName)
+                $($LocalizedData.NetAdapterNameNotMatchMessage -f $adapter.Name, $NewName)
             ) -join '')
+
         return $false
     } # if
 } # Test-TargetResource
