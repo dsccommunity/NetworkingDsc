@@ -191,11 +191,11 @@ try
                 Mock `
                     -CommandName Find-NetworkAdapter `
                     -MockWith { $script:mockAdapter } `
-                    -ParameterFilter {$Name -and $Name -eq $script:AdapterName}
+                    -ParameterFilter { $Name -and $Name -eq $script:AdapterName }
 
                 Mock `
                     -CommandName Find-NetworkAdapter `
-                    -ParameterFilter {$Name -and $Name -eq $script:newAdapterName}
+                    -ParameterFilter { $Name -and $Name -eq $script:newAdapterName }
 
                 It 'Should not throw exception' {
                     { $script:result = Test-TargetResource @adapterParameters -Verbose } | Should -Not -Throw
@@ -208,11 +208,11 @@ try
                 It 'Should call all the mocks' {
                     Assert-MockCalled `
                         -CommandName Find-NetworkAdapter -Exactly -Times 1 `
-                        -ParameterFilter {$Name -and $Name -eq $script:AdapterName}
+                        -ParameterFilter { $Name -and $Name -eq $script:AdapterName }
 
                     Assert-MockCalled `
                         -CommandName Find-NetworkAdapter -Exactly -Times 1 `
-                        -ParameterFilter {$Name -and $Name -eq $script:newAdapterName}
+                        -ParameterFilter { $Name -and $Name -eq $script:newAdapterName }
                 }
             }
 
@@ -220,20 +220,20 @@ try
                 Mock `
                     -CommandName Find-NetworkAdapter `
                     -MockWith { $script:mockRenamedAdapter } `
-                    -ParameterFilter {$Name -and $Name -eq $script:newAdapterName}
+                    -ParameterFilter { $Name -and $Name -eq $script:newAdapterName }
 
                 It 'Should not throw exception' {
                     { $script:result = Test-TargetResource @adapterParameters -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:result | Should -Be $True
+                    $script:result | Should -Be $true
                 }
 
                 It 'Should call all the mocks' {
                     Assert-MockCalled `
                         -CommandName Find-NetworkAdapter -Exactly -Times 1 `
-                        -ParameterFilter {$Name -and $Name -eq $script:newAdapterName}
+                        -ParameterFilter { $Name -and $Name -eq $script:newAdapterName }
                 }
             }
         }

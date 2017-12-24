@@ -47,7 +47,7 @@ try
         $mockBindingEnabled = @{
             InterfaceAlias = 'Ethernet'
             ComponentId    = 'ms_tcpip63'
-            Enabled        = $True
+            Enabled        = $true
         }
 
         $mockBindingDisabled = @{
@@ -65,7 +65,7 @@ try
             @{
                 InterfaceAlias = 'Ethernet2'
                 ComponentId    = 'ms_tcpip63'
-                Enabled        = $True
+                Enabled        = $true
             }
         )
 
@@ -183,7 +183,7 @@ try
                 Mock -CommandName Get-Binding -MockWith { $mockBindingEnabled }
 
                 It 'Should return true' {
-                    Test-TargetResource @testBindingEnabled | Should Be $True
+                    Test-TargetResource @testBindingEnabled | Should Be $true
                 }
 
                 It 'Should call all the mocks' {
@@ -195,7 +195,7 @@ try
                 Mock -CommandName Get-Binding -MockWith { $mockBindingDisabled }
 
                 It 'Should return true' {
-                    Test-TargetResource @testBindingDisabled | Should Be $True
+                    Test-TargetResource @testBindingDisabled | Should Be $true
                 }
 
                 It 'Should call all the mocks' {
