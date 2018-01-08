@@ -1,4 +1,4 @@
-﻿$script:DSCModuleName = 'xNetworking'
+$script:DSCModuleName = 'xNetworking'
 $script:DSCResourceName = 'MSFT_xNetAdapterAdvancedProperty'
 
 #region HEADER
@@ -40,8 +40,11 @@ try
             RegistryKeyword = "*JumboPacket"
             RegistryValue = 1514
         }
+
         function Get-NetAdapterAdvancedProperty { }
+
         Describe "$($script:DSCResourceName)\Get-TargetResource" -Tag 'Get' {
+
             Context 'Adapter exist and JumboPacket is enabled 9014' {
                 Mock Get-NetAdapterAdvancedProperty -Verbose -MockWith {
                     @{
@@ -52,7 +55,7 @@ try
 
                 It 'Should return the JumboPacket size' {
                     $result = Get-TargetResource @TestJumboPacket9014
-                    $result.RegistryValue | Should Be $TestJumboPacket9014.RegistryValue
+                    $result.RegistryValue | Should -Be $TestJumboPacket9014.RegistryValue
                 }
 
                 It 'Should call all mocks' {
@@ -70,13 +73,14 @@ try
 
                 It 'Should return the JumboPacket size' {
                     $result = Get-TargetResource @TestJumboPacket1514
-                    $result.RegistryValue | Should Be $TestJumboPacket1514.RegistryValue
+                    $result.RegistryValue | Should -Be $TestJumboPacket1514.RegistryValue
                 }
 
                 It 'Should call all mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly -Time 1
                 }
             }
+
             Context 'Adapter does not exist' {
 
                 Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith { throw 'Network adapter not found' }
@@ -85,7 +89,7 @@ try
                     -Message ($LocalizedData.NetAdapterNotFoundMessage)
 
                 It 'Should throw an exception' {
-                    { Get-TargetResource @TestAdapterNotFound } | Should throw $errorRecord
+                    { Get-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
                 }
 
                 It 'Should call all mocks' {
@@ -105,7 +109,7 @@ try
                     Mock -CommandName Set-NetAdapterAdvancedProperty
 
                     It 'Should not throw an exception' {
-                        { Set-TargetResource @TestJumboPacket9014 } | Should Not Throw
+                        { Set-TargetResource @TestJumboPacket9014 } | Should -Not -Throw
                     }
 
                     It 'Should call all mocks' {
@@ -124,7 +128,7 @@ try
                     Mock -CommandName Set-NetAdapterAdvancedProperty
 
                     It 'Should not throw an exception' {
-                        { Set-TargetResource @TestJumboPacket1514 } | Should Not Throw
+                        { Set-TargetResource @TestJumboPacket1514 } | Should -Not -Throw
                     }
 
                     It 'Should call all mocks' {
@@ -143,7 +147,7 @@ try
                     Mock -CommandName Set-NetAdapterAdvancedProperty
 
                     It 'Should not throw an exception' {
-                        { Set-TargetResource @TestJumboPacket9014 } | Should Not Throw
+                        { Set-TargetResource @TestJumboPacket9014 } | Should -Not -Throw
                     }
 
                     It 'Should call all mocks' {
@@ -151,8 +155,6 @@ try
                         Assert-MockCalled -CommandName Set-NetAdapterAdvancedProperty -Exactly -Time 1
                     }
                 }
-
-
 
                 # Adapter
                 Context 'Adapter does not exist' {
@@ -162,18 +164,18 @@ try
                         -Message ($LocalizedData.NetAdapterNotFoundMessage)
 
                     It 'Should throw an exception' {
-                        { Set-TargetResource @TestAdapterNotFound } | Should throw $errorRecord
+                        { Set-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
                     }
 
                     It 'Should call all mocks' {
                         Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly -Time 1
                     }
                 }
-
             }
-
         }
+
         Describe "$($script:DSCResourceName)\Test-TargetResource" {
+
             # JumboPacket
             Context 'Adapter exist, JumboPacket is 9014, no action required' {
                 Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith {
@@ -184,10 +186,10 @@ try
                 }
 
                 It 'Should return true' {
-                    Test-TargetResource @TestJumboPacket9014 | Should Be $true
+                    Test-TargetResource @TestJumboPacket9014 | Should -Be $true
                 }
 
-                it 'Should call all mocks' {
+                It 'Should call all mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly 1
                 }
             }
@@ -201,10 +203,10 @@ try
                 }
 
                 It 'Should return false' {
-                    Test-TargetResource @TestJumboPacket1514 | Should Be $false
+                    Test-TargetResource @TestJumboPacket1514 | Should -Be $false
                 }
 
-                it 'Should call all mocks' {
+                It 'Should call all mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly 1
                 }
             }
@@ -215,7 +217,7 @@ try
                 Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith { throw 'Network adapter not found' }
 
                 It 'Should throw an exception' {
-                    { Test-TargetResource @TestAdapterNotFound } | Should throw
+                    { Test-TargetResource @TestAdapterNotFound } | Should -Throw
                 }
 
                 It 'Should call all mocks' {

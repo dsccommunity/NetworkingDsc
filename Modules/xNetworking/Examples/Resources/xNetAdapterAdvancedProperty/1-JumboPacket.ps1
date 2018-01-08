@@ -17,9 +17,9 @@ Configuration Example
     {
         xNetAdapterAdvancedProperty JumboPacket9014
         {
-            NetworkAdapterName = 'Ethernet'
-            RegistryKeyword = "*JumboPacket"
-            RegistryValue = 9014
+            NetworkAdapterName  = 'Ethernet'
+            RegistryKeyword     = "*JumboPacket"
+            RegistryValue       = 9014
         }
     }
 }

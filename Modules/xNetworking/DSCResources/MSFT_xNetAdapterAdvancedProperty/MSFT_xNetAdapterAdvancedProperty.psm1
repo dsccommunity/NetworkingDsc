@@ -17,10 +17,10 @@ $localizedData = Get-LocalizedData `
 
 <#
 .SYNOPSIS
-    Gets the current state of NetAdapterRss for a adapter.
+    Gets the current value of an advanced property.
 
 .PARAMETER NetworkAdapterName
-    Specifies the Name of the network adapter to check.
+    Specifies the Name of the network adapter to get the advanced property for.
 
 .PARAMETER RegistryKeyword
     Specifies the settings registrykeyword that should be in desired state.
@@ -31,20 +31,20 @@ $localizedData = Get-LocalizedData `
 function Get-TargetResource
 {
     [CmdletBinding()]
-    [OutputType([Hashtable])]
+    [OutputType([System.Collections.Hashtable])]
     param
     (
         [Parameter(Mandatory = $true)]
-        [String]
+        [System.String]
         $NetworkAdapterName,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("*FlowControl","*InterruptModeration","*IPChecksumOffloadIPv4","*JumboPacket","*LsoV2IPv4","*LsoV2IPv6","*MaxRssProcessors","*NumaNodeId","*NumRssQueues","*PriorityVLANTag","*ReceiveBuffers","*RSS","*RssBaseProcNumber","*RssMaxProcNumber","*RSSProfile","*SpeedDuplex","*TCPChecksumOffloadIPv4","*TCPChecksumOffloadIPv6","*TransmitBuffers","*UDPChecksumOffloadIPv4","*UDPChecksumOffloadIPv6","AdaptiveIFS","ITR","LogLinkStateEvent","MasterSlave","NetworkAddress","WaitAutoNegComplete")]
-        [String]
+        [System.String]
         $RegistryKeyword,
 
         [Parameter(Mandatory = $true)]
-        [String]
+        [System.String]
         $RegistryValue
     )
 
@@ -55,7 +55,7 @@ function Get-TargetResource
 
     try
     {
-        $netAdapteradvprop = Get-NetAdapterAdvancedProperty -Name $networkAdapterName  -RegistryKeyword $RegistryKeyword -ErrorAction Stop
+        $netAdapterAdvancedProperty = Get-NetAdapterAdvancedProperty -Name $networkAdapterName -RegistryKeyword $RegistryKeyword -ErrorAction Stop
     }
     catch
     {
@@ -63,7 +63,7 @@ function Get-TargetResource
             -Message ($LocalizedData.NetAdapterNotFoundMessage)
     }
 
-    if ($netAdapteradvprop)
+    if ($netAdapterAdvancedProperty)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
@@ -73,8 +73,8 @@ function Get-TargetResource
         $result = @{
             Name            = $NetworkAdapterName
             RegistryKeyword = $RegistryKeyword
-            DisplayValue    = $netadapteradvprop.DisplayValue
-            RegistryValue   = $netadapteradvprop.RegistryValue
+            DisplayValue    = $netAdapterAdvancedProperty.DisplayValue
+            RegistryValue   = $netAdapterAdvancedProperty.RegistryValue
         }
 
         return $result
@@ -83,10 +83,10 @@ function Get-TargetResource
 
 <#
 .SYNOPSIS
-    Gets the current state of NetAdapterRss for a adapter.
+    Gets the current value of an advanced property.
 
 .PARAMETER NetworkAdapterName
-    Specifies the Name of the network adapter to check.
+    Specifies the Name of the network adapter to get the advanced property for.
 
 .PARAMETER RegistryKeyword
     Specifies the settings registrykeyword that should be in desired state.
@@ -100,16 +100,16 @@ function Set-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [String]
+        [System.String]
         $NetworkAdapterName,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("*FlowControl","*InterruptModeration","*IPChecksumOffloadIPv4","*JumboPacket","*LsoV2IPv4","*LsoV2IPv6","*MaxRssProcessors","*NumaNodeId","*NumRssQueues","*PriorityVLANTag","*ReceiveBuffers","*RSS","*RssBaseProcNumber","*RssMaxProcNumber","*RSSProfile","*SpeedDuplex","*TCPChecksumOffloadIPv4","*TCPChecksumOffloadIPv6","*TransmitBuffers","*UDPChecksumOffloadIPv4","*UDPChecksumOffloadIPv6","AdaptiveIFS","ITR","LogLinkStateEvent","MasterSlave","NetworkAddress","WaitAutoNegComplete")]
-        [String]
+        [System.String]
         $RegistryKeyword,
 
         [Parameter(Mandatory = $true)]
-        [String]
+        [System.String]
         $RegistryValue
     )
 
@@ -120,7 +120,7 @@ function Set-TargetResource
 
     try
     {
-        $netAdapteradvprop = Get-NetAdapterAdvancedProperty -Name $networkAdapterName  -RegistryKeyword $RegistryKeyword -ErrorAction Stop
+        $netAdapterAdvancedProperty = Get-NetAdapterAdvancedProperty -Name $networkAdapterName  -RegistryKeyword $RegistryKeyword -ErrorAction Stop
     }
     catch
     {
@@ -128,7 +128,7 @@ function Set-TargetResource
             -Message ($LocalizedData.NetAdapterNotFoundMessage)
     }
 
-    if ($netAdapteradvprop)
+    if ($netAdapterAdvancedProperty)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
@@ -137,7 +137,7 @@ function Set-TargetResource
 
         if ($RegistryValue -ne $netadapteradvprop.RegistryValue)
         {
-            $netadapterRegistryValue = $netadapteradvprop.RegistryValue
+            $netadapterRegistryValue = $netAdapterAdvancedProperty.RegistryValue
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.NetAdapterApplyingChangesMessage -f `
@@ -151,10 +151,10 @@ function Set-TargetResource
 
 <#
 .SYNOPSIS
-    Gets the current state of NetAdapterRss for a adapter.
+    Sets the current value of an advanced property.
 
 .PARAMETER NetworkAdapterName
-    Specifies the Name of the network adapter to check.
+    Specifies the Name of the network adapter to get the advanced property for.
 
 .PARAMETER RegistryKeyword
     Specifies the settings registrykeyword that should be in desired state.
@@ -165,20 +165,20 @@ function Set-TargetResource
 function Test-TargetResource
 {
     [CmdletBinding()]
-    [OutputType([Boolean])]
+    [OutputType([System.Boolean])]
     param
     (
         [Parameter(Mandatory = $true)]
-        [String]
+        [System.String]
         $NetworkAdapterName,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("*FlowControl","*InterruptModeration","*IPChecksumOffloadIPv4","*JumboPacket","*LsoV2IPv4","*LsoV2IPv6","*MaxRssProcessors","*NumaNodeId","*NumRssQueues","*PriorityVLANTag","*ReceiveBuffers","*RSS","*RssBaseProcNumber","*RssMaxProcNumber","*RSSProfile","*SpeedDuplex","*TCPChecksumOffloadIPv4","*TCPChecksumOffloadIPv6","*TransmitBuffers","*UDPChecksumOffloadIPv4","*UDPChecksumOffloadIPv6","AdaptiveIFS","ITR","LogLinkStateEvent","MasterSlave","NetworkAddress","WaitAutoNegComplete")]
-        [String]
+        [System.String]
         $RegistryKeyword,
 
         [Parameter(Mandatory = $true)]
-        [String]
+        [System.String]
         $RegistryValue
     )
 
@@ -187,11 +187,9 @@ function Test-TargetResource
             $localizedData.CheckingNetAdapterMessage
         ) -join '')
 
-
-
     try
     {
-        $netAdapteradvprop = Get-NetAdapterAdvancedProperty -Name $networkAdapterName  -RegistryKeyword $RegistryKeyword -ErrorAction Stop
+        $netAdapterAdvancedProperty = Get-NetAdapterAdvancedProperty -Name $networkAdapterName  -RegistryKeyword $RegistryKeyword -ErrorAction Stop
     }
     catch
     {
@@ -199,7 +197,7 @@ function Test-TargetResource
             -Message ($LocalizedData.NetAdapterNotFoundMessage)
     }
 
-    if ($netAdapteradvprop)
+    if ($netAdapterAdvancedProperty)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
@@ -207,7 +205,7 @@ function Test-TargetResource
                     $NetworkAdapterName, $RegistryKeyword
             ) -join '')
 
-        If ($RegistryValue -eq $netadapteradvprop.RegistryValue)
+        if ($RegistryValue -eq $netAdapterAdvancedProperty.RegistryValue)
         {
             return $true
         }
