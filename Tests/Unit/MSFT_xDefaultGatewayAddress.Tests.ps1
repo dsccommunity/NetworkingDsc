@@ -153,7 +153,7 @@ try
                         AddressFamily = 'IPv4'
                     }
 
-                    Test-TargetResource @testTargetResourceParameters | Should Be $True
+                    Test-TargetResource @testTargetResourceParameters | Should Be $true
                 }
             }
 
@@ -207,7 +207,7 @@ try
                         AddressFamily = 'IPv4'
                     }
 
-                    Test-TargetResource @testTargetResourceParameters | Should Be $True
+                    Test-TargetResource @testTargetResourceParameters | Should Be $true
                 }
             }
         }

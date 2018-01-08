@@ -27,13 +27,13 @@ try
         $dnsClientGlobalSettings = [PSObject]@{
             SuffixSearchList = 'contoso.com'
             DevolutionLevel  = 1
-            UseDevolution    = $True
+            UseDevolution    = $true
         }
 
         $dnsClientGlobalMultiSuffixSettings = [PSObject]@{
             SuffixSearchList = @('fabrikam.com', 'fourthcoffee.com')
             DevolutionLevel  = 1
-            UseDevolution    = $True
+            UseDevolution    = $true
         }
 
         $dnsClientGlobalSettingsSplat = [PSObject]@{
@@ -167,7 +167,7 @@ try
                 Context 'DNS Client Global Settings all parameters are the same' {
                     It 'Should return true' {
                         $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
-                        Test-TargetResource @testTargetResourceParameters | Should Be $True
+                        Test-TargetResource @testTargetResourceParameters | Should Be $true
                     }
 
                     It 'Should call expected Mocks' {
@@ -233,7 +233,7 @@ try
                     It 'Should return true' {
                         $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $testTargetResourceParameters.SuffixSearchList = @('fabrikam.com', 'fourthcoffee.com')
-                        Test-TargetResource @testTargetResourceParameters | Should Be $True
+                        Test-TargetResource @testTargetResourceParameters | Should Be $true
                     }
 
                     It 'Should call expected Mocks' {

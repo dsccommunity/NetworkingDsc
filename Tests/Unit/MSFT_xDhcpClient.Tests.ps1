@@ -182,7 +182,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
 
                 It 'Should return true' {
-                    Test-TargetResource @testNetIPInterfaceDisabled | Should Be $True
+                    Test-TargetResource @testNetIPInterfaceDisabled | Should Be $true
                 }
 
                 It 'Should call expected mocks' {
@@ -195,7 +195,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
 
                 It 'Should return true' {
-                    Test-TargetResource @testNetIPInterfaceEnabled | Should Be $True
+                    Test-TargetResource @testNetIPInterfaceEnabled | Should Be $true
                 }
 
                 It 'Should call expected mocks' {

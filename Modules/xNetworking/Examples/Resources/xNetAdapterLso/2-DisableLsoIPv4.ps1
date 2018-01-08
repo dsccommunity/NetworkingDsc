@@ -7,7 +7,7 @@ Configuration Example
     param
     (
         [Parameter()]
-        [System.String[]] 
+        [System.String[]]
         $NodeName = 'localhost'
     )
 
@@ -17,9 +17,9 @@ Configuration Example
     {
         xNetAdapterLso DisableLsoIPv4
         {
-            Name = 'Ethernet'
+            Name     = 'Ethernet'
             Protocol = 'IPv4'
-            State = $false
+            State    = $false
         }
     }
 }

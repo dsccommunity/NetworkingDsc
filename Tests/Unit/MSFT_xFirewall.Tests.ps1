@@ -748,7 +748,7 @@ try
 
                 It "Should return True on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $True
+                    $result | Should be $true
                 }
             }
 
