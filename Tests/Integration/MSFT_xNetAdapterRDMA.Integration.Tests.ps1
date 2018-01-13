@@ -19,7 +19,7 @@ $script:AdapterName = 'vEthernet (Default Switch)'
 $adapterRDMAStatus = Get-NetAdapterRdma -Name $script:AdapterName -ErrorAction SilentlyContinue
 if (-not $adapterRDMAStatus)
 {
-    Write-Verbse -Message ('The network adapter selected for RDMA integration testing is not RDMA compatible. Integration tests will be skipped.')
+    Write-Verbose -Message ('The network adapter selected for RDMA integration testing is not RDMA compatible. Integration tests will be skipped.')
     return
 }
 
