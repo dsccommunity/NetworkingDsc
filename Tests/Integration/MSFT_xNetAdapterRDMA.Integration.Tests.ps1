@@ -1,16 +1,38 @@
-#Remove this following line before using this integration test script
-return
+<#
+    To execute integration tests an RDMA compatible adapter is required in the host
+    The Microsoft Loopback Adapter is not RDMA compatible so can not be used for
+    test automation.
 
-$script:DSCModuleName      = 'xNetworking'
-$script:DSCResourceName    = 'MSFT_xNetAdapterRDMA'
+    To run the this test on a machine with a compatible RDMA adapter, set the value of
+    the `$script:AdapterName` variable to the name of the adapter to test. The RDMA status
+    of the adapter should be restored after test completion.
+
+    Important: this test will disrupt network connectivity to the adapter selected for
+    testing, so do not specify an adapter used for connectivity to the test client. This
+    is why these tests can not be executed in AppVeyor.
+#>
+$script:DSCModuleName = 'xNetworking'
+$script:DSCResourceName = 'MSFT_xNetAdapterRDMA'
+$script:AdapterName = 'vEthernet (Default Switch)'
+
+# Check the adapter selected for use in testing is RDMA compatible and preserve state
+$adapterRDMAStatus = Get-NetAdapterRdma -Name $script:AdapterName -ErrorAction SilentlyContinue
+if (-not $adapterRDMAStatus)
+{
+    Write-Verbse -Message ('The network adapter selected for RDMA integration testing is not RDMA compatible. Integration tests will be skipped.')
+    return
+}
+
+# Make sure RDMA is disabled on the selected adapter before running tests
+Set-NetAdapterRdma -Name $script:AdapterName -Enabled $false
 
 #region HEADER
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -18,7 +40,7 @@ Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:DSCModuleName `
     -DSCResourceName $script:DSCResourceName `
-    -TestType Integration 
+    -TestType Integration
 #endregion
 
 # Using try/finally to always cleanup even if something awful happens.
@@ -28,36 +50,56 @@ try
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
+    # This is to pass to the Config
+    $configData = @{
+        AllNodes = @(
+            @{
+                NodeName = 'localhost'
+                Name     = $script:AdapterName
+                Enabled  = $true
+            }
+        )
+    }
+
     Describe "$($script:DSCResourceName)_Integration" {
-        #region DEFAULT TESTS
-        It 'Should compile without throwing' {
+        It 'Should compile and apply the MOF without throwing' {
             {
-                & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
-                Start-DscConfiguration -Path $TestDrive `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+                & "$($script:DSCResourceName)_Config" `
+                    -OutputPath $TestDrive `
+                    -ConfigurationData $configData
+
+                Start-DscConfiguration `
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force `
+                    -ErrorAction Stop
+            } | Should -Not -Throw
         }
 
-        It 'should be able to call Get-DscConfiguration without throwing' {
+        It 'Should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
         }
-        #endregion
 
         It 'Should have set the resource and all the parameters should match' {
-            $result = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
-            $result.Name                   | Should Be $TestAdapter.Name
-            $result.Enabled                | Should Be $TestAdapter.Enabled
+            $result = Get-DscConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+            }
+            $result.Name                   | Should -Be $configData.AllNodes[0].Name
+            $result.Enabled                | Should -Be $configData.AllNodes[0].Enabled
         }
 
         Set-NetAdapterRDMA `
-            -Name $TestAdapter.Name `
+            -Name $configData.AllNodes[0].Name `
             -Enabled $false
     }
-    #endregion
 }
 finally
 {
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
+
+    Set-NetAdapterRdma -Name $script:AdapterName -Enabled $adapterRDMAStatus.Enabled
     #endregion
 }
