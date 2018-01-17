@@ -66,6 +66,7 @@ function Get-TargetResource
         [System.String]
         $NewName,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Name,
@@ -199,6 +200,7 @@ function Set-TargetResource
         [System.String]
         $NewName,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Name,
@@ -314,6 +316,7 @@ function Test-TargetResource
         [System.String]
         $NewName,
 
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Name,

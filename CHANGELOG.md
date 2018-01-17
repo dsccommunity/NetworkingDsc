@@ -8,6 +8,12 @@
 - MSFT_xNetAdapterName:
   - Corrected style and formatting to meet HQRM guidelines.
   - Updated tests to meet Pester v4 guidelines.
+- MSFT_xNetAdapterRDMA:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Improved integration tests to preserve system status and run in more
+    scenarios.
 
 ## 5.4.0.0
 
