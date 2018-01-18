@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- MSFT_xNetAdapterAdvancedProperty:
+  - Created new resource configuring AdvancedProperties for NetAdapter
 - MSFT_xNetAdapterLso:
   - Corrected style and formatting to meet HQRM guidelines.
   - Updated tests to meet Pester v4 guidelines.
