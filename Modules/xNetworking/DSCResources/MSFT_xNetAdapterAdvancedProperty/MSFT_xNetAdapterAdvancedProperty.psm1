@@ -135,7 +135,7 @@ function Set-TargetResource
                 $($LocalizedData.NetAdapterTestingStateMessage -f $NetworkAdapterName, $RegistryKeyword)
             ) -join '')
 
-        if ($RegistryValue -ne $netadapteradvprop.RegistryValue)
+        if ($RegistryValue -ne $netAdapterAdvancedProperty.RegistryValue)
         {
             $netadapterRegistryValue = $netAdapterAdvancedProperty.RegistryValue
             Write-Verbose -Message ( @(
