@@ -6,9 +6,9 @@ Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot 
 # Unit Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -47,7 +47,7 @@ try
             }
         }
         Context 'Multiple Notations Used "192.168.0.0/16,10.0.0.24/255.255.255.0"' {
-            $Result = Convert-CIDRToSubhetMask -Address @('192.168.0.0/16','10.0.0.24/255.255.255.0')
+            $Result = Convert-CIDRToSubhetMask -Address @('192.168.0.0/16', '10.0.0.24/255.255.255.0')
             It 'Should Return "192.168.0.0/255.255.0.0,10.0.0.0/255.255.255.0"' {
                 $Result[0] | Should Be '192.168.0.0/255.255.0.0'
                 $Result[1] | Should Be '10.0.0.0/255.255.255.0'
@@ -462,7 +462,7 @@ try
                     -MockWith { $multipleMatchingAdapterArray }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.InvalidNetAdapterNumberError -f 2,3)
+                    -Message ($LocalizedData.InvalidNetAdapterNumberError -f 2, 3)
 
                 It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -IgnoreMultipleMatchingAdapters:$true -InterfaceNumber 3 -Verbose } | Should Throw $errorRecord
@@ -483,14 +483,14 @@ try
         an exception because the GetAdapter module has no manifest
     #>
     InModuleScope $script:ModuleName {
-        Describe "NetworkingDsc.Common\Get-DnsClientServerStaticAddress" {
+        Describe 'NetworkingDsc.Common\Get-DnsClientServerStaticAddress' {
 
             # Generate the adapter data to be used for Mocking
             $interfaceAlias = 'Adapter'
             $interfaceGuid = [Guid]::NewGuid().ToString()
             $nomatchAdapter = $null
             $matchAdapter = [PSObject]@{
-                InterfaceGuid        = $interfaceGuid
+                InterfaceGuid = $interfaceGuid
             }
             $ipv4Parameters = @{
                 InterfaceAlias = $interfaceAlias
@@ -534,10 +534,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        [psobject] @{
-                            NameServer  = $noIpv4StaticAddressString
-                        }
+                    [psobject] @{
+                        NameServer = $noIpv4StaticAddressString
                     }
+                }
 
                 It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
@@ -561,10 +561,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        [psobject] @{
-                            Dummy = ''
-                        }
+                    [psobject] @{
+                        Dummy = ''
                     }
+                }
 
                 It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
@@ -588,10 +588,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        [psobject] @{
-                            NameServer = $oneIpv4StaticAddressString
-                        }
+                    [psobject] @{
+                        NameServer = $oneIpv4StaticAddressString
                     }
+                }
 
                 It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
@@ -615,10 +615,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        [psobject] @{
-                            NameServer = $twoIpv4StaticAddressString
-                        }
+                    [psobject] @{
+                        NameServer = $twoIpv4StaticAddressString
                     }
+                }
 
                 It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
@@ -643,10 +643,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        [psobject] @{
-                            NameServer = $noIpv6StaticAddressString
-                        }
+                    [psobject] @{
+                        NameServer = $noIpv6StaticAddressString
                     }
+                }
 
                 It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
@@ -670,10 +670,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        [psobject] @{
-                            Dummy = ''
-                        }
+                    [psobject] @{
+                        Dummy = ''
                     }
+                }
 
                 It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
@@ -697,10 +697,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        [psobject] @{
-                            NameServer = $oneIpv6StaticAddressString
-                        }
+                    [psobject] @{
+                        NameServer = $oneIpv6StaticAddressString
                     }
+                }
 
                 It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
@@ -724,10 +724,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        [psobject] @{
-                            NameServer = $twoIpv6StaticAddressString
-                        }
+                    [psobject] @{
+                        NameServer = $twoIpv6StaticAddressString
                     }
+                }
 
                 It 'Should not throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
@@ -748,7 +748,7 @@ try
     #endregion
 
     #region Function Get-IPAddressPrefix
-    Describe "NetworkingDsc.Common\Get-IPAddressPrefix" {
+    Describe 'NetworkingDsc.Common\Get-IPAddressPrefix' {
         Context 'IPv4 CIDR notation provided' {
             it 'Should return the provided IP and prefix as separate properties' {
                 $IPaddress = Get-IPAddressPrefix -IPAddress '192.168.10.0/24'
@@ -800,6 +800,431 @@ try
 
                 $IPaddress.IPaddress | Should be 'FF12::12::123'
                 $IPaddress.PrefixLength | Should be 64
+            }
+        }
+    }
+
+    InModuleScope $script:ModuleName {
+        Describe 'NetworkingDsc.Common\Remove-CommonParameter' {
+            $removeCommonParameter = @{
+                Parameter1          = 'value1'
+                Parameter2          = 'value2'
+                Verbose             = $true
+                Debug               = $true
+                ErrorAction         = 'Stop'
+                WarningAction       = 'Stop'
+                InformationAction   = 'Stop'
+                ErrorVariable       = 'errorVariable'
+                WarningVariable     = 'warningVariable'
+                OutVariable         = 'outVariable'
+                OutBuffer           = 'outBuffer'
+                PipelineVariable    = 'pipelineVariable'
+                InformationVariable = 'informationVariable'
+                WhatIf              = $true
+                Confirm             = $true
+                UseTransaction      = $true
+            }
+
+            Context 'Hashtable contains all common parameters' {
+                It 'Should not throw exception' {
+                    { $script:result = Remove-CommonParameter -Hashtable $removeCommonParameter -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should have retained parameters in the hashtable' {
+                    $script:result.Contains('Parameter1') | Should -Be $true
+                    $script:result.Contains('Parameter2') | Should -Be $true
+                }
+
+                It 'Should have removed the common parameters from the hashtable' {
+                    $script:result.Contains('Verbose') | Should -Be $false
+                    $script:result.Contains('Debug') | Should -Be $false
+                    $script:result.Contains('ErrorAction') | Should -Be $false
+                    $script:result.Contains('WarningAction') | Should -Be $false
+                    $script:result.Contains('InformationAction') | Should -Be $false
+                    $script:result.Contains('ErrorVariable') | Should -Be $false
+                    $script:result.Contains('WarningVariable') | Should -Be $false
+                    $script:result.Contains('OutVariable') | Should -Be $false
+                    $script:result.Contains('OutBuffer') | Should -Be $false
+                    $script:result.Contains('PipelineVariable') | Should -Be $false
+                    $script:result.Contains('InformationVariable') | Should -Be $false
+                    $script:result.Contains('WhatIf') | Should -Be $false
+                    $script:result.Contains('Confirm') | Should -Be $false
+                    $script:result.Contains('UseTransaction') | Should -Be $false
+                }
+            }
+        }
+
+        Describe 'NetworkingDsc.Common\Test-DscParameterState' {
+            Context 'All current parameters match desired parameters' {
+                $currentValues = @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 99
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $desiredValues = [PSObject] @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 99
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $valuesToCheck = @(
+                    'parameterString'
+                    'parameterBool'
+                    'ParameterInt'
+                    'ParameterArray'
+                )
+
+                It 'Should not throw exception' {
+                    { $script:result = Test-DscParameterState `
+                            -CurrentValues $currentValues `
+                            -DesiredValues $desiredValues `
+                            -ValuesToCheck $valuesToCheck `
+                            -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return $true' {
+                    $script:result | Should -Be $true
+                }
+            }
+
+            Context 'The current parameters do not match desired parameters because a string mismatches' {
+                $currentValues = @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 99
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $desiredValues = [PSObject] @{
+                    parameterString = 'different string'
+                    parameterBool   = $true
+                    parameterInt    = 99
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $valuesToCheck = @(
+                    'parameterString'
+                    'parameterBool'
+                    'ParameterInt'
+                    'ParameterArray'
+                )
+
+                It 'Should not throw exception' {
+                    { $script:result = Test-DscParameterState `
+                            -CurrentValues $currentValues `
+                            -DesiredValues $desiredValues `
+                            -ValuesToCheck $valuesToCheck `
+                            -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -Be $false
+                }
+            }
+
+            Context 'The current parameters do not match desired parameters because a boolean mismatches' {
+                $currentValues = @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 99
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $desiredValues = [PSObject] @{
+                    parameterString = 'a string'
+                    parameterBool   = $false
+                    parameterInt    = 99
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $valuesToCheck = @(
+                    'parameterString'
+                    'parameterBool'
+                    'ParameterInt'
+                    'ParameterArray'
+                )
+
+                It 'Should not throw exception' {
+                    { $script:result = Test-DscParameterState `
+                            -CurrentValues $currentValues `
+                            -DesiredValues $desiredValues `
+                            -ValuesToCheck $valuesToCheck `
+                            -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -Be $false
+                }
+            }
+
+            Context 'The current parameters do not match desired parameters because a int mismatches' {
+                $currentValues = @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 99
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $desiredValues = [PSObject] @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 1
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $valuesToCheck = @(
+                    'parameterString'
+                    'parameterBool'
+                    'ParameterInt'
+                    'ParameterArray'
+                )
+
+                It 'Should not throw exception' {
+                    { $script:result = Test-DscParameterState `
+                            -CurrentValues $currentValues `
+                            -DesiredValues $desiredValues `
+                            -ValuesToCheck $valuesToCheck `
+                            -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -Be $false
+                }
+            }
+
+            Context 'The current parameters do not match desired parameters because an array is missing a value' {
+                $currentValues = @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 99
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $desiredValues = [PSObject] @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 1
+                    parameterArray  = @( 'a', 'b' )
+                }
+
+                $valuesToCheck = @(
+                    'parameterString'
+                    'parameterBool'
+                    'ParameterInt'
+                    'ParameterArray'
+                )
+
+                It 'Should not throw exception' {
+                    { $script:result = Test-DscParameterState `
+                            -CurrentValues $currentValues `
+                            -DesiredValues $desiredValues `
+                            -ValuesToCheck $valuesToCheck `
+                            -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -Be $false
+                }
+            }
+
+            Context 'The current parameters do not match desired parameters because an array has an additional value' {
+                $currentValues = @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 99
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $desiredValues = [PSObject] @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 1
+                    parameterArray  = @( 'a', 'b', 'c', 'd' )
+                }
+
+                $valuesToCheck = @(
+                    'parameterString'
+                    'parameterBool'
+                    'ParameterInt'
+                    'ParameterArray'
+                )
+
+                It 'Should not throw exception' {
+                    { $script:result = Test-DscParameterState `
+                            -CurrentValues $currentValues `
+                            -DesiredValues $desiredValues `
+                            -ValuesToCheck $valuesToCheck `
+                            -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -Be $false
+                }
+            }
+
+            Context 'The current parameters do not match desired parameters because an array has a different value' {
+                $currentValues = @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 99
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $desiredValues = [PSObject] @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 1
+                    parameterArray  = @( 'a', 'd', 'c' )
+                }
+
+                $valuesToCheck = @(
+                    'parameterString'
+                    'parameterBool'
+                    'ParameterInt'
+                    'ParameterArray'
+                )
+
+                It 'Should not throw exception' {
+                    { $script:result = Test-DscParameterState `
+                            -CurrentValues $currentValues `
+                            -DesiredValues $desiredValues `
+                            -ValuesToCheck $valuesToCheck `
+                            -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -Be $false
+                }
+            }
+
+            Context 'The current parameters do not match desired parameters because an array has a different type' {
+                $currentValues = @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 99
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $desiredValues = [PSObject] @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 1
+                    parameterArray  = @( 'a', 1, 'c' )
+                }
+
+                $valuesToCheck = @(
+                    'parameterString'
+                    'parameterBool'
+                    'ParameterInt'
+                    'ParameterArray'
+                )
+
+                It 'Should not throw exception' {
+                    { $script:result = Test-DscParameterState `
+                            -CurrentValues $currentValues `
+                            -DesiredValues $desiredValues `
+                            -ValuesToCheck $valuesToCheck `
+                            -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -Be $false
+                }
+            }
+
+            Context 'The current parameters do not match desired parameters because a parameter has a different type' {
+                $currentValues = @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 99
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $desiredValues = [PSObject] @{
+                    parameterString = $false
+                    parameterBool   = $true
+                    parameterInt    = 1
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $valuesToCheck = @(
+                    'parameterString'
+                    'parameterBool'
+                    'ParameterInt'
+                    'ParameterArray'
+                )
+
+                It 'Should not throw exception' {
+                    { $script:result = Test-DscParameterState `
+                            -CurrentValues $currentValues `
+                            -DesiredValues $desiredValues `
+                            -ValuesToCheck $valuesToCheck `
+                            -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -Be $false
+                }
+            }
+
+            Context 'Some of the current parameters do not match desired parameters but only matching parameter is compared' {
+                $currentValues = @{
+                    parameterString = 'a string'
+                    parameterBool   = $true
+                    parameterInt    = 99
+                    parameterArray  = @( 'a', 'b', 'c' )
+                }
+
+                $desiredValues = [PSObject] @{
+                    parameterString = 'a string'
+                    parameterBool   = $false
+                    parameterInt    = 1
+                    parameterArray  = @( 'a', 'b' )
+                }
+
+                $valuesToCheck = @(
+                    'parameterString'
+                )
+
+                It 'Should not throw exception' {
+                    { $script:result = Test-DscParameterState `
+                            -CurrentValues $currentValues `
+                            -DesiredValues $desiredValues `
+                            -ValuesToCheck $valuesToCheck `
+                            -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return $true' {
+                    $script:result | Should -Be $true
+                }
+            }
+
+            Describe 'NetworkingDsc.Common\Test-DscObjectHasProperty' {
+                # Use the Get-Verb cmdlet to just get a simple object fast
+                $testDscObject = (Get-Verb)[0]
+
+                Context 'The object contains the expected property' {
+                    It 'Should not throw exception' {
+                        { $script:result = Test-DscObjectHasProperty -Object $testDscObject -PropertyName 'Verb' -Verbose } | Should -Not -Throw
+                    }
+
+                    It 'Should return $true' {
+                        $script:result | Should -Be $true
+                    }
+                }
+
+                Context 'The object does not contain the expected property' {
+                    It 'Should not throw exception' {
+                        { $script:result = Test-DscObjectHasProperty -Object $testDscObject -PropertyName 'Missing' -Verbose } | Should -Not -Throw
+                    }
+
+                    It 'Should return $false' {
+                        $script:result | Should -Be $false
+                    }
+                }
             }
         }
     }
