@@ -23,6 +23,9 @@
   - Improved integration tests to preserve system status, run in more
     scenarios and more effectively test the resource.
   - Changed to report back error if unable to set NetBIOS setting.
+- MSFT_xWinsSetting:
+  - Created new resource for enabling/disabling LMHOSTS lookup and
+    enabling/disabling WINS name resoluton using DNS.
 
 ## 5.4.0.0
 
