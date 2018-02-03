@@ -224,7 +224,6 @@ try
                 }
 
                 It 'Should call "Invoke-CimMethod" instead of "Set-ItemProperty"' {
-
                     Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 0
                     Assert-MockCalled -CommandName Invoke-CimMethod -Exactly -Times 1
                 }
