@@ -48,7 +48,7 @@ try
                     NodeName               = 'localhost'
                     Name                   = 'TestTeam'
                     Members                = 'xNetworkingLBA1','xNetworkingLBA2'
-                    LoadBalancingAlgorithm = 'Dynamic'
+                    LoadBalancingAlgorithm = 'MacAddresses'
                     TeamingMode            = 'SwitchIndependent'
                     Ensure                 = 'Present'
                 }
