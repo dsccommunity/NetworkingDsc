@@ -5,6 +5,9 @@
     They can be run by commenting out the return below. All the physical
     adapters in the machine will be used to create the team. The team will
     be removed when tests are complete.
+
+    Loopback adapters can not be used for NIC teaming and only server OS
+    SKU machines will support it.
 #>
 return
 
