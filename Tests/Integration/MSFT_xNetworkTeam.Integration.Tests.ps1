@@ -1,17 +1,24 @@
-#Remove this following line before using this integration test script
-return
+<#
+    These tests can not be run in AppVeyor as this will cause the network
+    adapter to disconnect and terminate the build.
 
-$script:DSCModuleName      = 'xNetworking'
-$script:DSCResourceName    = 'MSFT_xNetworkTeam'
+    They can be run by commenting out the return below. All the physical
+    adapters in the machine will be used to create the team. It will be
+    removed from the team and the team deleted once testing completes.
+#>
+# return
+
+$script:DSCModuleName = 'xNetworking'
+$script:DSCResourceName = 'MSFT_xNetworkTeam'
 
 #region HEADER
 # Integration Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -21,47 +28,90 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Integration
 #endregion
 
+# Configure Loopback Adapters
+. (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
+New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA1'
+New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA2'
+
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    #region Integration Tests
-    $teamMembers = (Get-NetAdapter -Physical).Name
-
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        #region DEFAULT TESTS
-        It 'Should compile without throwing' {
-            {
-                & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
-                Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+        #$teamMembers = (Get-NetAdapter -Physical).Name
+
+        $configData = @{
+            AllNodes = @(
+                @{
+                    NodeName               = 'localhost'
+                    Name                   = 'TestTeam'
+                    Members                = 'xNetworkingLBA1','xNetworkingLBA2'
+                    LoadBalancingAlgorithm = 'Dynamic'
+                    TeamingMode            = 'SwitchIndependent'
+                    Ensure                 = 'Present'
+                }
+            )
         }
 
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            Start-Sleep -Seconds 30
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+        It 'Should compile and apply the MOF without throwing' {
+            {
+                & "$($script:DSCResourceName)_Config" `
+                    -OutputPath $TestDrive `
+                    -ConfigurationData $configData
+
+                Start-DscConfiguration `
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force `
+                    -ErrorAction Stop
+
+                # Wait for up to 60 seconds for the team to be created
+                $count = 0
+                While (-not (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue))
+                {
+                    Start-Sleep -Seconds 1
+
+                    if ($count -ge 60)
+                    {
+                        break
+                    }
+
+                    $count++
+                }
+            } | Should -Not -Throw
         }
-        #endregion
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
 
         It 'Should have set the resource and all the parameters should match' {
-            $result = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
-            $result.Ensure                 | Should Be $TestTeam.Ensure
-            $result.Name                   | Should Be $TestTeam.Name
-            $result.TeamMembers            | Should Be $teamMembers
-            $result.loadBalancingAlgorithm | Should Be $TestTeam.loadBalancingAlgorithm
-            $result.teamingMode            | Should Be $TestTeam.teamingMode
+            $result = Get-DscConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+            }
+            $result.Ensure                 | Should -Be $configData.AllNodes[0].Ensure
+            $result.Name                   | Should -Be $configData.AllNodes[0].Name
+            $result.TeamMembers            | Should -Be $configData.AllNodes[0].teamMembers
+            $result.loadBalancingAlgorithm | Should -Be $configData.AllNodes[0].loadBalancingAlgorithm
+            $result.teamingMode            | Should -Be $configData.AllNodes[0].teamingMode
         }
-
-        Remove-NetLbfoTeam `
-            -Name $TestTeam.Name `
-            -Confirm:$false
     }
-    #endregion
 }
 finally
 {
+    Remove-NetLbfoTeam `
+        -Name 'TestTeam' `
+        -Confirm:$false `
+        -ErrorAction SilentlyContinue
+
+    # Remove Loopback Adapters
+    Remove-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA1'
+    Remove-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA2'
+
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion

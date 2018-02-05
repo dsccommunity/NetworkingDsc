@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-    Removes the NIC Team for the listed interfacess.
+    Removes the NIC Team 'HostTeam' from the interfaces NIC1, NIC2 and NIC3.
 #>
 Configuration Example
 {
@@ -17,9 +17,9 @@ Configuration Example
     {
         xNetworkTeam HostTeam
         {
-            Name = 'HostTeam'
-            Ensure = 'Absent'
-            TeamMembers = 'NIC1','NIC2','NIC3'
+            Name        = 'HostTeam'
+            Ensure      = 'Absent'
+            TeamMembers = 'NIC1', 'NIC2', 'NIC3'
         }
     }
 }

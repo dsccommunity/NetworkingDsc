@@ -2,13 +2,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
@@ -33,17 +33,17 @@ Function Get-TargetResource
     Param
     (
         [Parameter(Mandatory = $true)]
-        [string]
+        [System.String]
         $Name,
 
         [Parameter(Mandatory = $true)]
-        [String[]]
+        [System.String[]]
         $TeamMembers
     )
 
     $configuration = @{
-        name        = $Name
-        teamMembers = $TeamMembers
+        Name        = $Name
+        TeamMembers = $TeamMembers
     }
 
     Write-Verbose -Message ($localizedData.GetTeamInfo -f $Name)
@@ -54,16 +54,16 @@ Function Get-TargetResource
         Write-Verbose -Message ($localizedData.FoundTeam -f $Name)
         if ($null -eq (Compare-Object -ReferenceObject $TeamMembers -DifferenceObject $networkTeam.Members))
         {
-            Write-Verbose -Message ($localizedData.teamMembersExist -f $Name)
-            $configuration.Add('loadBalancingAlgorithm', $networkTeam.loadBalancingAlgorithm)
-            $configuration.Add('teamingMode', $networkTeam.teamingMode)
-            $configuration.Add('ensure','Present')
+            Write-Verbose -Message ($localizedData.TeamMembersExist -f $Name)
+            $configuration.Add('LoadBalancingAlgorithm', $networkTeam.loadBalancingAlgorithm)
+            $configuration.Add('TeamingMode', $networkTeam.teamingMode)
+            $configuration.Add('Ensure', 'Present')
         }
     }
     else
     {
         Write-Verbose -Message ($localizedData.TeamNotFound -f $Name)
-        $configuration.Add('ensure','Absent')
+        $configuration.Add('Ensure', 'Absent')
     }
 
     return $configuration
@@ -95,119 +95,130 @@ Function Set-TargetResource
     Param
     (
         [Parameter(Mandatory = $true)]
-        [string]
+        [System.String]
         $Name,
 
         [Parameter(Mandatory = $true)]
-        [String[]]
+        [System.String[]]
         $TeamMembers,
 
         [Parameter()]
         [ValidateSet("SwitchIndependent", "LACP", "Static")]
-        [String]
+        [System.String]
         $TeamingMode = "SwitchIndependent",
 
         [Parameter()]
         [ValidateSet("Dynamic", "HyperVPort", "IPAddresses", "MacAddresses", "TransportPorts")]
-        [String]
+        [System.String]
         $LoadBalancingAlgorithm = "HyperVPort",
 
         [ValidateSet('Present', 'Absent')]
-        [String]
+        [System.String]
         $Ensure = 'Present'
     )
+
     Write-Verbose -Message ($localizedData.GetTeamInfo -f $Name)
+
     $networkTeam = Get-NetLBFOTeam -Name $Name -ErrorAction SilentlyContinue
 
     if ($Ensure -eq 'Present')
     {
         if ($networkTeam)
         {
-            Write-Verbose -Message ($localizedData.foundTeam -f $Name)
+            Write-Verbose -Message ($localizedData.FoundTeam -f $Name)
+
             $setArguments = @{
-                'name' = $Name
+                Name = $Name
             }
 
             if ($networkTeam.loadBalancingAlgorithm -ne $LoadBalancingAlgorithm)
             {
-                Write-Verbose -Message ($localizedData.lbAlgoDifferent -f $LoadBalancingAlgorithm)
-                $setArguments.Add('loadBalancingAlgorithm', $LoadBalancingAlgorithm)
+                Write-Verbose -Message ($localizedData.LoadBalancingAlgorithmDifferent -f $LoadBalancingAlgorithm)
+
+                $setArguments.Add('LoadBalancingAlgorithm', $LoadBalancingAlgorithm)
                 $isNetModifyRequired = $true
             }
 
             if ($networkTeam.TeamingMode -ne $TeamingMode)
             {
-                Write-Verbose -Message ($localizedData.teamingModeDifferent -f $TeamingMode)
-                $setArguments.Add('teamingMode', $TeamingMode)
+                Write-Verbose -Message ($localizedData.TeamingModeDifferent -f $TeamingMode)
+
+                $setArguments.Add('TeamingMode', $TeamingMode)
                 $isNetModifyRequired = $true
             }
 
             if ($isNetModifyRequired)
             {
-                Write-Verbose -Message ($localizedData.modifyTeam -f $Name)
+                Write-Verbose -Message ($localizedData.ModifyTeam -f $Name)
+
                 Set-NetLbfoTeam @setArguments -ErrorAction Stop -Confirm:$false
             }
 
             $netTeamMembers = Compare-Object `
-                            -ReferenceObject $TeamMembers `
-                            -DifferenceObject $networkTeam.Members
+                -ReferenceObject $TeamMembers `
+                -DifferenceObject $networkTeam.Members
+
             if ($null -ne $netTeamMembers)
             {
-                Write-Verbose -Message ($localizedData.membersDifferent -f $Name)
-                $membersToRemove = ($netTeamMembers | Where-Object {$_.SideIndicator -eq '=>'}).InputObject
+                Write-Verbose -Message ($localizedData.MembersDifferent -f $Name)
+
+                $membersToRemove = ($netTeamMembers | Where-Object -FilterScript {
+                        $_.SideIndicator -eq '=>'
+                    }).InputObject
+
                 if ($membersToRemove)
                 {
-                    Write-Verbose -Message ($localizedData.removingMembers -f ($membersToRemove -join ','))
+                    Write-Verbose -Message ($localizedData.RemovingMembers -f ($membersToRemove -join ','))
+
                     $null = Remove-NetLbfoTeamMember -Name $membersToRemove `
-                                                    -Team $Name `
-                                                    -ErrorAction Stop `
-                                                    -Confirm:$false
+                        -Team $Name `
+                        -ErrorAction Stop `
+                        -Confirm:$false
                 }
 
-                $membersToAdd = ($netTeamMembers | Where-Object {$_.SideIndicator -eq '<='}).InputObject
+                $membersToAdd = ($netTeamMembers | Where-Object -FilterScript {
+                        $_.SideIndicator -eq '<='
+                    }).InputObject
+
                 if ($membersToAdd)
                 {
-                    Write-Verbose -Message ($localizedData.addingMembers -f ($membersToAdd -join ','))
+                    Write-Verbose -Message ($localizedData.AddingMembers -f ($membersToAdd -join ','))
+
                     $null = Add-NetLbfoTeamMember -Name $membersToAdd `
-                                        -Team $Name `
-                                        -ErrorAction Stop `
-                                        -Confirm:$false
+                        -Team $Name `
+                        -ErrorAction Stop `
+                        -Confirm:$false
                 }
             }
-
         }
         else
         {
-            Write-Verbose -Message ($localizedData.createTeam -f $Name)
+            Write-Verbose -Message ($localizedData.CreateTeam -f $Name)
+
             try
             {
                 $null = New-NetLbfoTeam `
-                            -Name $Name `
-                            -TeamMembers $teamMembers `
-                            -TeamingMode $TeamingMode `
-                            -LoadBalancingAlgorithm $loadBalancingAlgorithm `
-                            -ErrorAction Stop `
-                            -Confirm:$false
-                Write-Verbose -Message $localizedData.createdNetTeam
+                    -Name $Name `
+                    -TeamMembers $teamMembers `
+                    -TeamingMode $TeamingMode `
+                    -LoadBalancingAlgorithm $loadBalancingAlgorithm `
+                    -ErrorAction Stop `
+                    -Confirm:$false
+
+                Write-Verbose -Message $localizedData.CreatedNetTeam
             }
 
             catch
             {
-                    $errorId = 'TeamCreateError'
-                    $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-                    $errorMessage = $localizedData.failedToCreateTeam
-                    $exception = New-Object -TypeName System.InvalidOperationException `
-                                            -ArgumentList $errorMessage
-                    $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                                            -ArgumentList $exception, $errorId, $errorCategory, $null
-
-                    $PSCmdlet.ThrowTerminatingError($errorRecord)
+                New-InvalidOperationException `
+                    -Message ($localizedData.failedToCreateTeam -f $_.Exception.Message)
             }
         }
     }
     else
     {
-        Write-Verbose -Message ($localizedData.removeTeam -f $Name)
+        Write-Verbose -Message ($localizedData.RemoveTeam -f $Name)
+
         $null = Remove-NetLbfoTeam -Name $name -ErrorAction Stop -Confirm:$false
     }
 }
@@ -239,54 +250,59 @@ Function Test-TargetResource
     Param
     (
         [Parameter(Mandatory = $true)]
-        [string]
+        [System.String]
         $Name,
 
         [Parameter(Mandatory = $true)]
-        [String[]]
+        [System.String[]]
         $TeamMembers,
 
         [Parameter()]
         [ValidateSet("SwitchIndependent", "LACP", "Static")]
-        [String]
+        [System.String]
         $TeamingMode = "SwitchIndependent",
 
         [Parameter()]
         [ValidateSet("Dynamic", "HyperVPort", "IPAddresses", "MacAddresses", "TransportPorts")]
-        [String]
+        [System.String]
         $LoadBalancingAlgorithm = "HyperVPort",
 
         [ValidateSet('Present', 'Absent')]
-        [String]
+        [System.String]
         $Ensure = 'Present'
     )
 
     Write-Verbose -Message ($localizedData.GetTeamInfo -f $Name)
+
     $networkTeam = Get-NetLbfoTeam -Name $Name -ErrorAction SilentlyContinue
 
     if ($ensure -eq 'Present')
     {
         if ($networkTeam)
         {
-            Write-Verbose -Message ($localizedData.foundTeam -f $Name)
+            Write-Verbose -Message ($localizedData.FoundTeam -f $Name)
+
             if (
                 ($networkTeam.LoadBalancingAlgorithm -eq $LoadBalancingAlgorithm) -and
                 ($networkTeam.teamingMode -eq $TeamingMode) -and
                 ($null -eq (Compare-Object -ReferenceObject $TeamMembers -DifferenceObject $networkTeam.Members))
             )
             {
-                Write-Verbose -Message ($localizedData.teamExistsNoAction -f $Name)
+                Write-Verbose -Message ($localizedData.TeamExistsNoAction -f $Name)
+
                 return $true
             }
             else
             {
-                Write-Verbose -Message ($localizedData.teamExistsWithDifferentConfig -f $Name)
+                Write-Verbose -Message ($localizedData.TeamExistsWithDifferentConfig -f $Name)
+
                 return $false
             }
         }
         else
         {
-            Write-Verbose -Message ($localizedData.teamDoesNotExistShouldCreate -f $Name)
+            Write-Verbose -Message ($localizedData.TeamDoesNotExistShouldCreate -f $Name)
+
             return $false
         }
     }
@@ -294,12 +310,14 @@ Function Test-TargetResource
     {
         if ($networkTeam)
         {
-            Write-Verbose -Message ($localizedData.teamExistsShouldRemove -f $Name)
+            Write-Verbose -Message ($localizedData.TeamExistsShouldRemove -f $Name)
+
             return $false
         }
         else
         {
-            Write-Verbose -Message ($localizedData.teamDoesNotExistNoAction -f $Name)
+            Write-Verbose -Message ($localizedData.TeamDoesNotExistNoAction -f $Name)
+
             return $true
         }
     }
