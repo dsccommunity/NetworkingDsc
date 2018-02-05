@@ -1,13 +1,13 @@
-$script:DSCModuleName   = 'xNetworking'
+$script:DSCModuleName = 'xNetworking'
 $script:DSCResourceName = 'MSFT_xNetworkTeam'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -22,311 +22,325 @@ try
 {
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
-
-        # Create the Mock Objects that will be used for running tests
-        $MockNetTeam = [PSCustomObject] @{
-            Name                = 'HostTeam'
-            Members             = @('NIC1','NIC2')
+        # Create the Mock -CommandName Objects that will be used for running tests
+        $mockNetTeam = [PSCustomObject] @{
+            Name    = 'HostTeam'
+            Members = @('NIC1', 'NIC2')
         }
 
-        $TestTeam = [PSObject]@{
-            Name                    = $MockNetTeam.Name
-            TeamMembers             = $MockNetTeam.Members
+        $testTeam = [PSObject] @{
+            Name        = $mockNetTeam.Name
+            TeamMembers = $mockNetTeam.Members
         }
 
-        $MockTeam = [PSObject]@{
-            Name                    = $TestTeam.Name
-            Members                 = $TestTeam.TeamMembers
-            loadBalancingAlgorithm  = 'Dynamic'
-            teamingMode             = 'SwitchIndependent'
-            Ensure                  = 'Present'
+        $mockTeam = [PSObject] @{
+            Name                   = $testTeam.Name
+            Members                = $testTeam.TeamMembers
+            LoadBalancingAlgorithm = 'Dynamic'
+            TeamingMode            = 'SwitchIndependent'
+            Ensure                 = 'Present'
         }
 
-        Describe "MSFT_xNetworkTeam\Get-TargetResource" {
-
+        Describe 'MSFT_xNetworkTeam\Get-TargetResource' {
             Context 'Team does not exist' {
-                Mock Get-NetLbfoTeam
-                It 'should return ensure as absent' {
+                Mock -CommandName Get-NetLbfoTeam
+
+                It 'Should return ensure as absent' {
                     $Result = Get-TargetResource `
-                        @TestTeam
-                    $Result.Ensure | Should Be 'Absent'
+                        @testTeam
+                    $Result.Ensure | Should -Be 'Absent'
                 }
-                It 'should call the expected mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
+
+                It 'Should call the expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
                 }
             }
 
             Context 'Network Team exists' {
-                Mock Get-NetLbfoTeam -MockWith { $MockTeam }
-                It 'should return team properties' {
-                    $Result = Get-TargetResource @TestTeam
-                    $Result.Ensure                 | Should Be 'Present'
-                    $Result.Name                   | Should Be $TestTeam.Name
-                    $Result.TeamMembers            | Should Be $TestTeam.TeamMembers
-                    $Result.loadBalancingAlgorithm | Should Be 'Dynamic'
-                    $Result.teamingMode            | Should Be 'SwitchIndependent'
+                Mock -CommandName Get-NetLbfoTeam -MockWith { $mockTeam }
+
+                It 'Should return team properties' {
+                    $Result = Get-TargetResource @testTeam
+                    $Result.Ensure                 | Should -Be 'Present'
+                    $Result.Name                   | Should -Be $testTeam.Name
+                    $Result.TeamMembers            | Should -Be $testTeam.TeamMembers
+                    $Result.LoadBalancingAlgorithm | Should -Be 'Dynamic'
+                    $Result.TeamingMode            | Should -Be 'SwitchIndependent'
                 }
-                It 'should call the expected mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
+
+                It 'Should call the expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
                 }
             }
         }
 
-        Describe "MSFT_xNetworkTeam\Set-TargetResource" {
-            $newTeam = [PSObject]@{
-                Name                    = $TestTeam.Name
-                TeamMembers             = $TestTeam.TeamMembers
-                loadBalancingAlgorithm  = 'Dynamic'
-                teamingMode             = 'SwitchIndependent'
-                Ensure                  = 'Present'
+        Describe 'MSFT_xNetworkTeam\Set-TargetResource' {
+            $newTeam = [PSObject] @{
+                Name                   = $testTeam.Name
+                TeamMembers            = $testTeam.TeamMembers
+                LoadBalancingAlgorithm = 'Dynamic'
+                TeamingMode            = 'SwitchIndependent'
+                Ensure                 = 'Present'
             }
 
             Context 'Team does not exist but should' {
+                Mock -CommandName Get-NetLbfoTeam
+                Mock -CommandName New-NetLbfoTeam
+                Mock -CommandName Set-NetLbfoTeam
+                Mock -CommandName Remove-NetLbfoTeamMember
+                Mock -CommandName Add-NetLbfoTeamMember
 
-                Mock Get-NetLbfoTeam
-                Mock New-NetLbfoTeam
-                Mock Set-NetLbfoTeam
-                Mock Remove-NetLbfoTeamMember
-                Mock Add-NetLbfoTeamMember
-
-                It 'should not throw error' {
+                It 'Should not throw error' {
                     {
                         Set-TargetResource @newTeam
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
-                    Assert-MockCalled -commandName New-NetLbfoTeam -Exactly 1
-                    Assert-MockCalled -commandName Set-NetLbfoTeam -Exactly 0
-                    Assert-MockCalled -commandName Remove-NetLbfoTeamMember -Exactly 0
-                    Assert-MockCalled -commandName Add-NetLbfoTeamMember -Exactly 0
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
+                    Assert-MockCalled -CommandName New-NetLbfoTeam -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-NetLbfoTeam -Exactly -Times 0
+                    Assert-MockCalled -CommandName Remove-NetLbfoTeamMember -Exactly -Times 0
+                    Assert-MockCalled -CommandName Add-NetLbfoTeamMember -Exactly -Times 0
                 }
             }
 
-            Context 'team exists but needs a different teaming mode' {
+            Context 'Team exists but needs a different teaming mode' {
+                Mock -CommandName Get-NetLbfoTeam -MockWith { $mockTeam }
+                Mock -CommandName New-NetLbfoTeam
+                Mock -CommandName Set-NetLbfoTeam
+                Mock -CommandName Remove-NetLbfoTeam
 
-                Mock Get-NetLbfoTeam -MockWith { $MockTeam }
-                Mock New-NetLbfoTeam
-                Mock Set-NetLbfoTeam
-                Mock Remove-NetLbfoTeam
-
-                It 'should not throw error' {
+                It 'Should not throw error' {
                     {
                         $updateTeam = $newTeam.Clone()
-                        $updateTeam.teamingMode = 'LACP'
+                        $updateTeam.TeamingMode = 'LACP'
                         Set-TargetResource @updateTeam
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
-                    Assert-MockCalled -commandName New-NetLbfoTeam -Exactly 0
-                    Assert-MockCalled -commandName Set-NetLbfoTeam -Exactly 1
-                    Assert-MockCalled -commandName Remove-NetLbfoTeam -Exactly 0
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
+                    Assert-MockCalled -CommandName New-NetLbfoTeam -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-NetLbfoTeam -Exactly -Times 1
+                    Assert-MockCalled -CommandName Remove-NetLbfoTeam -Exactly -Times 0
                 }
             }
 
-            Context 'team exists but needs a different load balacing algorithm' {
-                Mock Get-NetLbfoTeam -MockWith { $MockTeam }
-                Mock New-NetLbfoTeam
-                Mock Set-NetLbfoTeam
-                Mock Remove-NetLbfoTeam
+            Context 'Team exists but needs a different load balacing algorithm' {
+                Mock -CommandName Get-NetLbfoTeam -MockWith { $mockTeam }
+                Mock -CommandName New-NetLbfoTeam
+                Mock -CommandName Set-NetLbfoTeam
+                Mock -CommandName Remove-NetLbfoTeam
 
-                It 'should not throw error' {
+                It 'Should not throw error' {
                     {
                         $updateTeam = $newTeam.Clone()
-                        $updateTeam.loadBalancingAlgorithm = 'HyperVPort'
+                        $updateTeam.LoadBalancingAlgorithm = 'HyperVPort'
                         Set-TargetResource @updateTeam
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
-                    Assert-MockCalled -commandName New-NetLbfoTeam -Exactly 0
-                    Assert-MockCalled -commandName Set-NetLbfoTeam -Exactly 1
-                    Assert-MockCalled -commandName Remove-NetLbfoTeam -Exactly 0
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
+                    Assert-MockCalled -CommandName New-NetLbfoTeam -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-NetLbfoTeam -Exactly -Times 1
+                    Assert-MockCalled -CommandName Remove-NetLbfoTeam -Exactly -Times 0
                 }
             }
 
-            Context 'team exists but has to remove a member adapter' {
-                Mock Get-NetLbfoTeam -MockWith { $MockTeam }
-                Mock New-NetLbfoTeam
-                Mock Set-NetLbfoTeam
-                Mock Remove-NetLbfoTeam
-                Mock Remove-NetLbfoTeamMember
+            Context 'Team exists but has to remove a member adapter' {
+                Mock -CommandName Get-NetLbfoTeam -MockWith { $mockTeam }
+                Mock -CommandName New-NetLbfoTeam
+                Mock -CommandName Set-NetLbfoTeam
+                Mock -CommandName Remove-NetLbfoTeam
+                Mock -CommandName Remove-NetLbfoTeamMember
 
-                It 'should not throw error' {
+                It 'Should not throw error' {
                     {
                         $updateTeam = $newTeam.Clone()
                         $updateTeam.TeamMembers = $newTeam.TeamMembers[0]
                         Set-TargetResource @updateTeam
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
-                    Assert-MockCalled -commandName New-NetLbfoTeam -Exactly 0
-                    Assert-MockCalled -commandName Set-NetLbfoTeam -Exactly 0
-                    Assert-MockCalled -commandName Remove-NetLbfoTeam -Exactly 0
-                    Assert-MockCalled -commandName Remove-NetLbfoTeamMember -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
+                    Assert-MockCalled -CommandName New-NetLbfoTeam -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-NetLbfoTeam -Exactly -Times 0
+                    Assert-MockCalled -CommandName Remove-NetLbfoTeam -Exactly -Times 0
+                    Assert-MockCalled -CommandName Remove-NetLbfoTeamMember -Exactly -Times 1
                 }
             }
 
-            Context 'team exists but has to add a member adapter' {
-                Mock Get-NetLbfoTeam -MockWith { $MockTeam }
-                Mock New-NetLbfoTeam
-                Mock Set-NetLbfoTeam
-                Mock Remove-NetLbfoTeam
-                Mock Remove-NetLbfoTeamMember
-                Mock Add-NetLbfoTeamMember
+            Context 'Team exists but has to add a member adapter' {
+                Mock -CommandName Get-NetLbfoTeam -MockWith { $mockTeam }
+                Mock -CommandName New-NetLbfoTeam
+                Mock -CommandName Set-NetLbfoTeam
+                Mock -CommandName Remove-NetLbfoTeam
+                Mock -CommandName Remove-NetLbfoTeamMember
+                Mock -CommandName Add-NetLbfoTeamMember
 
-                It 'should not throw error' {
+                It 'Should not throw error' {
                     {
                         $updateTeam = $newTeam.Clone()
                         $updateTeam.TeamMembers += 'NIC3'
                         Set-TargetResource @updateTeam
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
-                    Assert-MockCalled -commandName New-NetLbfoTeam -Exactly 0
-                    Assert-MockCalled -commandName Set-NetLbfoTeam -Exactly 0
-                    Assert-MockCalled -commandName Remove-NetLbfoTeam -Exactly 0
-                    Assert-MockCalled -commandName Remove-NetLbfoTeamMember -Exactly 0
-                    Assert-MockCalled -commandName Add-NetLbfoTeamMember -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
+                    Assert-MockCalled -CommandName New-NetLbfoTeam -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-NetLbfoTeam -Exactly -Times 0
+                    Assert-MockCalled -CommandName Remove-NetLbfoTeam -Exactly -Times 0
+                    Assert-MockCalled -CommandName Remove-NetLbfoTeamMember -Exactly -Times 0
+                    Assert-MockCalled -CommandName Add-NetLbfoTeamMember -Exactly -Times 1
                 }
             }
 
-            Context 'team exists but should not exist' {
-                Mock Get-NetLbfoTeam -MockWith { $MockTeam }
-                Mock New-NetLbfoTeam
-                Mock Set-NetLbfoTeam
-                Mock Remove-NetLbfoTeam
-                Mock Remove-NetLbfoTeamMember
-                Mock Add-NetLbfoTeamMember
+            Context 'Team exists but should not exist' {
+                Mock -CommandName Get-NetLbfoTeam -MockWith { $mockTeam }
+                Mock -CommandName New-NetLbfoTeam
+                Mock -CommandName Set-NetLbfoTeam
+                Mock -CommandName Remove-NetLbfoTeam
+                Mock -CommandName Remove-NetLbfoTeamMember
+                Mock -CommandName Add-NetLbfoTeamMember
 
-                It 'should not throw error' {
+                It 'Should not throw error' {
                     {
                         $updateTeam = $newTeam.Clone()
                         $updateTeam.Ensure = 'absent'
                         Set-TargetResource @updateTeam
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
-                    Assert-MockCalled -commandName New-NetLbfoTeam -Exactly 0
-                    Assert-MockCalled -commandName Set-NetLbfoTeam -Exactly 0
-                    Assert-MockCalled -commandName Remove-NetLbfoTeam -Exactly 1
-                    Assert-MockCalled -commandName Remove-NetLbfoTeamMember -Exactly 0
-                    Assert-MockCalled -commandName Add-NetLbfoTeamMember -Exactly 0
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
+                    Assert-MockCalled -CommandName New-NetLbfoTeam -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-NetLbfoTeam -Exactly -Times 0
+                    Assert-MockCalled -CommandName Remove-NetLbfoTeam -Exactly -Times 1
+                    Assert-MockCalled -CommandName Remove-NetLbfoTeamMember -Exactly -Times 0
+                    Assert-MockCalled -CommandName Add-NetLbfoTeamMember -Exactly -Times 0
                 }
             }
         }
 
-        Describe "MSFT_xNetworkTeam\Test-TargetResource" {
-            $newTeam = [PSObject]@{
-                Name                    = $TestTeam.Name
-                TeamMembers             = $TestTeam.TeamMembers
-                loadBalancingAlgorithm  = 'Dynamic'
-                teamingMode             = 'SwitchIndependent'
-                Ensure                  = 'Present'
+        Describe 'MSFT_xNetworkTeam\Test-TargetResource' {
+            $newTeam = [PSObject] @{
+                Name                   = $testTeam.Name
+                TeamMembers            = $testTeam.TeamMembers
+                LoadBalancingAlgorithm = 'Dynamic'
+                TeamingMode            = 'SwitchIndependent'
+                Ensure                 = 'Present'
             }
 
             Context 'Team does not exist but should' {
-                Mock Get-NetLbfoTeam
+                Mock -CommandName Get-NetLbfoTeam
 
-                It 'should return false' {
-                        Test-TargetResource @newTeam | Should be $false
+                It 'Should return false' {
+                    Test-TargetResource @newTeam | Should -Be $false
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
                 }
             }
 
-            Context 'team exists but needs a different teaming mode' {
-                Mock Get-NetLbfoTeam -MockWith { $MockTeam }
+            Context 'Team exists but needs a different teaming mode' {
+                Mock -CommandName Get-NetLbfoTeam -MockWith { $mockTeam }
 
-                It 'should return false' {
+                It 'Should return false' {
                     $updateTeam = $newTeam.Clone()
-                    $updateTeam.teamingMode = 'LACP'
-                    Test-TargetResource @updateTeam | Should Be $false
+                    $updateTeam.TeamingMode = 'LACP'
+                    Test-TargetResource @updateTeam | Should -Be $false
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
                 }
             }
 
             Context 'team exists but needs a different load balacing algorithm' {
-                Mock Get-NetLbfoTeam -MockWith { $MockTeam }
+                Mock -CommandName Get-NetLbfoTeam -MockWith { $mockTeam }
 
-                It 'should return false' {
+                It 'Should return false' {
                     $updateTeam = $newTeam.Clone()
-                    $updateTeam.loadBalancingAlgorithm = 'HyperVPort'
-                    Test-TargetResource @updateTeam | Should Be $false
+                    $updateTeam.LoadBalancingAlgorithm = 'HyperVPort'
+                    Test-TargetResource @updateTeam | Should -Be $false
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
                 }
             }
 
-            Context 'team exists but has to remove a member adapter' {
-                Mock Get-NetLbfoTeam -MockWith { $MockTeam }
+            Context 'Team exists but has to remove a member adapter' {
+                Mock -CommandName Get-NetLbfoTeam -MockWith { $mockTeam }
 
-                It 'should return false' {
+                It 'Should return false' {
                     $updateTeam = $newTeam.Clone()
                     $updateTeam.TeamMembers = $newTeam.TeamMembers[0]
-                    Test-TargetResource @updateTeam | Should Be $false
+                    Test-TargetResource @updateTeam | Should -Be $false
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
                 }
             }
 
-            Context 'team exists but has to add a member adapter' {
-                Mock Get-NetLbfoTeam -MockWith { $MockTeam }
+            Context 'Team exists but has to add a member adapter' {
+                Mock -CommandName Get-NetLbfoTeam -MockWith { $mockTeam }
 
-                It 'should return false' {
+                It 'Should return false' {
                     $updateTeam = $newTeam.Clone()
                     $updateTeam.TeamMembers += 'NIC3'
-                    Test-TargetResource @updateTeam | Should Be $false
+                    Test-TargetResource @updateTeam | Should -Be $false
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
                 }
             }
 
-            Context 'team exists but should not exist' {
-                Mock Get-NetLbfoTeam -MockWith { $MockTeam }
+            Context 'Team exists but should not exist' {
+                Mock -CommandName Get-NetLbfoTeam -MockWith { $mockTeam }
 
-                It 'should return $false' {
+                It 'Should return $false' {
                     $updateTeam = $newTeam.Clone()
                     $updateTeam.Ensure = 'absent'
-                    Test-TargetResource @updateTeam | Should Be $false
+                    Test-TargetResource @updateTeam | Should -Be $false
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
                 }
             }
 
-            Context 'team exists and no action needed' {
-                Mock Get-NetLbfoTeam -MockWith { $MockTeam }
+            Context 'Team exists and no action needed' {
+                Mock -CommandName Get-NetLbfoTeam -MockWith { $mockTeam }
 
-                It 'should return true' {
+                It 'Should return true' {
                     $updateTeam = $newTeam.Clone()
-                    Test-TargetResource @updateTeam | Should Be $true
+                    Test-TargetResource @updateTeam | Should -Be $true
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
                 }
             }
 
-            Context 'team does not and no action needed' {
-                Mock Get-NetLbfoTeam
+            Context 'Team does not and no action needed' {
+                Mock -CommandName Get-NetLbfoTeam
 
-                It 'should return true' {
+                It 'Should return true' {
                     $updateTeam = $newTeam.Clone()
                     $updateTeam.Ensure = 'Absent'
-                    Test-TargetResource @updateTeam | Should Be $true
+                    Test-TargetResource @updateTeam | Should -Be $true
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeam -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
                 }
             }
         }
