@@ -3,10 +3,10 @@
     adapter to disconnect and terminate the build.
 
     They can be run by commenting out the return below. All the physical
-    adapters in the machine will be used to create the team. It will be
-    removed from the team and the team deleted once testing completes.
+    adapters in the machine will be used to create the team. The team will
+    be removed when tests are complete.
 #>
-# return
+return
 
 $script:DSCModuleName = 'xNetworking'
 $script:DSCResourceName = 'MSFT_xNetworkTeam'
@@ -28,11 +28,6 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Integration
 #endregion
 
-# Configure Loopback Adapters
-. (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
-New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA1'
-New-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA2'
-
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
@@ -40,14 +35,14 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        #$teamMembers = (Get-NetAdapter -Physical).Name
+        $teamMembers = (Get-NetAdapter -Physical).Name
 
         $configData = @{
             AllNodes = @(
                 @{
                     NodeName               = 'localhost'
                     Name                   = 'TestTeam'
-                    Members                = 'xNetworkingLBA1','xNetworkingLBA2'
+                    Members                = $teamMembers
                     LoadBalancingAlgorithm = 'MacAddresses'
                     TeamingMode            = 'SwitchIndependent'
                     Ensure                 = 'Present'
@@ -107,10 +102,6 @@ finally
         -Name 'TestTeam' `
         -Confirm:$false `
         -ErrorAction SilentlyContinue
-
-    # Remove Loopback Adapters
-    Remove-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA1'
-    Remove-IntegrationLoopbackAdapter -AdapterName 'xNetworkingLBA2'
 
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
