@@ -1,5 +1,6 @@
 $script:DSCModuleName = 'xNetworking'
 $script:DSCResourceName = 'MSFT_xWinsSetting'
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
@@ -23,98 +24,144 @@ try
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
         # Create the Mock Objects that will be used for running tests
-        $mockEnabledLmHostsRegistryKey = [PSObject] @{
-            EnableLMHosts = 1
+        $mockEnabledLmHostsRegistryKey = {
+                [PSObject] @{
+                    EnableLMHOSTS = 1
+            }
         }
 
-        $mockDisabledLmHostsRegistryKey = [PSObject] @{
-            EnableLMHosts = 0
+        $mockDisabledLmHostsRegistryKey = {
+            [PSObject] @{
+                EnableLMHOSTS = 0
+            }
         }
 
-        $mockEnabledDNSRegistryKey = [PSObject] @{
-            EnableDNS = 1
+        $mockEnabledDNSRegistryKey = {
+            [PSObject] @{
+                EnableDNS = 1
+            }
         }
 
-        $mockDisabledDNSRegistryKey = [PSObject] @{
-            EnableDNS = 0
+        $mockDisabledDNSRegistryKey = {
+            [PSObject] @{
+                EnableDNS = 0
+            }
         }
 
-        $mockGetTargetResourceAllEnabled = [PSObject] @{
-            IsSingleInstance = 'Yes'
-            EnableLMHOSTS    = $true
-            EnableDNS        = $true
+        $mockGetTargetResourceAllEnabled = {
+            [PSObject] @{
+                IsSingleInstance = 'Yes'
+                EnableLmHosts    = $true
+                EnableDns        = $true
+            }
         }
 
-        $mockGetTargetResourceAllDisabled = [PSObject] @{
-            IsSingleInstance = 'Yes'
-            EnableLMHOSTS    = $false
-            EnableDNS        = $false
+        $mockGetTargetResourceAllDisabled = {
+            [PSObject] @{
+                IsSingleInstance = 'Yes'
+                EnableLmHosts    = $false
+                EnableDns        = $false
+            }
+        }
+
+        $mockInvokeCimMethodReturnValueOK = {
+            @{
+                ReturnValue = 0
+            }
+        }
+
+        $mockInvokeCimMethodReturnValueError = {
+            @{
+                ReturnValue = 74
+            }
+        }
+
+        $getItemProperty_EnableLmHosts_ParameterFilter = {
+            $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' -and $Name -eq 'EnableLMHOSTS'
+        }
+
+        $getItemProperty_EnableDns_ParameterFilter = {
+            $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' -and $Name -eq 'EnableDNS'
+        }
+
+        $invokeCimMethod_EnableAll_ParameterFilter = {
+            $ClassName -eq 'Win32_NetworkAdapterConfiguration' `
+            -and $MethodName -eq 'EnableWins' `
+            -and $Arguments.DNSEnabledForWINSResolution -eq $true `
+            -and $Arguments.WINSEnableLMHostsLookup -eq $true
+        }
+
+        $invokeCimMethod_DisableAll_ParameterFilter = {
+            $ClassName -eq 'Win32_NetworkAdapterConfiguration' `
+            -and $MethodName -eq 'EnableWins' `
+            -and $Arguments.DNSEnabledForWINSResolution -eq $false `
+            -and $Arguments.WINSEnableLMHostsLookup -eq $false
         }
 
         Describe 'MSFT_xWinsSetting\Get-TargetResource' {
-            Context 'EnableLMHosts is enabled and EnableDNS is enabled' {
+            Context 'EnableLmHosts is enabled and EnableDns is enabled' {
                 Mock `
                     -CommandName Get-ItemProperty `
-                    -ParameterFilter {
-                    $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' -and $Name -eq 'EnableLMHOSTS'
-                } `
-                    -MockWith {
-                    $mockEnabledLmHostsRegistryKey
-                }
+                    -ParameterFilter $getItemProperty_EnableLmHosts_ParameterFilter `
+                    -MockWith $mockEnabledLmHostsRegistryKey
 
                 Mock `
                     -CommandName Get-ItemProperty `
-                    -ParameterFilter {
-                    $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' -and $Name -eq 'EnableDNS'
-                } `
-                    -MockWith {
-                    $mockEnabledDNSRegistryKey
-                }
+                    -ParameterFilter $getItemProperty_EnableDns_ParameterFilter `
+                    -MockWith $mockEnabledDNSRegistryKey
 
                 It 'Should not throw an exception' {
                     { $script:result = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected results' {
-                    $script:result.EnableLMHOSTS | Should Be $true
-                    $script:result.EnableDNS | Should Be $true
+                    $script:result.EnableLmHosts | Should Be $true
+                    $script:result.EnableDns | Should Be $true
                 }
 
                 It 'Should call the expected mocks' {
-                    Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 2
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -ParameterFilter $getItemProperty_EnableLmHosts_ParameterFilter `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -ParameterFilter $getItemProperty_EnableDns_ParameterFilter `
+                        -Exactly -Times 1
                 }
             }
 
-            Context 'EnableLMHosts is disabled and EnableDNS is disabled' {
+            Context 'EnableLmHosts is disabled and EnableDns is disabled' {
                 Mock `
                     -CommandName Get-ItemProperty `
-                    -ParameterFilter {
-                    $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' -and $Name -eq 'EnableLMHOSTS'
-                } `
-                    -MockWith {
-                    $mockDisabledLmHostsRegistryKey
-                }
+                    -ParameterFilter $getItemProperty_EnableLmHosts_ParameterFilter `
+                    -MockWith $mockDisabledLmHostsRegistryKey
 
                 Mock `
                     -CommandName Get-ItemProperty `
-                    -ParameterFilter {
-                    $Path -eq 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' -and $Name -eq 'EnableDNS'
-                } `
-                    -MockWith {
-                    $mockDisabledDNSRegistryKey
-                }
+                    -ParameterFilter $getItemProperty_EnableDns_ParameterFilter `
+                    -MockWith $mockDisabledDNSRegistryKey
 
                 It 'Should not throw an exception' {
                     { $script:result = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected results' {
-                    $script:result.EnableLMHOSTS | Should Be $false
-                    $script:result.EnableDNS | Should Be $false
+                    $script:result.EnableLmHosts | Should Be $false
+                    $script:result.EnableDns | Should Be $false
                 }
 
                 It 'Should call the expected mocks' {
-                    Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 2
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -ParameterFilter $getItemProperty_EnableLmHosts_ParameterFilter `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Get-ItemProperty `
+                        -ParameterFilter $getItemProperty_EnableDns_ParameterFilter `
+                        -Exactly -Times 1
                 }
             }
         }
@@ -124,60 +171,78 @@ try
                 Mock -CommandName Get-TargetResource -MockWith { $mockGetTargetResourceAllEnabled }
             }
 
-            Context 'Set EnableLMHosts to enabled and EnableDNS to enabled' {
-                Mock -CommandName Invoke-CimMethod -MockWith { @{ ReturnValue = 0 } }
+            Context 'Set EnableLmHosts to enabled and EnableDns to enabled' {
+                Mock `
+                    -CommandName Invoke-CimMethod `
+                    -ParameterFilter $invokeCimMethod_EnableAll_ParameterFilter `
+                    -MockWith $mockInvokeCimMethodReturnValueOK
 
                 It 'Should not throw an exception' {
                     {
-                        Set-TargetResource -IsSingleInstance 'Yes' -EnableLMHosts $true -EnableDNS $true -Verbose
+                        Set-TargetResource -IsSingleInstance 'Yes' -EnableLmHosts $true -EnableDns $true -Verbose
                     } | Should -Not -Throw
                 }
 
                 It 'Should call expected Mocks' {
-                    Assert-MockCalled -commandName Invoke-CimMethod -Exactly -Times 1
+                    Assert-MockCalled `
+                        -CommandName Invoke-CimMethod `
+                        -ParameterFilter $invokeCimMethod_EnableAll_ParameterFilter `
+                        -Exactly -Times 1
                 }
             }
 
-            Context 'Set EnableLMHosts to disabled and EnableDNS to disabled' {
-                Mock -CommandName Invoke-CimMethod -MockWith { @{ ReturnValue = 0 } }
+            Context 'Set EnableLmHosts to disabled and EnableDns to disabled' {
+                Mock `
+                    -CommandName Invoke-CimMethod `
+                    -ParameterFilter $invokeCimMethod_DisableAll_ParameterFilter `
+                    -MockWith $mockInvokeCimMethodReturnValueOK
 
                 It 'Should not throw an exception' {
                     {
-                        Set-TargetResource -IsSingleInstance 'Yes' -EnableLMHosts $false -EnableDNS $false -Verbose
+                        Set-TargetResource -IsSingleInstance 'Yes' -EnableLmHosts $false -EnableDns $false -Verbose
                     } | Should -Not -Throw
                 }
 
                 It 'Should call expected Mocks' {
-                    Assert-MockCalled -commandName Invoke-CimMethod -Exactly -Times 1
+                    Assert-MockCalled `
+                        -CommandName Invoke-CimMethod `
+                        -ParameterFilter $invokeCimMethod_DisableAll_ParameterFilter ` `
+                        -Exactly -Times 1
                 }
             }
 
-            Context 'Set EnableLMHosts and EnableDNS but Invoke-CimMethod returns error' {
-                Mock -CommandName Invoke-CimMethod -MockWith { @{ ReturnValue = 74 } }
+            Context 'Set EnableLmHosts and EnableDNS but Invoke-CimMethod returns error' {
+                Mock `
+                    -CommandName Invoke-CimMethod `
+                    -ParameterFilter $invokeCimMethod_EnableAll_ParameterFilter ` `
+                    -MockWith $mockInvokeCimMethodReturnValueError
 
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.FailedUpdatingWinsSettingError -f 74, 'Enable')
 
                 It 'Should throw an exception' {
                     {
-                        Set-TargetResource -IsSingleInstance 'Yes' -EnableLMHosts $true -EnableDNS $true -Verbose
+                        Set-TargetResource -IsSingleInstance 'Yes' -EnableLmHosts $true -EnableDns $true -Verbose
                     } | Should -Throw $errorRecord
                 }
 
                 It 'Should call expected Mocks' {
-                    Assert-MockCalled -commandName Invoke-CimMethod -Exactly -Times 1
+                    Assert-MockCalled `
+                        -CommandName Invoke-CimMethod `
+                        -ParameterFilter $invokeCimMethod_EnableAll_ParameterFilter ` `
+                        -Exactly -Times 1
                 }
             }
         }
 
         Describe 'MSFT_xDnsClientGlobalSetting\Test-TargetResource' {
-            Context 'EnableLMHosts is enabled and EnableDNS is enabled' {
-                Context 'Set EnableLMHosts to true and EnableDNS to true' {
-                    Mock -CommandName Get-TargetResource -MockWith { $mockGetTargetResourceAllEnabled }
+            Context 'EnableLmHosts is enabled and EnableDns is enabled' {
+                Context 'Set EnableLmHosts to true and EnableDns to true' {
+                    Mock -CommandName Get-TargetResource -MockWith $mockGetTargetResourceAllEnabled
 
                     It 'Should not throw an exception' {
                         {
-                            $script:result = Test-TargetResource -IsSingleInstance 'Yes' -EnableLMHosts $true -EnableDNS $true -Verbose
+                            $script:result = Test-TargetResource -IsSingleInstance 'Yes' -EnableLmHosts $true -EnableDns $true -Verbose
                         } | Should -Not -Throw
                     }
 
@@ -186,12 +251,12 @@ try
                     }
                 }
 
-                Context 'Set EnableLMHosts to false' {
-                    Mock -CommandName Get-TargetResource -MockWith { $mockGetTargetResourceAllEnabled }
+                Context 'Set EnableLmHosts to false' {
+                    Mock -CommandName Get-TargetResource -MockWith $mockGetTargetResourceAllEnabled
 
                     It 'Should not throw an exception' {
                         {
-                            $script:result = Test-TargetResource -IsSingleInstance 'Yes' -EnableLMHosts $false -Verbose
+                            $script:result = Test-TargetResource -IsSingleInstance 'Yes' -EnableLmHosts $false -Verbose
                         } | Should -Not -Throw
                     }
 
@@ -200,12 +265,12 @@ try
                     }
                 }
 
-                Context 'Set EnableDNS to false' {
-                    Mock -CommandName Get-TargetResource -MockWith { $mockGetTargetResourceAllEnabled }
+                Context 'Set EnableDns to false' {
+                    Mock -CommandName Get-TargetResource -MockWith $mockGetTargetResourceAllEnabled
 
                     It 'Should not throw an exception' {
                         {
-                            $script:result = Test-TargetResource -IsSingleInstance 'Yes' -EnableDNS $false -Verbose
+                            $script:result = Test-TargetResource -IsSingleInstance 'Yes' -EnableDns $false -Verbose
                         } | Should -Not -Throw
                     }
 
@@ -215,13 +280,13 @@ try
                 }
             }
 
-            Context 'EnableLMHosts is disabled and EnableDNS is disabled' {
-                Context 'Set EnableLMHosts to false and EnableDNS to false' {
-                    Mock -CommandName Get-TargetResource -MockWith { $mockGetTargetResourceAllDisabled }
+            Context 'EnableLmHosts is disabled and EnableDNS is disabled' {
+                Context 'Set EnableLmHosts to false and EnableDNS to false' {
+                    Mock -CommandName Get-TargetResource -MockWith $mockGetTargetResourceAllDisabled
 
                     It 'Should not throw an exception' {
                         {
-                            $script:result = Test-TargetResource -IsSingleInstance 'Yes' -EnableLMHosts $false -EnableDNS $false -Verbose
+                            $script:result = Test-TargetResource -IsSingleInstance 'Yes' -EnableLmHosts $false -EnableDns $false -Verbose
                         } | Should -Not -Throw
                     }
 
@@ -230,12 +295,12 @@ try
                     }
                 }
 
-                Context 'Set EnableLMHosts to true' {
-                    Mock -CommandName Get-TargetResource -MockWith { $mockGetTargetResourceAllDisabled }
+                Context 'Set EnableLmHosts to true' {
+                    Mock -CommandName Get-TargetResource -MockWith $mockGetTargetResourceAllDisabled
 
                     It 'Should not throw an exception' {
                         {
-                            $script:result = Test-TargetResource -IsSingleInstance 'Yes' -EnableLMHosts $true -Verbose
+                            $script:result = Test-TargetResource -IsSingleInstance 'Yes' -EnableLmHosts $true -Verbose
                         } | Should -Not -Throw
                     }
 
@@ -244,12 +309,12 @@ try
                     }
                 }
 
-                Context 'Set EnableDNS to true' {
-                    Mock -CommandName Get-TargetResource -MockWith { $mockGetTargetResourceAllDisabled }
+                Context 'Set EnableDns to true' {
+                    Mock -CommandName Get-TargetResource -MockWith $mockGetTargetResourceAllDisabled
 
                     It 'Should not throw an exception' {
                         {
-                            $script:result = Test-TargetResource -IsSingleInstance 'Yes' -EnableDNS $true -Verbose
+                            $script:result = Test-TargetResource -IsSingleInstance 'Yes' -EnableDns $true -Verbose
                         } | Should -Not -Throw
                     }
 

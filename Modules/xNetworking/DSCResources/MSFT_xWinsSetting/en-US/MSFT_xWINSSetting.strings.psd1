@@ -5,5 +5,5 @@ ConvertFrom-StringData @'
     SettingWinsSettingMessage = Setting WINS settings.
     WinsSettingUpdatedMessage = WINS settings updated.
     TestingWinsSettingMessage = Testing WINS settings.
-    FailedUpdatingWinsSettingError = An error result of '{0}' was returned when attemting to update WINS settings.
+    FailedUpdatingWinsSettingError = An error code of '{0}' was returned when attemting to update WINS settings.
 '@

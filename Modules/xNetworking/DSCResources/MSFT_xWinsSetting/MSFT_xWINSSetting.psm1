@@ -40,12 +40,12 @@ function Get-TargetResource
         ) -join '' )
 
     # 0 equals off, 1 equals on
-    $enableLMHostsRegistryKey = Get-ItemProperty `
+    $enableLmHostsRegistryKey = Get-ItemProperty `
         -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' `
         -Name EnableLMHOSTS `
         -ErrorAction SilentlyContinue
 
-    $enableLMHOSTS = ($enableLMHOSTSRegistryKey.EnableLMHOSTS -eq 1)
+    $enableLmHosts = ($enableLmHostsRegistryKey.EnableLMHOSTS -eq 1)
 
     # 0 equals off, 1 equals on
     $enableDnsRegistryKey = Get-ItemProperty `
@@ -55,18 +55,18 @@ function Get-TargetResource
 
     if ($enableDnsRegistryKey)
     {
-        $enableDNS = ($enableDnsRegistryKey.EnableDNS -eq 1)
+        $enableDns = ($enableDnsRegistryKey.EnableDNS -eq 1)
     }
     else
     {
         # if the key does not exist, then set the default which is enabled.
-        $enableDNS = $true
+        $enableDns = $true
     }
 
     return @{
         IsSingleInstance = 'Yes'
-        EnableLMHOSTS    = $enableLMHOSTS
-        EnableDNS        = $enableDNS
+        EnableLmHosts    = $enableLmHosts
+        EnableDns        = $enableDns
     }
 } # Get-TargetResource
 
@@ -77,11 +77,11 @@ function Get-TargetResource
     .PARAMETER IsSingleInstance
     Specifies the resource is a single instance, the value must be 'Yes'.
 
-    .PARAMETER EnableLMHOSTS
+    .PARAMETER EnableLmHosts
     Specifies if LMHOSTS lookup should be enabled for all network
     adapters with TCP/IP enabled.
 
-    .PARAMETER EnableDNS
+    .PARAMETER EnableDns
     Specifies if DNS is enabled for name resolution over WINS for
     all network adapters with TCP/IP enabled.
 #>
@@ -97,11 +97,11 @@ function Set-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $EnableLMHOSTS,
+        $EnableLmHosts,
 
         [Parameter()]
         [System.Boolean]
-        $EnableDNS
+        $EnableDns
     )
 
     Write-Verbose -Message ( @(
@@ -112,22 +112,22 @@ function Set-TargetResource
     # Get the current values of the WINS settings
     $currentState = Get-TargetResource -IsSingleInstance 'Yes'
 
-    if (-not $PSBoundParameters.ContainsKey('EnableLMHOSTS'))
+    if (-not $PSBoundParameters.ContainsKey('EnableLmHosts'))
     {
-        $EnableLMHOSTS = $currentState.EnableLMHOSTS
+        $EnableLmHosts = $currentState.EnableLmHosts
     }
 
-    if (-not $PSBoundParameters.ContainsKey('EnableDNS'))
+    if (-not $PSBoundParameters.ContainsKey('EnableDns'))
     {
-        $EnableDNS = $currentState.EnableDNS
+        $EnableDns = $currentState.EnableDNS
     }
 
     $result = Invoke-CimMethod `
         -ClassName Win32_NetworkAdapterConfiguration `
         -MethodName EnableWins `
         -Arguments @{
-            DNSEnabledForWINSResolution = $EnableDNS
-            WINSEnableLMHostsLookup     = $EnableLMHOSTS
+            DNSEnabledForWINSResolution = $EnableDns
+            WINSEnableLMHostsLookup     = $EnableLmHosts
         }
 
     if ($result.ReturnValue -ne 0)
@@ -149,11 +149,11 @@ function Set-TargetResource
     .PARAMETER IsSingleInstance
     Specifies the resource is a single instance, the value must be 'Yes'.
 
-    .PARAMETER EnableLMHOSTS
+    .PARAMETER EnableLmHosts
     Specifies if LMHOSTS lookup should be enabled for all network
     adapters with TCP/IP enabled.
 
-    .PARAMETER EnableDNS
+    .PARAMETER EnableDns
     Specifies if DNS is enabled for name resolution over WINS for
     all network adapters with TCP/IP enabled.
 #>
@@ -170,11 +170,11 @@ function Test-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $EnableLMHOSTS,
+        $EnableLmHosts,
 
         [Parameter()]
         [System.Boolean]
-        $EnableDNS
+        $EnableDns
     )
 
     Write-Verbose -Message ( @(

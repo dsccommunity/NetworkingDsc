@@ -72,7 +72,7 @@ try
         -Name EnableLMHOSTS `
         -ErrorAction SilentlyContinue
 
-    $currentEnableLMHOSTS = ($enableLMHOSTSRegistryKey.EnableLMHOSTS -eq 1)
+    $currentEnableLmHosts = ($enableLMHOSTSRegistryKey.EnableLMHOSTS -eq 1)
 
     # Set the WINS settings to known values
     $null = Invoke-CimMethod `
@@ -85,12 +85,12 @@ try
 
     Describe "$($script:DSCResourceName)_Integration" {
         Context 'Disable all settings' {
-            $configData = @{
+            $configurationData = @{
                 AllNodes = @(
                     @{
                         NodeName      = 'localhost'
-                        EnableLMHOSTS = $false
-                        EnableDNS     = $false
+                        EnableLmHosts = $false
+                        EnableDns     = $false
                     }
                 )
             }
@@ -99,7 +99,7 @@ try
                 {
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $configData
+                        -ConfigurationData $configurationData
 
                     Start-DscConfiguration `
                         -Path $TestDrive `
@@ -119,18 +119,18 @@ try
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $result.EnableLMHOSTS | Should -Be $false
-                $result.EnableDNS | Should -Be $false
+                $result.EnableLmHosts | Should -Be $false
+                $result.EnableDns | Should -Be $false
             }
         }
 
         Context 'Enable all settings' {
-            $configData = @{
+            $configurationData = @{
                 AllNodes = @(
                     @{
                         NodeName      = 'localhost'
-                        EnableLMHOSTS = $true
-                        EnableDNS     = $true
+                        EnableLmHosts = $true
+                        EnableDns     = $true
                     }
                 )
             }
@@ -139,7 +139,7 @@ try
                 {
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $configData
+                        -ConfigurationData $configurationData
 
                     Start-DscConfiguration `
                         -Path $TestDrive `
@@ -159,8 +159,8 @@ try
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $result.EnableLMHOSTS | Should -Be $true
-                $result.EnableDNS | Should -Be $true
+                $result.EnableLmHosts | Should -Be $true
+                $result.EnableDns | Should -Be $true
             }
         }
     }
@@ -172,8 +172,8 @@ finally
         -ClassName Win32_NetworkAdapterConfiguration `
         -MethodName EnableWins `
         -Arguments @{
-            DNSEnabledForWINSResolution = $currentEnableDNS
-            WINSEnableLMHostsLookup     = $currentEnableLMHOSTS
+            DNSEnabledForWINSResolution = $currentEnableDns
+            WINSEnableLMHostsLookup     = $currentEnableLmHosts
         }
 
     #region FOOTER

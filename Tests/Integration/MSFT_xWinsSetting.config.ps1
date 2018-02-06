@@ -5,8 +5,8 @@ Configuration MSFT_xWinsSetting_Config {
         xWinsSetting Integration_Test
         {
             IsSingleInstance = 'Yes'
-            EnableLMHOSTS    = $Node.EnableLMHOSTS
-            EnableDNS        = $Node.EnableDNS
+            EnableLmHosts    = $Node.EnableLmHosts
+            EnableDns        = $Node.EnableDns
         }
     }
 }
