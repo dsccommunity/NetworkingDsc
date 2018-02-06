@@ -40,7 +40,7 @@ try
     Describe "$($script:DSCResourceName)_Integration" {
         $teamMembers = (Get-NetAdapter -Physical).Name
 
-        $configData = @{
+        $configurationData = @{
             AllNodes = @(
                 @{
                     NodeName               = 'localhost'
@@ -53,54 +53,106 @@ try
             )
         }
 
-        It 'Should compile and apply the MOF without throwing' {
-            {
-                & "$($script:DSCResourceName)_Config" `
-                    -OutputPath $TestDrive `
-                    -ConfigurationData $configData
-
-                Start-DscConfiguration `
-                    -Path $TestDrive `
-                    -ComputerName localhost `
-                    -Wait `
-                    -Verbose `
-                    -Force `
-                    -ErrorAction Stop
-
-                # Wait for up to 60 seconds for the team to be created
-                $count = 0
-                While (-not (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue))
+        Context 'When the network team is created' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
-                    Start-Sleep -Seconds 1
+                    & "$($script:DSCResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configurationData
 
-                    if ($count -ge 60)
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
+
+                    # Wait for up to 60 seconds for the team to be created
+                    $count = 0
+                    While (-not (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue))
                     {
-                        break
+                        Start-Sleep -Seconds 1
+
+                        if ($count -ge 60)
+                        {
+                            break
+                        }
+
+                        $count++
                     }
-
-                    $count++
-                }
-            } | Should -Not -Throw
-        }
-
-        It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-        }
-
-        It 'Should have set the resource and all the parameters should match' {
-            $result = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                } | Should -Not -Throw
             }
-            $result.Ensure                 | Should -Be $configData.AllNodes[0].Ensure
-            $result.Name                   | Should -Be $configData.AllNodes[0].Name
-            $result.TeamMembers            | Should -Be $configData.AllNodes[0].teamMembers
-            $result.loadBalancingAlgorithm | Should -Be $configData.AllNodes[0].loadBalancingAlgorithm
-            $result.teamingMode            | Should -Be $configData.AllNodes[0].teamingMode
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $result = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                }
+                $result.Ensure                 | Should -Be $configurationData.AllNodes[0].Ensure
+                $result.Name                   | Should -Be $configurationData.AllNodes[0].Name
+                $result.TeamMembers            | Should -Be $configurationData.AllNodes[0].TeamMembers
+                $result.LoadBalancingAlgorithm | Should -Be $configurationData.AllNodes[0].LoadBalancingAlgorithm
+                $result.TeamingMode            | Should -Be $configurationData.AllNodes[0].TeamingMode
+            }
+        }
+
+        $configurationData.AllNodes[0].Ensure = 'Absent'
+
+        Context 'When the network team is deleted' {
+            It 'Should compile and apply the MOF without throwing' {
+                {
+                    & "$($script:DSCResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configurationData
+
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
+
+                    # Wait for up to 60 seconds for the team to be removed
+                    $count = 0
+                    While (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue)
+                    {
+                        Start-Sleep -Seconds 1
+
+                        if ($count -ge 60)
+                        {
+                            break
+                        }
+
+                        $count++
+                    }
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $result = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                }
+                $result.Ensure                 | Should -Be $configurationData.AllNodes[0].Ensure
+                $result.Name                   | Should -Be $configurationData.AllNodes[0].Name
+                $result.TeamMembers            | Should -Be $configurationData.AllNodes[0].TeamMembers
+                $result.LoadBalancingAlgorithm | Should -Be $configurationData.AllNodes[0].LoadBalancingAlgorithm
+                $result.TeamingMode            | Should -Be $configurationData.AllNodes[0].TeamingMode
+            }
         }
     }
 }
 finally
 {
+    # Remove the team just in case it wasn't removed correctly
     Remove-NetLbfoTeam `
         -Name 'TestTeam' `
         -Confirm:$false `

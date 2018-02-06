@@ -46,9 +46,9 @@ try
                 Mock -CommandName Get-NetLbfoTeam
 
                 It 'Should return ensure as absent' {
-                    $Result = Get-TargetResource `
+                    $result = Get-TargetResource `
                         @testTeam
-                    $Result.Ensure | Should -Be 'Absent'
+                    $result.Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should call the expected mocks' {
@@ -60,12 +60,12 @@ try
                 Mock -CommandName Get-NetLbfoTeam -MockWith { $mockTeam }
 
                 It 'Should return team properties' {
-                    $Result = Get-TargetResource @testTeam
-                    $Result.Ensure                 | Should -Be 'Present'
-                    $Result.Name                   | Should -Be $testTeam.Name
-                    $Result.TeamMembers            | Should -Be $testTeam.TeamMembers
-                    $Result.LoadBalancingAlgorithm | Should -Be 'Dynamic'
-                    $Result.TeamingMode            | Should -Be 'SwitchIndependent'
+                    $result = Get-TargetResource @testTeam
+                    $result.Ensure                 | Should -Be 'Present'
+                    $result.Name                   | Should -Be $testTeam.Name
+                    $result.TeamMembers            | Should -Be $testTeam.TeamMembers
+                    $result.LoadBalancingAlgorithm | Should -Be 'Dynamic'
+                    $result.TeamingMode            | Should -Be 'SwitchIndependent'
                 }
 
                 It 'Should call the expected mocks' {
@@ -210,7 +210,7 @@ try
                 It 'Should not throw error' {
                     {
                         $updateTeam = $newTeam.Clone()
-                        $updateTeam.Ensure = 'absent'
+                        $updateTeam.Ensure = 'Absent'
                         Set-TargetResource @updateTeam
                     } | Should -Not -Throw
                 }
@@ -308,7 +308,7 @@ try
 
                 It 'Should return $false' {
                     $updateTeam = $newTeam.Clone()
-                    $updateTeam.Ensure = 'absent'
+                    $updateTeam.Ensure = 'Absent'
                     Test-TargetResource @updateTeam | Should -Be $false
                 }
 

@@ -103,14 +103,14 @@ Function Set-TargetResource
         $TeamMembers,
 
         [Parameter()]
-        [ValidateSet("SwitchIndependent", "LACP", "Static")]
+        [ValidateSet('SwitchIndependent', 'LACP', 'Static')]
         [System.String]
-        $TeamingMode = "SwitchIndependent",
+        $TeamingMode = 'SwitchIndependent',
 
         [Parameter()]
-        [ValidateSet("Dynamic", "HyperVPort", "IPAddresses", "MacAddresses", "TransportPorts")]
+        [ValidateSet('Dynamic', 'HyperVPort', 'IPAddresses', 'MacAddresses', 'TransportPorts')]
         [System.String]
-        $LoadBalancingAlgorithm = "HyperVPort",
+        $LoadBalancingAlgorithm = 'HyperVPort',
 
         [ValidateSet('Present', 'Absent')]
         [System.String]
@@ -258,14 +258,14 @@ Function Test-TargetResource
         $TeamMembers,
 
         [Parameter()]
-        [ValidateSet("SwitchIndependent", "LACP", "Static")]
+        [ValidateSet('SwitchIndependent', 'LACP', 'Static')]
         [System.String]
-        $TeamingMode = "SwitchIndependent",
+        $TeamingMode = 'SwitchIndependent',
 
         [Parameter()]
-        [ValidateSet("Dynamic", "HyperVPort", "IPAddresses", "MacAddresses", "TransportPorts")]
+        [ValidateSet('Dynamic', 'HyperVPort', 'IPAddresses', 'MacAddresses', 'TransportPorts')]
         [System.String]
-        $LoadBalancingAlgorithm = "HyperVPort",
+        $LoadBalancingAlgorithm = 'HyperVPort',
 
         [ValidateSet('Present', 'Absent')]
         [System.String]
