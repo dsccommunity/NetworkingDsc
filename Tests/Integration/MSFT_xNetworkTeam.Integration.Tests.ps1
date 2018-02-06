@@ -94,7 +94,7 @@ try
                 }
                 $result.Ensure                 | Should -Be $configurationData.AllNodes[0].Ensure
                 $result.Name                   | Should -Be $configurationData.AllNodes[0].Name
-                $result.TeamMembers            | Should -Be $configurationData.AllNodes[0].TeamMembers
+                $result.TeamMembers            | Should -Be $configurationData.AllNodes[0].Members
                 $result.LoadBalancingAlgorithm | Should -Be $configurationData.AllNodes[0].LoadBalancingAlgorithm
                 $result.TeamingMode            | Should -Be $configurationData.AllNodes[0].TeamingMode
             }
@@ -143,9 +143,7 @@ try
                 }
                 $result.Ensure                 | Should -Be $configurationData.AllNodes[0].Ensure
                 $result.Name                   | Should -Be $configurationData.AllNodes[0].Name
-                $result.TeamMembers            | Should -Be $configurationData.AllNodes[0].TeamMembers
-                $result.LoadBalancingAlgorithm | Should -Be $configurationData.AllNodes[0].LoadBalancingAlgorithm
-                $result.TeamingMode            | Should -Be $configurationData.AllNodes[0].TeamingMode
+                $result.TeamMembers            | Should -Be $configurationData.AllNodes[0].Members
             }
         }
     }
