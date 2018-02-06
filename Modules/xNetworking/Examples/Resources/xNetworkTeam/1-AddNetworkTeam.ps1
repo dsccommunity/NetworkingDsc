@@ -1,6 +1,7 @@
 <#
     .EXAMPLE
-    Creates the Host Team with the NIC1 and NIC2 Interfaces
+    Creates the switch independent Network Team 'HostTeam' using the NIC1
+    and NIC2 interfaces. It sets the load balacing algorithm to 'HyperVPort'.
 #>
 Configuration Example
 {
@@ -17,11 +18,11 @@ Configuration Example
     {
         xNetworkTeam HostTeam
         {
-            Name = 'HostTeam'
-            TeamingMode = 'SwitchIndependent'
+            Name                   = 'HostTeam'
+            TeamingMode            = 'SwitchIndependent'
             LoadBalancingAlgorithm = 'HyperVPort'
-            TeamMembers = 'NIC1','NIC2'
-            Ensure = 'Present'
+            TeamMembers            = 'NIC1', 'NIC2'
+            Ensure                 = 'Present'
         }
     }
 }

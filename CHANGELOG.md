@@ -26,6 +26,10 @@
 - MSFT_xWinsSetting:
   - Created new resource for enabling/disabling LMHOSTS lookup and
     enabling/disabling WINS name resoluton using DNS.
+- MSFT_xNetworkTeam:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+  - Converted exceptions to use ResourceHelper functions.
 
 ## 5.4.0.0
 
