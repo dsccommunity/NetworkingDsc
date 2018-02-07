@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.5.0.0
+
 - MSFT_xNetAdapterAdvancedProperty:
   - Created new resource configuring AdvancedProperties for NetAdapter
 - MSFT_xNetAdapterLso:

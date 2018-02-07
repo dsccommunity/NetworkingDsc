@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '5.4.0.0'
+ModuleVersion = '5.5.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -50,19 +50,34 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- MSFT_xIPAddressOption:
-  - Added a new resource to set the SkipAsSource option for an IP address.
-- MSFT_xWeakHostSend:
-  - Created the new Weak Host Send resource.
-- MSFT_xWeakHostReceive:
-  - Created the new Weak Host Receive resource.
-- MSFT_xRoute:
+        ReleaseNotes = '- MSFT_xNetAdapterAdvancedProperty:
+  - Created new resource configuring AdvancedProperties for NetAdapter
+- MSFT_xNetAdapterLso:
   - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+- MSFT_xNetAdapterName:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+- MSFT_xNetAdapterRDMA:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
   - Converted exceptions to use ResourceHelper functions.
-  - Changed unit tests so that they can be run in any order.
-  - Included default values in MOF file so that they are displayed
-    in Wiki documentation.
-  - Converted tests to meet Pester V4 standards.
+  - Improved integration tests to preserve system status and run in more
+    scenarios.
+- MSFT_xNetBIOS:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Improved integration tests to preserve system status, run in more
+    scenarios and more effectively test the resource.
+  - Changed to report back error if unable to set NetBIOS setting.
+- MSFT_xWinsSetting:
+  - Created new resource for enabling/disabling LMHOSTS lookup and
+    enabling/disabling WINS name resoluton using DNS.
+- MSFT_xNetworkTeam:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+  - Converted exceptions to use ResourceHelper functions.
 
 '
 
@@ -70,6 +85,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 
