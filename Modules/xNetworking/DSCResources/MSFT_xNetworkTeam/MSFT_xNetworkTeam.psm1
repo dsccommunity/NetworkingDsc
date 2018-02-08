@@ -112,6 +112,7 @@ Function Set-TargetResource
         [System.String]
         $LoadBalancingAlgorithm = 'HyperVPort',
 
+        [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
         $Ensure = 'Present'
@@ -267,6 +268,7 @@ Function Test-TargetResource
         [System.String]
         $LoadBalancingAlgorithm = 'HyperVPort',
 
+        [Parameter()]
         [ValidateSet('Present', 'Absent')]
         [System.String]
         $Ensure = 'Present'

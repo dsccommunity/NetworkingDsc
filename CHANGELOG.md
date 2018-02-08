@@ -4,6 +4,15 @@
 
 - Reordered resource list in README.MD to be alphabetical and added
   missing resource xNetAdapterAdvancedProperty - Fixes [issue #309](https://github.com/PowerShell/xNetworking/issues/309).
+- MSFT_xNetworkTeamInterface:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- MSFT_xNetBIOS:
+  - Corrected style and formatting to meet HQRM guidelines.
+- MSFT_xNetworkTeam:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Added missing default from MOF description of Ensure parameter.
 
 ## 5.5.0.0
 
