@@ -2,31 +2,32 @@
 
 The **xNetworking** module contains the following resources:
 
-- **xFirewall**: Sets a node's firewall rules.
-- **xIPAddress**: Sets a node's IP address(s).
-- **xIPAddressOption**: Sets an IP address option.
-- **xDnsServerAddress**: Sets a node's DNS server address(s).
+- **xDefaultGatewayAddress**: Sets a node's default gateway address.
+- **xDhcpClient**: Enable or Disable DHCP on an network interface.
+- **xDnsClientGlobalSetting**: Configure DNS client global settings.
 - **xDnsConnectionSuffix**: Sets a node's network interface
     connection-specific DNS suffix.
-- **xDefaultGatewayAddress**: Sets a node's default gateway address.
-- **xNetConnectionProfile**: Sets a node's connection profile.
-- **xDhcpClient**: Enable or Disable DHCP on an network interface.
-- **xRoute**: Sets static routes on a node.
-- **xNetBIOS**: Enable or Disable NetBios on a network interface.
-- **xNetworkTeam**: Set up network teams on a node.
-- **xNetworkTeamInterface**: Add network interfaces to a network team.
+- **xDnsServerAddress**: Sets a node's DNS server address(s).
+- **xFirewall**: Sets a node's firewall rules.
+- **xFirewallProfile**: Configures a node's private, public or domain firewall profile.
 - **xHostsFile**: Adds, edits or removes entries from the hosts file on a node.
+- **xIPAddress**: Sets a node's IP address(s).
+- **xIPAddressOption**: Sets an IP address option.
+- **xNetAdapterAdvancedProperty**: Sets advanced properties on a network adapter.
 - **xNetAdapterBinding**: Bind or unbind transport or filters to a network interface.
-- **xDnsClientGlobalSetting**: Configure DNS client global settings.
-- **xNetAdapterRDMA**: Enable or disable RDMA on a network adapter.
 - **xNetAdapterLso**: Enable or disable Lso for different protocols
     on a network adapter.
+- **xNetAdapterName**: Rename a network interface that matches specified search parameters.
+- **xNetAdapterRDMA**: Enable or disable RDMA on a network adapter.
 - **xNetAdapterRsc**: Enable or disable Rsc for different protocols
     on a network adapter.
 - **xNetAdapterRss**: Enable or disable Rss on a network adapter.
-- **xNetAdapterName**: Rename a network interface that matches specified search parameters.
-- **xFirewallProfile**: Configures a node's private, public or domain firewall profile.
+- **xNetBIOS**: Enable or Disable NetBios on a network interface.
+- **xNetConnectionProfile**: Sets a node's connection profile.
+- **xNetworkTeam**: Set up network teams on a node.
+- **xNetworkTeamInterface**: Add network interfaces to a network team.
 - **xProxySettings**: Configures the proxy settings for the computer.
+- **xRoute**: Sets static routes on a node.
 - **xWeakHostSend**: Enable or disable the Weak Host Send setting on a network adapter.
 - **xWeakHostReceive**: Enable or disable the Weak Host Receive setting
     on a network adapter.
