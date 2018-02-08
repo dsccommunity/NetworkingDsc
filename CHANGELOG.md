@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Reordered resource list in README.MD to be alphabetical and added
+  missing resource xNetAdapterAdvancedProperty - Fixes [issue #309](https://github.com/PowerShell/xNetworking/issues/309).
+
 ## 5.5.0.0
 
 - MSFT_xNetAdapterAdvancedProperty:
