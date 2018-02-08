@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-    Removes the NIC Team 'HostTeam' from the interfaces NIC1, NIC2 and NIC3.
+    This configuration changes the JumboPacket Size.
 #>
 Configuration Example
 {
@@ -15,11 +15,11 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetworkTeam HostTeam
+        xNetAdapterAdvancedProperty JumboPacket9014
         {
-            Name        = 'HostTeam'
-            Ensure      = 'Absent'
-            TeamMembers = 'NIC1', 'NIC2', 'NIC3'
+            NetworkAdapterName  = 'Ethernet'
+            RegistryKeyword     = "*JumboPacket"
+            RegistryValue       = 9014
         }
     }
 }

@@ -2,13 +2,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
@@ -18,7 +18,7 @@ $localizedData = Get-LocalizedData `
 #region check NetBIOSSetting enum loaded, if not load
 try
 {
-    [void][reflection.assembly]::GetAssembly([NetBIOSSetting])
+    [void][System.Reflection.Assembly]::GetAssembly([NetBiosSetting])
 }
 catch
 {
@@ -34,14 +34,17 @@ catch
 #endregion
 
 <#
-    .SYNOPSIS
+.SYNOPSIS
     Returns the current state of the Net Bios on an interface.
 
-    .PARAMETER InterfaceAlias
+.PARAMETER InterfaceAlias
     Specifies the alias of a network interface. Supports the use of '*'.
 
-    .PARAMETER Setting
-    Default - Use NetBios settings from the DHCP server. If static IP, Enable NetBIOS.
+.PARAMETER Setting
+    Specifies if NetBIOS should be enabled or disabled or obtained from
+    the DHCP server (Default). If static IP, Enable NetBIOS.
+
+    Parameter value is ignored.
 #>
 function Get-TargetResource
 {
@@ -54,38 +57,57 @@ function Get-TargetResource
         $InterfaceAlias,
 
         [parameter(Mandatory = $true)]
-        [ValidateSet("Default","Enable","Disable")]
+        [ValidateSet("Default", "Enable", "Disable")]
         [System.String]
         $Setting
     )
 
-    Write-Verbose -Message ($LocalizedData.GettingNetBiosSetting -f $InterfaceAlias)
+    Write-Verbose -Message ($LocalizedData.GettingNetBiosSettingMessage -f $InterfaceAlias)
 
-    $netadapterparams = @{
-        ClassName = 'Win32_NetworkAdapter'
-        Filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
+    $netAdapter = Get-CimInstance `
+        -ClassName Win32_NetworkAdapter `
+        -Filter ('Name="{0}"' -f $InterfaceAlias)
+
+    if ($netAdapter)
+    {
+        Write-Verbose -Message ($localizedData.InterfaceDetectedMessage -f $InterfaceAlias, $netAdapter.InterfaceIndex)
+    }
+    else
+    {
+        New-InvalidOperationException `
+            -Message ($localizedData.InterfaceNotFoundError -f $InterfaceAlias)
     }
 
-    $netAdapterConfig = Get-CimInstance @netadapterparams -ErrorAction Stop |
-            Get-CimAssociatedInstance `
-                -ResultClassName Win32_NetworkAdapterConfiguration `
-                -ErrorAction Stop
+    $netAdapterConfig = $netAdapter | Get-CimAssociatedInstance `
+        -ResultClassName Win32_NetworkAdapterConfiguration `
+        -ErrorAction Stop
+
+    $tcpipNetbiosOptions = $netAdapterConfig.TcpipNetbiosOptions
+    if ($tcpipNetbiosOptions)
+    {
+        $Setting = $([NetBiosSetting].GetEnumValues()[$tcpipNetbiosOptions])
+    }
+    else
+    {
+        $Setting = 'Default'
+    }
 
     return @{
         InterfaceAlias = $InterfaceAlias
-        Setting = $([NETBIOSSetting].GetEnumValues()[$netAdapterConfig.TcpipNetbiosOptions])
+        Setting        = $Setting
     }
 }
 
 <#
-    .SYNOPSIS
+.SYNOPSIS
     Sets the state of the Net Bios on an interface.
 
-    .PARAMETER InterfaceAlias
+.PARAMETER InterfaceAlias
     Specifies the alias of a network interface. Supports the use of '*'.
 
-    .PARAMETER Setting
-    Default - Use NetBios settings from the DHCP server. If static IP, Enable NetBIOS.
+.PARAMETER Setting
+    Specifies if NetBIOS should be enabled or disabled or obtained from
+    the DHCP server (Default). If static IP, Enable NetBIOS.
 #>
 function Set-TargetResource
 {
@@ -97,50 +119,73 @@ function Set-TargetResource
         $InterfaceAlias,
 
         [parameter(Mandatory = $true)]
-        [ValidateSet("Default","Enable","Disable")]
+        [ValidateSet("Default", "Enable", "Disable")]
         [System.String]
         $Setting
     )
 
-    $netadapterparams = @{
-        ClassName = 'Win32_NetworkAdapter'
-        Filter = 'NetConnectionID="{0}"' -f $InterfaceAlias
-    }
-    $netAdapterConfig = Get-CimInstance @netadapterparams -ErrorAction Stop |
-            Get-CimAssociatedInstance `
-                -ResultClassName Win32_NetworkAdapterConfiguration `
-                -ErrorAction Stop
+    Write-Verbose -Message ($LocalizedData.SettingNetBiosSettingMessage -f $InterfaceAlias)
 
-    if ($Setting -eq [NETBIOSSetting]::Default)
+    $netAdapter = Get-CimInstance `
+        -ClassName Win32_NetworkAdapter `
+        -Filter ('Name="{0}"' -f $InterfaceAlias)
+
+    if ($netAdapter)
     {
-        Write-Verbose -Message $LocalizedData.ResetToDefaut
-        #If DHCP is not enabled, settcpipnetbios CIM Method won't take 0 so overwrite registry entry instead.
-        $regParam = @{
-            Path = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetAdapterConfig.SettingID)"
-            Name = 'NetbiosOptions'
-            Value = 0
-        }
-        $null = Set-ItemProperty @regParam
+        Write-Verbose -Message ($localizedData.InterfaceDetectedMessage -f $InterfaceAlias, $netAdapter.InterfaceIndex)
     }
     else
     {
-        Write-Verbose -Message ($LocalizedData.SetNetBIOS -f $Setting)
-        $null = $netAdapterConfig |
-            Invoke-CimMethod -MethodName SetTcpipNetbios -ErrorAction Stop -Arguments @{
-                TcpipNetbiosOptions = [uint32][NETBIOSSetting]::$Setting.value__
-            }
+        New-InvalidOperationException `
+            -Message ($localizedData.InterfaceNotFoundError -f $InterfaceAlias)
+    }
+
+    $netAdapterConfig = $netAdapter | Get-CimAssociatedInstance `
+        -ResultClassName Win32_NetworkAdapterConfiguration `
+        -ErrorAction Stop
+
+    if ($Setting -eq [NetBiosSetting]::Default)
+    {
+        Write-Verbose -Message $LocalizedData.ResetToDefautMessage
+
+        # If DHCP is not enabled, SetTcpipNetbios CIM Method won't take 0 so overwrite registry entry instead.
+        $setItemPropertyParameters = @{
+            Path  = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetAdapterConfig.SettingID)"
+            Name  = 'NetbiosOptions'
+            Value = 0
+        }
+        $null = Set-ItemProperty @setItemPropertyParameters
+    }
+    else
+    {
+        Write-Verbose -Message ($LocalizedData.SetNetBiosMessage -f $Setting)
+
+        $result = $netAdapterConfig |
+            Invoke-CimMethod `
+                -MethodName SetTcpipNetbios `
+                -ErrorAction Stop `
+                -Arguments @{
+                    TcpipNetbiosOptions = [uint32][NetBiosSetting]::$Setting.value__
+                }
+
+        if ($result.ReturnValue -ne 0)
+        {
+            New-InvalidOperationException `
+                -Message ($localizedData.FailedUpdatingNetBiosError -f $result.ReturnValue, $Setting)
+        }
     }
 }
 
 <#
-    .SYNOPSIS
+.SYNOPSIS
     Tests the current state the Net Bios on an interface.
 
-    .PARAMETER InterfaceAlias
+.PARAMETER InterfaceAlias
     Specifies the alias of a network interface. Supports the use of '*'.
 
-    .PARAMETER Setting
-    Default - Use NetBios settings from the DHCP server. If static IP, Enable NetBIOS.
+.PARAMETER Setting
+    Specifies if NetBIOS should be enabled or disabled or obtained from
+    the DHCP server (Default). If static IP, Enable NetBIOS.
 #>
 function Test-TargetResource
 {
@@ -153,44 +198,30 @@ function Test-TargetResource
         $InterfaceAlias,
 
         [parameter(Mandatory = $true)]
-        [ValidateSet("Default","Enable","Disable")]
+        [ValidateSet("Default", "Enable", "Disable")]
         [System.String]
         $Setting
     )
 
-    $nic = Get-CimInstance `
+    Write-Verbose -Message ($LocalizedData.TestingNetBiosSettingMessage -f $InterfaceAlias)
+
+    $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter "NetConnectionID=`"$InterfaceAlias`""
-    if ($null -ne $nic)
+        -Filter ('Name="{0}"' -f $InterfaceAlias)
+
+    if ($netAdapter)
     {
-        Write-Verbose -Message ($LocalizedData.InterfaceDetected -f $InterfaceAlias,$nic.InterfaceIndex)
+        Write-Verbose -Message ($localizedData.InterfaceDetectedMessage -f $InterfaceAlias, $netAdapter.InterfaceIndex)
     }
     else
     {
-        $errorParam = @{
-            Message = ($LocalizedData.NICNotFound -f $InterfaceAlias)
-            ArgumentName = 'InterfaceAlias'
-        }
-        New-InvalidArgumentException @errorParam
+        New-InvalidOperationException `
+            -Message ($localizedData.InterfaceNotFoundError -f $InterfaceAlias)
     }
 
-    $nicConfig = $NIC | Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration
+    $currentState = Get-TargetResource @PSBoundParameters
 
-    Write-Verbose -Message ($LocalizedData.CurrentNetBiosSetting -f [NETBIOSSetting].GetEnumValues()[$NICConfig.TcpipNetbiosOptions])
-
-    $desiredSetting = ([NETBIOSSetting]::$($Setting)).value__
-    Write-Verbose -Message ($LocalizedData.DesiredSetting -f $Setting)
-
-    if ($nicConfig.TcpipNetbiosOptions -eq $desiredSetting)
-    {
-        Write-Verbose -Message $LocalizedData.InDesiredState
-        return $true
-    }
-    else
-    {
-        Write-Verbose -Message $LocalizedData.NotInDesiredState
-        return $false
-    }
+    return Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
 }
 
 Export-ModuleMember -Function *-TargetResource

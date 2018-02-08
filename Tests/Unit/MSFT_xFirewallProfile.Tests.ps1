@@ -237,7 +237,7 @@ try
             Context 'Firewall Profile all parameters are the same' {
                 It 'Should return true' {
                     $testTargetResourceParameters = $firewallProfileSplat.Clone()
-                    Test-TargetResource @testTargetResourceParameters | Should Be $True
+                    Test-TargetResource @testTargetResourceParameters | Should Be $true
                 }
 
                 It 'Should call expected Mocks' {

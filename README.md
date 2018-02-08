@@ -30,6 +30,8 @@ The **xNetworking** module contains the following resources:
 - **xWeakHostSend**: Enable or disable the Weak Host Send setting on a network adapter.
 - **xWeakHostReceive**: Enable or disable the Weak Host Receive setting
     on a network adapter.
+- **xWinsSetting**: Configure the WINS settings that enable or disable LMHOSTS lookups
+  and enable or disable DNS for name resolution over WINS.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)

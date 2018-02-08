@@ -1,5 +1,5 @@
 $script:DSCModuleName = 'xNetworking'
-$script:DSCResourceName = 'MSFT_xNetBIOS'
+$script:DSCResourceName = 'MSFT_xWinsSetting'
 
 # Find an adapter we can test with. It needs to be enabled and have IP enabled.
 $netAdapter = $null
@@ -49,36 +49,48 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
+    . $ConfigFile
 
-    $tcpipNetbiosOptions = $netAdapterConfig.TcpipNetbiosOptions
+    # Store the current WINS settings
+    $enableDnsRegistryKey = Get-ItemProperty `
+        -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' `
+        -Name EnableDNS `
+        -ErrorAction SilentlyContinue
 
-    # Store the current Net Bios setting
-    if ($null -eq $tcpipNetbiosOptions)
+    if ($enableDnsRegistryKey)
     {
-        $currentNetBiosSetting = [NetBiosSetting]::Default
+        $currentEnableDNS = ($enableDnsRegistryKey.EnableDNS -eq 1)
     }
     else
     {
-        $currentNetBiosSetting = [NetBiosSetting].GetEnumValues()[$tcpipNetbiosOptions]
+        # if the key does not exist, then set the default which is enabled.
+        $currentEnableDNS = $true
     }
 
-    # Ensure the Net Bios setting is in a known state (enabled)
-    $null = $netAdapterConfig | Invoke-CimMethod `
-        -MethodName SetTcpipNetbios `
-        -ErrorAction Stop `
+    $enableLMHostsRegistryKey = Get-ItemProperty `
+        -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' `
+        -Name EnableLMHOSTS `
+        -ErrorAction SilentlyContinue
+
+    $currentEnableLmHosts = ($enableLMHOSTSRegistryKey.EnableLMHOSTS -eq 1)
+
+    # Set the WINS settings to known values
+    $null = Invoke-CimMethod `
+        -ClassName Win32_NetworkAdapterConfiguration `
+        -MethodName EnableWins `
         -Arguments @{
-            TcpipNetbiosOptions = [uint32][NetBiosSetting]::Enable
+            DNSEnabledForWINSResolution = $true
+            WINSEnableLMHostsLookup     = $true
         }
 
     Describe "$($script:DSCResourceName)_Integration" {
-        Context 'Disable NetBIOS over TCP/IP' {
-            $configData = @{
+        Context 'Disable all settings' {
+            $configurationData = @{
                 AllNodes = @(
                     @{
-                        NodeName            = 'localhost'
-                        InterfaceAlias      = $netAdapter.Name
-                        Setting             = 'Disable'
+                        NodeName      = 'localhost'
+                        EnableLmHosts = $false
+                        EnableDns     = $false
                     }
                 )
             }
@@ -87,7 +99,7 @@ try
                 {
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $configData
+                        -ConfigurationData $configurationData
 
                     Start-DscConfiguration `
                         -Path $TestDrive `
@@ -107,17 +119,18 @@ try
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $result.Setting | Should -Be 'Disable'
+                $result.EnableLmHosts | Should -Be $false
+                $result.EnableDns | Should -Be $false
             }
         }
 
-        Context 'Enable NetBIOS over TCP/IP' {
-            $configData = @{
+        Context 'Enable all settings' {
+            $configurationData = @{
                 AllNodes = @(
                     @{
-                        NodeName            = 'localhost'
-                        InterfaceAlias      = $netAdapter.Name
-                        Setting             = 'Enable'
+                        NodeName      = 'localhost'
+                        EnableLmHosts = $true
+                        EnableDns     = $true
                     }
                 )
             }
@@ -126,7 +139,7 @@ try
                 {
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $configData
+                        -ConfigurationData $configurationData
 
                     Start-DscConfiguration `
                         -Path $TestDrive `
@@ -146,61 +159,24 @@ try
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $result.Setting | Should -Be 'Enable'
-            }
-        }
-
-        Context 'Default NetBIOS over TCP/IP' {
-            $configData = @{
-                AllNodes = @(
-                    @{
-                        NodeName            = 'localhost'
-                        InterfaceAlias      = $netAdapter.Name
-                        Setting             = 'Default'
-                    }
-                )
-            }
-
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
-
-                    Start-DscConfiguration `
-                        -Path $TestDrive `
-                        -ComputerName localhost `
-                        -Wait `
-                        -Verbose `
-                        -Force `
-                        -ErrorAction Stop
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should have set the resource and all setting should match current state' {
-                $result = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
-                }
-                $result.Setting | Should -Be 'Default'
+                $result.EnableLmHosts | Should -Be $true
+                $result.EnableDns | Should -Be $true
             }
         }
     }
 }
 finally
 {
-    #region FOOTER
-    # Restore the Net Bios setting
-    $null = $netAdapterConfig | Invoke-CimMethod `
-        -MethodName SetTcpipNetbios `
-        -ErrorAction Stop `
+    # Restore the WINS settings
+    $null = Invoke-CimMethod `
+        -ClassName Win32_NetworkAdapterConfiguration `
+        -MethodName EnableWins `
         -Arguments @{
-            TcpipNetbiosOptions = $currentNetBiosSetting
+            DNSEnabledForWINSResolution = $currentEnableDns
+            WINSEnableLMHostsLookup     = $currentEnableLmHosts
         }
 
+    #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
 }

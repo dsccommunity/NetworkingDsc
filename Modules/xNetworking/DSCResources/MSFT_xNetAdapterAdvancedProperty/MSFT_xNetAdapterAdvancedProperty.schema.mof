@@ -1,0 +1,8 @@
+[ClassVersion("1.0.0.0"), FriendlyName("xNetAdapterAdvancedProperty")]
+class MSFT_xNetAdapterAdvancedProperty : OMI_BaseResource
+{
+    [Key,ValueMap{"*FlowControl","*InterruptModeration","*IPChecksumOffloadIPv4","*JumboPacket","*LsoV2IPv4","*LsoV2IPv6","*MaxRssProcessors","*NumaNodeId","*NumRssQueues","*PriorityVLANTag","*ReceiveBuffers","*RSS","*RssBaseProcNumber","*RssMaxProcNumber","*RSSProfile","*SpeedDuplex","*TCPChecksumOffloadIPv4","*TCPChecksumOffloadIPv6","*TransmitBuffers","*UDPChecksumOffloadIPv4","*UDPChecksumOffloadIPv6","AdaptiveIFS","ITR","LogLinkStateEvent","MasterSlave","NetworkAddress","WaitAutoNegComplete"},Values{"*FlowControl","*InterruptModeration","*IPChecksumOffloadIPv4","*JumboPacket","*LsoV2IPv4","*LsoV2IPv6","*MaxRssProcessors","*NumaNodeId","*NumRssQueues","*PriorityVLANTag","*ReceiveBuffers","*RSS","*RssBaseProcNumber","*RssMaxProcNumber","*RSSProfile","*SpeedDuplex","*TCPChecksumOffloadIPv4","*TCPChecksumOffloadIPv6","*TransmitBuffers","*UDPChecksumOffloadIPv4","*UDPChecksumOffloadIPv6","AdaptiveIFS","ITR","LogLinkStateEvent","MasterSlave","NetworkAddress","WaitAutoNegComplete"},Description("Specifies the registrykeyword of the property that should be in desired state.")] String RegistryKeyword;
+    [Required, Description("Specifies the network adapter name.")] String NetworkAdapterName;
+    [Required, Description("Specifies the registryvalue.")] String RegistryValue;
+    [Read, Description("Output Display value of selected RegistryKeyword.")] String DisplayValue;
+};

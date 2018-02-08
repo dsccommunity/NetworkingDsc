@@ -3,5 +3,5 @@
 class MSFT_xNetBIOS : OMI_BaseResource
 {
     [Key, Description("Specifies the alias of a network interface.")] String InterfaceAlias;
-    [Required, Description("Default - Use NetBios settings from the DHCP server. If static IP, Enable NetBIOS."), ValueMap{"Default","Enable","Disable"}, Values{"Default","Enable","Disable"}] String Setting;
+    [Required, Description("Specifies if NetBIOS should be enabled or disabled or obtained from the DHCP server (Default). If static IP, Enable NetBIOS."), ValueMap{"Default","Enable","Disable"}, Values{"Default","Enable","Disable"}] String Setting;
 };

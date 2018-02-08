@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+## 5.5.0.0
+
+- MSFT_xNetAdapterAdvancedProperty:
+  - Created new resource configuring AdvancedProperties for NetAdapter
+- MSFT_xNetAdapterLso:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+- MSFT_xNetAdapterName:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+- MSFT_xNetAdapterRDMA:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Improved integration tests to preserve system status and run in more
+    scenarios.
+- MSFT_xNetBIOS:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Improved integration tests to preserve system status, run in more
+    scenarios and more effectively test the resource.
+  - Changed to report back error if unable to set NetBIOS setting.
+- MSFT_xWinsSetting:
+  - Created new resource for enabling/disabling LMHOSTS lookup and
+    enabling/disabling WINS name resoluton using DNS.
+- MSFT_xNetworkTeam:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+
 ## 5.4.0.0
 
 - MSFT_xIPAddressOption:

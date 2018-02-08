@@ -1,10 +1,10 @@
 # Localized resources for MSFT_xNetAdapterRDMA
 
 ConvertFrom-StringData @'
-    CheckNetAdapter = Checking if network adapter exists or not.
-    CheckNetAdapterRDMA = Checking if RDMA is enabled and in desired state for this adapter.
-    NetAdapterNotFound = Network Adapter not found.
-    NetAdapterRDMADifferent = Network adapter RDMA setting is not in desired state. This will be configured.
-    SetNetAdapterRDMA = Setting network adapter RDMA configuration to desired state.
-    NetAdapterRDMAMatches = Network adapter RDMA configuration is in desired state. No action needed.
+    GetNetAdapterRDMAMessage = Getting network adapter '{0}' RDMA setting.
+    NetAdapterNotFoundError = Network adapter '{0}' not found.
+    CheckNetAdapterRDMAMessage = Checking the RDMA enabled state for network adapter '{0}'.
+    SetNetAdapterRDMAMessage = Setting network adapter '{0}' RDMA enabled to '{1}'.
+    NetAdapterRDMADifferentMessage = RDMA setting for network adapter '{0}' is not in desired state. This will be configured.
+    NetAdapterRDMAMatchesMessage = RDMA setting for network adapter '{0}' is in desired state. No action needed.
 '@

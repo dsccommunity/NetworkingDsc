@@ -30,7 +30,6 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        #region DEFAULT TESTS
         It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
@@ -42,21 +41,20 @@ try
                     -Verbose `
                     -Force `
                     -ErrorAction Stop
-            } | Should Not Throw
+            } | Should -Not -Throw
         }
 
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
-        #endregion
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
-            $current.InterfaceAlias | Should Be $TestDisableIPv4.InterfaceAlias
-            $current.ComponentId    | Should Be $TestDisableIPv4.ComponentId
-            $current.State          | Should Be $TestDisableIPv4.State
+            $current.InterfaceAlias | Should -Be $TestDisableIPv4.InterfaceAlias
+            $current.ComponentId    | Should -Be $TestDisableIPv4.ComponentId
+            $current.State          | Should -Be $TestDisableIPv4.State
         }
     }
     #endregion
