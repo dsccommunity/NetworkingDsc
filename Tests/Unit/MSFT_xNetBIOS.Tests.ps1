@@ -1,5 +1,6 @@
 $script:DSCModuleName = 'xNetworking'
 $script:DSCResourceName = 'MSFT_xNetBIOS'
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 #region HEADER
 # Unit Test Template Version: 1.1.0

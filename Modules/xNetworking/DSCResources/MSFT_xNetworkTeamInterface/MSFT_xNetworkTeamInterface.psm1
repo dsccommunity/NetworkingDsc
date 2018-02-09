@@ -47,12 +47,12 @@ function Get-TargetResource
 
     Write-Verbose -Message ($localizedData.GetTeamNicInfo -f $Name)
 
-    $getNetLbfoTeamNic_parameters = @{
+    $getNetLbfoTeamNicParameters = @{
         Name        = $Name
         Team        = $TeamName
         ErrorAction = 'SilentlyContinue'
     }
-    $teamNic = Get-NetLbfoTeamNic @getNetLbfoTeamNic_parameters
+    $teamNic = Get-NetLbfoTeamNic @getNetLbfoTeamNicParameters
 
     if ($teamNic)
     {
@@ -112,12 +112,12 @@ function Set-TargetResource
 
     Write-Verbose -Message ($LocalizedData.GetTeamNicInfo -f $Name)
 
-    $getNetLbfoTeamNic_parameters = @{
+    $getNetLbfoTeamNicParameters = @{
         Name        = $Name
         Team        = $TeamName
         ErrorAction = 'SilentlyContinue'
     }
-    $teamNic = Get-NetLbfoTeamNic @getNetLbfoTeamNic_parameters
+    $teamNic = Get-NetLbfoTeamNic @getNetLbfoTeamNicParameters
 
     if ($Ensure -eq 'Present')
     {
@@ -138,14 +138,14 @@ function Set-TargetResource
 
                 if ($VlanId -eq 0)
                 {
-                    $setNetLbfoTeamNic_parameters = @{
+                    $setNetLbfoTeamNicParameters = @{
                         Name        = $Name
                         Team        = $TeamName
                         Default     = $true
                         ErrorAction = 'Stop'
                         Confirm     = $false
                     }
-                    Set-NetLbfoTeamNic @setNetLbfoTeamNic_parameters
+                    Set-NetLbfoTeamNic @setNetLbfoTeamNicParameters
                 }
                 else
                 {
@@ -153,20 +153,20 @@ function Set-TargetResource
                         Required in case of primary interface, whose name gets changed
                         to include VLAN ID, if specified
                     #>
-                    $setNetLbfoTeamNic_parameters = @{
+                    $setNetLbfoTeamNicParameters = @{
                         Name        = $Name
                         Team        = $TeamName
                         VlanId      = $VlanId
                         ErrorAction = 'Stop'
                         Confirm     = $false
                     }
-                    $renameNetAdapter_parameters = @{
+                    $renameNetAdapterParameters = @{
                         NewName     = $Name
                         ErrorAction = 'SilentlyContinue'
                         Confirm     = $false
                     }
-                    $null = Set-NetLbfoTeamNic @setNetLbfoTeamNic_parameters |
-                        Rename-NetAdapter @renameNetAdapter_parameters
+                    $null = Set-NetLbfoTeamNic @setNetLbfoTeamNicParameters |
+                        Rename-NetAdapter @renameNetAdapterParameters
                 }
             }
         }
@@ -176,14 +176,14 @@ function Set-TargetResource
 
             if ($VlanId -ne 0)
             {
-                $addNetLbfoTeamNic_parameters = @{
+                $addNetLbfoTeamNicParameters = @{
                     Name        = $Name
                     Team        = $TeamName
                     VlanId      = $VlanId
                     ErrorAction = 'Stop'
                     Confirm     = $false
                 }
-                $null = Add-NetLbfoTeamNic @addNetLbfoTeamNic_parameters
+                $null = Add-NetLbfoTeamNic @addNetLbfoTeamNicParameters
 
                 Write-Verbose -Message ($LocalizedData.CreatedNetTeamNic -f $Name)
             }
@@ -198,13 +198,13 @@ function Set-TargetResource
     {
         Write-Verbose -Message ($LocalizedData.RemoveTeamNic -f $Name)
 
-        $removeNetLbfoTeamNic_parameters = @{
+        $removeNetLbfoTeamNicParameters = @{
             Team        = $teamNic.Team
             VlanId      = $teamNic.VlanId
             ErrorAction = 'Stop'
             Confirm     = $false
         }
-        $null = Remove-NetLbfoTeamNic @removeNetLbfoTeamNic_parameters
+        $null = Remove-NetLbfoTeamNic @removeNetLbfoTeamNicParameters
     }
 }
 
@@ -250,12 +250,12 @@ function Test-TargetResource
 
     Write-Verbose -Message ($LocalizedData.GetTeamNicInfo -f $Name)
 
-    $getNetLbfoTeamNic_parameters = @{
+    $getNetLbfoTeamNicParameters = @{
         Name        = $Name
         Team        = $TeamName
         ErrorAction = 'SilentlyContinue'
     }
-    $teamNic = Get-NetLbfoTeamNic @getNetLbfoTeamNic_parameters
+    $teamNic = Get-NetLbfoTeamNic @getNetLbfoTeamNicParameters
 
     if ($VlanId -eq 0)
     {

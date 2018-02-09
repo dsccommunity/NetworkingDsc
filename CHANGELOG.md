@@ -10,9 +10,12 @@
   - Converted exceptions to use ResourceHelper functions.
 - MSFT_xNetBIOS:
   - Corrected style and formatting to meet HQRM guidelines.
+  - Ensured CommonTestHelper.psm1 is loaded before running unit tests.
 - MSFT_xNetworkTeam:
   - Corrected style and formatting to meet HQRM guidelines.
   - Added missing default from MOF description of Ensure parameter.
+- MSFT_xNetConnectionProfile:
+  - Corrected style and formatting to meet HQRM guidelines.
 
 ## 5.5.0.0
 
