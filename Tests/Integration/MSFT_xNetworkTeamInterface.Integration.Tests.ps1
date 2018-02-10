@@ -71,9 +71,9 @@ try
                         -Force `
                         -ErrorAction Stop
 
-                    # Wait for up to 60 seconds for the team to be created
+                    # Wait for up to 60 seconds for the team interface to be created
                     $count = 0
-                    While (-not (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue))
+                    While (-not (Get-NetLbfoTeamNic -Name 'TestInterface' -Team 'TestTeam' -ErrorAction SilentlyContinue))
                     {
                         Start-Sleep -Seconds 1
 
@@ -124,9 +124,9 @@ try
                         -Force `
                         -ErrorAction Stop
 
-                    # Wait for up to 60 seconds for the team to be created
+                    # Wait for up to 60 seconds for the team interface to be created
                     $count = 0
-                    While (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue)
+                    While (Get-NetLbfoTeamNic -Name 'TestInterface' -Team 'TestTeam' -ErrorAction SilentlyContinue)
                     {
                         Start-Sleep -Seconds 1
 
@@ -166,7 +166,8 @@ finally
     Remove-NetLbfoTeamNic `
         -Team 'TestTeam' `
         -VlanId 100 `
-        -Confirm:$false
+        -Confirm:$false `
+        -ErrorAction SilentlyContinue
 
     Remove-NetLbfoTeam `
         -Name 'TestTeam' `

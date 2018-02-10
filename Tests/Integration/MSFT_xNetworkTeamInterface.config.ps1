@@ -1,5 +1,5 @@
 
-configuration MSFT_xNetworkTeamInterface_Add_Config
+configuration MSFT_xNetworkTeamInterface_Config
 {
     Import-DSCResource -ModuleName xNetworking
 
