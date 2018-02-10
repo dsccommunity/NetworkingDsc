@@ -44,6 +44,7 @@ Function Get-TargetResource
     $configuration = @{
         Name        = $Name
         TeamMembers = $TeamMembers
+        Ensure      = 'Absent'
     }
 
     Write-Verbose -Message ($localizedData.GetTeamInfo -f $Name)
@@ -52,18 +53,22 @@ Function Get-TargetResource
     if ($networkTeam)
     {
         Write-Verbose -Message ($localizedData.FoundTeam -f $Name)
+        $configuration.Add('LoadBalancingAlgorithm', $networkTeam.LoadBalancingAlgorithm)
+        $configuration.Add('TeamingMode', $networkTeam.TeamingMode)
+
         if ($null -eq (Compare-Object -ReferenceObject $TeamMembers -DifferenceObject $networkTeam.Members))
         {
-            Write-Verbose -Message ($localizedData.TeamMembersExist -f $Name)
-            $configuration.Add('LoadBalancingAlgorithm', $networkTeam.loadBalancingAlgorithm)
-            $configuration.Add('TeamingMode', $networkTeam.teamingMode)
-            $configuration.Add('Ensure', 'Present')
+            Write-Verbose -Message ($localizedData.TeamMembersMatch -f $Name)
+            $configuration.Ensure = 'Present'
+        }
+        else
+        {
+            Write-Verbose -Message ($localizedData.TeamMembersNotMatch -f $Name)
         }
     }
     else
     {
         Write-Verbose -Message ($localizedData.TeamNotFound -f $Name)
-        $configuration.Add('Ensure', 'Absent')
     }
 
     return $configuration

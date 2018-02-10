@@ -1,9 +1,9 @@
 
-configuration MSFT_xNetworkTeamInterface_Config
+configuration MSFT_xNetworkTeamInterface_Add_Config
 {
     Import-DSCResource -ModuleName xNetworking
 
-    Node $NodeName
+    node localhost
     {
         xNetworkTeam HostTeam
         {
@@ -11,7 +11,7 @@ configuration MSFT_xNetworkTeamInterface_Config
             TeamingMode            = $Node.TeamingMode
             LoadBalancingAlgorithm = $Node.LoadBalancingAlgorithm
             TeamMembers            = $Node.Members
-            Ensure                 = $Node.Ensure
+            Ensure                 = 'Present'
         }
 
         xNetworkTeamInterface LbfoInterface
@@ -20,7 +20,7 @@ configuration MSFT_xNetworkTeamInterface_Config
             TeamName  = $Node.TeamName
             VlanID    = $Node.VlanId
             Ensure    = $Node.Ensure
-            DependsOn = '[xNetworkTeam] HostTeam'
+            DependsOn = '[xNetworkTeam]HostTeam'
         }
     }
 }

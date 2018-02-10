@@ -84,7 +84,7 @@ try
         }
 
         Describe "$($Global:DSCResourceName)\Get-TargetResource" {
-            Context 'Team Interface does not exist' {
+            Context 'When team Interface does not exist' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
                     -ParameterFilter $getNetLbfoTeamNic_ParameterFilter
@@ -132,7 +132,7 @@ try
         }
 
         Describe "$($Global:DSCResourceName)\Set-TargetResource" {
-            Context 'Team Interface does not exist but invalid VlanId (0) is passed' {
+            Context 'When team Interface does not exist but invalid VlanId (0) is passed' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
                     -ParameterFilter $getNetLbfoTeamNic_ParameterFilter
@@ -167,7 +167,7 @@ try
                 }
             }
 
-            Context 'Team Interface does not exist but should' {
+            Context 'When team Interface does not exist but should' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
                     -ParameterFilter $getNetLbfoTeamNic_ParameterFilter
@@ -201,7 +201,7 @@ try
                 }
             }
 
-            Context 'Team Interface exists but needs a different VlanId' {
+            Context 'When team Interface exists but needs a different VlanId' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
                     -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
@@ -238,7 +238,7 @@ try
                 }
             }
 
-            Context 'Team Interface exists but should not exist' {
+            Context 'When team Interface exists but should not exist' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
                     -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
@@ -282,7 +282,7 @@ try
         }
 
         Describe "$($Global:DSCResourceName)\Test-TargetResource" {
-            Context 'Team Interface does not exist but should' {
+            Context 'When team Interface does not exist but should' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
                     -ParameterFilter $getNetLbfoTeamNic_ParameterFilter
@@ -305,7 +305,7 @@ try
                 }
             }
 
-            Context 'Team Interface exists but needs a different VlanId' {
+            Context 'When team Interface exists but needs a different VlanId' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
                     -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
@@ -329,7 +329,7 @@ try
                 }
             }
 
-            Context 'Team Interface exists but should not exist' {
+            Context 'When team Interface exists but should not exist' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
                     -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
@@ -353,7 +353,7 @@ try
                 }
             }
 
-            Context 'Team Interface exists and no action needed' {
+            Context 'When team Interface exists and no action needed' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
                     -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
@@ -376,7 +376,7 @@ try
                 }
             }
 
-            Context 'Team Interface does not exist and no action needed' {
+            Context 'When team Interface does not exist and no action needed' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
                     -ParameterFilter $getNetLbfoTeamNic_ParameterFilter
@@ -399,7 +399,7 @@ try
                 }
             }
 
-            Context 'Team Interface exists on the default 0 VLAN' {
+            Context 'When team Interface exists on the default 0 VLAN' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
                     -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `

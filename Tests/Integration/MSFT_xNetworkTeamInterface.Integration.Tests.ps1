@@ -13,7 +13,6 @@ return
 
 $script:DSCModuleName      = 'xNetworking'
 $script:DSCResourceName    = 'MSFT_xNetworkTeamInterface'
-$script:teamMembers        = (Get-NetAdapter -Physical).Name
 
 #region HEADER
 # Integration Test Template Version: 1.1.0
@@ -46,7 +45,7 @@ try
             AllNodes = @(
                 @{
                     NodeName               = 'localhost'
-                    TeamName               = 'TestName'
+                    TeamName               = 'TestTeam'
                     Members                = $teamMembers
                     LoadBalancingAlgorithm = 'MacAddresses'
                     TeamingMode            = 'SwitchIndependent'
@@ -57,53 +56,107 @@ try
             )
         }
 
-        It 'Should compile and apply the MOF without throwing' {
-            {
-                & "$($script:DSCResourceName)_Config" `
-                    -OutputPath $TestDrive `
-                    -ConfigurationData $configurationData
-
-                Start-DscConfiguration `
-                    -Path $TestDrive `
-                    -ComputerName localhost `
-                    -Wait `
-                    -Verbose `
-                    -Force `
-                    -ErrorAction Stop
-
-                # Wait for up to 60 seconds for the team to be created
-                $count = 0
-                While (-not (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue))
+        Context 'When the network team is created and the TestInterface is added' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
-                    Start-Sleep -Seconds 1
+                    & "$($script:DSCResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configurationData
 
-                    if ($count -ge 60)
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
+
+                    # Wait for up to 60 seconds for the team to be created
+                    $count = 0
+                    While (-not (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue))
                     {
-                        break
+                        Start-Sleep -Seconds 1
+
+                        if ($count -ge 60)
+                        {
+                            break
+                        }
+
+                        $count++
                     }
-
-                    $count++
-                }
-            } | Should -Not -Throw
-        }
-
-        It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-        }
-
-        It 'Should have set the resource and all the parameters should match' {
-            $result = Get-DscConfiguration    | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                } | Should -Not -Throw
             }
-            $result[0].Ensure                 | Should -Be $configurationData.AllNodes[0].Ensure
-            $result[0].Name                   | Should -Be $configurationData.AllNodes[0].TeamName
-            $result[0].TeamMembers            | Should -Be $configurationData.AllNodes[0].TeamMembers
-            $result[0].LoadBalancingAlgorithm | Should -Be $configurationData.AllNodes[0].LoadBalancingAlgorithm
-            $result[0].TeamingMode            | Should -Be $configurationData.AllNodes[0].TeamingMode
-            $result[1].Ensure                 | Should -Be $configurationData.AllNodes[0].Ensure
-            $result[1].Name                   | Should -Be $configurationData.AllNodes[0].InterfaceName
-            $result[1].TeamName               | Should -Be $configurationData.AllNodes[0].TeamName
-            $result[1].VlanId                 | Should -Be $configurationData.AllNodes[0].VlanId
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $result = Get-DscConfiguration    | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                }
+                $result[0].Ensure                 | Should -Be 'Present'
+                $result[0].Name                   | Should -Be $configurationData.AllNodes[0].TeamName
+                $result[0].TeamMembers            | Should -Be $configurationData.AllNodes[0].Members
+                $result[0].LoadBalancingAlgorithm | Should -Be $configurationData.AllNodes[0].LoadBalancingAlgorithm
+                $result[0].TeamingMode            | Should -Be $configurationData.AllNodes[0].TeamingMode
+                $result[1].Ensure                 | Should -Be $configurationData.AllNodes[0].Ensure
+                $result[1].Name                   | Should -Be $configurationData.AllNodes[0].InterfaceName
+                $result[1].TeamName               | Should -Be $configurationData.AllNodes[0].TeamName
+                $result[1].VlanId                 | Should -Be $configurationData.AllNodes[0].VlanId
+            }
+        }
+
+        $configurationData.AllNodes[0].Ensure = 'Absent'
+
+        Context 'When the network team is created and the TestInterface is removed' {
+            It 'Should compile and apply the MOF without throwing' {
+                {
+                    & "$($script:DSCResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configurationData
+
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
+
+                    # Wait for up to 60 seconds for the team to be created
+                    $count = 0
+                    While (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue)
+                    {
+                        Start-Sleep -Seconds 1
+
+                        if ($count -ge 60)
+                        {
+                            break
+                        }
+
+                        $count++
+                    }
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $result = Get-DscConfiguration    | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                }
+                $result[0].Ensure                 | Should -Be 'Present'
+                $result[0].Name                   | Should -Be $configurationData.AllNodes[0].TeamName
+                $result[0].TeamMembers            | Should -Be $configurationData.AllNodes[0].Members
+                $result[0].LoadBalancingAlgorithm | Should -Be $configurationData.AllNodes[0].LoadBalancingAlgorithm
+                $result[0].TeamingMode            | Should -Be $configurationData.AllNodes[0].TeamingMode
+                $result[1].Ensure                 | Should -Be $configurationData.AllNodes[0].Ensure
+                $result[1].Name                   | Should -Be $configurationData.AllNodes[0].InterfaceName
+                $result[1].TeamName               | Should -Be $configurationData.AllNodes[0].TeamName
+            }
         }
     }
 }
