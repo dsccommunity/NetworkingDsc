@@ -379,10 +379,10 @@ function Get-IPAddressPrefix
     [cmdletbinding()]
     param
     (
-        [parameter(Mandatory=$True, ValueFromPipeline)]
+        [Parameter(Mandatory=$True, ValueFromPipeline)]
         [string[]]$IPAddress,
 
-        [parameter()]
+        [Parameter()]
         [ValidateSet('IPv4','IPv6')]
         [string]$AddressFamily = 'IPv4'
     )

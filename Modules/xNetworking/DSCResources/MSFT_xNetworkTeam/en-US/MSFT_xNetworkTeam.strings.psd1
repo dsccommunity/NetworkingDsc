@@ -3,7 +3,8 @@
 ConvertFrom-StringData @'
     GetTeamInfo = Getting network team information for '{0}'.
     FoundTeam = Found a network team with name '{0}'.
-    TeamMembersExist = Members in the network team '{0}' exist as per the configuration.
+    TeamMembersMatch = Members in the network team '{0}' exist as per the configuration.
+    TeamMembersNotMatch = Members in the network team '{0}' do not match configuration.
     TeamNotFound = Network team with name '{0}' not found.
     LoadBalancingAlgorithmDifferent = Load Balancing algorithm is different from the requested '{0}' algorithm.
     TeamingModeDifferent = Teaming mode is different from the requested '{0}' mode.

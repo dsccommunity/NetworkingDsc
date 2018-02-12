@@ -2,13 +2,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
+            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
@@ -17,7 +17,7 @@ $localizedData = Get-LocalizedData `
 
 <#
     .SYNOPSIS
-    Returns the current state of a Network Team Interface in a Network Team.
+    Returns the current state of a network team interface in a Network Team.
 
     .PARAMETER Name
     Specifies the name of the network team interface to create.
@@ -31,33 +31,41 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $Name,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $TeamName
     )
 
     $configuration = @{
-        name     = $Name
-        teamName = $TeamName
+        Name     = $Name
+        TeamName = $TeamName
     }
 
     Write-Verbose -Message ($localizedData.GetTeamNicInfo -f $Name)
-    $teamNic = Get-NetLbfoTeamNic -Name $Name -Team $TeamName -ErrorAction SilentlyContinue
+
+    $getNetLbfoTeamNicParameters = @{
+        Name        = $Name
+        Team        = $TeamName
+        ErrorAction = 'SilentlyContinue'
+    }
+    $teamNic = Get-NetLbfoTeamNic @getNetLbfoTeamNicParameters
 
     if ($teamNic)
     {
         Write-Verbose -Message ($localizedData.FoundTeamNic -f $Name)
-        $configuration.Add("vlanID", $teamNic.VlanID)
-        $configuration.Add("ensure", "Present")
+
+        $configuration.Add('VlanId', $teamNic.VlanId)
+        $configuration.Add('Ensure', 'Present')
     }
     else
     {
         Write-Verbose -Message ($localizedData.TeamNicNotFound -f $Name)
-        $configuration.Add("ensure", "Absent")
+
+        $configuration.Add('Ensure', 'Absent')
     }
 
     return $configuration
@@ -65,7 +73,7 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Adds, updates or removes a Network Team Interface from a Network Team.
+    Adds, updates or removes a network team interface from a Network Team.
 
     .PARAMETER Name
     Specifies the name of the network team interface to create.
@@ -73,8 +81,8 @@ function Get-TargetResource
     .PARAMETER TeamName
     Specifies the name of the network team on which this particular interface should exist.
 
-    .PARAMETER VlanID
-    Specifies VlanID to be set on network team interface.
+    .PARAMETER VlanId
+    Specifies VlanId to be set on network team interface.
 
     .PARAMETER Ensure
     Specifies if the network team interface should be created or deleted.
@@ -84,83 +92,119 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $Name,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $TeamName,
 
+        [Parameter()]
         [System.UInt32]
-        $VlanID,
+        $VlanId,
 
-        [ValidateSet("Present","Absent")]
+        [Parameter()]
+        [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = "Present"
+        $Ensure = 'Present'
     )
 
     Write-Verbose -Message ($LocalizedData.GetTeamNicInfo -f $Name)
-    $teamNic = Get-NetLbfoTeamNic -Name $Name -Team $TeamName -ErrorAction SilentlyContinue
 
-    if ($Ensure -eq "Present")
+    $getNetLbfoTeamNicParameters = @{
+        Name        = $Name
+        Team        = $TeamName
+        ErrorAction = 'SilentlyContinue'
+    }
+    $teamNic = Get-NetLbfoTeamNic @getNetLbfoTeamNicParameters
+
+    if ($Ensure -eq 'Present')
     {
         if ($teamNic)
         {
             Write-Verbose -Message ($LocalizedData.FoundTeamNic -f $Name)
-            if ($teamNic.VlanID -ne $VlanID)
+
+            if ($teamNic.VlanId -ne $VlanId)
             {
-                Write-Verbose -Message ($LocalizedData.TeamNicVlanMismatch -f $VlanID)
+                Write-Verbose -Message ($LocalizedData.TeamNicVlanMismatch -f $VlanId)
+
                 $isNetModifyRequired = $true
             }
 
             if ($isNetModifyRequired)
             {
                 Write-Verbose -Message ($LocalizedData.ModifyTeamNic -f $Name)
-                if ($VlanID -eq 0)
+
+                if ($VlanId -eq 0)
                 {
-                    Set-NetLbfoTeamNic -Name $Name -Team $TeamName -Default `
-                                       -ErrorAction Stop -Confirm:$false
+                    $setNetLbfoTeamNicParameters = @{
+                        Name        = $Name
+                        Team        = $TeamName
+                        Default     = $true
+                        ErrorAction = 'Stop'
+                        Confirm     = $false
+                    }
+                    Set-NetLbfoTeamNic @setNetLbfoTeamNicParameters
                 }
                 else
                 {
-                    # Required in case of primary interface, whose name gets changed
-                    # to include VLAN ID, if specified
-                    Set-NetLbfoTeamNic -Name $Name -Team $TeamName -VlanID $VlanID `
-                                       -ErrorAction Stop -Confirm:$false -PassThru `
-                                       | Rename-NetAdapter -NewName $Name `
-                                                           -ErrorAction SilentlyContinue `
-                                                           -Confirm:$false
+                    <#
+                        Required in case of primary interface, whose name gets changed
+                        to include VLAN ID, if specified
+                    #>
+                    $setNetLbfoTeamNicParameters = @{
+                        Name        = $Name
+                        Team        = $TeamName
+                        VlanId      = $VlanId
+                        ErrorAction = 'Stop'
+                        Confirm     = $false
+                    }
+                    $renameNetAdapterParameters = @{
+                        NewName     = $Name
+                        ErrorAction = 'SilentlyContinue'
+                        Confirm     = $false
+                    }
+                    $null = Set-NetLbfoTeamNic @setNetLbfoTeamNicParameters |
+                        Rename-NetAdapter @renameNetAdapterParameters
                 }
             }
         }
         else
         {
             Write-Verbose -Message ($LocalizedData.CreateTeamNic -f $Name)
-            if ($VlanID -ne 0)
+
+            if ($VlanId -ne 0)
             {
-                $null = Add-NetLbfoTeamNic -Name $Name -Team $TeamName -VlanID $VlanID `
-                                           -ErrorAction Stop -Confirm:$false
+                $addNetLbfoTeamNicParameters = @{
+                    Name        = $Name
+                    Team        = $TeamName
+                    VlanId      = $VlanId
+                    ErrorAction = 'Stop'
+                    Confirm     = $false
+                }
+                $null = Add-NetLbfoTeamNic @addNetLbfoTeamNicParameters
+
                 Write-Verbose -Message ($LocalizedData.CreatedNetTeamNic -f $Name)
             }
             else
             {
-                $errorId = "TeamNicCreateError"
-                $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-                $errorMessage = $LocalizedData.FailedToCreateTeamNic
-                $exception = New-Object -TypeName System.InvalidOperationException `
-                                        -ArgumentList $errorMessage
-                $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                                          -ArgumentList $exception, $errorId, $errorCategory, $null
-                $PSCmdlet.ThrowTerminatingError($errorRecord)
+                New-InvalidOperationException `
+                    -Message ($localizedData.FailedToCreateTeamNic)
             }
         }
     }
     else
     {
         Write-Verbose -Message ($LocalizedData.RemoveTeamNic -f $Name)
-        $null = Remove-NetLbfoTeamNic -Team $teamNic.Team -VlanID $teamNic.VlanID `
-                                      -ErrorAction Stop -Confirm:$false
+
+        $removeNetLbfoTeamNicParameters = @{
+            Team        = $teamNic.Team
+            VlanId      = $teamNic.VlanId
+            ErrorAction = 'Stop'
+            Confirm     = $false
+        }
+        $null = Remove-NetLbfoTeamNic @removeNetLbfoTeamNicParameters
     }
 }
 
@@ -174,8 +218,8 @@ function Set-TargetResource
     .PARAMETER TeamName
     Specifies the name of the network team on which this particular interface should exist.
 
-    .PARAMETER VlanID
-    Specifies VlanID to be set on network team interface.
+    .PARAMETER VlanId
+    Specifies VlanId to be set on network team interface.
 
     .PARAMETER Ensure
     Specifies if the network team interface should be created or deleted.
@@ -186,53 +230,65 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $Name,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $TeamName,
 
+        [Parameter()]
         [System.UInt32]
-        $VlanID,
+        $VlanId,
 
-        [ValidateSet("Present","Absent")]
+        [Parameter()]
+        [ValidateSet('Present', 'Absent')]
         [System.String]
-        $Ensure = "Present"
+        $Ensure = 'Present'
     )
 
     Write-Verbose -Message ($LocalizedData.GetTeamNicInfo -f $Name)
-    $teamNic = Get-NetLbfoTeamNic -Name $Name -Team $TeamName -ErrorAction SilentlyContinue
 
-    if ($VlanID -eq 0)
+    $getNetLbfoTeamNicParameters = @{
+        Name        = $Name
+        Team        = $TeamName
+        ErrorAction = 'SilentlyContinue'
+    }
+    $teamNic = Get-NetLbfoTeamNic @getNetLbfoTeamNicParameters
+
+    if ($VlanId -eq 0)
     {
         $VlanValue = $null
     }
     else
     {
-        $VlanValue = $VlanID
+        $VlanValue = $VlanId
     }
 
-    if ($Ensure -eq "Present")
+    if ($Ensure -eq 'Present')
     {
         if ($teamNic)
         {
             Write-Verbose -Message ($LocalizedData.FoundTeamNic -f $Name)
-            if ($teamNic.VlanID -eq $VlanValue)
+
+            if ($teamNic.VlanId -eq $VlanValue)
             {
                 Write-Verbose -Message ($LocalizedData.TeamNicExistsNoAction -f $Name)
+
                 return $true
             }
             else
             {
                 Write-Verbose -Message ($LocalizedData.TeamNicExistsWithDifferentConfig -f $Name)
+
                 return $false
             }
         }
         else
         {
             Write-Verbose -Message ($LocalizedData.TeamNicDoesNotExistShouldCreate -f $Name)
+
             return $false
         }
     }
@@ -241,11 +297,13 @@ function Test-TargetResource
         if ($teamNic)
         {
             Write-Verbose -Message ($LocalizedData.TeamNicExistsShouldRemove -f $Name)
+
             return $false
         }
         else
         {
             Write-Verbose -Message ($LocalizedData.TeamNicExistsNoAction -f $Name)
+
             return $true
         }
     }

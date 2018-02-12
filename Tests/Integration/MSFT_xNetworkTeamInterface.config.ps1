@@ -1,45 +1,26 @@
-$TestTeam = [PSObject]@{
-    Name                    = 'TestTeam'
-    Members                 =  (Get-NetAdapter -Physical).Name
-    loadBalancingAlgorithm  = 'Dynamic'
-    teamingMode             = 'SwitchIndependent'
-    Ensure                  = 'Present'
-}
-
-$TestInterface = [PSObject]@{
-    Name                    = 'TestInterface'
-    TeamName                = $TestTeam.Name
-    VlanID                  = 100
-    Ensure                  = 'Present'
-}
 
 configuration MSFT_xNetworkTeamInterface_Config
 {
-    param
-    (
-        [string[]]$NodeName = 'localhost'
-    )
-
     Import-DSCResource -ModuleName xNetworking
 
-    Node $NodeName
+    node localhost
     {
         xNetworkTeam HostTeam
         {
-          Name = $TestTeam.Name
-          TeamingMode = $TestTeam.teamingMode
-          LoadBalancingAlgorithm = $TestTeam.loadBalancingAlgorithm
-          TeamMembers = $TestTeam.Members
-          Ensure = $TestTeam.Ensure
+            Name                   = $Node.TeamName
+            TeamingMode            = $Node.TeamingMode
+            LoadBalancingAlgorithm = $Node.LoadBalancingAlgorithm
+            TeamMembers            = $Node.Members
+            Ensure                 = 'Present'
         }
-        
+
         xNetworkTeamInterface LbfoInterface
         {
-          Name = $TestInterface.Name
-          TeamName = $TestInterface.TeamName
-          VlanID = $TestInterface.VlanID
-          Ensure = $TestInterface.Ensure
-          DependsOn = '[xNetworkTeam]HostTeam'
+            Name      = $Node.InterfaceName
+            TeamName  = $Node.TeamName
+            VlanID    = $Node.VlanId
+            Ensure    = $Node.Ensure
+            DependsOn = '[xNetworkTeam]HostTeam'
         }
     }
 }
