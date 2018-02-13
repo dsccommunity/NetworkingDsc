@@ -89,11 +89,11 @@ try
                     -ConfigurationData $configData
                 Start-DscConfiguration `
                     -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
         #endregion
 
@@ -134,7 +134,7 @@ try
                 {
                     $parameterNew = $parameterNew -join $parameter.Delimiter
                     It "Should have set the '$parameterName' to '$parameterNew'" {
-                        $parameterValue | Should Be $parameterNew
+                        $parameterValue | Should -Be $parameterNew
                     }
                 }
                 elseif ($parameter.Type -eq 'ArrayIP')
@@ -142,14 +142,14 @@ try
                     for ([int] $entry = 0; $entry -lt $parameterNew.Count; $entry++)
                     {
                         It "Should have set the '$parameterName' arry item $entry to '$($parameterNew[$entry])'" {
-                            $parameterValue[$entry] | Should Be (Convert-CIDRToSubhetMask -Address $parameterNew[$entry])
+                            $parameterValue[$entry] | Should -Be (Convert-CIDRToSubhetMask -Address $parameterNew[$entry])
                         }
                     }
                 }
                 else
                 {
                     It "Should have set the '$parameterName' to '$parameterNew'" {
-                        $parameterValue | Should Be $parameterNew
+                        $parameterValue | Should -Be $parameterNew
                     }
                 }
             }
@@ -174,18 +174,18 @@ try
                     -ConfigurationData $configData
                 Start-DscConfiguration `
                     -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
         #endregion
 
         It 'Should have deleted the rule' {
             # Get the Rule details
             $firewallRule = Get-NetFireWallRule -Name $ruleName -ErrorAction SilentlyContinue
-            $firewallRule | Should BeNullOrEmpty
+            $firewallRule | Should -BeNullOrEmpty
         }
     }
     #endregion

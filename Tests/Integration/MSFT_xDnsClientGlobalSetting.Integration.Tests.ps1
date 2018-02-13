@@ -66,11 +66,11 @@ try
                     -ConfigurationData $configData
                 Start-DscConfiguration `
                     -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
         #endregion
 
@@ -84,7 +84,7 @@ try
             $parameterNewValue = (Get-Variable -Name configData).Value.AllNodes[0].$($parameter.Name)
 
             It "Should have set the '$parameterName' to '$parameterNewValue'" {
-                $parameterCurrentValue | Should Be $parameterNewValue
+                $parameterCurrentValue | Should -Be $parameterNewValue
             }
         }
     }

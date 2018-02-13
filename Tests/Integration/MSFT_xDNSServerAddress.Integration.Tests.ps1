@@ -54,19 +54,19 @@ try
                     -ConfigurationData $configData
                 Start-DscConfiguration -Path $TestDrive `
                     -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config_Static"}
-            $current.InterfaceAlias             | Should Be $adapterName
-            $current.AddressFamily              | Should Be 'IPv4'
-            $current.Address.Count              | Should Be 1
-            $current.Address                    | Should Be '10.139.17.99'
+            $current.InterfaceAlias             | Should -Be $adapterName
+            $current.AddressFamily              | Should -Be 'IPv4'
+            $current.Address.Count              | Should -Be 1
+            $current.Address                    | Should -Be '10.139.17.99'
         }
         #endregion
     }
@@ -93,20 +93,20 @@ try
                     -ConfigurationData $configData
                 Start-DscConfiguration -Path $TestDrive `
                     -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config_Static"}
-            $current.InterfaceAlias             | Should Be $adapterName
-            $current.AddressFamily              | Should Be 'IPv4'
-            $current.Address.Count              | Should Be 2
-            $current.Address[0]                 | Should Be '10.139.17.99'
-            $current.Address[1]                 | Should Be '10.139.17.100'
+            $current.InterfaceAlias             | Should -Be $adapterName
+            $current.AddressFamily              | Should -Be 'IPv4'
+            $current.Address.Count              | Should -Be 2
+            $current.Address[0]                 | Should -Be '10.139.17.99'
+            $current.Address[1]                 | Should -Be '10.139.17.100'
         }
         #endregion
     }
@@ -134,19 +134,19 @@ try
                     -ConfigurationData $configData
                 Start-DscConfiguration -Path $TestDrive `
                     -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config_DHCP"}
-            $current.InterfaceAlias             | Should Be $adapterName
-            $current.AddressFamily              | Should Be 'IPv4'
-            $current.Address.Count              | Should Be 0
-            $current.Address                    | Should BeNullOrEmpty
+            $current.InterfaceAlias             | Should -Be $adapterName
+            $current.AddressFamily              | Should -Be 'IPv4'
+            $current.Address.Count              | Should -Be 0
+            $current.Address                    | Should -BeNullOrEmpty
         }
         #endregion
     }

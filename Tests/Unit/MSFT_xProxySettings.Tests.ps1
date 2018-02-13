@@ -103,11 +103,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should Not Throw
+                    { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return the expected values' {
-                    $script:getTargetResourceResult.Ensure | Should Be 'Absent'
+                    $script:getTargetResourceResult.Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should call expected mocks' {
@@ -131,18 +131,18 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should Not Throw
+                    { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return the expected values' {
-                    $script:getTargetResourceResult.Ensure | Should Be 'Present'
-                    $script:getTargetResourceResult.EnableAutoDetection | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoDetection
-                    $script:getTargetResourceResult.EnableManualProxy | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableManualProxy
-                    $script:getTargetResourceResult.ProxyServer | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServer
-                    $script:getTargetResourceResult.ProxyServerBypassLocal | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerBypassLocal
-                    $script:getTargetResourceResult.ProxyServerExceptions | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerExceptions
-                    $script:getTargetResourceResult.EnableAutoConfiguration | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoConfiguration
-                    $script:getTargetResourceResult.AutoConfigURL | Should Be $testProxyAllEnabledWithBypassLocalSettings.AutoConfigURL
+                    $script:getTargetResourceResult.Ensure | Should -Be 'Present'
+                    $script:getTargetResourceResult.EnableAutoDetection | Should -Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoDetection
+                    $script:getTargetResourceResult.EnableManualProxy | Should -Be $testProxyAllEnabledWithBypassLocalSettings.EnableManualProxy
+                    $script:getTargetResourceResult.ProxyServer | Should -Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServer
+                    $script:getTargetResourceResult.ProxyServerBypassLocal | Should -Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerBypassLocal
+                    $script:getTargetResourceResult.ProxyServerExceptions | Should -Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerExceptions
+                    $script:getTargetResourceResult.EnableAutoConfiguration | Should -Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoConfiguration
+                    $script:getTargetResourceResult.AutoConfigURL | Should -Be $testProxyAllEnabledWithBypassLocalSettings.AutoConfigURL
                 }
 
                 It 'Should call expected mocks' {
@@ -166,18 +166,18 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should Not Throw
+                    { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return the expected values' {
-                    $script:getTargetResourceResult.Ensure | Should Be 'Present'
-                    $script:getTargetResourceResult.EnableAutoDetection | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoDetection
-                    $script:getTargetResourceResult.EnableManualProxy | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableManualProxy
-                    $script:getTargetResourceResult.ProxyServer | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServer
-                    $script:getTargetResourceResult.ProxyServerBypassLocal | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerBypassLocal
-                    $script:getTargetResourceResult.ProxyServerExceptions | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerExceptions
-                    $script:getTargetResourceResult.EnableAutoConfiguration | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoConfiguration
-                    $script:getTargetResourceResult.AutoConfigURL | Should Be $testProxyAllEnabledWithBypassLocalSettings.AutoConfigURL
+                    $script:getTargetResourceResult.Ensure | Should -Be 'Present'
+                    $script:getTargetResourceResult.EnableAutoDetection | Should -Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoDetection
+                    $script:getTargetResourceResult.EnableManualProxy | Should -Be $testProxyAllEnabledWithBypassLocalSettings.EnableManualProxy
+                    $script:getTargetResourceResult.ProxyServer | Should -Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServer
+                    $script:getTargetResourceResult.ProxyServerBypassLocal | Should -Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerBypassLocal
+                    $script:getTargetResourceResult.ProxyServerExceptions | Should -Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerExceptions
+                    $script:getTargetResourceResult.EnableAutoConfiguration | Should -Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoConfiguration
+                    $script:getTargetResourceResult.AutoConfigURL | Should -Be $testProxyAllEnabledWithBypassLocalSettings.AutoConfigURL
                 }
 
                 It 'Should call expected mocks' {
@@ -197,7 +197,7 @@ try
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should Not Throw
+                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -223,7 +223,7 @@ try
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Default' -Verbose } | Should Not Throw
+                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Default' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -249,7 +249,7 @@ try
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
+                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -275,7 +275,7 @@ try
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'All' -Verbose } | Should Not Throw
+                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'All' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -301,7 +301,7 @@ try
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should Not Throw
+                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -327,7 +327,7 @@ try
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
+                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -351,11 +351,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should Not Throw
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
-                    $script:testTargetResourceResult | Should Be $True
+                    $script:testTargetResourceResult | Should -Be $True
                 }
 
                 It 'Should call expected mocks' {
@@ -374,11 +374,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should Not Throw
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:testTargetResourceResult | Should Be $False
+                    $script:testTargetResourceResult | Should -Be $False
                 }
 
                 It 'Should call expected mocks' {
@@ -397,11 +397,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
-                    $script:testTargetResourceResult | Should Be $True
+                    $script:testTargetResourceResult | Should -Be $True
                 }
 
                 It 'Should call expected mocks' {
@@ -420,11 +420,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should Not Throw
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:testTargetResourceResult | Should Be $False
+                    $script:testTargetResourceResult | Should -Be $False
                 }
 
                 It 'Should call expected mocks' {
@@ -443,11 +443,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Default' -Verbose } | Should Not Throw
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Default' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
-                    $script:testTargetResourceResult | Should Be $True
+                    $script:testTargetResourceResult | Should -Be $True
                 }
 
                 It 'Should call expected mocks' {
@@ -471,11 +471,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should Not Throw
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:testTargetResourceResult | Should Be $False
+                    $script:testTargetResourceResult | Should -Be $False
                 }
 
                 It 'Should call expected mocks' {
@@ -503,11 +503,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:testTargetResourceResult | Should Be $False
+                    $script:testTargetResourceResult | Should -Be $False
                 }
 
                 It 'Should call expected mocks' {
@@ -535,11 +535,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should Not Throw
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
-                    $script:testTargetResourceResult | Should Be $True
+                    $script:testTargetResourceResult | Should -Be $True
                 }
 
                 It 'Should call expected mocks' {
@@ -567,11 +567,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
-                    $script:testTargetResourceResult | Should Be $True
+                    $script:testTargetResourceResult | Should -Be $True
                 }
 
                 It 'Should call expected mocks' {
@@ -599,11 +599,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should Not Throw
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:testTargetResourceResult | Should Be $False
+                    $script:testTargetResourceResult | Should -Be $False
                 }
 
                 It 'Should call expected mocks' {
@@ -631,11 +631,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should Not Throw
+                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:testTargetResourceResult | Should Be $False
+                    $script:testTargetResourceResult | Should -Be $False
                 }
 
                 It 'Should call expected mocks' {
@@ -656,11 +656,11 @@ try
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllDisabledSettings `
                             -DesiredValues $testProxyAllDisabledSettings `
-                            -Verbose } | Should Not Throw
+                            -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
-                    $script:testProxySettingsResult | Should Be $true
+                    $script:testProxySettingsResult | Should -Be $true
                 }
             }
 
@@ -669,11 +669,11 @@ try
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllEnabledWithoutBypassLocalSettings `
                             -DesiredValues $testProxyAllEnabledWithoutBypassLocalSettings `
-                            -Verbose  } | Should Not Throw
+                            -Verbose  } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
-                    $script:testProxySettingsResult | Should Be $true
+                    $script:testProxySettingsResult | Should -Be $true
                 }
             }
 
@@ -682,11 +682,11 @@ try
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllEnabledWithBypassLocalSettings `
                             -DesiredValues $testProxyAllEnabledWithBypassLocalSettings `
-                            -Verbose  } | Should Not Throw
+                            -Verbose  } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
-                    $script:testProxySettingsResult | Should Be $true
+                    $script:testProxySettingsResult | Should -Be $true
                 }
             }
 
@@ -695,11 +695,11 @@ try
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllEnabledWithBypassLocalSettings `
                             -DesiredValues $testProxyAllEnabledWithoutBypassLocalSettings `
-                            -Verbose  } | Should Not Throw
+                            -Verbose  } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:testProxySettingsResult | Should Be $false
+                    $script:testProxySettingsResult | Should -Be $false
                 }
             }
 
@@ -708,11 +708,11 @@ try
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyManualProxyWithExceptionsSettings `
                             -DesiredValues $testProxyManualProxyWithExceptionsSettings `
-                            -Verbose  } | Should Not Throw
+                            -Verbose  } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
-                    $script:testProxySettingsResult | Should Be $true
+                    $script:testProxySettingsResult | Should -Be $true
                 }
             }
 
@@ -721,11 +721,11 @@ try
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyManualProxyWithExceptionsSettings `
                             -DesiredValues $testProxyManualProxyWithAlternateExceptionsSettings `
-                            -Verbose  } | Should Not Throw
+                            -Verbose  } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:testProxySettingsResult | Should Be $false
+                    $script:testProxySettingsResult | Should -Be $false
                 }
             }
         }
@@ -733,141 +733,141 @@ try
         Describe "$script:DSCResourceName\Convert*-ProxySettingsBinary" {
             Context 'All Proxy Types Disabled' {
                 It 'Should not throw an exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllDisabledSettings -Verbose } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllDisabledSettings -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should not throw an exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {
-                    $script:proxySettingsResult.EnableAutoDetection | Should Be $testProxyAllDisabledSettings.EnableAutoDetection
-                    $script:proxySettingsResult.EnableManualProxy | Should Be $testProxyAllDisabledSettings.EnableManualProxy
-                    $script:proxySettingsResult.ProxyServer | Should BeNullOrEmpty
-                    $script:proxySettingsResult.ProxyServerBypassLocal | Should Be $False
-                    $script:proxySettingsResult.ProxyServerExceptions | Should BeNullOrEmpty
-                    $script:proxySettingsResult.EnableAutoConfiguration | Should Be $testProxyAllDisabledSettings.EnableAutoConfiguration
-                    $script:proxySettingsResult.AutoConfigURL | Should BeNullOrEmpty
+                    $script:proxySettingsResult.EnableAutoDetection | Should -Be $testProxyAllDisabledSettings.EnableAutoDetection
+                    $script:proxySettingsResult.EnableManualProxy | Should -Be $testProxyAllDisabledSettings.EnableManualProxy
+                    $script:proxySettingsResult.ProxyServer | Should -BeNullOrEmpty
+                    $script:proxySettingsResult.ProxyServerBypassLocal | Should -Be $False
+                    $script:proxySettingsResult.ProxyServerExceptions | Should -BeNullOrEmpty
+                    $script:proxySettingsResult.EnableAutoConfiguration | Should -Be $testProxyAllDisabledSettings.EnableAutoConfiguration
+                    $script:proxySettingsResult.AutoConfigURL | Should -BeNullOrEmpty
                 }
             }
 
             Context 'Only Manual Proxy Server type Enabled' {
                 It 'Should not throw an exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxySettings -Verbose } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxySettings -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should not throw an exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {
-                    $script:proxySettingsResult.EnableAutoDetection | Should Be $testProxyManualProxySettings.EnableAutoDetection
-                    $script:proxySettingsResult.EnableManualProxy | Should Be $testProxyManualProxySettings.EnableManualProxy
-                    $script:proxySettingsResult.ProxyServer | Should Be $testProxyManualProxySettings.ProxyServer
-                    $script:proxySettingsResult.ProxyServerBypassLocal | Should Be $False
-                    $script:proxySettingsResult.ProxyServerExceptions | Should BeNullOrEmpty
-                    $script:proxySettingsResult.EnableAutoConfiguration | Should Be $testProxyManualProxySettings.EnableAutoConfiguration
-                    $script:proxySettingsResult.AutoConfigURL | Should BeNullOrEmpty
+                    $script:proxySettingsResult.EnableAutoDetection | Should -Be $testProxyManualProxySettings.EnableAutoDetection
+                    $script:proxySettingsResult.EnableManualProxy | Should -Be $testProxyManualProxySettings.EnableManualProxy
+                    $script:proxySettingsResult.ProxyServer | Should -Be $testProxyManualProxySettings.ProxyServer
+                    $script:proxySettingsResult.ProxyServerBypassLocal | Should -Be $False
+                    $script:proxySettingsResult.ProxyServerExceptions | Should -BeNullOrEmpty
+                    $script:proxySettingsResult.EnableAutoConfiguration | Should -Be $testProxyManualProxySettings.EnableAutoConfiguration
+                    $script:proxySettingsResult.AutoConfigURL | Should -BeNullOrEmpty
                 }
             }
 
             Context 'Only Manual Proxy Server type Enabled with Exceptions Only' {
                 It 'Should not throw an exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxyWithExceptionsSettings -Verbose } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxyWithExceptionsSettings -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should not throw an exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {
-                    $script:proxySettingsResult.EnableAutoDetection | Should Be $testProxyManualProxyWithExceptionsSettings.EnableAutoDetection
-                    $script:proxySettingsResult.EnableManualProxy | Should Be $testProxyManualProxyWithExceptionsSettings.EnableManualProxy
-                    $script:proxySettingsResult.ProxyServer | Should Be $testProxyManualProxyWithExceptionsSettings.ProxyServer
-                    $script:proxySettingsResult.ProxyServerBypassLocal | Should Be $False
-                    $script:proxySettingsResult.ProxyServerExceptions | Should Be $testProxyManualProxyWithExceptionsSettings.ProxyServerExceptions
-                    $script:proxySettingsResult.EnableAutoConfiguration | Should Be $testProxyManualProxyWithExceptionsSettings.EnableAutoConfiguration
-                    $script:proxySettingsResult.AutoConfigURL | Should BeNullOrEmpty
+                    $script:proxySettingsResult.EnableAutoDetection | Should -Be $testProxyManualProxyWithExceptionsSettings.EnableAutoDetection
+                    $script:proxySettingsResult.EnableManualProxy | Should -Be $testProxyManualProxyWithExceptionsSettings.EnableManualProxy
+                    $script:proxySettingsResult.ProxyServer | Should -Be $testProxyManualProxyWithExceptionsSettings.ProxyServer
+                    $script:proxySettingsResult.ProxyServerBypassLocal | Should -Be $False
+                    $script:proxySettingsResult.ProxyServerExceptions | Should -Be $testProxyManualProxyWithExceptionsSettings.ProxyServerExceptions
+                    $script:proxySettingsResult.EnableAutoConfiguration | Should -Be $testProxyManualProxyWithExceptionsSettings.EnableAutoConfiguration
+                    $script:proxySettingsResult.AutoConfigURL | Should -BeNullOrEmpty
                 }
             }
 
             Context 'Only Manual Proxy Server type Enabled with Bypass Local Only' {
                 It 'Should not throw an exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxyWithBypassLocalOnlySettings -Verbose } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxyWithBypassLocalOnlySettings -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should not throw an exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {
-                    $script:proxySettingsResult.EnableAutoDetection | Should Be $testProxyManualProxyWithBypassLocalOnlySettings.EnableAutoDetection
-                    $script:proxySettingsResult.EnableManualProxy | Should Be $testProxyManualProxyWithBypassLocalOnlySettings.EnableManualProxy
-                    $script:proxySettingsResult.ProxyServer | Should Be $testProxyManualProxyWithBypassLocalOnlySettings.ProxyServer
-                    $script:proxySettingsResult.ProxyServerBypassLocal | Should Be $True
-                    $script:proxySettingsResult.ProxyServerExceptions | Should BeNullOrEmpty
-                    $script:proxySettingsResult.EnableAutoConfiguration | Should Be $testProxyManualProxyWithBypassLocalOnlySettings.EnableAutoConfiguration
-                    $script:proxySettingsResult.AutoConfigURL | Should BeNullOrEmpty
+                    $script:proxySettingsResult.EnableAutoDetection | Should -Be $testProxyManualProxyWithBypassLocalOnlySettings.EnableAutoDetection
+                    $script:proxySettingsResult.EnableManualProxy | Should -Be $testProxyManualProxyWithBypassLocalOnlySettings.EnableManualProxy
+                    $script:proxySettingsResult.ProxyServer | Should -Be $testProxyManualProxyWithBypassLocalOnlySettings.ProxyServer
+                    $script:proxySettingsResult.ProxyServerBypassLocal | Should -Be $True
+                    $script:proxySettingsResult.ProxyServerExceptions | Should -BeNullOrEmpty
+                    $script:proxySettingsResult.EnableAutoConfiguration | Should -Be $testProxyManualProxyWithBypassLocalOnlySettings.EnableAutoConfiguration
+                    $script:proxySettingsResult.AutoConfigURL | Should -BeNullOrEmpty
                 }
             }
 
             Context 'Only Auto Config Proxy type Enabled' {
                 It 'Should not throw an exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAutoConfigOnlySettings -Verbose } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAutoConfigOnlySettings -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should not throw an exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {
-                    $script:proxySettingsResult.EnableAutoDetection | Should Be $testProxyAutoConfigOnlySettings.EnableAutoDetection
-                    $script:proxySettingsResult.EnableManualProxy | Should Be $testProxyAutoConfigOnlySettings.EnableManualProxy
-                    $script:proxySettingsResult.ProxyServer | Should BeNullOrEmpty
-                    $script:proxySettingsResult.ProxyServerBypassLocal | Should Be $False
-                    $script:proxySettingsResult.ProxyServerExceptions | Should BeNullOrEmpty
-                    $script:proxySettingsResult.EnableAutoConfiguration | Should Be $testProxyAutoConfigOnlySettings.EnableAutoConfiguration
-                    $script:proxySettingsResult.AutoConfigURL | Should Be $testProxyAutoConfigOnlySettings.AutoConfigURL
+                    $script:proxySettingsResult.EnableAutoDetection | Should -Be $testProxyAutoConfigOnlySettings.EnableAutoDetection
+                    $script:proxySettingsResult.EnableManualProxy | Should -Be $testProxyAutoConfigOnlySettings.EnableManualProxy
+                    $script:proxySettingsResult.ProxyServer | Should -BeNullOrEmpty
+                    $script:proxySettingsResult.ProxyServerBypassLocal | Should -Be $False
+                    $script:proxySettingsResult.ProxyServerExceptions | Should -BeNullOrEmpty
+                    $script:proxySettingsResult.EnableAutoConfiguration | Should -Be $testProxyAutoConfigOnlySettings.EnableAutoConfiguration
+                    $script:proxySettingsResult.AutoConfigURL | Should -Be $testProxyAutoConfigOnlySettings.AutoConfigURL
                 }
             }
 
             Context 'All Proxy Types Enabled and Proxy Bypass Local Disabled' {
                 It 'Should not throw an exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllEnabledWithoutBypassLocalSettings -Verbose } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllEnabledWithoutBypassLocalSettings -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should not throw an exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {
-                    $script:proxySettingsResult.EnableAutoDetection | Should Be $testProxyAllEnabledWithoutBypassLocalSettings.EnableAutoDetection
-                    $script:proxySettingsResult.EnableManualProxy | Should Be $testProxyAllEnabledWithoutBypassLocalSettings.EnableManualProxy
-                    $script:proxySettingsResult.ProxyServer | Should Be $testProxyAllEnabledWithoutBypassLocalSettings.ProxyServer
-                    $script:proxySettingsResult.ProxyServerBypassLocal | Should Be $testProxyAllEnabledWithoutBypassLocalSettings.ProxyServerBypassLocal
-                    $script:proxySettingsResult.ProxyServerExceptions | Should Be $testProxyAllEnabledWithoutBypassLocalSettings.ProxyServerExceptions
-                    $script:proxySettingsResult.EnableAutoConfiguration | Should Be $testProxyAllEnabledWithoutBypassLocalSettings.EnableAutoConfiguration
-                    $script:proxySettingsResult.AutoConfigURL | Should Be $testProxyAllEnabledWithoutBypassLocalSettings.AutoConfigURL
+                    $script:proxySettingsResult.EnableAutoDetection | Should -Be $testProxyAllEnabledWithoutBypassLocalSettings.EnableAutoDetection
+                    $script:proxySettingsResult.EnableManualProxy | Should -Be $testProxyAllEnabledWithoutBypassLocalSettings.EnableManualProxy
+                    $script:proxySettingsResult.ProxyServer | Should -Be $testProxyAllEnabledWithoutBypassLocalSettings.ProxyServer
+                    $script:proxySettingsResult.ProxyServerBypassLocal | Should -Be $testProxyAllEnabledWithoutBypassLocalSettings.ProxyServerBypassLocal
+                    $script:proxySettingsResult.ProxyServerExceptions | Should -Be $testProxyAllEnabledWithoutBypassLocalSettings.ProxyServerExceptions
+                    $script:proxySettingsResult.EnableAutoConfiguration | Should -Be $testProxyAllEnabledWithoutBypassLocalSettings.EnableAutoConfiguration
+                    $script:proxySettingsResult.AutoConfigURL | Should -Be $testProxyAllEnabledWithoutBypassLocalSettings.AutoConfigURL
                 }
             }
 
             Context 'All Proxy Types Enabled and Proxy Bypass Local Enabled' {
                 It 'Should not throw an exception when converting to Proxy Settings Binary' {
-                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllEnabledWithBypassLocalSettings -Verbose } | Should Not Throw
+                    { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllEnabledWithBypassLocalSettings -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should not throw an exception when converting from Proxy Settings Binary' {
-                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should Not Throw
+                    { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should convert the values to binary and back to source values correctly' {
-                    $script:proxySettingsResult.EnableAutoDetection | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoDetection
-                    $script:proxySettingsResult.EnableManualProxy | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableManualProxy
-                    $script:proxySettingsResult.ProxyServer | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServer
-                    $script:proxySettingsResult.ProxyServerBypassLocal | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerBypassLocal
-                    $script:proxySettingsResult.ProxyServerExceptions | Should Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerExceptions
-                    $script:proxySettingsResult.EnableAutoConfiguration | Should Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoConfiguration
-                    $script:proxySettingsResult.AutoConfigURL | Should Be $testProxyAllEnabledWithBypassLocalSettings.AutoConfigURL
+                    $script:proxySettingsResult.EnableAutoDetection | Should -Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoDetection
+                    $script:proxySettingsResult.EnableManualProxy | Should -Be $testProxyAllEnabledWithBypassLocalSettings.EnableManualProxy
+                    $script:proxySettingsResult.ProxyServer | Should -Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServer
+                    $script:proxySettingsResult.ProxyServerBypassLocal | Should -Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerBypassLocal
+                    $script:proxySettingsResult.ProxyServerExceptions | Should -Be $testProxyAllEnabledWithBypassLocalSettings.ProxyServerExceptions
+                    $script:proxySettingsResult.EnableAutoConfiguration | Should -Be $testProxyAllEnabledWithBypassLocalSettings.EnableAutoConfiguration
+                    $script:proxySettingsResult.AutoConfigURL | Should -Be $testProxyAllEnabledWithBypassLocalSettings.AutoConfigURL
                 }
             }
         }

@@ -77,10 +77,10 @@ try
             $result = Get-TargetResource -InterfaceAlias $mockNetAdapter.Name
 
             It 'Should return the correct values' {
-                $result.InterfaceAlias   | Should Be $mockNetConnnectionProfileAll.InterfaceAlias
-                $result.NetworkCategory  | Should Be $mockNetConnnectionProfileAll.NetworkCategory
-                $result.IPv4Connectivity | Should Be $mockNetConnnectionProfileAll.IPv4Connectivity
-                $result.IPv6Connectivity | Should Be $mockNetConnnectionProfileAll.IPv6Connectivity
+                $result.InterfaceAlias   | Should -Be $mockNetConnnectionProfileAll.InterfaceAlias
+                $result.NetworkCategory  | Should -Be $mockNetConnnectionProfileAll.NetworkCategory
+                $result.IPv4Connectivity | Should -Be $mockNetConnnectionProfileAll.IPv4Connectivity
+                $result.IPv6Connectivity | Should -Be $mockNetConnnectionProfileAll.IPv6Connectivity
             }
         }
 
@@ -95,37 +95,37 @@ try
 
             Context 'NetworkCategory matches' {
                 It 'Should return false' {
-                    Test-TargetResource @testNetworkCategoryMatches | should be $true
+                    Test-TargetResource @testNetworkCategoryMatches | should -be $true
                 }
             }
 
             Context 'NetworkCategory does not match' {
                 It 'Should return false' {
-                    Test-TargetResource @testNetworkCategoryNoMatches | should be $false
+                    Test-TargetResource @testNetworkCategoryNoMatches | should -be $false
                 }
             }
 
             Context 'IPv4Connectivity matches' {
                 It 'Should return false' {
-                    Test-TargetResource @testIPv4ConnectivityMatches | should be $true
+                    Test-TargetResource @testIPv4ConnectivityMatches | should -be $true
                 }
             }
 
             Context 'IPv4Connectivity does not match' {
                 It 'Should return false' {
-                    Test-TargetResource @testIPv4ConnectivityNoMatches | should be $false
+                    Test-TargetResource @testIPv4ConnectivityNoMatches | should -be $false
                 }
             }
 
             Context 'IPv6Connectivity matches' {
                 It 'Should return false' {
-                    Test-TargetResource @testIPv6ConnectivityMatches | should be $true
+                    Test-TargetResource @testIPv6ConnectivityMatches | should -be $true
                 }
             }
 
             Context 'IPv6Connectivity does not match' {
                 It 'Should return false' {
-                    Test-TargetResource @testIPv6ConnectivityNoMatches | should be $false
+                    Test-TargetResource @testIPv6ConnectivityNoMatches | should -be $false
                 }
             }
         }
@@ -149,7 +149,7 @@ try
                     $errorRecord = Get-InvalidOperationRecord `
                         -Message ($LocalizedData.InterfaceNotAvailableError -f $testValidInterfaceAliasOnlyPassed.InterfaceAlias)
 
-                    { Assert-ResourceProperty @testValidInterfaceAliasOnlyPassed } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @testValidInterfaceAliasOnlyPassed } | Should -Throw $errorRecord
                 }
             }
 
@@ -160,7 +160,7 @@ try
                     -Message ($LocalizedData.ParameterCombinationError)
 
                 It 'Should not ParameterCombinationError exception' {
-                    { Assert-ResourceProperty @testValidInterfaceAliasOnlyPassed } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @testValidInterfaceAliasOnlyPassed } | Should -Throw $errorRecord
                 }
             }
 
@@ -168,7 +168,7 @@ try
                 Mock -CommandName Get-NetAdapter -MockWith { return $mockNetAdapter }
 
                 It 'Should not throw an exception' {
-                    { Assert-ResourceProperty @testNetworkCategoryMatches } | Should Not Throw
+                    { Assert-ResourceProperty @testNetworkCategoryMatches } | Should -Not -Throw
                 }
             }
 
@@ -176,7 +176,7 @@ try
                 Mock -CommandName Get-NetAdapter -MockWith { return $mockNetAdapter }
 
                 It 'Should not throw an exception' {
-                    { Assert-ResourceProperty @testIPv4ConnectivityMatches } | Should Not Throw
+                    { Assert-ResourceProperty @testIPv4ConnectivityMatches } | Should -Not -Throw
                 }
             }
 
@@ -184,7 +184,7 @@ try
                 Mock -CommandName Get-NetAdapter -MockWith { return $mockNetAdapter }
 
                 It 'Should not throw an exception' {
-                    { Assert-ResourceProperty @testIPv6ConnectivityMatches } | Should Not Throw
+                    { Assert-ResourceProperty @testIPv6ConnectivityMatches } | Should -Not -Throw
                 }
             }
         }

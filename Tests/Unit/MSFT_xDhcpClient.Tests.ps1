@@ -1,4 +1,4 @@
-﻿$script:DSCModuleName = 'xNetworking'
+$script:DSCModuleName = 'xNetworking'
 $script:DSCResourceName = 'MSFT_xDhcpClient'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
@@ -64,9 +64,9 @@ try
 
                 It 'Should return DHCP state of enabled' {
                     $Result = Get-TargetResource @testNetIPInterfaceEnabled
-                    $Result.State          | Should Be $testNetIPInterfaceEnabled.State
-                    $Result.InterfaceAlias | Should Be $testNetIPInterfaceEnabled.InterfaceAlias
-                    $Result.AddressFamily  | Should Be $testNetIPInterfaceEnabled.AddressFamily
+                    $Result.State          | Should -Be $testNetIPInterfaceEnabled.State
+                    $Result.InterfaceAlias | Should -Be $testNetIPInterfaceEnabled.InterfaceAlias
+                    $Result.AddressFamily  | Should -Be $testNetIPInterfaceEnabled.AddressFamily
                 }
 
                 It 'Should call the expected mocks' {
@@ -80,9 +80,9 @@ try
 
                 It 'Should return DHCP state of disabled' {
                     $Result = Get-TargetResource @testNetIPInterfaceDisabled
-                    $Result.State          | Should Be $testNetIPInterfaceDisabled.State
-                    $Result.InterfaceAlias | Should Be $testNetIPInterfaceDisabled.InterfaceAlias
-                    $Result.AddressFamily  | Should Be $testNetIPInterfaceDisabled.AddressFamily
+                    $Result.State          | Should -Be $testNetIPInterfaceDisabled.State
+                    $Result.InterfaceAlias | Should -Be $testNetIPInterfaceDisabled.InterfaceAlias
+                    $Result.AddressFamily  | Should -Be $testNetIPInterfaceDisabled.AddressFamily
                 }
 
                 It 'Should call the expected mocks' {
@@ -103,7 +103,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @testNetIPInterfaceEnabled } | Should Not Throw
+                    { Set-TargetResource @testNetIPInterfaceEnabled } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -118,7 +118,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @testNetIPInterfaceDisabled } | Should Not Throw
+                    { Set-TargetResource @testNetIPInterfaceDisabled } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -133,7 +133,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @testNetIPInterfaceEnabled } | Should Not Throw
+                    { Set-TargetResource @testNetIPInterfaceEnabled } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -148,7 +148,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @testNetIPInterfaceDisabled } | Should Not Throw
+                    { Set-TargetResource @testNetIPInterfaceDisabled } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -169,7 +169,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
 
                 It 'Should return false' {
-                    Test-TargetResource @testNetIPInterfaceEnabled | Should Be $False
+                    Test-TargetResource @testNetIPInterfaceEnabled | Should -Be $False
                 }
 
                 It 'Should call expected mocks' {
@@ -182,7 +182,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceDisabled }
 
                 It 'Should return true' {
-                    Test-TargetResource @testNetIPInterfaceDisabled | Should Be $true
+                    Test-TargetResource @testNetIPInterfaceDisabled | Should -Be $true
                 }
 
                 It 'Should call expected mocks' {
@@ -195,7 +195,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
 
                 It 'Should return true' {
-                    Test-TargetResource @testNetIPInterfaceEnabled | Should Be $true
+                    Test-TargetResource @testNetIPInterfaceEnabled | Should -Be $true
                 }
 
                 It 'Should call expected mocks' {
@@ -208,7 +208,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPInterfaceEnabled }
 
                 It 'Should return false' {
-                    Test-TargetResource @testNetIPInterfaceDisabled | Should Be $False
+                    Test-TargetResource @testNetIPInterfaceDisabled | Should -Be $False
                 }
 
                 It 'Should call expected mocks' {
@@ -226,7 +226,7 @@ try
                     $errorRecord = Get-InvalidOperationRecord `
                         -Message ($LocalizedData.InterfaceNotAvailableError -f $testNetIPInterfaceEnabled.InterfaceAlias)
 
-                    { Assert-ResourceProperty @testNetIPInterfaceEnabled } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @testNetIPInterfaceEnabled } | Should -Throw $errorRecord
                 }
             }
         }

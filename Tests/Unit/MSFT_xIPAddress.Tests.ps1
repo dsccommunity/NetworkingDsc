@@ -1,4 +1,4 @@
-﻿$script:DSCModuleName = 'xNetworking'
+$script:DSCModuleName = 'xNetworking'
 $script:DSCResourceName = 'MSFT_xIPAddress'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
@@ -45,7 +45,7 @@ try
                     }
 
                     $result = Get-TargetResource @getTargetResourceParameters
-                    $result.IPAddress | Should Be $getTargetResourceParameters.IPAddress
+                    $result.IPAddress | Should -Be $getTargetResourceParameters.IPAddress
                 }
             }
 
@@ -70,7 +70,7 @@ try
                     }
 
                     $result = Get-TargetResource @getTargetResourceParameters
-                    $result.IPAddress | Should Be $getTargetResourceParameters.IPAddress
+                    $result.IPAddress | Should -Be $getTargetResourceParameters.IPAddress
                 }
             }
         }
@@ -112,8 +112,8 @@ try
                             InterfaceAlias = 'Ethernet'
                             AddressFamily  = 'IPv4'
                         }
-                        { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
-                        $result | Should BeNullOrEmpty
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
                     }
 
                     It 'Should call all the mocks' {
@@ -132,8 +132,8 @@ try
                             InterfaceAlias = 'Ethernet'
                             AddressFamily  = 'IPv4'
                         }
-                        { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
-                        $result | Should BeNullOrEmpty
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
                     }
 
                     It 'Should call all the mocks' {
@@ -153,8 +153,8 @@ try
                             AddressFamily  = 'IPv4'
                         }
 
-                        { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
-                        $result | Should BeNullOrEmpty
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
                     }
 
                     It 'Should call expected mocks' {
@@ -177,8 +177,8 @@ try
                             AddressFamily  = 'IPv4'
                         }
 
-                        { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
-                        $result | Should BeNullOrEmpty
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
                     }
 
                     It 'Should call expected mocks' {
@@ -200,8 +200,8 @@ try
                             AddressFamily  = 'IPv4'
                         }
 
-                        { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
-                        $result | Should BeNullOrEmpty
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
                     }
 
                     It 'Should call expected mocks' {
@@ -253,8 +253,8 @@ try
                             AddressFamily  = 'IPv6'
                         }
 
-                        { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
-                        $result | Should BeNullOrEmpty
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
                     }
 
                     It 'Should call all the mocks' {
@@ -274,8 +274,8 @@ try
                             AddressFamily  = 'IPv6'
                         }
 
-                        { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
-                        $result | Should BeNullOrEmpty
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
                     }
 
                     It 'Should call all the mocks' {
@@ -295,8 +295,8 @@ try
                             AddressFamily  = 'IPv6'
                         }
 
-                        { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
-                        $result | Should BeNullOrEmpty
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
                     }
 
                     It 'Should call expected mocks' {
@@ -353,8 +353,8 @@ try
                             AddressFamily  = 'IPv4'
                         }
 
-                        { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
-                        $result | Should BeNullOrEmpty
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
                     }
 
                     It 'Should call expected mocks' {
@@ -374,8 +374,8 @@ try
                             AddressFamily  = 'IPv4'
                         }
 
-                        { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
-                        $result | Should BeNullOrEmpty
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
                     }
 
                     It 'Should call expected mocks' {
@@ -421,7 +421,7 @@ try
                             -Message ($LocalizedData.AddressFormatError -f $testGetResourceParameters.IPAddress) `
                             -ArgumentName 'IPAddress'
 
-                        { $result = Test-TargetResource @testGetResourceParameters } | Should Throw $errorRecord
+                        { $result = Test-TargetResource @testGetResourceParameters } | Should -Throw $errorRecord
                     }
                 }
 
@@ -434,7 +434,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call appropriate mocks' {
@@ -451,7 +451,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $true
+                        $result | Should -Be $true
                     }
 
                     It 'Should call appropriate mocks' {
@@ -468,7 +468,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call appropriate mocks' {
@@ -505,7 +505,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call appropriate mocks' {
@@ -522,7 +522,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call appropriate mocks' {
@@ -539,7 +539,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $true
+                        $result | Should -Be $true
                     }
 
                     It 'Should call appropriate mocks' {
@@ -556,7 +556,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call appropriate mocks' {
@@ -573,7 +573,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call appropriate mocks' {
@@ -590,7 +590,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
                     It 'Should call appropriate mocks' {
                         Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
@@ -606,7 +606,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call appropriate mocks' {
@@ -643,7 +643,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $true
+                        $result | Should -Be $true
                     }
 
                     It 'Should call appropriate mocks' {
@@ -680,7 +680,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $true
+                        $result | Should -Be $true
                     }
 
                     It 'Should call appropriate mocks' {
@@ -717,7 +717,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $true
+                        $result | Should -Be $true
                     }
 
                     It 'Should call appropriate mocks' {
@@ -757,7 +757,7 @@ try
                             -Message ($LocalizedData.AddressFormatError -f $testGetResourceParameters.IPAddress) `
                             -ArgumentName 'IPAddress'
 
-                        { $result = Test-TargetResource @testGetResourceParameters } | Should Throw $errorRecord
+                        { $result = Test-TargetResource @testGetResourceParameters } | Should -Throw $errorRecord
                     }
                 }
 
@@ -770,7 +770,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call appropriate mocks' {
@@ -786,7 +786,7 @@ try
                             AddressFamily  = 'IPv6'
                         }
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $true
+                        $result | Should -Be $true
                     }
 
                     It 'Should call appropriate mocks' {
@@ -803,7 +803,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $true
+                        $result | Should -Be $true
                     }
 
                     It 'Should call appropriate mocks' {
@@ -840,7 +840,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call appropriate mocks' {
@@ -857,7 +857,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call appropriate mocks' {
@@ -874,7 +874,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $true
+                        $result | Should -Be $true
                     }
 
                     It 'Should call appropriate mocks' {
@@ -891,7 +891,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call appropriate mocks' {
@@ -908,7 +908,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $false
+                        $result | Should -Be $false
                     }
 
                     It 'Should call appropriate mocks' {
@@ -939,7 +939,7 @@ try
                         -Message ($LocalizedData.InterfaceNotAvailableError -f $assertResourcePropertyParameters.InterfaceAlias) `
                         -ArgumentName 'Interface'
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
                 }
             }
 
@@ -955,7 +955,7 @@ try
                         -Message ($LocalizedData.AddressFormatError -f $assertResourcePropertyParameters.IPAddress) `
                         -ArgumentName 'IPAddress'
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
                 }
             }
 
@@ -971,7 +971,7 @@ try
                         -Message ($LocalizedData.AddressIPv4MismatchError -f $assertResourcePropertyParameters.IPAddress, $assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'IPAddress'
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
                 }
             }
 
@@ -987,7 +987,7 @@ try
                         -Message ($LocalizedData.AddressIPv6MismatchError -f $assertResourcePropertyParameters.IPAddress, $assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'IPAddress'
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
                 }
             }
 
@@ -999,7 +999,7 @@ try
                         AddressFamily  = 'IPv4'
                     }
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Not Throw
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Not -Throw
                 }
             }
 
@@ -1011,7 +1011,7 @@ try
                         AddressFamily  = 'IPv4'
                     }
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Not Throw
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Not -Throw
                 }
             }
 
@@ -1023,7 +1023,7 @@ try
                         AddressFamily  = 'IPv6'
                     }
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Not Throw
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Not -Throw
                 }
             }
 
@@ -1041,7 +1041,7 @@ try
                         -Message ($LocalizedData.PrefixLengthError -f $prefixLength, $assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'IPAddress'
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
                 }
 
                 It 'Should throw an Argument error when less than 0' {
@@ -1050,7 +1050,7 @@ try
                         InterfaceAlias = 'Ethernet'
                         AddressFamily  = 'IPv4'
                     }
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw 'Value was either too large or too small for a UInt32.'
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw 'Value was either too large or too small for a UInt32.'
                 }
             }
 
@@ -1068,7 +1068,7 @@ try
                         -Message ($LocalizedData.PrefixLengthError -f $prefixLength, $assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'IPAddress'
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
                 }
 
                 It 'Should throw an Argument error when less than 0' {
@@ -1078,7 +1078,7 @@ try
                         AddressFamily  = 'IPv6'
                     }
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw 'Value was either too large or too small for a UInt32.'
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw 'Value was either too large or too small for a UInt32.'
                 }
             }
 
@@ -1090,7 +1090,7 @@ try
                         AddressFamily  = 'IPv6'
                     }
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Not Throw
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Not -Throw
                 }
             }
         }

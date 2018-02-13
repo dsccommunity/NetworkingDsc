@@ -42,11 +42,11 @@ try
                     -Verbose `
                     -Force `
                     -ErrorAction Stop
-            } | Should Not Throw
+            } | Should -Not -Throw
         }
 
         It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
         #endregion
 
@@ -54,11 +54,11 @@ try
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
-            $current[0].InterfaceAlias | Should Be $TestIPAddress.InterfaceAlias
-            $current[0].AddressFamily  | Should Be $TestIPAddress.AddressFamily
-            $current[0].IPAddress      | Should Be $TestIPAddress.IPAddress
-            $current[1].IPAddress      | Should Be $TestIPAddressOption.IPAddress
-            $current[1].SkipAsSource   | Should Be $TestIPAddressOption.SkipAsSource
+            $current[0].InterfaceAlias | Should -Be $TestIPAddress.InterfaceAlias
+            $current[0].AddressFamily  | Should -Be $TestIPAddress.AddressFamily
+            $current[0].IPAddress      | Should -Be $TestIPAddress.IPAddress
+            $current[1].IPAddress      | Should -Be $TestIPAddressOption.IPAddress
+            $current[1].SkipAsSource   | Should -Be $TestIPAddressOption.SkipAsSource
         }
     }
     #endregion

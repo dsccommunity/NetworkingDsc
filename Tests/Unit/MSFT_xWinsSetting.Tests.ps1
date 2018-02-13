@@ -115,8 +115,8 @@ try
                 }
 
                 It 'Should return expected results' {
-                    $script:result.EnableLmHosts | Should Be $true
-                    $script:result.EnableDns | Should Be $true
+                    $script:result.EnableLmHosts | Should -Be $true
+                    $script:result.EnableDns | Should -Be $true
                 }
 
                 It 'Should call the expected mocks' {
@@ -148,8 +148,8 @@ try
                 }
 
                 It 'Should return expected results' {
-                    $script:result.EnableLmHosts | Should Be $false
-                    $script:result.EnableDns | Should Be $false
+                    $script:result.EnableLmHosts | Should -Be $false
+                    $script:result.EnableDns | Should -Be $false
                 }
 
                 It 'Should call the expected mocks' {

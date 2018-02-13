@@ -116,10 +116,10 @@ try
                 }
 
                 It 'Should return team properties' {
-                    $script:result.Ensure   | Should Be 'Present'
-                    $script:result.Name     | Should Be $testTeamNic.Name
-                    $script:result.TeamName | Should Be $testTeamNic.TeamName
-                    $script:result.VlanId   | Should be 100
+                    $script:result.Ensure   | Should -Be 'Present'
+                    $script:result.Name     | Should -Be $testTeamNic.Name
+                    $script:result.TeamName | Should -Be $testTeamNic.TeamName
+                    $script:result.VlanId   | Should -Be 100
                 }
 
                 It 'Should call the expected mocks' {
