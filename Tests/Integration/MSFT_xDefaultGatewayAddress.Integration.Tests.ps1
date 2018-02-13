@@ -36,19 +36,19 @@ try
             {
                 & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
                 Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
         #endregion
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration   | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
-            $current.InterfaceAlias           | Should Be $TestDefaultGatewayAddress.InterfaceAlias
-            $current.AddressFamily            | Should Be $TestDefaultGatewayAddress.AddressFamily
-            $current.Address                  | Should Be $TestDefaultGatewayAddress.Address
+            $current.InterfaceAlias           | Should -Be $TestDefaultGatewayAddress.InterfaceAlias
+            $current.AddressFamily            | Should -Be $TestDefaultGatewayAddress.AddressFamily
+            $current.Address                  | Should -Be $TestDefaultGatewayAddress.Address
         }
     }
     #endregion

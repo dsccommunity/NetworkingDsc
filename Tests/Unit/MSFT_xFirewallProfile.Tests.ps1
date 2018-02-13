@@ -105,24 +105,24 @@ try
             Context 'Firewall Profile Exists' {
                 It 'Should return correct Firewall Profile values' {
                     $getTargetResourceParameters = Get-TargetResource -Name 'Private'
-                    $getTargetResourceParameters.Name                            | Should Be $firewallProfile.Name
-                    $getTargetResourceParameters.Enabled                         | Should Be $firewallProfile.Enabled
-                    $getTargetResourceParameters.DefaultInboundAction            | Should Be $firewallProfile.DefaultInboundAction
-                    $getTargetResourceParameters.DefaultOutboundAction           | Should Be $firewallProfile.DefaultOutboundAction
-                    $getTargetResourceParameters.AllowInboundRules               | Should Be $firewallProfile.AllowInboundRules
-                    $getTargetResourceParameters.AllowLocalFirewallRules         | Should Be $firewallProfile.AllowLocalFirewallRules
-                    $getTargetResourceParameters.AllowLocalIPsecRules            | Should Be $firewallProfile.AllowLocalIPsecRules
-                    $getTargetResourceParameters.AllowUserApps                   | Should Be $firewallProfile.AllowUserApps
-                    $getTargetResourceParameters.AllowUserPorts                  | Should Be $firewallProfile.AllowUserPorts
-                    $getTargetResourceParameters.AllowUnicastResponseToMulticast | Should Be $firewallProfile.AllowUnicastResponseToMulticast
-                    $getTargetResourceParameters.NotifyOnListen                  | Should Be $firewallProfile.NotifyOnListen
-                    $getTargetResourceParameters.EnableStealthModeForIPsec       | Should Be $firewallProfile.EnableStealthModeForIPsec
-                    $getTargetResourceParameters.LogFileName                     | Should Be $firewallProfile.LogFileName
-                    $getTargetResourceParameters.LogMaxSizeKilobytes             | Should Be $firewallProfile.LogMaxSizeKilobytes
-                    $getTargetResourceParameters.LogAllowed                      | Should Be $firewallProfile.LogAllowed
-                    $getTargetResourceParameters.LogBlocked                      | Should Be $firewallProfile.LogBlocked
-                    $getTargetResourceParameters.LogIgnored                      | Should Be $firewallProfile.LogIgnored
-                    $getTargetResourceParameters.DisabledInterfaceAliases        | Should Be $firewallProfile.DisabledInterfaceAliases
+                    $getTargetResourceParameters.Name                            | Should -Be $firewallProfile.Name
+                    $getTargetResourceParameters.Enabled                         | Should -Be $firewallProfile.Enabled
+                    $getTargetResourceParameters.DefaultInboundAction            | Should -Be $firewallProfile.DefaultInboundAction
+                    $getTargetResourceParameters.DefaultOutboundAction           | Should -Be $firewallProfile.DefaultOutboundAction
+                    $getTargetResourceParameters.AllowInboundRules               | Should -Be $firewallProfile.AllowInboundRules
+                    $getTargetResourceParameters.AllowLocalFirewallRules         | Should -Be $firewallProfile.AllowLocalFirewallRules
+                    $getTargetResourceParameters.AllowLocalIPsecRules            | Should -Be $firewallProfile.AllowLocalIPsecRules
+                    $getTargetResourceParameters.AllowUserApps                   | Should -Be $firewallProfile.AllowUserApps
+                    $getTargetResourceParameters.AllowUserPorts                  | Should -Be $firewallProfile.AllowUserPorts
+                    $getTargetResourceParameters.AllowUnicastResponseToMulticast | Should -Be $firewallProfile.AllowUnicastResponseToMulticast
+                    $getTargetResourceParameters.NotifyOnListen                  | Should -Be $firewallProfile.NotifyOnListen
+                    $getTargetResourceParameters.EnableStealthModeForIPsec       | Should -Be $firewallProfile.EnableStealthModeForIPsec
+                    $getTargetResourceParameters.LogFileName                     | Should -Be $firewallProfile.LogFileName
+                    $getTargetResourceParameters.LogMaxSizeKilobytes             | Should -Be $firewallProfile.LogMaxSizeKilobytes
+                    $getTargetResourceParameters.LogAllowed                      | Should -Be $firewallProfile.LogAllowed
+                    $getTargetResourceParameters.LogBlocked                      | Should -Be $firewallProfile.LogBlocked
+                    $getTargetResourceParameters.LogIgnored                      | Should -Be $firewallProfile.LogIgnored
+                    $getTargetResourceParameters.DisabledInterfaceAliases        | Should -Be $firewallProfile.DisabledInterfaceAliases
                 }
 
                 It 'Should call the expected mocks' {
@@ -143,7 +143,7 @@ try
                     {
                         $setTargetResourceParameters = $firewallProfileSplat.Clone()
                         Set-TargetResource @setTargetResourceParameters
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected Mocks' {
@@ -163,7 +163,7 @@ try
                             $setTargetResourceParameters = $firewallProfileSplat.Clone()
                             $setTargetResourceParameters.$parameterName = 'True'
                             Set-TargetResource @setTargetResourceParameters
-                        } | Should Not Throw
+                        } | Should -Not -Throw
                     }
 
                     It 'Should call expected Mocks' {
@@ -184,7 +184,7 @@ try
                             $setTargetResourceParameters = $firewallProfileSplat.Clone()
                             $setTargetResourceParameters.$parameterName = 'Allow'
                             Set-TargetResource @setTargetResourceParameters
-                        } | Should Not Throw
+                        } | Should -Not -Throw
                     }
 
                     It 'Should call expected Mocks' {
@@ -202,7 +202,7 @@ try
                         $setTargetResourceParameters = $firewallProfileSplat.Clone()
                         $setTargetResourceParameters.LogFileName = 'c:\differentfile.txt'
                         Set-TargetResource @setTargetResourceParameters
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected Mocks' {
@@ -219,7 +219,7 @@ try
                         $setTargetResourceParameters = $firewallProfileSplat.Clone()
                         $setTargetResourceParameters.DisabledInterfaceAliases = 'DifferentInterface'
                         Set-TargetResource @setTargetResourceParameters
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected Mocks' {
@@ -237,7 +237,7 @@ try
             Context 'Firewall Profile all parameters are the same' {
                 It 'Should return true' {
                     $testTargetResourceParameters = $firewallProfileSplat.Clone()
-                    Test-TargetResource @testTargetResourceParameters | Should Be $true
+                    Test-TargetResource @testTargetResourceParameters | Should -Be $true
                 }
 
                 It 'Should call expected Mocks' {
@@ -252,7 +252,7 @@ try
                     It 'Should return false' {
                         $testTargetResourceParameters = $firewallProfileSplat.Clone()
                         $testTargetResourceParameters.$parameterName = 'True'
-                        Test-TargetResource @testTargetResourceParameters | Should Be $False
+                        Test-TargetResource @testTargetResourceParameters | Should -Be $False
                     }
 
                     It 'Should call expected Mocks' {
@@ -268,7 +268,7 @@ try
                     It 'Should return false' {
                         $testTargetResourceParameters = $firewallProfileSplat.Clone()
                         $testTargetResourceParameters.$parameterName = 'Allow'
-                        Test-TargetResource @testTargetResourceParameters | Should Be $False
+                        Test-TargetResource @testTargetResourceParameters | Should -Be $False
                     }
 
                     It 'Should call expected Mocks' {
@@ -281,7 +281,7 @@ try
                 It 'Should return false' {
                     $testTargetResourceParameters = $firewallProfileSplat.Clone()
                     $testTargetResourceParameters.LogFileName = 'c:\differentfile.txt'
-                    Test-TargetResource @testTargetResourceParameters | Should Be $False
+                    Test-TargetResource @testTargetResourceParameters | Should -Be $False
                 }
 
                 It 'Should call expected Mocks' {
@@ -293,7 +293,7 @@ try
                 It 'Should return false' {
                     $testTargetResourceParameters = $firewallProfileSplat.Clone()
                     $testTargetResourceParameters.DisabledInterfaceAliases = 'DifferentInterface'
-                    Test-TargetResource @testTargetResourceParameters | Should Be $False
+                    Test-TargetResource @testTargetResourceParameters | Should -Be $False
                 }
 
                 It 'Should call expected Mocks' {

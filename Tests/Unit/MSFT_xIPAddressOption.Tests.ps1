@@ -43,8 +43,8 @@ try
                         IPAddress = '192.168.0.1'
                     }
                     $result = Get-TargetResource @getTargetResourceParameters
-                    $result.IPAddress    | Should Be $getTargetResourceParameters.IPAddress
-                    $result.SkipAsSource | Should Be $true
+                    $result.IPAddress    | Should -Be $getTargetResourceParameters.IPAddress
+                    $result.SkipAsSource | Should -Be $true
                 }
             }
         }
@@ -72,8 +72,8 @@ try
                             IPAddress    = '192.168.0.1'
                             SkipAsSource = $true
                         }
-                        { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
-                        $result | Should BeNullOrEmpty
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
                     }
 
                     It 'Should call all the mock' {
@@ -106,7 +106,7 @@ try
                         }
 
                         $result = Test-TargetResource @testGetResourceParameters
-                        $result | Should Be $true
+                        $result | Should -Be $true
                     }
                 }
             }

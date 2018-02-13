@@ -47,8 +47,8 @@ try
 
                 It "Should return absent on firewall rule $($firewallRule.Name)" {
                     $result = Get-TargetResource -Name 'FirewallRule'
-                    $result.Name | Should Be 'FirewallRule'
-                    $result.Ensure | Should Be 'Absent'
+                    $result.Name | Should -Be 'FirewallRule'
+                    $result.Ensure | Should -Be 'Absent'
                 }
             }
 
@@ -77,7 +77,7 @@ try
                             $parameterNew = $parameterNew -join ','
                         }
 
-                        $parameterNew | Should Be $parameterValue
+                        $parameterNew | Should -Be $parameterValue
                     }
                 }
             }
@@ -91,7 +91,7 @@ try
 
                 It "Should return $true on firewall rule $($firewallRule.Name)" {
                     $result = Test-TargetResource -Name 'FirewallRule' -Ensure 'Absent'
-                    $result | Should Be $true
+                    $result | Should -Be $true
                 }
             }
 
@@ -100,7 +100,7 @@ try
 
                 It "Should return $false on firewall rule $($firewallRule.Name)" {
                     $result = Test-TargetResource -Name $firewallRule.Name -Ensure 'Absent'
-                    $result | Should Be $false
+                    $result | Should -Be $false
                 }
             }
 
@@ -109,7 +109,7 @@ try
 
                 It "Should return $true on firewall rule $($firewallRule.Name)" {
                     $result = Test-TargetResource -Name $firewallRule.Name
-                    $result | Should Be $true
+                    $result | Should -Be $true
                 }
             }
 
@@ -118,7 +118,7 @@ try
 
                 It "Should return $false on firewall rule $($firewallRule.Name)" {
                     $result = Test-TargetResource -Name $firewallRule.Name
-                    $result | Should Be $false
+                    $result | Should -Be $false
                 }
             }
 
@@ -126,7 +126,7 @@ try
                 Mock -CommandName Get-FirewallRule
                 It "Should return $false on firewall rule $($firewallRule.Name)" {
                     $result = Test-TargetResource -Name $firewallRule.Name
-                    $result | Should Be $false
+                    $result | Should -Be $false
                 }
             }
         }
@@ -748,7 +748,7 @@ try
 
                 It "Should return True on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $true
+                    $result | Should -Be $true
                 }
             }
 
@@ -758,7 +758,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -768,7 +768,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -778,7 +778,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -796,7 +796,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -814,7 +814,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -832,7 +832,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -850,7 +850,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -860,7 +860,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -870,7 +870,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -888,7 +888,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -898,7 +898,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -908,7 +908,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -918,7 +918,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -936,7 +936,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -954,7 +954,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -964,7 +964,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -982,7 +982,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -992,7 +992,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -1002,7 +1002,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -1012,7 +1012,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -1022,7 +1022,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -1032,7 +1032,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -1042,7 +1042,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -1052,7 +1052,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -1062,7 +1062,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -1072,7 +1072,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -1082,7 +1082,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -1092,7 +1092,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -1102,7 +1102,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -1112,7 +1112,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
 
@@ -1122,7 +1122,7 @@ try
 
                 It "Should return False on firewall rule $($firewallRule.Name)" {
                     $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should be $False
+                    $result | Should -Be $False
                 }
             }
         }
@@ -1133,14 +1133,14 @@ try
             Context 'testing with firewall that exists' {
                 It "Should return a firewall rule when name is passed on firewall rule $($firewallRule.Name)" {
                     $result = Get-FirewallRule -Name $firewallRule.Name
-                    $result | Should Not BeNullOrEmpty
+                    $result | Should -Not -BeNullOrEmpty
                 }
             }
 
             Context 'testing with firewall that does not exist' {
                 It "Should not return anything on firewall rule $($firewallRule.Name)" {
                     $result = Get-FirewallRule -Name 'Does not exist'
-                    $result | Should BeNullOrEmpty
+                    $result | Should -BeNullOrEmpty
                 }
             }
 
@@ -1151,7 +1151,7 @@ try
                     -Message ($LocalizedData.RuleNotUniqueError -f 2, $firewallRule.Name)
 
                 It "Should throw RuleNotUnique exception on firewall rule $($firewallRule.Name)" {
-                    { $result = Get-FirewallRule -Name $firewallRule.Name } | Should Throw $errorRecord
+                    { $result = Get-FirewallRule -Name $firewallRule.Name } | Should -Throw $errorRecord
                 }
             }
         }
@@ -1167,57 +1167,57 @@ try
                     $expected = Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $firewallRule
 
                     $($result.AddressFilters | Out-String -Stream) |
-                        Should Be $($expected | Out-String -Stream)
+                        Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right application filter on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $firewallRule
 
                     $($result.ApplicationFilters | Out-String -Stream) |
-                        Should Be $($expected | Out-String -Stream)
+                        Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right interface filter on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $firewallRule
 
                     $($result.InterfaceFilters | Out-String -Stream) |
-                        Should Be $($expected | Out-String -Stream)
+                        Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right interface type filter on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $firewallRule
                     $($result.InterfaceTypeFilters | Out-String -Stream) |
-                        Should Be $($expected | Out-String -Stream)
+                        Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right port filter on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallPortFilter -AssociatedNetFirewallRule $firewallRule
                     $($result.PortFilters | Out-String -Stream) |
-                        Should Be $($expected | Out-String -Stream)
+                        Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right Profile on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallProfile -AssociatedNetFirewallRule $firewallRule
                     $($result.Profile | Out-String -Stream) |
-                        Should Be $($expected | Out-String -Stream)
+                        Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right Profile on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallProfile -AssociatedNetFirewallRule $firewallRule
                     $($result.Profile | Out-String -Stream) |
-                        Should Be $($expected | Out-String -Stream)
+                        Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right Security Filters on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $firewallRule
                     $($result.SecurityFilters | Out-String -Stream) |
-                        Should Be $($expected | Out-String -Stream)
+                        Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right Service Filters on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $firewallRule
                     $($result.ServiceFilters | Out-String -Stream) |
-                        Should Be $($expected | Out-String -Stream)
+                        Should -Be $($expected | Out-String -Stream)
                 }
             }
         }

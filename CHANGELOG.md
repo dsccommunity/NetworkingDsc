@@ -19,6 +19,7 @@
   - Changed unit tests to output Verbose logs.
 - MSFT_xNetConnectionProfile:
   - Corrected style and formatting to meet HQRM guidelines.
+- Updated tests to meet Pester V4 guidelines - Fixes [Issue #272](https://github.com/PowerShell/xNetworking/issues/272).
 
 ## 5.5.0.0
 

@@ -76,8 +76,8 @@ try
 
                 It 'Should return the Rsc state' {
                     $result = Get-TargetResource @TestAllRscEnabled
-                    $result.StateIPv4 | Should Be $TestAllRscEnabled.State
-                    $result.StateIPv6 | Should Be $TestAllRscEnabled.State
+                    $result.StateIPv4 | Should -Be $TestAllRscEnabled.State
+                    $result.StateIPv6 | Should -Be $TestAllRscEnabled.State
                 }
 
                 It 'Should call all mocks' {
@@ -95,8 +95,8 @@ try
 
                 It 'Should return the Rsc state' {
                     $result = Get-TargetResource @TestAllRscDisabled
-                    $result.StateIPv4 | Should Be $TestAllRscDisabled.State
-                    $result.StateIPv6 | Should Be $TestAllRscDisabled.State
+                    $result.StateIPv4 | Should -Be $TestAllRscDisabled.State
+                    $result.StateIPv6 | Should -Be $TestAllRscDisabled.State
 
                 }
 
@@ -115,7 +115,7 @@ try
 
                 It 'Should return the Rsc state of IPv4' {
                     $result = Get-TargetResource @TestIPv4RscEnabled
-                    $result.State | Should Be $TestIPv4RscEnabled.State
+                    $result.State | Should -Be $TestIPv4RscEnabled.State
                 }
 
                 It 'Should call all mocks' {
@@ -132,7 +132,7 @@ try
 
                 It 'Should return the Rsc state of IPv4' {
                     $result = Get-TargetResource @TestIPv4RscDisabled
-                    $result.State | Should Be $TestIPv4RscDisabled.State
+                    $result.State | Should -Be $TestIPv4RscDisabled.State
                 }
 
                 It 'Should call all mocks' {
@@ -149,7 +149,7 @@ try
 
                 It 'Should return the Rsc state of IPv6' {
                     $result = Get-TargetResource @TestIPv6RscEnabled
-                    $result.State | Should Be $TestIPv6RscEnabled.State
+                    $result.State | Should -Be $TestIPv6RscEnabled.State
                 }
 
                 It 'Should call all mocks' {
@@ -166,7 +166,7 @@ try
 
                 It 'Should return the Rsc state of IPv6' {
                     $result = Get-TargetResource @TestIPv6RscDisabled
-                    $result.State | Should Be $TestIPv6RscDisabled.State
+                    $result.State | Should -Be $TestIPv6RscDisabled.State
                 }
 
                 It 'Should call all mocks' {
@@ -181,7 +181,7 @@ try
                     -Message ($LocalizedData.NetAdapterNotFoundMessage)
 
                 It 'Should throw an exception' {
-                    { Get-TargetResource @TestAdapterNotFound } | Should throw $errorRecord
+                    { Get-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
                 }
 
                 It 'Should call all mocks' {
@@ -203,7 +203,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestAllRscEnabled } | Should Not Throw
+                    { Set-TargetResource @TestAllRscEnabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -222,7 +222,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestAllRscDisabled } | Should Not Throw
+                    { Set-TargetResource @TestAllRscDisabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -241,7 +241,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestAllRscDisabled } | Should Not Throw
+                    { Set-TargetResource @TestAllRscDisabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -260,7 +260,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestAllRscEnabled } | Should Not Throw
+                    { Set-TargetResource @TestAllRscEnabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -279,7 +279,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestAllRscEnabled } | Should Not Throw
+                    { Set-TargetResource @TestAllRscEnabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -298,7 +298,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestAllRscDisabled } | Should Not Throw
+                    { Set-TargetResource @TestAllRscDisabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -315,7 +315,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestIPv4RscEnabled } | Should Not Throw
+                    { Set-TargetResource @TestIPv4RscEnabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -331,7 +331,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestIPv4RscDisabled } | Should Not Throw
+                    { Set-TargetResource @TestIPv4RscDisabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -347,7 +347,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestIPv4RscDisabled } | Should Not Throw
+                    { Set-TargetResource @TestIPv4RscDisabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -363,7 +363,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestIPv4RscEnabled } | Should Not Throw
+                    { Set-TargetResource @TestIPv4RscEnabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -380,7 +380,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestIPv6RscEnabled } | Should Not Throw
+                    { Set-TargetResource @TestIPv6RscEnabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -396,7 +396,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestIPv6RscDisabled } | Should Not Throw
+                    { Set-TargetResource @TestIPv6RscDisabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -412,7 +412,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestIPv6RscDisabled } | Should Not Throw
+                    { Set-TargetResource @TestIPv6RscDisabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -428,7 +428,7 @@ try
                 Mock -CommandName Set-NetAdapterRsc
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @TestIPv6RscEnabled } | Should Not Throw
+                    { Set-TargetResource @TestIPv6RscEnabled } | Should -Not -Throw
                 }
 
                 It 'Should call all mocks' {
@@ -445,7 +445,7 @@ try
                     -Message ($LocalizedData.NetAdapterNotFoundMessage)
 
                 It 'Should throw an exception' {
-                    { Set-TargetResource @TestAdapterNotFound } | Should throw $errorRecord
+                    { Set-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
                 }
 
                 It 'Should call all mocks' {
@@ -466,7 +466,7 @@ try
                 }
 
                 It 'Should return true' {
-                    Test-TargetResource @TestAllRscEnabled | Should Be $true
+                    Test-TargetResource @TestAllRscEnabled | Should -Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -483,7 +483,7 @@ try
                 }
 
                 It 'Should return false' {
-                    Test-TargetResource @TestAllRscDisabled | Should Be $false
+                    Test-TargetResource @TestAllRscDisabled | Should -Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -499,7 +499,7 @@ try
                 }
 
                 It 'Should return true' {
-                    Test-TargetResource @TestAllRscDisabled | Should Be $true
+                    Test-TargetResource @TestAllRscDisabled | Should -Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -515,7 +515,7 @@ try
                 }
 
                 It 'Should return false' {
-                    Test-TargetResource @TestAllRscEnabled | Should Be $false
+                    Test-TargetResource @TestAllRscEnabled | Should -Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -530,7 +530,7 @@ try
                 }
 
                 It 'Should return true' {
-                    Test-TargetResource @TestIPv4RscEnabled | Should Be $true
+                    Test-TargetResource @TestIPv4RscEnabled | Should -Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -544,7 +544,7 @@ try
                 }
 
                 It 'Should return false' {
-                    Test-TargetResource @TestIPv4RscDisabled | Should Be $false
+                    Test-TargetResource @TestIPv4RscDisabled | Should -Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -558,7 +558,7 @@ try
                 }
 
                 It 'Should return true' {
-                    Test-TargetResource @TestIPv4RscDisabled | Should Be $true
+                    Test-TargetResource @TestIPv4RscDisabled | Should -Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -572,7 +572,7 @@ try
                 }
 
                 It 'Should return false' {
-                    Test-TargetResource @TestIPv4RscEnabled | Should Be $false
+                    Test-TargetResource @TestIPv4RscEnabled | Should -Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -587,7 +587,7 @@ try
                 }
 
                 It 'Should return true' {
-                    Test-TargetResource @TestIPv6RscEnabled | Should Be $true
+                    Test-TargetResource @TestIPv6RscEnabled | Should -Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -601,7 +601,7 @@ try
                 }
 
                 It 'Should return false' {
-                    Test-TargetResource @TestIPv6RscDisabled | Should Be $false
+                    Test-TargetResource @TestIPv6RscDisabled | Should -Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -615,7 +615,7 @@ try
                 }
 
                 It 'Should return true' {
-                    Test-TargetResource @TestIPv6RscDisabled | Should Be $true
+                    Test-TargetResource @TestIPv6RscDisabled | Should -Be $true
                 }
 
                 it 'Should call all mocks' {
@@ -629,7 +629,7 @@ try
                 }
 
                 It 'Should return false' {
-                    Test-TargetResource @TestIPv6RscEnabled | Should Be $false
+                    Test-TargetResource @TestIPv6RscEnabled | Should -Be $false
                 }
 
                 it 'Should call all mocks' {
@@ -645,7 +645,7 @@ try
                     -Message ($LocalizedData.NetAdapterNotFoundMessage)
 
                 It 'Should throw an exception' {
-                    { Test-TargetResource @TestAdapterNotFound } | Should throw $errorRecord
+                    { Test-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
                 }
 
                 It 'Should call all mocks' {

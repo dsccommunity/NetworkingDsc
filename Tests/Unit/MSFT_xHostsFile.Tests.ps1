@@ -1,4 +1,4 @@
-﻿$script:DSCModuleName = 'xNetworking'
+$script:DSCModuleName = 'xNetworking'
 $script:DSCResourceName = 'MSFT_xHostsFile'
 
 #region HEADER
@@ -46,11 +46,11 @@ try
                 }
 
                 It 'Should return absent from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Absent'
+                    (Get-TargetResource @testParams).Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParams | Should Be $false
+                    Test-TargetResource @testParams | Should -Be $false
                 }
 
                 It 'Should create the entry in the set method' {
@@ -78,11 +78,11 @@ try
                 }
 
                 It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                    (Get-TargetResource @testParams).Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParams | Should Be $false
+                    Test-TargetResource @testParams | Should -Be $false
                 }
 
                 It 'Should update the entry in the set method' {
@@ -110,11 +110,11 @@ try
                 }
 
                 It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                    (Get-TargetResource @testParams).Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParams | Should Be $true
+                    Test-TargetResource @testParams | Should -Be $true
                 }
             }
 
@@ -137,11 +137,11 @@ try
                 }
 
                 It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                    (Get-TargetResource @testParams).Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParams | Should Be $false
+                    Test-TargetResource @testParams | Should -Be $false
                 }
 
                 It 'Should remove the entry in the set method' {
@@ -169,11 +169,11 @@ try
                 }
 
                 It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Absent'
+                    (Get-TargetResource @testParams).Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParams | Should Be $false
+                    Test-TargetResource @testParams | Should -Be $false
                 }
 
                 It 'Should add the entry in the set method' {
@@ -200,11 +200,11 @@ try
                 }
 
                 It 'Should return absent from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Absent'
+                    (Get-TargetResource @testParams).Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParams | Should Be $true
+                    Test-TargetResource @testParams | Should -Be $true
                 }
             }
 
@@ -227,11 +227,11 @@ try
                 }
 
                 It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                    (Get-TargetResource @testParams).Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return true from the test method' {
-                    Test-TargetResource @testParams | Should Be $true
+                    Test-TargetResource @testParams | Should -Be $true
                 }
             }
 
@@ -254,11 +254,11 @@ try
                 }
 
                 It 'Should return present from the get method' {
-                    (Get-TargetResource @testParams).Ensure | Should Be 'Present'
+                    (Get-TargetResource @testParams).Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return false from the test method' {
-                    Test-TargetResource @testParams | Should Be $false
+                    Test-TargetResource @testParams | Should -Be $false
                 }
 
                 It 'Should update the entry in the set method' {
@@ -284,7 +284,7 @@ try
                 }
 
                 It 'Should throw an error when IP Address is not provide and ensure is present' {
-                    { Set-TargetResource @testParams } | Should throw $LocalizedData.UnableToEnsureWithoutIP
+                    { Set-TargetResource @testParams } | Should -Throw $LocalizedData.UnableToEnsureWithoutIP
                 }
             }
         }

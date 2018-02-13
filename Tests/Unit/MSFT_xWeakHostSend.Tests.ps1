@@ -66,9 +66,9 @@ try
 
                 It 'Should return Weak Host Sending state of enabled' {
                     $Result = Get-TargetResource @testNetIPWeakHostSendEnabled
-                    $Result.State          | Should Be $testNetIPWeakHostSendEnabled.State
-                    $Result.InterfaceAlias | Should Be $testNetIPWeakHostSendEnabled.InterfaceAlias
-                    $Result.AddressFamily  | Should Be $testNetIPWeakHostSendEnabled.AddressFamily
+                    $Result.State          | Should -Be $testNetIPWeakHostSendEnabled.State
+                    $Result.InterfaceAlias | Should -Be $testNetIPWeakHostSendEnabled.InterfaceAlias
+                    $Result.AddressFamily  | Should -Be $testNetIPWeakHostSendEnabled.AddressFamily
                 }
 
                 It 'Should call the expected mocks' {
@@ -82,9 +82,9 @@ try
 
                 It 'Should return Weak Host Sending state of disabled' {
                     $Result = Get-TargetResource @testNetIPWeakHostSendDisabled
-                    $Result.State          | Should Be $testNetIPWeakHostSendDisabled.State
-                    $Result.InterfaceAlias | Should Be $testNetIPWeakHostSendDisabled.InterfaceAlias
-                    $Result.AddressFamily  | Should Be $testNetIPWeakHostSendDisabled.AddressFamily
+                    $Result.State          | Should -Be $testNetIPWeakHostSendDisabled.State
+                    $Result.InterfaceAlias | Should -Be $testNetIPWeakHostSendDisabled.InterfaceAlias
+                    $Result.AddressFamily  | Should -Be $testNetIPWeakHostSendDisabled.AddressFamily
                 }
 
                 It 'Should call the expected mocks' {
@@ -105,7 +105,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendDisabled }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @testNetIPWeakHostSendEnabled } | Should Not Throw
+                    { Set-TargetResource @testNetIPWeakHostSendEnabled } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -120,7 +120,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendDisabled }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @testNetIPWeakHostSendDisabled } | Should Not Throw
+                    { Set-TargetResource @testNetIPWeakHostSendDisabled } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -135,7 +135,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendEnabled }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @testNetIPWeakHostSendEnabled } | Should Not Throw
+                    { Set-TargetResource @testNetIPWeakHostSendEnabled } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -150,7 +150,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendEnabled }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource @testNetIPWeakHostSendDisabled } | Should Not Throw
+                    { Set-TargetResource @testNetIPWeakHostSendDisabled } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -171,7 +171,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendDisabled }
 
                 It 'Should return false' {
-                    Test-TargetResource @testNetIPWeakHostSendEnabled | Should Be $False
+                    Test-TargetResource @testNetIPWeakHostSendEnabled | Should -Be $False
                 }
 
                 It 'Should call expected mocks' {
@@ -184,7 +184,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendDisabled }
 
                 It 'Should return true' {
-                    Test-TargetResource @testNetIPWeakHostSendDisabled | Should Be $True
+                    Test-TargetResource @testNetIPWeakHostSendDisabled | Should -Be $True
                 }
 
                 It 'Should call expected mocks' {
@@ -197,7 +197,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendEnabled }
 
                 It 'Should return true' {
-                    Test-TargetResource @testNetIPWeakHostSendEnabled | Should Be $True
+                    Test-TargetResource @testNetIPWeakHostSendEnabled | Should -Be $True
                 }
 
                 It 'Should call expected mocks' {
@@ -210,7 +210,7 @@ try
                 Mock -CommandName Get-NetIPInterface -MockWith { $mockNetIPWeakHostSendEnabled }
 
                 It 'Should return false' {
-                    Test-TargetResource @testNetIPWeakHostSendDisabled | Should Be $False
+                    Test-TargetResource @testNetIPWeakHostSendDisabled | Should -Be $False
                 }
 
                 It 'Should call expected mocks' {
@@ -228,7 +228,7 @@ try
                     $errorRecord = Get-InvalidOperationRecord `
                         -Message ($LocalizedData.InterfaceNotAvailableError -f $testNetIPWeakHostSendEnabled.InterfaceAlias)
 
-                    { Assert-ResourceProperty @testNetIPWeakHostSendEnabled } | Should Throw $errorRecord
+                    { Assert-ResourceProperty @testNetIPWeakHostSendEnabled } | Should -Throw $errorRecord
                 }
             }
         }

@@ -78,13 +78,13 @@ try
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
 
-            $current.InterfaceAlias    | Should Be $configData.AllNodes[0].InterfaceAlias
-            $current.AddressFamily     | Should Be $configData.AllNodes[0].AddressFamily
-            $current.DestinationPrefix | Should Be $configData.AllNodes[0].DestinationPrefix
-            $current.NextHop           | Should Be $configData.AllNodes[0].NextHop
-            $current.Ensure            | Should Be $configData.AllNodes[0].Ensure
-            $current.RouteMetric       | Should Be $configData.AllNodes[0].RouteMetric
-            $current.Publish           | Should Be $configData.AllNodes[0].Publish
+            $current.InterfaceAlias    | Should -Be $configData.AllNodes[0].InterfaceAlias
+            $current.AddressFamily     | Should -Be $configData.AllNodes[0].AddressFamily
+            $current.DestinationPrefix | Should -Be $configData.AllNodes[0].DestinationPrefix
+            $current.NextHop           | Should -Be $configData.AllNodes[0].NextHop
+            $current.Ensure            | Should -Be $configData.AllNodes[0].Ensure
+            $current.RouteMetric       | Should -Be $configData.AllNodes[0].RouteMetric
+            $current.Publish           | Should -Be $configData.AllNodes[0].Publish
         }
 
         It 'Should have created the route' {
@@ -135,11 +135,11 @@ try
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
 
-            $current.InterfaceAlias    | Should Be $configData.AllNodes[0].InterfaceAlias
-            $current.AddressFamily     | Should Be $configData.AllNodes[0].AddressFamily
-            $current.DestinationPrefix | Should Be $configData.AllNodes[0].DestinationPrefix
-            $current.NextHop           | Should Be $configData.AllNodes[0].NextHop
-            $current.Ensure            | Should Be $configData.AllNodes[0].Ensure
+            $current.InterfaceAlias    | Should -Be $configData.AllNodes[0].InterfaceAlias
+            $current.AddressFamily     | Should -Be $configData.AllNodes[0].AddressFamily
+            $current.DestinationPrefix | Should -Be $configData.AllNodes[0].DestinationPrefix
+            $current.NextHop           | Should -Be $configData.AllNodes[0].NextHop
+            $current.Ensure            | Should -Be $configData.AllNodes[0].Ensure
         }
 
         It 'Should have deleted the route' {
