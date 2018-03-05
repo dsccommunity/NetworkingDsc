@@ -9,6 +9,8 @@
   - Updated tests to meet Pester v4 guidelines.
   - Converted exceptions to use ResourceHelper functions.
   - Changed unit tests to output Verbose logs.
+- MSFT_xNetAdapterAdvancedProperty
+  - Added a number of additional advanced properties.
 - MSFT_xNetBIOS:
   - Corrected style and formatting to meet HQRM guidelines.
   - Ensured CommonTestHelper.psm1 is loaded before running unit tests.
