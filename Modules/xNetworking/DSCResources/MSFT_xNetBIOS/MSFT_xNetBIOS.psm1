@@ -66,7 +66,7 @@ function Get-TargetResource
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter ('Name="{0}"' -f $InterfaceAlias)
+        -Filter ('NetConnectionID="{0}"' -f $InterfaceAlias)
 
     if ($netAdapter)
     {
@@ -128,7 +128,7 @@ function Set-TargetResource
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter ('Name="{0}"' -f $InterfaceAlias)
+        -Filter ('NetConnectionID="{0}"' -f $InterfaceAlias)
 
     if ($netAdapter)
     {
@@ -207,7 +207,7 @@ function Test-TargetResource
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter ('Name="{0}"' -f $InterfaceAlias)
+        -Filter ('NetConnectionID="{0}"' -f $InterfaceAlias)
 
     if ($netAdapter)
     {
