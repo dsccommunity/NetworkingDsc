@@ -1,13 +1,14 @@
-$Global:DSCModuleName   = 'xNetworking'
+$Global:DSCModuleName = 'xNetworking'
 $Global:DSCResourceName = 'MSFT_xNetworkTeamInterface'
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -22,207 +23,406 @@ try
 {
     #region Pester Tests
     InModuleScope $Global:DSCResourceName {
-        # Create the Mock Objects that will be used for running tests
-        $MockNetTeamNic = [PSCustomObject] @{
-            Name                = 'HostTeamNic'
-            Team                = 'HostTeam'
+        # Create the Mock -CommandName Objects that will be used for running tests
+        $script:testNicName = 'HostTeamNic'
+        $script:testTeamName = 'HostTeam'
+
+        $mockNetTeamNic = [PSCustomObject] @{
+            Name = $script:testNicName
+            Team = $script:testTeamName
         }
 
-        $TestTeamNic = [PSObject] @{
-            Name                = $MockNetTeamNic.Name
-            TeamName            = $MockNetTeamNic.Team
+        $testTeamNic = [PSObject] @{
+            Name     = $script:testNicName
+            TeamName = $script:testTeamName
+            Verbose  = $true
         }
 
-        $MockTeamNic = [PSObject] @{
-            Name                = $TestTeamNic.Name
-            Team                = $TestTeamNic.TeamName
-            VlanID              = 100
+        $newTeamNic = [PSObject] @{
+            Name     = $script:testNicName
+            TeamName = $script:testTeamName
+            VlanId   = 100
+            Verbose  = $true
         }
 
-        $MockTeamNicDefaultVLAN = [PSObject] @{
-            Name                = $TestTeamNic.Name
-            Team                = $TestTeamNic.TeamName
-            VlanID              = $null
+        $mockTeamNic = {
+            [PSObject] @{
+                Name   = $script:testNicName
+                Team   = $script:testTeamName
+                VlanId = 100
+            }
+        }
+
+        $mockTeamNicDefaultVLAN = {
+            [PSObject] @{
+                Name   = $script:testNicName
+                Team   = $script:testTeamName
+                VlanId = $null
+            }
+        }
+
+        $getNetLbfoTeamNic_ParameterFilter = {
+            $Name -eq $script:testNicName `
+            -and $Team -eq $script:testTeamName
+        }
+
+        $addNetLbfoTeamNic_ParameterFilter = {
+            $Name -eq $script:testNicName `
+            -and $Team -eq $script:testTeamName `
+            -and $VlanId -eq 100
+        }
+
+        $setNetLbfoTeamNic_ParameterFilter = {
+            $Name -eq $script:testNicName `
+            -and $Team -eq $script:testTeamName `
+            -and $VlanId -eq 105
+        }
+
+        $removeNetLbfoTeamNic_ParameterFilter = {
+            $Team -eq $script:testTeamName `
+            -and $VlanId -eq 100
         }
 
         Describe "$($Global:DSCResourceName)\Get-TargetResource" {
+            Context 'When team Interface does not exist' {
+                Mock `
+                    -CommandName Get-NetLbfoTeamNic `
+                    -ParameterFilter $getNetLbfoTeamNic_ParameterFilter
 
-            Context 'Team Interface does not exist' {
-                Mock Get-NetLbfoTeamNic
-                It 'should return ensure as absent' {
-                    $Result = Get-TargetResource @TestTeamNic
-                    $Result.Ensure | Should Be 'Absent'
+                It 'Should not throw exception' {
+                    $script:result = Get-TargetResource @testTeamNic
                 }
-                It 'should call the expected mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
+
+                It 'Should return ensure as absent' {
+                    $script:result.Ensure | Should -Be 'Absent'
+                }
+
+                It 'Should call the expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-NetLbfoTeamNic `
+                        -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
                 }
             }
 
             Context 'Network Team Interface exists' {
-                Mock Get-NetLbfoTeamNic -MockWith { $MockTeamNic }
-                It 'should return team properties' {
-                    $Result = Get-TargetResource @TestTeamNic
-                    $Result.Ensure                 | Should Be 'Present'
-                    $Result.Name                   | Should Be $TestTeamNic.Name
-                    $Result.TeamName               | Should Be $TestTeamNic.TeamName
-                    $Result.VlanID                 | Should be 100
+                Mock `
+                    -CommandName Get-NetLbfoTeamNic `
+                    -MockWith $mockTeamNic `
+                    -ParameterFilter $getNetLbfoTeamNic_ParameterFilter
+
+                It 'Should not throw exception' {
+                    $script:result = Get-TargetResource @testTeamNic
                 }
-                It 'should call the expected mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
+
+                It 'Should return team properties' {
+                    $script:result.Ensure   | Should -Be 'Present'
+                    $script:result.Name     | Should -Be $testTeamNic.Name
+                    $script:result.TeamName | Should -Be $testTeamNic.TeamName
+                    $script:result.VlanId   | Should -Be 100
+                }
+
+                It 'Should call the expected mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-NetLbfoTeamNic `
+                        -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
                 }
             }
         }
 
         Describe "$($Global:DSCResourceName)\Set-TargetResource" {
-            $newTeamNic = [PSObject] @{
-                Name            = $TestTeamNic.Name
-                TeamName        = $TestTeamNic.TeamName
-                VlanID          = 100
+            Context 'When team Interface does not exist but invalid VlanId (0) is passed' {
+                Mock `
+                    -CommandName Get-NetLbfoTeamNic `
+                    -ParameterFilter $getNetLbfoTeamNic_ParameterFilter
+
+                Mock -CommandName Add-NetLbfoTeamNic
+                Mock -CommandName Set-NetLbfoTeamNic
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.FailedToCreateTeamNic)
+
+                It 'Should not throw exception' {
+                    {
+                        $errorTeamNic = $newTeamNic.Clone()
+                        $errorTeamNic.VlanId = 0
+                        Set-TargetResource @errorTeamNic
+                    } | Should -Throw $errorRecord
+                }
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-NetLbfoTeamNic `
+                        -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Add-NetLbfoTeamNic `
+                        -Exactly -Times 0
+
+                    Assert-MockCalled `
+                        -CommandName Set-NetLbfoTeamNic `
+                        -Exactly -Times 0
+                }
             }
 
-            Context 'Team Interface does not exist but should' {
+            Context 'When team Interface does not exist but should' {
+                Mock `
+                    -CommandName Get-NetLbfoTeamNic `
+                    -ParameterFilter $getNetLbfoTeamNic_ParameterFilter
 
-                Mock Get-NetLbfoTeamNic
-                Mock Add-NetLbfoTeamNic
-                Mock Set-NetLbfoTeamNic
+                Mock `
+                    -CommandName Add-NetLbfoTeamNic `
+                    -ParameterFilter $addNetLbfoTeamNic_ParameterFilter
 
-                It 'should not throw error' {
+                Mock -CommandName Set-NetLbfoTeamNic
+
+                It 'Should not throw exception' {
                     {
                         Set-TargetResource @newTeamNic
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
-                    Assert-MockCalled -commandName Add-NetLbfoTeamNic -Exactly 1
-                    Assert-MockCalled -commandName Set-NetLbfoTeamNic -Exactly 0
-                }
-            }
 
-            Context 'Team Interface exists but needs a different VlanID' {
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-NetLbfoTeamNic `
+                        -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
 
-                Mock Get-NetLbfoTeamNic -MockWith { $MockTeamNic }
-                Mock Add-NetLbfoTeamNic
-                Mock Set-NetLbfoTeamNic
+                    Assert-MockCalled `
+                        -CommandName Add-NetLbfoTeamNic `
+                        -ParameterFilter $addNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
 
-                It 'should not throw error' {
-                    {
-                        $updateTeamNic = $newTeamNic.Clone()
-                        $updateTeamNic.VlanID = 105
-                        Set-TargetResource @updateTeamNic
-                    } | Should Not Throw
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
-                    Assert-MockCalled -commandName Add-NetLbfoTeamNic -Exactly 0
-                    Assert-MockCalled -commandName Set-NetLbfoTeamNic -Exactly 1
+                    Assert-MockCalled `
+                        -CommandName Set-NetLbfoTeamNic `
+                        -Exactly -Times 0
                 }
             }
 
-            Context 'Team Interface exists but should not exist' {
-                Mock Get-NetLbfoTeamNic -MockWith { $MockTeamNic }
-                Mock Add-NetLbfoTeamNic
-                Mock Set-NetLbfoTeamNic
-                Mock Remove-NetLbfoTeamNic
+            Context 'When team Interface exists but needs a different VlanId' {
+                Mock `
+                    -CommandName Get-NetLbfoTeamNic `
+                    -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                    -MockWith $mockTeamNic
 
-                It 'should not throw error' {
+                Mock -CommandName Add-NetLbfoTeamNic
+
+                Mock `
+                    -CommandName Set-NetLbfoTeamNic  `
+                    -ParameterFilter $setNetLbfoTeamNic_ParameterFilter
+
+                It 'Should not throw exception' {
                     {
                         $updateTeamNic = $newTeamNic.Clone()
-                        $updateTeamNic.Ensure = 'absent'
+                        $updateTeamNic.VlanId = 105
                         Set-TargetResource @updateTeamNic
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
-                    Assert-MockCalled -commandName Add-NetLbfoTeamNic -Exactly 0
-                    Assert-MockCalled -commandName Set-NetLbfoTeamNic -Exactly 0
-                    Assert-MockCalled -commandName Remove-NetLbfoTeamNic -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-NetLbfoTeamNic `
+                        -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Add-NetLbfoTeamNic `
+                        -Exactly -Times 0
+
+                    Assert-MockCalled `
+                        -CommandName Set-NetLbfoTeamNic `
+                        -ParameterFilter $setNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'When team Interface exists but should not exist' {
+                Mock `
+                    -CommandName Get-NetLbfoTeamNic `
+                    -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                    -MockWith $mockTeamNic
+
+                Mock -CommandName Add-NetLbfoTeamNic
+                Mock -CommandName Set-NetLbfoTeamNic
+
+                Mock `
+                    -CommandName Remove-NetLbfoTeamNic `
+                    -ParameterFilter $removeNetLbfoTeamNic_ParameterFilter
+
+                It 'Should not throw exception' {
+                    {
+                        $updateTeamNic = $newTeamNic.Clone()
+                        $updateTeamNic.Ensure = 'Absent'
+                        Set-TargetResource @updateTeamNic
+                    } | Should -Not -Throw
+                }
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-NetLbfoTeamNic `
+                        -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Add-NetLbfoTeamNic `
+                        -Exactly -Times 0
+
+                    Assert-MockCalled `
+                        -CommandName Set-NetLbfoTeamNic `
+                        -Exactly -Times 0
+
+                    Assert-MockCalled `
+                        -CommandName Remove-NetLbfoTeamNic  `
+                        -ParameterFilter $removeNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
                 }
             }
         }
 
         Describe "$($Global:DSCResourceName)\Test-TargetResource" {
-            $newTeamNic = [PSObject] @{
-                Name            = $TestTeamNic.Name
-                TeamName        = $TestTeamNic.TeamName
-                VlanID          = 100
+            Context 'When team Interface does not exist but should' {
+                Mock `
+                    -CommandName Get-NetLbfoTeamNic `
+                    -ParameterFilter $getNetLbfoTeamNic_ParameterFilter
+
+                It 'Should not throw exception' {
+                    {
+                        $script:result = Test-TargetResource @newTeamNic
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return false' {
+                    $script:result | Should -Be $false
+                }
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-NetLbfoTeamNic `
+                        -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
+                }
             }
 
-            Context 'Team Interface does not exist but should' {
-                Mock Get-NetLbfoTeamNic
+            Context 'When team Interface exists but needs a different VlanId' {
+                Mock `
+                    -CommandName Get-NetLbfoTeamNic `
+                    -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                    -MockWith $mockTeamNic
 
-                It 'should return false' {
-                        Test-TargetResource @newTeamNic | Should be $false
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
-                }
-            }
-
-            Context 'Team Interface exists but needs a different VlanID' {
-                Mock Get-NetLbfoTeamNic -MockWith { $MockTeam }
-
-                It 'should return false' {
+                It 'Should not throw exception' {
                     $updateTeamNic = $newTeamNic.Clone()
-                    $updateTeamNic.VlanID = 105
-                    Test-TargetResource @updateTeamNic | Should Be $false
+                    $updateTeamNic.VlanId = 105
+                    $script:result = Test-TargetResource @updateTeamNic
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
-                }
-            }
 
-            Context 'Team Interface exists but should not exist' {
-                Mock Get-NetLbfoTeamNic -MockWith { $MockTeamNic }
-
-                It 'should return $false' {
-                    $updateTeamNic = $newTeamNic.Clone()
-                    $updateTeamNic.Ensure = 'absent'
-                    Test-TargetResource @updateTeamNic | Should Be $false
+                It 'Should return false' {
+                    $script:result | Should -Be $false
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-NetLbfoTeamNic  `
+                        -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
                 }
             }
 
-            Context 'Team Interface exists and no action needed' {
-                Mock Get-NetLbfoTeamNic -MockWith { $MockTeamNic }
+            Context 'When team Interface exists but should not exist' {
+                Mock `
+                    -CommandName Get-NetLbfoTeamNic `
+                    -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                    -MockWith $mockTeamNic
 
-                It 'should return true' {
-                    $updateTeamNic = $newTeamNic.Clone()
-                    Test-TargetResource @updateTeamNic | Should Be $true
-                }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
-                }
-            }
-
-            Context 'Team Interface does not exist and no action needed' {
-                Mock Get-NetLbfoTeamNic
-
-                It 'should return true' {
+                It 'Should not throw exception' {
                     $updateTeamNic = $newTeamNic.Clone()
                     $updateTeamNic.Ensure = 'Absent'
-                    Test-TargetResource @updateTeamNic | Should Be $true
+                    $script:result = Test-TargetResource @updateTeamNic
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
+
+                It 'Should return false' {
+                    $script:result | Should -Be $false
+                }
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-NetLbfoTeamNic `
+                        -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
                 }
             }
 
-            Context 'Team Interface exists on the default 0 VLAN' {
-                Mock Get-NetLbfoTeamNic -MockWith { $MockTeamNicDefaultVLAN }
+            Context 'When team Interface exists and no action needed' {
+                Mock `
+                    -CommandName Get-NetLbfoTeamNic `
+                    -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                    -MockWith $mockTeamNic
 
-                It 'should return true' {
-                    $TeamNicOnDefaultVLAN = $newTeamNic.Clone()
-                    $TeamNicOnDefaultVLAN.VlanID = 0
-                    Test-TargetResource @TeamNicOnDefaultVLAN | Should Be $true
+                It 'Should not throw exception' {
+                    $updateTeamNic = $newTeamNic.Clone()
+                    $script:result = Test-TargetResource @updateTeamNic
                 }
-                It 'should call expected Mocks' {
-                    Assert-MockCalled -commandName Get-NetLbfoTeamNic -Exactly 1
+
+                It 'Should return true' {
+                    $script:result | Should -Be $true
+                }
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-NetLbfoTeamNic `
+                        -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'When team Interface does not exist and no action needed' {
+                Mock `
+                    -CommandName Get-NetLbfoTeamNic `
+                    -ParameterFilter $getNetLbfoTeamNic_ParameterFilter
+
+                It 'Should not throw exception' {
+                    $updateTeamNic = $newTeamNic.Clone()
+                    $updateTeamNic.Ensure = 'Absent'
+                    $script:result = Test-TargetResource @updateTeamNic
+                }
+
+                It 'Should return true' {
+                    $script:result | Should -Be $true
+                }
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-NetLbfoTeamNic `
+                        -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'When team Interface exists on the default 0 VLAN' {
+                Mock `
+                    -CommandName Get-NetLbfoTeamNic `
+                    -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                    -MockWith $mockTeamNicDefaultVLAN
+
+                It 'Should not throw exception' {
+                    $TeamNicOnDefaultVLAN = $newTeamNic.Clone()
+                    $TeamNicOnDefaultVLAN.VlanId = 0
+                    $script:result = Test-TargetResource @TeamNicOnDefaultVLAN
+                }
+
+                It 'Should return true' {
+                    $script:result | Should -Be $true
+                }
+
+                It 'Should call expected Mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-NetLbfoTeamNic `
+                        -ParameterFilter $getNetLbfoTeamNic_ParameterFilter `
+                        -Exactly -Times 1
                 }
             }
         }
-
     }
     #endregion
 }

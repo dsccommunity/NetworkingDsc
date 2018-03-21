@@ -46,20 +46,20 @@ try
                     -ConfigurationData $configData
                 Start-DscConfiguration `
                     -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
 
         It 'Should have set the resource and all the parameters should match' {
             $result = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
-            $result.Ensure                 | Should Be $configData.AllNodes[0].Ensure
-            $result.HostName               | Should Be $configData.AllNodes[0].HostName
-            $result.IPAddress              | Should Be $configData.AllNodes[0].IPAddress
+            $result.Ensure                 | Should -Be $configData.AllNodes[0].Ensure
+            $result.HostName               | Should -Be $configData.AllNodes[0].HostName
+            $result.IPAddress              | Should -Be $configData.AllNodes[0].IPAddress
         }
     }
 
@@ -85,20 +85,20 @@ try
                     -ConfigurationData $configData
                 Start-DscConfiguration `
                     -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
 
         It 'Should have set the resource and all the parameters should match' {
             $result = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
-            $result.Ensure                 | Should Be $configData.AllNodes[0].Ensure
-            $result.HostName               | Should Be $configData.AllNodes[0].HostName
-            $result.IPAddress              | Should Be $configData.AllNodes[0].IPAddress
+            $result.Ensure                 | Should -Be $configData.AllNodes[0].Ensure
+            $result.HostName               | Should -Be $configData.AllNodes[0].HostName
+            $result.IPAddress              | Should -Be $configData.AllNodes[0].IPAddress
         }
     }
 
@@ -124,20 +124,20 @@ try
                     -ConfigurationData $configData
                 Start-DscConfiguration `
                     -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
 
         It 'Should have set the resource and all the parameters should match' {
             $result = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
-            $result.Ensure                 | Should Be $configData.AllNodes[0].Ensure
-            $result.HostName               | Should Be $configData.AllNodes[0].HostName
-            $result.IPAddress              | Should BeNullOrEmpty
+            $result.Ensure                 | Should -Be $configData.AllNodes[0].Ensure
+            $result.HostName               | Should -Be $configData.AllNodes[0].HostName
+            $result.IPAddress              | Should -BeNullOrEmpty
         }
     }
     #endregion

@@ -38,7 +38,7 @@ try
                         }
 
                         $Result = Get-TargetResource @getTargetResourceSplat
-                        $Result.Address | Should Be '192.168.0.1'
+                        $Result.Address | Should -Be '192.168.0.1'
                     }
 
                     It 'Should call all the mocks' {
@@ -60,7 +60,7 @@ try
                         }
 
                         $Result = Get-TargetResource @getTargetResourceSplat
-                        $Result.Address | Should Be 'fe80:ab04:30F5:002b::1'
+                        $Result.Address | Should -Be 'fe80:ab04:30F5:002b::1'
                     }
 
                     It 'Should call all the mocks' {
@@ -82,7 +82,7 @@ try
                         }
 
                         $Result = Get-TargetResource @getTargetResourceSplat
-                        $Result.Address | Should BeNullOrEmpty
+                        $Result.Address | Should -BeNullOrEmpty
                     }
 
                     It 'Should call all the mocks' {
@@ -110,7 +110,7 @@ try
                             Verbose        = $true
                         }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                     }
 
                     It 'Should call all the mocks' {
@@ -130,7 +130,7 @@ try
                             Verbose        = $true
                         }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                     }
 
                     It 'Should call all the mocks' {
@@ -151,7 +151,7 @@ try
                             Verbose        = $true
                         }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                     }
 
                     It 'Should call all the mocks' {
@@ -171,7 +171,7 @@ try
                             Verbose        = $true
                         }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                     }
 
                     It 'Should call all the mocks' {
@@ -190,7 +190,7 @@ try
                             Verbose        = $true
                         }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                     }
 
                     It 'Should call all the mocks' {
@@ -212,7 +212,7 @@ try
                             Verbose        = $true
                         }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                     }
 
                     It 'Should call all the mocks' {
@@ -234,7 +234,7 @@ try
                             Verbose        = $true
                         }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                     }
 
                     It 'Should call all the mocks' {
@@ -263,7 +263,7 @@ try
                             Verbose        = $true
                         }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                     }
 
                     It 'Should call all the mocks' {
@@ -283,7 +283,7 @@ try
                             Verbose        = $true
                         }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                     }
 
                     It 'Should call all the mocks' {
@@ -304,7 +304,7 @@ try
                             Verbose        = $true
                         }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                     }
 
                     It 'Should call all the mocks' {
@@ -324,7 +324,7 @@ try
                             Verbose        = $true
                         }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                     }
 
                     It 'Should call all the mocks' {
@@ -343,7 +343,7 @@ try
                             Verbose        = $true
                         }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                     }
 
                     It 'Should call all the mocks' {
@@ -365,7 +365,7 @@ try
                             Verbose        = $true
                         }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should Not Throw
+                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                     }
 
                     It 'Should call all the mocks' {
@@ -394,7 +394,7 @@ try
                             Verbose        = $true
                         }
 
-                        Test-TargetResource @testTargetResourceSplat | Should Be $true
+                        Test-TargetResource @testTargetResourceSplat | Should -Be $true
                     }
 
                     It 'Should call all the mocks' {
@@ -411,7 +411,7 @@ try
                             Verbose        = $true
                         }
 
-                        Test-TargetResource @testTargetResourceSplat | Should Be $False
+                        Test-TargetResource @testTargetResourceSplat | Should -Be $False
                     }
 
                     It 'Should call all the mocks' {
@@ -428,7 +428,7 @@ try
                             Verbose        = $true
                         }
 
-                        Test-TargetResource @testTargetResourceSplat | Should Be $False
+                        Test-TargetResource @testTargetResourceSplat | Should -Be $False
                     }
 
                     It 'Should call all the mocks' {
@@ -444,7 +444,7 @@ try
                             Verbose        = $true
                         }
 
-                        Test-TargetResource @testTargetResourceSplat | Should Be $False
+                        Test-TargetResource @testTargetResourceSplat | Should -Be $False
                     }
 
                     It 'Should call all the mocks' {
@@ -464,7 +464,7 @@ try
                             Verbose        = $true
                         }
 
-                        Test-TargetResource @testTargetResourceSplat | Should Be $False
+                        Test-TargetResource @testTargetResourceSplat | Should -Be $False
                     }
 
                     It 'Should call all the mocks' {
@@ -488,7 +488,7 @@ try
                             Verbose        = $true
                         }
 
-                        Test-TargetResource @testTargetResourceSplat | Should Be $true
+                        Test-TargetResource @testTargetResourceSplat | Should -Be $true
                     }
 
                     It 'Should call all the mocks' {
@@ -505,7 +505,7 @@ try
                             Verbose        = $true
                         }
 
-                        Test-TargetResource @testTargetResourceSplat | Should Be $False
+                        Test-TargetResource @testTargetResourceSplat | Should -Be $False
                     }
 
                     It 'Should call all the mocks' {
@@ -522,7 +522,7 @@ try
                             Verbose        = $true
                         }
 
-                        Test-TargetResource @testTargetResourceSplat | Should Be $False
+                        Test-TargetResource @testTargetResourceSplat | Should -Be $False
                     }
 
                     It 'Should call all the mocks' {
@@ -538,7 +538,7 @@ try
                             Verbose        = $true
                         }
 
-                        Test-TargetResource @testTargetResourceSplat | Should Be $False
+                        Test-TargetResource @testTargetResourceSplat | Should -Be $False
                     }
 
                     It 'Should call all the mocks' {
@@ -558,7 +558,7 @@ try
                             Verbose        = $true
                         }
 
-                        Test-TargetResource @testTargetResourceSplat | Should Be $False
+                        Test-TargetResource @testTargetResourceSplat | Should -Be $False
                     }
 
                     It 'Should call all the mocks' {
@@ -586,7 +586,7 @@ try
                         -Message ($LocalizedData.InterfaceNotAvailableError -f $assertResourcePropertySplat.InterfaceAlias) `
                         -ArgumentName 'InterfaceAlias'
 
-                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
                 }
             }
 
@@ -603,7 +603,7 @@ try
                         -Message ($LocalizedData.AddressFormatError -f $assertResourcePropertySplat.Address) `
                         -ArgumentName 'Address'
 
-                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
                 }
             }
 
@@ -620,7 +620,7 @@ try
                         -Message ($LocalizedData.AddressIPv4MismatchError -f $assertResourcePropertySplat.Address,$assertResourcePropertySplat.AddressFamily) `
                         -ArgumentName 'Address'
 
-                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
                 }
             }
 
@@ -637,7 +637,7 @@ try
                         -Message ($LocalizedData.AddressIPv6MismatchError -f $assertResourcePropertySplat.Address,$assertResourcePropertySplat.AddressFamily) `
                         -ArgumentName 'Address'
 
-                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
                 }
             }
 
@@ -650,7 +650,7 @@ try
                         Verbose        = $true
                     }
 
-                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should Not Throw
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Not -Throw
                 }
             }
 
@@ -663,7 +663,7 @@ try
                         Verbose        = $true
                     }
 
-                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should Not Throw
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Not -Throw
                 }
             }
         }

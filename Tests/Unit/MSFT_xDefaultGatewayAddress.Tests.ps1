@@ -45,7 +45,7 @@ try
 
                     $result = Get-TargetResource @getTargetResourceParameters
 
-                    $result.Address | Should Be '192.168.0.1'
+                    $result.Address | Should -Be '192.168.0.1'
                 }
             }
 
@@ -62,7 +62,7 @@ try
 
                     $result = Get-TargetResource @getTargetResourceParameters
 
-                    $result.Address | Should BeNullOrEmpty
+                    $result.Address | Should -BeNullOrEmpty
                 }
             }
         }
@@ -93,9 +93,9 @@ try
                         AddressFamily = 'IPv4'
                     }
 
-                    { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
+                    { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
 
-                    $result | Should BeNullOrEmpty
+                    $result | Should -BeNullOrEmpty
                 }
 
                 It 'Should call all the mocks' {
@@ -113,9 +113,9 @@ try
                         AddressFamily = 'IPv4'
                     }
 
-                    { $result = Set-TargetResource @setTargetResourceParameters } | Should Not Throw
+                    { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
 
-                    $result | Should BeNullOrEmpty
+                    $result | Should -BeNullOrEmpty
                 }
 
                 It 'Should call all the mocks' {
@@ -153,7 +153,7 @@ try
                         AddressFamily = 'IPv4'
                     }
 
-                    Test-TargetResource @testTargetResourceParameters | Should Be $true
+                    Test-TargetResource @testTargetResourceParameters | Should -Be $true
                 }
             }
 
@@ -176,7 +176,7 @@ try
                         AddressFamily = 'IPv4'
                     }
 
-                    Test-TargetResource @testTargetResourceParameters | Should Be $False
+                    Test-TargetResource @testTargetResourceParameters | Should -Be $False
                 }
             }
 
@@ -192,7 +192,7 @@ try
                         AddressFamily = 'IPv4'
                     }
 
-                    Test-TargetResource @testTargetResourceParameters | Should Be $False
+                    Test-TargetResource @testTargetResourceParameters | Should -Be $False
                 }
             }
 
@@ -207,7 +207,7 @@ try
                         AddressFamily = 'IPv4'
                     }
 
-                    Test-TargetResource @testTargetResourceParameters | Should Be $true
+                    Test-TargetResource @testTargetResourceParameters | Should -Be $true
                 }
             }
         }
@@ -228,7 +228,7 @@ try
                     $errorRecord = Get-InvalidOperationRecord `
                         -Message ($LocalizedData.InterfaceNotAvailableError -f $assertResourcePropertyParameters.InterfaceAlias)
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
                 }
             }
 
@@ -244,7 +244,7 @@ try
                         -Message ($LocalizedData.AddressFormatError -f $assertResourcePropertyParameters.Address) `
                         -ArgumentName 'Address'
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
                 }
             }
 
@@ -260,7 +260,7 @@ try
                         -Message ($LocalizedData.AddressIPv4MismatchError -f $assertResourcePropertyParameters.Address,$assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'AddressFamily'
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
                 }
             }
 
@@ -276,7 +276,7 @@ try
                         -Message ($LocalizedData.AddressIPv6MismatchError -f $assertResourcePropertyParameters.Address,$assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'AddressFamily'
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
                 }
             }
 
@@ -288,7 +288,7 @@ try
                         AddressFamily = 'IPv4'
                     }
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Not Throw
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Not -Throw
                 }
             }
 
@@ -300,7 +300,7 @@ try
                         AddressFamily = 'IPv6'
                     }
 
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should Not Throw
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Not -Throw
                 }
             }
         }

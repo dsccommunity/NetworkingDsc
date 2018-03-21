@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+## 5.6.0.0
+
+- Reordered resource list in README.MD to be alphabetical and added
+  missing resource xNetAdapterAdvancedProperty - Fixes [issue #309](https://github.com/PowerShell/xNetworking/issues/309).
+- MSFT_xNetworkTeamInterface:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Changed unit tests to output Verbose logs.
+- MSFT_xNetAdapterAdvancedProperty:
+  - Added a number of additional advanced properties.
+  - Fixes [issue #314](https://github.com/PowerShell/xNetworking/issues/314).
+- MSFT_xNetBIOS:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Ensured CommonTestHelper.psm1 is loaded before running unit tests.
+- MSFT_xNetworkTeam:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Added missing default from MOF description of Ensure parameter.
+  - Fixed `Get-TargetResource` to always output Ensure parameter.
+  - Changed unit tests to output Verbose logs.
+- MSFT_xNetConnectionProfile:
+  - Corrected style and formatting to meet HQRM guidelines.
+- Updated tests to meet Pester V4 guidelines - Fixes [Issue #272](https://github.com/PowerShell/xNetworking/issues/272).
+
 ## 5.5.0.0
 
 - MSFT_xNetAdapterAdvancedProperty:

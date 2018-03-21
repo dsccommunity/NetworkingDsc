@@ -51,7 +51,7 @@ try
 
                     $targetResource = Get-TargetResource @testDnsSuffixParams
 
-                    $targetResource -is [System.Collections.Hashtable] | Should Be $true
+                    $targetResource -is [System.Collections.Hashtable] | Should -Be $true
                 }
 
                 It 'Should return "Present" when DNS suffix matches and "Ensure" = "Present"' {
@@ -59,7 +59,7 @@ try
 
                     $targetResource = Get-TargetResource @testDnsSuffixParams
 
-                    $targetResource.Ensure | Should Be 'Present'
+                    $targetResource.Ensure | Should -Be 'Present'
                 }
 
                 It 'Should return "Absent" when DNS suffix does not match and "Ensure" = "Present"' {
@@ -67,7 +67,7 @@ try
 
                     $targetResource = Get-TargetResource @testDnsSuffixParams
 
-                    $targetResource.Ensure | Should Be 'Absent'
+                    $targetResource.Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should return "Absent" when no DNS suffix is defined and "Ensure" = "Present"' {
@@ -75,7 +75,7 @@ try
 
                     $targetResource = Get-TargetResource @testDnsSuffixParams
 
-                    $targetResource.Ensure | Should Be 'Absent'
+                    $targetResource.Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should return "Absent" when no DNS suffix is defined and "Ensure" = "Absent"' {
@@ -83,7 +83,7 @@ try
 
                     $targetResource = Get-TargetResource @testDnsSuffixParams -Ensure Absent
 
-                    $targetResource.Ensure | Should Be 'Absent'
+                    $targetResource.Ensure | Should -Be 'Absent'
                 }
 
                 It 'Should return "Present" when DNS suffix is defined and "Ensure" = "Absent"' {
@@ -91,7 +91,7 @@ try
 
                     $targetResource = Get-TargetResource @testDnsSuffixParams -Ensure Absent
 
-                    $targetResource.Ensure | Should Be 'Present'
+                    $targetResource.Ensure | Should -Be 'Present'
                 }
 
             } #end Context 'Validates "Get-TargetResource" method'
@@ -104,7 +104,7 @@ try
 
                     $targetResource = Test-TargetResource @testDnsSuffixParams
 
-                    $targetResource | Should Be $true
+                    $targetResource | Should -Be $true
                 }
 
                 It 'Should pass when no DNS suffix is registered and "Ensure" = "Absent"' {
@@ -112,7 +112,7 @@ try
 
                     $targetResource = Test-TargetResource @testDnsSuffixParams -Ensure Absent
 
-                    $targetResource | Should Be $true
+                    $targetResource | Should -Be $true
                 }
 
                 It 'Should pass when "RegisterThisConnectionsAddress" setting is correct' {
@@ -120,7 +120,7 @@ try
 
                     $targetResource = Test-TargetResource @testDnsSuffixParams -RegisterThisConnectionsAddress $true
 
-                    $targetResource | Should Be $true
+                    $targetResource | Should -Be $true
                 }
 
                 It 'Should pass when "UseSuffixWhenRegistering" setting is correct' {
@@ -128,7 +128,7 @@ try
 
                     $targetResource = Test-TargetResource @testDnsSuffixParams -UseSuffixWhenRegistering $false
 
-                    $targetResource | Should Be $true
+                    $targetResource | Should -Be $true
                 }
 
 
@@ -137,7 +137,7 @@ try
 
                     $targetResource = Test-TargetResource @testDnsSuffixParams
 
-                    $targetResource | Should Be $false
+                    $targetResource | Should -Be $false
                 }
 
                 It 'Should fail when the registered DNS suffix is incorrect and "Ensure" = "Present"' {
@@ -145,7 +145,7 @@ try
 
                     $targetResource = Test-TargetResource @testDnsSuffixParams
 
-                    $targetResource | Should Be $false
+                    $targetResource | Should -Be $false
                 }
 
                 It 'Should fail when a DNS suffix is registered and "Ensure" = "Absent"' {
@@ -153,7 +153,7 @@ try
 
                     $targetResource = Test-TargetResource @testDnsSuffixParams -Ensure Absent
 
-                    $targetResource | Should Be $false
+                    $targetResource | Should -Be $false
                 }
 
                 It 'Should fail when "RegisterThisConnectionsAddress" setting is incorrect' {
@@ -161,7 +161,7 @@ try
 
                     $targetResource = Test-TargetResource @testDnsSuffixParams -RegisterThisConnectionsAddress $false
 
-                    $targetResource | Should Be $false
+                    $targetResource | Should -Be $false
                 }
 
                 It 'Should fail when "UseSuffixWhenRegistering" setting is incorrect' {
@@ -169,7 +169,7 @@ try
 
                     $targetResource = Test-TargetResource @testDnsSuffixParams -UseSuffixWhenRegistering $true
 
-                    $targetResource | Should Be $false
+                    $targetResource | Should -Be $false
                 }
             } #end Context 'Validates "Test-TargetResource" method'
         }

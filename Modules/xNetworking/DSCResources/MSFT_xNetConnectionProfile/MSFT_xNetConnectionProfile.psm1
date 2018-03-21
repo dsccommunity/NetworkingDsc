@@ -29,7 +29,7 @@ function Get-TargetResource
     param
     (
         [Parameter(Position = 0, Mandatory = $true)]
-        [string]
+        [System.String]
         $InterfaceAlias
     )
 
@@ -69,19 +69,22 @@ function Set-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [string]
+        [System.String]
         $InterfaceAlias,
 
+        [Parameter()]
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
-        [string]
+        [System.String]
         $IPv4Connectivity,
 
+        [Parameter()]
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
-        [string]
+        [System.String]
         $IPv6Connectivity,
 
+        [Parameter()]
         [ValidateSet('Public', 'Private')]
-        [string]
+        [System.String]
         $NetworkCategory
     )
 
@@ -117,22 +120,22 @@ function Test-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [string]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter()]
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
-        [string]
+        [System.String]
         $IPv4Connectivity,
 
         [Parameter()]
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
-        [string]
+        [System.String]
         $IPv6Connectivity,
 
         [Parameter()]
         [ValidateSet('Public', 'Private')]
-        [string]
+        [System.String]
         $NetworkCategory
     )
 
@@ -140,7 +143,7 @@ function Test-TargetResource
 
     $current = Get-TargetResource -InterfaceAlias $InterfaceAlias
 
-    if (-not [String]::IsNullOrEmpty($IPv4Connectivity) -and `
+    if (-not [System.String]::IsNullOrEmpty($IPv4Connectivity) -and `
         ($IPv4Connectivity -ne $current.IPv4Connectivity))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -150,7 +153,7 @@ function Test-TargetResource
         return $false
     }
 
-    if (-not [String]::IsNullOrEmpty($IPv6Connectivity) -and `
+    if (-not [System.String]::IsNullOrEmpty($IPv6Connectivity) -and `
         ($IPv6Connectivity -ne $current.IPv6Connectivity))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -160,7 +163,7 @@ function Test-TargetResource
         return $false
     }
 
-    if (-not [String]::IsNullOrEmpty($NetworkCategory) -and `
+    if (-not [System.String]::IsNullOrEmpty($NetworkCategory) -and `
         ($NetworkCategory -ne $current.NetworkCategory))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -197,22 +200,22 @@ function Assert-ResourceProperty
     param
     (
         [Parameter(Mandatory = $true)]
-        [string]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter()]
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
-        [string]
+        [System.String]
         $IPv4Connectivity,
 
         [Parameter()]
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
-        [string]
+        [System.String]
         $IPv6Connectivity,
 
         [Parameter()]
         [ValidateSet('Public', 'Private')]
-        [string]
+        [System.String]
         $NetworkCategory
     )
 
@@ -222,9 +225,9 @@ function Assert-ResourceProperty
             -Message ($LocalizedData.InterfaceNotAvailableError -f $InterfaceAlias)
     }
 
-    if ([String]::IsNullOrEmpty($IPv4Connectivity) -and `
-        [String]::IsNullOrEmpty($IPv6Connectivity) -and `
-        [String]::IsNullOrEmpty($NetworkCategory))
+    if ([System.String]::IsNullOrEmpty($IPv4Connectivity) -and `
+        [System.String]::IsNullOrEmpty($IPv6Connectivity) -and `
+        [System.String]::IsNullOrEmpty($NetworkCategory))
     {
         New-InvalidOperationException `
             -Message ($LocalizedData.ParameterCombinationError)

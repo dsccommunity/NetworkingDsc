@@ -28,39 +28,39 @@ try
     Describe "NetworkingDsc.Common\Convert-CIDRToSubhetMask" {
         Context 'Subnet Mask Notation Used "192.168.0.0/255.255.0.0"' {
             It 'Should Return "192.168.0.0/255.255.0.0"' {
-                Convert-CIDRToSubhetMask -Address @('192.168.0.0/255.255.0.0') | Should Be '192.168.0.0/255.255.0.0'
+                Convert-CIDRToSubhetMask -Address @('192.168.0.0/255.255.0.0') | Should -Be '192.168.0.0/255.255.0.0'
             }
         }
         Context 'Subnet Mask Notation Used "192.168.0.10/255.255.0.0" resulting in source bits masked' {
             It 'Should Return "192.168.0.0/255.255.0.0" with source bits masked' {
-                Convert-CIDRToSubhetMask -Address @('192.168.0.10/255.255.0.0') | Should Be '192.168.0.0/255.255.0.0'
+                Convert-CIDRToSubhetMask -Address @('192.168.0.10/255.255.0.0') | Should -Be '192.168.0.0/255.255.0.0'
             }
         }
         Context 'CIDR Notation Used "192.168.0.0/16"' {
             It 'Should Return "192.168.0.0/255.255.0.0"' {
-                Convert-CIDRToSubhetMask -Address @('192.168.0.0/16') | Should Be '192.168.0.0/255.255.0.0'
+                Convert-CIDRToSubhetMask -Address @('192.168.0.0/16') | Should -Be '192.168.0.0/255.255.0.0'
             }
         }
         Context 'CIDR Notation Used "192.168.0.10/16" resulting in source bits masked' {
             It 'Should Return "192.168.0.0/255.255.0.0" with source bits masked' {
-                Convert-CIDRToSubhetMask -Address @('192.168.0.10/16') | Should Be '192.168.0.0/255.255.0.0'
+                Convert-CIDRToSubhetMask -Address @('192.168.0.10/16') | Should -Be '192.168.0.0/255.255.0.0'
             }
         }
         Context 'Multiple Notations Used "192.168.0.0/16,10.0.0.24/255.255.255.0"' {
             $Result = Convert-CIDRToSubhetMask -Address @('192.168.0.0/16', '10.0.0.24/255.255.255.0')
             It 'Should Return "192.168.0.0/255.255.0.0,10.0.0.0/255.255.255.0"' {
-                $Result[0] | Should Be '192.168.0.0/255.255.0.0'
-                $Result[1] | Should Be '10.0.0.0/255.255.255.0'
+                $Result[0] | Should -Be '192.168.0.0/255.255.0.0'
+                $Result[1] | Should -Be '10.0.0.0/255.255.255.0'
             }
         }
         Context 'Range Used "192.168.1.0-192.168.1.128"' {
             It 'Should Return "192.168.1.0-192.168.1.128"' {
-                Convert-CIDRToSubhetMask -Address @('192.168.1.0-192.168.1.128') | Should Be '192.168.1.0-192.168.1.128'
+                Convert-CIDRToSubhetMask -Address @('192.168.1.0-192.168.1.128') | Should -Be '192.168.1.0-192.168.1.128'
             }
         }
         Context 'IPv6 Used "fe80::/112"' {
             It 'Should Return "fe80::/112"' {
-                Convert-CIDRToSubhetMask -Address @('fe80::/112') | Should Be 'fe80::/112'
+                Convert-CIDRToSubhetMask -Address @('fe80::/112') | Should -Be 'fe80::/112'
             }
         }
     }
@@ -112,11 +112,11 @@ try
                     -MockWith { $adapterArray }
 
                 It 'Should not throw exception' {
-                    { $script:result = Find-NetworkAdapter -Name $adapterName -Verbose } | Should Not Throw
+                    { $script:result = Find-NetworkAdapter -Name $adapterName -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected adapter' {
-                    $script:result.Name | Should Be $adapterName
+                    $script:result.Name | Should -Be $adapterName
                 }
 
                 It 'Should call expected mocks' {
@@ -133,7 +133,7 @@ try
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
-                    { $script:result = Find-NetworkAdapter -Name 'NOMATCH' -Verbose } | Should Throw $errorRecord
+                    { $script:result = Find-NetworkAdapter -Name 'NOMATCH' -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call expected mocks' {
@@ -147,11 +147,11 @@ try
                     -MockWith { $adapterArray }
 
                 It 'Should not throw exception' {
-                    { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -Verbose } | Should Not Throw
+                    { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected adapter' {
-                    $script:result.Name | Should Be $adapterName
+                    $script:result.Name | Should -Be $adapterName
                 }
 
                 It 'Should call expected mocks' {
@@ -168,7 +168,7 @@ try
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
-                    { $script:result = Find-NetworkAdapter -PhysicalMediaType 'NOMATCH' -Verbose } | Should Throw $errorRecord
+                    { $script:result = Find-NetworkAdapter -PhysicalMediaType 'NOMATCH' -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call expected mocks' {
@@ -182,11 +182,11 @@ try
                     -MockWith { $adapterArray }
 
                 It 'Should not throw exception' {
-                    { $script:result = Find-NetworkAdapter -Status $adapterStatus -Verbose } | Should Not Throw
+                    { $script:result = Find-NetworkAdapter -Status $adapterStatus -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected adapter' {
-                    $script:result.Name | Should Be $adapterName
+                    $script:result.Name | Should -Be $adapterName
                 }
 
                 It 'Should call expected mocks' {
@@ -203,7 +203,7 @@ try
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
-                    { $script:result = Find-NetworkAdapter -Status 'Disabled' -Verbose } | Should Throw $errorRecord
+                    { $script:result = Find-NetworkAdapter -Status 'Disabled' -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call expected mocks' {
@@ -217,11 +217,11 @@ try
                     -MockWith { $adapterArray }
 
                 It 'Should not throw exception' {
-                    { $script:result = Find-NetworkAdapter -MacAddress $adapterMacAddress -Verbose } | Should Not Throw
+                    { $script:result = Find-NetworkAdapter -MacAddress $adapterMacAddress -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected adapter' {
-                    $script:result.Name | Should Be $adapterName
+                    $script:result.Name | Should -Be $adapterName
                 }
 
                 It 'Should call expected mocks' {
@@ -238,7 +238,7 @@ try
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
-                    { $script:result = Find-NetworkAdapter -MacAddress '00-00-00-00-00-00' -Verbose } | Should Throw $errorRecord
+                    { $script:result = Find-NetworkAdapter -MacAddress '00-00-00-00-00-00' -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call expected mocks' {
@@ -252,11 +252,11 @@ try
                     -MockWith { $adapterArray }
 
                 It 'Should not throw exception' {
-                    { $script:result = Find-NetworkAdapter -InterfaceDescription $adapterInterfaceDescription -Verbose } | Should Not Throw
+                    { $script:result = Find-NetworkAdapter -InterfaceDescription $adapterInterfaceDescription -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected adapter' {
-                    $script:result.Name | Should Be $adapterName
+                    $script:result.Name | Should -Be $adapterName
                 }
 
                 It 'Should call expected mocks' {
@@ -273,7 +273,7 @@ try
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
-                    { $script:result = Find-NetworkAdapter -InterfaceDescription 'NOMATCH' -Verbose } | Should Throw $errorRecord
+                    { $script:result = Find-NetworkAdapter -InterfaceDescription 'NOMATCH' -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call expected mocks' {
@@ -287,11 +287,11 @@ try
                     -MockWith { $adapterArray }
 
                 It 'Should not throw exception' {
-                    { $script:result = Find-NetworkAdapter -InterfaceIndex $adapterInterfaceIndex -Verbose } | Should Not Throw
+                    { $script:result = Find-NetworkAdapter -InterfaceIndex $adapterInterfaceIndex -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected adapter' {
-                    $script:result.Name | Should Be $adapterName
+                    $script:result.Name | Should -Be $adapterName
                 }
 
                 It 'Should call expected mocks' {
@@ -308,7 +308,7 @@ try
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
-                    { $script:result = Find-NetworkAdapter -InterfaceIndex 99 -Verbose } | Should Throw $errorRecord
+                    { $script:result = Find-NetworkAdapter -InterfaceIndex 99 -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call expected mocks' {
@@ -322,11 +322,11 @@ try
                     -MockWith { $adapterArray }
 
                 It 'Should not throw exception' {
-                    { $script:result = Find-NetworkAdapter -InterfaceGuid $adapterInterfaceGuid -Verbose } | Should Not Throw
+                    { $script:result = Find-NetworkAdapter -InterfaceGuid $adapterInterfaceGuid -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected adapter' {
-                    $script:result.Name | Should Be $adapterName
+                    $script:result.Name | Should -Be $adapterName
                 }
 
                 It 'Should call expected mocks' {
@@ -343,7 +343,7 @@ try
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
-                    { $script:result = Find-NetworkAdapter -InterfaceGuid 'NOMATCH' -Verbose } | Should Throw $errorRecord
+                    { $script:result = Find-NetworkAdapter -InterfaceGuid 'NOMATCH' -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call expected mocks' {
@@ -357,11 +357,11 @@ try
                     -MockWith { $adapterArray }
 
                 It 'Should not throw exception' {
-                    { $script:result = Find-NetworkAdapter -DriverDescription $adapterDriverDescription -Verbose } | Should Not Throw
+                    { $script:result = Find-NetworkAdapter -DriverDescription $adapterDriverDescription -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected adapter' {
-                    $script:result.Name | Should Be $adapterName
+                    $script:result.Name | Should -Be $adapterName
                 }
 
                 It 'Should call expected mocks' {
@@ -378,7 +378,7 @@ try
                     -Message ($LocalizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
-                    { $script:result = Find-NetworkAdapter -DriverDescription 'NOMATCH' -Verbose } | Should Throw $errorRecord
+                    { $script:result = Find-NetworkAdapter -DriverDescription 'NOMATCH' -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call expected mocks' {
@@ -395,7 +395,7 @@ try
                     -Message ($LocalizedData.MultipleMatchingNetAdapterFound -f 2)
 
                 It 'Should throw the correct exception' {
-                    { $script:result = Find-NetworkAdapter -Verbose } | Should Throw $errorRecord
+                    { $script:result = Find-NetworkAdapter -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call expected mocks' {
@@ -409,11 +409,11 @@ try
                     -MockWith { $adapterArray }
 
                 It 'Should not throw exception' {
-                    { $script:result = Find-NetworkAdapter -IgnoreMultipleMatchingAdapters:$true -InterfaceNumber 2 -Verbose } | Should Not Throw
+                    { $script:result = Find-NetworkAdapter -IgnoreMultipleMatchingAdapters:$true -InterfaceNumber 2 -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected adapter' {
-                    $script:result.Name | Should Be $adapterName
+                    $script:result.Name | Should -Be $adapterName
                 }
 
                 It 'Should call expected mocks' {
@@ -430,7 +430,7 @@ try
                     -Message ($LocalizedData.MultipleMatchingNetAdapterFound -f 2)
 
                 It 'Should throw the correct exception' {
-                    { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -Verbose } | Should Throw $errorRecord
+                    { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call expected mocks' {
@@ -444,11 +444,11 @@ try
                     -MockWith { $multipleMatchingAdapterArray }
 
                 It 'Should not throw exception' {
-                    { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -IgnoreMultipleMatchingAdapters:$true -Verbose } | Should Not Throw
+                    { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -IgnoreMultipleMatchingAdapters:$true -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected adapter' {
-                    $script:result.Name | Should Be $adapterName
+                    $script:result.Name | Should -Be $adapterName
                 }
 
                 It 'Should call expected mocks' {
@@ -465,7 +465,7 @@ try
                     -Message ($LocalizedData.InvalidNetAdapterNumberError -f 2, 3)
 
                 It 'Should throw the correct exception' {
-                    { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -IgnoreMultipleMatchingAdapters:$true -InterfaceNumber 3 -Verbose } | Should Throw $errorRecord
+                    { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -IgnoreMultipleMatchingAdapters:$true -InterfaceNumber 3 -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call expected mocks' {
@@ -518,7 +518,7 @@ try
                     -Message ($LocalizedData.InterfaceAliasNotFoundError -f $interfaceAlias)
 
                 It 'Should throw exception' {
-                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Throw $errorRecord
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call expected mocks' {
@@ -540,11 +540,11 @@ try
                 }
 
                 It 'Should not throw exception' {
-                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return null' {
-                    $script:result | Should BeNullOrEmpty
+                    $script:result | Should -BeNullOrEmpty
                 }
 
                 It 'Should call expected mocks' {
@@ -567,11 +567,11 @@ try
                 }
 
                 It 'Should not throw exception' {
-                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return null' {
-                    $script:result | Should BeNullOrEmpty
+                    $script:result | Should -BeNullOrEmpty
                 }
 
                 It 'Should call expected mocks' {
@@ -594,11 +594,11 @@ try
                 }
 
                 It 'Should not throw exception' {
-                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected address' {
-                    $script:result | Should Be $oneIpv4StaticAddressString
+                    $script:result | Should -Be $oneIpv4StaticAddressString
                 }
 
                 It 'Should call expected mocks' {
@@ -621,12 +621,12 @@ try
                 }
 
                 It 'Should not throw exception' {
-                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should Not Throw
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return two expected addresses' {
-                    $script:result[0] | Should Be $oneIpv4StaticAddressString
-                    $script:result[1] | Should Be $secondIpv4StaticAddressString
+                    $script:result[0] | Should -Be $oneIpv4StaticAddressString
+                    $script:result[1] | Should -Be $secondIpv4StaticAddressString
                 }
 
                 It 'Should call expected mocks' {
@@ -649,11 +649,11 @@ try
                 }
 
                 It 'Should not throw exception' {
-                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return null' {
-                    $script:result | Should BeNullOrEmpty
+                    $script:result | Should -BeNullOrEmpty
                 }
 
                 It 'Should call expected mocks' {
@@ -676,11 +676,11 @@ try
                 }
 
                 It 'Should not throw exception' {
-                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return null' {
-                    $script:result | Should BeNullOrEmpty
+                    $script:result | Should -BeNullOrEmpty
                 }
 
                 It 'Should call expected mocks' {
@@ -703,11 +703,11 @@ try
                 }
 
                 It 'Should not throw exception' {
-                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected address' {
-                    $script:result | Should Be $oneIpv6StaticAddressString
+                    $script:result | Should -Be $oneIpv6StaticAddressString
                 }
 
                 It 'Should call expected mocks' {
@@ -730,12 +730,12 @@ try
                 }
 
                 It 'Should not throw exception' {
-                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should Not Throw
+                    { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return two expected addresses' {
-                    $script:result[0] | Should Be $oneIpv6StaticAddressString
-                    $script:result[1] | Should Be $secondIpv6StaticAddressString
+                    $script:result[0] | Should -Be $oneIpv6StaticAddressString
+                    $script:result[1] | Should -Be $secondIpv6StaticAddressString
                 }
 
                 It 'Should call expected mocks' {
@@ -753,8 +753,8 @@ try
             it 'Should return the provided IP and prefix as separate properties' {
                 $IPaddress = Get-IPAddressPrefix -IPAddress '192.168.10.0/24'
 
-                $IPaddress.IPaddress | Should be '192.168.10.0'
-                $IPaddress.PrefixLength | Should be 24
+                $IPaddress.IPaddress | Should -Be '192.168.10.0'
+                $IPaddress.PrefixLength | Should -Be 24
             }
         }
 
@@ -762,8 +762,8 @@ try
             it 'Should return correct prefix when Class A address provided' {
                 $IPaddress = Get-IPAddressPrefix -IPAddress '10.1.2.3'
 
-                $IPaddress.IPaddress | Should be '10.1.2.3'
-                $IPaddress.PrefixLength | Should be 8
+                $IPaddress.IPaddress | Should -Be '10.1.2.3'
+                $IPaddress.PrefixLength | Should -Be 8
             }
         }
 
@@ -771,8 +771,8 @@ try
             it 'Should return correct prefix when Class B address provided' {
                 $IPaddress = Get-IPAddressPrefix -IPAddress '172.16.2.3'
 
-                $IPaddress.IPaddress | Should be '172.16.2.3'
-                $IPaddress.PrefixLength | Should be 16
+                $IPaddress.IPaddress | Should -Be '172.16.2.3'
+                $IPaddress.PrefixLength | Should -Be 16
             }
         }
 
@@ -780,8 +780,8 @@ try
             it 'Should return correct prefix when Class C address provided' {
                 $IPaddress = Get-IPAddressPrefix -IPAddress '192.168.20.3'
 
-                $IPaddress.IPaddress | Should be '192.168.20.3'
-                $IPaddress.PrefixLength | Should be 24
+                $IPaddress.IPaddress | Should -Be '192.168.20.3'
+                $IPaddress.PrefixLength | Should -Be 24
             }
         }
 
@@ -789,8 +789,8 @@ try
             it 'Should return provided IP and prefix as separate properties' {
                 $IPaddress = Get-IPAddressPrefix -IPAddress 'FF12::12::123/64' -AddressFamily IPv6
 
-                $IPaddress.IPaddress | Should be 'FF12::12::123'
-                $IPaddress.PrefixLength | Should be 64
+                $IPaddress.IPaddress | Should -Be 'FF12::12::123'
+                $IPaddress.PrefixLength | Should -Be 64
             }
         }
 
@@ -798,8 +798,8 @@ try
             it 'Should return provided IP and correct IPv6 prefix' {
                 $IPaddress = Get-IPAddressPrefix -IPAddress 'FF12::12::123' -AddressFamily IPv6
 
-                $IPaddress.IPaddress | Should be 'FF12::12::123'
-                $IPaddress.PrefixLength | Should be 64
+                $IPaddress.IPaddress | Should -Be 'FF12::12::123'
+                $IPaddress.PrefixLength | Should -Be 64
             }
         }
     }

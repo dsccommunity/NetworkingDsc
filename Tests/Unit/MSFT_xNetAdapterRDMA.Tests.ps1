@@ -69,8 +69,8 @@ try
 
                 It 'Should return network adapter RDMA properties' {
                     $Result = Get-TargetResource @targetParameters
-                    $Result.Name                   | Should Be $targetParameters.Name
-                    $Result.Enabled                | Should Be $true
+                    $Result.Name                   | Should -Be $targetParameters.Name
+                    $Result.Enabled                | Should -Be $true
                 }
 
                 It 'Should call the expected mocks' {

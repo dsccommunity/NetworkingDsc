@@ -58,31 +58,31 @@ try
                     -Verbose `
                     -Force `
                     -ErrorAction Stop
-            } | Should Not Throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
 
         It 'Should be able to call Test-DscConfiguration without throwing' {
-            { $script:currentState = Test-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
+            { $script:currentState = Test-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
 
         It 'Should report that DSC is in state' {
-            $script:currentState | Should Be $true
+            $script:currentState | Should -Be $true
         }
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:DSCResourceName)_Present_Config" }
-            $current.Ensure                  | Should Be 'Present'
-            $current.EnableAutoDetection     | Should Be $True
-            $current.EnableAutoConfiguration | Should Be $True
-            $current.EnableManualProxy       | Should Be $True
-            $current.ProxyServer             | Should Be $testProxyServer
-            $current.ProxyServerExceptions   | Should Be $testProxyExeceptions
-            $current.ProxyServerBypassLocal  | Should Be $True
-            $current.AutoConfigURL           | Should Be $testAutoConfigURL
+            $current.Ensure                  | Should -Be 'Present'
+            $current.EnableAutoDetection     | Should -Be $True
+            $current.EnableAutoConfiguration | Should -Be $True
+            $current.EnableManualProxy       | Should -Be $True
+            $current.ProxyServer             | Should -Be $testProxyServer
+            $current.ProxyServerExceptions   | Should -Be $testProxyExeceptions
+            $current.ProxyServerBypassLocal  | Should -Be $True
+            $current.AutoConfigURL           | Should -Be $testAutoConfigURL
         }
     }
 
@@ -102,24 +102,24 @@ try
                     -Verbose `
                     -Force `
                     -ErrorAction Stop
-            } | Should Not Throw
+            } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
 
         It 'Should be able to call Test-DscConfiguration without throwing' {
-            { $script:currentState = Test-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
+            { $script:currentState = Test-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
 
         It 'Should report that DSC is in state' {
-            $script:currentState | Should Be $true
+            $script:currentState | Should -Be $true
         }
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:DSCResourceName)_Absent_Config" }
-            $current.Ensure            | Should Be 'Absent'
+            $current.Ensure            | Should -Be 'Absent'
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿$script:DSCModuleName = 'xNetworking'
+$script:DSCModuleName = 'xNetworking'
 $script:DSCResourceName = 'MSFT_xNetAdapterRss'
 
 #region HEADER
@@ -44,7 +44,7 @@ try
 
                 It 'Should return the RSS Enabled' {
                     $result = Get-TargetResource @TestRssEnabled
-                    $result.Enabled | Should Be $TestRSSEnabled.Enabled
+                    $result.Enabled | Should -Be $TestRSSEnabled.Enabled
                 }
 
                 It 'Should call all mocks' {
@@ -59,7 +59,7 @@ try
 
                 It 'Should return the RSS Enabled' {
                     $result = Get-TargetResource @TestRSSDisabled
-                    $result.Enabled | Should Be $TestRSSDisabled.Enabled
+                    $result.Enabled | Should -Be $TestRSSDisabled.Enabled
                 }
 
                 It 'Should call all mocks' {
@@ -74,7 +74,7 @@ try
                     -Message ($LocalizedData.NetAdapterNotFoundMessage)
 
                 It 'Should throw an exception' {
-                    { Get-TargetResource @TestAdapterNotFound } | Should throw $errorRecord
+                    { Get-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
                 }
 
                 It 'Should call all mocks' {
@@ -91,7 +91,7 @@ try
                     Mock -CommandName Set-NetAdapterRSS
 
                     It 'Should not throw an exception' {
-                        { Set-TargetResource @TestRSSEnabled } | Should Not Throw
+                        { Set-TargetResource @TestRSSEnabled } | Should -Not -Throw
                     }
 
                     It 'Should call all mocks' {
@@ -107,7 +107,7 @@ try
                     Mock -CommandName Set-NetAdapterRSS
 
                     It 'Should not throw an exception' {
-                        { Set-TargetResource @TestRSSDisabled } | Should Not Throw
+                        { Set-TargetResource @TestRSSDisabled } | Should -Not -Throw
                     }
 
                     It 'Should call all mocks' {
@@ -123,7 +123,7 @@ try
                     Mock -CommandName Set-NetAdapterRSS
 
                     It 'Should not throw an exception' {
-                        { Set-TargetResource @TestRSSDisabled } | Should Not Throw
+                        { Set-TargetResource @TestRSSDisabled } | Should -Not -Throw
                     }
 
                     It 'Should call all mocks' {
@@ -139,7 +139,7 @@ try
                     Mock -CommandName Set-NetAdapterRSS
 
                     It 'Should not throw an exception' {
-                        { Set-TargetResource @TestRSSEnabled } | Should Not Throw
+                        { Set-TargetResource @TestRSSEnabled } | Should -Not -Throw
                     }
 
                     It 'Should call all mocks' {
@@ -156,7 +156,7 @@ try
                         -Message ($LocalizedData.NetAdapterNotFoundMessage)
 
                     It 'Should throw an exception' {
-                        { Set-TargetResource @TestAdapterNotFound } | Should throw $errorRecord
+                        { Set-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
                     }
 
                     It 'Should call all mocks' {
@@ -174,7 +174,7 @@ try
                     }
 
                     It 'Should return true' {
-                        Test-TargetResource @TestRSSEnabled | Should Be $true
+                        Test-TargetResource @TestRSSEnabled | Should -Be $true
                     }
 
                     It 'Should call all mocks' {
@@ -188,7 +188,7 @@ try
                     }
 
                     It 'Should return false' {
-                        Test-TargetResource @TestRSSDisabled | Should Be $false
+                        Test-TargetResource @TestRSSDisabled | Should -Be $false
                     }
 
                     it 'Should call all mocks' {
@@ -202,7 +202,7 @@ try
                     }
 
                     It 'Should return true' {
-                        Test-TargetResource @TestRSSDisabled | Should Be $true
+                        Test-TargetResource @TestRSSDisabled | Should -Be $true
                     }
 
                     it 'Should call all mocks' {
@@ -216,7 +216,7 @@ try
                     }
 
                     It 'Should return false' {
-                        Test-TargetResource @TestRSSEnabled | Should Be $false
+                        Test-TargetResource @TestRSSEnabled | Should -Be $false
                     }
 
                     it 'Should call all mocks' {
@@ -232,7 +232,7 @@ try
                         -Message ($LocalizedData.NetAdapterNotFoundMessage)
 
                     It 'Should throw an exception' {
-                        { Test-TargetResource @TestAdapterNotFound } | Should throw $errorRecord
+                        { Test-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
                     }
 
                     It 'Should call all mocks' {

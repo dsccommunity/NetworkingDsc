@@ -51,9 +51,9 @@ try
             Context 'DNS Client Global Settings Exists' {
                 It 'Should return correct DNS Client Global Settings values' {
                     $getTargetResourceParameters = Get-TargetResource -IsSingleInstance 'Yes'
-                    $getTargetResourceParameters.SuffixSearchList | Should Be $dnsClientGlobalSettings.SuffixSearchList
-                    $getTargetResourceParameters.DevolutionLevel  | Should Be $dnsClientGlobalSettings.DevolutionLevel
-                    $getTargetResourceParameters.UseDevolution    | Should Be $dnsClientGlobalSettings.UseDevolution
+                    $getTargetResourceParameters.SuffixSearchList | Should -Be $dnsClientGlobalSettings.SuffixSearchList
+                    $getTargetResourceParameters.DevolutionLevel  | Should -Be $dnsClientGlobalSettings.DevolutionLevel
+                    $getTargetResourceParameters.UseDevolution    | Should -Be $dnsClientGlobalSettings.UseDevolution
                 }
 
                 It 'Should call the expected mocks' {
@@ -74,7 +74,7 @@ try
                     {
                         $setTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         Set-TargetResource @setTargetResourceParameters
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected Mocks' {
@@ -91,7 +91,7 @@ try
                         $setTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $setTargetResourceParameters.SuffixSearchList = 'fabrikam.com'
                         Set-TargetResource @setTargetResourceParameters
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected Mocks' {
@@ -114,7 +114,7 @@ try
                         $setTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $setTargetResourceParameters.SuffixSearchList = $suffixSearchListArray
                         Set-TargetResource @setTargetResourceParameters
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected Mocks' {
@@ -131,7 +131,7 @@ try
                         $setTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $setTargetResourceParameters.DevolutionLevel = $setTargetResourceParameters.DevolutionLevel + 1
                         Set-TargetResource @setTargetResourceParameters
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected Mocks' {
@@ -148,7 +148,7 @@ try
                         $setTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $setTargetResourceParameters.UseDevolution = -not $setTargetResourceParameters.UseDevolution
                         Set-TargetResource @setTargetResourceParameters
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected Mocks' {
@@ -167,7 +167,7 @@ try
                 Context 'DNS Client Global Settings all parameters are the same' {
                     It 'Should return true' {
                         $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
-                        Test-TargetResource @testTargetResourceParameters | Should Be $true
+                        Test-TargetResource @testTargetResourceParameters | Should -Be $true
                     }
 
                     It 'Should call expected Mocks' {
@@ -179,7 +179,7 @@ try
                     It 'Should return false' {
                         $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $testTargetResourceParameters.SuffixSearchList = 'fabrikam.com'
-                        Test-TargetResource @testTargetResourceParameters | Should Be $False
+                        Test-TargetResource @testTargetResourceParameters | Should -Be $False
                     }
 
                     It 'Should call expected Mocks' {
@@ -191,7 +191,7 @@ try
                     It 'Should return false' {
                         $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $testTargetResourceParameters.DevolutionLevel = $testTargetResourceParameters.DevolutionLevel + 1
-                        Test-TargetResource @testTargetResourceParameters | Should Be $False
+                        Test-TargetResource @testTargetResourceParameters | Should -Be $False
                     }
 
                     It 'Should call expected Mocks' {
@@ -203,7 +203,7 @@ try
                     It 'Should return false' {
                         $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $testTargetResourceParameters.UseDevolution = -not $testTargetResourceParameters.UseDevolution
-                        Test-TargetResource @testTargetResourceParameters | Should Be $False
+                        Test-TargetResource @testTargetResourceParameters | Should -Be $False
                     }
 
                     It 'Should call expected Mocks' {
@@ -221,7 +221,7 @@ try
                     It 'Should return false' {
                         $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $testTargetResourceParameters.SuffixSearchList = @('fabrikam.com', 'contoso.com')
-                        Test-TargetResource @testTargetResourceParameters | Should Be $False
+                        Test-TargetResource @testTargetResourceParameters | Should -Be $False
                     }
 
                     It 'Should call expected Mocks' {
@@ -233,7 +233,7 @@ try
                     It 'Should return true' {
                         $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $testTargetResourceParameters.SuffixSearchList = @('fabrikam.com', 'fourthcoffee.com')
-                        Test-TargetResource @testTargetResourceParameters | Should Be $true
+                        Test-TargetResource @testTargetResourceParameters | Should -Be $true
                     }
 
                     It 'Should call expected Mocks' {
@@ -245,7 +245,7 @@ try
                     It 'Should return false' {
                         $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $testTargetResourceParameters.SuffixSearchList = @('fourthcoffee.com', 'fabrikam.com')
-                        Test-TargetResource @testTargetResourceParameters | Should Be $False
+                        Test-TargetResource @testTargetResourceParameters | Should -Be $False
                     }
 
                     It 'Should call expected Mocks' {
