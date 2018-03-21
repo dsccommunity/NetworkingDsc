@@ -1,6 +1,6 @@
 @{
 # Version number of this module.
-ModuleVersion = '5.5.0.0'
+moduleVersion = '5.6.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -50,34 +50,27 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- MSFT_xNetAdapterAdvancedProperty:
-  - Created new resource configuring AdvancedProperties for NetAdapter
-- MSFT_xNetAdapterLso:
-  - Corrected style and formatting to meet HQRM guidelines.
-  - Updated tests to meet Pester v4 guidelines.
-- MSFT_xNetAdapterName:
-  - Corrected style and formatting to meet HQRM guidelines.
-  - Updated tests to meet Pester v4 guidelines.
-- MSFT_xNetAdapterRDMA:
+        ReleaseNotes = '- Reordered resource list in README.MD to be alphabetical and added
+  missing resource xNetAdapterAdvancedProperty - Fixes [issue 309](https://github.com/PowerShell/xNetworking/issues/309).
+- MSFT_xNetworkTeamInterface:
   - Corrected style and formatting to meet HQRM guidelines.
   - Updated tests to meet Pester v4 guidelines.
   - Converted exceptions to use ResourceHelper functions.
-  - Improved integration tests to preserve system status and run in more
-    scenarios.
+  - Changed unit tests to output Verbose logs.
+- MSFT_xNetAdapterAdvancedProperty:
+  - Added a number of additional advanced properties.
+  - Fixes [issue 314](https://github.com/PowerShell/xNetworking/issues/314).
 - MSFT_xNetBIOS:
   - Corrected style and formatting to meet HQRM guidelines.
-  - Updated tests to meet Pester v4 guidelines.
-  - Converted exceptions to use ResourceHelper functions.
-  - Improved integration tests to preserve system status, run in more
-    scenarios and more effectively test the resource.
-  - Changed to report back error if unable to set NetBIOS setting.
-- MSFT_xWinsSetting:
-  - Created new resource for enabling/disabling LMHOSTS lookup and
-    enabling/disabling WINS name resoluton using DNS.
+  - Ensured CommonTestHelper.psm1 is loaded before running unit tests.
 - MSFT_xNetworkTeam:
   - Corrected style and formatting to meet HQRM guidelines.
-  - Updated tests to meet Pester v4 guidelines.
-  - Converted exceptions to use ResourceHelper functions.
+  - Added missing default from MOF description of Ensure parameter.
+  - Fixed `Get-TargetResource` to always output Ensure parameter.
+  - Changed unit tests to output Verbose logs.
+- MSFT_xNetConnectionProfile:
+  - Corrected style and formatting to meet HQRM guidelines.
+- Updated tests to meet Pester V4 guidelines - Fixes [Issue 272](https://github.com/PowerShell/xNetworking/issues/272).
 
 '
 
@@ -85,6 +78,7 @@ PrivateData = @{
 
 } # End of PrivateData hashtable
 }
+
 
 
 
