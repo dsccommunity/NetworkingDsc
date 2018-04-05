@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Enabled PSSA rule violations to fail build - Fixes [Issue #320](https://github.com/PowerShell/xNetworking/issues/320).
+
 ## 5.6.0.0
 
 - Reordered resource list in README.MD to be alphabetical and added
