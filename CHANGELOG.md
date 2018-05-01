@@ -6,6 +6,8 @@
 - MSFT_xNetAdapterAdvancedProperty:
   - Enabled setting the same property on multiple network
     adapters - Fixes [issue #324](https://github.com/PowerShell/xNetworking/issues/324).
+- EXPERIMENT to check if AppVeyor is reporting status back
+  to PR in GitHub correctly. DO NOT MERGE!
 
 ## 5.6.0.0
 
