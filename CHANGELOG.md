@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.7.0.0
+
 - Enabled PSSA rule violations to fail build - Fixes [Issue #320](https://github.com/PowerShell/xNetworking/issues/320).
 - MSFT_xNetAdapterAdvancedProperty:
   - Enabled setting the same property on multiple network
