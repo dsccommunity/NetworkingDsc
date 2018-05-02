@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 5.7.0.0
+
+- Enabled PSSA rule violations to fail build - Fixes [Issue #320](https://github.com/PowerShell/xNetworking/issues/320).
+- MSFT_xNetAdapterAdvancedProperty:
+  - Enabled setting the same property on multiple network
+    adapters - Fixes [issue #324](https://github.com/PowerShell/xNetworking/issues/324).
+
 ## 5.6.0.0
 
 - Reordered resource list in README.MD to be alphabetical and added
@@ -17,6 +24,8 @@
 - MSFT_xNetBIOS:
   - Corrected style and formatting to meet HQRM guidelines.
   - Ensured CommonTestHelper.psm1 is loaded before running unit tests.
+  - Fix issue with InterfaceAlias matching on Adapter description
+    rather than Adapter Name - Fixes [Issue #315](https://github.com/PowerShell/xNetworking/issues/315).
 - MSFT_xNetworkTeam:
   - Corrected style and formatting to meet HQRM guidelines.
   - Added missing default from MOF description of Ensure parameter.

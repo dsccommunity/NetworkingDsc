@@ -26,7 +26,7 @@ if (-not $netAdapterConfig)
     Write-Verbose -Message ('There are no enabled network adapters with IP enabled in this system. Integration tests will be skipped.') -Verbose
     return
 }
-Write-Verbose -Message ('A network adapter ({0}) was found in this system that meets requirements for integration testing.' -f $netAdapter.Name) -Verbose
+Write-Verbose -Message ('A network adapter ({0}) was found in this system that meets requirements for integration testing.' -f $netAdapter.NetConnectionID) -Verbose
 
 #region HEADER
 # Integration Test Template Version: 1.1.0
@@ -77,7 +77,7 @@ try
                 AllNodes = @(
                     @{
                         NodeName            = 'localhost'
-                        InterfaceAlias      = $netAdapter.Name
+                        InterfaceAlias      = $netAdapter.NetConnectionID
                         Setting             = 'Disable'
                     }
                 )
@@ -116,7 +116,7 @@ try
                 AllNodes = @(
                     @{
                         NodeName            = 'localhost'
-                        InterfaceAlias      = $netAdapter.Name
+                        InterfaceAlias      = $netAdapter.NetConnectionID
                         Setting             = 'Enable'
                     }
                 )
@@ -155,7 +155,7 @@ try
                 AllNodes = @(
                     @{
                         NodeName            = 'localhost'
-                        InterfaceAlias      = $netAdapter.Name
+                        InterfaceAlias      = $netAdapter.NetConnectionID
                         Setting             = 'Default'
                     }
                 )
