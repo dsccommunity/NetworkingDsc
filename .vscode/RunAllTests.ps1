@@ -7,7 +7,6 @@ if ( (-not (Test-Path -Path $dscResourceTestsPath)) -or `
     & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',$dscResourceTestsPath)
 }
 
-Import-Module (Join-Path $PSScriptRoot "..\Tests\TestHarness.psm1" -Resolve)
-$dscTestsPath = Join-Path -Path $PSScriptRoot `
-                          -ChildPath "..\Modules\NetworkingDsc\DscResource.Tests\Meta.Tests.ps1"
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\Tests\TestHarness.psm1' -Resolve)
+$dscTestsPath = Join-Path -Path $dscResourceTestsPath -ChildPath 'Meta.Tests.ps1'
 Invoke-TestHarness -DscTestsPath $dscTestsPath
