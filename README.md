@@ -1,6 +1,6 @@
-# xNetworking
+# NetworkingDsc
 
-The **xNetworking** module contains the following resources:
+The **NetworkingDsc** module contains the following resources:
 
 - **xDefaultGatewayAddress**: Sets a node's default gateway address.
 - **xDhcpClient**: Enable or Disable DHCP on an network interface.
@@ -41,23 +41,23 @@ additional questions or comments.
 
 ## Documentation and Examples
 
-For a full list of resources in xNetworking and examples on their use, check out
-the [xNetworking wiki](https://github.com/PowerShell/xNetworking/wiki).
+For a full list of resources in NetworkingDsc and examples on their use, check out
+the [NetworkingDsc wiki](https://github.com/PowerShell/NetworkingDsc/wiki).
 
 ## Branches
 
 ### master
 
-[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/master)
-[![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/NetworkingDsc/branch/master)
+[![codecov](https://codecov.io/gh/PowerShell/NetworkingDsc/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/NetworkingDsc/branch/master)
 
 This is the branch containing the latest release - no contributions should be made
 directly to this branch.
 
 ### dev
 
-[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/dev)
-[![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking/branch/dev)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/NetworkingDsc/branch/dev)
+[![codecov](https://codecov.io/gh/PowerShell/NetworkingDsc/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/NetworkingDsc/branch/dev)
 
 This is the development branch to which contributions should be proposed by contributors
 as pull requests. This development branch will periodically be merged to the master
