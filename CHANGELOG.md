@@ -3,11 +3,11 @@
 ## Unreleased
 
 - BREAKING CHANGE:
-  - Renamed ComputerManagement to ComputerManagementDsc - fixes [Issue #119](https://github.com/PowerShell/NetworkingDsc/issues/290).
+  - Renamed xNetworking to NetworkingDsc - fixes [Issue #119](https://github.com/PowerShell/NetworkingDsc/issues/290).
   - Changed all MSFT\_xResourceName to MSFT\_ResourceName.
   - Updated DSCResources, Examples, Modules and Tests with new naming.
   - Updated Year to 2018 in License and Manifest.
-  - Updated README.md from xComputerManagement to ComputerManagementDsc.
+  - Updated README.md from xNetworking to NetworkingDsc.
 
 ## 5.7.0.0
 
