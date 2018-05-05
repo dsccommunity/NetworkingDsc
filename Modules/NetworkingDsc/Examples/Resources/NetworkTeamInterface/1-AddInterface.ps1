@@ -30,7 +30,7 @@ Configuration Example
             TeamName = 'HostTeam'
             VlanID = 100
             Ensure = 'Present'
-            DependsOn = '[xNetworkTeam]HostTeam'
+            DependsOn = '[NetworkTeam]HostTeam'
         }
     }
 }

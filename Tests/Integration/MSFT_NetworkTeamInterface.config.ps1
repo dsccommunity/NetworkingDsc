@@ -20,7 +20,7 @@ configuration MSFT_NetworkTeamInterface_Config
             TeamName  = $Node.TeamName
             VlanID    = $Node.VlanId
             Ensure    = $Node.Ensure
-            DependsOn = '[xNetworkTeam]HostTeam'
+            DependsOn = 'NetworkTeam]HostTeam'
         }
     }
 }

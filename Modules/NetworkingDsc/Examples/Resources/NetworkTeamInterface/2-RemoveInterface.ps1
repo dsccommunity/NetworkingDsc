@@ -29,7 +29,7 @@ Configuration Example
             Name = 'NewInterface'
             TeamName = 'HostTeam'
             Ensure = 'Absent'
-            DependsOn = '[xNetworkTeam]HostTeam'
+            DependsOn = '[NetworkTeam]HostTeam'
         }
     }
 }
