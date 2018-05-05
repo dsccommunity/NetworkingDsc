@@ -15,7 +15,7 @@ Configuration Example
 
     node $NodeName
     {
-        xNetBIOS DisableNetBIOS
+        NetBIOS DisableNetBIOS
         {
             InterfaceAlias = 'Ethernet'
             Setting        = 'Disable'

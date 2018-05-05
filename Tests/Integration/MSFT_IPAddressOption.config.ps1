@@ -10,13 +10,15 @@ $TestIPAddressOption = [PSObject]@{
 
 configuration MSFT_IPAddressOption_Config {
     Import-DscResource -ModuleName NetworkingDsc
+
     node localhost {
-        xIPAddress Integration_Test {
+        IPAddress Integration_Test {
             InterfaceAlias = $TestIPAddress.InterfaceAlias
             AddressFamily  = $TestIPAddress.AddressFamily
             IPAddress      = $TestIPAddress.IPAddress
         }
-        xIPAddressOption Integration_Test {
+
+        IPAddressOption Integration_Test {
             IPAddress    = $TestIPAddressOption.IPAddress
             SkipAsSource = $TestIPAddressOption.SkipAsSource
         }

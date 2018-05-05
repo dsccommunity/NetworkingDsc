@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xDnsServerAddress DnsServerAddress
+        DnsServerAddress DnsServerAddress
         {
             Address        = '10.0.0.2','10.0.0.40'
             InterfaceAlias = 'Ethernet'

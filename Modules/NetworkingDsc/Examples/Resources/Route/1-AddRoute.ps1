@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xRoute NetRoute1
+        Route NetRoute1
         {
             Ensure = 'Present'
             InterfaceAlias = 'Ethernet'

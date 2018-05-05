@@ -7,8 +7,9 @@ $TestEnableLsoIPv6 = [PSObject]@{
 
 configuration MSFT_NetAdapterLso_Config {
     Import-DscResource -ModuleName NetworkingDsc
+
     node localhost {
-        xNetAdapterLso Integration_Test
+        NetAdapterLso Integration_Test
         {
             Name     = $TestEnableLsoIPv6.Name
             Protocol = $TestEnableLsoIPv6.Protocol

@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetConnectionProfile Example
+        NetConnectionProfile Example
         {
             InterfaceAlias   = 'Ethernet'
             NetworkCategory  = 'Public'

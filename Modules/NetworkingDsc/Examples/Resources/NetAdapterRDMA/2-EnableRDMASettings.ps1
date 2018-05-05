@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetAdapterRDMA SMBAdapter1
+        NetAdapterRDMA SMBAdapter1
         {
             Name = 'SMB1_1'
             Enabled = $true

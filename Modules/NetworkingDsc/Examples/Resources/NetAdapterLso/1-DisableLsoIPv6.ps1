@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetAdapterLso DisableLsoIPv6
+        NetAdapterLso DisableLsoIPv6
         {
             Name     = 'Ethernet'
             Protocol = 'IPv6'

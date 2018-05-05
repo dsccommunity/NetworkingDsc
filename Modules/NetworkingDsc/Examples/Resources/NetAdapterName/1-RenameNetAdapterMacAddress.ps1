@@ -16,39 +16,39 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetAdapterName RenameNetAdapterCluster
+        NetAdapterName RenameNetAdapterCluster
         {
             NewName    = 'Cluster'
             MacAddress = '9C-D2-1E-61-B5-DA'
         }
 
-        xDhcpClient EnableDhcpClientCluster
+        DhcpClient EnableDhcpClientCluster
         {
             State          = 'Enabled'
             InterfaceAlias = 'Cluster'
             AddressFamily  = 'IPv4'
         }
 
-        xNetAdapterName RenameNetAdapterManagement
+        NetAdapterName RenameNetAdapterManagement
         {
             NewName    = 'Management'
             MacAddress = '9C-D2-1E-61-B5-DB'
         }
 
-        xDhcpClient EnableDhcpClientManagement
+        DhcpClient EnableDhcpClientManagement
         {
             State          = 'Enabled'
             InterfaceAlias = 'Management'
             AddressFamily  = 'IPv4'
         }
 
-        xNetAdapterName RenameNetAdapterSMB
+        NetAdapterName RenameNetAdapterSMB
         {
             NewName    = 'SMB'
             MacAddress = '9C-D2-1E-61-B5-DC'
         }
 
-        xDhcpClient EnableDhcpClientSMB
+        DhcpClient EnableDhcpClientSMB
         {
             State          = 'Enabled'
             InterfaceAlias = 'SMB'

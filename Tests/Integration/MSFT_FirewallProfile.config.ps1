@@ -1,7 +1,8 @@
 Configuration MSFT_FirewallProfile_Config {
     Import-DscResource -ModuleName NetworkingDsc
+
     node localhost {
-        xFirewallProfile Integration_Test {
+        FirewallProfile Integration_Test {
             Name                            = $Node.Name
             Enabled                         = $Node.Enabled
             DefaultInboundAction            = $Node.DefaultInboundAction

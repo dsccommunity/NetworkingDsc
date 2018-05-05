@@ -9,7 +9,7 @@ configuration MSFT_Route_Config {
     Import-DscResource -ModuleName NetworkingDsc
 
     Node $NodeName {
-        xRoute Integration_Test {
+        Route Integration_Test {
             InterfaceAlias          = $Node.InterfaceAlias
             AddressFamily           = $Node.AddressFamily
             DestinationPrefix       = $Node.DestinationPrefix

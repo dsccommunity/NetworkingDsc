@@ -14,9 +14,10 @@ Configuration Example
     )
 
     Import-DscResource -Module NetworkingDsc
+
     Node $NodeName
     {
-        xDefaultGatewayAddress SetDefaultGateway
+        DefaultGatewayAddress SetDefaultGateway
         {
             Address        = '192.168.1.1'
             InterfaceAlias = 'Ethernet'

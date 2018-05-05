@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetAdapterRss EnableRss
+        NetAdapterRss EnableRss
         {
             Name = 'Ethernet'
             Enabled = $True

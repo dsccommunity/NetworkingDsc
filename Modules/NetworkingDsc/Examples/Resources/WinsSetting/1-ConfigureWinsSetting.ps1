@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xWinsSetting ConfigureWinsSettings
+        WinsSetting ConfigureWinsSettings
         {
             IsSingleInstance = 'Yes'
             EnableLMHOSTS    = $false

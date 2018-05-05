@@ -5,7 +5,7 @@ configuration MSFT_NetworkTeamInterface_Config
 
     node localhost
     {
-        xNetworkTeam HostTeam
+        NetworkTeam HostTeam
         {
             Name                   = $Node.TeamName
             TeamingMode            = $Node.TeamingMode
@@ -14,7 +14,7 @@ configuration MSFT_NetworkTeamInterface_Config
             Ensure                 = 'Present'
         }
 
-        xNetworkTeamInterface LbfoInterface
+        NetworkTeamInterface LbfoInterface
         {
             Name      = $Node.InterfaceName
             TeamName  = $Node.TeamName

@@ -18,7 +18,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xProxySettings ManualProxy
+        ProxySettings ManualProxy
         {
             IsSingleInstance        = 'Yes'
             Ensure                  = 'Present'

@@ -6,7 +6,7 @@ Configuration MSFT_Firewall_Add_Config {
     Import-DscResource -ModuleName NetworkingDsc
 
     node localhost {
-       xFirewall Integration_Test {
+       Firewall Integration_Test {
             Name                  = $Node.RuleName
             DisplayName           = $Node.DisplayName
             Group                 = $Node.Group

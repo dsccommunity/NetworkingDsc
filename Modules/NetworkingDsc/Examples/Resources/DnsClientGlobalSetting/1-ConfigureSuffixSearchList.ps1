@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xDnsClientGlobalSetting AddDNSSuffix
+        DnsClientGlobalSetting AddDNSSuffix
         {
             IsSingleInstance = 'Yes'
             SuffixSearchList = 'contoso.com'

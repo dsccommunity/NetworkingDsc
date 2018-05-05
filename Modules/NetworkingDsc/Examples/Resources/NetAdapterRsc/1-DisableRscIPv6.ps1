@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetAdapterRsc DisableRscIPv6
+        NetAdapterRsc DisableRscIPv6
         {
             Name = 'Ethernet'
             Protocol = 'IPv6'

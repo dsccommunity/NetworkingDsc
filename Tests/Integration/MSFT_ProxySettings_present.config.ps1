@@ -2,7 +2,7 @@ configuration MSFT_ProxySettings_Present_Config {
     Import-DscResource -ModuleName NetworkingDsc
 
     node localhost {
-        xProxySettings Integration_Test {
+        ProxySettings Integration_Test {
             IsSingleInstance        = 'Yes'
             Ensure                  = 'Present'
             EnableAutoDetection     = $Node.EnableAutoDetection

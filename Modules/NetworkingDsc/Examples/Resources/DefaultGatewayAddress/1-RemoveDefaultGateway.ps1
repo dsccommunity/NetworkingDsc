@@ -13,9 +13,10 @@ Configuration Example
     )
 
     Import-DscResource -Module NetworkingDsc
+
     Node $NodeName
     {
-        xDefaultGatewayAddress RemoveDefaultGateway
+        DefaultGatewayAddress RemoveDefaultGateway
         {
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPv4'

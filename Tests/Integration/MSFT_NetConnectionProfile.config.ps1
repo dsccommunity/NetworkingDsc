@@ -2,8 +2,9 @@ $rule = Get-NetConnectionProfile | Select-Object -First 1
 
 configuration MSFT_NetConnectionProfile_Config {
     Import-DscResource -ModuleName NetworkingDsc
+
     node localhost {
-        xNetConnectionProfile Integration_Test {
+        NetConnectionProfile Integration_Test {
             InterfaceAlias   = $rule.InterfaceAlias
             NetworkCategory  = $rule.NetworkCategory
             IPv4Connectivity = $rule.IPv4Connectivity

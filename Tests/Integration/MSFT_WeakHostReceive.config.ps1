@@ -8,7 +8,7 @@ configuration MSFT_WeakHostReceive_Config {
     Import-DscResource -ModuleName NetworkingDsc
 
     Node localhost {
-        xWeakHostReceive Integration_Test
+        WeakHostReceive Integration_Test
         {
             InterfaceAlias = $TestWeakHostReceive.InterfaceAlias
             AddressFamily  = $TestWeakHostReceive.AddressFamily

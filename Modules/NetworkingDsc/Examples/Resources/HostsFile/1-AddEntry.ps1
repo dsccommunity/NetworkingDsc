@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xHostsFile HostEntry
+        HostsFile HostEntry
         {
             HostName  = 'Host01'
             IPAddress = '192.168.0.1'

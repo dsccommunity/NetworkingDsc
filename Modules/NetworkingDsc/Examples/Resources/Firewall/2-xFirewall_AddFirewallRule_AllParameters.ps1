@@ -17,7 +17,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xFirewall Firewall
+        Firewall Firewall
         {
             Name                  = 'NotePadFirewallRule'
             DisplayName           = 'Firewall Rule for Notepad.exe'

@@ -15,14 +15,14 @@ Configuration Example
 
     Node $NodeName
     {
-        xFirewall Firewall
+        Firewall Firewall
         {
             Name                  = 'MyFirewallRule'
             DisplayName           = 'My Firewall Rule'
             Group                 = 'My Firewall Rule Group'
         }
 
-        xFirewall Firewall1
+        Firewall Firewall1
         {
             Name                  = 'MyFirewallRule1'
             DisplayName           = 'My Firewall Rule'

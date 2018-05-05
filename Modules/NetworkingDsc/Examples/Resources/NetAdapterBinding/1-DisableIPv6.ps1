@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetAdapterBinding DisableIPv6
+        NetAdapterBinding DisableIPv6
         {
             InterfaceAlias = 'Ethernet'
             ComponentId    = 'ms_tcpip6'

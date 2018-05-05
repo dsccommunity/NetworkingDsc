@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetworkTeam HostTeam
+        NetworkTeam HostTeam
         {
             Name        = 'HostTeam'
             Ensure      = 'Absent'

@@ -2,7 +2,7 @@ configuration MSFT_NetAdapterRDMA_Config {
     Import-DSCResource -ModuleName NetworkingDsc
 
     node localhost {
-        xNetAdapterRDMA ConfigureRDMA {
+        NetAdapterRDMA ConfigureRDMA {
             Name    = $Node.Name
             Enabled = $Node.Enabled
         }

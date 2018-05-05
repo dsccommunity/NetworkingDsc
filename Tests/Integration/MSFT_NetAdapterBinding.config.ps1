@@ -6,8 +6,9 @@ $TestDisableIPv4 = [PSObject]@{
 
 configuration MSFT_NetAdapterBinding_Config {
     Import-DscResource -ModuleName NetworkingDsc
+
     node localhost {
-        xNetAdapterBinding Integration_Test
+        NetAdapterBinding Integration_Test
         {
             InterfaceAlias = $TestDisableIPv4.InterfaceAlias
             ComponentId    = $TestDisableIPv4.ComponentId

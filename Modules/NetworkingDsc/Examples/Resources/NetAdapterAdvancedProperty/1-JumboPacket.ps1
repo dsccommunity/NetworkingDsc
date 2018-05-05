@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetAdapterAdvancedProperty JumboPacket9014
+        NetAdapterAdvancedProperty JumboPacket9014
         {
             NetworkAdapterName  = 'Ethernet'
             RegistryKeyword     = "*JumboPacket"

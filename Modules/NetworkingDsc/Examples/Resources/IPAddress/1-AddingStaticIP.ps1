@@ -16,7 +16,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xDhcpClient DisabledDhcpClient
+        DhcpClient DisabledDhcpClient
         {
             State          = 'Disabled'
             InterfaceAlias = 'Ethernet'
@@ -24,7 +24,7 @@ Configuration Example
         }
 
         # If no prefix is supplied IPv6 will default to /64.
-        xIPAddress NewIPv6Address
+        IPAddress NewIPv6Address
         {
             IPAddress      = '2001:4898:200:7:6c71:a102:ebd8:f482'
             InterfaceAlias = 'Ethernet'
@@ -35,7 +35,7 @@ Configuration Example
         #  Class A - /8
         #  Class B - /16
         #  Class C - /24
-        xIPAddress NewIPv4Address
+        IPAddress NewIPv4Address
         {
             IPAddress      = '192.168.10.5'
             InterfaceAlias = 'Ethernet'

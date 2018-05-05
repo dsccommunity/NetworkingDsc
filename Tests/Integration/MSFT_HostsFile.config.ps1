@@ -11,7 +11,7 @@ Configuration MSFT_HostsFile_Config
 
     Node $NodeName
     {
-        xHostsFile HostEntry
+        HostsFile HostEntry
         {
             HostName  = $Node.HostName
             IPAddress = $Node.IPAddress

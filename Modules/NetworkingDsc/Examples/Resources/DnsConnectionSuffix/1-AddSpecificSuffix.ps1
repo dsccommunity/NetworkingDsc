@@ -12,9 +12,10 @@ Configuration Example
     )
 
     Import-DscResource -Module NetworkingDsc
+
     Node $NodeName
     {
-        xDnsConnectionSuffix DnsConnectionSuffix
+        DnsConnectionSuffix DnsConnectionSuffix
         {
             InterfaceAlias           = 'Ethernet'
             ConnectionSpecificSuffix = 'contoso.com'

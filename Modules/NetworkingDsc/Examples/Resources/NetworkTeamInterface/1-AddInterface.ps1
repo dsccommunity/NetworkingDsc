@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetworkTeam HostTeam
+        NetworkTeam HostTeam
         {
             Name = 'HostTeam'
             TeamingMode = 'SwitchIndependent'
@@ -24,7 +24,7 @@ Configuration Example
             Ensure = 'Present'
         }
 
-        xNetworkTeamInterface NewInterface
+        NetworkTeamInterface NewInterface
         {
             Name = 'NewInterface'
             TeamName = 'HostTeam'

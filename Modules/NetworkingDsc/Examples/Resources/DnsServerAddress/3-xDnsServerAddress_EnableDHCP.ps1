@@ -15,14 +15,14 @@ Configuration Example
 
     Node $NodeName
     {
-        xDhcpClient EnableDhcpClient
+        DhcpClient EnableDhcpClient
         {
             State          = 'Enabled'
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPv4'
         }
 
-        xDnsServerAddress EnableDhcpDNS
+        DnsServerAddress EnableDhcpDNS
         {
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPv4'

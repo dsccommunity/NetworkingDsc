@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xFirewallProfile FirewallProfilePrivate
+        FirewallProfile FirewallProfilePrivate
         {
             Name = 'Private'
             Enabled = 'True'

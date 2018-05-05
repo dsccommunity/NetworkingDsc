@@ -16,21 +16,21 @@ Configuration Example
 
     Node $NodeName
     {
-        xDhcpClient DisabledDhcpClient
+        DhcpClient DisabledDhcpClient
         {
             State          = 'Disabled'
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPv6'
         }
 
-        xIPAddress NewIPv6Address
+        IPAddress NewIPv6Address
         {
             IPAddress      = '2001:4898:200:7:6c71:a102:ebd8:f482/64'
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPV6'
         }
 
-        xIPAddress NewIPv4Address
+        IPAddress NewIPv4Address
         {
             IPAddress      = '192.168.10.5/24'
             InterfaceAlias = 'Ethernet'

@@ -8,8 +8,9 @@ $TestDnsConnectionSuffix = [PSObject]@{
 
 configuration MSFT_DnsConnectionSuffix_Config {
     Import-DscResource -ModuleName NetworkingDsc
+
     node localhost {
-        xDnsConnectionSuffix Integration_Test {
+        DnsConnectionSuffix Integration_Test {
             InterfaceAlias                 = $TestDnsConnectionSuffix.InterfaceAlias
             ConnectionSpecificSuffix       = $TestDnsConnectionSuffix.ConnectionSpecificSuffix
             RegisterThisConnectionsAddress = $TestDnsConnectionSuffix.RegisterThisConnectionsAddress

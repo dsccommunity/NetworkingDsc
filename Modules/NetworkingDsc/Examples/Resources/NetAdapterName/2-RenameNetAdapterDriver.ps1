@@ -17,42 +17,42 @@ Configuration Example
 
     Node $NodeName
     {
-        xNetAdapterName RenameNetAdapterCluster
+        NetAdapterName RenameNetAdapterCluster
         {
             NewName           = 'Cluster'
             DriverDescription = 'Hyper-V Virtual Ethernet Adapter'
             InterfaceNumber   = 1
         }
 
-        xDhcpClient EnableDhcpClientCluster
+        DhcpClient EnableDhcpClientCluster
         {
             State          = 'Enabled'
             InterfaceAlias = 'Cluster'
             AddressFamily  = 'IPv4'
         }
 
-        xNetAdapterName RenameNetAdapterManagement
+        NetAdapterName RenameNetAdapterManagement
         {
             NewName           = 'Management'
             DriverDescription = 'Hyper-V Virtual Ethernet Adapter'
             InterfaceNumber   = 2
         }
 
-        xDhcpClient EnableDhcpClientManagement
+        DhcpClient EnableDhcpClientManagement
         {
             State          = 'Enabled'
             InterfaceAlias = 'Management'
             AddressFamily  = 'IPv4'
         }
 
-        xNetAdapterName RenameNetAdapterSMB
+        NetAdapterName RenameNetAdapterSMB
         {
             NewName           = 'SMB'
             DriverDescription = 'Hyper-V Virtual Ethernet Adapter'
             InterfaceNumber   = 3
         }
 
-        xDhcpClient EnableDhcpClientSMB
+        DhcpClient EnableDhcpClientSMB
         {
             State          = 'Enabled'
             InterfaceAlias = 'SMB'

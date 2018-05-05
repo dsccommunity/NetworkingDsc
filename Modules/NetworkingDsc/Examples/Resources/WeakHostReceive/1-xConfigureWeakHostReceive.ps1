@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xWeakHostSend DisableWeakHostReceiving
+        WeakHostSend DisableWeakHostReceiving
         {
             State          = 'Disabled'
             InterfaceAlias = 'Ethernet'

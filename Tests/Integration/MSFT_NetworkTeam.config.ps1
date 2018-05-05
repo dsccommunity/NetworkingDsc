@@ -5,7 +5,7 @@ configuration MSFT_NetworkTeam_Config
 
     node localhost
     {
-        xNetworkTeam HostTeam
+        NetworkTeam HostTeam
         {
             Name                   = $Node.Name
             TeamingMode            = $Node.TeamingMode

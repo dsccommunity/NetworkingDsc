@@ -8,7 +8,7 @@ configuration MSFT_DhcpClient_Config {
     Import-DscResource -ModuleName NetworkingDsc
 
     Node localhost {
-        xDhcpClient Integration_Test
+        DhcpClient Integration_Test
         {
             InterfaceAlias = $TestDhcpClient.InterfaceAlias
             AddressFamily  = $TestDhcpClient.AddressFamily

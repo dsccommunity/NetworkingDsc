@@ -8,7 +8,7 @@ configuration MSFT_DefaultGatewayAddress_Config {
     Import-DscResource -ModuleName NetworkingDsc
 
     Node localhost {
-        xDefaultGatewayAddress Integration_Test
+        DefaultGatewayAddress Integration_Test
         {
             InterfaceAlias = $TestDefaultGatewayAddress.InterfaceAlias
             AddressFamily  = $TestDefaultGatewayAddress.AddressFamily

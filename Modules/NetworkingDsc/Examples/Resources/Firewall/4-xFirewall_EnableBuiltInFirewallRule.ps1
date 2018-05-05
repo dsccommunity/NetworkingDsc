@@ -16,7 +16,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xFirewall Firewall
+        Firewall Firewall
         {
             Name                  = 'IIS-WebServerRole-HTTP-In-TCP'
             Ensure                = 'Present'

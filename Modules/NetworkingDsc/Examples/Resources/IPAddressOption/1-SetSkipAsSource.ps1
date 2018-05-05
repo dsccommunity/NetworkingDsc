@@ -15,7 +15,7 @@ Configuration Example
 
     Node $NodeName
     {
-        xIPAddressOption SetSkipAsSource
+        IPAddressOption SetSkipAsSource
         {
             IPAddress    = '192.168.10.5'
             SkipAsSource = $true
