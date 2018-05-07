@@ -2,36 +2,36 @@
 
 The **NetworkingDsc** module contains the following resources:
 
-- **xDefaultGatewayAddress**: Sets a node's default gateway address.
-- **xDhcpClient**: Enable or Disable DHCP on an network interface.
-- **xDnsClientGlobalSetting**: Configure DNS client global settings.
-- **xDnsConnectionSuffix**: Sets a node's network interface
+- **DefaultGatewayAddress**: Sets a node's default gateway address.
+- **DhcpClient**: Enable or Disable DHCP on an network interface.
+- **DnsClientGlobalSetting**: Configure DNS client global settings.
+- **DnsConnectionSuffix**: Sets a node's network interface
     connection-specific DNS suffix.
-- **xDnsServerAddress**: Sets a node's DNS server address(s).
-- **xFirewall**: Sets a node's firewall rules.
-- **xFirewallProfile**: Configures a node's private, public or domain firewall profile.
-- **xHostsFile**: Adds, edits or removes entries from the hosts file on a node.
-- **xIPAddress**: Sets a node's IP address(s).
-- **xIPAddressOption**: Sets an IP address option.
-- **xNetAdapterAdvancedProperty**: Sets advanced properties on a network adapter.
-- **xNetAdapterBinding**: Bind or unbind transport or filters to a network interface.
-- **xNetAdapterLso**: Enable or disable Lso for different protocols
+- **DnsServerAddress**: Sets a node's DNS server address(s).
+- **Firewall**: Sets a node's firewall rules.
+- **FirewallProfile**: Configures a node's private, public or domain firewall profile.
+- **HostsFile**: Adds, edits or removes entries from the hosts file on a node.
+- **IPAddress**: Sets a node's IP address(s).
+- **IPAddressOption**: Sets an IP address option.
+- **NetAdapterAdvancedProperty**: Sets advanced properties on a network adapter.
+- **NetAdapterBinding**: Bind or unbind transport or filters to a network interface.
+- **NetAdapterLso**: Enable or disable Lso for different protocols
     on a network adapter.
-- **xNetAdapterName**: Rename a network interface that matches specified search parameters.
-- **xNetAdapterRDMA**: Enable or disable RDMA on a network adapter.
-- **xNetAdapterRsc**: Enable or disable Rsc for different protocols
+- **NetAdapterName**: Rename a network interface that matches specified search parameters.
+- **NetAdapterRdma**: Enable or disable RDMA on a network adapter.
+- **NetAdapterRsc**: Enable or disable Rsc for different protocols
     on a network adapter.
-- **xNetAdapterRss**: Enable or disable Rss on a network adapter.
-- **xNetBIOS**: Enable or Disable NetBios on a network interface.
-- **xNetConnectionProfile**: Sets a node's connection profile.
-- **xNetworkTeam**: Set up network teams on a node.
-- **xNetworkTeamInterface**: Add network interfaces to a network team.
-- **xProxySettings**: Configures the proxy settings for the computer.
-- **xRoute**: Sets static routes on a node.
-- **xWeakHostSend**: Enable or disable the Weak Host Send setting on a network adapter.
-- **xWeakHostReceive**: Enable or disable the Weak Host Receive setting
+- **NetAdapterRss**: Enable or disable Rss on a network adapter.
+- **NetBios**: Enable or Disable NetBios on a network interface.
+- **NetConnectionProfile**: Sets a node's connection profile.
+- **NetworkTeam**: Set up network teams on a node.
+- **NetworkTeamInterface**: Add network interfaces to a network team.
+- **ProxySettings**: Configures the proxy settings for the computer.
+- **Route**: Sets static routes on a node.
+- **WeakHostSend**: Enable or disable the Weak Host Send setting on a network adapter.
+- **WeakHostReceive**: Enable or disable the Weak Host Receive setting
     on a network adapter.
-- **xWinsSetting**: Configure the WINS settings that enable or disable LMHOSTS lookups
+- **WinsSetting**: Configure the WINS settings that enable or disable LMHOSTS lookups
   and enable or disable DNS for name resolution over WINS.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
@@ -69,9 +69,9 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ## Known Issues
 
-### xFirewall Known Issues
+### Firewall Known Issues
 
-The following error may occur when applying xFirewall configurations on Windows
+The following error may occur when applying Firewall configurations on Windows
 Server 2012 R2 if [KB3000850](https://support.microsoft.com/en-us/kb/3000850) is
 not installed. Please ensure this update is installed if this error occurs.
 

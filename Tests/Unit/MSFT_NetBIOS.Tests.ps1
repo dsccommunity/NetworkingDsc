@@ -1,5 +1,5 @@
 $script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'MSFT_NetBIOS'
+$script:DSCResourceName = 'MSFT_NetBios'
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
 #region HEADER
@@ -62,8 +62,8 @@ try
             -PassThru
 
         #region Function Get-TargetResource
-        Describe 'MSFT_NetBIOS\Get-TargetResource' {
-            Context 'NetBIOS over TCP/IP is set to "Default"' {
+        Describe 'MSFT_NetBios\Get-TargetResource' {
+            Context 'NetBios over TCP/IP is set to "Default"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDefault}
 
@@ -82,7 +82,7 @@ try
                 }
             }
 
-            Context 'NetBIOS over TCP/IP is set to "Enable"' {
+            Context 'NetBios over TCP/IP is set to "Enable"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsEnable }
 
@@ -101,7 +101,7 @@ try
                 }
             }
 
-            Context 'NetBIOS over TCP/IP is set to "Disable"' {
+            Context 'NetBios over TCP/IP is set to "Disable"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
 
@@ -137,8 +137,8 @@ try
         #endregion
 
         #region Function Test-TargetResource
-        Describe 'MSFT_NetBIOS\Test-TargetResource' {
-            Context 'NetBIOS over TCP/IP is set to "Default"' {
+        Describe 'MSFT_NetBios\Test-TargetResource' {
+            Context 'NetBios over TCP/IP is set to "Default"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDefault }
 
@@ -151,7 +151,7 @@ try
                 }
             }
 
-            Context 'NetBIOS over TCP/IP is set to "Disable"' {
+            Context 'NetBios over TCP/IP is set to "Disable"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
 
@@ -164,7 +164,7 @@ try
                 }
             }
 
-            Context 'NetBIOS over TCP/IP is set to "Enable"' {
+            Context 'NetBios over TCP/IP is set to "Enable"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsEnable }
 
@@ -193,8 +193,8 @@ try
         #endregion
 
         #region Function Set-TargetResource
-        Describe 'MSFT_NetBIOS\Set-TargetResource' {
-            Context 'NetBIOS over TCP/IP should be set to "Default"' {
+        Describe 'MSFT_NetBios\Set-TargetResource' {
+            Context 'NetBios over TCP/IP should be set to "Default"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsEnable }
                 Mock -CommandName Set-ItemProperty
@@ -212,7 +212,7 @@ try
                 }
             }
 
-            Context 'NetBIOS over TCP/IP should be set to "Disable"' {
+            Context 'NetBios over TCP/IP should be set to "Disable"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsEnable }
                 Mock -CommandName Set-ItemProperty
@@ -230,7 +230,7 @@ try
                 }
             }
 
-            Context 'NetBIOS over TCP/IP should be set to "Enable"' {
+            Context 'NetBios over TCP/IP should be set to "Enable"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
                 Mock -CommandName Set-ItemProperty
@@ -249,7 +249,7 @@ try
                 }
             }
 
-            Context 'NetBIOS over TCP/IP should be set to "Enable" but error returned from "Invoke-CimMethod"' {
+            Context 'NetBios over TCP/IP should be set to "Enable" but error returned from "Invoke-CimMethod"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
                 Mock -CommandName Invoke-CimMethod -MockWith { @{ ReturnValue = 74 } }

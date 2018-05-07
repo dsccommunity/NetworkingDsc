@@ -1,5 +1,5 @@
 $script:DSCModuleName      = 'NetworkingDsc'
-$script:DSCResourceName    = 'MSFT_DNSServerAddress'
+$script:DSCResourceName    = 'MSFT_DnsServerAddress'
 
 #region HEADER
 # Integration Test Template Version: 1.1.0

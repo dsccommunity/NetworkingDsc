@@ -1,5 +1,5 @@
 $script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'MSFT_NetBIOS'
+$script:DSCResourceName = 'MSFT_NetBios'
 
 # Find an adapter we can test with. It needs to be enabled and have IP enabled.
 $netAdapter = $null
@@ -72,7 +72,7 @@ try
         }
 
     Describe "$($script:DSCResourceName)_Integration" {
-        Context 'Disable NetBIOS over TCP/IP' {
+        Context 'Disable NetBios over TCP/IP' {
             $configData = @{
                 AllNodes = @(
                     @{
@@ -111,7 +111,7 @@ try
             }
         }
 
-        Context 'Enable NetBIOS over TCP/IP' {
+        Context 'Enable NetBios over TCP/IP' {
             $configData = @{
                 AllNodes = @(
                     @{
@@ -150,7 +150,7 @@ try
             }
         }
 
-        Context 'Default NetBIOS over TCP/IP' {
+        Context 'Default NetBios over TCP/IP' {
             $configData = @{
                 AllNodes = @(
                     @{

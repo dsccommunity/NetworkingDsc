@@ -1,8 +1,8 @@
-configuration MSFT_DNSServerAddress_Config_Static {
+configuration MSFT_DnsServerAddress_Config_Static {
     Import-DscResource -ModuleName NetworkingDsc
 
     node localhost {
-        DNSServerAddress Integration_Test {
+        DnsServerAddress Integration_Test {
             InterfaceAlias = $Node.InterfaceAlias
             AddressFamily  = $Node.AddressFamily
             Address        = $Node.Address

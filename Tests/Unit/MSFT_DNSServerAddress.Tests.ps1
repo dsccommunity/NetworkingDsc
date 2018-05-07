@@ -1,5 +1,5 @@
 $script:DSCModuleName      = 'NetworkingDsc'
-$script:DSCResourceName    = 'MSFT_DNSServerAddress'
+$script:DSCResourceName    = 'MSFT_DnsServerAddress'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -24,7 +24,7 @@ try
 {
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
-        Describe 'MSFT_DNSServerAddress\Get-TargetResource' {
+        Describe 'MSFT_DnsServerAddress\Get-TargetResource' {
             Context 'Test IPv4' {
                 Context 'Invoking with an IPv4 address and one address is currently set' {
                     Mock Get-DnsClientServerStaticAddress -MockWith { '192.168.0.1' }
@@ -92,7 +92,7 @@ try
             }
         }
 
-        Describe 'MSFT_DNSServerAddress\Set-TargetResource' {
+        Describe 'MSFT_DnsServerAddress\Set-TargetResource' {
             Context 'Test IPv4' {
                 BeforeEach {
                     Mock Get-DnsClientServerStaticAddress -MockWith { '192.168.0.1' }
@@ -378,7 +378,7 @@ try
             }
         }
 
-        Describe 'MSFT_DNSServerAddress\Test-TargetResource' {
+        Describe 'MSFT_DnsServerAddress\Test-TargetResource' {
             Context 'Test IPv4' {
                 BeforeEach {
                     Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
@@ -568,7 +568,7 @@ try
             }
         }
 
-        Describe 'MSFT_DNSServerAddress\Assert-ResourceProperty' {
+        Describe 'MSFT_DnsServerAddress\Assert-ResourceProperty' {
             BeforeEach {
                 Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
             }

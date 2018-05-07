@@ -1,8 +1,8 @@
-configuration MSFT_NetBIOS_Config {
+configuration MSFT_NetBios_Config {
     Import-DscResource -ModuleName NetworkingDsc
 
     node localhost {
-        NetBIOS Integration_Test {
+        NetBios Integration_Test {
             InterfaceAlias      = $Node.InterfaceAlias
             Setting             = $Node.Setting
         }

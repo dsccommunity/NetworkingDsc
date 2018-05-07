@@ -12,7 +12,7 @@
     is why these tests can not be executed in AppVeyor.
 #>
 $script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'MSFT_NetAdapterRDMA'
+$script:DSCResourceName = 'MSFT_NetAdapterRdma'
 $script:AdapterName = 'vEthernet (Default Switch)'
 
 # Check the adapter selected for use in testing is RDMA compatible and preserve state
@@ -90,7 +90,7 @@ try
             $result.Enabled                | Should -Be $configData.AllNodes[0].Enabled
         }
 
-        Set-NetAdapterRDMA `
+        Set-NetAdapterRdma `
             -Name $configData.AllNodes[0].Name `
             -Enabled $false
     }

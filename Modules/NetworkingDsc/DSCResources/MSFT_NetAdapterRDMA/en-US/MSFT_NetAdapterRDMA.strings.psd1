@@ -1,10 +1,10 @@
-# Localized resources for MSFT_NetAdapterRDMA
+# Localized resources for MSFT_NetAdapterRdma
 
 ConvertFrom-StringData @'
-    GetNetAdapterRDMAMessage = Getting network adapter '{0}' RDMA setting.
+    GetNetAdapterRdmaMessage = Getting network adapter '{0}' RDMA setting.
     NetAdapterNotFoundError = Network adapter '{0}' not found.
-    CheckNetAdapterRDMAMessage = Checking the RDMA enabled state for network adapter '{0}'.
-    SetNetAdapterRDMAMessage = Setting network adapter '{0}' RDMA enabled to '{1}'.
-    NetAdapterRDMADifferentMessage = RDMA setting for network adapter '{0}' is not in desired state. This will be configured.
-    NetAdapterRDMAMatchesMessage = RDMA setting for network adapter '{0}' is in desired state. No action needed.
+    CheckNetAdapterRdmaMessage = Checking the RDMA enabled state for network adapter '{0}'.
+    SetNetAdapterRdmaMessage = Setting network adapter '{0}' RDMA enabled to '{1}'.
+    NetAdapterRdmaDifferentMessage = RDMA setting for network adapter '{0}' is not in desired state. This will be configured.
+    NetAdapterRdmaMatchesMessage = RDMA setting for network adapter '{0}' is in desired state. No action needed.
 '@

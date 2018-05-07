@@ -1,5 +1,5 @@
-[ClassVersion("1.0.0"), FriendlyName("DNSServerAddress")]
-class MSFT_DNSServerAddress : OMI_BaseResource
+[ClassVersion("1.0.0"), FriendlyName("DnsServerAddress")]
+class MSFT_DnsServerAddress : OMI_BaseResource
 {
     [Key, Description("Alias of the network interface for which the DNS server address is set.")] string InterfaceAlias;
     [Key, Description("IP address family."), ValueMap{"IPv4", "IPv6"},Values{"IPv4", "IPv6"}] string AddressFamily;

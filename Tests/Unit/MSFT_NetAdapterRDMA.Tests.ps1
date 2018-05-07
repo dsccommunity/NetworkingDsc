@@ -1,5 +1,5 @@
 $script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'MSFT_NetAdapterRDMA'
+$script:DSCResourceName = 'MSFT_NetAdapterRdma'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -30,12 +30,12 @@ try
             Name = $testAdapterName
         }
 
-        $mockNetAdapterRDMAEnabled = [PSCustomObject] @{
+        $mockNetAdapterRdmaEnabled = [PSCustomObject] @{
             Name    = $testAdapterName
             Enabled = $true
         }
 
-        $mockNetAdapterRDMADisabled = [PSCustomObject] @{
+        $mockNetAdapterRdmaDisabled = [PSCustomObject] @{
             Name    = $testAdapterName
             Enabled = $false
         }
@@ -65,7 +65,7 @@ try
             }
 
             Context 'Network Team exists' {
-                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRDMAEnabled }
+                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaEnabled }
 
                 It 'Should return network adapter RDMA properties' {
                     $Result = Get-TargetResource @targetParameters
@@ -123,7 +123,7 @@ try
 
             Context 'Net Adapter RDMA is already enabled and no action needed' {
                 Mock -CommandName Set-NetAdapterRdma
-                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRDMAEnabled }
+                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaEnabled }
 
                 It 'Should not throw exception' {
                     $setTargetResourceParameters = $targetParameters.Clone()
@@ -141,7 +141,7 @@ try
 
             Context 'Net Adapter RDMA is disabled and should be enabled' {
                 Mock -CommandName Set-NetAdapterRdma
-                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRDMADisabled }
+                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaDisabled }
 
                 It 'Should not throw exception' {
                     $setTargetResourceParameters = $targetParameters.Clone()
@@ -159,7 +159,7 @@ try
 
             Context 'Net Adapter RDMA is enabled and should be disabled' {
                 Mock -CommandName Set-NetAdapterRdma
-                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRDMAEnabled }
+                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaEnabled }
 
                 It 'Should not throw exception' {
                     $setTargetResourceParameters = $targetParameters.Clone()
@@ -177,7 +177,7 @@ try
 
             Context 'Net Adapter RDMA is already disabled and no action needed' {
                 Mock -CommandName Set-NetAdapterRdma
-                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRDMADisabled }
+                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaDisabled }
 
                 It 'Should not throw exception' {
                     $setTargetResourceParameters = $targetParameters.Clone()
@@ -222,7 +222,7 @@ try
             }
 
             Context 'Net Adapter RDMA is already enabled and no action needed' {
-                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRDMAEnabled }
+                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaEnabled }
 
                 It 'Should return true' {
                     $testTargetResourceParameters = $targetParameters.Clone()
@@ -236,7 +236,7 @@ try
             }
 
             Context 'Net Adapter RDMA is disabled and should be enabled' {
-                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRDMADisabled }
+                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaDisabled }
 
                 It 'Should return false' {
                     $testTargetResourceParameters = $targetParameters.Clone()
@@ -250,7 +250,7 @@ try
             }
 
             Context 'Net Adapter RDMA is enabled and should be disabled' {
-                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRDMAEnabled }
+                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaEnabled }
 
                 It 'Should return false' {
                     $testTargetResourceParameters = $targetParameters.Clone()
@@ -264,7 +264,7 @@ try
             }
 
             Context 'Net Adapter RDMA is already disabled and no action needed' {
-                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRDMADisabled }
+                Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaDisabled }
 
                 It 'Should return true' {
                     $testTargetResourceParameters = $targetParameters.Clone()

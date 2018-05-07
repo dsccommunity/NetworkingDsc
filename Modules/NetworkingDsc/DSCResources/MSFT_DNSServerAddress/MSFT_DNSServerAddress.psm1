@@ -12,7 +12,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_DNSServerAddress' `
+    -ResourceName 'MSFT_DnsServerAddress' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
@@ -51,7 +51,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.GettingDNSServerAddressesMessage)
+        $($LocalizedData.GettingDnsServerAddressesMessage)
         ) -join '')
 
     # Remove the parameters we don't want to splat
@@ -115,7 +115,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.ApplyingDNSServerAddressesMessage)
+        $($LocalizedData.ApplyingDnsServerAddressesMessage)
         ) -join '')
 
     # If address not passed, set to an empty array
@@ -231,7 +231,7 @@ function Test-TargetResource
     [Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.CheckingDNSServerAddressesMessage)
+        $($LocalizedData.CheckingDnsServerAddressesMessage)
         ) -join '' )
 
     # Validate the Address passed or set to empty array if not passed

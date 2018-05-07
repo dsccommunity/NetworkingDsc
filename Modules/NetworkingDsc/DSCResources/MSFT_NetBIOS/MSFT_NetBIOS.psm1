@@ -12,10 +12,10 @@ Import-Module -Name (Join-Path -Path $modulePath `
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_NetBIOS' `
+    -ResourceName 'MSFT_NetBios' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
-#region check NetBIOSSetting enum loaded, if not load
+#region check NetBiosSetting enum loaded, if not load
 try
 {
     [void][System.Reflection.Assembly]::GetAssembly([NetBiosSetting])

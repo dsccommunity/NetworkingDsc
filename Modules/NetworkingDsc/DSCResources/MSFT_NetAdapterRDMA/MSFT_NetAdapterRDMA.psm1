@@ -12,7 +12,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_NetAdapterRDMA' `
+    -ResourceName 'MSFT_NetAdapterRdma' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
@@ -40,7 +40,7 @@ function Get-TargetResource
 
     try
     {
-        Write-Verbose -Message ($localizedData.GetNetAdapterRDMAMessage -f $Name)
+        Write-Verbose -Message ($localizedData.GetNetAdapterRdmaMessage -f $Name)
 
         $netAdapterRdma = Get-NetAdapterRdma -Name $Name -ErrorAction Stop
     }
@@ -52,7 +52,7 @@ function Get-TargetResource
 
     if ($netAdapterRdma)
     {
-        Write-Verbose -Message ($localizedData.CheckNetAdapterRDMAMessage -f $Name)
+        Write-Verbose -Message ($localizedData.CheckNetAdapterRdmaMessage -f $Name)
 
         $configuration.Add('Enabled', $netAdapterRdma.Enabled)
     }
@@ -92,7 +92,7 @@ function Set-TargetResource
 
     try
     {
-        Write-Verbose -Message ($localizedData.GetNetAdapterRDMAMessage -f $Name)
+        Write-Verbose -Message ($localizedData.GetNetAdapterRdmaMessage -f $Name)
 
         $netAdapterRdma = Get-NetAdapterRdma -Name $Name -ErrorAction Stop
     }
@@ -104,11 +104,11 @@ function Set-TargetResource
 
     if ($netAdapterRdma)
     {
-        Write-Verbose -Message ($localizedData.CheckNetAdapterRDMAMessage -f $Name)
+        Write-Verbose -Message ($localizedData.CheckNetAdapterRdmaMessage -f $Name)
 
         if ($netAdapterRdma.Enabled -ne $Enabled)
         {
-            Write-Verbose -Message ($localizedData.SetNetAdapterRDMAMessage -f $Name, $Enabled)
+            Write-Verbose -Message ($localizedData.SetNetAdapterRdmaMessage -f $Name, $Enabled)
 
             Set-NetAdapterRdma -Name $Name -Enabled $Enabled
         }
@@ -144,7 +144,7 @@ function Test-TargetResource
 
     try
     {
-        Write-Verbose -Message ($localizedData.GetNetAdapterRDMAMessage -f $Name)
+        Write-Verbose -Message ($localizedData.GetNetAdapterRdmaMessage -f $Name)
 
         $netAdapterRdma = Get-NetAdapterRdma -Name $Name -ErrorAction Stop
     }
@@ -156,17 +156,17 @@ function Test-TargetResource
 
     if ($netAdapterRdma)
     {
-        Write-Verbose -Message ($localizedData.CheckNetAdapterRDMAMessage -f $Name)
+        Write-Verbose -Message ($localizedData.CheckNetAdapterRdmaMessage -f $Name)
 
         if ($netAdapterRdma.Enabled -ne $Enabled)
         {
-            Write-Verbose -Message ($localizedData.NetAdapterRDMADifferentMessage -f $Name)
+            Write-Verbose -Message ($localizedData.NetAdapterRdmaDifferentMessage -f $Name)
 
             return $false
         }
         else
         {
-            Write-Verbose -Message ($localizedData.NetAdapterRDMAMatchesMessage -f $Name)
+            Write-Verbose -Message ($localizedData.NetAdapterRdmaMatchesMessage -f $Name)
 
             return $true
         }
