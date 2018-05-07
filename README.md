@@ -71,9 +71,9 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ### Firewall Known Issues
 
-The following error may occur when applying Firewall configurations on Windows
-Server 2012 R2 if [KB3000850](https://support.microsoft.com/en-us/kb/3000850) is
-not installed. Please ensure this update is installed if this error occurs.
+The following error may occur when using the resource Firewall in configurations
+on Windows Server 2012 R2 if [KB3000850](https://support.microsoft.com/en-us/kb/3000850)
+is not installed. Please ensure this update is installed if this error occurs.
 
 ````markdown
     The cmdlet does not fully support the Inquire action for debug messages.
