@@ -1,7 +1,0 @@
-[ClassVersion("1.0.0.0"), FriendlyName("xIPAddress")]
-class MSFT_xIPAddress : OMI_BaseResource
-{
-    [Write, Description("The desired IP address, optionally including prefix length using CIDR notation.")] string IPAddress[];
-    [Key, Description("Alias of the network interface for which the IP address should be set.")] string InterfaceAlias;
-    [Key, Description("IP address family.") ,ValueMap{"IPv4", "IPv6"},Values{"IPv4", "IPv6"}] string AddressFamily;
-};
