@@ -208,15 +208,27 @@ function Set-TargetResource
 
     $ipAddressObject = Get-IPAddressPrefix -IPAddress $IPAddress -AddressFamily $AddressFamily
 
+    # Get updated IP addresses
+    $currentIPs = @(Get-NetIPAddress @getNetIPAddressParameters)
+
     foreach ($singleIP in $ipAddressObject)
     {
-        $prefixLength = $singleIP.prefixLength
-
         # Build parameter hash table
         $newNetIPAddressParameters = @{
             IPAddress      = $singleIP.IPAddress
-            prefixLength   = $prefixLength
+            prefixLength   = $singleIP.prefixLength
             InterfaceAlias = $InterfaceAlias
+        }
+
+        # Verifying IP address is not already set
+        $ipExists = $currentIPs | Where-Object IPAddress -eq $singleIP.IPAddress
+        if($null -ne $ipExists)
+        {
+            # If the IP address and prefix match we do not need to call new-netIPAddress
+            if(($singleIP.IPAddress -eq $ipExists.IPAddress) -and ($singleIP.prefixLength -eq $ipExists.prefixLength))
+            {
+                continue
+            }
         }
 
         # Apply the specified IP configuration
