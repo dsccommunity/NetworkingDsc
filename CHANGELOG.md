@@ -8,6 +8,8 @@
   - Updated DSCResources, Examples, Modules and Tests with new naming.
   - Updated Year to 2018 in License and Manifest.
   - Updated README.md from xNetworking to NetworkingDsc.
+- MSFT_IPAddress:
+  - Fixed bug in `Set-TargetResource` where it would fail setting multiple IP Addresses if one was already set - Fixes [Issue #323](https://github.com/PowerShell/NetworkingDsc/issues/323)
 
 ## 5.7.0.0
 
