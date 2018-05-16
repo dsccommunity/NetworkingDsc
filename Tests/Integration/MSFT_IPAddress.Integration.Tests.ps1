@@ -21,6 +21,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Configure Loopback Adapter
 . (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
 New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
+New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
 
 # Using try/finally to always cleanup even if something awful happens.
 try
@@ -54,9 +55,12 @@ try
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
-            $current.InterfaceAlias | Should -Be $TestIPAddress.InterfaceAlias
-            $current.AddressFamily  | Should -Be $TestIPAddress.AddressFamily
-            $current.IPAddress      | Should -Be $TestIPAddress.IPAddress
+            $current[0].InterfaceAlias | Should -Be $TestIPAddress.InterfaceAlias
+            $current[0].AddressFamily  | Should -Be $TestIPAddress.AddressFamily
+            $current[0].IPAddress      | Should -Be $TestIPAddress.IPAddress
+            $current[1].InterfaceAlias | Should -Be $TestMultipleIPAddress.InterfaceAlias
+            $current[1].AddressFamily  | Should -Be $TestMultipleIPAddress.AddressFamily
+            $current[1].IPAddress      | Should -Be $TestMultipleIPAddress.IPAddress
         }
     }
     #endregion
@@ -65,6 +69,7 @@ finally
 {
     # Remove Loopback Adapter
     Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
+    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
 
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
