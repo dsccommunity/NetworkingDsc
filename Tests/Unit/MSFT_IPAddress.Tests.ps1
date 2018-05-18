@@ -166,7 +166,7 @@ try
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 0
-                        Assert-MockCalled -CommandName New-NetIPAddress -Exactly -Times 1
+                        Assert-MockCalled -CommandName New-NetIPAddress -Exactly -Times 2
                     }
                 }
 
@@ -387,7 +387,7 @@ try
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 1
-                        Assert-MockCalled -CommandName New-NetIPAddress -Exactly -Times 1
+                        Assert-MockCalled -CommandName New-NetIPAddress -Exactly -Times 2
                     }
                 }
 
