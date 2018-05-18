@@ -208,9 +208,6 @@ function Set-TargetResource
 
     $ipAddressObject = Get-IPAddressPrefix -IPAddress $IPAddress -AddressFamily $AddressFamily
 
-    # Get updated IP addresses
-    $currentIPs = @(Get-NetIPAddress @getNetIPAddressParameters)
-
     foreach ($singleIP in $ipAddressObject)
     {
         # Build parameter hash table
@@ -220,19 +217,18 @@ function Set-TargetResource
             InterfaceAlias = $InterfaceAlias
         }
 
-        # Verifying IP address is not already set
-        $ipExists = $currentIPs | Where-Object IPAddress -eq $singleIP.IPAddress
-        if($null -ne $ipExists)
+        try
         {
-            # If the IP address and prefix match we do not need to call new-netIPAddress
-            if(($singleIP.IPAddress -eq $ipExists.IPAddress) -and ($singleIP.prefixLength -eq $ipExists.prefixLength))
-            {
-                continue
-            }
+            # Apply the specified IP configuration
+            New-NetIPAddress @newNetIPAddressParameters -ErrorAction Stop
         }
-
-        # Apply the specified IP configuration
-        $null = New-NetIPAddress @newNetIPAddressParameters -ErrorAction Stop
+        catch [Microsoft.Management.Infrastructure.CimException]
+        {
+            Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                $($LocalizedData.IPAddressMatchMessage)
+                ) -join '' )
+            continue
+        }
 
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                 $($LocalizedData.IPAddressSetStateMessage)
