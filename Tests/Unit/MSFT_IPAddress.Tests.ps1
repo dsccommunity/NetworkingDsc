@@ -117,7 +117,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 1
@@ -137,7 +137,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 1
@@ -151,12 +151,18 @@ try
                             InterfaceAlias = 'Ethernet'
                             AddressFamily  = 'IPv4'
                         }
+
+                        Mock -CommandName New-NetIPAddress -MockWith {
+                            throw [Microsoft.Management.Infrastructure.CimException] 'InvalidOperation'
+                        } -ParameterFilter { $IPaddress -eq '192.168.0.1' }
+
                         { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
                         $result | Should -BeNullOrEmpty
+
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 0
@@ -177,7 +183,7 @@ try
                     }
 
                     It 'Should call expected mocks' {
-                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 1
@@ -201,7 +207,7 @@ try
                     }
 
                     It 'Should call expected mocks' {
-                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 1
@@ -224,7 +230,7 @@ try
                     }
 
                     It 'Should call expected mocks' {
-                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 1
@@ -277,7 +283,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 1
@@ -298,7 +304,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 1
@@ -319,7 +325,7 @@ try
                     }
 
                     It 'Should call expected mocks' {
-                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 1
@@ -377,7 +383,7 @@ try
                     }
 
                     It 'Should call expected mocks' {
-                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 1
@@ -398,7 +404,7 @@ try
                     }
 
                     It 'Should call expected mocks' {
-                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 2
