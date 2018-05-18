@@ -224,6 +224,7 @@ function Set-TargetResource
         }
         catch [Microsoft.Management.Infrastructure.CimException]
         {
+            # The IP Address is already set
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                 $($LocalizedData.IPAddressMatchMessage)
                 ) -join '' )
