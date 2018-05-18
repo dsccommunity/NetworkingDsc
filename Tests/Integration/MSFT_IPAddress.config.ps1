@@ -6,7 +6,7 @@ $TestIPAddress = [PSObject]@{
 $TestMultipleIPAddress = [PSObject]@{
     InterfaceAlias          = 'NetworkingDscLBA2'
     AddressFamily           = 'IPv4'
-    IPAddress               = @('10.11.12.13/16','10.13.14.16/32')
+    IPAddress               = @('10.12.13.14/16','10.13.14.16/32')
 }
 
 configuration MSFT_IPAddress_Config {

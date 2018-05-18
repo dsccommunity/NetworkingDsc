@@ -60,7 +60,8 @@ try
             $current[0].IPAddress      | Should -Be $TestIPAddress.IPAddress
             $current[1].InterfaceAlias | Should -Be $TestMultipleIPAddress.InterfaceAlias
             $current[1].AddressFamily  | Should -Be $TestMultipleIPAddress.AddressFamily
-            $current[1].IPAddress      | Should -Be $TestMultipleIPAddress.IPAddress
+            $current[1].IPAddress      | Should -Contain $TestMultipleIPAddress.IPAddress[0]
+            $current[1].IPAddress      | Should -Contain $TestMultipleIPAddress.IPAddress[1]
         }
     }
     #endregion
