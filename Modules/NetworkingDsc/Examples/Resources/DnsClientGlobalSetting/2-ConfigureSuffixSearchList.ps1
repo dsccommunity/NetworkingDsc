@@ -24,5 +24,3 @@ Configuration Example
         }
     }
 }
-
-Example
