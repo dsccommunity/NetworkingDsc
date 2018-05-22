@@ -18,7 +18,7 @@ Configuration Example
         DnsClientGlobalSetting AddMultipleDNSSuffix
         {
             IsSingleInstance = 'Yes'
-            SuffixSearchList = { 'fabrikam.com','fourthcoffee.com' }
+            SuffixSearchList = ('fabrikam.com', 'fourthcoffee.com')
             UseDevolution    = $true
             DevolutionLevel  = 0
         }
