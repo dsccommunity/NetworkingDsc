@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- New Example for multiple SuffixSearchList entries 2-ConfigureSuffixSearchList.ps1.
 - BREAKING CHANGE:
   - Renamed xNetworking to NetworkingDsc - fixes [Issue #119](https://github.com/PowerShell/NetworkingDsc/issues/290).
   - Changed all MSFT\_xResourceName to MSFT\_ResourceName.
