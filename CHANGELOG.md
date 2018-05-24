@@ -9,7 +9,8 @@
   - Updated Year to 2018 in License and Manifest.
   - Updated README.md from xNetworking to NetworkingDsc.
 - MSFT_IPAddress:
-  - Updated to allow setting multiple IP Addresses when one is already set - Fixes [Issue #323](https://github.com/PowerShell/NetworkingDsc/issues/323)
+  - Updated to allow setting multiple IP Addresses
+    when one is already set - Fixes [Issue #323](https://github.com/PowerShell/NetworkingDsc/issues/323)
 
 ## 5.7.0.0
 
