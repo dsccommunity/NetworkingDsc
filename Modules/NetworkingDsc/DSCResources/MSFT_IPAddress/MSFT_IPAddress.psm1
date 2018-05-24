@@ -234,7 +234,7 @@ function Set-TargetResource
             #>
             $verifyNetIPAddressAdapter = Get-NetIPAddress @verifyNetIPAddressAdapterParam -ErrorAction SilentlyContinue
 
-            if($verifyNetIPAddressAdapter.InterfaceAlias -eq $InterfaceAlias)
+            if ($verifyNetIPAddressAdapter.InterfaceAlias -eq $InterfaceAlias)
             {
                 # The IP Address is already set on the correct interface
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
