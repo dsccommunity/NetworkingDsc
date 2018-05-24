@@ -224,10 +224,30 @@ function Set-TargetResource
         }
         catch [Microsoft.Management.Infrastructure.CimException]
         {
-            # The IP Address is already set
-            Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+            $verifyNetIPAddressAdapterParam = @{
+                IPAddress      = $singleIP.IPAddress
+                prefixLength   = $singleIP.prefixLength
+            }
+            <#
+                Setting New-NetIPaddress will throw [Microsoft.Management.Infrastructure.CimException] if
+                the IP address is already set. Need to check to make sure the IP is set on correct interface
+            #>
+            $verifyNetIPAddressAdapter = Get-NetIPAddress @verifyNetIPAddressAdapterParam -ErrorAction SilentlyContinue
+
+            if($verifyNetIPAddressAdapter.InterfaceAlias -eq $InterfaceAlias)
+            {
+                # The IP Address is already set on the correct interface
+                Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                 $($LocalizedData.IPAddressMatchMessage)
                 ) -join '' )
+            }
+            else
+            {
+                Write-Error -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.IPAddressDoesNotMatchInterfaceAliasMessage) -f $InterfaceAlias,$verifyNetIPAddressAdapter.InterfaceAlias
+                ) -join '' )
+            }
             continue
         }
 
