@@ -238,8 +238,8 @@ function Set-TargetResource
             {
                 # The IP Address is already set on the correct interface
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.IPAddressMatchMessage)
-                ) -join '' )
+                        $($LocalizedData.IPAddressMatchMessage)
+                    ) -join '' )
             }
             else
             {
