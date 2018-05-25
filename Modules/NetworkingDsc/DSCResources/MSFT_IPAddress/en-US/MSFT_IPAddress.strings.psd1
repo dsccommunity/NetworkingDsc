@@ -7,6 +7,7 @@ ConvertFrom-StringData @'
     CheckingIPAddressMessage = Checking the IP Address.
     IPAddressDoesNotMatchMessage = IP Address does NOT match desired state. Expected {0}, actual {1}.
     IPAddressMatchMessage = IP Address is in desired state.
+    IPAddressDoesNotMatchInterfaceAliasMessage = IP Address set on different InterfaceAlias. Expected {0}, actual {1}.
     PrefixLengthDoesNotMatchMessage = Prefix Length does NOT match desired state. Expected {0}, actual {1}.
     PrefixLengthMatchMessage = Prefix Length is in desired state.
     DHCPIsNotDisabledMessage = DHCP is NOT disabled.

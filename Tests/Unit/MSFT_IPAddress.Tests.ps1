@@ -145,6 +145,81 @@ try
                     }
                 }
 
+                Context 'Invoked with multiple valid IP Addresses with one currently set' {
+                    It 'Should return $null' {
+                        $setTargetResourceParameters = @{
+                            IPAddress      = @('192.168.0.1/16', '10.0.0.3/24')
+                            InterfaceAlias = 'Ethernet'
+                            AddressFamily  = 'IPv4'
+                        }
+
+                        Mock -CommandName New-NetIPAddress -MockWith {
+                            throw [Microsoft.Management.Infrastructure.CimException] 'InvalidOperation'
+                        } -ParameterFilter { $IPaddress -eq '192.168.0.1' }
+
+                        Mock -CommandName Get-NetIPAddress -MockWith {
+                            [PSCustomObject] @{
+                                IPAddress      = '192.168.0.1'
+                                InterfaceAlias = 'Ethernet'
+                                PrefixLength   = [System.Byte] 16
+                                AddressFamily  = 'IPv4'
+                            }
+                        } -ParameterFilter { $IPaddress -eq '192.168.0.1' }
+
+                        Mock -CommandName Write-Error
+
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
+                    }
+
+                    It 'Should call all the mocks' {
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
+                        Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
+                        Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 0
+                        Assert-MockCalled -CommandName New-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Write-Error -Exactly -Times 0
+                    }
+                }
+
+                Context 'Invoked with multiple valid IP Addresses with one currently set on another adapter' {
+                    It 'Should return $null' {
+                        $setTargetResourceParameters = @{
+                            IPAddress      = @('192.168.0.1/16', '10.0.0.3/24')
+                            InterfaceAlias = 'Ethernet'
+                            AddressFamily  = 'IPv4'
+                        }
+
+                        Mock -CommandName New-NetIPAddress -MockWith {
+                            throw [Microsoft.Management.Infrastructure.CimException] 'InvalidOperation'
+                        } -ParameterFilter { $IPaddress -eq '192.168.0.1' }
+
+                        Mock -CommandName Get-NetIPAddress -MockWith {
+                            [PSCustomObject] @{
+                                IPAddress      = '192.168.0.1'
+                                InterfaceAlias = 'Ethernet2'
+                                PrefixLength   = [System.Byte] 16
+                                AddressFamily  = 'IPv4'
+                            }
+                        } -ParameterFilter { $IPaddress -eq '192.168.0.1' }
+
+                        Mock -CommandName Write-Error
+
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
+
+                    }
+
+                    It 'Should call all the mocks' {
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
+                        Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
+                        Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 0
+                        Assert-MockCalled -CommandName New-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName Write-Error -Exactly -Times 1
+                    }
+                }
+
                 Context 'Invoked IPv4 Class A with no prefix' {
                     It 'Should return $null' {
                         $setTargetResourceParameters = @{

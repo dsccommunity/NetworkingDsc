@@ -210,17 +210,46 @@ function Set-TargetResource
 
     foreach ($singleIP in $ipAddressObject)
     {
-        $prefixLength = $singleIP.prefixLength
-
         # Build parameter hash table
         $newNetIPAddressParameters = @{
             IPAddress      = $singleIP.IPAddress
-            prefixLength   = $prefixLength
+            prefixLength   = $singleIP.prefixLength
             InterfaceAlias = $InterfaceAlias
         }
 
-        # Apply the specified IP configuration
-        $null = New-NetIPAddress @newNetIPAddressParameters -ErrorAction Stop
+        try
+        {
+            # Apply the specified IP configuration
+            New-NetIPAddress @newNetIPAddressParameters -ErrorAction Stop
+        }
+        catch [Microsoft.Management.Infrastructure.CimException]
+        {
+            $verifyNetIPAddressAdapterParam = @{
+                IPAddress      = $singleIP.IPAddress
+                prefixLength   = $singleIP.prefixLength
+            }
+            <#
+                Setting New-NetIPaddress will throw [Microsoft.Management.Infrastructure.CimException] if
+                the IP address is already set. Need to check to make sure the IP is set on correct interface
+            #>
+            $verifyNetIPAddressAdapter = Get-NetIPAddress @verifyNetIPAddressAdapterParam -ErrorAction SilentlyContinue
+
+            if ($verifyNetIPAddressAdapter.InterfaceAlias -eq $InterfaceAlias)
+            {
+                # The IP Address is already set on the correct interface
+                Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                        $($LocalizedData.IPAddressMatchMessage)
+                    ) -join '' )
+            }
+            else
+            {
+                Write-Error -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.IPAddressDoesNotMatchInterfaceAliasMessage) -f $InterfaceAlias,$verifyNetIPAddressAdapter.InterfaceAlias
+                ) -join '' )
+            }
+            continue
+        }
 
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                 $($LocalizedData.IPAddressSetStateMessage)
