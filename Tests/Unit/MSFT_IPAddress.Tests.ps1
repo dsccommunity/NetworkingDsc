@@ -170,7 +170,6 @@ try
 
                         { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
                         $result | Should -BeNullOrEmpty
-
                     }
 
                     It 'Should call all the mocks' {
