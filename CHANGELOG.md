@@ -16,6 +16,8 @@
 - Corrected CHANGELOG.MD to report that issue with InterfaceAlias matching
   on Adapter description rather than Adapter Name was released in 5.7.0.0
   rather than 5.6.0.0 - See [Issue #315](https://github.com/PowerShell/xNetworking/issues/315).
+- MSFT_WaitForNetworkTeam:
+  - Added a new resource to set the wait for a network team to become 'Up'.
 
 ## 5.7.0.0
 
