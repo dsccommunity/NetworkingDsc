@@ -13,6 +13,9 @@
 - MSFT_IPAddress:
   - Updated to allow setting multiple IP Addresses
     when one is already set - Fixes [Issue #323](https://github.com/PowerShell/NetworkingDsc/issues/323)
+- Corrected CHANGELOG.MD to report that issue with InterfaceAlias matching
+  on Adapter description rather than Adapter Name was released in 5.7.0.0
+  rather than 5.6.0.0 - See [Issue #315](https://github.com/PowerShell/xNetworking/issues/315).
 
 ## 5.7.0.0
 
@@ -20,6 +23,9 @@
 - MSFT_xNetAdapterAdvancedProperty:
   - Enabled setting the same property on multiple network
     adapters - Fixes [issue #324](https://github.com/PowerShell/xNetworking/issues/324).
+- MSFT_xNetBIOS:
+  - Fix issue with InterfaceAlias matching on Adapter description
+    rather than Adapter Name - Fixes [Issue #315](https://github.com/PowerShell/xNetworking/issues/315).
 
 ## 5.6.0.0
 
@@ -36,8 +42,6 @@
 - MSFT_xNetBIOS:
   - Corrected style and formatting to meet HQRM guidelines.
   - Ensured CommonTestHelper.psm1 is loaded before running unit tests.
-  - Fix issue with InterfaceAlias matching on Adapter description
-    rather than Adapter Name - Fixes [Issue #315](https://github.com/PowerShell/xNetworking/issues/315).
 - MSFT_xNetworkTeam:
   - Corrected style and formatting to meet HQRM guidelines.
   - Added missing default from MOF description of Ensure parameter.
