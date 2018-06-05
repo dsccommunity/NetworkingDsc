@@ -95,7 +95,6 @@ function Test-NetworkTeamIntegrationEnvironment
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
         [System.String[]]
         $NetworkAdapters
     )
