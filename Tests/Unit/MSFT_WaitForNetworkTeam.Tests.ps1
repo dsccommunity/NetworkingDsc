@@ -103,7 +103,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        Set-targetResource @testTeamParameters
+                        Set-TargetResource @testTeamParameters
                     } | Should -Not -Throw
                 }
 
@@ -122,7 +122,7 @@ try
 
                 It 'Should throw VolumeNotFoundAfterError' {
                     {
-                        Set-targetResource @testTeamParameters
+                        Set-TargetResource @testTeamParameters
                     } | Should -Throw $errorRecord
                 }
 

@@ -81,6 +81,54 @@ function Get-InvalidOperationRecord
     return New-Object @newObjectParams
 }
 
+<#
+    .SYNOPSIS
+        Determines if Network Team integration tests can be executed.
+
+    .PARAMETER NetworkAdapters
+        The network adapters that should be used for integration testing.
+#>
+function Test-NetworkTeamIntegrationEnvironment
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String[]]
+        $NetworkAdapters
+    )
+
+    $executeTests = $true
+
+    if ($env:APPVEYOR -ne $true)
+    {
+        Write-Warning -Message 'Performing Network Teaming integration tests on AppVeyor is not possible.'
+        $executeTests = $false
+    }
+
+    if ($NetworkAdapters.Count -lt 2)
+    {
+        Write-Warning -Message 'Performing Network Teaming integration tests requires at least two compatible network adapters to be specified.'
+        $executeTests = $false
+    }
+
+    foreach ($NetworkAdapter in $NetworkAdapters)
+    {
+        $adapter = Get-NetAdapter -Name $NetworkAdapter -ErrorAction SilentlyContinue
+        if (-not $adapter)
+        {
+            Write-Warning -Message ('Network Teaming integration test adapter ''{0}'' could not be found.' -f $NetworkAdapter)
+            $executeTests = $false
+        }
+    }
+
+    return $executeTests
+}
+
+
 Export-ModuleMember -Function `
     Get-InvalidArgumentRecord, `
-    Get-InvalidOperationRecord
+    Get-InvalidOperationRecord, `
+    Test-NetworkTeamIntegrationEnvironment
