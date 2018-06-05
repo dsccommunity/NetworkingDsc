@@ -94,14 +94,14 @@ function Test-NetworkTeamIntegrationEnvironment
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String[]]
         $NetworkAdapters
     )
 
     $executeTests = $true
 
-    if ($env:APPVEYOR -ne $true)
+    if ($env:APPVEYOR -eq $true)
     {
         Write-Warning -Message 'Performing Network Teaming integration tests on AppVeyor is not possible.'
         $executeTests = $false
@@ -125,7 +125,6 @@ function Test-NetworkTeamIntegrationEnvironment
 
     return $executeTests
 }
-
 
 Export-ModuleMember -Function `
     Get-InvalidArgumentRecord, `

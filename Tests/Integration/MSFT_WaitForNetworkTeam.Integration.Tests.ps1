@@ -17,7 +17,15 @@ $script:NetworkTeamMembers = @()
 $script:DSCModuleName      = 'NetworkingDsc'
 $script:DSCResourceName    = 'MSFT_WaitForNetworkTeam'
 
+# Load the common test helper
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
+
+# Check if integration tests can be run
+if (-not (Test-NetworkTeamIntegrationEnvironment -NetworkAdapters $script:NetworkTeamMembers))
+{
+    Write-Warning -Message 'Integration tests will be skipped.'
+    return
+}
 
 #region HEADER
 # Integration Test Template Version: 1.1.1
@@ -29,14 +37,6 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-
-# Check if integration tests can be run
-if (-not (Test-NetworkTeamIntegrationEnvironment -NetworkAdapters $script:NetworkTeamMembers))
-{
-    Write-Warning -Message 'Integration tests will be skipped.'
-    return
-}
-
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:DSCModuleName `
     -DSCResourceName $script:DSCResourceName `
