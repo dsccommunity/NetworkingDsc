@@ -15,6 +15,12 @@
     when one is already set - Fixes [Issue #323](https://github.com/PowerShell/NetworkingDsc/issues/323)
 - MSFT_WaitForNetworkTeam:
   - Added a new resource to set the wait for a network team to become 'Up'.
+- MSFT_NetworkTeam:
+  - Improved detection of environmemt for running network team integration
+    tests.
+- MSFT_NetworkTeamInterface:
+  - Improved detection of environmemt for running network team integration
+    tests.
 
 ## 5.7.0.0
 
