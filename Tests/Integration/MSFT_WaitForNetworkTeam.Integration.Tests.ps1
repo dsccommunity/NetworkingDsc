@@ -15,7 +15,7 @@
 #>
 $script:NetworkTeamMembers = @()
 $script:DSCModuleName      = 'NetworkingDsc'
-$script:DSCResourceName    = 'MSFT_NetworkTeam'
+$script:DSCResourceName    = 'MSFT_WaitForNetworkTeam'
 
 # Load the common test helper
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
@@ -50,20 +50,25 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
+        $null = New-NetLbfoTeam `
+            -Name 'TestTeam' `
+            -TeamMembers $script:NetworkTeamMembers `
+            -LoadBalancingAlgorithm 'MacAddresses' `
+            -TeamingMode 'SwitchIndependent' `
+            -Confirm:$false
+
         $configurationData = @{
             AllNodes = @(
                 @{
                     NodeName               = 'localhost'
                     Name                   = 'TestTeam'
-                    Members                = $script:NetworkTeamMembers
-                    LoadBalancingAlgorithm = 'MacAddresses'
-                    TeamingMode            = 'SwitchIndependent'
-                    Ensure                 = 'Present'
+                    RetryIntervalSec       = 2
+                    RetryCount             = 30
                 }
             )
         }
 
-        Context 'When the network team is created' {
+        Context 'When the network team has been created' {
             It 'Should compile and apply the MOF without throwing' {
                 {
                     & "$($script:DSCResourceName)_Config" `
@@ -77,20 +82,6 @@ try
                         -Verbose `
                         -Force `
                         -ErrorAction Stop
-
-                    # Wait for up to 60 seconds for the team to be created
-                    $count = 0
-                    While (-not (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue))
-                    {
-                        Start-Sleep -Seconds 1
-
-                        if ($count -ge 60)
-                        {
-                            break
-                        }
-
-                        $count++
-                    }
                 } | Should -Not -Throw
             }
 
@@ -104,56 +95,6 @@ try
                 }
                 $result.Ensure                 | Should -Be $configurationData.AllNodes[0].Ensure
                 $result.Name                   | Should -Be $configurationData.AllNodes[0].Name
-                $result.TeamMembers            | Should -Be $configurationData.AllNodes[0].Members
-                $result.LoadBalancingAlgorithm | Should -Be $configurationData.AllNodes[0].LoadBalancingAlgorithm
-                $result.TeamingMode            | Should -Be $configurationData.AllNodes[0].TeamingMode
-            }
-        }
-
-        $configurationData.AllNodes[0].Ensure = 'Absent'
-
-        Context 'When the network team is deleted' {
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configurationData
-
-                    Start-DscConfiguration `
-                        -Path $TestDrive `
-                        -ComputerName localhost `
-                        -Wait `
-                        -Verbose `
-                        -Force `
-                        -ErrorAction Stop
-
-                    # Wait for up to 60 seconds for the team to be removed
-                    $count = 0
-                    While (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue)
-                    {
-                        Start-Sleep -Seconds 1
-
-                        if ($count -ge 60)
-                        {
-                            break
-                        }
-
-                        $count++
-                    }
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should have set the resource and all the parameters should match' {
-                $result = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
-                }
-                $result.Ensure                 | Should -Be $configurationData.AllNodes[0].Ensure
-                $result.Name                   | Should -Be $configurationData.AllNodes[0].Name
-                $result.TeamMembers            | Should -Be $configurationData.AllNodes[0].Members
             }
         }
     }

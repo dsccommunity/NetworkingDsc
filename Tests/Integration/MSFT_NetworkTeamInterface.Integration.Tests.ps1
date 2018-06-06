@@ -2,22 +2,34 @@
     These tests can not be run in AppVeyor as this will cause the network
     adapter to disconnect and terminate the build.
 
-    They can be run by commenting out the return below. All the physical
-    adapters in the machine will be used to create the team. The team will
-    be removed when tests are complete.
+    They can only be run if two teaming compatible network adapters are
+    present on the test machine and the adapters can be safely used in
+    a team during the test process.
 
     Loopback adapters can not be used for NIC teaming and only server OS
     SKU machines will support it.
-#>
-return
 
+    To enable this test to be run, add the names of the adapters to use
+    for testing into the $script:NetworkTeamMembers array below. E.g.
+    $script:NetworkTeamMembers = @('Ethernet','Ethernet 2')
+#>
+$script:NetworkTeamMembers = @()
 $script:DSCModuleName      = 'NetworkingDsc'
 $script:DSCResourceName    = 'MSFT_NetworkTeamInterface'
 
-#region HEADER
-# Integration Test Template Version: 1.1.0
-[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\NetworkingDsc'
+# Load the common test helper
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
+# Check if integration tests can be run
+if (-not (Test-NetworkTeamIntegrationEnvironment -NetworkAdapters $script:NetworkTeamMembers))
+{
+    Write-Warning -Message 'Integration tests will be skipped.'
+    return
+}
+
+#region HEADER
+# Integration Test Template Version: 1.1.1
+[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\NetworkingDsc'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -39,14 +51,12 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        $teamMembers = (Get-NetAdapter -Physical).Name
-
         $configurationData = @{
             AllNodes = @(
                 @{
                     NodeName               = 'localhost'
                     TeamName               = 'TestTeam'
-                    Members                = $teamMembers
+                    Members                = $script:NetworkTeamMembers
                     LoadBalancingAlgorithm = 'MacAddresses'
                     TeamingMode            = 'SwitchIndependent'
                     Ensure                 = 'Present'

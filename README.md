@@ -28,6 +28,7 @@ The **NetworkingDsc** module contains the following resources:
 - **NetworkTeamInterface**: Add network interfaces to a network team.
 - **ProxySettings**: Configures the proxy settings for the computer.
 - **Route**: Sets static routes on a node.
+- **WaitForNetworkTeam**: Wait for a network team to achieve the 'Up' status.
 - **WeakHostSend**: Enable or disable the Weak Host Send setting on a network adapter.
 - **WeakHostReceive**: Enable or disable the Weak Host Receive setting
     on a network adapter.
