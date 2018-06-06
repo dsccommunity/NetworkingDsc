@@ -109,7 +109,12 @@ function Test-NetworkTeamIntegrationEnvironment
 
     if ($NetworkAdapters.Count -lt 2)
     {
-        Write-Warning -Message 'Performing Network Teaming integration tests requires at least two compatible network adapters to be specified.'
+        Write-Warning -Message (@(
+            'Performing Network Teaming integration tests requires at least two compatible'
+            'network adapters to be specified.'
+            'Please see the comment based help in the header of the integration tests for'
+            'instruction on how to specify the network adapters to use.'
+        ) -join ' ')
         $executeTests = $false
     }
 
