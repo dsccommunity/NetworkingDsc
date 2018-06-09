@@ -24,6 +24,8 @@
 - MSFT_NetworkTeamInterface:
   - Improved detection of environmemt for running network team integration
     tests.
+- Added a CODE\_OF\_CONDUCT.md with the same content as in the README.md - fixes
+  [Issue #337](https://github.com/PowerShell/NetworkingDsc/issues/337).
 
 ## 5.7.0.0
 
