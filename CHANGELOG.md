@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.0.0.0
+
 - New Example 2-ConfigureSuffixSearchList.ps1 for multiple
   SuffixSearchList entries for resource DnsClientGlobalSetting.
 - BREAKING CHANGE:
