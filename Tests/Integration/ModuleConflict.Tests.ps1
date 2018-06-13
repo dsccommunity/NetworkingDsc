@@ -1,13 +1,13 @@
-$script:DSCModuleName      = 'xNetworking'
+$script:DSCModuleName      = 'NetworkingDsc'
 <#
     These integration tests ensure that exported cmdlets names do not conflict
     with any other names that are exposed by other common resource kit modules.
 #>
-$script:ModulesToTest = @( 'xStorage','xComputerManagement','xDFS' )
+$script:ModulesToTest = @( 'StorageDsc','ComputerManagementDsc','DFSDsc' )
 
 #region HEADER
 # Integration Test Template Version: 1.1.0
-[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xNetworking'
+[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\NetworkingDsc'
 
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
@@ -28,7 +28,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     Describe "$($script:DSCModuleName)_CommonModuleConflict" {
-        
+
         foreach ($moduleToTest in $script:ModulesToTest)
         {
             It "Should be able to install DSC Resource module '$moduleToTest'" {

@@ -2,12 +2,42 @@
 
 ## Unreleased
 
+## 6.0.0.0
+
+- New Example 2-ConfigureSuffixSearchList.ps1 for multiple
+  SuffixSearchList entries for resource DnsClientGlobalSetting.
+- BREAKING CHANGE:
+  - Renamed xNetworking to NetworkingDsc - fixes [Issue #119](https://github.com/PowerShell/NetworkingDsc/issues/290).
+  - Changed all MSFT\_xResourceName to MSFT\_ResourceName.
+  - Updated DSCResources, Examples, Modules and Tests with new naming.
+  - Updated Year to 2018 in License and Manifest.
+  - Updated README.md from xNetworking to NetworkingDsc.
+- MSFT_IPAddress:
+  - Updated to allow setting multiple IP Addresses
+    when one is already set - Fixes [Issue #323](https://github.com/PowerShell/NetworkingDsc/issues/323)
+- Corrected CHANGELOG.MD to report that issue with InterfaceAlias matching
+  on Adapter description rather than Adapter Name was released in 5.7.0.0
+  rather than 5.6.0.0 - See [Issue #315](https://github.com/PowerShell/xNetworking/issues/315).
+- MSFT_WaitForNetworkTeam:
+  - Added a new resource to set the wait for a network team to become 'Up'.
+- MSFT_NetworkTeam:
+  - Improved detection of environmemt for running network team integration
+    tests.
+- MSFT_NetworkTeamInterface:
+  - Improved detection of environmemt for running network team integration
+    tests.
+- Added a CODE\_OF\_CONDUCT.md with the same content as in the README.md - fixes
+  [Issue #337](https://github.com/PowerShell/NetworkingDsc/issues/337).
+
 ## 5.7.0.0
 
 - Enabled PSSA rule violations to fail build - Fixes [Issue #320](https://github.com/PowerShell/xNetworking/issues/320).
 - MSFT_xNetAdapterAdvancedProperty:
   - Enabled setting the same property on multiple network
     adapters - Fixes [issue #324](https://github.com/PowerShell/xNetworking/issues/324).
+- MSFT_xNetBIOS:
+  - Fix issue with InterfaceAlias matching on Adapter description
+    rather than Adapter Name - Fixes [Issue #315](https://github.com/PowerShell/xNetworking/issues/315).
 
 ## 5.6.0.0
 
@@ -24,8 +54,6 @@
 - MSFT_xNetBIOS:
   - Corrected style and formatting to meet HQRM guidelines.
   - Ensured CommonTestHelper.psm1 is loaded before running unit tests.
-  - Fix issue with InterfaceAlias matching on Adapter description
-    rather than Adapter Name - Fixes [Issue #315](https://github.com/PowerShell/xNetworking/issues/315).
 - MSFT_xNetworkTeam:
   - Corrected style and formatting to meet HQRM guidelines.
   - Added missing default from MOF description of Ensure parameter.

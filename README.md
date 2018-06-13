@@ -1,63 +1,61 @@
-# xNetworking
+# NetworkingDsc
 
-The **xNetworking** module contains the following resources:
+The **NetworkingDsc** module contains the following resources:
 
-- **xDefaultGatewayAddress**: Sets a node's default gateway address.
-- **xDhcpClient**: Enable or Disable DHCP on an network interface.
-- **xDnsClientGlobalSetting**: Configure DNS client global settings.
-- **xDnsConnectionSuffix**: Sets a node's network interface
+- **DefaultGatewayAddress**: Sets a node's default gateway address.
+- **DhcpClient**: Enable or Disable DHCP on an network interface.
+- **DnsClientGlobalSetting**: Configure DNS client global settings.
+- **DnsConnectionSuffix**: Sets a node's network interface
     connection-specific DNS suffix.
-- **xDnsServerAddress**: Sets a node's DNS server address(s).
-- **xFirewall**: Sets a node's firewall rules.
-- **xFirewallProfile**: Configures a node's private, public or domain firewall profile.
-- **xHostsFile**: Adds, edits or removes entries from the hosts file on a node.
-- **xIPAddress**: Sets a node's IP address(s).
-- **xIPAddressOption**: Sets an IP address option.
-- **xNetAdapterAdvancedProperty**: Sets advanced properties on a network adapter.
-- **xNetAdapterBinding**: Bind or unbind transport or filters to a network interface.
-- **xNetAdapterLso**: Enable or disable Lso for different protocols
+- **DnsServerAddress**: Sets a node's DNS server address(s).
+- **Firewall**: Sets a node's firewall rules.
+- **FirewallProfile**: Configures a node's private, public or domain firewall profile.
+- **HostsFile**: Adds, edits or removes entries from the hosts file on a node.
+- **IPAddress**: Sets a node's IP address(s).
+- **IPAddressOption**: Sets an IP address option.
+- **NetAdapterAdvancedProperty**: Sets advanced properties on a network adapter.
+- **NetAdapterBinding**: Bind or unbind transport or filters to a network interface.
+- **NetAdapterLso**: Enable or disable Lso for different protocols
     on a network adapter.
-- **xNetAdapterName**: Rename a network interface that matches specified search parameters.
-- **xNetAdapterRDMA**: Enable or disable RDMA on a network adapter.
-- **xNetAdapterRsc**: Enable or disable Rsc for different protocols
+- **NetAdapterName**: Rename a network interface that matches specified search parameters.
+- **NetAdapterRdma**: Enable or disable RDMA on a network adapter.
+- **NetAdapterRsc**: Enable or disable Rsc for different protocols
     on a network adapter.
-- **xNetAdapterRss**: Enable or disable Rss on a network adapter.
-- **xNetBIOS**: Enable or Disable NetBios on a network interface.
-- **xNetConnectionProfile**: Sets a node's connection profile.
-- **xNetworkTeam**: Set up network teams on a node.
-- **xNetworkTeamInterface**: Add network interfaces to a network team.
-- **xProxySettings**: Configures the proxy settings for the computer.
-- **xRoute**: Sets static routes on a node.
-- **xWeakHostSend**: Enable or disable the Weak Host Send setting on a network adapter.
-- **xWeakHostReceive**: Enable or disable the Weak Host Receive setting
+- **NetAdapterRss**: Enable or disable Rss on a network adapter.
+- **NetBios**: Enable or Disable NetBios on a network interface.
+- **NetConnectionProfile**: Sets a node's connection profile.
+- **NetworkTeam**: Set up network teams on a node.
+- **NetworkTeamInterface**: Add network interfaces to a network team.
+- **ProxySettings**: Configures the proxy settings for the computer.
+- **Route**: Sets static routes on a node.
+- **WaitForNetworkTeam**: Wait for a network team to achieve the 'Up' status.
+- **WeakHostSend**: Enable or disable the Weak Host Send setting on a network adapter.
+- **WeakHostReceive**: Enable or disable the Weak Host Receive setting
     on a network adapter.
-- **xWinsSetting**: Configure the WINS settings that enable or disable LMHOSTS lookups
+- **WinsSetting**: Configure the WINS settings that enable or disable LMHOSTS lookups
   and enable or disable DNS for name resolution over WINS.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/)
-or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any
-additional questions or comments.
+This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 
 ## Documentation and Examples
 
-For a full list of resources in xNetworking and examples on their use, check out
-the [xNetworking wiki](https://github.com/PowerShell/xNetworking/wiki).
+For a full list of resources in NetworkingDsc and examples on their use, check out
+the [NetworkingDsc wiki](https://github.com/PowerShell/NetworkingDsc/wiki).
 
 ## Branches
 
 ### master
 
-[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/master)
-[![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/NetworkingDsc/branch/master)
+[![codecov](https://codecov.io/gh/PowerShell/NetworkingDsc/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/NetworkingDsc/branch/master)
 
 This is the branch containing the latest release - no contributions should be made
 directly to this branch.
 
 ### dev
 
-[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xNetworking/branch/dev)
-[![codecov](https://codecov.io/gh/PowerShell/xNetworking/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xNetworking/branch/dev)
+[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/NetworkingDsc/branch/dev)
+[![codecov](https://codecov.io/gh/PowerShell/NetworkingDsc/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/NetworkingDsc/branch/dev)
 
 This is the development branch to which contributions should be proposed by contributors
 as pull requests. This development branch will periodically be merged to the master
@@ -69,11 +67,11 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ## Known Issues
 
-### xFirewall Known Issues
+### Firewall Known Issues
 
-The following error may occur when applying xFirewall configurations on Windows
-Server 2012 R2 if [KB3000850](https://support.microsoft.com/en-us/kb/3000850) is
-not installed. Please ensure this update is installed if this error occurs.
+The following error may occur when using the resource Firewall in configurations
+on Windows Server 2012 R2 if [KB3000850](https://support.microsoft.com/en-us/kb/3000850)
+is not installed. Please ensure this update is installed if this error occurs.
 
 ````markdown
     The cmdlet does not fully support the Inquire action for debug messages.
