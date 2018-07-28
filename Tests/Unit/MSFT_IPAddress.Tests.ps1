@@ -289,6 +289,27 @@ try
                         }
                     }
                 }
+
+                Context 'Invoked with parameter "KeepExistingAddress"' {
+                    It 'Should return $null' {
+                        $setTargetResourceParameters = @{
+                            IPAddress           = '10.0.0.2/24'
+                            InterfaceAlias      = 'Ethernet'
+                            AddressFamily       = 'IPv4'
+                            KeepExistingAddress = $true
+                        }
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
+                    }
+
+                    It 'Should call all the mocks' {
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
+                        Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
+                        Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
+                        Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 0
+                        Assert-MockCalled -CommandName New-NetIPAddress -Exactly -Times 1
+                    }
+                }
             }
 
             Context 'A single IPv6 address is currently set on the adapter' {
@@ -382,6 +403,28 @@ try
                         Assert-MockCalled -CommandName New-NetIPAddress -Exactly -Times 1
                     }
                 }
+
+                Context 'Invoked with parameter "KeepExistingAddress"' {
+                    It 'Should return $null' {
+                        $setTargetResourceParameters = @{
+                            IPAddress           = 'fe80::17/64'
+                            InterfaceAlias      = 'Ethernet'
+                            AddressFamily       = 'IPv6'
+                            KeepExistingAddress = $true
+                        }
+
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
+                    }
+
+                    It 'Should call all the mocks' {
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
+                        Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
+                        Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
+                        Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 0
+                        Assert-MockCalled -CommandName New-NetIPAddress -Exactly -Times 1
+                    }
+                }
             }
 
             Context 'Multiple IPv4 addresses are currently set on the adapter' {
@@ -458,6 +501,50 @@ try
                         Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
                         Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 2
+                        Assert-MockCalled -CommandName New-NetIPAddress -Exactly -Times 1
+                    }
+                }
+
+                Context 'Invoked with parameter "KeepExistingAddress" and different prefixes' {
+                    It 'Should return $null' {
+                        $setTargetResourceParameters = @{
+                            IPAddress      = '10.0.0.2/24', '172.16.4.19/16'
+                            InterfaceAlias = 'Ethernet'
+                            AddressFamily  = 'IPv4'
+                            KeepExistingAddress = $true
+                        }
+
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
+                    }
+
+                    It 'Should call expected mocks' {
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
+                        Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
+                        Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
+                        Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 0
+                        Assert-MockCalled -CommandName New-NetIPAddress -Exactly -Times 2
+                    }
+                }
+
+                Context 'Invoked with parameter "KeepExistingAddress" and existing IP with different prefix' {
+                    It 'Should return $null' {
+                        $setTargetResourceParameters = @{
+                            IPAddress      = '172.16.4.19/24'
+                            InterfaceAlias = 'Ethernet'
+                            AddressFamily  = 'IPv4'
+                            KeepExistingAddress = $true
+                        }
+
+                        { $result = Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
+                        $result | Should -BeNullOrEmpty
+                    }
+
+                    It 'Should call expected mocks' {
+                        Assert-MockCalled -CommandName Get-NetIPAddress -Exactly -Times 1
+                        Assert-MockCalled -CommandName Get-NetRoute -Exactly -Times 1
+                        Assert-MockCalled -CommandName Remove-NetRoute -Exactly -Times 1
+                        Assert-MockCalled -CommandName Remove-NetIPAddress -Exactly -Times 1
                         Assert-MockCalled -CommandName New-NetIPAddress -Exactly -Times 1
                     }
                 }

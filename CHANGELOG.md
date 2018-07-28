@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- MSFT_IPAddress:
+  - Updated to allow retaining existing addresses in order to support cluster
+    configurations as well
+
 ## 6.0.0.0
 
 - New Example 2-ConfigureSuffixSearchList.ps1 for multiple
