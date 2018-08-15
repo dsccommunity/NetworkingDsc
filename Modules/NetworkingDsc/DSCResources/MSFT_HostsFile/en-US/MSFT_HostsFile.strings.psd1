@@ -8,4 +8,5 @@ ConvertFrom-StringData @'
     StartingGet = Looking up host entry for {0}.
     StartingSet = Setting host entry for {0}.
     StartingTest = Testing host entry for {0}.
+    SkippingEmptyHost = Skipping empty host name entry in hosts file for IP address {0} in line '{1}'.
 '@

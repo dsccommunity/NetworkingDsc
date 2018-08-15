@@ -219,19 +219,25 @@ function Get-HostEntry
 
     $allHosts = foreach ($line in $hostContent)
     {
-        if($line -match '^\s*(?<IpAddress>[0-9.:]+)\s+(?<HostName>[\w\s\.]+)')
+        if ($line -match '^\s*(?<IpAddress>[0-9.:]+)\s+(?<HostName>[\w\s\.]+)')
         {
-            if ([System.String]::IsNullOrWhiteSpace($Matches.HostName)) { continue }
+            if ([System.String]::IsNullOrWhiteSpace($Matches.HostName))
+            {
+                # If, for some reason, $Matches.HostName is empty, .Trim() will throw, so we skip the entry.
+                Write-Verbose -Message ($LocalizedData.SkippingEmptyHost -f $Matches.IPAddress,$line)
+                continue
+            }
+
             $hostEntry = ($Matches.HostName).Trim()
             $ipEntry = $Matches.IpAddress
 
-            [string[]]$multiLineHosts = $hostEntry -split '\s+'
+            [string[]] $multiLineHosts = $hostEntry -split '\s+'
 
-            foreach($multiLineHost in $multiLineHosts)
+            foreach ($multiLineHost in $multiLineHosts)
             {
-                [PSCustomObject]@{
-                HostName = $multiLineHost
-                IpAddress = $Matches.IpAddress
+                [PSCustomObject] @{
+                    HostName = $multiLineHost
+                    IpAddress = $Matches.IpAddress
                 }
             }
         }
@@ -241,9 +247,9 @@ function Get-HostEntry
 
     if ($filteredHosts)
     {
-        return ([PSCustomObject]@{
+        return ([PSCustomObject] @{
             HostName = $HostName
-            IPAddress = [string[]]$filteredHosts.IpAddress
+            IPAddress = [string[]] $filteredHosts.IpAddress
         })
     }
 }
