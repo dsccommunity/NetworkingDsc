@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- MSFT_HostsFile:
+  - Updated Get-HostEntry method to return multiple IP addresses
+  - Updated resource to be able to work with multiple IP addresses for one
+    host name - fixes [Issue #301](https://github.com/PowerShell/NetworkingDsc/issues/301).
+
 ## 6.0.0.0
 
 - New Example 2-ConfigureSuffixSearchList.ps1 for multiple
