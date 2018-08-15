@@ -39,7 +39,7 @@ function Get-TargetResource
         $HostName,
 
         [Parameter()]
-        [System.String]
+        [System.String[]]
         $IPAddress,
 
         [Parameter()]
@@ -93,7 +93,7 @@ function Set-TargetResource
         $HostName,
 
         [Parameter()]
-        [System.String]
+        [System.String[]]
         $IPAddress,
 
         [Parameter()]
@@ -117,52 +117,38 @@ function Set-TargetResource
     if ($currentValues.Ensure -eq 'Absent' -and $Ensure -eq 'Present')
     {
         Write-Verbose -Message ($LocalizedData.CreateNewEntry -f $HostName)
-        Add-Content -Path $hostPath -Value "`r`n$IPAddress`t$HostName"
+        foreach ($desiredIp in $IPAddress)
+        {
+            Add-Content -Path $hostPath -Value "`r`n$desiredIp`t$HostName"
+        }
     }
     else
     {
         $hosts = Get-Content -Path $hostPath
-        $replace = $hosts | Where-Object -FilterScript {
-            [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false -and $_ -like "*$HostName*"
-        }
 
-        $multiLineEntry = $false
-        $data = $replace -split '\s+'
-
-        if ($data.Length -gt 2)
+        <#
+          Remove all entries. If Ensure is set to present,
+          add the desired host name entries again.
+        #>
+        foreach ($hostAddress in (Get-HostEntry -HostName $HostName).IPAddress)
         {
-            $multiLineEntry = $true
+            <#
+              Replace all occurrences of $HostName
+              as well as lines with a (now) lone IP address.
+            #>
+            $hosts = $hosts -replace "$($HostName -replace '\.','\.')"
+            $hosts = $hosts -replace "^\s*[0-9.:]+\s+$"
         }
 
         if ($Ensure -eq 'Present')
         {
-            Write-Verbose -Message ($LocalizedData.UpdateExistingEntry -f $HostName)
-
-            if ($multiLineEntry -eq $true)
+            foreach ($desiredIp in $IPAddress)
             {
-                $newReplaceLine = $replace -replace $HostName, ''
-                $hosts = $hosts -replace $replace, $newReplaceLine
-                $hosts += "$IPAddress`t$HostName"
-            }
-            else
-            {
-                $hosts = $hosts -replace $replace, "$IPAddress`t$HostName"
+                $hosts += "$desiredIp`t$HostName"
             }
         }
-        else
-        {
-            Write-Verbose -Message ($LocalizedData.RemoveEntry -f $HostName)
 
-            if ($multiLineEntry -eq $true)
-            {
-                $newReplaceLine = $replace -replace $HostName, ''
-                $hosts = $hosts -replace $replace, $newReplaceLine
-            }
-            else
-            {
-                $hosts = $hosts -replace $replace, ''
-            }
-        }
+        $hosts = $hosts | Where-Object {-not [System.String]::IsNullOrWhiteSpace($_)}
 
         Set-Content -Path $hostPath -Value $hosts
     }
@@ -192,7 +178,7 @@ function Test-TargetResource
         $HostName,
 
         [Parameter()]
-        [System.String]
+        [System.String[]]
         $IPAddress,
 
         [Parameter()]
@@ -210,7 +196,8 @@ function Test-TargetResource
         return $false
     }
 
-    if ($Ensure -eq 'Present' -and $IPAddress -ne $currentValues.IPAddress)
+    # If Compare-Object returns anything, the list of entries is different from the desired state
+    if ($Ensure -eq 'Present' -and (Compare-Object -ReferenceObject $IPAddress -DifferenceObject $currentValues.IPAddress))
     {
         return $false
     }
@@ -228,56 +215,35 @@ function Get-HostEntry
     )
 
     $hostPath = "$env:windir\System32\drivers\etc\hosts"
+    $hostContent = Get-Content -Encoding Ascii -Path $hostPath
 
-    $allHosts = Get-Content -Path $hostPath | Where-Object -FilterScript {
-        [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false
+    $allHosts = foreach ($line in $hostContent)
+    {
+        if($line -match '^\s*(?<IpAddress>[0-9.:]+)\s+(?<HostName>[\w\s\.]+)')
+        {
+            if ([System.String]::IsNullOrWhiteSpace($Matches.HostName)) { continue }
+            $hostEntry = ($Matches.HostName).Trim()
+            $ipEntry = $Matches.IpAddress
+
+            [string[]]$multiLineHosts = $hostEntry -split '\s+'
+
+            foreach($multiLineHost in $multiLineHosts)
+            {
+                [PSCustomObject]@{
+                HostName = $multiLineHost
+                IpAddress = $Matches.IpAddress
+                }
+            }
+        }
     }
 
-    foreach ($hosts in $allHosts)
+    $filteredHosts = $allHosts | Where-Object HostName -eq $HostName
+
+    if ($filteredHosts)
     {
-        $data = $hosts -split '\s+'
-
-        if ($data.Length -gt 2)
-        {
-            # Account for host entries that have multiple entries on a single line
-            $result = @()
-            $array = @()
-
-            for ($i = 1; $i -lt $data.Length; $i++)
-            {
-                <#
-                    Filter commments on the line.
-                    Example: 0.0.0.0 s.gateway.messenger.live.com # breaks Skype GH-183
-                    becomes:
-                    0.0.0.0 s.gateway.messenger.live.com
-                #>
-                if ($data[$i] -eq '#')
-                {
-                    break
-                }
-
-                $array += $data[$i]
-            }
-
-            $result = @{
-                Host      = $array
-                IPAddress = $data[0]
-            }
-        }
-        else
-        {
-            $result = @{
-                Host      = $data[1]
-                IPAddress = $data[0]
-            }
-        }
-
-        if ($result.Host -eq $HostName)
-        {
-            return @{
-                HostName  = $result.Host
-                IPAddress = $result.IPAddress
-            }
-        }
+        return ([PSCustomObject]@{
+            HostName = $HostName
+            IPAddress = [string[]]$filteredHosts.IpAddress
+        })
     }
 }
