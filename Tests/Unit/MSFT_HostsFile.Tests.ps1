@@ -86,7 +86,8 @@ try
 
                 It 'Should create all entries in the set method' {
                     Set-TargetResource @testParams
-                    Assert-MockCalled -CommandName Add-Content -Exactly -Times 2
+                    Assert-MockCalled -CommandName Add-Content -Exactly -Times 1 -ParameterFilter {$Value -like "*$($testParams.IPAddress[0])*"}
+                    Assert-MockCalled -CommandName Add-Content -Exactly -Times 1 -ParameterFilter {$Value -like "*$($testParams.IPAddress[1])*"}
                 }
             }
 
