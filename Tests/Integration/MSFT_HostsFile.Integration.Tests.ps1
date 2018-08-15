@@ -38,7 +38,7 @@ try
 
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
         . $configFile -Verbose -ErrorAction Stop
-
+        
         It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:DSCResourceName)_Config" `
@@ -48,11 +48,11 @@ try
                     -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
             } | Should -Not -Throw
         }
-
+        
         It 'Should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
-
+        
         It 'Should have set the resource and all the parameters should match' {
             $result = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
@@ -77,7 +77,7 @@ try
 
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
         . $configFile -Verbose -ErrorAction Stop
-
+        
         It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:DSCResourceName)_Config" `
@@ -87,11 +87,11 @@ try
                     -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
             } | Should -Not -Throw
         }
-
+        
         It 'Should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
-
+        
         It 'Should have set the resource and all the parameters should match' {
             $result = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
@@ -116,7 +116,7 @@ try
 
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
         . $configFile -Verbose -ErrorAction Stop
-
+        
         It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:DSCResourceName)_Config" `
@@ -126,11 +126,89 @@ try
                     -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
             } | Should -Not -Throw
         }
-
+        
         It 'Should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
+        
+        It 'Should have set the resource and all the parameters should match' {
+            $result = Get-DscConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+            }
+            $result.Ensure                 | Should -Be $configData.AllNodes[0].Ensure
+            $result.HostName               | Should -Be $configData.AllNodes[0].HostName
+            $result.IPAddress              | Should -BeNullOrEmpty
+        }
+    }
+    
+    Describe "$($script:DSCResourceName)_Integration - Add multiple entries" {
+        $configData = @{
+            AllNodes = @(
+                @{
+                    NodeName  = 'localhost'
+                    HostName  = 'Host01'
+                    IPAddress = '192.168.0.1','192.168.0.2'
+                    Ensure    = 'Present'
+                }
+            )
+        }
 
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+        . $configFile -Verbose -ErrorAction Stop
+        
+        It 'Should compile and apply the MOF without throwing' {
+            {
+                & "$($script:DSCResourceName)_Config" `
+                    -OutputPath $TestDrive `
+                    -ConfigurationData $configData
+                Start-DscConfiguration `
+                    -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+            } | Should -Not -Throw
+        }
+        
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+        
+        It 'Should have set the resource and all the parameters should match' {
+            $result = Get-DscConfiguration | Where-Object -FilterScript {
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+            }
+            $result.Ensure                                                                                          | Should -Be $configData.AllNodes[0].Ensure
+            $result.HostName                                                                                        | Should -Be $configData.AllNodes[0].HostName
+            (Compare-Object -ReferenceObject $result.IPAddress -DifferenceObject $configData.AllNodes[0].IPAddress) | Should -Be $null
+        }
+    }
+
+    Describe "$($script:DSCResourceName)_Integration - Remove multiple entries" {
+        $configData = @{
+            AllNodes = @(
+                @{
+                    NodeName  = 'localhost'
+                    HostName  = 'Host01'
+                    IPAddress = '192.168.0.1','192.168.0.2'
+                    Ensure    = 'Absent'
+                }
+            )
+        }
+
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+        . $configFile -Verbose -ErrorAction Stop
+        
+        It 'Should compile and apply the MOF without throwing' {
+            {
+                & "$($script:DSCResourceName)_Config" `
+                    -OutputPath $TestDrive `
+                    -ConfigurationData $configData
+                Start-DscConfiguration `
+                    -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+            } | Should -Not -Throw
+        }
+        
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+        
         It 'Should have set the resource and all the parameters should match' {
             $result = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"

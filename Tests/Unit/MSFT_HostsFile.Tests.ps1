@@ -59,6 +59,37 @@ try
                 }
             }
 
+            Context 'A host entry with multiple addresses does not exist, and should' {
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156','192.168.0.157'
+                    Verbose   = $true
+                }
+
+                Mock -CommandName Get-Content -MockWith {
+                    return @(
+                        '# A mocked example of a host file - this line is a comment',
+                        '',
+                        '127.0.0.1       localhost',
+                        '127.0.0.1  www.anotherexample.com',
+                        ''
+                    )
+                }
+
+                It 'Should return absent from the get method' {
+                    (Get-TargetResource @testParams).Ensure | Should -Be 'Absent'
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParams | Should -Be $false
+                }
+
+                It 'Should create all entries in the set method' {
+                    Set-TargetResource @testParams
+                    Assert-MockCalled -CommandName Add-Content -Exactly -Times 2
+                }
+            }
+
             Context 'A host entry exists but has the wrong IP address' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
