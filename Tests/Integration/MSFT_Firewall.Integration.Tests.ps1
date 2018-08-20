@@ -34,7 +34,9 @@ try
     $parameterList = $resourceData.ParameterList
 
     # Create a config data object to pass to the Add Rule Config
-    $ruleName = [Guid]::NewGuid()
+    $ruleNameGuid = [Guid]::NewGuid().ToString()
+    $ruleName = $ruleNameGuid + '[]*'
+    $ruleNameEscaped = $ruleNameGuid + '`[`]`*'
     $configData = @{
         AllNodes = @(
             @{
@@ -88,7 +90,12 @@ try
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
                 Start-DscConfiguration `
-                    -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force `
+                    -ErrorAction Stop
             } | Should -Not -Throw
         }
 
@@ -98,7 +105,7 @@ try
         #endregion
 
         # Get the Rule details
-        $firewallRule = Get-NetFireWallRule -Name $ruleName
+        $firewallRule = Get-NetFireWallRule -Name $ruleNameEscaped
 
         $properties = @{
             AddressFilters       = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
@@ -173,7 +180,12 @@ try
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
                 Start-DscConfiguration `
-                    -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force `
+                    -ErrorAction Stop
             } | Should -Not -Throw
         }
 
@@ -184,7 +196,7 @@ try
 
         It 'Should have deleted the rule' {
             # Get the Rule details
-            $firewallRule = Get-NetFireWallRule -Name $ruleName -ErrorAction SilentlyContinue
+            $firewallRule = Get-NetFireWallRule -Name $ruleNameEscaped -ErrorAction SilentlyContinue
             $firewallRule | Should -BeNullOrEmpty
         }
     }
@@ -193,9 +205,9 @@ try
 finally
 {
     #region FOOTER
-    if (Get-NetFirewallRule -Name $ruleName -ErrorAction SilentlyContinue)
+    if (Get-NetFirewallRule -Name $ruleNameEscaped -ErrorAction SilentlyContinue)
     {
-        Remove-NetFirewallRule -Name $ruleName
+        Remove-NetFirewallRule -Name $ruleNameEscaped
     }
 
     Restore-TestEnvironment -TestEnvironment $TestEnvironment

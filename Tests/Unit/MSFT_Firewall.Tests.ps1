@@ -27,17 +27,21 @@ try
 
         #region Pester Test Initialization
         # Get the rule that will be used for testing
-        $firewallRuleName = (Get-NetFirewallRule | `
-                Sort-Object Name | `
-                Where-Object { $_.DisplayGroup -ne $null } | `
-                Select-Object -first 1).Name
-        $firewallRule = Get-FirewallRule -Name $firewallRuleName
+        $firewallRule = Get-NetFirewallRule |
+                Sort-Object -Property Name |
+                Where-Object {
+                    $_.DisplayGroup -ne $null
+                } |
+                Select-Object -First 1
+        $firewallRuleName = $firewallRule.Name
         $Properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
         # Pull two rules to use testing that error is thrown when this occurs
-        $firewallRules = (Get-NetFirewallRule | `
-                Sort-Object Name | `
-                Where-Object { $_.DisplayGroup -ne $null } | `
-                Select-Object -first 2)
+        $firewallRules = Get-NetFirewallRule |
+                Sort-Object -Property Name |
+                Where-Object -FilterScript {
+                    $_.DisplayGroup -ne $null
+                } |
+                Select-Object -First 2
         #endregion
 
         #region Function Get-TargetResource
@@ -140,7 +144,7 @@ try
                 Mock -CommandName Get-FirewallRuleProperty -MockWith { $Properties }
             }
 
-            Context 'Ensure is Absent and Firewall Exist' {
+            Context 'Ensure is Absent and Firewall rule exists' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Remove-NetFirewallRule
 
@@ -150,7 +154,26 @@ try
                 }
             }
 
-            Context 'Ensure is Absent and the Firewall Does Not Exist' {
+            Context 'Ensure is Absent and Firewall rule with wildcard characters in name exists' {
+                It "Should call expected mocks on firewall rule 'Test [With] Wildcard*'" {
+                    Mock `
+                        -CommandName Remove-NetFirewallRule `
+                        -ParameterFilter {
+                            $Name -eq 'Test `[With`] Wildcard`*'
+                        }
+
+                    $result = Set-TargetResource -Name 'Test [With] Wildcard*' -Ensure 'Absent'
+
+                    Assert-MockCalled `
+                        -CommandName Remove-NetFirewallRule `
+                        -ParameterFilter {
+                            $Name -eq 'Test `[With`] Wildcard`*'
+                        } `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'Ensure is Absent and the Firewall rule does not exist' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Get-FirewallRule
                     Mock -CommandName Remove-NetFirewallRule
@@ -161,7 +184,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Not Exist' {
+            Context 'Ensure is Present and the Firewall rule does not exist' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Get-FirewallRule
                     Mock -CommandName New-NetFirewallRule
@@ -173,7 +196,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different DisplayName' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different DisplayName' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -188,7 +211,32 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Group' {
+            Context 'Ensure is Present and the Firewall rule with wildcard characters in name does exist but has a different DisplayName' {
+                It "Should call expected mocks on firewall rule 'Test [With] Wildcard*'" {
+                    Mock `
+                        -CommandName Set-NetFirewallRule `
+                        -ParameterFilter {
+                            $Name -eq 'Test `[With`] Wildcard`*'
+                        }
+                    Mock -CommandName Test-RuleProperties -MockWith { return $false }
+
+                    $result = Set-TargetResource `
+                        -Name 'Test [With] Wildcard*' `
+                        -DisplayName 'Different' `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled `
+                        -CommandName Set-NetFirewallRule `
+                        -ParameterFilter {
+                            $Name -eq 'Test `[With`] Wildcard`*'
+                        } `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled -CommandName Test-RuleProperties -Exactly -Times 1
+                }
+            }
+
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Group' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName New-NetFirewallRule
                     Mock -CommandName Remove-NetFirewallRule
@@ -206,7 +254,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Enabled' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Enabled' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -230,7 +278,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Action' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Action' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -254,7 +302,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Profile' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Profile' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -278,7 +326,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Direction' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Direction' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -302,7 +350,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different RemotePort' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different RemotePort' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -317,7 +365,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different LocalPort' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different LocalPort' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -332,7 +380,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Protocol' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Protocol' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -356,7 +404,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Description' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Description' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -371,7 +419,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Program' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Program' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -386,7 +434,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Service' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Service' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -401,7 +449,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Authentication' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Authentication' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -425,7 +473,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Encryption' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Encryption' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -449,7 +497,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different InterfaceAlias' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different InterfaceAlias' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -464,7 +512,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different InterfaceType' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different InterfaceType' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -488,7 +536,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different LocalAddress' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different LocalAddress' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -503,7 +551,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different LocalUser' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different LocalUser' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -518,7 +566,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Package' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Package' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -533,7 +581,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Platform' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Platform' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -548,7 +596,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different RemoteAddress' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different RemoteAddress' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -563,7 +611,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different RemoteMachine' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different RemoteMachine' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -578,7 +626,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different RemoteUser' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different RemoteUser' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -593,7 +641,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different DynamicTransport' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different DynamicTransport' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -607,7 +655,7 @@ try
                     Assert-MockCalled -CommandName Test-RuleProperties -Exactly -Times 1
                 }
             }
-            Context 'Ensure is Present and the Firewall Does Exist but has a different EdgeTraversalPolicy' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different EdgeTraversalPolicy' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -622,7 +670,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different IcmpType' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different IcmpType' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -637,7 +685,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different LocalOnlyMapping' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different LocalOnlyMapping' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -652,7 +700,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different LooseSourceMapping' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different LooseSourceMapping' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -667,7 +715,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different OverrideBlockRules' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different OverrideBlockRules' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -682,7 +730,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist but has a different Owner' {
+            Context 'Ensure is Present and the Firewall rule does exist but has a different Owner' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
@@ -697,7 +745,7 @@ try
                 }
             }
 
-            Context 'Ensure is Present and the Firewall Does Exist and is the same' {
+            Context 'Ensure is Present and the Firewall rule does exist and is the same' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $true }
@@ -1130,7 +1178,7 @@ try
 
         #region Function Get-FirewallRule
         Describe 'MSFT_Firewall\Get-FirewallRule' {
-            Context 'testing with firewall that exists' {
+            Context 'esting with firewall that exists' {
                 It "Should return a firewall rule when name is passed on firewall rule $($firewallRule.Name)" {
                     $result = Get-FirewallRule -Name $firewallRule.Name
                     $result | Should -Not -BeNullOrEmpty
@@ -1154,9 +1202,31 @@ try
                     { $result = Get-FirewallRule -Name $firewallRule.Name } | Should -Throw $errorRecord
                 }
             }
+
+            Context 'testing with firewall that exists and name contains wildcard characters' {
+                Mock `
+                    -CommandName Get-NetFirewallRule `
+                    -ParameterFilter {
+                        $Name -eq 'Test `[With`] Wildcard`*'
+                    } `
+                    -MockWith { $firewallRule }
+
+                It 'Should return a firewall rule when name is passed with wildcard characters' {
+                    $result = Get-FirewallRule -Name 'Test [With] Wildcard*'
+                    $result | Should -Not -BeNullOrEmpty
+                }
+
+                It 'Should call Get-NetFirewallRule with Name parameter value escaped' {
+                    Assert-MockCalled `
+                        -CommandName Get-NetFirewallRule `
+                        -ParameterFilter {
+                            $Name -eq 'Test `[With`] Wildcard`*'
+                        } `
+                        -Exactly -Times 1
+                }
+            }
         }
         #endregion
-
 
         #region Function Get-FirewallRuleProperty
         Describe "MSFT_Firewall\Get-FirewallRuleProperty" {
@@ -1218,6 +1288,22 @@ try
                     $expected = Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $firewallRule
                     $($result.ServiceFilters | Out-String -Stream) |
                         Should -Be $($expected | Out-String -Stream)
+                }
+            }
+        }
+        #endregion
+
+        #region Function ConvertTo-FirewallRuleNameEscapedString
+        Describe "MSFT_Firewall\ConvertTo-FirewallRuleNameEscapedString" {
+            Context 'Rule name that contains no escaped characters' {
+                It 'Should return the rule name with no backticks added' {
+                    ConvertTo-FirewallRuleNameEscapedString -Name 'No Escaped Characters' | Should -Be 'No Escaped Characters'
+                }
+            }
+
+            Context 'Rule name that contains at least one of each escaped characters' {
+                It 'Should return the rule name with expected backticks added' {
+                    ConvertTo-FirewallRuleNameEscapedString -Name 'Left [ Right ] Asterisk *' | Should -Be 'Left `[ Right `] Asterisk `*'
                 }
             }
         }

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- MSFT_Firewall:
+  - Added full stop to end of MOF field descriptions.
+  - Support for `[`, `]` and `*` characters in the Name property
+    added - fixes [Issue #348](https://github.com/PowerShell/NetworkingDsc/issues/348).
+  - Improved unit tests to meet style guidelines.
+
 ## 6.0.0.0
 
 - New Example 2-ConfigureSuffixSearchList.ps1 for multiple
