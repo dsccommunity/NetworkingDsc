@@ -1213,7 +1213,7 @@ try
 
                 It 'Should return a firewall rule when name is passed with wildcard characters' {
                     $result = Get-FirewallRule -Name 'Test [With] Wildcard*'
-                    $result | Should -Not -BeNullOrEmpty
+                    $result.Name | Should -Be 'Test [With] Wildcard*'
                 }
 
                 It 'Should call Get-NetFirewallRule with Name parameter value escaped' {
