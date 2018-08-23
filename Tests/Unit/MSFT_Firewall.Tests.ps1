@@ -148,7 +148,7 @@ try
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Remove-NetFirewallRule
 
-                    $result = Set-TargetResource -Name $firewallRule.Name -Ensure 'Absent'
+                    Set-TargetResource -Name $firewallRule.Name -Ensure 'Absent'
 
                     Assert-MockCalled -CommandName Remove-NetFirewallRule -Exactly -Times 1
                 }
@@ -162,7 +162,7 @@ try
                             $Name -eq 'Test `[With`] Wildcard`*'
                         }
 
-                    $result = Set-TargetResource -Name 'Test [With] Wildcard*' -Ensure 'Absent'
+                    Set-TargetResource -Name 'Test [With] Wildcard*' -Ensure 'Absent'
 
                     Assert-MockCalled `
                         -CommandName Remove-NetFirewallRule `
@@ -178,7 +178,7 @@ try
                     Mock -CommandName Get-FirewallRule
                     Mock -CommandName Remove-NetFirewallRule
 
-                    $result = Set-TargetResource -Name $firewallRule.Name -Ensure 'Absent'
+                    Set-TargetResource -Name $firewallRule.Name -Ensure 'Absent'
 
                     Assert-MockCalled -CommandName Remove-NetFirewallRule -Exactly 0
                 }
@@ -189,7 +189,7 @@ try
                     Mock -CommandName Get-FirewallRule
                     Mock -CommandName New-NetFirewallRule
 
-                    $result = Set-TargetResource -Name $firewallRule.Name -Ensure 'Present'
+                    Set-TargetResource -Name $firewallRule.Name -Ensure 'Present'
 
                     Assert-MockCalled -CommandName New-NetFirewallRule -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-FirewallRule -Exactly -Times 1
@@ -201,7 +201,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -DisplayName 'Different' `
                         -Ensure 'Present'
@@ -220,7 +220,7 @@ try
                         }
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name 'Test [With] Wildcard*' `
                         -DisplayName 'Different' `
                         -Ensure 'Present'
@@ -242,7 +242,7 @@ try
                     Mock -CommandName Remove-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -DisplayName $firewallRule.DisplayName `
                         -Group 'Different' `
@@ -268,7 +268,7 @@ try
                         $newEnabled = 'True'
                     }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -Enabled $newEnabled `
                         -Ensure 'Present'
@@ -292,7 +292,7 @@ try
                         $NewAction = 'Allow'
                     }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -Action $NewAction `
                         -Ensure 'Present'
@@ -316,7 +316,7 @@ try
                         $NewProfile = @('Domain', 'Public')
                     }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -Profile $NewProfile `
                         -Ensure 'Present'
@@ -340,7 +340,7 @@ try
                         $NewDirection = 'Inbound'
                     }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -Direction $NewDirection `
                         -Ensure 'Present'
@@ -355,7 +355,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -RemotePort 9999 `
                         -Ensure 'Present'
@@ -370,7 +370,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -LocalPort 9999 `
                         -Ensure 'Present'
@@ -394,7 +394,7 @@ try
                         $NewProtocol = 'TCP'
                     }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -Protocol $NewProtocol `
                         -Ensure 'Present'
@@ -409,7 +409,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -Description 'Different' `
                         -Ensure 'Present'
@@ -424,7 +424,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -Program 'Different' `
                         -Ensure 'Present'
@@ -439,7 +439,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -Service 'Different' `
                         -Ensure 'Present'
@@ -463,7 +463,7 @@ try
                         $NewAuthentication = 'Required'
                     }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -Authentication $NewAuthentication `
                         -Ensure 'Present'
@@ -487,7 +487,7 @@ try
                         $NewEncryption = 'Required'
                     }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -Encryption $NewEncryption `
                         -Ensure 'Present'
@@ -502,7 +502,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -InterfaceAlias 'Different' `
                         -Ensure 'Present'
@@ -526,7 +526,7 @@ try
                         $NewInterfaceType = 'Wired'
                     }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -InterfaceType $NewInterfaceType `
                         -Ensure 'Present'
@@ -541,7 +541,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -LocalAddress @('10.0.0.1/255.0.0.0', '10.1.1.0-10.1.2.0') `
                         -Ensure 'Present'
@@ -556,7 +556,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -LocalUser 'Different' `
                         -Ensure 'Present'
@@ -571,7 +571,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -Package 'Different' `
                         -Ensure 'Present'
@@ -586,7 +586,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -Platform @('6.1') `
                         -Ensure 'Present'
@@ -601,7 +601,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -RemoteAddress @('10.0.0.1/255.0.0.0', '10.1.1.0-10.1.2.0') `
                         -Ensure 'Present'
@@ -616,7 +616,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -RemoteMachine 'Different' `
                         -Ensure 'Present'
@@ -631,7 +631,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -RemoteUser 'Different' `
                         -Ensure 'Present'
@@ -646,7 +646,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -DynamicTransport 'WifiDirectDisplay' `
                         -Ensure 'Present'
@@ -660,7 +660,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -EdgeTraversalPolicy 'Allow' `
                         -Ensure 'Present'
@@ -675,7 +675,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -IcmpType @('52', '53') `
                         -Ensure 'Present'
@@ -690,7 +690,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -LocalOnlyMapping $true `
                         -Ensure 'Present'
@@ -705,7 +705,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -LooseSourceMapping $true `
                         -Ensure 'Present'
@@ -720,7 +720,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -OverrideBlockRules $true `
                         -Ensure 'Present'
@@ -735,7 +735,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    $result = Set-TargetResource `
+                    Set-TargetResource `
                         -Name $firewallRule.Name `
                         -Owner (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid `
                         -Ensure 'Present'
@@ -750,7 +750,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $true }
 
-                    $result = Set-TargetResource -Name $firewallRule.Name -Ensure 'Present'
+                    Set-TargetResource -Name $firewallRule.Name -Ensure 'Present'
 
                     Assert-MockCalled -CommandName Set-NetFirewallRule -Exactly 0
                     Assert-MockCalled -CommandName Test-RuleProperties -Exactly -Times 1
@@ -791,7 +791,7 @@ try
                 Mock -CommandName Get-FirewallRuleProperty -MockWith { $Properties }
             }
 
-            Context 'testing with a rule with no property differences' {
+            Context 'When testing with a rule with no property differences' {
                 $compareRule = $Splat.Clone()
 
                 It "Should return True on firewall rule $($firewallRule.Name)" {
@@ -800,7 +800,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different name' {
+            Context 'When testing with a rule with a different name' {
                 $compareRule = $Splat.Clone()
                 $compareRule.Name = 'Different'
 
@@ -810,7 +810,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different displayname' {
+            Context 'When testing with a rule with a different displayname' {
                 $compareRule = $Splat.Clone()
                 $compareRule.DisplayName = 'Different'
 
@@ -820,7 +820,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different group' {
+            Context 'When testing with a rule with a different group' {
                 $compareRule = $Splat.Clone()
                 $compareRule.Group = 'Different'
 
@@ -830,7 +830,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different enabled' {
+            Context 'When testing with a rule with a different enabled' {
                 $compareRule = $Splat.Clone()
 
                 if ( $compareRule.Enabled -eq 'True' )
@@ -848,7 +848,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different action' {
+            Context 'When testing with a rule with a different action' {
                 $compareRule = $Splat.Clone()
 
                 if ($compareRule.Action -eq 'Allow')
@@ -866,7 +866,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different profile' {
+            Context 'When testing with a rule with a different profile' {
                 $compareRule = $Splat.Clone()
 
                 if ( $compareRule.Profile -ccontains 'Domain')
@@ -884,7 +884,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different direction' {
+            Context 'When testing with a rule with a different direction' {
                 $compareRule = $Splat.Clone()
 
                 if ($compareRule.Direction -eq 'Inbound')
@@ -902,7 +902,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different remote port' {
+            Context 'When testing with a rule with a different remote port' {
                 $compareRule = $Splat.Clone()
                 $compareRule.RemotePort = 1
 
@@ -912,7 +912,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different local port' {
+            Context 'When testing with a rule with a different local port' {
                 $compareRule = $Splat.Clone()
                 $compareRule.LocalPort = 1
 
@@ -922,7 +922,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different protocol' {
+            Context 'When testing with a rule with a different protocol' {
                 $compareRule = $Splat.Clone()
 
                 if ( $compareRule.Protocol -eq 'TCP')
@@ -940,7 +940,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different description' {
+            Context 'When testing with a rule with a different description' {
                 $compareRule = $Splat.Clone()
                 $compareRule.Description = 'Different'
 
@@ -950,7 +950,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different program' {
+            Context 'When testing with a rule with a different program' {
                 $compareRule = $Splat.Clone()
                 $compareRule.Program = 'Different'
 
@@ -960,7 +960,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different service' {
+            Context 'When testing with a rule with a different service' {
                 $compareRule = $Splat.Clone()
                 $compareRule.Service = 'Different'
 
@@ -970,7 +970,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different Authentication' {
+            Context 'When testing with a rule with a different Authentication' {
                 $compareRule = $Splat.Clone()
 
                 if ( $compareRule.Authentication -eq 'Required')
@@ -988,7 +988,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different Encryption' {
+            Context 'When testing with a rule with a different Encryption' {
                 $compareRule = $Splat.Clone()
 
                 if ( $compareRule.Encryption -eq 'Required')
@@ -1006,7 +1006,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different InterfaceAlias' {
+            Context 'When testing with a rule with a different InterfaceAlias' {
                 $compareRule = $Splat.Clone()
                 $compareRule.InterfaceAlias = 'Different'
 
@@ -1016,7 +1016,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different InterfaceType' {
+            Context 'When testing with a rule with a different InterfaceType' {
                 $compareRule = $Splat.Clone()
 
                 if ( $compareRule.InterfaceType -eq 'Wired')
@@ -1034,7 +1034,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different LocalAddress' {
+            Context 'When testing with a rule with a different LocalAddress' {
                 $compareRule = $Splat.Clone()
                 $compareRule.LocalAddress = @('10.0.0.1/255.0.0.0', '10.1.1.0-10.1.2.0')
 
@@ -1044,7 +1044,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different LocalUser' {
+            Context 'When testing with a rule with a different LocalUser' {
                 $compareRule = $Splat.Clone()
                 $compareRule.LocalUser = 'Different'
 
@@ -1054,7 +1054,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different Package' {
+            Context 'When testing with a rule with a different Package' {
                 $compareRule = $Splat.Clone()
                 $compareRule.Package = 'Different'
 
@@ -1064,7 +1064,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different Platform' {
+            Context 'When testing with a rule with a different Platform' {
                 $compareRule = $Splat.Clone()
                 $compareRule.Platform = @('6.2')
 
@@ -1074,7 +1074,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different RemoteAddress' {
+            Context 'When testing with a rule with a different RemoteAddress' {
                 $compareRule = $Splat.Clone()
                 $compareRule.RemoteAddress = @('10.0.0.1/255.0.0.0', '10.1.1.0-10.1.2.0')
 
@@ -1084,7 +1084,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different RemoteMachine' {
+            Context 'When testing with a rule with a different RemoteMachine' {
                 $compareRule = $Splat.Clone()
                 $compareRule.RemoteMachine = 'Different'
 
@@ -1094,7 +1094,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different RemoteUser' {
+            Context 'When testing with a rule with a different RemoteUser' {
                 $compareRule = $Splat.Clone()
                 $compareRule.RemoteUser = 'Different'
 
@@ -1104,7 +1104,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different DynamicTransport' {
+            Context 'When testing with a rule with a different DynamicTransport' {
                 $compareRule = $Splat.Clone()
                 $compareRule.DynamicTransport = 'WifiDirectDevices'
 
@@ -1114,7 +1114,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different EdgeTraversalPolicy' {
+            Context 'When testing with a rule with a different EdgeTraversalPolicy' {
                 $compareRule = $Splat.Clone()
                 $compareRule.EdgeTraversalPolicy = 'DeferToApp'
 
@@ -1124,7 +1124,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different IcmpType' {
+            Context 'When testing with a rule with a different IcmpType' {
                 $compareRule = $Splat.Clone()
                 $compareRule.IcmpType = @('53', '54')
 
@@ -1134,7 +1134,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different LocalOnlyMapping' {
+            Context 'When testing with a rule with a different LocalOnlyMapping' {
                 $compareRule = $Splat.Clone()
                 $compareRule.LocalOnlyMapping = ! $compareRule.LocalOnlyMapping
 
@@ -1144,7 +1144,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different LooseSourceMapping' {
+            Context 'When testing with a rule with a different LooseSourceMapping' {
                 $compareRule = $Splat.Clone()
                 $compareRule.LooseSourceMapping = ! $compareRule.LooseSourceMapping
 
@@ -1154,7 +1154,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different OverrideBlockRules' {
+            Context 'When testing with a rule with a different OverrideBlockRules' {
                 $compareRule = $Splat.Clone()
                 $compareRule.OverrideBlockRules = ! $compareRule.OverrideBlockRules
 
@@ -1164,7 +1164,7 @@ try
                 }
             }
 
-            Context 'testing with a rule with a different Owner' {
+            Context 'When testing with a rule with a different Owner' {
                 $compareRule = $Splat.Clone()
                 $compareRule.Owner = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
 
@@ -1185,14 +1185,14 @@ try
                 }
             }
 
-            Context 'testing with firewall that does not exist' {
+            Context 'When testing with firewall that does not exist' {
                 It "Should not return anything on firewall rule $($firewallRule.Name)" {
                     $result = Get-FirewallRule -Name 'Does not exist'
                     $result | Should -BeNullOrEmpty
                 }
             }
 
-            Context 'testing with firewall that somehow occurs more than once' {
+            Context 'When testing with firewall that somehow occurs more than once' {
                 Mock -CommandName Get-NetFirewallRule -MockWith { $firewallRules }
 
                 $errorRecord = Get-InvalidOperationRecord `
@@ -1203,7 +1203,7 @@ try
                 }
             }
 
-            Context 'testing with firewall that exists and name contains wildcard characters' {
+            Context 'When testing with firewall that exists and name contains wildcard characters' {
                 Mock `
                     -CommandName Get-NetFirewallRule `
                     -ParameterFilter {
