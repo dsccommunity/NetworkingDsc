@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.1.0.0
+
 - MSFT_Firewall:
   - Added full stop to end of MOF field descriptions.
   - Support for `[`, `]` and `*` characters in the Name property
