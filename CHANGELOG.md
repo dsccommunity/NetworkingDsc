@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #357](https://github.com/PowerShell/NetworkingDsc/issues/357).
+
 ## 6.1.0.0
 
 - MSFT_Firewall:
