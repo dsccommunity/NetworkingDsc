@@ -24,6 +24,7 @@ The **NetworkingDsc** module contains the following resources:
 - **NetAdapterRss**: Enable or disable Rss on a network adapter.
 - **NetBios**: Enable or Disable NetBios on a network interface.
 - **NetConnectionProfile**: Sets a node's connection profile.
+- **NetIPInterface**: Configure the IP interface settings for a network interface.
 - **NetworkTeam**: Set up network teams on a node.
 - **NetworkTeamInterface**: Add network interfaces to a network team.
 - **ProxySettings**: Configures the proxy settings for the computer.
