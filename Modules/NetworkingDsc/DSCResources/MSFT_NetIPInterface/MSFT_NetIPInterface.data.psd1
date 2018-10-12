@@ -13,10 +13,6 @@
             Type = 'String'
         },
         @{
-            Name = 'ClampMss'
-            Type = 'String'
-        },
-        @{
             Name = 'Forwarding'
             Type = 'String'
         },
