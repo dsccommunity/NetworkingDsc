@@ -77,6 +77,14 @@ try
                 }
             },
             @{
+                Name = 'ForceArpNdWolPattern'
+                MockedValue = 'Enabled'
+                TestValue = 'Disabled'
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $ForceArpNdWolPattern -eq 'Disabled'
+                }
+            },
+            @{
                 Name = 'Forwarding'
                 MockedValue = 'Enabled'
                 TestValue = 'Disabled'

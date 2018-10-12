@@ -115,6 +115,9 @@ function Get-TargetResource
     .PARAMETER EcnMarking
     Specifies the value for Explicit Congestion Notification (ECN) marking.
 
+    .PARAMETER ForceArpNdWolPattern
+    Specifies the Wake On LAN (WOL) value for the IP interface.
+
     .PARAMETER Forwarding
     Specifies the packet forwarding value for the IP interface.
 
@@ -160,6 +163,11 @@ function Set-TargetResource
         [ValidateSet('Disabled', 'UseEct1', 'UseEct0', 'AppDecide')]
         [System.String]
         $EcnMarking,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $ForceArpNdWolPattern,
 
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
@@ -239,6 +247,9 @@ function Set-TargetResource
     .PARAMETER EcnMarking
     Specifies the value for Explicit Congestion Notification (ECN) marking.
 
+    .PARAMETER ForceArpNdWolPattern
+    Specifies the Wake On LAN (WOL) value for the IP interface.
+
     .PARAMETER Forwarding
     Specifies the packet forwarding value for the IP interface.
 
@@ -285,6 +296,11 @@ function Test-TargetResource
         [ValidateSet('Disabled', 'UseEct1', 'UseEct0', 'AppDecide')]
         [System.String]
         $EcnMarking,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $ForceArpNdWolPattern,
 
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]

@@ -10,6 +10,7 @@ configuration MSFT_NetIPInterface_Config_Enabled {
             AutomaticMetric       = $Node.AutomaticMetric
             DirectedMacWolPattern = $Node.DirectedMacWolPattern
             EcnMarking            = $Node.EcnMarking
+            ForceArpNdWolPattern  = $Node.ForceArpNdWolPattern
             Forwarding            = $Node.Forwarding
             IgnoreDefaultRoutes   = $Node.IgnoreDefaultRoutes
         }
@@ -27,6 +28,7 @@ configuration MSFT_NetIPInterface_Config_Disabled {
             AdvertiseDefaultRoute = $Node.AdvertiseDefaultRoute
             DirectedMacWolPattern = $Node.DirectedMacWolPattern
             EcnMarking            = $Node.EcnMarking
+            ForceArpNdWolPattern  = $Node.ForceArpNdWolPattern
             Forwarding            = $Node.Forwarding
             IgnoreDefaultRoutes   = $Node.IgnoreDefaultRoutes
         }

@@ -21,6 +21,10 @@
             Type = 'String'
         },
         @{
+            Name = 'ForceArpNdWolPattern'
+            Type = 'String'
+        },
+        @{
             Name = 'Forwarding'
             Type = 'String'
         },
