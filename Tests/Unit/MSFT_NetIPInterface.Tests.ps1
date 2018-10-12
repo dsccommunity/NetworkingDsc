@@ -99,6 +99,22 @@ try
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $IgnoreDefaultRoutes -eq 'Disabled'
                 }
+            },
+            @{
+                Name = 'ManagedAddressConfiguration'
+                MockedValue = 'Enabled'
+                TestValue = 'Disabled'
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $ManagedAddressConfiguration -eq 'Disabled'
+                }
+            },
+            @{
+                Name = 'NeighborUnreachabilityDetection'
+                MockedValue = 'Enabled'
+                TestValue = 'Disabled'
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $NeighborUnreachabilityDetection -eq 'Disabled'
+                }
             }
         )
 

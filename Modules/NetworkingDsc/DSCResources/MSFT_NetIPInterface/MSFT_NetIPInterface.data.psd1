@@ -31,6 +31,14 @@
         @{
             Name = 'IgnoreDefaultRoutes'
             Type = 'String'
+        },
+        @{
+            Name = 'ManagedAddressConfiguration'
+            Type = 'String'
+        },
+        @{
+            Name = 'NeighborUnreachabilityDetection'
+            Type = 'String'
         }
     )
 }

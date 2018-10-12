@@ -123,6 +123,12 @@ function Get-TargetResource
 
     .PARAMETER IgnoreDefaultRoutes
     Specifies a value for Default Route advertisements.
+
+    .PARAMETER ManagedAddressConfiguration
+    Specifies the value for managed address configuration.
+
+    .PARAMETER NeighborUnreachabilityDetection
+    Specifies the value for Neighbor Unreachability Detection (NUD).
 #>
 function Set-TargetResource
 {
@@ -177,7 +183,17 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
-        $IgnoreDefaultRoutes
+        $IgnoreDefaultRoutes,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $ManagedAddressConfiguration,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $NeighborUnreachabilityDetection
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -255,6 +271,12 @@ function Set-TargetResource
 
     .PARAMETER IgnoreDefaultRoutes
     Specifies a value for Default Route advertisements.
+
+    .PARAMETER ManagedAddressConfiguration
+    Specifies the value for managed address configuration.
+
+    .PARAMETER NeighborUnreachabilityDetection
+    Specifies the value for Neighbor Unreachability Detection (NUD).
 #>
 function Test-TargetResource
 {
@@ -310,7 +332,17 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
-        $IgnoreDefaultRoutes
+        $IgnoreDefaultRoutes,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $ManagedAddressConfiguration,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $NeighborUnreachabilityDetection
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
