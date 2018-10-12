@@ -1,0 +1,12 @@
+[ClassVersion("1.0.0"), FriendlyName("NetIPInterface")]
+class MSFT_NetIPInterface : OMI_BaseResource
+{
+    [Key, Description("Alias of the network interface to configure.")] string InterfaceAlias;
+    [Key, Description("IP address family on the interface to configure."), ValueMap{"IPv4", "IPv6"}, Values{"IPv4", "IPv6"}] string AddressFamily;
+    [Write, Description("Specifies the default router advertisement for an interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String AdvertiseDefaultRoute;
+    [Write, Description("Specifies the router advertisement value for the IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String Advertising;
+    [Write, Description("Specifies the value for automatic metric calculation."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String AutomaticMetric;
+    [Write, Description("Specifies the MSS clamping value for the IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String ClampMss;
+    [Write, Description("Specifies the packet forwarding value for the IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String Forwarding;
+    [Write, Description("Specifies a value for Default Route advertisements."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String IgnoreDefaultRoutes;
+};
