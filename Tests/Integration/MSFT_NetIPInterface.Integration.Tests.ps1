@@ -33,6 +33,8 @@ $setNetIPInterfaceParameters = @{
     AddressFamily         = 'IPv4'
     AdvertiseDefaultRoute = 'Disabled'
     AutomaticMetric       = 'Disabled'
+    DirectedMacWolPattern = 'Disabled'
+    EcnMarking            = 'Disabled'
     Forwarding            = 'Disabled'
     IgnoreDefaultRoutes   = 'Disabled'
 }
@@ -56,6 +58,8 @@ try
                         AddressFamily         = 'IPv4'
                         AdvertiseDefaultRoute = 'Enabled'
                         AutomaticMetric       = 'Enabled'
+                        DirectedMacWolPattern = 'Enabled'
+                        EcnMarking            = 'AppDecide'
                         Forwarding            = 'Enabled'
                         IgnoreDefaultRoutes   = 'Enabled'
                     }
@@ -90,6 +94,8 @@ try
                 $current.AddressFamily         | Should -Be $script:configData.AllNodes[0].AddressFamily
                 $current.AdvertiseDefaultRoute | Should -Be $script:configData.AllNodes[0].AdvertiseDefaultRoute
                 $current.AutomaticMetric       | Should -Be $script:configData.AllNodes[0].AutomaticMetric
+                $current.DirectedMacWolPattern | Should -Be $script:configData.AllNodes[0].DirectedMacWolPattern
+                $current.EcnMarking            | Should -Be $script:configData.AllNodes[0].EcnMarking
                 $current.Forwarding            | Should -Be $script:configData.AllNodes[0].Forwarding
                 $current.IgnoreDefaultRoutes   | Should -Be $script:configData.AllNodes[0].IgnoreDefaultRoutes
             }
@@ -104,6 +110,8 @@ try
                         InterfaceAlias        = 'NetworkingDscLBA'
                         AddressFamily         = 'IPv4'
                         AdvertiseDefaultRoute = 'Disabled'
+                        DirectedMacWolPattern = 'Disabled'
+                        EcnMarking            = 'Disabled'
                         Forwarding            = 'Disabled'
                         IgnoreDefaultRoutes   = 'Disabled'
                     }
@@ -137,6 +145,8 @@ try
                 $current.InterfaceAlias        | Should -Be $script:configData.AllNodes[0].InterfaceAlias
                 $current.AddressFamily         | Should -Be $script:configData.AllNodes[0].AddressFamily
                 $current.AdvertiseDefaultRoute | Should -Be $script:configData.AllNodes[0].AdvertiseDefaultRoute
+                $current.DirectedMacWolPattern | Should -Be $script:configData.AllNodes[0].DirectedMacWolPattern
+                $current.EcnMarking            | Should -Be $script:configData.AllNodes[0].EcnMarking
                 $current.Forwarding            | Should -Be $script:configData.AllNodes[0].Forwarding
                 $current.IgnoreDefaultRoutes   | Should -Be $script:configData.AllNodes[0].IgnoreDefaultRoutes
             }
