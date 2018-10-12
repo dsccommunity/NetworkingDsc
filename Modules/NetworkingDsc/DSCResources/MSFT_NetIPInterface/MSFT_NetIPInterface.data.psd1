@@ -39,6 +39,10 @@
         @{
             Name = 'NeighborUnreachabilityDetection'
             Type = 'String'
+        },
+        @{
+            Name = 'OtherStatefulConfiguration'
+            Type = 'String'
         }
     )
 }

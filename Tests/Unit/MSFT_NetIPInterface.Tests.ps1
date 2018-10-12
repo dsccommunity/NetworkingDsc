@@ -115,6 +115,14 @@ try
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $NeighborUnreachabilityDetection -eq 'Disabled'
                 }
+            },
+            @{
+                Name = 'OtherStatefulConfiguration'
+                MockedValue = 'Enabled'
+                TestValue = 'Disabled'
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $OtherStatefulConfiguration -eq 'Disabled'
+                }
             }
         )
 

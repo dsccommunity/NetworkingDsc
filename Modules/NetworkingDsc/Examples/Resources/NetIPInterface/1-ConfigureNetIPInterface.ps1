@@ -11,6 +11,7 @@
     - IgnoreDefaultRoute
     - ManagedAddressConfiguration
     - NeighborUnreachabilityDetection
+    - OtherStatefulConfiguration
     The EcnMarking parameter will be set to AppDecide.
 #>
 Configuration Example
@@ -33,6 +34,7 @@ Configuration Example
             IgnoreDefaultRoutes             = 'Enabled'
             ManagedAddressConfiguration     = 'Enabled'
             NeighborUnreachabilityDetection = 'Enabled'
+            OtherStatefulConfiguration      = 'Enabled'
         }
     }
 }
