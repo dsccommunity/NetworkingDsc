@@ -35,6 +35,7 @@ $setNetIPInterfaceParameters = @{
     AutomaticMetric       = 'Disabled'
     DirectedMacWolPattern = 'Disabled'
     EcnMarking            = 'Disabled'
+    ForceArpNdWolPattern  = 'Disabled'
     Forwarding            = 'Disabled'
     IgnoreDefaultRoutes   = 'Disabled'
 }
@@ -60,6 +61,7 @@ try
                         AutomaticMetric       = 'Enabled'
                         DirectedMacWolPattern = 'Enabled'
                         EcnMarking            = 'AppDecide'
+                        ForceArpNdWolPattern  = 'Enabled'
                         Forwarding            = 'Enabled'
                         IgnoreDefaultRoutes   = 'Enabled'
                     }
@@ -96,6 +98,7 @@ try
                 $current.AutomaticMetric       | Should -Be $script:configData.AllNodes[0].AutomaticMetric
                 $current.DirectedMacWolPattern | Should -Be $script:configData.AllNodes[0].DirectedMacWolPattern
                 $current.EcnMarking            | Should -Be $script:configData.AllNodes[0].EcnMarking
+                $current.ForceArpNdWolPattern  | Should -Be $script:configData.AllNodes[0].ForceArpNdWolPattern
                 $current.Forwarding            | Should -Be $script:configData.AllNodes[0].Forwarding
                 $current.IgnoreDefaultRoutes   | Should -Be $script:configData.AllNodes[0].IgnoreDefaultRoutes
             }
@@ -113,6 +116,7 @@ try
                         DirectedMacWolPattern = 'Disabled'
                         EcnMarking            = 'Disabled'
                         Forwarding            = 'Disabled'
+                        ForceArpNdWolPattern  = 'Disabled'
                         IgnoreDefaultRoutes   = 'Disabled'
                     }
                 )
@@ -147,6 +151,7 @@ try
                 $current.AdvertiseDefaultRoute | Should -Be $script:configData.AllNodes[0].AdvertiseDefaultRoute
                 $current.DirectedMacWolPattern | Should -Be $script:configData.AllNodes[0].DirectedMacWolPattern
                 $current.EcnMarking            | Should -Be $script:configData.AllNodes[0].EcnMarking
+                $current.ForceArpNdWolPattern  | Should -Be $script:configData.AllNodes[0].ForceArpNdWolPattern
                 $current.Forwarding            | Should -Be $script:configData.AllNodes[0].Forwarding
                 $current.IgnoreDefaultRoutes   | Should -Be $script:configData.AllNodes[0].IgnoreDefaultRoutes
             }

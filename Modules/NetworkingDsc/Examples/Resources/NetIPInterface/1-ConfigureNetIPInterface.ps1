@@ -6,6 +6,7 @@
     - Avertising
     - AutomaticMetric
     - DirectedMacWolPattern
+    - ForceArpNdWolPattern
     - Forwarding
     - IgnoreDefaultRoute
     The EcnMarking parameter will be set to AppDecide.
@@ -25,6 +26,7 @@ Configuration Example
             AutomaticMetric       = 'Enabled'
             DirectedMacWolPattern = 'Enabled'
             EcnMarking            = 'AppDecide'
+            ForceArpNdWolPattern  = 'Enabled'
             Forwarding            = 'Enabled'
             IgnoreDefaultRoutes   = 'Enabled'
         }

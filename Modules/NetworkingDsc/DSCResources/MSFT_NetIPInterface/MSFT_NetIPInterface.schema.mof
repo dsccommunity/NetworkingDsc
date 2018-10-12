@@ -8,6 +8,7 @@ class MSFT_NetIPInterface : OMI_BaseResource
     [Write, Description("Specifies the value for automatic metric calculation."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String AutomaticMetric;
     [Write, Description("Specifies the wake-up packet value for an IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String DirectedMacWolPattern;
     [Write, Description("Specifies the value for Explicit Congestion Notification (ECN) marking."), ValueMap{"Disabled", "UseEct1", "UseEct0", "AppDecide"},Values{"Disabled", "UseEct1", "UseEct0", "AppDecide"}] String EcnMarking;
+    [Write, Description("Specifies the Wake On LAN (WOL) value for the IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String ForceArpNdWolPattern;
     [Write, Description("Specifies the packet forwarding value for the IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String Forwarding;
     [Write, Description("Specifies a value for Default Route advertisements."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String IgnoreDefaultRoutes;
 };
