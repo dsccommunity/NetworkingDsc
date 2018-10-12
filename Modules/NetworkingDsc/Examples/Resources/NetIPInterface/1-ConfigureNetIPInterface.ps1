@@ -9,6 +9,8 @@
     - ForceArpNdWolPattern
     - Forwarding
     - IgnoreDefaultRoute
+    - ManagedAddressConfiguration
+    - NeighborUnreachabilityDetection
     The EcnMarking parameter will be set to AppDecide.
 #>
 Configuration Example
@@ -19,16 +21,18 @@ Configuration Example
     {
         NetIPInterface EnableSettings
         {
-            InterfaceAlias        = 'Ethernet'
-            AddressFamily         = 'IPv4'
-            AdvertiseDefaultRoute = 'Enabled'
-            Advertising           = 'Enabled'
-            AutomaticMetric       = 'Enabled'
-            DirectedMacWolPattern = 'Enabled'
-            EcnMarking            = 'AppDecide'
-            ForceArpNdWolPattern  = 'Enabled'
-            Forwarding            = 'Enabled'
-            IgnoreDefaultRoutes   = 'Enabled'
+            InterfaceAlias                  = 'Ethernet'
+            AddressFamily                   = 'IPv4'
+            AdvertiseDefaultRoute           = 'Enabled'
+            Advertising                     = 'Enabled'
+            AutomaticMetric                 = 'Enabled'
+            DirectedMacWolPattern           = 'Enabled'
+            EcnMarking                      = 'AppDecide'
+            ForceArpNdWolPattern            = 'Enabled'
+            Forwarding                      = 'Enabled'
+            IgnoreDefaultRoutes             = 'Enabled'
+            ManagedAddressConfiguration     = 'Enabled'
+            NeighborUnreachabilityDetection = 'Enabled'
         }
     }
 }

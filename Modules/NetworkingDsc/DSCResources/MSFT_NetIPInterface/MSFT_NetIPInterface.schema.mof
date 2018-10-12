@@ -11,4 +11,6 @@ class MSFT_NetIPInterface : OMI_BaseResource
     [Write, Description("Specifies the Wake On LAN (WOL) value for the IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String ForceArpNdWolPattern;
     [Write, Description("Specifies the packet forwarding value for the IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String Forwarding;
     [Write, Description("Specifies a value for Default Route advertisements."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String IgnoreDefaultRoutes;
+    [Write, Description("Specifies the value for managed address configuration."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String ManagedAddressConfiguration;
+    [Write, Description("Specifies the value for Neighbor Unreachability Detection (NUD)."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String NeighborUnreachabilityDetection;
 };

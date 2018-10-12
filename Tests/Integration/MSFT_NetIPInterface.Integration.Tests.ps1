@@ -18,7 +18,7 @@ $TestEnvironment = Initialize-TestEnvironment `
     -TestType Integration
 #endregion
 
-# Configure Loopback Adapter and disable all settings
+# Configure Loopback Adapter and configure settings with an initial state
 . (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
 New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
 
@@ -27,17 +27,22 @@ New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
     can not be tested using these tests:
     - Advertising
     - Automatic Metric (can not be disabled after being enabled)
+    - NeighborUnreachabilityDetection
+
+    Applying the above configuration settings to the loopback adapter
+    results in a "The parameter is incorrect" error message.
 #>
 $setNetIPInterfaceParameters = @{
-    InterfaceAlias        = 'NetworkingDscLBA'
-    AddressFamily         = 'IPv4'
-    AdvertiseDefaultRoute = 'Disabled'
-    AutomaticMetric       = 'Disabled'
-    DirectedMacWolPattern = 'Disabled'
-    EcnMarking            = 'Disabled'
-    ForceArpNdWolPattern  = 'Disabled'
-    Forwarding            = 'Disabled'
-    IgnoreDefaultRoutes   = 'Disabled'
+    InterfaceAlias                  = 'NetworkingDscLBA'
+    AddressFamily                   = 'IPv4'
+    AdvertiseDefaultRoute           = 'Disabled'
+    AutomaticMetric                 = 'Disabled'
+    DirectedMacWolPattern           = 'Disabled'
+    EcnMarking                      = 'Disabled'
+    ForceArpNdWolPattern            = 'Disabled'
+    Forwarding                      = 'Disabled'
+    IgnoreDefaultRoutes             = 'Disabled'
+    ManagedAddressConfiguration     = 'Disabled'
 }
 Set-NetIPInterface @setNetIPInterfaceParameters
 
@@ -54,16 +59,18 @@ try
             $script:configData = @{
                 AllNodes = @(
                     @{
-                        NodeName              = 'localhost'
-                        InterfaceAlias        = 'NetworkingDscLBA'
-                        AddressFamily         = 'IPv4'
-                        AdvertiseDefaultRoute = 'Enabled'
-                        AutomaticMetric       = 'Enabled'
-                        DirectedMacWolPattern = 'Enabled'
-                        EcnMarking            = 'AppDecide'
-                        ForceArpNdWolPattern  = 'Enabled'
-                        Forwarding            = 'Enabled'
-                        IgnoreDefaultRoutes   = 'Enabled'
+                        NodeName                        = 'localhost'
+                        InterfaceAlias                  = 'NetworkingDscLBA'
+                        AddressFamily                   = 'IPv4'
+                        AdvertiseDefaultRoute           = 'Enabled'
+                        AutomaticMetric                 = 'Enabled'
+                        DirectedMacWolPattern           = 'Enabled'
+                        EcnMarking                      = 'AppDecide'
+                        ForceArpNdWolPattern            = 'Enabled'
+                        Forwarding                      = 'Enabled'
+                        IgnoreDefaultRoutes             = 'Enabled'
+                        ManagedAddressConfiguration     = 'Enabled'
+                        NeighborUnreachabilityDetection = 'Enabled'
                     }
                 )
             }
@@ -92,15 +99,17 @@ try
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_Enabled"
                 }
-                $current.InterfaceAlias        | Should -Be $script:configData.AllNodes[0].InterfaceAlias
-                $current.AddressFamily         | Should -Be $script:configData.AllNodes[0].AddressFamily
-                $current.AdvertiseDefaultRoute | Should -Be $script:configData.AllNodes[0].AdvertiseDefaultRoute
-                $current.AutomaticMetric       | Should -Be $script:configData.AllNodes[0].AutomaticMetric
-                $current.DirectedMacWolPattern | Should -Be $script:configData.AllNodes[0].DirectedMacWolPattern
-                $current.EcnMarking            | Should -Be $script:configData.AllNodes[0].EcnMarking
-                $current.ForceArpNdWolPattern  | Should -Be $script:configData.AllNodes[0].ForceArpNdWolPattern
-                $current.Forwarding            | Should -Be $script:configData.AllNodes[0].Forwarding
-                $current.IgnoreDefaultRoutes   | Should -Be $script:configData.AllNodes[0].IgnoreDefaultRoutes
+                $current.InterfaceAlias                  | Should -Be $script:configData.AllNodes[0].InterfaceAlias
+                $current.AddressFamily                   | Should -Be $script:configData.AllNodes[0].AddressFamily
+                $current.AdvertiseDefaultRoute           | Should -Be $script:configData.AllNodes[0].AdvertiseDefaultRoute
+                $current.AutomaticMetric                 | Should -Be $script:configData.AllNodes[0].AutomaticMetric
+                $current.DirectedMacWolPattern           | Should -Be $script:configData.AllNodes[0].DirectedMacWolPattern
+                $current.EcnMarking                      | Should -Be $script:configData.AllNodes[0].EcnMarking
+                $current.ForceArpNdWolPattern            | Should -Be $script:configData.AllNodes[0].ForceArpNdWolPattern
+                $current.Forwarding                      | Should -Be $script:configData.AllNodes[0].Forwarding
+                $current.IgnoreDefaultRoutes             | Should -Be $script:configData.AllNodes[0].IgnoreDefaultRoutes
+                $current.ManagedAddressConfiguration     | Should -Be $script:configData.AllNodes[0].ManagedAddressConfiguration
+                $current.NeighborUnreachabilityDetection | Should -Be $script:configData.AllNodes[0].NeighborUnreachabilityDetection
             }
         }
 
@@ -109,15 +118,16 @@ try
             $script:configData = @{
                 AllNodes = @(
                     @{
-                        NodeName              = 'localhost'
-                        InterfaceAlias        = 'NetworkingDscLBA'
-                        AddressFamily         = 'IPv4'
-                        AdvertiseDefaultRoute = 'Disabled'
-                        DirectedMacWolPattern = 'Disabled'
-                        EcnMarking            = 'Disabled'
-                        Forwarding            = 'Disabled'
-                        ForceArpNdWolPattern  = 'Disabled'
-                        IgnoreDefaultRoutes   = 'Disabled'
+                        NodeName                        = 'localhost'
+                        InterfaceAlias                  = 'NetworkingDscLBA'
+                        AddressFamily                   = 'IPv4'
+                        AdvertiseDefaultRoute           = 'Disabled'
+                        DirectedMacWolPattern           = 'Disabled'
+                        EcnMarking                      = 'Disabled'
+                        Forwarding                      = 'Disabled'
+                        ForceArpNdWolPattern            = 'Disabled'
+                        IgnoreDefaultRoutes             = 'Disabled'
+                        ManagedAddressConfiguration     = 'Disabled'
                     }
                 )
             }
@@ -146,14 +156,16 @@ try
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_Disabled"
                 }
-                $current.InterfaceAlias        | Should -Be $script:configData.AllNodes[0].InterfaceAlias
-                $current.AddressFamily         | Should -Be $script:configData.AllNodes[0].AddressFamily
-                $current.AdvertiseDefaultRoute | Should -Be $script:configData.AllNodes[0].AdvertiseDefaultRoute
-                $current.DirectedMacWolPattern | Should -Be $script:configData.AllNodes[0].DirectedMacWolPattern
-                $current.EcnMarking            | Should -Be $script:configData.AllNodes[0].EcnMarking
-                $current.ForceArpNdWolPattern  | Should -Be $script:configData.AllNodes[0].ForceArpNdWolPattern
-                $current.Forwarding            | Should -Be $script:configData.AllNodes[0].Forwarding
-                $current.IgnoreDefaultRoutes   | Should -Be $script:configData.AllNodes[0].IgnoreDefaultRoutes
+                $current.InterfaceAlias                  | Should -Be $script:configData.AllNodes[0].InterfaceAlias
+                $current.AddressFamily                   | Should -Be $script:configData.AllNodes[0].AddressFamily
+                $current.AdvertiseDefaultRoute           | Should -Be $script:configData.AllNodes[0].AdvertiseDefaultRoute
+                $current.DirectedMacWolPattern           | Should -Be $script:configData.AllNodes[0].DirectedMacWolPattern
+                $current.EcnMarking                      | Should -Be $script:configData.AllNodes[0].EcnMarking
+                $current.ForceArpNdWolPattern            | Should -Be $script:configData.AllNodes[0].ForceArpNdWolPattern
+                $current.Forwarding                      | Should -Be $script:configData.AllNodes[0].Forwarding
+                $current.IgnoreDefaultRoutes             | Should -Be $script:configData.AllNodes[0].IgnoreDefaultRoutes
+                $current.ManagedAddressConfiguration     | Should -Be $script:configData.AllNodes[0].ManagedAddressConfiguration
+
             }
         }
     }
