@@ -33,16 +33,17 @@ New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
     results in a "The parameter is incorrect" error message.
 #>
 $setNetIPInterfaceParameters = @{
-    InterfaceAlias                  = 'NetworkingDscLBA'
-    AddressFamily                   = 'IPv4'
-    AdvertiseDefaultRoute           = 'Disabled'
-    AutomaticMetric                 = 'Disabled'
-    DirectedMacWolPattern           = 'Disabled'
-    EcnMarking                      = 'Disabled'
-    ForceArpNdWolPattern            = 'Disabled'
-    Forwarding                      = 'Disabled'
-    IgnoreDefaultRoutes             = 'Disabled'
-    ManagedAddressConfiguration     = 'Disabled'
+    InterfaceAlias              = 'NetworkingDscLBA'
+    AddressFamily               = 'IPv4'
+    AdvertiseDefaultRoute       = 'Disabled'
+    AutomaticMetric             = 'Disabled'
+    DirectedMacWolPattern       = 'Disabled'
+    EcnMarking                  = 'Disabled'
+    ForceArpNdWolPattern        = 'Disabled'
+    Forwarding                  = 'Disabled'
+    IgnoreDefaultRoutes         = 'Disabled'
+    ManagedAddressConfiguration = 'Disabled'
+    OtherStatefulConfiguration  = 'Disabled'
 }
 Set-NetIPInterface @setNetIPInterfaceParameters
 
@@ -71,6 +72,7 @@ try
                         IgnoreDefaultRoutes             = 'Enabled'
                         ManagedAddressConfiguration     = 'Enabled'
                         NeighborUnreachabilityDetection = 'Enabled'
+                        OtherStatefulConfiguration      = 'Enabled'
                     }
                 )
             }
@@ -110,6 +112,7 @@ try
                 $current.IgnoreDefaultRoutes             | Should -Be $script:configData.AllNodes[0].IgnoreDefaultRoutes
                 $current.ManagedAddressConfiguration     | Should -Be $script:configData.AllNodes[0].ManagedAddressConfiguration
                 $current.NeighborUnreachabilityDetection | Should -Be $script:configData.AllNodes[0].NeighborUnreachabilityDetection
+                $current.OtherStatefulConfiguration      | Should -Be $script:configData.AllNodes[0].OtherStatefulConfiguration
             }
         }
 
@@ -118,16 +121,17 @@ try
             $script:configData = @{
                 AllNodes = @(
                     @{
-                        NodeName                        = 'localhost'
-                        InterfaceAlias                  = 'NetworkingDscLBA'
-                        AddressFamily                   = 'IPv4'
-                        AdvertiseDefaultRoute           = 'Disabled'
-                        DirectedMacWolPattern           = 'Disabled'
-                        EcnMarking                      = 'Disabled'
-                        Forwarding                      = 'Disabled'
-                        ForceArpNdWolPattern            = 'Disabled'
-                        IgnoreDefaultRoutes             = 'Disabled'
-                        ManagedAddressConfiguration     = 'Disabled'
+                        NodeName                    = 'localhost'
+                        InterfaceAlias              = 'NetworkingDscLBA'
+                        AddressFamily               = 'IPv4'
+                        AdvertiseDefaultRoute       = 'Disabled'
+                        DirectedMacWolPattern       = 'Disabled'
+                        EcnMarking                  = 'Disabled'
+                        Forwarding                  = 'Disabled'
+                        ForceArpNdWolPattern        = 'Disabled'
+                        IgnoreDefaultRoutes         = 'Disabled'
+                        ManagedAddressConfiguration = 'Disabled'
+                        OtherStatefulConfiguration  = 'Disabled'
                     }
                 )
             }
@@ -165,7 +169,7 @@ try
                 $current.Forwarding                      | Should -Be $script:configData.AllNodes[0].Forwarding
                 $current.IgnoreDefaultRoutes             | Should -Be $script:configData.AllNodes[0].IgnoreDefaultRoutes
                 $current.ManagedAddressConfiguration     | Should -Be $script:configData.AllNodes[0].ManagedAddressConfiguration
-
+                $current.OtherStatefulConfiguration      | Should -Be $script:configData.AllNodes[0].OtherStatefulConfiguration
             }
         }
     }

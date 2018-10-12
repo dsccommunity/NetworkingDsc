@@ -129,6 +129,9 @@ function Get-TargetResource
 
     .PARAMETER NeighborUnreachabilityDetection
     Specifies the value for Neighbor Unreachability Detection (NUD).
+
+    .PARAMETER OtherStatefulConfiguration
+    Specifies the value for configuration other than addresses.
 #>
 function Set-TargetResource
 {
@@ -193,7 +196,12 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
-        $NeighborUnreachabilityDetection
+        $NeighborUnreachabilityDetection,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $OtherStatefulConfiguration
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -277,6 +285,9 @@ function Set-TargetResource
 
     .PARAMETER NeighborUnreachabilityDetection
     Specifies the value for Neighbor Unreachability Detection (NUD).
+
+    .PARAMETER OtherStatefulConfiguration
+    Specifies the value for configuration other than addresses.
 #>
 function Test-TargetResource
 {
@@ -342,7 +353,12 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
-        $NeighborUnreachabilityDetection
+        $NeighborUnreachabilityDetection,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $OtherStatefulConfiguration
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "

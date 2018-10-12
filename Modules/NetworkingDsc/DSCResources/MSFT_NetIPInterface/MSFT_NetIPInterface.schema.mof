@@ -13,4 +13,5 @@ class MSFT_NetIPInterface : OMI_BaseResource
     [Write, Description("Specifies a value for Default Route advertisements."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String IgnoreDefaultRoutes;
     [Write, Description("Specifies the value for managed address configuration."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String ManagedAddressConfiguration;
     [Write, Description("Specifies the value for Neighbor Unreachability Detection (NUD)."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String NeighborUnreachabilityDetection;
+    [Write, Description("Specifies the value for configuration other than addresses."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String OtherStatefulConfiguration;
 };

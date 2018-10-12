@@ -15,6 +15,7 @@ configuration MSFT_NetIPInterface_Config_Enabled {
             IgnoreDefaultRoutes             = $Node.IgnoreDefaultRoutes
             ManagedAddressConfiguration     = $Node.ManagedAddressConfiguration
             NeighborUnreachabilityDetection = $Node.NeighborUnreachabilityDetection
+            OtherStatefulConfiguration      = $Node.OtherStatefulConfiguration
         }
     }
 }
@@ -34,6 +35,7 @@ configuration MSFT_NetIPInterface_Config_Disabled {
             Forwarding                      = $Node.Forwarding
             IgnoreDefaultRoutes             = $Node.IgnoreDefaultRoutes
             ManagedAddressConfiguration     = $Node.ManagedAddressConfiguration
+            OtherStatefulConfiguration      = $Node.OtherStatefulConfiguration
         }
     }
 }
