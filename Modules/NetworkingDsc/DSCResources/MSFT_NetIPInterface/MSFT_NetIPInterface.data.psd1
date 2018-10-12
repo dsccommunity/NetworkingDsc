@@ -13,6 +13,14 @@
             Type = 'String'
         },
         @{
+            Name = 'DirectedMacWolPattern'
+            Type = 'String'
+        },
+        @{
+            Name = 'EcnMarking'
+            Type = 'String'
+        },
+        @{
             Name = 'Forwarding'
             Type = 'String'
         },

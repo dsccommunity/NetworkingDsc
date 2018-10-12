@@ -109,6 +109,12 @@ function Get-TargetResource
     .PARAMETER AutomaticMetric
     Specifies the value for automatic metric calculation.
 
+    .PARAMETER DirectedMacWolPattern
+    Specifies the wake-up packet value for an IP interface.
+
+    .PARAMETER EcnMarking
+    Specifies the value for Explicit Congestion Notification (ECN) marking.
+
     .PARAMETER Forwarding
     Specifies the packet forwarding value for the IP interface.
 
@@ -144,6 +150,16 @@ function Set-TargetResource
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
         $AutomaticMetric,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $DirectedMacWolPattern,
+
+        [Parameter()]
+        [ValidateSet('Disabled', 'UseEct1', 'UseEct0', 'AppDecide')]
+        [System.String]
+        $EcnMarking,
 
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
@@ -217,6 +233,12 @@ function Set-TargetResource
     .PARAMETER AutomaticMetric
     Specifies the value for automatic metric calculation.
 
+    .PARAMETER DirectedMacWolPattern
+    Specifies the wake-up packet value for an IP interface.
+
+    .PARAMETER EcnMarking
+    Specifies the value for Explicit Congestion Notification (ECN) marking.
+
     .PARAMETER Forwarding
     Specifies the packet forwarding value for the IP interface.
 
@@ -253,6 +275,16 @@ function Test-TargetResource
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
         $AutomaticMetric,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $DirectedMacWolPattern,
+
+        [Parameter()]
+        [ValidateSet('Disabled', 'UseEct1', 'UseEct0', 'AppDecide')]
+        [System.String]
+        $EcnMarking,
 
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]

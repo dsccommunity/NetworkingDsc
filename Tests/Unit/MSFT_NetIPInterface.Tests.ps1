@@ -61,6 +61,22 @@ try
                 }
             },
             @{
+                Name = 'DirectedMacWolPattern'
+                MockedValue = 'Enabled'
+                TestValue = 'Disabled'
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $DirectedMacWolPattern -eq 'Disabled'
+                }
+            },
+            @{
+                Name = 'EcnMarking'
+                MockedValue = 'AppDecide'
+                TestValue = 'Disabled'
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $EcnMarking -eq 'Disabled'
+                }
+            },
+            @{
                 Name = 'Forwarding'
                 MockedValue = 'Enabled'
                 TestValue = 'Disabled'
@@ -73,7 +89,7 @@ try
                 MockedValue = 'Enabled'
                 TestValue = 'Disabled'
                 ParameterFilter = {
-                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $Forwarding -eq 'Disabled'
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $IgnoreDefaultRoutes -eq 'Disabled'
                 }
             }
         )

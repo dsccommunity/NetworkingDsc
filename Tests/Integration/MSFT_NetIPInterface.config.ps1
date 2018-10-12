@@ -8,6 +8,8 @@ configuration MSFT_NetIPInterface_Config_Enabled {
             AddressFamily         = $Node.AddressFamily
             AdvertiseDefaultRoute = $Node.AdvertiseDefaultRoute
             AutomaticMetric       = $Node.AutomaticMetric
+            DirectedMacWolPattern = $Node.DirectedMacWolPattern
+            EcnMarking            = $Node.EcnMarking
             Forwarding            = $Node.Forwarding
             IgnoreDefaultRoutes   = $Node.IgnoreDefaultRoutes
         }
@@ -23,6 +25,8 @@ configuration MSFT_NetIPInterface_Config_Disabled {
             InterfaceAlias        = $Node.InterfaceAlias
             AddressFamily         = $Node.AddressFamily
             AdvertiseDefaultRoute = $Node.AdvertiseDefaultRoute
+            DirectedMacWolPattern = $Node.DirectedMacWolPattern
+            EcnMarking            = $Node.EcnMarking
             Forwarding            = $Node.Forwarding
             IgnoreDefaultRoutes   = $Node.IgnoreDefaultRoutes
         }

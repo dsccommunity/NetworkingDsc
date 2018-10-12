@@ -5,8 +5,10 @@
     - AdvertiseDefaultRoute
     - Avertising
     - AutomaticMetric
+    - DirectedMacWolPattern
     - Forwarding
     - IgnoreDefaultRoute
+    The EcnMarking parameter will be set to AppDecide.
 #>
 Configuration Example
 {
@@ -21,6 +23,8 @@ Configuration Example
             AdvertiseDefaultRoute = 'Enabled'
             Advertising           = 'Enabled'
             AutomaticMetric       = 'Enabled'
+            DirectedMacWolPattern = 'Enabled'
+            EcnMarking            = 'AppDecide'
             Forwarding            = 'Enabled'
             IgnoreDefaultRoutes   = 'Enabled'
         }
