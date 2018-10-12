@@ -6,7 +6,6 @@ class MSFT_NetIPInterface : OMI_BaseResource
     [Write, Description("Specifies the default router advertisement for an interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String AdvertiseDefaultRoute;
     [Write, Description("Specifies the router advertisement value for the IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String Advertising;
     [Write, Description("Specifies the value for automatic metric calculation."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String AutomaticMetric;
-    [Write, Description("Specifies the MSS clamping value for the IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String ClampMss;
     [Write, Description("Specifies the packet forwarding value for the IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String Forwarding;
     [Write, Description("Specifies a value for Default Route advertisements."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String IgnoreDefaultRoutes;
 };

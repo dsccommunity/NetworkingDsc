@@ -5,7 +5,6 @@
     - AdvertiseDefaultRoute
     - Avertising
     - AutomaticMetric
-    - ClampMss
     - Forwarding
     - IgnoreDefaultRoute
 #>
@@ -22,7 +21,6 @@ Configuration Example
             AdvertiseDefaultRoute = 'Enabled'
             Advertising           = 'Enabled'
             AutomaticMetric       = 'Enabled'
-            ClampMss              = 'Enabled'
             Forwarding            = 'Enabled'
             IgnoreDefaultRoutes   = 'Enabled'
         }

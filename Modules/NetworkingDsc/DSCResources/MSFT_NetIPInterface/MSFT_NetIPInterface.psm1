@@ -109,9 +109,6 @@ function Get-TargetResource
     .PARAMETER AutomaticMetric
     Specifies the value for automatic metric calculation.
 
-    .PARAMETER ClampMss
-    Specifies the MSS clamping value for the IP interface.
-
     .PARAMETER Forwarding
     Specifies the packet forwarding value for the IP interface.
 
@@ -147,11 +144,6 @@ function Set-TargetResource
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
         $AutomaticMetric,
-
-        [Parameter()]
-        [ValidateSet('Enabled', 'Disabled')]
-        [System.String]
-        $ClampMss,
 
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
@@ -225,9 +217,6 @@ function Set-TargetResource
     .PARAMETER AutomaticMetric
     Specifies the value for automatic metric calculation.
 
-    .PARAMETER ClampMss
-    Specifies the MSS clamping value for the IP interface.
-
     .PARAMETER Forwarding
     Specifies the packet forwarding value for the IP interface.
 
@@ -264,11 +253,6 @@ function Test-TargetResource
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
         $AutomaticMetric,
-
-        [Parameter()]
-        [ValidateSet('Enabled', 'Disabled')]
-        [System.String]
-        $ClampMss,
 
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
