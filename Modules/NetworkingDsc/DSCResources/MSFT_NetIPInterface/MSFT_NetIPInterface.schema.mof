@@ -14,4 +14,5 @@ class MSFT_NetIPInterface : OMI_BaseResource
     [Write, Description("Specifies the value for managed address configuration."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String ManagedAddressConfiguration;
     [Write, Description("Specifies the value for Neighbor Unreachability Detection (NUD)."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String NeighborUnreachabilityDetection;
     [Write, Description("Specifies the value for configuration other than addresses."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String OtherStatefulConfiguration;
+    [Write, Description("Specifies the value for router discovery for an IP interface."), ValueMap{"Enabled", "Disabled", "ControlledByDHCP"},Values{"Enabled", "Disabled", "ControlledByDHCP"}] String RouterDiscovery;
 };

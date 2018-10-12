@@ -132,6 +132,9 @@ function Get-TargetResource
 
     .PARAMETER OtherStatefulConfiguration
     Specifies the value for configuration other than addresses.
+
+    .PARAMETER RouterDiscovery
+    Specifies the value for router discovery for an IP interface.
 #>
 function Set-TargetResource
 {
@@ -201,7 +204,12 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
-        $OtherStatefulConfiguration
+        $OtherStatefulConfiguration,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled', 'ControlledByDHCP')]
+        [System.String]
+        $RouterDiscovery
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -288,6 +296,9 @@ function Set-TargetResource
 
     .PARAMETER OtherStatefulConfiguration
     Specifies the value for configuration other than addresses.
+
+    .PARAMETER RouterDiscovery
+    Specifies the value for router discovery for an IP interface.
 #>
 function Test-TargetResource
 {
@@ -358,7 +369,12 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
-        $OtherStatefulConfiguration
+        $OtherStatefulConfiguration,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled', 'ControlledByDHCP')]
+        [System.String]
+        $RouterDiscovery
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "

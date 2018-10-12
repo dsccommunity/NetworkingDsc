@@ -16,6 +16,7 @@ configuration MSFT_NetIPInterface_Config_Enabled {
             ManagedAddressConfiguration     = $Node.ManagedAddressConfiguration
             NeighborUnreachabilityDetection = $Node.NeighborUnreachabilityDetection
             OtherStatefulConfiguration      = $Node.OtherStatefulConfiguration
+            RouterDiscovery                 = $Node.RouterDiscovery
         }
     }
 }
@@ -36,6 +37,7 @@ configuration MSFT_NetIPInterface_Config_Disabled {
             IgnoreDefaultRoutes             = $Node.IgnoreDefaultRoutes
             ManagedAddressConfiguration     = $Node.ManagedAddressConfiguration
             OtherStatefulConfiguration      = $Node.OtherStatefulConfiguration
+            RouterDiscovery                 = $Node.RouterDiscovery
         }
     }
 }

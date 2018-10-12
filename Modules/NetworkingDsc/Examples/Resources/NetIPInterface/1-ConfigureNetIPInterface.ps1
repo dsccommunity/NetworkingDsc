@@ -12,6 +12,7 @@
     - ManagedAddressConfiguration
     - NeighborUnreachabilityDetection
     - OtherStatefulConfiguration
+    - RouterDiscovery
     The EcnMarking parameter will be set to AppDecide.
 #>
 Configuration Example
@@ -35,6 +36,7 @@ Configuration Example
             ManagedAddressConfiguration     = 'Enabled'
             NeighborUnreachabilityDetection = 'Enabled'
             OtherStatefulConfiguration      = 'Enabled'
+            RouterDiscovery                 = 'Enabled'
         }
     }
 }
