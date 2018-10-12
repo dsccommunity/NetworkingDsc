@@ -43,6 +43,10 @@
         @{
             Name = 'OtherStatefulConfiguration'
             Type = 'String'
+        },
+        @{
+            Name = 'RouterDiscovery'
+            Type = 'String'
         }
     )
 }

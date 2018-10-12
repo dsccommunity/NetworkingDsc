@@ -26,7 +26,7 @@ New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
     The following settings are not supported by the loopback adapter so
     can not be tested using these tests:
     - Advertising
-    - Automatic Metric (can not be disabled after being enabled)
+    - AutomaticMetric (can not be disabled after being enabled)
     - NeighborUnreachabilityDetection
 
     Applying the above configuration settings to the loopback adapter
@@ -44,6 +44,7 @@ $setNetIPInterfaceParameters = @{
     IgnoreDefaultRoutes         = 'Disabled'
     ManagedAddressConfiguration = 'Disabled'
     OtherStatefulConfiguration  = 'Disabled'
+    RouterDiscovery             = 'Disabled'
 }
 Set-NetIPInterface @setNetIPInterfaceParameters
 
@@ -73,6 +74,7 @@ try
                         ManagedAddressConfiguration     = 'Enabled'
                         NeighborUnreachabilityDetection = 'Enabled'
                         OtherStatefulConfiguration      = 'Enabled'
+                        RouterDiscovery                 = 'ControlledByDHCP'
                     }
                 )
             }
@@ -113,6 +115,7 @@ try
                 $current.ManagedAddressConfiguration     | Should -Be $script:configData.AllNodes[0].ManagedAddressConfiguration
                 $current.NeighborUnreachabilityDetection | Should -Be $script:configData.AllNodes[0].NeighborUnreachabilityDetection
                 $current.OtherStatefulConfiguration      | Should -Be $script:configData.AllNodes[0].OtherStatefulConfiguration
+                $current.RouterDiscovery                 | Should -Be $script:configData.AllNodes[0].RouterDiscovery
             }
         }
 
@@ -132,6 +135,8 @@ try
                         IgnoreDefaultRoutes         = 'Disabled'
                         ManagedAddressConfiguration = 'Disabled'
                         OtherStatefulConfiguration  = 'Disabled'
+                        RouterDiscovery             = 'Disabled'
+
                     }
                 )
             }
@@ -170,6 +175,7 @@ try
                 $current.IgnoreDefaultRoutes             | Should -Be $script:configData.AllNodes[0].IgnoreDefaultRoutes
                 $current.ManagedAddressConfiguration     | Should -Be $script:configData.AllNodes[0].ManagedAddressConfiguration
                 $current.OtherStatefulConfiguration      | Should -Be $script:configData.AllNodes[0].OtherStatefulConfiguration
+                $current.RouterDiscovery                 | Should -Be $script:configData.AllNodes[0].RouterDiscovery
             }
         }
     }
