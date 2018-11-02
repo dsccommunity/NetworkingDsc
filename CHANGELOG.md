@@ -4,7 +4,7 @@
 
 - Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #357](https://github.com/PowerShell/NetworkingDsc/issues/357).
 - Updated LICENSE file to match the Microsoft Open Source Team standard - fixes
-[Issue #363](https://github.com/PowerShell/NetworkingDsc/issues/363)
+  [Issue #363](https://github.com/PowerShell/NetworkingDsc/issues/363)
 
 ## 6.1.0.0
 
