@@ -200,11 +200,11 @@ try
                         $Name, $MockedValue, $TestValue, $ParameterFilter
                     )
 
-                    $comparisonParamater = @{
+                    $comparisonParameter = @{
                         $Name = $TestValue
                     }
 
-                    $script:result = Test-TargetResource @script:netIPInterfaceExists @comparisonParamater
+                    $script:result = Test-TargetResource @script:netIPInterfaceExists @comparisonParameter
 
                     $script:result | Should -Be $false
                 }
@@ -222,11 +222,11 @@ try
                         $Name, $MockedValue, $TestValue, $ParameterFilter
                     )
 
-                    $comparisonParamater = @{
+                    $comparisonParameter = @{
                         $Name = $MockedValue
                     }
 
-                    $script:result = Test-TargetResource @script:netIPInterfaceExists @comparisonParamater
+                    $script:result = Test-TargetResource @script:netIPInterfaceExists @comparisonParameter
 
                     $script:result | Should -Be $true
                 }
@@ -248,19 +248,42 @@ try
                         $Name, $MockedValue, $TestValue, $ParameterFilter
                     )
 
-                    $comparisonParamater = @{
+                    $comparisonParameter = @{
                         $Name = $TestValue
                     }
 
                     Mock `
                         -CommandName Set-NetIPInterface
 
-                    Set-TargetResource @script:netIPInterfaceExists @comparisonParamater
+                    Set-TargetResource @script:netIPInterfaceExists @comparisonParameter
 
                     Assert-MockCalled `
                         -CommandName Set-NetIPInterface `
                         -ParameterFilter $ParameterFilter `
                         -Exactly -Times 1
+                }
+            }
+
+            Context 'When called with alias and address family of an exisitng interface and no mismatching values' {
+                Mock `
+                    -CommandName Get-NetworkIPInterface `
+                    -ParameterFilter $script:netIPInterfaceExists_ParameterFilter `
+                    -MockWith { $script:netIPInterfaceExists_Settings }
+
+                It 'Should not call Set-NetIPInterface' {
+                    $comparisonParameter = @{
+                        $testParameterList[0].Name = $testParameterList[0].MockedValue
+                    }
+
+                    Mock `
+                        -CommandName Set-NetIPInterface
+
+                    Set-TargetResource @script:netIPInterfaceExists @comparisonParameter
+
+                    Assert-MockCalled `
+                        -CommandName Set-NetIPInterface `
+                        -ParameterFilter $ParameterFilter `
+                        -Exactly -Times 0
                 }
             }
         }
