@@ -230,13 +230,14 @@ function Set-TargetResource
         netIPInterfaceParameters array that will be used to update the
         net IP interface settings.
     #>
+    $parameterUpdated = $false
     foreach ($parameter in $script:parameterList)
     {
         $parameterName = $parameter.Name
 
         if ($PSBoundParameters.ContainsKey($parameterName))
         {
-            $parameterValue = $netIPInterface.$($parameter.Name)
+            $parameterValue = $netIPInterface.$($parameterName)
             $parameterNewValue = (Get-Variable -Name ($parameterName)).Value
 
             if ($parameterNewValue -and ($parameterValue -ne $parameterNewValue))
@@ -247,11 +248,16 @@ function Set-TargetResource
                         $($LocalizedData.SettingNetIPInterfaceParameterValueMessage) `
                             -f $InterfaceAlias, $AddressFamily, $parameterName, $parameterNewValue
                     ) -join '')
+
+                $parameterUpdated = $true
             }
         }
     }
 
-    $null = Set-NetIPInterface @netIPInterfaceParameters
+    if ($parameterUpdated)
+    {
+        $null = Set-NetIPInterface @netIPInterfaceParameters
+    }
 }
 
 <#
@@ -401,7 +407,7 @@ function Test-TargetResource
 
         if ($PSBoundParameters.ContainsKey($parameterName))
         {
-            $parameterValue = $netIPInterface.$($parameter.Name)
+            $parameterValue = $netIPInterface.$($parameterName)
             $parameterNewValue = (Get-Variable -Name ($parameterName)).Value
 
             switch -Wildcard ($parameter.Type)
