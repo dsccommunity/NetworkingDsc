@@ -166,13 +166,17 @@ try
 
         #region Function Get-TargetResource
         Describe 'MSFT_NetIPInterface\Get-TargetResource' {
-            Context 'When called with alias and address family of an exisitng interface' {
+            Context 'When called with alias and address family of an existing interface' {
                 Mock `
                     -CommandName Get-NetworkIPInterface `
                     -ParameterFilter $script:netIPInterfaceExists_ParameterFilter `
                     -MockWith { $script:netIPInterfaceExists_Settings }
 
-                $script:result = Get-TargetResource @script:netIPInterfaceExists
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Get-TargetResource @script:netIPInterfaceExists
+                    } | Should -Not -Throw
+                }
 
                 It 'Should return <MockedValue> for parameter <Name>' -TestCases $testParameterList {
                     param
@@ -188,7 +192,7 @@ try
 
         #region Function Test-TargetResource
         Describe 'MSFT_NetIPInterface\Test-TargetResource' {
-            Context 'When called with alias and address family of an exisitng interface and a mismatching value' {
+            Context 'When called with alias and address family of an existing interface and a mismatching value' {
                 Mock `
                     -CommandName Get-NetworkIPInterface `
                     -ParameterFilter $script:netIPInterfaceExists_ParameterFilter `
@@ -210,7 +214,7 @@ try
                 }
             }
 
-            Context 'When called with alias and address family of an exisitng interface and no mismatching values' {
+            Context 'When called with alias and address family of an existing interface and no mismatching values' {
                 Mock `
                     -CommandName Get-NetworkIPInterface `
                     -ParameterFilter $script:netIPInterfaceExists_ParameterFilter `
@@ -236,7 +240,7 @@ try
 
         #region Function Set-TargetResource
         Describe 'MSFT_NetIPInterface\Set-TargetResource' {
-            Context 'When called with alias and address family of an exisitng interface and a mismatching value' {
+            Context 'When called with alias and address family of an existing interface and a mismatching value' {
                 Mock `
                     -CommandName Get-NetworkIPInterface `
                     -ParameterFilter $script:netIPInterfaceExists_ParameterFilter `
@@ -264,7 +268,7 @@ try
                 }
             }
 
-            Context 'When called with alias and address family of an exisitng interface and no mismatching values' {
+            Context 'When called with alias and address family of an existing interface and no mismatching values' {
                 Mock `
                     -CommandName Get-NetworkIPInterface `
                     -ParameterFilter $script:netIPInterfaceExists_ParameterFilter `
@@ -313,7 +317,7 @@ try
                 }
             }
 
-            Context 'When called with alias and address family of an exisitng interface' {
+            Context 'When called with alias and address family of an existing interface' {
                 Mock `
                     -CommandName Get-NetIPInterface `
                     -ParameterFilter $script:netIPInterfaceExists_ParameterFilter `
