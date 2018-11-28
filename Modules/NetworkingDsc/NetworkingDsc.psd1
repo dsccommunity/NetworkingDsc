@@ -1,6 +1,6 @@
 @{
     # Version number of this module.
-    moduleVersion = '6.1.0.0'
+    moduleVersion = '6.2.0.0'
 
     # ID used to uniquely identify this module
     GUID              = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -50,16 +50,18 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-        ReleaseNotes = '- MSFT_Firewall:
-  - Added full stop to end of MOF field descriptions.
-  - Support for `[`, `]` and `*` characters in the Name property
-    added - fixes [Issue 348](https://github.com/PowerShell/NetworkingDsc/issues/348).
-  - Improved unit tests to meet style guidelines.
+        ReleaseNotes = '- Added .VSCode settings for applying DSC PSSA rules - fixes [Issue 357](https://github.com/PowerShell/NetworkingDsc/issues/357).
+- Updated LICENSE file to match the Microsoft Open Source Team standard - fixes
+  [Issue 363](https://github.com/PowerShell/NetworkingDsc/issues/363)
+- MSFT_NetIPInterface:
+  - Added a new resource for configuring the IP interface settings for a network
+    interface.
 
 '
 
         } # End of PSData hashtable
     } # End of PrivateData hashtable
 }
+
 
 
