@@ -20,6 +20,12 @@
 - MSFT_WeakHostSend:
   - BREAKING CHANGE: Resource has been deprecated and replaced by `WeakHostSend`
     parameter in MSFT_NetIPInterface.
+- MSFT_IPAddress:
+  - Updated examples to use NetIPInterface.
+- MSFT_NetAdapterName:
+  - Updated examples to use NetIPInterface.
+- MSFT_DnsServerAddress:
+  - Updated examples to use NetIPInterface.
 
 ## 6.2.0.0
 

@@ -12,7 +12,7 @@ Configuration Example
         {
             InterfaceAlias  = 'Ethernet'
             AddressFamily   = 'IPv4'
-            WeakHostReceive = 'Disable'
+            WeakHostReceive = 'Disabled'
         }
     }
 }
