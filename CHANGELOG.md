@@ -6,7 +6,7 @@
 
 - MSFT_IPAddress:
   - Updated to allow retaining existing addresses in order to support cluster
-    configurations as well
+    configurations as well.
 - MSFT_NetIPInterface:
   - Added `Dhcp`, `WeakHostReceive` and `WeakHostSend` parameters so that
     MSFT_DHCPClient, MSFT_WeakHostReceive, MSFT_WeakHostSend can be
