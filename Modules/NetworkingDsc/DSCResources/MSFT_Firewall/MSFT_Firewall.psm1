@@ -445,7 +445,7 @@ function Set-TargetResource
                 if ($PSBoundParameters.ContainsKey('Group') `
                         -and ($Group -ne $FirewallRule.Group))
                 {
-                    Remove-NetFirewallRule -Name $Name
+                    Remove-NetFirewallRule -Name  (ConvertTo-FirewallRuleNameEscapedString -Name $Name)
 
                     <#
                         Merge the existing rule values into the PSBoundParameters
@@ -490,6 +490,9 @@ function Set-TargetResource
                         }
                     }
 
+                    # Escape firewall rule name to ensure that wildcard update is not used
+                    $PSBoundParameters['Name'] = ConvertTo-FirewallRuleNameEscapedString -Name $Name
+
                     # Set the existing Firewall rule based on specified parameters
                     Set-NetFirewallRule @PSBoundParameters
                 }
@@ -531,7 +534,7 @@ function Set-TargetResource
                 ) -join '')
 
             # Remove the existing Firewall rule
-            Remove-NetFirewallRule -Name $Name
+            Remove-NetFirewallRule -Name (ConvertTo-FirewallRuleNameEscapedString -Name $Name)
         }
         else
         {
@@ -1146,9 +1149,11 @@ function Test-RuleProperties
 
     $desiredConfigurationMatch = $true
 
-    # Loop through the $script:parameterList array and compare the source
-    # with the value of each parameter. If different then
-    # set $desiredConfigurationMatch to false.
+    <#
+        Loop through the $script:parameterList array and compare the source
+        with the value of each parameter. If different then set $desiredConfigurationMatch
+        to false.
+    #>
     foreach ($parameter in $script:parameterList)
     {
         $parameterValue = Get-FirewallPropertyValue `
@@ -1251,7 +1256,7 @@ function Get-FirewallRule
         $Name
     )
 
-    $firewallRule = @(Get-NetFirewallRule -Name $Name -ErrorAction SilentlyContinue)
+    $firewallRule = @(Get-NetFirewallRule -Name (ConvertTo-FirewallRuleNameEscapedString -Name $Name) -ErrorAction SilentlyContinue)
 
     if (-not $firewallRule)
     {
@@ -1346,6 +1351,28 @@ function Get-FirewallPropertyValue
         return (Get-Variable `
                 -Name ($Parameter.Variable)).value.$($Parameter.Name)
     }
+}
+
+<#
+    .SYNOPSIS
+    Convert Firewall Rule name to Escape Wildcard Characters.
+
+    It will append '[', ']' and '*' with a backtick.
+
+    .PARAMETER Name
+    The firewall rule name to escape.
+#>
+function ConvertTo-FirewallRuleNameEscapedString
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        $Name
+    )
+
+    return $Name.Replace('[','`[').Replace(']','`]').Replace('*','`*')
 }
 #endregion
 

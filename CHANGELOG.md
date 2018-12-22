@@ -6,6 +6,23 @@
   - Updated to allow retaining existing addresses in order to support cluster
     configurations as well
 
+## 6.2.0.0
+
+- Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #357](https://github.com/PowerShell/NetworkingDsc/issues/357).
+- Updated LICENSE file to match the Microsoft Open Source Team standard - fixes
+  [Issue #363](https://github.com/PowerShell/NetworkingDsc/issues/363)
+- MSFT_NetIPInterface:
+  - Added a new resource for configuring the IP interface settings for a network
+    interface.
+
+## 6.1.0.0
+
+- MSFT_Firewall:
+  - Added full stop to end of MOF field descriptions.
+  - Support for `[`, `]` and `*` characters in the Name property
+    added - fixes [Issue #348](https://github.com/PowerShell/NetworkingDsc/issues/348).
+  - Improved unit tests to meet style guidelines.
+
 ## 6.0.0.0
 
 - New Example 2-ConfigureSuffixSearchList.ps1 for multiple

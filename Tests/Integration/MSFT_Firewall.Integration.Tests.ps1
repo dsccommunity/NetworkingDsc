@@ -34,7 +34,9 @@ try
     $parameterList = $resourceData.ParameterList
 
     # Create a config data object to pass to the Add Rule Config
-    $ruleName = [Guid]::NewGuid()
+    $ruleNameGuid = [Guid]::NewGuid().ToString()
+    $ruleName = $ruleNameGuid + '[]*'
+    $ruleNameEscaped = $ruleNameGuid + '`[`]`*'
     $configData = @{
         AllNodes = @(
             @{
@@ -76,126 +78,174 @@ try
         )
     }
 
-    #region Integration Tests for Add Firewall Rule
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_add.config.ps1"
     . $configFile
 
     Describe "$($script:DSCResourceName)_Add_Integration" {
-        #region DEFAULT TESTS
         It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:DSCResourceName)_Add_Config" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
                 Start-DscConfiguration `
-                    -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force `
+                    -ErrorAction Stop
             } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-        }
-        #endregion
-
-        # Get the Rule details
-        $firewallRule = Get-NetFireWallRule -Name $ruleName
-
-        $properties = @{
-            AddressFilters       = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
-            ApplicationFilters   = @(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $FirewallRule)
-            InterfaceFilters     = @(Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $FirewallRule)
-            InterfaceTypeFilters = @(Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $FirewallRule)
-            PortFilters          = @(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $FirewallRule)
-            Profile              = @(Get-NetFirewallProfile -AssociatedNetFirewallRule $FirewallRule)
-            SecurityFilters      = @(Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $FirewallRule)
-            ServiceFilters       = @(Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule)
+            { $script:current = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
 
-        # Use the Parameters List to perform these tests
-        foreach ($parameter in $parameterList)
-        {
-            $parameterName = $parameter.Name
-            if ($parameterName -ne 'Name')
+        Context 'DSC resource state' {
+            # Use the Parameters List to perform these tests
+            foreach ($parameter in $parameterList)
             {
-                if ($parameter.Property)
-                {
-                    $parameterValue = (Get-Variable `
-                            -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
-                }
-                else
-                {
-                    $parameterValue = (Get-Variable `
-                            -Name ($parameter.Variable)).value.$($parameter.Name)
-                }
+                $parameterName = $parameter.Name
 
-                $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$($parameter.Name)
+                if ($parameterName -ne 'Name')
+                {
+                    $parameterValue = $Current.$($parameter.Name)
 
-                if ($parameter.Type -eq 'Array' -and $parameter.Delimiter)
-                {
-                    $parameterNew = $parameterNew -join $parameter.Delimiter
-                    It "Should have set the '$parameterName' to '$parameterNew'" {
-                        $parameterValue | Should -Be $parameterNew
-                    }
-                }
-                elseif ($parameter.Type -eq 'ArrayIP')
-                {
-                    for ([int] $entry = 0; $entry -lt $parameterNew.Count; $entry++)
+                    $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$($parameter.Name)
+
+                    if ($parameter.Type -eq 'Array' -and $parameter.Delimiter)
                     {
-                        It "Should have set the '$parameterName' arry item $entry to '$($parameterNew[$entry])'" {
-                            $parameterValue[$entry] | Should -Be (Convert-CIDRToSubhetMask -Address $parameterNew[$entry])
+                        It "Should have set the '$parameterName' to '$parameterNew'" {
+                            $parameterValue | Should -Be $parameterNew
                         }
                     }
-                }
-                else
-                {
-                    It "Should have set the '$parameterName' to '$parameterNew'" {
-                        $parameterValue | Should -Be $parameterNew
+                    elseif ($parameter.Type -eq 'ArrayIP')
+                    {
+                        for ([int] $entry = 0; $entry -lt $parameterNew.Count; $entry++)
+                        {
+                            It "Should have set the '$parameterName' arry item $entry to '$($parameterNew[$entry])'" {
+                                $parameterValue[$entry] | Should -Be (Convert-CIDRToSubhetMask -Address $parameterNew[$entry])
+                            }
+                        }
+                    }
+                    else
+                    {
+                        It "Should have set the '$parameterName' to '$parameterNew'" {
+                            $parameterValue | Should -Be $parameterNew
+                        }
                     }
                 }
             }
         }
 
+        Context 'The current firewall rule state' {
+            # Get the Rule details
+            $firewallRule = Get-NetFireWallRule -Name $ruleNameEscaped
+
+            $properties = @{
+                AddressFilters       = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
+                ApplicationFilters   = @(Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $FirewallRule)
+                InterfaceFilters     = @(Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $FirewallRule)
+                InterfaceTypeFilters = @(Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $FirewallRule)
+                PortFilters          = @(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $FirewallRule)
+                Profile              = @(Get-NetFirewallProfile -AssociatedNetFirewallRule $FirewallRule)
+                SecurityFilters      = @(Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $FirewallRule)
+                ServiceFilters       = @(Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $FirewallRule)
+            }
+
+            # Use the Parameters List to perform these tests
+            foreach ($parameter in $parameterList)
+            {
+                $parameterName = $parameter.Name
+
+                if ($parameterName -ne 'Name')
+                {
+                    if ($parameter.Property)
+                    {
+                        $parameterValue = (Get-Variable -Name ($parameter.Variable)).value.$($parameter.Property).$($parameter.Name)
+                    }
+                    else
+                    {
+                        $parameterValue = (Get-Variable -Name ($parameter.Variable)).value.$($parameter.Name)
+                    }
+
+                    $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$($parameter.Name)
+
+                    if ($parameter.Type -eq 'Array' -and $parameter.Delimiter)
+                    {
+                        $parameterNew = $parameterNew -join $parameter.Delimiter
+
+                        It "Should have set the '$parameterName' to '$parameterNew'" {
+                            $parameterValue | Should -Be $parameterNew
+                        }
+                    }
+                    elseif ($parameter.Type -eq 'ArrayIP')
+                    {
+                        for ([int] $entry = 0; $entry -lt $parameterNew.Count; $entry++)
+                        {
+                            It "Should have set the '$parameterName' arry item $entry to '$($parameterNew[$entry])'" {
+                                $parameterValue[$entry] | Should -Be (Convert-CIDRToSubhetMask -Address $parameterNew[$entry])
+                            }
+                        }
+                    }
+                    else
+                    {
+                        It "Should have set the '$parameterName' to '$parameterNew'" {
+                            $parameterValue | Should -Be $parameterNew
+                        }
+                    }
+                }
+            }
+        }
     }
-    #endregion
 
     # Modify the config data object to pass to the Remove Rule Config
     $configData.AllNodes[0].Ensure = 'Absent'
 
-    #region Integration Tests for Remove Firewall Rule
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_remove.config.ps1"
     . $configFile
 
     Describe "$($script:DSCResourceName)_Remove_Integration" {
-        #region DEFAULT TESTS
         It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:DSCResourceName)_Remove_Config" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
                 Start-DscConfiguration `
-                    -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force `
+                    -ErrorAction Stop
             } | Should -Not -Throw
         }
 
         It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            { $script:current = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
-        #endregion
 
-        It 'Should have deleted the rule' {
-            # Get the Rule details
-            $firewallRule = Get-NetFireWallRule -Name $ruleName -ErrorAction SilentlyContinue
-            $firewallRule | Should -BeNullOrEmpty
+        Context 'DSC resource state' {
+            It 'Should return the expected values' {
+                $script:current.Ensure | Should -Be 'Absent'
+            }
+        }
+
+        Context 'The current firewall rule state' {
+            It 'Should have deleted the rule' {
+                # Get the Rule details
+                $firewallRule = Get-NetFireWallRule -Name $ruleNameEscaped -ErrorAction SilentlyContinue
+                $firewallRule | Should -BeNullOrEmpty
+            }
         }
     }
-    #endregion
 }
 finally
 {
     #region FOOTER
-    if (Get-NetFirewallRule -Name $ruleName -ErrorAction SilentlyContinue)
+    if (Get-NetFirewallRule -Name $ruleNameEscaped -ErrorAction SilentlyContinue)
     {
-        Remove-NetFirewallRule -Name $ruleName
+        Remove-NetFirewallRule -Name $ruleNameEscaped
     }
 
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
