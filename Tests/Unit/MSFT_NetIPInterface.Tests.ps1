@@ -61,6 +61,14 @@ try
                 }
             },
             @{
+                Name = 'Dhcp'
+                MockedValue = 'Enabled'
+                TestValue = 'Disabled'
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $DirectedMacWolPattern -eq 'Disabled'
+                }
+            },
+            @{
                 Name = 'DirectedMacWolPattern'
                 MockedValue = 'Enabled'
                 TestValue = 'Disabled'
@@ -126,6 +134,22 @@ try
             },
             @{
                 Name = 'RouterDiscovery'
+                MockedValue = 'Enabled'
+                TestValue = 'Disabled'
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $RouterDiscovery -eq 'Disabled'
+                }
+            },
+            @{
+                Name = 'WeakHostReceive'
+                MockedValue = 'Enabled'
+                TestValue = 'Disabled'
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $RouterDiscovery -eq 'Disabled'
+                }
+            },
+            @{
+                Name = 'WeakHostSend'
                 MockedValue = 'Enabled'
                 TestValue = 'Disabled'
                 ParameterFilter = {

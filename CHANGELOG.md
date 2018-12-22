@@ -7,6 +7,19 @@
 - MSFT_IPAddress:
   - Updated to allow retaining existing addresses in order to support cluster
     configurations as well
+- MSFT_NetIPInterface:
+  - Added `Dhcp`, `WeakHostReceive` and `WeakHostSend` parameters so that
+    MSFT_DHCPClient, MSFT_WeakHostReceive, MSFT_WeakHostSend can be
+    deprecated - fixes [Issue #360](https://github.com/PowerShell/NetworkingDsc/issues/360).
+- MSFT_DhcpClient:
+  - BREAKING CHANGE: Resource has been deprecated and replaced by `Dhcp`
+    parameter in MSFT_NetIPInterface.
+- MSFT_WeakHostReceive:
+  - BREAKING CHANGE: Resource has been deprecated and replaced by `WeakHostReceive`
+    parameter in MSFT_NetIPInterface.
+- MSFT_WeakHostSend:
+  - BREAKING CHANGE: Resource has been deprecated and replaced by `WeakHostSend`
+    parameter in MSFT_NetIPInterface.
 
 ## 6.2.0.0
 

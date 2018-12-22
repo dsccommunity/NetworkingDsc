@@ -17,6 +17,10 @@
             Type = 'String'
         },
         @{
+            Name = 'Dhcp'
+            Type = 'String'
+        },
+        @{
             Name = 'EcnMarking'
             Type = 'String'
         },
@@ -46,6 +50,14 @@
         },
         @{
             Name = 'RouterDiscovery'
+            Type = 'String'
+        },
+        @{
+            Name = 'WeakHostReceive'
+            Type = 'String'
+        },
+        @{
+            Name = 'WeakHostSend'
             Type = 'String'
         }
     )

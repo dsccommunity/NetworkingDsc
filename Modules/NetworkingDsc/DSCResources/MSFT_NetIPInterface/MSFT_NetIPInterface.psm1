@@ -109,6 +109,9 @@ function Get-TargetResource
     .PARAMETER AutomaticMetric
     Specifies the value for automatic metric calculation.
 
+    .PARAMETER Dhcp
+    Specifies the Dynamic Host Configuration Protocol (DHCP) value for an IP interface.
+
     .PARAMETER DirectedMacWolPattern
     Specifies the wake-up packet value for an IP interface.
 
@@ -135,6 +138,12 @@ function Get-TargetResource
 
     .PARAMETER RouterDiscovery
     Specifies the value for router discovery for an IP interface.
+
+    .PARAMETER WeakHostReceive
+    Specifies the receive value for a weak host model.
+
+    .PARAMETER WeakHostSend
+    Specifies the send value for a weak host model.
 #>
 function Set-TargetResource
 {
@@ -165,6 +174,11 @@ function Set-TargetResource
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
         $AutomaticMetric,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $Dhcp,
 
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
@@ -209,7 +223,17 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled', 'ControlledByDHCP')]
         [System.String]
-        $RouterDiscovery
+        $RouterDiscovery,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $WeakHostReceive,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $WeakHostSend
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -279,6 +303,9 @@ function Set-TargetResource
     .PARAMETER AutomaticMetric
     Specifies the value for automatic metric calculation.
 
+    .PARAMETER Dhcp
+    Specifies the Dynamic Host Configuration Protocol (DHCP) value for an IP interface.
+
     .PARAMETER DirectedMacWolPattern
     Specifies the wake-up packet value for an IP interface.
 
@@ -305,6 +332,12 @@ function Set-TargetResource
 
     .PARAMETER RouterDiscovery
     Specifies the value for router discovery for an IP interface.
+
+    .PARAMETER WeakHostReceive
+    Specifies the receive value for a weak host model.
+
+    .PARAMETER WeakHostSend
+    Specifies the send value for a weak host model.
 #>
 function Test-TargetResource
 {
@@ -336,6 +369,11 @@ function Test-TargetResource
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
         $AutomaticMetric,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $Dhcp,
 
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
@@ -380,7 +418,17 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled', 'ControlledByDHCP')]
         [System.String]
-        $RouterDiscovery
+        $RouterDiscovery,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $WeakHostReceive,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $WeakHostSend
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
