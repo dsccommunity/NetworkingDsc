@@ -8,6 +8,7 @@ configuration MSFT_NetIPInterface_Config_Enabled {
             AddressFamily                   = $Node.AddressFamily
             AdvertiseDefaultRoute           = $Node.AdvertiseDefaultRoute
             AutomaticMetric                 = $Node.AutomaticMetric
+            Dhcp                            = $Node.Dhcp
             DirectedMacWolPattern           = $Node.DirectedMacWolPattern
             EcnMarking                      = $Node.EcnMarking
             ForceArpNdWolPattern            = $Node.ForceArpNdWolPattern
@@ -17,6 +18,8 @@ configuration MSFT_NetIPInterface_Config_Enabled {
             NeighborUnreachabilityDetection = $Node.NeighborUnreachabilityDetection
             OtherStatefulConfiguration      = $Node.OtherStatefulConfiguration
             RouterDiscovery                 = $Node.RouterDiscovery
+            WeakHostReceive                 = $Node.WeakHostReceive
+            WeakHostSend                    = $Node.WeakHostSend
         }
     }
 }
@@ -30,6 +33,7 @@ configuration MSFT_NetIPInterface_Config_Disabled {
             InterfaceAlias                  = $Node.InterfaceAlias
             AddressFamily                   = $Node.AddressFamily
             AdvertiseDefaultRoute           = $Node.AdvertiseDefaultRoute
+            Dhcp                            = $Node.Dhcp
             DirectedMacWolPattern           = $Node.DirectedMacWolPattern
             EcnMarking                      = $Node.EcnMarking
             ForceArpNdWolPattern            = $Node.ForceArpNdWolPattern
@@ -38,6 +42,8 @@ configuration MSFT_NetIPInterface_Config_Disabled {
             ManagedAddressConfiguration     = $Node.ManagedAddressConfiguration
             OtherStatefulConfiguration      = $Node.OtherStatefulConfiguration
             RouterDiscovery                 = $Node.RouterDiscovery
+            WeakHostReceive                 = $Node.WeakHostReceive
+            WeakHostSend                    = $Node.WeakHostSend
         }
     }
 }
