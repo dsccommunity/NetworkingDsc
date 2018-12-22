@@ -29,6 +29,9 @@ $localizedData = Get-LocalizedData @localizedDataSplat
 
     .PARAMETER AddressFamily
     IP address family.
+
+    .PARAMETER KeepExistingAddress
+    Indicates whether or not existing IP addresses on an interface will be retained.
 #>
 function Get-TargetResource
 {
@@ -49,7 +52,11 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
         [System.String]
-        $AddressFamily = 'IPv4'
+        $AddressFamily = 'IPv4',
+
+        [Parameter()]
+        [System.Boolean]
+        $KeepExistingAddress = $false
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -69,9 +76,10 @@ function Get-TargetResource
         }
 
     $returnValue = @{
-        IPAddress      = @($currentIPAddressWithPrefix)
-        AddressFamily  = $AddressFamily
-        InterfaceAlias = $InterfaceAlias
+        IPAddress             = @($currentIPAddressWithPrefix)
+        AddressFamily         = $AddressFamily
+        InterfaceAlias        = $InterfaceAlias
+        KeepExistingAddress = $KeepExistingAddress
     }
 
     return $returnValue
@@ -89,6 +97,9 @@ function Get-TargetResource
 
     .PARAMETER AddressFamily
     IP address family.
+
+    .PARAMETER KeepExistingAddress
+    Indicates whether or not existing IP addresses on an interface will be retained.
 #>
 function Set-TargetResource
 {
@@ -108,7 +119,11 @@ function Set-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
         [System.String]
-        $AddressFamily = 'IPv4'
+        $AddressFamily = 'IPv4',
+
+        [Parameter()]
+        [System.Boolean]
+        $KeepExistingAddress = $false
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -174,7 +189,7 @@ function Set-TargetResource
         {
             $removeIP = $false
 
-            if ($currentIP.IPAddress -notin ($IPAddress -replace '\/\S*', ''))
+            if ($currentIP.IPAddress -notin ($IPAddress -replace '\/\S*', '') -and -not $KeepExistingAddress)
             {
                 $removeIP = $true
             }
@@ -269,6 +284,9 @@ function Set-TargetResource
 
     .PARAMETER AddressFamily
     IP address family.
+
+    .PARAMETER KeepExistingAddress
+    Indicates whether or not existing IP addresses on an interface will be retained.
 #>
 function Test-TargetResource
 {
@@ -289,7 +307,11 @@ function Test-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
         [System.String]
-        $AddressFamily = 'IPv4'
+        $AddressFamily = 'IPv4',
+
+        [Parameter()]
+        [System.Boolean]
+        $KeepExistingAddress = $false
     )
 
     # Flag to signal whether settings are correct
@@ -392,6 +414,9 @@ function Test-TargetResource
 
     .PARAMETER AddressFamily
     IP address family.
+
+    .PARAMETER KeepExistingAddress
+    Indicates whether or not existing IP addresses on an interface will be retained.
 #>
 function Assert-ResourceProperty
 {
@@ -411,7 +436,11 @@ function Assert-ResourceProperty
         [Parameter()]
         [ValidateSet('IPv4', 'IPv6')]
         [System.String]
-        $AddressFamily = 'IPv4'
+        $AddressFamily = 'IPv4',
+
+        [Parameter()]
+        [System.Boolean]
+        $KeepExistingAddress = $false
     )
 
     $prefixLengthArray = ($IPAddress -split '/')[1]
