@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 6.3.0.0
+
+- MSFT_IPAddress:
+  - Updated to allow retaining existing addresses in order to support cluster
+    configurations as well
+
 ## 6.2.0.0
 
 - Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #357](https://github.com/PowerShell/NetworkingDsc/issues/357).
