@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.3.0.0
+
 - MSFT_IPAddress:
   - Updated to allow retaining existing addresses in order to support cluster
     configurations as well
