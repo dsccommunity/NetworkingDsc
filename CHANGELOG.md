@@ -8,6 +8,9 @@
   - Updated to allow retaining existing addresses in order to support cluster
     configurations as well
 
+- MSFT_NetAdapterAdvancedProperty:
+    - Resolves issue #370. Name is not specified in the schema; Returns the NetworkAdapterName in place of the name property.
+
 ## 6.2.0.0
 
 - Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #357](https://github.com/PowerShell/NetworkingDsc/issues/357).
