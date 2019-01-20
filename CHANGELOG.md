@@ -9,7 +9,7 @@
     configurations as well
 
 - MSFT_NetAdapterAdvancedProperty:
-    - Resolves issue #370. Name is not specified in the schema; Returns the NetworkAdapterName in place of the name property.
+  - Resolves issue #370. Name is not specified in the schema; Returns the NetworkAdapterName in place of the name property.
 
 ## 6.2.0.0
 
