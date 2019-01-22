@@ -6,22 +6,15 @@
 #>
 Configuration Example
 {
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $NodeName = 'localhost'
-    )
-
     Import-DscResource -Module NetworkingDsc
 
-    Node $NodeName
+    Node localhost
     {
-        DhcpClient DisabledDhcpClient
+        NetIPInterface DisableDhcp
         {
-            State          = 'Disabled'
             InterfaceAlias = 'Ethernet'
-            AddressFamily  = 'IPv6'
+            AddressFamily  = 'IPv4'
+            Dhcp           = 'Disabled'
         }
 
         # If no prefix is supplied IPv6 will default to /64.

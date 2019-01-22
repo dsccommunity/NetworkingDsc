@@ -4,22 +4,15 @@
 #>
 Configuration Example
 {
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $NodeName = 'localhost'
-    )
-
     Import-DscResource -Module NetworkingDsc
 
-    Node $NodeName
+    Node localhost
     {
-        DhcpClient DisabledDhcpClient
+        NetIPInterface DisableDhcp
         {
-            State          = 'Disabled'
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPv6'
+            Dhcp           = 'Disabled'
         }
 
         IPAddress NewIPv6Address

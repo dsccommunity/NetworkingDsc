@@ -2,11 +2,31 @@
 
 ## Unreleased
 
+- MSFT_NetIPInterface:
+  - Added `Dhcp`, `WeakHostReceive` and `WeakHostSend` parameters so that
+    MSFT_DHCPClient, MSFT_WeakHostReceive, MSFT_WeakHostSend can be
+    deprecated - fixes [Issue #360](https://github.com/PowerShell/NetworkingDsc/issues/360).
+- MSFT_DhcpClient:
+  - BREAKING CHANGE: Resource has been deprecated and replaced by `Dhcp`
+    parameter in MSFT_NetIPInterface.
+- MSFT_WeakHostReceive:
+  - BREAKING CHANGE: Resource has been deprecated and replaced by `WeakHostReceive`
+    parameter in MSFT_NetIPInterface.
+- MSFT_WeakHostSend:
+  - BREAKING CHANGE: Resource has been deprecated and replaced by `WeakHostSend`
+    parameter in MSFT_NetIPInterface.
+- MSFT_IPAddress:
+  - Updated examples to use NetIPInterface.
+- MSFT_NetAdapterName:
+  - Updated examples to use NetIPInterface.
+- MSFT_DnsServerAddress:
+  - Updated examples to use NetIPInterface.
+
 ## 6.3.0.0
 
 - MSFT_IPAddress:
   - Updated to allow retaining existing addresses in order to support cluster
-    configurations as well
+    configurations as well.
 
 - MSFT_NetAdapterAdvancedProperty:
   - Resolves issue #370. Name is not specified in the schema; Returns the NetworkAdapterName in place of the name property.
