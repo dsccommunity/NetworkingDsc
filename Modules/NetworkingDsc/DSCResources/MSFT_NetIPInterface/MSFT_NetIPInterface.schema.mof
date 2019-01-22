@@ -6,6 +6,7 @@ class MSFT_NetIPInterface : OMI_BaseResource
     [Write, Description("Specifies the default router advertisement for an interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String AdvertiseDefaultRoute;
     [Write, Description("Specifies the router advertisement value for the IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String Advertising;
     [Write, Description("Specifies the value for automatic metric calculation."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String AutomaticMetric;
+    [Write, Description("Specifies the Dynamic Host Configuration Protocol (DHCP) value for an IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String Dhcp;
     [Write, Description("Specifies the wake-up packet value for an IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String DirectedMacWolPattern;
     [Write, Description("Specifies the value for Explicit Congestion Notification (ECN) marking."), ValueMap{"Disabled", "UseEct1", "UseEct0", "AppDecide"},Values{"Disabled", "UseEct1", "UseEct0", "AppDecide"}] String EcnMarking;
     [Write, Description("Specifies the Wake On LAN (WOL) value for the IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String ForceArpNdWolPattern;
@@ -15,4 +16,6 @@ class MSFT_NetIPInterface : OMI_BaseResource
     [Write, Description("Specifies the value for Neighbor Unreachability Detection (NUD)."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String NeighborUnreachabilityDetection;
     [Write, Description("Specifies the value for configuration other than addresses."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String OtherStatefulConfiguration;
     [Write, Description("Specifies the value for router discovery for an IP interface."), ValueMap{"Enabled", "Disabled", "ControlledByDHCP"},Values{"Enabled", "Disabled", "ControlledByDHCP"}] String RouterDiscovery;
+    [Write, Description("Specifies the receive value for a weak host model."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String WeakHostReceive;
+    [Write, Description("Specifies the send value for a weak host model."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String WeakHostSend;
 };

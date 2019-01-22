@@ -5,16 +5,9 @@
 #>
 Configuration Example
 {
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $NodeName = 'localhost'
-    )
-
     Import-DSCResource -ModuleName NetworkingDsc
 
-    Node $NodeName
+    Node localhost
     {
         NetAdapterName RenameNetAdapterCluster
         {
@@ -22,11 +15,11 @@ Configuration Example
             MacAddress = '9C-D2-1E-61-B5-DA'
         }
 
-        DhcpClient EnableDhcpClientCluster
+        NetIPInterface EnableDhcpClientCluster
         {
-            State          = 'Enabled'
             InterfaceAlias = 'Cluster'
             AddressFamily  = 'IPv4'
+            Dhcp           = 'Enabled'
         }
 
         NetAdapterName RenameNetAdapterManagement
@@ -35,11 +28,11 @@ Configuration Example
             MacAddress = '9C-D2-1E-61-B5-DB'
         }
 
-        DhcpClient EnableDhcpClientManagement
+        NetIPInterface EnableDhcpClientManagement
         {
-            State          = 'Enabled'
             InterfaceAlias = 'Management'
             AddressFamily  = 'IPv4'
+            Dhcp           = 'Enabled'
         }
 
         NetAdapterName RenameNetAdapterSMB
@@ -48,11 +41,11 @@ Configuration Example
             MacAddress = '9C-D2-1E-61-B5-DC'
         }
 
-        DhcpClient EnableDhcpClientSMB
+        NetIPInterface EnableDhcpClientSMB
         {
-            State          = 'Enabled'
             InterfaceAlias = 'SMB'
             AddressFamily  = 'IPv4'
+            Dhcp           = 'Enabled'
         }
     }
 }

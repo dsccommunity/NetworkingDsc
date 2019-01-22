@@ -1,25 +1,19 @@
 <#
     .EXAMPLE
-    Enabling DHCP for the IP Address and DNS on the adapter with alias 'Ethernet'.
+    Enabling DHCP for the IPv4 Address and DNS on the adapter with alias 'Ethernet'.
+
 #>
 Configuration Example
 {
-    param
-    (
-        [Parameter()]
-        [System.String[]]
-        $NodeName = 'localhost'
-    )
-
     Import-DscResource -Module NetworkingDsc
 
-    Node $NodeName
+    Node localhost
     {
-        DhcpClient EnableDhcpClient
+        NetIPInterface EnableDhcp
         {
-            State          = 'Enabled'
             InterfaceAlias = 'Ethernet'
             AddressFamily  = 'IPv4'
+            Dhcp           = 'Enabled'
         }
 
         DnsServerAddress EnableDhcpDNS
