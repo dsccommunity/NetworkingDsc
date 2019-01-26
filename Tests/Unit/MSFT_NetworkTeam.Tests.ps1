@@ -100,9 +100,9 @@ try
                 }
 
                 It 'Should return team properties' {
-                    $result.Ensure                 | Should -Be 'Absent'
+                    $result.Ensure                 | Should -Be 'Present'
                     $result.Name                   | Should -Be $testTeam.Name
-                    $result.TeamMembers            | Should -Be @('NIC1','NIC3')
+                    $result.TeamMembers            | Should -Be @('NIC1','NIC2')
                     $result.LoadBalancingAlgorithm | Should -Be 'Dynamic'
                     $result.TeamingMode            | Should -Be 'SwitchIndependent'
                 }
