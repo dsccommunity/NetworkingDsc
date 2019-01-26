@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID 1b89dde9-d835-4941-900c-fa99ccbe42d1
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -29,7 +29,7 @@ Configuration NetworkTeam_AddNetworkTeam_Config
 
     Node localhost
     {
-        NetworkTeam HostTeam
+        NetworkTeam AddNetworkTeam
         {
             Name                   = 'HostTeam'
             TeamingMode            = 'SwitchIndependent'

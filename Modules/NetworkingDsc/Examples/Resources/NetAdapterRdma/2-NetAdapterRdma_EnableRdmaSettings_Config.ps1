@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID aaf5817d-3f61-4c88-881a-f07d660be548
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -27,7 +27,7 @@ Configuration NetAdapterRdma_EnableRdmaSettings_Config
 
     Node localhost
     {
-        NetAdapterRdma SMBAdapter1
+        NetAdapterRdma EnableRdmaSettings
         {
             Name = 'SMB1_1'
             Enabled = $true

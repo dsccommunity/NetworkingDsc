@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID 8f82152a-d833-4752-a9f1-7960bda73536
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -27,7 +27,7 @@ Configuration DnsClientGlobalSetting_ConfigureSuffixSearchListMultiple_Config
 
     Node localhost
     {
-        DnsClientGlobalSetting AddMultipleDNSSuffix
+        DnsClientGlobalSetting ConfigureSuffixSearchListMultiple
         {
             IsSingleInstance = 'Yes'
             SuffixSearchList = ('fabrikam.com', 'fourthcoffee.com')

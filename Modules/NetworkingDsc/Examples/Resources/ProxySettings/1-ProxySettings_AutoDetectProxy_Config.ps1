@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID 49497e7c-1788-4d3e-a857-f676f88ec70d
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -27,7 +27,7 @@ Configuration ProxySettings_AutoDetectProxy_Config
 
     Node localhost
     {
-        ProxySettings AutoConfigurationProxy
+        ProxySettings AutoDetectProxy
         {
             IsSingleInstance        = 'Yes'
             Ensure                  = 'Present'

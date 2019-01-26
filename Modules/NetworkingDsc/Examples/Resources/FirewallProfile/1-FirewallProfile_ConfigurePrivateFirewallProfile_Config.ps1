@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID 293c0473-a0bd-4ccd-82dd-086790598e73
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -27,7 +27,7 @@ Configuration FirewallProfile_ConfigurePrivateFirewallProfile_Config
 
     Node localhost
     {
-        FirewallProfile FirewallProfilePrivate
+        FirewallProfile ConfigurePrivateFirewallProfile
         {
             Name = 'Private'
             Enabled = 'True'

@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID 87e17ee4-64b0-476a-8aa8-1018a5de6353
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -27,7 +27,7 @@ Configuration DnsServerAddress_PrimaryAndSecondary_Config
 
     Node localhost
     {
-        DnsServerAddress DnsServerAddress
+        DnsServerAddress PrimaryAndSecondary
         {
             Address        = '10.0.0.2','10.0.0.40'
             InterfaceAlias = 'Ethernet'

@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID a675798c-d2b7-4f1b-b59a-b90f2f2e6178
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -27,7 +27,7 @@ Configuration Firewall_AddFirewallRule_Config
 
     Node localhost
     {
-        Firewall Firewall
+        Firewall AddFirewallRule
         {
             Name                  = 'NotePadFirewallRule'
             DisplayName           = 'Firewall Rule for Notepad.exe'

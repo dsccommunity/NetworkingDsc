@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID ac021c17-02e7-4189-b40b-d7448ab73e99
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -27,7 +27,7 @@ Configuration HostsFile_RemoveEntry_Config
 
     Node localhost
     {
-        HostsFile HostEntry
+        HostsFile HostsFileRemoveEntry
         {
             HostName  = 'Host01'
             IPAddress = '192.168.0.1'

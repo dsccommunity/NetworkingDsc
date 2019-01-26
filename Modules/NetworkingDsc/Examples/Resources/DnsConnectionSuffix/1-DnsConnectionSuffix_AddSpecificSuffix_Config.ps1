@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID bb3f31aa-09bc-46c4-bf60-35c5702934b3
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -28,7 +28,7 @@ Configuration DnsConnectionSuffix_AddSpecificSuffix_Config
 
     Node localhost
     {
-        DnsConnectionSuffix DnsConnectionSuffix
+        DnsConnectionSuffix AddSpecificSuffix
         {
             InterfaceAlias           = 'Ethernet'
             ConnectionSpecificSuffix = 'contoso.com'
