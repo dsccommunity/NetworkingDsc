@@ -41,7 +41,7 @@ Configuration WaitForNetworkTeam_AddNetworkTeam_Config
         WaitForNetworkTeam WaitForHostTeam
         {
             Name      = 'HostTeam'
-            DependsOn = '[NetworkTeam]HostTeam'
+            DependsOn = '[NetworkTeam]AddNetworkTeam'
         }
     }
 }
