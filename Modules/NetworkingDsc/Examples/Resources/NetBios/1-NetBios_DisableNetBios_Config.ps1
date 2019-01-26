@@ -25,7 +25,7 @@ Configuration NetBios_DisableNetBios_Config
 {
     Import-DscResource -ModuleName NetworkingDsc
 
-    node $NodeName
+    Node localhost
     {
         NetBios DisableNetBios
         {
