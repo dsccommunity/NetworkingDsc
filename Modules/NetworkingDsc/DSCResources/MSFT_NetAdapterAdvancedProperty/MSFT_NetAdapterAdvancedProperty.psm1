@@ -74,10 +74,10 @@ function Get-TargetResource
             ) -join '')
 
         $result = @{
-            Name            = $NetworkAdapterName
-            RegistryKeyword = $RegistryKeyword
-            DisplayValue    = $netAdapterAdvancedProperty.DisplayValue
-            RegistryValue   = $netAdapterAdvancedProperty.RegistryValue
+            NetworkAdapterName = $NetworkAdapterName
+            RegistryKeyword    = $RegistryKeyword
+            DisplayValue       = $netAdapterAdvancedProperty.DisplayValue
+            RegistryValue      = $netAdapterAdvancedProperty.RegistryValue
         }
 
         return $result

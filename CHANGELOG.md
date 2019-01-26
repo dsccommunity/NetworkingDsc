@@ -28,6 +28,10 @@
   - Updated to allow retaining existing addresses in order to support cluster
     configurations as well.
 
+- MSFT_NetAdapterAdvancedProperty:
+  - Fixes NetworkAdapterName being returned in Name property when calling
+    Get-TargetResourceFixes - fixes [Issue #370](https://github.com/PowerShell/NetworkingDsc/issues/370).
+
 ## 6.2.0.0
 
 - Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #357](https://github.com/PowerShell/NetworkingDsc/issues/357).
