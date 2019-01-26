@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID ef34f3d9-826f-4e01-81fb-3980d07efcfe
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -27,7 +27,7 @@ Configuration NetConnectionProfile_SetPublicEnableInternet_Config
 
     Node localhost
     {
-        NetConnectionProfile Example
+        NetConnectionProfile SetPublicEnableInternet
         {
             InterfaceAlias   = 'Ethernet'
             NetworkCategory  = 'Public'

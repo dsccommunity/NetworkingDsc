@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID 1b144c2a-c111-40bd-b3ac-8d3209de3b5c
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -28,7 +28,7 @@ Configuration Firewall_EnableBuiltInFirewallRule_Config
 
     Node localhost
     {
-        Firewall Firewall
+        Firewall EnableBuiltInFirewallRule
         {
             Name                  = 'IIS-WebServerRole-HTTP-In-TCP'
             Ensure                = 'Present'

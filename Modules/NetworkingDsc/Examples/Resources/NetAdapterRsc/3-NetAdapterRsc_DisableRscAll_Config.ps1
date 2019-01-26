@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID 2763e266-d03a-4736-b7bf-3108cfeadc4e
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -27,7 +27,7 @@ Configuration NetAdapterRsc_DisableRscAll_Config
 
     Node localhost
     {
-        NetAdapterRsc DisableRscIPv4
+        NetAdapterRsc DisableRscAll
         {
             Name = 'Ethernet'
             Protocol = 'All'

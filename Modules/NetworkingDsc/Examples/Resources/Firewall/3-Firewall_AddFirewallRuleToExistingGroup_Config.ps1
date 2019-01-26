@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID 6121a928-6d18-4b48-8261-d2bea7036a8d
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -27,7 +27,7 @@ Configuration Firewall_AddFirewallRuleToExistingGroup_Config
 
     Node localhost
     {
-        Firewall Firewall
+        Firewall AddFirewallRuleToExistingGroup
         {
             Name                  = 'MyFirewallRule'
             DisplayName           = 'My Firewall Rule'

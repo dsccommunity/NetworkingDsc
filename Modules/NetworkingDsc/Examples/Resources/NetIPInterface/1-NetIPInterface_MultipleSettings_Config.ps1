@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID 35f4563f-fae5-4028-b8eb-06939caf62fe
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -40,7 +40,7 @@ Configuration NetIPInterface_MultipleSettings_Config
 
     Node localhost
     {
-        NetIPInterface EnableSettings
+        NetIPInterface MultipleSettings
         {
             InterfaceAlias                  = 'Ethernet'
             AddressFamily                   = 'IPv4'

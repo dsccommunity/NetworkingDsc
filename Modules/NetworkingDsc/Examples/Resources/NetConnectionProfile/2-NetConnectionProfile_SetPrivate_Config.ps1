@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID 28ca3005-2ec5-4e0a-acb0-084b459e6303
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -28,7 +28,7 @@ Configuration NetConnectionProfile_SetPrivate_Config
 
     Node localhost
     {
-        NetConnectionProfile Example
+        NetConnectionProfile SetPrivate
         {
             InterfaceAlias   = 'Ethernet'
             NetworkCategory  = 'Private'

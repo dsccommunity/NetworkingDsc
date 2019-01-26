@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID e4536f6b-b2a4-41b6-94eb-4c5e1dccac53
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -27,7 +27,7 @@ Configuration HostsFile_AddEntry_Config
 
     Node localhost
     {
-        HostsFile HostEntry
+        HostsFile HostsFileAddEntry
         {
             HostName  = 'Host01'
             IPAddress = '192.168.0.1'

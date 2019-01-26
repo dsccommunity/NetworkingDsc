@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID e1a46ec1-73ff-49e6-849b-81b13917d2b0
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -21,13 +21,13 @@
     .DESCRIPTION
     Removes the NIC Team 'HostTeam' from the interfaces NIC1, NIC2 and NIC3.
 #>
-Configuration NetworkTeam_RemoveTeam_Config
+Configuration NetworkTeam_RemoveNetworkTeam_Config
 {
     Import-DSCResource -ModuleName NetworkingDsc
 
     Node localhost
     {
-        NetworkTeam HostTeam
+        NetworkTeam RemoveNetworkTeam
         {
             Name        = 'HostTeam'
             Ensure      = 'Absent'

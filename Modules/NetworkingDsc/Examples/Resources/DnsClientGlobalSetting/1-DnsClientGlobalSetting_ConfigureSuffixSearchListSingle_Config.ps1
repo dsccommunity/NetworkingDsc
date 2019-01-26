@@ -1,6 +1,6 @@
 <#PSScriptInfo
 .VERSION 1.0.0
-.GUID
+.GUID ef9d0f9a-5a08-43c0-9645-48e103188971
 .AUTHOR Microsoft Corporation
 .COMPANYNAME Microsoft Corporation
 .COPYRIGHT
@@ -27,7 +27,7 @@ Configuration DnsClientGlobalSetting_ConfigureSuffixSearchListSingle_Config
 
     Node localhost
     {
-        DnsClientGlobalSetting AddDNSSuffix
+        DnsClientGlobalSetting ConfigureSuffixSearchListSingle
         {
             IsSingleInstance = 'Yes'
             SuffixSearchList = 'contoso.com'
