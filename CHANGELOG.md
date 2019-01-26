@@ -21,6 +21,10 @@
   - Updated examples to use NetIPInterface.
 - MSFT_DnsServerAddress:
   - Updated examples to use NetIPInterface.
+- MSFT_NetworkTeam:
+  - Change `Get-TargetResource` to return actual TeamMembers if network team
+    exists and 'Ensure' returns 'Present' even when actual TeamMembers do
+    not match 'TeamMembers' parameter - fixes [Issue #342](https://github.com/PowerShell/NetworkingDsc/issues/342).
 
 ## 6.3.0.0
 

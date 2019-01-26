@@ -55,14 +55,15 @@ Function Get-TargetResource
         Write-Verbose -Message ($localizedData.FoundTeam -f $Name)
         $configuration.Add('LoadBalancingAlgorithm', $networkTeam.LoadBalancingAlgorithm)
         $configuration.Add('TeamingMode', $networkTeam.TeamingMode)
+        $configuration.Ensure = 'Present'
 
         if ($null -eq (Compare-Object -ReferenceObject $TeamMembers -DifferenceObject $networkTeam.Members))
         {
             Write-Verbose -Message ($localizedData.TeamMembersMatch -f $Name)
-            $configuration.Ensure = 'Present'
         }
         else
         {
+            $configuration.TeamMembers = $networkTeam.Members
             Write-Verbose -Message ($localizedData.TeamMembersNotMatch -f $Name)
         }
     }
