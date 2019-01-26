@@ -25,6 +25,8 @@
   - Change `Get-TargetResource` to return actual TeamMembers if network team
     exists and 'Ensure' returns 'Present' even when actual TeamMembers do
     not match 'TeamMembers' parameter - fixes [Issue #342](https://github.com/PowerShell/NetworkingDsc/issues/342).
+- Updated examples to format required for publishing to PowerShell Gallery - fixes
+  [Issue #374](https://github.com/PowerShell/NetworkingDsc/issues/374).
 
 ## 6.3.0.0
 
