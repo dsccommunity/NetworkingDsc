@@ -3,7 +3,6 @@
 The **NetworkingDsc** module contains the following resources:
 
 - **DefaultGatewayAddress**: Sets a node's default gateway address.
-- **DhcpClient**: Enable or Disable DHCP on an network interface.
 - **DnsClientGlobalSetting**: Configure DNS client global settings.
 - **DnsConnectionSuffix**: Sets a node's network interface
     connection-specific DNS suffix.
@@ -30,9 +29,6 @@ The **NetworkingDsc** module contains the following resources:
 - **ProxySettings**: Configures the proxy settings for the computer.
 - **Route**: Sets static routes on a node.
 - **WaitForNetworkTeam**: Wait for a network team to achieve the 'Up' status.
-- **WeakHostSend**: Enable or disable the Weak Host Send setting on a network adapter.
-- **WeakHostReceive**: Enable or disable the Weak Host Receive setting
-    on a network adapter.
 - **WinsSetting**: Configure the WINS settings that enable or disable LMHOSTS lookups
   and enable or disable DNS for name resolution over WINS.
 

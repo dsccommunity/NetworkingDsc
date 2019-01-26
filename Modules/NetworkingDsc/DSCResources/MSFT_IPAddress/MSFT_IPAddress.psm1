@@ -76,9 +76,9 @@ function Get-TargetResource
         }
 
     $returnValue = @{
-        IPAddress             = @($currentIPAddressWithPrefix)
-        AddressFamily         = $AddressFamily
-        InterfaceAlias        = $InterfaceAlias
+        IPAddress           = @($currentIPAddressWithPrefix)
+        AddressFamily       = $AddressFamily
+        InterfaceAlias      = $InterfaceAlias
         KeepExistingAddress = $KeepExistingAddress
     }
 
