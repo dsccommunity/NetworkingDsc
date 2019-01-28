@@ -1,4 +1,4 @@
-﻿<#
+<#
     .SYNOPSIS
         Returns an invalid argument exception object
 

@@ -1,5 +1,5 @@
-$Global:DSCModuleName = 'NetworkingDsc'
-$Global:DSCResourceName = 'MSFT_NetworkTeamInterface'
+$script:DSCModuleName = 'NetworkingDsc'
+$script:DSCResourceName = 'MSFT_NetworkTeamInterface'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -23,7 +23,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     #region Pester Tests
-    InModuleScope $Global:DSCResourceName {
+    InModuleScope $script:DSCResourceName {
         # Create the Mock -CommandName Objects that will be used for running tests
         $script:testNicName = 'HostTeamNic'
         $script:testTeamName = 'HostTeam'
@@ -84,7 +84,7 @@ try
             -and $VlanId -eq 100
         }
 
-        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
+        Describe "$($script:DSCResourceName)\Get-TargetResource" {
             Context 'When team Interface does not exist' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
@@ -132,7 +132,7 @@ try
             }
         }
 
-        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
+        Describe "$($script:DSCResourceName)\Set-TargetResource" {
             Context 'When team Interface does not exist but invalid VlanId (0) is passed' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
@@ -282,7 +282,7 @@ try
             }
         }
 
-        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
+        Describe "$($script:DSCResourceName)\Test-TargetResource" {
             Context 'When team Interface does not exist but should' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `

@@ -27,8 +27,6 @@ if (-not (Test-NetworkTeamIntegrationEnvironment -NetworkAdapters $script:Networ
     return
 }
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
 #region HEADER
 # Integration Test Template Version: 1.1.1
 [System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
