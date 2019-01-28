@@ -3,6 +3,7 @@ function New-IntegrationLoopbackAdapter
     [cmdletbinding()]
     param
     (
+        [Parameter()]
         [String]
         $AdapterName
     )
@@ -42,10 +43,13 @@ function Remove-IntegrationLoopbackAdapter
     [cmdletbinding()]
     param
     (
+        [Parameter()]
         [String]
         $AdapterName
     )
-    if ($env:APPVEYOR) {
+
+    if ($env:APPVEYOR)
+    {
         # Running in AppVeyor so force silent install of LoopbackAdapter
         $Splat = @{ Force = $true }
     }

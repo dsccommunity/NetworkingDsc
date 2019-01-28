@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Refactored module folder structure to move resource to root folder of
+  repository and remove test harness - fixes [Issue #372](https://github.com/PowerShell/NetworkingDsc/issues/372).
+- Removed module conflict tests because only required for harness style
+  modules.
+- Opted into Common Tests 'Validate Example Files To Be Published',
+  'Validate Markdown Links' and 'Relative Path Length'.
+- Added 'DscResourcesToExport' to manifest to improve information in
+  PowerShell Gallery and removed wildcards from 'FunctionsToExport',
+  'CmdletsToExport', 'VariablesToExport' and 'AliasesToExport' - fixes
+  [Issue #376](https://github.com/PowerShell/NetworkingDsc/issues/376).
 - MSFT_NetIPInterface:
   - Added `Dhcp`, `WeakHostReceive` and `WeakHostSend` parameters so that
     MSFT_DHCPClient, MSFT_WeakHostReceive, MSFT_WeakHostSend can be
