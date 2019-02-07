@@ -39,10 +39,11 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Get-TargetResource" {
+        Describe "$($DSCResourceName)\Get-TargetResource" {
 
             $getTargetResource = @{
                 Name = 'Ethernet'
+                State = 'Enabled'
             }
 
             Context 'Adapter exist and is enabled' {
@@ -77,7 +78,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Set-TargetResource" {
+        Describe "$($DSCResourceName)\Set-TargetResource" {
 
             $setTargetResourceEnabled = @{
                 Name = 'Ethernet'
@@ -175,7 +176,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Test-TargetResource" {
+        Describe "$($DSCResourceName)\Test-TargetResource" {
 
             $testTargetResourceEnabled = @{
                 Name = 'Ethernet'

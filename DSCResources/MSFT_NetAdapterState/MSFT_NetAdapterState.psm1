@@ -21,6 +21,9 @@ $localizedData = Get-LocalizedData `
 
 .PARAMETER Name
     Specifies the name of the network adapter.
+
+.PARAMETER State
+    Specifies the desired state for the network adapter.
 #>
 function Get-TargetResource
 {
@@ -30,7 +33,12 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $Name
+        $Name,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("Enabled", "Disabled")]
+        [System.String]
+        $State
     )
 
     Write-Verbose -Message ( @(
@@ -91,6 +99,7 @@ function Set-TargetResource
         $Name,
 
         [Parameter(Mandatory = $true)]
+        [ValidateSet("Enabled", "Disabled")]
         [System.String]
         $State
     )
@@ -159,6 +168,7 @@ function Test-TargetResource
         $Name,
 
         [Parameter(Mandatory = $true)]
+        [ValidateSet("Enabled", "Disabled")]
         [System.String]
         $State
     )
