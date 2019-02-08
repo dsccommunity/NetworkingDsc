@@ -24,6 +24,7 @@ $localizedData = Get-LocalizedData `
 
 .PARAMETER State
     Specifies the desired state for the network adapter.
+    Not used in Get-TargetResource.
 #>
 function Get-TargetResource
 {
@@ -52,8 +53,10 @@ function Get-TargetResource
     }
     catch
     {
-        New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+        Write-Warning -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $LocalizedData.NetAdapterNotFoundMessage -f $Name
+        ) -join '')
     }
 
     if ($netAdapter)
@@ -63,16 +66,20 @@ function Get-TargetResource
                 $($LocalizedData.NetAdapterTestingStateMessage -f $Name)
             ) -join '')
 
+        # Using NET_IF_ADMIN_STATUS as documented here:
+        # https://docs.microsoft.com/en-us/windows/desktop/api/ifdef/ne-ifdef-net_if_admin_status
+
+        $enabled  = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Up
+        $disabled = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Down
+
         $result = @{
             Name  = $Name
-            State = if ($netAdapter.AdminStatus.value__ -eq 1)
-                    {
-                        'Enabled'
-                    }
-                    else
-                    {
-                        'Disabled'
-                    }
+            State = switch ($netAdapter.AdminStatus)
+            {
+                $enabled  { 'Enabled' }
+                $disabled { 'Disabled' }
+                default   { 'Unsupported' }
+            }
         }
 
         return $result
@@ -115,8 +122,10 @@ function Set-TargetResource
     }
     catch
     {
-        New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+        Write-Error -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $LocalizedData.NetAdapterNotFoundMessage -f $Name
+        ) -join '')
     }
 
     if ($netAdapter)
@@ -128,13 +137,13 @@ function Set-TargetResource
 
         try
         {
-            if ($State -eq 'Enabled')
+            if ($State -eq 'Disabled')
             {
-                Enable-NetAdapter -Name $Name -ErrorAction Stop
+                Disable-NetAdapter -Name $Name -Confirm:$false -ErrorAction Stop
             }
             else
             {
-                Disable-NetAdapter -Name $Name -Confirm:$false -ErrorAction Stop
+                Enable-NetAdapter -Name $Name -ErrorAction Stop
             }
         }
         catch
@@ -187,19 +196,15 @@ function Test-TargetResource
                 $($localizedData.NetAdapterTestingStateMessage -f $Name)
             ) -join '')
 
-        $currentState = if ($netAdapter.AdminStatus.value__ -eq 1)
-        {
-            'Enabled'
-        }
-        else
-        {
-            'Disabled'
-        }
+        $currentState = Get-TargetResource @PSBoundParameters
 
-        return $currentState -eq $State
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.NetAdapterStateMessage -f $Name, $currentState.State)
+            ) -join '')
+
+        return $currentState.State -eq $State
     }
-    else
-    {
-        return $false
-    }
+
+    return $false
 }

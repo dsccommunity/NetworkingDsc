@@ -25,18 +25,22 @@ try
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
 
+        # Import the NetAdapter module to load the required NET_IF_ADMIN_STATUS enums
+        Import-Module NetAdapter
+
         $netAdapterEnabled = [PSCustomObject]@{
             Name = 'Ethernet'
-            AdminStatus = [PSCustomObject]@{
-                value__ = 1
-            }
+            AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Up
         }
 
         $netAdapterDisabled = [PSCustomObject]@{
             Name = 'Ethernet'
-            AdminStatus = [PSCustomObject]@{
-                value__ = 2
-            }
+            AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Down
+        }
+
+        $netAdapterUnsupported = [PSCustomObject]@{
+            Name = 'Ethernet'
+            AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Testing
         }
 
         Describe "$($DSCResourceName)\Get-TargetResource" {
@@ -47,7 +51,6 @@ try
             }
 
             Context 'Adapter exist and is enabled' {
-
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterEnabled
                 }
@@ -59,6 +62,17 @@ try
 
                 It 'Should call all mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                }
+            }
+
+            Context 'Adapter exist and is in unsupported state' {
+                Mock -CommandName Get-NetAdapter -MockWith {
+                    $netAdapterUnsupported
+                }
+
+                It 'Should return the state of the network adapter' {
+                    $result = Get-TargetResource @getTargetResource
+                    $result.State | Should -Be 'Unsupported'
                 }
             }
 
@@ -74,6 +88,17 @@ try
 
                 It 'Should call all mocks' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                }
+            }
+
+            Context 'Get-NetAdapter returns error' {
+                Mock -CommandName Get-NetAdapter -MockWith {
+                    Throw 'Throwing from Get-NetAdapter'
+                }
+
+                It 'Should display warning when network adapter cannot be found' {
+                    $warning = Get-TargetResource @getTargetResource 3>&1
+                    $warning.Message | Should -Be "Get-TargetResource: Network adapter 'Ethernet' not found."
                 }
             }
         }
@@ -171,7 +196,19 @@ try
                 $errorText = "Set-TargetResource: Failed to set network adapter 'Ethernet' to state 'Enabled'. Error: 'Throwing from Enable-NetAdapter'."
                 It 'Should raise a non terminating error' {
                     $netAdapterError = Set-TargetResource @setTargetResourceEnabled 2>&1
-                    $netAdapterError.Exception.Message | Should Be $errorText
+                    $netAdapterError.Exception.Message | Should -Be $errorText
+                }
+            }
+
+            Context 'Adapter does not exist, desired state is enabled' {
+                Mock -CommandName Get-NetAdapter -MockWith {
+                    throw "Throwing from Get-NetAdapter"
+                }
+
+                $errorText = "Set-TargetResource: Network adapter 'Ethernet' not found."
+                It 'Should raise a non terminating error' {
+                    $netAdapterError = Set-TargetResource @setTargetResourceEnabled 2>&1
+                    $netAdapterError.Exception.Message | Should -Be $errorText
                 }
             }
         }
@@ -221,6 +258,16 @@ try
             Context 'Adapter exist and is disabled, desired state is enabled, test false' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterDisabled
+                }
+
+                It 'Should return false' {
+                    Test-TargetResource @testTargetResourceEnabled | Should -Be $false
+                }
+            }
+
+            Context 'Adapter exist and is in Unsupported state, desired state is enabled, test false' {
+                Mock -CommandName Get-NetAdapter -MockWith {
+                    $netAdapterUnsupported
                 }
 
                 It 'Should return false' {
