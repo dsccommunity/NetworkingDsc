@@ -116,7 +116,9 @@
     not match "TeamMembers" parameter - fixes [Issue 342](https://github.com/PowerShell/NetworkingDsc/issues/342).
 - Updated examples to format required for publishing to PowerShell Gallery - fixes
   [Issue 374](https://github.com/PowerShell/NetworkingDsc/issues/374).
-
+- MSFT_NetAdapterAdvancedProperty:
+- Fixes NetworkAdapterName being returned in Name property when calling
+  Get-TargetResourceFixes - fixes [Issue 370](https://github.com/PowerShell/NetworkingDsc/issues/370).
 '
 
 } # End of PSData hashtable
