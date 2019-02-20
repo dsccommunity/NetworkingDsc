@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.0.0.0
+
 - Refactored module folder structure to move resource to root folder of
   repository and remove test harness - fixes [Issue #372](https://github.com/PowerShell/NetworkingDsc/issues/372).
 - Removed module conflict tests because only required for harness style
