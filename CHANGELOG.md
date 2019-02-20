@@ -2,11 +2,52 @@
 
 ## Unreleased
 
+## 7.0.0.0
+
+- Refactored module folder structure to move resource to root folder of
+  repository and remove test harness - fixes [Issue #372](https://github.com/PowerShell/NetworkingDsc/issues/372).
+- Removed module conflict tests because only required for harness style
+  modules.
+- Opted into Common Tests 'Validate Example Files To Be Published',
+  'Validate Markdown Links' and 'Relative Path Length'.
+- Added 'DscResourcesToExport' to manifest to improve information in
+  PowerShell Gallery and removed wildcards from 'FunctionsToExport',
+  'CmdletsToExport', 'VariablesToExport' and 'AliasesToExport' - fixes
+  [Issue #376](https://github.com/PowerShell/NetworkingDsc/issues/376).
+- MSFT_NetIPInterface:
+  - Added `Dhcp`, `WeakHostReceive` and `WeakHostSend` parameters so that
+    MSFT_DHCPClient, MSFT_WeakHostReceive, MSFT_WeakHostSend can be
+    deprecated - fixes [Issue #360](https://github.com/PowerShell/NetworkingDsc/issues/360).
+- MSFT_DhcpClient:
+  - BREAKING CHANGE: Resource has been deprecated and replaced by `Dhcp`
+    parameter in MSFT_NetIPInterface.
+- MSFT_WeakHostReceive:
+  - BREAKING CHANGE: Resource has been deprecated and replaced by `WeakHostReceive`
+    parameter in MSFT_NetIPInterface.
+- MSFT_WeakHostSend:
+  - BREAKING CHANGE: Resource has been deprecated and replaced by `WeakHostSend`
+    parameter in MSFT_NetIPInterface.
+- MSFT_IPAddress:
+  - Updated examples to use NetIPInterface.
+- MSFT_NetAdapterName:
+  - Updated examples to use NetIPInterface.
+- MSFT_DnsServerAddress:
+  - Updated examples to use NetIPInterface.
+- MSFT_NetworkTeam:
+  - Change `Get-TargetResource` to return actual TeamMembers if network team
+    exists and 'Ensure' returns 'Present' even when actual TeamMembers do
+    not match 'TeamMembers' parameter - fixes [Issue #342](https://github.com/PowerShell/NetworkingDsc/issues/342).
+- Updated examples to format required for publishing to PowerShell Gallery - fixes
+  [Issue #374](https://github.com/PowerShell/NetworkingDsc/issues/374).
+- MSFT_NetAdapterAdvancedProperty:
+  - Fixes NetworkAdapterName being returned in Name property when calling
+    Get-TargetResourceFixes - fixes [Issue #370](https://github.com/PowerShell/NetworkingDsc/issues/370).
+
 ## 6.3.0.0
 
 - MSFT_IPAddress:
   - Updated to allow retaining existing addresses in order to support cluster
-    configurations as well
+    configurations as well.
 
 ## 6.2.0.0
 

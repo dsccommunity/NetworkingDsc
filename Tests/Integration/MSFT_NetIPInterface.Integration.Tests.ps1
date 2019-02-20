@@ -1,17 +1,18 @@
 $script:DSCModuleName = 'NetworkingDsc'
 $script:DSCResourceName = 'MSFT_NetIPInterface'
 
-#region HEADER
-# Integration Test Template Version: 1.1.0
-[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\NetworkingDsc'
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
+#region HEADER
+# Integration Test Template Version: 1.1.1
+[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
     & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
-Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:DSCModuleName `
     -DSCResourceName $script:DSCResourceName `
@@ -37,6 +38,7 @@ $setNetIPInterfaceParameters = @{
     AddressFamily               = 'IPv4'
     AdvertiseDefaultRoute       = 'Disabled'
     AutomaticMetric             = 'Disabled'
+    Dhcp                        = 'Disabled'
     DirectedMacWolPattern       = 'Disabled'
     EcnMarking                  = 'Disabled'
     ForceArpNdWolPattern        = 'Disabled'
@@ -45,6 +47,8 @@ $setNetIPInterfaceParameters = @{
     ManagedAddressConfiguration = 'Disabled'
     OtherStatefulConfiguration  = 'Disabled'
     RouterDiscovery             = 'Disabled'
+    WeakHostReceive             = 'Disabled'
+    WeakHostSend                = 'Disabled'
 }
 Set-NetIPInterface @setNetIPInterfaceParameters
 
@@ -66,6 +70,7 @@ try
                         AddressFamily                   = 'IPv4'
                         AdvertiseDefaultRoute           = 'Enabled'
                         AutomaticMetric                 = 'Enabled'
+                        Dhcp                            = 'Enabled'
                         DirectedMacWolPattern           = 'Enabled'
                         EcnMarking                      = 'AppDecide'
                         ForceArpNdWolPattern            = 'Enabled'
@@ -75,6 +80,8 @@ try
                         NeighborUnreachabilityDetection = 'Enabled'
                         OtherStatefulConfiguration      = 'Enabled'
                         RouterDiscovery                 = 'ControlledByDHCP'
+                        WeakHostReceive                 = 'Enabled'
+                        WeakHostSend                    = 'Enabled'
                     }
                 )
             }
@@ -107,6 +114,7 @@ try
                 $current.AddressFamily                   | Should -Be $script:configData.AllNodes[0].AddressFamily
                 $current.AdvertiseDefaultRoute           | Should -Be $script:configData.AllNodes[0].AdvertiseDefaultRoute
                 $current.AutomaticMetric                 | Should -Be $script:configData.AllNodes[0].AutomaticMetric
+                $current.Dhcp                            | Should -Be $script:configData.AllNodes[0].Dhcp
                 $current.DirectedMacWolPattern           | Should -Be $script:configData.AllNodes[0].DirectedMacWolPattern
                 $current.EcnMarking                      | Should -Be $script:configData.AllNodes[0].EcnMarking
                 $current.ForceArpNdWolPattern            | Should -Be $script:configData.AllNodes[0].ForceArpNdWolPattern
@@ -116,6 +124,8 @@ try
                 $current.NeighborUnreachabilityDetection | Should -Be $script:configData.AllNodes[0].NeighborUnreachabilityDetection
                 $current.OtherStatefulConfiguration      | Should -Be $script:configData.AllNodes[0].OtherStatefulConfiguration
                 $current.RouterDiscovery                 | Should -Be $script:configData.AllNodes[0].RouterDiscovery
+                $current.WeakHostReceive                 | Should -Be $script:configData.AllNodes[0].WeakHostReceive
+                $current.WeakHostSend                    | Should -Be $script:configData.AllNodes[0].WeakHostSend
             }
         }
 
@@ -128,6 +138,7 @@ try
                         InterfaceAlias              = 'NetworkingDscLBA'
                         AddressFamily               = 'IPv4'
                         AdvertiseDefaultRoute       = 'Disabled'
+                        Dhcp                        = 'Disabled'
                         DirectedMacWolPattern       = 'Disabled'
                         EcnMarking                  = 'Disabled'
                         Forwarding                  = 'Disabled'
@@ -136,7 +147,8 @@ try
                         ManagedAddressConfiguration = 'Disabled'
                         OtherStatefulConfiguration  = 'Disabled'
                         RouterDiscovery             = 'Disabled'
-
+                        WeakHostReceive             = 'Disabled'
+                        WeakHostSend                = 'Disabled'
                     }
                 )
             }
@@ -168,6 +180,7 @@ try
                 $current.InterfaceAlias                  | Should -Be $script:configData.AllNodes[0].InterfaceAlias
                 $current.AddressFamily                   | Should -Be $script:configData.AllNodes[0].AddressFamily
                 $current.AdvertiseDefaultRoute           | Should -Be $script:configData.AllNodes[0].AdvertiseDefaultRoute
+                $current.Dhcp                            | Should -Be $script:configData.AllNodes[0].Dhcp
                 $current.DirectedMacWolPattern           | Should -Be $script:configData.AllNodes[0].DirectedMacWolPattern
                 $current.EcnMarking                      | Should -Be $script:configData.AllNodes[0].EcnMarking
                 $current.ForceArpNdWolPattern            | Should -Be $script:configData.AllNodes[0].ForceArpNdWolPattern
@@ -176,6 +189,8 @@ try
                 $current.ManagedAddressConfiguration     | Should -Be $script:configData.AllNodes[0].ManagedAddressConfiguration
                 $current.OtherStatefulConfiguration      | Should -Be $script:configData.AllNodes[0].OtherStatefulConfiguration
                 $current.RouterDiscovery                 | Should -Be $script:configData.AllNodes[0].RouterDiscovery
+                $current.WeakHostReceive                 | Should -Be $script:configData.AllNodes[0].WeakHostReceive
+                $current.WeakHostSend                    | Should -Be $script:configData.AllNodes[0].WeakHostSend
             }
         }
     }

@@ -5,14 +5,14 @@ Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot 
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
-[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\NetworkingDsc'
+[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
     & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
-Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $script:DSCModuleName `
     -DSCResourceName $script:DSCResourceName `
@@ -58,6 +58,14 @@ try
                 TestValue = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $AutomaticMetric -eq 'Disabled'
+                }
+            },
+            @{
+                Name = 'Dhcp'
+                MockedValue = 'Enabled'
+                TestValue = 'Disabled'
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $Dhcp -eq 'Disabled'
                 }
             },
             @{
@@ -130,6 +138,22 @@ try
                 TestValue = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $RouterDiscovery -eq 'Disabled'
+                }
+            },
+            @{
+                Name = 'WeakHostReceive'
+                MockedValue = 'Enabled'
+                TestValue = 'Disabled'
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $WeakHostReceive -eq 'Disabled'
+                }
+            },
+            @{
+                Name = 'WeakHostSend'
+                MockedValue = 'Enabled'
+                TestValue = 'Disabled'
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $WeakHostSend -eq 'Disabled'
                 }
             }
         )

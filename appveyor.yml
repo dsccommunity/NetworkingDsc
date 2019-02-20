@@ -7,7 +7,6 @@ install:
 
     - ps: |
         $moduleName = 'NetworkingDsc'
-        $mainModuleFolder = "Modules\$moduleName"
         Import-Module "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
         Invoke-AppveyorInstallTask
 
@@ -24,9 +23,9 @@ build: false
 test_script:
     - ps: |
         Invoke-AppveyorTestScriptTask `
-            -Type 'Harness' `
-            -MainModulePath $mainModuleFolder `
-            -CodeCovIo
+            -CodeCoverage `
+            -CodeCovIo `
+            -ExcludeTag @()
 
 #---------------------------------#
 #      deployment configuration   #
@@ -37,5 +36,6 @@ deploy_script:
     - ps: |
         Invoke-AppveyorAfterTestTask `
             -Type 'Wiki' `
-            -MainModulePath $mainModuleFolder `
             -ResourceModuleName $moduleName
+
+        Invoke-AppVeyorDeployTask

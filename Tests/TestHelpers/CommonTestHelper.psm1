@@ -1,4 +1,4 @@
-﻿<#
+<#
     .SYNOPSIS
         Returns an invalid argument exception object
 
@@ -48,10 +48,12 @@ function Get-InvalidOperationRecord
     [CmdletBinding()]
     param
     (
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
         $Message,
 
+        [Parameter()]
         [ValidateNotNull()]
         [System.Management.Automation.ErrorRecord]
         $ErrorRecord
