@@ -26,7 +26,7 @@ try
     InModuleScope $script:DSCResourceName {
 
         # Import the NetAdapter module to load the required NET_IF_ADMIN_STATUS enums
-        Import-Module NetAdapter
+        Import-Module -Name NetAdapter
 
         $netAdapterEnabled = [PSCustomObject]@{
             Name = 'Ethernet'
@@ -45,12 +45,14 @@ try
 
         Describe "$($DSCResourceName)\Get-TargetResource" {
 
-            $getTargetResource = @{
-                Name = 'Ethernet'
-                State = 'Enabled'
+            BeforeEach {
+                $getTargetResource = @{
+                    Name = 'Ethernet'
+                    State = 'Enabled'
+                }
             }
 
-            Context 'Adapter exist and is enabled' {
+            Context 'When adapter exists and is enabled' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterEnabled
                 }
@@ -65,7 +67,7 @@ try
                 }
             }
 
-            Context 'Adapter exist and is in unsupported state' {
+            Context 'When adapter exists and is in unsupported state' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterUnsupported
                 }
@@ -76,7 +78,7 @@ try
                 }
             }
 
-            Context 'Adapter exist and is disabled' {
+            Context 'When adapter exists and is disabled' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterDisabled
                 }
@@ -91,7 +93,7 @@ try
                 }
             }
 
-            Context 'Get-NetAdapter returns error' {
+            Context 'When Get-NetAdapter returns error' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     Throw 'Throwing from Get-NetAdapter'
                 }
@@ -105,17 +107,19 @@ try
 
         Describe "$($DSCResourceName)\Set-TargetResource" {
 
-            $setTargetResourceEnabled = @{
-                Name = 'Ethernet'
-                State = 'Enabled'
+            BeforeEach {
+                $setTargetResourceEnabled = @{
+                    Name = 'Ethernet'
+                    State = 'Enabled'
+                }
+
+                $setTargetResourceDisabled = @{
+                    Name = 'Ethernet'
+                    State = 'Disabled'
+                }
             }
 
-            $setTargetResourceDisabled = @{
-                Name = 'Ethernet'
-                State = 'Disabled'
-            }
-
-            Context 'Adapter exist and is enabled, desired state is enabled, no action required' {
+            Context 'When adapter exists and is enabled, desired state is enabled, no action required' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterEnabled
                 }
@@ -131,7 +135,7 @@ try
                 }
             }
 
-            Context 'Adapter exist and is enabled, desired state is disabled, should be disabled' {
+            Context 'When adapter exists and is enabled, desired state is disabled, should be disabled' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterEnabled
                 }
@@ -149,7 +153,7 @@ try
                 }
             }
 
-            Context 'Adapter exist and is disabled, desired state is disabled, no action required' {
+            Context 'When adapter exists and is disabled, desired state is disabled, no action required' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterDisabled
                 }
@@ -166,7 +170,7 @@ try
                 }
             }
 
-            Context 'Adapter exist and is disabled, desired state is enabled, should be enabled' {
+            Context 'When adapter exists and is disabled, desired state is enabled, should be enabled' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterDisabled
                 }
@@ -184,7 +188,7 @@ try
                 }
             }
 
-            Context 'Adapter exist and is disabled, desired state is enabled, set failed' {
+            Context 'When adapter exists and is disabled, desired state is enabled, set failed' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterDisabled
                 }
@@ -200,7 +204,7 @@ try
                 }
             }
 
-            Context 'Adapter does not exist, desired state is enabled' {
+            Context 'When adapter does not exist and desired state is enabled' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     throw "Throwing from Get-NetAdapter"
                 }
@@ -215,17 +219,19 @@ try
 
         Describe "$($DSCResourceName)\Test-TargetResource" {
 
-            $testTargetResourceEnabled = @{
-                Name = 'Ethernet'
-                State = 'Enabled'
+            BeforeEach {
+                $testTargetResourceEnabled = @{
+                    Name = 'Ethernet'
+                    State = 'Enabled'
+                }
+
+                $testTargetResourceDisabled = @{
+                    Name = 'Ethernet'
+                    State = 'Disabled'
+                }
             }
 
-            $testTargetResourceDisabled = @{
-                Name = 'Ethernet'
-                State = 'Disabled'
-            }
-
-            Context 'Adapter exist and is enabled, desired state is enabled, test true' {
+            Context 'When adapter exists and is enabled, desired state is enabled, test true' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterEnabled
                 }
@@ -235,7 +241,7 @@ try
                 }
             }
 
-            Context 'Adapter exist and is enabled, desired state is disabled, test false' {
+            Context 'When adapter exists and is enabled, desired state is disabled, test false' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterEnabled
                 }
@@ -245,7 +251,7 @@ try
                 }
             }
 
-            Context 'Adapter exist and is disabled, desired state is disabled, test true' {
+            Context 'When adapter exists and is disabled, desired state is disabled, test true' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterDisabled
                 }
@@ -255,7 +261,7 @@ try
                 }
             }
 
-            Context 'Adapter exist and is disabled, desired state is enabled, test false' {
+            Context 'When adapter exists and is disabled, desired state is enabled, test false' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterDisabled
                 }
@@ -265,9 +271,19 @@ try
                 }
             }
 
-            Context 'Adapter exist and is in Unsupported state, desired state is enabled, test false' {
+            Context 'When adapter exists and is in Unsupported state, desired state is enabled, test false' {
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterUnsupported
+                }
+
+                It 'Should return false' {
+                    Test-TargetResource @testTargetResourceEnabled | Should -Be $false
+                }
+            }
+
+            Context 'When adapter does not exist, desired state is enabled, test false' {
+                Mock -CommandName Get-NetAdapter -MockWith {
+                    $null
                 }
 
                 It 'Should return false' {

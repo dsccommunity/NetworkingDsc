@@ -37,7 +37,7 @@ function Get-TargetResource
         $Name,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Enabled", "Disabled")]
+        [ValidateSet('Enabled', 'Disabled')]
         [System.String]
         $State
     )
@@ -91,7 +91,7 @@ function Get-TargetResource
     Sets the NetAdapterState resource state.
 
 .PARAMETER Name
-    Specifies the name of the network adapter..
+    Specifies the name of the network adapter.
 
 .PARAMETER State
     Specifies the desired state for the network adapter.
@@ -106,7 +106,7 @@ function Set-TargetResource
         $Name,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Enabled", "Disabled")]
+        [ValidateSet('Enabled', 'Disabled')]
         [System.String]
         $State
     )
@@ -130,11 +130,6 @@ function Set-TargetResource
 
     if ($netAdapter)
     {
-        Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterTestingStateMessage -f $Name)
-            ) -join '')
-
         try
         {
             if ($State -eq 'Disabled')
@@ -177,27 +172,18 @@ function Test-TargetResource
         $Name,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("Enabled", "Disabled")]
+        [ValidateSet('Enabled', 'Disabled')]
         [System.String]
         $State
     )
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $localizedData.CheckingNetAdapterMessage
+            $($localizedData.NetAdapterTestingStateMessage -f $Name)
         ) -join '')
 
-    $netAdapter = Get-NetAdapter -Name $Name -ErrorAction SilentlyContinue
-
-    if ($netAdapter)
+    if ($currentState = Get-TargetResource @PSBoundParameters)
     {
-        Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($localizedData.NetAdapterTestingStateMessage -f $Name)
-            ) -join '')
-
-        $currentState = Get-TargetResource @PSBoundParameters
-
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($localizedData.NetAdapterStateMessage -f $Name, $currentState.State)
