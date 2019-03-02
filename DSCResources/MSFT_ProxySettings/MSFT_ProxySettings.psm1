@@ -560,7 +560,7 @@ function Test-ProxySettings
 function Get-StringLengthInHexBytes
 {
     [CmdletBinding()]
-    [OutputType([System.String[]])]
+    [OutputType([System.Object[]])]
     param
     (
         [Parameter(Mandatory = $true)]
