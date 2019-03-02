@@ -604,9 +604,9 @@ function Get-Int32FromByteArray
 
     $value = [System.Int32] 0
     $value += [System.Int32] $Byte[$StartByte]
-    $value += [System.Int32] $Byte[$StartByte + 1] * 256
-    $value += [System.Int32] $Byte[$StartByte + 2] * 256 * 256
-    $value += [System.Int32] $Byte[$StartByte + 3] * 256 * 256 * 256
+    $value += [System.Int32] $Byte[$StartByte + 1] -shl 8
+    $value += [System.Int32] $Byte[$StartByte + 2] -shl 16
+    $value += [System.Int32] $Byte[$StartByte + 3] -shl 24
 
     return $value
 }
