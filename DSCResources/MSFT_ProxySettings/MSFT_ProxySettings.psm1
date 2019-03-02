@@ -551,6 +551,68 @@ function Test-ProxySettings
 
 <#
     .SYNOPSIS
+        Get the length of a string in the format of an array
+        of hexidecimal format strings.
+
+    .PARAMETER String
+        The string to return the length for.
+#>
+function Get-StringLengthInHexBytes
+{
+    [CmdletBinding()]
+    [OutputType([System.String[]])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [System.String]
+        $String
+    )
+
+    $hex = '{0:x8}' -f $String.Length
+    $stringLength = @()
+    $stringLength += @('0x' + $hex.Substring(6,2))
+    $stringLength += @('0x' + $hex.Substring(4,2))
+    $stringLength += @('0x' + $hex.Substring(2,2))
+    $stringLength += @('0x' + $hex.Substring(0,2))
+
+    return $stringLength
+}
+
+<#
+    .SYNOPSIS
+        Gets an int32 from 4 little endian bytes containing in a
+        byte array.
+
+    .PARAMETER Bytes
+        The bytes containing the little endian int32.
+#>
+function Get-Int32FromByteArray
+{
+    [CmdletBinding()]
+    [OutputType([System.Int32])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.Byte[]]
+        $Byte,
+
+        [Parameter(Mandatory = $true)]
+        [System.Int32]
+        $StartByte
+    )
+
+    $value = [System.Int32] 0
+    $value += [System.Int32] $Byte[$StartByte]
+    $value += [System.Int32] $Byte[$StartByte + 1] * 256
+    $value += [System.Int32] $Byte[$StartByte + 2] * 256 * 256
+    $value += [System.Int32] $Byte[$StartByte + 3] * 256 * 256 * 256
+
+    return $value
+}
+
+<#
+    .SYNOPSIS
         Convert the proxy settings parameters to a Byte Array that
         can be used to populate the DefaultConnectionSettings and
         SavedLegacySettings registry settings.
@@ -636,7 +698,7 @@ function ConvertTo-ProxySettingsBinary
 
     if ($PSBoundParameters.ContainsKey('ProxyServer'))
     {
-        $proxySettings += @($ProxyServer.Length, 0x0, 0x0, 0x0)
+        $proxySettings += Get-StringLengthInHexBytes -String $ProxyServer
         $proxySettings += [Byte[]][Char[]] $ProxyServer
     }
     else
@@ -651,9 +713,9 @@ function ConvertTo-ProxySettingsBinary
 
     if ($ProxyServerExceptions.Count -gt 0)
     {
-        $ProxyServerExceptionsString = $ProxyServerExceptions -join ';'
-        $proxySettings += @($ProxyServerExceptionsString.Length, 0x0, 0x0, 0x0)
-        $proxySettings += [Byte[]][Char[]] $ProxyServerExceptionsString
+        $proxyServerExceptionsString = $ProxyServerExceptions -join ';'
+        $proxySettings += Get-StringLengthInHexBytes -String $proxyServerExceptionsString
+        $proxySettings += [Byte[]][Char[]] $proxyServerExceptionsString
     }
     else
     {
@@ -662,7 +724,7 @@ function ConvertTo-ProxySettingsBinary
 
     if ($PSBoundParameters.ContainsKey('AutoConfigURL'))
     {
-        $proxySettings += @($AutoConfigURL.Length, 0x0, 0x0, 0x0)
+        $proxySettings += Get-StringLengthInHexBytes -String $AutoConfigURL
         $proxySettings += [Byte[]][Char[]] $AutoConfigURL
     }
 
@@ -735,7 +797,7 @@ function ConvertFrom-ProxySettingsBinary
 
         # Extract the Proxy Server string
         $proxyServer = ''
-        $stringLength = $ProxySettings[$stringPointer]
+        $stringLength = Get-Int32FromByteArray -Byte $ProxySettings -StartByte $stringPointer
         $stringPointer += 4
 
         if ($stringLength -gt 0)
@@ -750,7 +812,7 @@ function ConvertFrom-ProxySettingsBinary
 
         # Extract the Proxy Server Exceptions string
         $proxyServerExceptions = @()
-        $stringLength = $ProxySettings[$stringPointer]
+        $stringLength = Get-Int32FromByteArray -Byte $ProxySettings -StartByte $stringPointer
         $stringPointer += 4
 
         if ($stringLength -gt 0)
@@ -776,7 +838,7 @@ function ConvertFrom-ProxySettingsBinary
 
         # Extract the Auto Config URL string
         $autoConfigURL = ''
-        $stringLength = $ProxySettings[$stringPointer]
+        $stringLength = Get-Int32FromByteArray -Byte $ProxySettings -StartByte $stringPointer
         $stringPointer += 4
 
         if ($stringLength -gt 0)
