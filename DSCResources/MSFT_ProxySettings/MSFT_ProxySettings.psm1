@@ -554,7 +554,7 @@ function Test-ProxySettings
         Get the length of a string in the format of an array
         of hexidecimal format strings.
 
-    .PARAMETER String
+    .PARAMETER Value
         The string to return the length for.
 #>
 function Get-StringLengthInHexBytes
@@ -566,10 +566,10 @@ function Get-StringLengthInHexBytes
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
         [System.String]
-        $String
+        $Value
     )
 
-    $hex = '{0:x8}' -f $String.Length
+    $hex = '{0:x8}' -f $Value.Length
     $stringLength = @()
     $stringLength += @('0x' + $hex.Substring(6,2))
     $stringLength += @('0x' + $hex.Substring(4,2))
@@ -698,7 +698,7 @@ function ConvertTo-ProxySettingsBinary
 
     if ($PSBoundParameters.ContainsKey('ProxyServer'))
     {
-        $proxySettings += Get-StringLengthInHexBytes -String $ProxyServer
+        $proxySettings += Get-StringLengthInHexBytes -Value $ProxyServer
         $proxySettings += [Byte[]][Char[]] $ProxyServer
     }
     else
@@ -714,7 +714,7 @@ function ConvertTo-ProxySettingsBinary
     if ($ProxyServerExceptions.Count -gt 0)
     {
         $proxyServerExceptionsString = $ProxyServerExceptions -join ';'
-        $proxySettings += Get-StringLengthInHexBytes -String $proxyServerExceptionsString
+        $proxySettings += Get-StringLengthInHexBytes -Value $proxyServerExceptionsString
         $proxySettings += [Byte[]][Char[]] $proxyServerExceptionsString
     }
     else
@@ -724,7 +724,7 @@ function ConvertTo-ProxySettingsBinary
 
     if ($PSBoundParameters.ContainsKey('AutoConfigURL'))
     {
-        $proxySettings += Get-StringLengthInHexBytes -String $AutoConfigURL
+        $proxySettings += Get-StringLengthInHexBytes -Value $AutoConfigURL
         $proxySettings += [Byte[]][Char[]] $AutoConfigURL
     }
 

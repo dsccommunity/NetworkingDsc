@@ -28,10 +28,10 @@ try
 
         # Create the Mock Objects that will be used for running tests
         $testProxyServer = 'testproxy:8888'
-        $testProxyExeceptions = 1..20 | Foreach-Object -Process {
+        $testProxyExceptions = 1..20 | Foreach-Object -Process {
             "exception$_.contoso.com"
         }
-        $testProxyAlternateExeceptions = @('exception1.contoso.com')
+        $testProxyAlternateExceptions = @('exception1.contoso.com')
         $testAutoConfigURL = 'http://wpad.contoso.com/test.wpad'
 
         $testProxyAllDisabledSettings = [PSObject] @{
@@ -51,7 +51,7 @@ try
             EnableAutoDetection     = $False
             EnableManualProxy       = $True
             ProxyServer             = $testProxyServer
-            ProxyServerExceptions   = $testProxyExeceptions
+            ProxyServerExceptions   = $testProxyExceptions
             EnableAutoConfiguration = $False
         }
 
@@ -59,7 +59,7 @@ try
             EnableAutoDetection     = $False
             EnableManualProxy       = $True
             ProxyServer             = $testProxyServer
-            ProxyServerExceptions   = $testProxyAlternateExeceptions
+            ProxyServerExceptions   = $testProxyAlternateExceptions
             EnableAutoConfiguration = $False
         }
 
@@ -83,7 +83,7 @@ try
             EnableManualProxy       = $True
             ProxyServer             = $testProxyServer
             ProxyServerBypassLocal  = $False
-            ProxyServerExceptions   = $testProxyExeceptions
+            ProxyServerExceptions   = $testProxyExceptions
             EnableAutoConfiguration = $True
             AutoConfigURL           = $testAutoConfigURL
         }
@@ -93,7 +93,7 @@ try
             EnableManualProxy       = $True
             ProxyServer             = $testProxyServer
             ProxyServerBypassLocal  = $True
-            ProxyServerExceptions   = $testProxyExeceptions
+            ProxyServerExceptions   = $testProxyExceptions
             EnableAutoConfiguration = $True
             AutoConfigURL           = $testAutoConfigURL
         }
@@ -735,21 +735,21 @@ try
         }
 
         Describe "$script:DSCResourceName\Get-StringLengthInHexBytes" {
-            Context 'When an empty string is passed' {
+            Context 'When an empty value string is passed' {
                 It 'Should return @(0x00,0x00,0x00,0x00)' {
-                    Get-StringLengthInHexBytes -String '' | Should -Be @( '0x00', '0x00', '0x00', '0x00' )
+                    Get-StringLengthInHexBytes -Value '' | Should -Be @( '0x00', '0x00', '0x00', '0x00' )
                 }
             }
 
-            Context 'When a string less than 256 characters is passed' {
+            Context 'When a value string less than 256 characters is passed' {
                 It 'Should return @(0xFF,0x00,0x00,0x00)' {
-                    Get-StringLengthInHexBytes -String ([System.String]::new('a', 255)) | Should -Be @( '0xFF', '0x00', '0x00', '0x00' )
+                    Get-StringLengthInHexBytes -Value ([System.String]::new('a', 255)) | Should -Be @( '0xFF', '0x00', '0x00', '0x00' )
                 }
             }
 
-            Context 'When a string more than 256 characters is passed' {
+            Context 'When a value string more than 256 characters is passed' {
                 It 'Should return @(0x01,0x01,0x00,0x00)' {
-                    Get-StringLengthInHexBytes -String ([System.String]::new('a', 257)) | Should -Be @( '0x01', '0x01', '0x00', '0x00' )
+                    Get-StringLengthInHexBytes -Value ([System.String]::new('a', 257)) | Should -Be @( '0x01', '0x01', '0x00', '0x00' )
                 }
             }
         }
