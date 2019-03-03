@@ -477,6 +477,9 @@ function Set-TargetResource
                 }
                 else
                 {
+                    # Group is a lookup key parameter that cannot be used in conjunction with Name
+                    $null = $PSBoundParameters.Remove('Group')
+
                     <#
                         If the DisplayName is provided then need to remove it
                         And change it to NewDisplayName if it is different.

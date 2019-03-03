@@ -254,6 +254,25 @@ try
                 }
             }
 
+            Context 'Ensure is Present and the Firewall rule does exist with a specified Group that is unchanged but some other parameter is different' {
+                It "Should remove Group from parameters before calling Set-NetFirewallRule mock on firewall rule $($firewallRule.Name)" {
+                    Mock -CommandName Set-NetFirewallRule
+                    Mock -CommandName Test-RuleProperties -MockWith { return $false }
+
+                    # 1. Group is specified but unchanged
+                    # 2. Some other parameter is different (Description)
+                    Set-TargetResource `
+                        -Name $firewallRule.Name `
+                        -Group $firewallRule.Group `
+                        -Description 'Different' `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled -CommandName Set-NetFirewallRule -ExclusiveFilter {
+                        -not $PSBoundParameters.ContainsKey('Group')
+                    } -Exactly -Times 1
+                }
+            }
+
             Context 'Ensure is Present and the Firewall rule does exist but has a different Enabled' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
