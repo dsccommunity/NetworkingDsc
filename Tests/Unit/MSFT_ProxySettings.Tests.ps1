@@ -28,8 +28,10 @@ try
 
         # Create the Mock Objects that will be used for running tests
         $testProxyServer = 'testproxy:8888'
-        $testProxyExeceptions = @('exception1.contoso.com', 'exception2.contoso.com')
-        $testProxyAlternateExeceptions = @('exception1.contoso.com')
+        $testProxyExceptions = 1..20 | Foreach-Object -Process {
+            "exception$_.contoso.com"
+        }
+        $testProxyAlternateExceptions = @('exception1.contoso.com')
         $testAutoConfigURL = 'http://wpad.contoso.com/test.wpad'
 
         $testProxyAllDisabledSettings = [PSObject] @{
@@ -49,7 +51,7 @@ try
             EnableAutoDetection     = $False
             EnableManualProxy       = $True
             ProxyServer             = $testProxyServer
-            ProxyServerExceptions   = $testProxyExeceptions
+            ProxyServerExceptions   = $testProxyExceptions
             EnableAutoConfiguration = $False
         }
 
@@ -57,7 +59,7 @@ try
             EnableAutoDetection     = $False
             EnableManualProxy       = $True
             ProxyServer             = $testProxyServer
-            ProxyServerExceptions   = $testProxyAlternateExeceptions
+            ProxyServerExceptions   = $testProxyAlternateExceptions
             EnableAutoConfiguration = $False
         }
 
@@ -81,7 +83,7 @@ try
             EnableManualProxy       = $True
             ProxyServer             = $testProxyServer
             ProxyServerBypassLocal  = $False
-            ProxyServerExceptions   = $testProxyExeceptions
+            ProxyServerExceptions   = $testProxyExceptions
             EnableAutoConfiguration = $True
             AutoConfigURL           = $testAutoConfigURL
         }
@@ -91,7 +93,7 @@ try
             EnableManualProxy       = $True
             ProxyServer             = $testProxyServer
             ProxyServerBypassLocal  = $True
-            ProxyServerExceptions   = $testProxyExeceptions
+            ProxyServerExceptions   = $testProxyExceptions
             EnableAutoConfiguration = $True
             AutoConfigURL           = $testAutoConfigURL
         }
@@ -728,6 +730,52 @@ try
 
                 It 'Should return false' {
                     $script:testProxySettingsResult | Should -Be $false
+                }
+            }
+        }
+
+        Describe "$script:DSCResourceName\Get-StringLengthInHexBytes" {
+            Context 'When an empty value string is passed' {
+                It 'Should return @(0x00,0x00,0x00,0x00)' {
+                    Get-StringLengthInHexBytes -Value '' | Should -Be @( '0x00', '0x00', '0x00', '0x00' )
+                }
+            }
+
+            Context 'When a value string less than 256 characters is passed' {
+                It 'Should return @(0xFF,0x00,0x00,0x00)' {
+                    Get-StringLengthInHexBytes -Value ([System.String]::new('a', 255)) | Should -Be @( '0xFF', '0x00', '0x00', '0x00' )
+                }
+            }
+
+            Context 'When a value string more than 256 characters is passed' {
+                It 'Should return @(0x01,0x01,0x00,0x00)' {
+                    Get-StringLengthInHexBytes -Value ([System.String]::new('a', 257)) | Should -Be @( '0x01', '0x01', '0x00', '0x00' )
+                }
+            }
+        }
+
+        Describe "$script:DSCResourceName\Get-Int32FromByteArray" {
+            Context 'When a byte array with a little endian integer less than 256 starting at byte 0' {
+                It 'Should return 255' {
+                    Get-Int32FromByteArray -Byte ([System.Byte[]] @(255,0,0,0,99)) -StartByte 0 | Should -Be 255
+                }
+            }
+
+            Context 'When a byte array with a little endian integer less than 256 starting at byte 1' {
+                It 'Should return 255' {
+                    Get-Int32FromByteArray -Byte ([System.Byte[]] @(99,255,0,0,0,99)) -StartByte 1 | Should -Be 255
+                }
+            }
+
+            Context 'When a byte array with a little endian integer more than 256 starting at byte 0' {
+                It 'Should return 256' {
+                    Get-Int32FromByteArray -Byte ([System.Byte[]] @(1,1,0,0,99)) -StartByte 0 | Should -Be 257
+                }
+            }
+
+            Context 'When a byte array with a little endian integer more than 256 starting at byte 1' {
+                It 'Should return 256' {
+                    Get-Int32FromByteArray -Byte ([System.Byte[]] @(99,1,1,0,0,99)) -StartByte 1 | Should -Be 257
                 }
             }
         }
