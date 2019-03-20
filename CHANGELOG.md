@@ -4,6 +4,10 @@
 
 - New Resource: NetAdapterState to enable or disable a network adapter - fixes
   [Issue #365](https://github.com/PowerShell/NetworkingDsc/issues/365)
+- MSFT_Proxy:
+  - Fixed `ProxyServer`, `ProxyServerExceptions` and `AutoConfigURL`
+    parameters so that they correctly support strings longer than 255
+    characters - fixes [Issue #378](https://github.com/PowerShell/NetworkingDsc/issues/378).
 
 ## 7.0.0.0
 

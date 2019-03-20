@@ -24,7 +24,9 @@ try
 {
     # Create a config data object to pass to the DSC Config
     $testProxyServer = 'testproxy:8888'
-    $testProxyExeceptions = @('exception1.contoso.com', 'exception2.contoso.com')
+    $testProxyExceptions = 1..20 | Foreach-Object -Process {
+        "exception$_.contoso.com"
+    }
     $testAutoConfigURL = 'http://wpad.contoso.com/test.wpad'
 
     $configData = @{
@@ -35,7 +37,7 @@ try
                 EnableAutoConfiguration = $True
                 EnableManualProxy       = $True
                 ProxyServer             = $testProxyServer
-                ProxyServerExceptions   = $testProxyExeceptions
+                ProxyServerExceptions   = $testProxyExceptions
                 ProxyServerBypassLocal  = $True
                 AutoConfigURL           = $testAutoConfigURL
             }
@@ -81,7 +83,7 @@ try
             $current.EnableAutoConfiguration | Should -Be $True
             $current.EnableManualProxy       | Should -Be $True
             $current.ProxyServer             | Should -Be $testProxyServer
-            $current.ProxyServerExceptions   | Should -Be $testProxyExeceptions
+            $current.ProxyServerExceptions   | Should -Be $testProxyExceptions
             $current.ProxyServerBypassLocal  | Should -Be $True
             $current.AutoConfigURL           | Should -Be $testAutoConfigURL
         }
