@@ -182,7 +182,8 @@ function Test-TargetResource
             $($localizedData.NetAdapterTestingStateMessage -f $Name)
         ) -join '')
 
-    if ($currentState = Get-TargetResource @PSBoundParameters)
+    $currentState = Get-TargetResource @PSBoundParameters
+    if ($currentState)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
