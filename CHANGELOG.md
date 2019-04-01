@@ -4,6 +4,8 @@
 
 - New Resource: NetAdapterState to enable or disable a network adapter - fixes
   [Issue #365](https://github.com/PowerShell/NetworkingDsc/issues/365)
+- Fix example publish to PowerShell Gallery by adding `gallery_api`
+  environment variable to `AppVeyor.yml` - fixes [Issue #385](https://github.com/PowerShell/NetworkingDsc/issues/385).
 - MSFT_Proxy:
   - Fixed `ProxyServer`, `ProxyServerExceptions` and `AutoConfigURL`
     parameters so that they correctly support strings longer than 255
