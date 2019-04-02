@@ -53,6 +53,7 @@
         'NetAdapterRDMA',
         'NetAdapterRsc',
         'NetAdapterRss',
+        'NetAdapterState',
         'NetBIOS',
         'NetConnectionProfile',
         'NetIPInterface',
