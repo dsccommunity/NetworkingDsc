@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- NetAdapterAdvancedProperty:
+  - Added support for RegistryKeyword `MaxRxRing1Length` and
+    `NumRxBuffersSmall` - fixes [Issue #387](https://github.com/PowerShell/NetworkingDsc/issues/387).
+
 ## 7.1.0.0
 
 - New Resource: NetAdapterState to enable or disable a network adapter - fixes
