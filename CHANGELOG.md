@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.1.0.0
+
 - New Resource: NetAdapterState to enable or disable a network adapter - fixes
   [Issue #365](https://github.com/PowerShell/NetworkingDsc/issues/365)
 - Fix example publish to PowerShell Gallery by adding `gallery_api`
