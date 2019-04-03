@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 7.1.0.0
+
+- New Resource: NetAdapterState to enable or disable a network adapter - fixes
+  [Issue #365](https://github.com/PowerShell/NetworkingDsc/issues/365)
+- Fix example publish to PowerShell Gallery by adding `gallery_api`
+  environment variable to `AppVeyor.yml` - fixes [Issue #385](https://github.com/PowerShell/NetworkingDsc/issues/385).
+- MSFT_Proxy:
+  - Fixed `ProxyServer`, `ProxyServerExceptions` and `AutoConfigURL`
+    parameters so that they correctly support strings longer than 255
+    characters - fixes [Issue #378](https://github.com/PowerShell/NetworkingDsc/issues/378).
+
 ## 7.0.0.0
 
 - Refactored module folder structure to move resource to root folder of
