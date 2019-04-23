@@ -5,6 +5,11 @@
 - NetAdapterAdvancedProperty:
   - Added support for RegistryKeyword `MaxRxRing1Length` and
     `NumRxBuffersSmall` - fixes [Issue #387](https://github.com/PowerShell/NetworkingDsc/issues/387).
+- Firewall:
+  - Prevent 'Parameter set cannot be resolved using the specified named
+    parameters' error when updating rule when group name is specified - fixes
+    [Issue #130](https://github.com/PowerShell/NetworkingDsc/issues/130) and
+    [Issue #191](https://github.com/PowerShell/NetworkingDsc/issues/191)
 
 ## 7.1.0.0
 
