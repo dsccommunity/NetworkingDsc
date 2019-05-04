@@ -6,7 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$LocalizedData = Get-LocalizedData `
+$script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_DefaultGatewayAddress' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
@@ -45,7 +45,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingDefaultGatewayAddressMessage)
+            $($script:localizedData.GettingDefaultGatewayAddressMessage)
         ) -join '' )
 
     # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
@@ -111,7 +111,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.ApplyingDefaultGatewayAddressMessage)
+            $($script:localizedData.ApplyingDefaultGatewayAddressMessage)
         ) -join '' )
 
     # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
@@ -153,13 +153,13 @@ function Set-TargetResource
         New-NetRoute @Parameters -ErrorAction Stop
 
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.DefaultGatewayAddressSetToDesiredStateMessage)
+                $($script:localizedData.DefaultGatewayAddressSetToDesiredStateMessage)
             ) -join '' )
     }
     else
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.DefaultGatewayRemovedMessage)
+                $($script:localizedData.DefaultGatewayRemovedMessage)
             ) -join '' )
     }
 }
@@ -202,7 +202,7 @@ function Test-TargetResource
     [Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.CheckingDefaultGatewayAddressMessage)
+            $($script:localizedData.CheckingDefaultGatewayAddressMessage)
         ) -join '' )
 
     Assert-ResourceProperty @PSBoundParameters
@@ -228,21 +228,21 @@ function Test-TargetResource
             if (-not $defaultRoutes.Where( { $_.NextHop -eq $Address } ))
             {
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                        $($LocalizedData.DefaultGatewayNotMatchMessage) -f $Address, $defaultRoutes.NextHop
+                        $($script:localizedData.DefaultGatewayNotMatchMessage) -f $Address, $defaultRoutes.NextHop
                     ) -join '' )
                 $desiredConfigurationMatch = $false
             }
             else
             {
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                        $($LocalizedData.DefaultGatewayCorrectMessage)
+                        $($script:localizedData.DefaultGatewayCorrectMessage)
                     ) -join '' )
             }
         }
         else
         {
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                    $($LocalizedData.DefaultGatewayDoesNotExistMessage) -f $Address
+                    $($script:localizedData.DefaultGatewayDoesNotExistMessage) -f $Address
                 ) -join '' )
             $desiredConfigurationMatch = $false
         }
@@ -253,14 +253,14 @@ function Test-TargetResource
         if ($defaultRoutes)
         {
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                    $($LocalizedData.DefaultGatewayExistsButShouldNotMessage)
+                    $($script:localizedData.DefaultGatewayExistsButShouldNotMessage)
                 ) -join '' )
             $desiredConfigurationMatch = $false
         }
         else
         {
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                    $($LocalizedData.DefaultGatewayExistsAndShouldMessage)
+                    $($script:localizedData.DefaultGatewayExistsAndShouldMessage)
                     'Default Gateway does not exist which is correct.'
                 ) -join '' )
         }
@@ -306,7 +306,7 @@ function Assert-ResourceProperty
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.InterfaceNotAvailableError -f $InterfaceAlias)
+            -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias)
     }
 
     if ($Address)
@@ -314,7 +314,7 @@ function Assert-ResourceProperty
         if (-not ([System.Net.IPAddress]::TryParse($Address, [ref]0)))
         {
             New-InvalidArgumentException `
-                -Message ($LocalizedData.AddressFormatError -f $Address) `
+                -Message ($script:localizedData.AddressFormatError -f $Address) `
                 -ArgumentName 'Address'
         }
 
@@ -324,7 +324,7 @@ function Assert-ResourceProperty
                 -and ($AddressFamily -ne 'IPv4'))
         {
             New-InvalidArgumentException `
-                -Message ($LocalizedData.AddressIPv4MismatchError -f $Address, $AddressFamily) `
+                -Message ($script:localizedData.AddressIPv4MismatchError -f $Address, $AddressFamily) `
                 -ArgumentName 'AddressFamily'
         }
 
@@ -332,7 +332,7 @@ function Assert-ResourceProperty
                 -and ($AddressFamily -ne 'IPv6'))
         {
             New-InvalidArgumentException `
-                -Message ($LocalizedData.AddressIPv6MismatchError -f $Address, $AddressFamily) `
+                -Message ($script:localizedData.AddressIPv6MismatchError -f $Address, $AddressFamily) `
                 -ArgumentName 'AddressFamily'
         }
     }

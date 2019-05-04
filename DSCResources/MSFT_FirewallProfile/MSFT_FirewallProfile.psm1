@@ -6,7 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
                                                      -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$LocalizedData = Get-LocalizedData `
+$script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_FirewallProfile' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
@@ -41,7 +41,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingFirewallProfileMessage) `
+            $($script:localizedData.GettingFirewallProfileMessage) `
                 -f $Name
         ) -join '' )
 
@@ -226,7 +226,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.SettingFirewallProfileMessage) `
+            $($script:localizedData.SettingFirewallProfileMessage) `
                 -f $Name
         ) -join '' )
 
@@ -251,7 +251,7 @@ function Set-TargetResource
 
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.FirewallProfileUpdateParameterMessage) `
+                $($script:localizedData.FirewallProfileUpdateParameterMessage) `
                     -f $Name,$parameter.Name,$parameterNewValue
                 ) -join '' )
         } # if
@@ -266,7 +266,7 @@ function Set-TargetResource
 
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.FirewallProfileUpdatedMessage) `
+            $($script:localizedData.FirewallProfileUpdatedMessage) `
                 -f $Name
             ) -join '' )
     } # if
@@ -434,7 +434,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.TestingFirewallProfileMessage) `
+            $($script:localizedData.TestingFirewallProfileMessage) `
                 -f $Name
         ) -join '' )
 
@@ -456,7 +456,7 @@ function Test-TargetResource
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.FirewallProfileParameterNeedsUpdateMessage) `
+                $($script:localizedData.FirewallProfileParameterNeedsUpdateMessage) `
                     -f $Name,$parameter.Name,$parameterSourceValue,$parameterNewValue
                 ) -join '' )
 

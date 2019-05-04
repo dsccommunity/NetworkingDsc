@@ -6,7 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
+$script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_Route' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
@@ -57,7 +57,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingRouteMessage) `
+            $($script:localizedData.GettingRouteMessage) `
                 -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
         ) -join '' )
 
@@ -75,7 +75,7 @@ function Get-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.RouteExistsMessage) `
+                $($script:localizedData.RouteExistsMessage) `
                     -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
             ) -join '' )
 
@@ -90,7 +90,7 @@ function Get-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.RouteDoesNotExistMessage) `
+                $($script:localizedData.RouteDoesNotExistMessage) `
                     -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
             ) -join '' )
 
@@ -189,7 +189,7 @@ function Set-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.EnsureRouteExistsMessage) `
+                $($script:localizedData.EnsureRouteExistsMessage) `
                     -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
             ) -join '' )
 
@@ -202,7 +202,7 @@ function Set-TargetResource
 
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.RouteUpdatedMessage) `
+                    $($script:localizedData.RouteUpdatedMessage) `
                         -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
                 ) -join '' )
         }
@@ -214,7 +214,7 @@ function Set-TargetResource
 
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.RouteCreatedMessage) `
+                    $($script:localizedData.RouteCreatedMessage) `
                         -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
                 ) -join '' )
         }
@@ -223,7 +223,7 @@ function Set-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.EnsureRouteDoesNotExistMessage) `
+                $($script:localizedData.EnsureRouteDoesNotExistMessage) `
                     -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
             ) -join '' )
 
@@ -245,7 +245,7 @@ function Set-TargetResource
 
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.RouteRemovedMessage) `
+                    $($script:localizedData.RouteRemovedMessage) `
                         -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
                 ) -join '' )
         } # if
@@ -332,7 +332,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.TestingRouteMessage) `
+            $($script:localizedData.TestingRouteMessage) `
                 -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
         ) -join '' )
 
@@ -359,7 +359,7 @@ function Test-TargetResource
             {
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.RoutePropertyNeedsUpdateMessage) `
+                        $($script:localizedData.RoutePropertyNeedsUpdateMessage) `
                             -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop, 'RouteMetric' `
                     ) -join '' )
 
@@ -371,7 +371,7 @@ function Test-TargetResource
             {
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.RoutePropertyNeedsUpdateMessage) `
+                        $($script:localizedData.RoutePropertyNeedsUpdateMessage) `
                             -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop, 'Publish' `
                     ) -join '' )
 
@@ -383,7 +383,7 @@ function Test-TargetResource
             {
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.RoutePropertyNeedsUpdateMessage) `
+                        $($script:localizedData.RoutePropertyNeedsUpdateMessage) `
                             -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop, 'PreferredLifetime' `
                     ) -join '' )
 
@@ -395,7 +395,7 @@ function Test-TargetResource
             # The route doesn't exist but should
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.RouteDoesNotExistButShouldMessage) `
+                    $($script:localizedData.RouteDoesNotExistButShouldMessage) `
                         -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
                 ) -join '' )
 
@@ -410,7 +410,7 @@ function Test-TargetResource
             # The route exists but should not
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.RouteExistsButShouldNotMessage) `
+                    $($script:localizedData.RouteExistsButShouldNotMessage) `
                         -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
                 ) -join '' )
 
@@ -421,7 +421,7 @@ function Test-TargetResource
             # The route does not exist and should not
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.RouteDoesNotExistAndShouldNotMessage) `
+                    $($script:localizedData.RouteDoesNotExistAndShouldNotMessage) `
                         -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
                 ) -join '' )
         }
@@ -610,7 +610,7 @@ Function Assert-ResourceProperty
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
         New-InvalidArgumentException `
-            -Message $($($LocalizedData.InterfaceNotAvailableError) -f $InterfaceAlias) `
+            -Message $($($script:localizedData.InterfaceNotAvailableError) -f $InterfaceAlias) `
             -ArgumentName 'InterfaceAlias'
     }
 
@@ -621,7 +621,7 @@ Function Assert-ResourceProperty
     if (-not ([System.Net.Ipaddress]::TryParse($prefix, [ref]0)))
     {
         New-InvalidArgumentException `
-            -Message $($($LocalizedData.AddressFormatError) -f $prefix) `
+            -Message $($($script:localizedData.AddressFormatError) -f $prefix) `
             -ArgumentName 'DestinationPrefix'
     }
 
@@ -631,7 +631,7 @@ Function Assert-ResourceProperty
             -and ($AddressFamily -ne 'IPv4'))
     {
         New-InvalidArgumentException `
-            -Message $($($LocalizedData.AddressIPv4MismatchError) -f $prefix, $AddressFamily) `
+            -Message $($($script:localizedData.AddressIPv4MismatchError) -f $prefix, $AddressFamily) `
             -ArgumentName 'DestinationPrefix'
     }
 
@@ -639,7 +639,7 @@ Function Assert-ResourceProperty
             -and ($AddressFamily -ne 'IPv6'))
     {
         New-InvalidArgumentException `
-            -Message $($($LocalizedData.AddressIPv6MismatchError) -f $prefix, $AddressFamily) `
+            -Message $($($script:localizedData.AddressIPv6MismatchError) -f $prefix, $AddressFamily) `
             -ArgumentName 'DestinationPrefix'
     }
 
@@ -647,7 +647,7 @@ Function Assert-ResourceProperty
     if (-not ([System.Net.Ipaddress]::TryParse($NextHop, [ref]0)))
     {
         New-InvalidArgumentException `
-            -Message $($($LocalizedData.AddressFormatError) -f $NextHop) `
+            -Message $($($script:localizedData.AddressFormatError) -f $NextHop) `
             -ArgumentName 'NextHop'
     }
 
@@ -657,7 +657,7 @@ Function Assert-ResourceProperty
             -and ($AddressFamily -ne 'IPv4'))
     {
         New-InvalidArgumentException `
-            -Message $($($LocalizedData.AddressIPv4MismatchError) -f $NextHop, $AddressFamily) `
+            -Message $($($script:localizedData.AddressIPv4MismatchError) -f $NextHop, $AddressFamily) `
             -ArgumentName 'NextHop'
     }
 
@@ -665,7 +665,7 @@ Function Assert-ResourceProperty
             -and ($AddressFamily -ne 'IPv6'))
     {
         New-InvalidArgumentException `
-            -Message $($($LocalizedData.AddressIPv6MismatchError) -f $NextHop, $AddressFamily) `
+            -Message $($($script:localizedData.AddressIPv6MismatchError) -f $NextHop, $AddressFamily) `
             -ArgumentName 'NextHop'
     }
 }

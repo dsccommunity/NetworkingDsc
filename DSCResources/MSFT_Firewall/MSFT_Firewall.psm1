@@ -6,7 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
+$script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_Firewall' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
@@ -1271,7 +1271,7 @@ function Get-FirewallRule
     if ($firewallRule.Count -gt 1)
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.RuleNotUniqueError -f $firewallRule.Count, $Name)
+            -Message ($script:localizedData.RuleNotUniqueError -f $firewallRule.Count, $Name)
     }
 
     # The array will only contain a single rule so only return the first one (not the array)

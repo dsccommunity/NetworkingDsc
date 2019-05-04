@@ -6,7 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
+$script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_NetConnectionProfile' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
@@ -29,7 +29,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.GettingNetConnectionProfile) -f $InterfaceAlias
+        $($script:localizedData.GettingNetConnectionProfile) -f $InterfaceAlias
     ) -join '')
 
     $result = Get-NetConnectionProfile -InterfaceAlias $InterfaceAlias
@@ -84,7 +84,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.SetNetConnectionProfile) -f $InterfaceAlias
+        $($script:localizedData.SetNetConnectionProfile) -f $InterfaceAlias
     ) -join '')
 
     Assert-ResourceProperty @PSBoundParameters
@@ -142,7 +142,7 @@ function Test-TargetResource
         ($IPv4Connectivity -ne $current.IPv4Connectivity))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.TestIPv4Connectivity) -f $IPv4Connectivity, $current.IPv4Connectivity
+            $($script:localizedData.TestIPv4Connectivity) -f $IPv4Connectivity, $current.IPv4Connectivity
         ) -join '')
 
         return $false
@@ -152,7 +152,7 @@ function Test-TargetResource
         ($IPv6Connectivity -ne $current.IPv6Connectivity))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.TestIPv6Connectivity) -f $IPv6Connectivity, $current.IPv6Connectivity
+            $($script:localizedData.TestIPv6Connectivity) -f $IPv6Connectivity, $current.IPv6Connectivity
         ) -join '')
 
         return $false
@@ -162,7 +162,7 @@ function Test-TargetResource
         ($NetworkCategory -ne $current.NetworkCategory))
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.TestNetworkCategory) -f $NetworkCategory, $current.NetworkCategory
+            $($script:localizedData.TestNetworkCategory) -f $NetworkCategory, $current.NetworkCategory
         ) -join '')
 
         return $false
@@ -217,7 +217,7 @@ function Assert-ResourceProperty
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.InterfaceNotAvailableError -f $InterfaceAlias)
+            -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias)
     }
 
     if ([System.String]::IsNullOrEmpty($IPv4Connectivity) -and `
@@ -225,6 +225,6 @@ function Assert-ResourceProperty
         [System.String]::IsNullOrEmpty($NetworkCategory))
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.ParameterCombinationError)
+            -Message ($script:localizedData.ParameterCombinationError)
     }
 } # Assert-ResourceProperty

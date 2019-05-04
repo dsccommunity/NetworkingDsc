@@ -6,11 +6,11 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$localizedDataSplat = @{
+$script:localizedDataSplat = @{
     ResourceName = 'MSFT_IPAddressOption'
     ResourcePath = (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 }
-$localizedData = Get-LocalizedData @localizedDataSplat
+$script:localizedData = Get-LocalizedData @localizedDataSplat
 
 <#
     .SYNOPSIS
@@ -39,7 +39,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingIPAddressOptionMessage -f $IPAddress)
+            $($script:localizedData.GettingIPAddressOptionMessage -f $IPAddress)
         ) -join '')
 
     $currentIPAddress = Get-NetIPAddress -IPAddress $IPAddress
@@ -78,7 +78,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.ApplyingIPAddressOptionMessage -f $IPAddress)
+            $($script:localizedData.ApplyingIPAddressOptionMessage -f $IPAddress)
         ) -join '')
 
     $currentConfig = Get-TargetResource @PSBoundParameters
@@ -119,7 +119,7 @@ function Test-TargetResource
     [System.Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.CheckingIPAddressOptionMessage -f $IPAddress)
+            $($script:localizedData.CheckingIPAddressOptionMessage -f $IPAddress)
         ) -join '')
 
     $currentConfig = Get-TargetResource @PSBoundParameters

@@ -6,7 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
+$script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_NetAdapterState' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
@@ -39,7 +39,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $localizedData.CheckingNetAdapterMessage
+            $script:localizedData.CheckingNetAdapterMessage
         ) -join '')
 
     try
@@ -50,7 +50,7 @@ function Get-TargetResource
     {
         Write-Warning -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $LocalizedData.NetAdapterNotFoundMessage -f $Name
+            $script:localizedData.NetAdapterNotFoundMessage -f $Name
         ) -join '')
     }
 
@@ -58,7 +58,7 @@ function Get-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterTestingStateMessage -f $Name)
+                $($script:localizedData.NetAdapterTestingStateMessage -f $Name)
             ) -join '')
 
         # Using NET_IF_ADMIN_STATUS as documented here:
@@ -108,7 +108,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $localizedData.CheckingNetAdapterMessage
+            $script:localizedData.CheckingNetAdapterMessage
         ) -join '')
 
     try
@@ -119,7 +119,7 @@ function Set-TargetResource
     {
         Write-Error -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $LocalizedData.NetAdapterNotFoundMessage -f $Name
+            $script:localizedData.NetAdapterNotFoundMessage -f $Name
         ) -join '')
     }
 
@@ -140,7 +140,7 @@ function Set-TargetResource
         {
             Write-Error -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterSetFailedMessage -f $Name, $State, $_)
+                $($script:localizedData.NetAdapterSetFailedMessage -f $Name, $State, $_)
             ) -join '')
         }
     }
@@ -174,7 +174,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.NetAdapterTestingStateMessage -f $Name)
+            $($script:localizedData.NetAdapterTestingStateMessage -f $Name)
         ) -join '')
 
     $currentState = Get-TargetResource @PSBoundParameters
@@ -182,7 +182,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.NetAdapterStateMessage -f $Name, $currentState.State)
+                $($script:localizedData.NetAdapterStateMessage -f $Name, $currentState.State)
             ) -join '')
 
         return $currentState.State -eq $State

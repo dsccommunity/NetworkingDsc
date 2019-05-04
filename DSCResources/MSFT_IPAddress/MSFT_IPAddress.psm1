@@ -6,11 +6,11 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$localizedDataSplat = @{
+$script:localizedDataSplat = @{
     ResourceName = 'MSFT_IPAddress'
     ResourcePath = (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 }
-$localizedData = Get-LocalizedData @localizedDataSplat
+$script:localizedData = Get-LocalizedData @localizedDataSplat
 
 <#
     .SYNOPSIS
@@ -55,7 +55,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingIPAddressMessage)
+            $($script:localizedData.GettingIPAddressMessage)
         ) -join '')
 
     $getNetIPAddressParameters = @{
@@ -122,7 +122,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.ApplyingIPAddressMessage)
+            $($script:localizedData.ApplyingIPAddressMessage)
         ) -join '')
 
     # Use $AddressFamily to select the IPv4 or IPv6 destination prefix
@@ -248,21 +248,21 @@ function Set-TargetResource
             {
                 # The IP Address is already set on the correct interface
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                        $($LocalizedData.IPAddressMatchMessage)
+                        $($script:localizedData.IPAddressMatchMessage)
                     ) -join '' )
             }
             else
             {
                 Write-Error -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.IPAddressDoesNotMatchInterfaceAliasMessage) -f $InterfaceAlias,$verifyNetIPAddressAdapter.InterfaceAlias
+                    $($script:localizedData.IPAddressDoesNotMatchInterfaceAliasMessage) -f $InterfaceAlias,$verifyNetIPAddressAdapter.InterfaceAlias
                 ) -join '' )
             }
             continue
         }
 
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.IPAddressSetStateMessage)
+                $($script:localizedData.IPAddressSetStateMessage)
             ) -join '' )
     }
 } # Set-TargetResource
@@ -313,7 +313,7 @@ function Test-TargetResource
     [System.Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.CheckingIPAddressMessage)
+            $($script:localizedData.CheckingIPAddressMessage)
         ) -join '')
 
     Assert-ResourceProperty @PSBoundParameters
@@ -356,7 +356,7 @@ function Test-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.IPAddressDoesNotMatchMessage) -f $singleIP, $currentIPs.IPAddress
+                    $($script:localizedData.IPAddressDoesNotMatchMessage) -f $singleIP, $currentIPs.IPAddress
                 ) -join '' )
 
             $desiredConfigurationMatch = $false
@@ -364,7 +364,7 @@ function Test-TargetResource
         else
         {
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                    $($LocalizedData.IPAddressMatchMessage)
+                    $($script:localizedData.IPAddressMatchMessage)
                 ) -join '')
 
             # Filter the IP addresses for the IP address to check
@@ -379,7 +379,7 @@ function Test-TargetResource
             {
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.prefixLengthDoesNotMatchMessage) -f $prefixLength, $currentIPs.prefixLength
+                        $($script:localizedData.prefixLengthDoesNotMatchMessage) -f $prefixLength, $currentIPs.prefixLength
                     ) -join '' )
 
                 $desiredConfigurationMatch = $false
@@ -387,7 +387,7 @@ function Test-TargetResource
             else
             {
                 Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.prefixLengthMatchMessage)
+                        $($script:localizedData.prefixLengthMatchMessage)
                     ) -join '' )
             }
         }
@@ -474,7 +474,7 @@ function Assert-ResourceProperty
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
         New-InvalidArgumentException `
-            -Message $($($LocalizedData.InterfaceNotAvailableError) -f $InterfaceAlias) `
+            -Message $($($script:localizedData.InterfaceNotAvailableError) -f $InterfaceAlias) `
             -ArgumentName 'InterfaceAlias'
     }
 
@@ -485,7 +485,7 @@ function Assert-ResourceProperty
         if (-not ([System.Net.Ipaddress]::TryParse($singleIP, [ref]0)))
         {
             New-InvalidArgumentException `
-                -Message $($($LocalizedData.AddressFormatError) -f $singleIPAddress) `
+                -Message $($($script:localizedData.AddressFormatError) -f $singleIPAddress) `
                 -ArgumentName 'IPAddress'
         }
 
@@ -495,7 +495,7 @@ function Assert-ResourceProperty
                 -and ($AddressFamily -ne 'IPv4'))
         {
             New-InvalidArgumentException `
-                -Message $($($LocalizedData.AddressIPv4MismatchError) -f $singleIPAddress, $AddressFamily) `
+                -Message $($($script:localizedData.AddressIPv4MismatchError) -f $singleIPAddress, $AddressFamily) `
                 -ArgumentName 'IPAddress'
         }
 
@@ -503,7 +503,7 @@ function Assert-ResourceProperty
                 -and ($AddressFamily -ne 'IPv6'))
         {
             New-InvalidArgumentException `
-                -Message $($($LocalizedData.AddressIPv6MismatchError) -f $singleIPAddress, $AddressFamily) `
+                -Message $($($script:localizedData.AddressIPv6MismatchError) -f $singleIPAddress, $AddressFamily) `
                 -ArgumentName 'IPAddress'
         }
     }
@@ -521,7 +521,7 @@ function Assert-ResourceProperty
             ))
         {
             New-InvalidArgumentException `
-                -Message $($($LocalizedData.PrefixLengthError) -f $prefixLength, $AddressFamily) `
+                -Message $($($script:localizedData.PrefixLengthError) -f $prefixLength, $AddressFamily) `
                 -ArgumentName 'IPAddress'
         }
     }

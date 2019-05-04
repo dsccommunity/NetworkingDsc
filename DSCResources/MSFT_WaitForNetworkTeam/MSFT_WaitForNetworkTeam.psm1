@@ -11,7 +11,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
+$script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_WaitForNetworkTeam' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
@@ -35,7 +35,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.GettingWaitForNetworkTeamStatusMessage -f $Name)
+            $($script:localizedData.GettingWaitForNetworkTeamStatusMessage -f $Name)
         ) -join '' )
 
 
@@ -83,7 +83,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.SettingWaitForNetworkTeamStatusMessage -f $Name)
+            $($script:localizedData.SettingWaitForNetworkTeamStatusMessage -f $Name)
         ) -join '' )
 
     $lbfoTeamUp = $false
@@ -96,7 +96,7 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.NetworkTeamUpMessage -f $Name)
+                    $($script:localizedData.NetworkTeamUpMessage -f $Name)
                 ) -join '' )
 
             $lbfoTeamUp = $true
@@ -106,7 +106,7 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.NetworkTeamNotUpRetryingMessage -f $Name, $RetryIntervalSec)
+                    $($script:localizedData.NetworkTeamNotUpRetryingMessage -f $Name, $RetryIntervalSec)
                 ) -join '' )
 
             Start-Sleep -Seconds $RetryIntervalSec
@@ -116,7 +116,7 @@ function Set-TargetResource
     if ($lbfoTeamUp -eq $false)
     {
         New-InvalidOperationException `
-            -Message ($localizedData.NetworkTeamNotUpAfterError -f $Name, $RetryCount)
+            -Message ($script:localizedData.NetworkTeamNotUpAfterError -f $Name, $RetryCount)
     } # if
 } # function Set-TargetResource
 
@@ -154,7 +154,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.TestingWaitForNetworkTeamStatusMessage -f $Name)
+            $($script:localizedData.TestingWaitForNetworkTeamStatusMessage -f $Name)
         ) -join '' )
 
     $lbfoTeamStatus = Get-NetLbfoTeamStatus -Name $Name
@@ -163,7 +163,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.NetworkTeamUpMessage -f $Name)
+                $($script:localizedData.NetworkTeamUpMessage -f $Name)
             ) -join '' )
 
         return $true
@@ -171,7 +171,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.NetworkTeamNotUpMessage -f $Name)
+            $($script:localizedData.NetworkTeamNotUpMessage -f $Name)
         ) -join '' )
 
     return $false
@@ -207,14 +207,14 @@ function Get-NetLbfoTeamStatus
 
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.NetworkTeamFoundMessage -f $Name)
+            $($script:localizedData.NetworkTeamFoundMessage -f $Name)
         ) -join '' )
 
     }
     catch [Microsoft.PowerShell.Cmdletization.Cim.CimJobException]
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetworkTeamNotFoundMessage -f $Name)
+            -Message ($script:localizedData.NetworkTeamNotFoundMessage -f $Name)
     }
 
     return $lbfoTeam.Status

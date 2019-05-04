@@ -6,7 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
+$script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_NetAdapterName' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
@@ -106,7 +106,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingNetAdapterNameMessage -f $NewName)
+            $($script:localizedData.GettingNetAdapterNameMessage -f $NewName)
         ) -join '')
 
     $adapter = Find-NetworkAdapter `
@@ -116,7 +116,7 @@ function Get-TargetResource
     if (-not $adapter)
     {
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.FindNetAdapterMessage)
+                $($script:localizedData.FindNetAdapterMessage)
             ) -join '')
 
         $null = $PSBoundParameters.Remove('NewName')
@@ -127,7 +127,7 @@ function Get-TargetResource
     }
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.NetAdapterNameFoundMessage -f $adapter.Name)
+            $($script:localizedData.NetAdapterNameFoundMessage -f $adapter.Name)
         ) -join '')
 
     $returnValue = @{
@@ -240,7 +240,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.SettingNetAdapterNameMessage -f $NewName)
+            $($script:localizedData.SettingNetAdapterNameMessage -f $NewName)
         ) -join '')
 
     $null = $PSBoundParameters.Remove('NewName')
@@ -250,13 +250,13 @@ function Set-TargetResource
         -ErrorAction Stop
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.RenamingNetAdapterNameMessage -f $adapter.Name, $NewName)
+            $($script:localizedData.RenamingNetAdapterNameMessage -f $adapter.Name, $NewName)
         ) -join '')
 
     $adapter | Rename-NetAdapter -NewName $NewName
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.NetAdapterNameRenamedMessage -f $NewName)
+            $($script:localizedData.NetAdapterNameRenamedMessage -f $NewName)
         ) -join '')
 } # Set-TargetResource
 
@@ -356,7 +356,7 @@ function Test-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.TestingNetAdapterNameMessage -f $NewName)
+            $($script:localizedData.TestingNetAdapterNameMessage -f $NewName)
         ) -join '')
 
     $null = $PSBoundParameters.Remove('NewName')
@@ -371,7 +371,7 @@ function Test-TargetResource
     {
         # An adapter was found matching the new name
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterWithNewNameExistsMessage -f $adapterWithNewName.Name)
+                $($script:localizedData.NetAdapterWithNewNameExistsMessage -f $adapterWithNewName.Name)
             ) -join '')
 
         return $true
@@ -380,7 +380,7 @@ function Test-TargetResource
     {
         # Find an adapter matching the parameters - throw if none can be found
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.FindNetAdapterMessage)
+                $($script:localizedData.FindNetAdapterMessage)
             ) -join '')
 
         $adapter = Find-NetworkAdapter `
@@ -389,7 +389,7 @@ function Test-TargetResource
 
         # An adapter was found that needs to be changed to the new name
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterNameNotMatchMessage -f $adapter.Name, $NewName)
+                $($script:localizedData.NetAdapterNameNotMatchMessage -f $adapter.Name, $NewName)
             ) -join '')
 
         return $false

@@ -6,7 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$LocalizedData = Get-LocalizedData `
+$script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_DnsConnectionSuffix' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
@@ -72,7 +72,7 @@ function Get-TargetResource
     if ($Ensure -eq 'Present')
     {
         # Test to see if the connection-specific suffix matches
-        Write-Verbose -Message ($LocalizedData.CheckingConnectionSuffix -f $ConnectionSpecificSuffix)
+        Write-Verbose -Message ($script:localizedData.CheckingConnectionSuffix -f $ConnectionSpecificSuffix)
 
         if ($dnsClient.ConnectionSpecificSuffix -eq $ConnectionSpecificSuffix)
         {
@@ -86,7 +86,7 @@ function Get-TargetResource
     else
     {
         # ($Ensure -eq 'Absent'). Test to see if there is a connection-specific suffix
-        Write-Verbose -Message ($LocalizedData.CheckingConnectionSuffix -f '')
+        Write-Verbose -Message ($script:localizedData.CheckingConnectionSuffix -f '')
 
         if ([System.String]::IsNullOrEmpty($dnsClient.ConnectionSpecificSuffix))
         {
@@ -162,14 +162,14 @@ function Set-TargetResource
     {
         $setDnsClientParams['ConnectionSpecificSuffix'] = $ConnectionSpecificSuffix
 
-        Write-Verbose -Message ($LocalizedData.SettingConnectionSuffix `
+        Write-Verbose -Message ($script:localizedData.SettingConnectionSuffix `
                 -f $ConnectionSpecificSuffix, $InterfaceAlias)
     }
     else
     {
         $setDnsClientParams['ConnectionSpecificSuffix'] = ''
 
-        Write-Verbose -Message ($LocalizedData.RemovingConnectionSuffix `
+        Write-Verbose -Message ($script:localizedData.RemovingConnectionSuffix `
                 -f $ConnectionSpecificSuffix, $InterfaceAlias)
     }
 
@@ -231,7 +231,7 @@ function Test-TargetResource
 
     if ($targetResource.Ensure -ne $Ensure)
     {
-        Write-Verbose -Message ($LocalizedData.PropertyMismatch `
+        Write-Verbose -Message ($script:localizedData.PropertyMismatch `
                 -f 'Ensure', $Ensure, $targetResource.Ensure)
 
         $inDesiredState = $false
@@ -239,7 +239,7 @@ function Test-TargetResource
 
     if ($targetResource.RegisterThisConnectionsAddress -ne $RegisterThisConnectionsAddress)
     {
-        Write-Verbose -Message ($LocalizedData.PropertyMismatch `
+        Write-Verbose -Message ($script:localizedData.PropertyMismatch `
                 -f 'RegisterThisConnectionsAddress', $RegisterThisConnectionsAddress, $targetResource.RegisterThisConnectionsAddress)
 
         $inDesiredState = $false
@@ -247,7 +247,7 @@ function Test-TargetResource
 
     if ($targetResource.UseSuffixWhenRegistering -ne $UseSuffixWhenRegistering)
     {
-        Write-Verbose -Message ($LocalizedData.PropertyMismatch `
+        Write-Verbose -Message ($script:localizedData.PropertyMismatch `
                 -f 'UseSuffixWhenRegistering', $UseSuffixWhenRegistering, $targetResource.UseSuffixWhenRegistering)
 
         $inDesiredState = $false
@@ -255,11 +255,11 @@ function Test-TargetResource
 
     if ($inDesiredState)
     {
-        Write-Verbose -Message $LocalizedData.ResourceInDesiredState
+        Write-Verbose -Message $script:localizedData.ResourceInDesiredState
     }
     else
     {
-        Write-Verbose -Message $LocalizedData.ResourceNotInDesiredState
+        Write-Verbose -Message $script:localizedData.ResourceNotInDesiredState
     }
 
     return $inDesiredState

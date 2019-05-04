@@ -14,6 +14,8 @@
   fixes [Issue #393](https://github.com/PowerShell/NetworkingDsc/issues/393).
 - Combined all `NetworkingDsc.ResourceHelper` module functions into
   `NetworkingDsc.Common` module - fixes [Issue #394](https://github.com/PowerShell/NetworkingDsc/issues/394).
+- Renamed all localization strings so that they are detected by
+  'Common Tests - Validate Localization'.
 
 ## 7.1.0.0
 

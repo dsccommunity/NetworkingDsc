@@ -6,7 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
+$script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_NetAdapterBinding' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
@@ -47,7 +47,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingNetAdapterBindingMessage -f `
+            $($script:localizedData.GettingNetAdapterBindingMessage -f `
                     $InterfaceAlias, $ComponentId)
         ) -join '')
 
@@ -115,7 +115,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.ApplyingNetAdapterBindingMessage -f `
+            $($script:localizedData.ApplyingNetAdapterBindingMessage -f `
                     $InterfaceAlias, $ComponentId)
         ) -join '')
 
@@ -129,7 +129,7 @@ function Set-TargetResource
         Enable-NetAdapterBinding @PSBoundParameters
 
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterBindingEnabledMessage -f `
+                $($script:localizedData.NetAdapterBindingEnabledMessage -f `
                         $InterfaceAlias, $ComponentId)
             ) -join '' )
     }
@@ -138,7 +138,7 @@ function Set-TargetResource
         Disable-NetAdapterBinding @PSBoundParameters
 
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterBindingDisabledMessage -f `
+                $($script:localizedData.NetAdapterBindingDisabledMessage -f `
                         $InterfaceAlias, $ComponentId)
             ) -join '' )
     } # if
@@ -181,7 +181,7 @@ function Test-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.CheckingNetAdapterBindingMessage -f `
+            $($script:localizedData.CheckingNetAdapterBindingMessage -f `
                     $InterfaceAlias, $ComponentId)
         ) -join '')
 
@@ -207,7 +207,7 @@ function Test-TargetResource
     if ($currentEnabled -ne $State)
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterBindingDoesNotMatchMessage -f `
+                $($script:localizedData.NetAdapterBindingDoesNotMatchMessage -f `
                         $InterfaceAlias, $ComponentId, $State, $currentEnabled)
             ) -join '' )
 
@@ -216,7 +216,7 @@ function Test-TargetResource
     else
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterBindingMatchMessage -f `
+                $($script:localizedData.NetAdapterBindingMatchMessage -f `
                         $InterfaceAlias, $ComponentId)
             ) -join '' )
 
@@ -263,7 +263,7 @@ function Get-Binding
     if (-not (Get-NetAdapter -Name $InterfaceAlias -ErrorAction SilentlyContinue))
     {
         New-InvalidArgumentException `
-            -Message ($LocalizedData.InterfaceNotAvailableError -f $InterfaceAlias) `
+            -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias) `
             -ArgumentName 'InterfaceAlias'
     } # if
 

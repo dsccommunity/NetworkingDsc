@@ -6,7 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
+$script:localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_NetAdapterAdvancedProperty' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
@@ -45,7 +45,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $localizedData.CheckingNetAdapterMessage
+            $script:localizedData.CheckingNetAdapterMessage
         ) -join '')
 
     try
@@ -58,14 +58,14 @@ function Get-TargetResource
     catch
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+            -Message ($script:localizedData.NetAdapterNotFoundMessage)
     }
 
     if ($netAdapterAdvancedProperty)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterTestingStateMessage -f $NetworkAdapterName, $RegistryKeyword)
+                $($script:localizedData.NetAdapterTestingStateMessage -f $NetworkAdapterName, $RegistryKeyword)
             ) -join '')
 
         $result = @{
@@ -113,7 +113,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $localizedData.CheckingNetAdapterMessage
+            $script:localizedData.CheckingNetAdapterMessage
         ) -join '')
 
     try
@@ -126,14 +126,14 @@ function Set-TargetResource
     catch
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+            -Message ($script:localizedData.NetAdapterNotFoundMessage)
     }
 
     if ($netAdapterAdvancedProperty)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterTestingStateMessage -f $NetworkAdapterName, $RegistryKeyword)
+                $($script:localizedData.NetAdapterTestingStateMessage -f $NetworkAdapterName, $RegistryKeyword)
             ) -join '')
 
         if ($RegistryValue -ne $netAdapterAdvancedProperty.RegistryValue)
@@ -141,7 +141,7 @@ function Set-TargetResource
             $netadapterRegistryValue = $netAdapterAdvancedProperty.RegistryValue
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.NetAdapterApplyingChangesMessage -f `
+                    $($script:localizedData.NetAdapterApplyingChangesMessage -f `
                             $NetworkAdapterName, $RegistryKeyword, "$netadapterRegistryValue", $RegistryValue )
                 ) -join '')
 
@@ -188,7 +188,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $localizedData.CheckingNetAdapterMessage
+            $script:localizedData.CheckingNetAdapterMessage
         ) -join '')
 
     try
@@ -201,14 +201,14 @@ function Test-TargetResource
     catch
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+            -Message ($script:localizedData.NetAdapterNotFoundMessage)
     }
 
     if ($netAdapterAdvancedProperty)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $localizedData.NetAdapterTestingStateMessage -f `
+                $script:localizedData.NetAdapterTestingStateMessage -f `
                     $NetworkAdapterName, $RegistryKeyword
             ) -join '')
 
