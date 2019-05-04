@@ -179,6 +179,12 @@ function Set-TargetResource
         $PreferredLifetime
     )
 
+    Write-Verbose -Message ( @(
+        "$($MyInvocation.MyCommand): "
+        $($script:localizedData.SettingRouteMessage) `
+            -f $AddressFamily, $InterfaceAlias, $DestinationPrefix, $NextHop `
+    ) -join '' )
+
     # Remove any parameters that can't be splatted.
     $null = $PSBoundParameters.Remove('Ensure')
 

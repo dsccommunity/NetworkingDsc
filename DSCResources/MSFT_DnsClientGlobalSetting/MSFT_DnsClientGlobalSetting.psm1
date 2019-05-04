@@ -41,7 +41,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($script:localizedData.GettingDnsClientGlobalSettingsMessage)
+            $($script:localizedData.GettingDnsClientGlobalSettingMessage)
         ) -join '' )
 
     # Get the current Dns Client Global Settings

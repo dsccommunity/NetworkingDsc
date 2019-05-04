@@ -78,6 +78,7 @@ function Get-TargetResource
         -ErrorAction Stop
 
     $tcpipNetbiosOptions = $netAdapterConfig.TcpipNetbiosOptions
+
     if ($tcpipNetbiosOptions)
     {
         $Setting = $([NetBiosSetting].GetEnumValues()[$tcpipNetbiosOptions])
@@ -86,6 +87,8 @@ function Get-TargetResource
     {
         $Setting = 'Default'
     }
+
+    Write-Verbose -Message ($script:localizedData.CurrentNetBiosSettingMessage -f $Setting)
 
     return @{
         InterfaceAlias = $InterfaceAlias
@@ -141,7 +144,7 @@ function Set-TargetResource
 
     if ($Setting -eq [NetBiosSetting]::Default)
     {
-        Write-Verbose -Message $script:localizedData.ResetToDefautMessage
+        Write-Verbose -Message $script:localizedData.ResetToDefaultMessage
 
         # If DHCP is not enabled, SetTcpipNetbios CIM Method won't take 0 so overwrite registry entry instead.
         $setItemPropertyParameters = @{

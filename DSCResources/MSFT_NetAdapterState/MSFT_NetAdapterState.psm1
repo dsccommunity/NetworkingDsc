@@ -61,8 +61,10 @@ function Get-TargetResource
                 $($script:localizedData.NetAdapterTestingStateMessage -f $Name)
             ) -join '')
 
-        # Using NET_IF_ADMIN_STATUS as documented here:
-        # https://docs.microsoft.com/en-us/windows/desktop/api/ifdef/ne-ifdef-net_if_admin_status
+        <#
+            Using NET_IF_ADMIN_STATUS as documented here:
+            https://docs.microsoft.com/en-us/windows/desktop/api/ifdef/ne-ifdef-net_if_admin_status
+        #>
 
         $enabled  = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Up
         $disabled = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Down
@@ -178,6 +180,7 @@ function Test-TargetResource
         ) -join '')
 
     $currentState = Get-TargetResource @PSBoundParameters
+
     if ($currentState)
     {
         Write-Verbose -Message ( @(

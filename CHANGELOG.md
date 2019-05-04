@@ -16,6 +16,8 @@
   `NetworkingDsc.Common` module - fixes [Issue #394](https://github.com/PowerShell/NetworkingDsc/issues/394).
 - Renamed all localization strings so that they are detected by
   'Common Tests - Validate Localization'.
+- Route:
+  - Fixed issues with mismatched localization strings.
 
 ## 7.1.0.0
 

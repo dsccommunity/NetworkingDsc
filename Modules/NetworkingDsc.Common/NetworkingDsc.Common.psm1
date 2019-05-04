@@ -163,7 +163,7 @@ function Get-LocalizedData
         -FileName "$ResourceName.strings.psd1" `
         -BaseDirectory $localizedStringFileLocation
 
-    return $localizedData
+    return $script:localizedData
 }
 
 <#
@@ -314,7 +314,7 @@ function Find-NetworkAdapter
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.FindingNetAdapterMessage)
+        $($script:localizedData.FindingNetAdapterMessage)
         ) -join '')
 
     $adapterFilters = @()
@@ -360,7 +360,7 @@ function Find-NetworkAdapter
     if ($adapterFilters.Count -eq 0)
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.AllNetAdaptersFoundMessage)
+            $($script:localizedData.AllNetAdaptersFoundMessage)
             ) -join '')
 
         $matchingAdapters = @(Get-NetAdapter)
@@ -377,7 +377,7 @@ function Find-NetworkAdapter
     if ($matchingAdapters.Count -eq 0)
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundError)
+            -Message ($script:localizedData.NetAdapterNotFoundError)
 
         # Return a null so that ErrorAction SilentlyContinue works correctly
         return $null
@@ -385,7 +385,7 @@ function Find-NetworkAdapter
     else
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.NetAdapterFoundMessage -f $matchingAdapters.Count)
+            $($script:localizedData.NetAdapterFoundMessage -f $matchingAdapters.Count)
             ) -join '')
 
         if ($matchingAdapters.Count -gt 1)
@@ -396,7 +396,7 @@ function Find-NetworkAdapter
                 if (($InterfaceNumber -gt 1) -and ($InterfaceNumber -gt $matchingAdapters.Count))
                 {
                     New-InvalidOperationException `
-                        -Message ($LocalizedData.InvalidNetAdapterNumberError `
+                        -Message ($script:localizedData.InvalidNetAdapterNumberError `
                             -f $matchingAdapters.Count,$InterfaceNumber)
 
                     # Return a null so that ErrorAction SilentlyContinue works correctly
@@ -406,7 +406,7 @@ function Find-NetworkAdapter
             else
             {
                 New-InvalidOperationException `
-                    -Message ($LocalizedData.MultipleMatchingNetAdapterFound `
+                    -Message ($script:localizedData.MultipleMatchingNetAdapterFound `
                         -f $matchingAdapters.Count)
 
                 # Return a null so that ErrorAction SilentlyContinue works correctly
@@ -465,7 +465,7 @@ function Get-DnsClientServerStaticAddress
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.GettingDNSServerStaticAddressMessage) -f $AddressFamily,$InterfaceAlias
+        $($script:localizedData.GettingDNSServerStaticAddressMessage) -f $AddressFamily,$InterfaceAlias
         ) -join '')
 
     # Look up the interface Guid
@@ -476,7 +476,7 @@ function Get-DnsClientServerStaticAddress
     if (-not $adapter)
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.InterfaceAliasNotFoundError `
+            -Message ($script:localizedData.InterfaceAliasNotFoundError `
                 -f $InterfaceAlias)
 
         # Return null to support ErrorAction Silently Continue
@@ -505,7 +505,7 @@ function Get-DnsClientServerStaticAddress
     {
         # Static DNS Server addresses not found so return empty array
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily,$InterfaceAlias
+            $($script:localizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily,$InterfaceAlias
             ) -join '')
 
         return $null
@@ -514,7 +514,7 @@ function Get-DnsClientServerStaticAddress
     {
         # Static DNS Server addresses found so split them into an array using comma
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.DNSServerStaticAddressFoundMessage) -f $AddressFamily,$InterfaceAlias,$nameServerAddressString
+            $($script:localizedData.DNSServerStaticAddressFoundMessage) -f $AddressFamily,$InterfaceAlias,$nameServerAddressString
             ) -join '')
 
         return @($nameServerAddressString -split ',')
