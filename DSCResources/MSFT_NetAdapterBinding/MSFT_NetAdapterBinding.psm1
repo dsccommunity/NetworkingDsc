@@ -5,11 +5,6 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
     -ResourceName 'MSFT_NetAdapterBinding' `

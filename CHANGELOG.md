@@ -9,9 +9,11 @@
   - Prevent 'Parameter set cannot be resolved using the specified named
     parameters' error when updating rule when group name is specified - fixes
     [Issue #130](https://github.com/PowerShell/NetworkingDsc/issues/130) and
-    [Issue #191](https://github.com/PowerShell/NetworkingDsc/issues/191)
+    [Issue #191](https://github.com/PowerShell/NetworkingDsc/issues/191).
 - Opted into Common Tests 'Common Tests - Validate Localization' -
-  fixes [Issue #393](https://github.com/PowerShell/NetworkingDsc/issues/393)
+  fixes [Issue #393](https://github.com/PowerShell/NetworkingDsc/issues/393).
+- Combined all `NetworkingDsc.ResourceHelper` module functions into
+  `NetworkingDsc.Common` module - fixes [Issue #394](https://github.com/PowerShell/NetworkingDsc/issues/394).
 
 ## 7.1.0.0
 
