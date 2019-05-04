@@ -579,7 +579,7 @@ try
                         }
 
                         $errorRecord = Get-InvalidArgumentRecord `
-                            -Message ($LocalizedData.AddressFormatError -f $testGetResourceParameters.IPAddress) `
+                            -Message ($script:localizedData.AddressFormatError -f $testGetResourceParameters.IPAddress) `
                             -ArgumentName 'IPAddress'
 
                         { $result = Test-TargetResource @testGetResourceParameters } | Should -Throw $errorRecord
@@ -915,7 +915,7 @@ try
                         }
 
                         $errorRecord = Get-InvalidArgumentRecord `
-                            -Message ($LocalizedData.AddressFormatError -f $testGetResourceParameters.IPAddress) `
+                            -Message ($script:localizedData.AddressFormatError -f $testGetResourceParameters.IPAddress) `
                             -ArgumentName 'IPAddress'
 
                         { $result = Test-TargetResource @testGetResourceParameters } | Should -Throw $errorRecord
@@ -1097,7 +1097,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.InterfaceNotAvailableError -f $assertResourcePropertyParameters.InterfaceAlias) `
+                        -Message ($script:localizedData.InterfaceNotAvailableError -f $assertResourcePropertyParameters.InterfaceAlias) `
                         -ArgumentName 'Interface'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
@@ -1113,7 +1113,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressFormatError -f $assertResourcePropertyParameters.IPAddress) `
+                        -Message ($script:localizedData.AddressFormatError -f $assertResourcePropertyParameters.IPAddress) `
                         -ArgumentName 'IPAddress'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
@@ -1129,7 +1129,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressIPv4MismatchError -f $assertResourcePropertyParameters.IPAddress, $assertResourcePropertyParameters.AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv4MismatchError -f $assertResourcePropertyParameters.IPAddress, $assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'IPAddress'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
@@ -1145,7 +1145,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressIPv6MismatchError -f $assertResourcePropertyParameters.IPAddress, $assertResourcePropertyParameters.AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv6MismatchError -f $assertResourcePropertyParameters.IPAddress, $assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'IPAddress'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
@@ -1199,7 +1199,7 @@ try
                     $prefixLength = ($assertResourcePropertyParameters.IPAddress -split '/')[-1]
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.PrefixLengthError -f $prefixLength, $assertResourcePropertyParameters.AddressFamily) `
+                        -Message ($script:localizedData.PrefixLengthError -f $prefixLength, $assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'IPAddress'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
@@ -1226,7 +1226,7 @@ try
                     $prefixLength = ($assertResourcePropertyParameters.IPAddress -split '/')[-1]
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.PrefixLengthError -f $prefixLength, $assertResourcePropertyParameters.AddressFamily) `
+                        -Message ($script:localizedData.PrefixLengthError -f $prefixLength, $assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'IPAddress'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord

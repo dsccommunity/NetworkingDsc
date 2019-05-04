@@ -75,11 +75,11 @@ try
                 Mock `
                     -CommandName Get-NetLbfoTeamStatus `
                     -MockWith {
-                        New-InvalidOperationException -Message $($LocalizedData.NetworkTeamNotFoundMessage -f $testTeamName)
+                        New-InvalidOperationException -Message $($script:localizedData.NetworkTeamNotFoundMessage -f $testTeamName)
                     }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetworkTeamNotFoundMessage -f $testTeamName)
+                    -Message ($script:localizedData.NetworkTeamNotFoundMessage -f $testTeamName)
 
                 It 'Should throw exception' {
                     {
@@ -118,7 +118,7 @@ try
                 Mock -CommandName Get-NetLbfoTeamStatus -MockWith { 'Degraded' }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message $($localizedData.NetworkTeamNotUpAfterError -f $testTeamName, $testTeamParameters.RetryCount)
+                    -Message $($script:localizedData.NetworkTeamNotUpAfterError -f $testTeamName, $testTeamParameters.RetryCount)
 
                 It 'Should throw VolumeNotFoundAfterError' {
                     {
@@ -214,7 +214,7 @@ try
                     -MockWith { Throw (New-Object -TypeName 'Microsoft.PowerShell.Cmdletization.Cim.CimJobException') }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetworkTeamNotFoundMessage -f $testTeamName)
+                    -Message ($script:localizedData.NetworkTeamNotFoundMessage -f $testTeamName)
 
                 It 'Should throw expected exception' {
                     {

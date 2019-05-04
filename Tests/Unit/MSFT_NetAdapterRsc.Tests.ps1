@@ -179,7 +179,7 @@ try
                 Mock -CommandName Get-NetAdapterRsc -MockWith { throw 'Network adapter not found' }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetAdapterNotFoundMessage)
+                    -Message ($script:localizedData.NetAdapterNotFoundMessage)
 
                 It 'Should throw an exception' {
                     { Get-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
@@ -443,7 +443,7 @@ try
                 Mock -CommandName Get-NetAdapterRsc -MockWith { throw 'Network adapter not found' }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetAdapterNotFoundMessage)
+                    -Message ($script:localizedData.NetAdapterNotFoundMessage)
 
                 It 'Should throw an exception' {
                     { Set-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
@@ -643,7 +643,7 @@ try
                 Mock -CommandName Get-NetAdapterRsc -MockWith { throw 'Network adapter not found' }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetAdapterNotFoundMessage)
+                    -Message ($script:localizedData.NetAdapterNotFoundMessage)
 
                 It 'Should throw an exception' {
                     { Test-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord

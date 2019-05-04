@@ -52,7 +52,7 @@ try
 
                 It 'Should throw expected exception' {
                     $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($LocalizedData.NetAdapterNotFoundError -f $testAdapterName)
+                        -Message ($script:localizedData.NetAdapterNotFoundError -f $testAdapterName)
 
                     {
                         Get-TargetResource @targetParameters
@@ -108,7 +108,7 @@ try
                     $setTargetResourceParameters['Enabled'] = $true
 
                     $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($LocalizedData.NetAdapterNotFoundError -f $testAdapterName)
+                        -Message ($script:localizedData.NetAdapterNotFoundError -f $testAdapterName)
 
                     {
                         Set-TargetResource @setTargetResourceParameters
@@ -209,7 +209,7 @@ try
                     $testTargetResourceParameters['Enabled'] = $true
 
                     $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($LocalizedData.NetAdapterNotFoundError -f $testAdapterName)
+                        -Message ($script:localizedData.NetAdapterNotFoundError -f $testAdapterName)
 
                     {
                         Test-TargetResource @testTargetResourceParameters

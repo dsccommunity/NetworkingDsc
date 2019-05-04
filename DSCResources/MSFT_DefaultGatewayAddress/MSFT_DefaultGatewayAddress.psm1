@@ -6,9 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_DefaultGatewayAddress' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_DefaultGatewayAddress'
 
 <#
     .SYNOPSIS

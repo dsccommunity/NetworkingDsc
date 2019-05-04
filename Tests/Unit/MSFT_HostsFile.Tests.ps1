@@ -286,7 +286,7 @@ try
                 }
 
                 It 'Should throw an error when IP Address is not provide and ensure is present' {
-                    { Set-TargetResource @testParams } | Should -Throw $LocalizedData.UnableToEnsureWithoutIP
+                    { Set-TargetResource @testParams } | Should -Throw $script:localizedData.UnableToEnsureWithoutIP
                 }
             }
         }

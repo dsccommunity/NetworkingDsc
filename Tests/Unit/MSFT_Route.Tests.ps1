@@ -365,7 +365,7 @@ try
 
                 It 'Should throw an InterfaceNotAvailable error' {
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.InterfaceNotAvailableError -f $testRoute.InterfaceAlias) `
+                        -Message ($script:localizedData.InterfaceNotAvailableError -f $testRoute.InterfaceAlias) `
                         -ArgumentName 'Interface'
 
                     { Assert-ResourceProperty @testRoute } | Should -Throw $errorRecord
@@ -382,7 +382,7 @@ try
                     $Splat.AddressFamily = 'IPv4'
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressFormatError -f '10.0.300.0') `
+                        -Message ($script:localizedData.AddressFormatError -f '10.0.300.0') `
                         -ArgumentName 'DestinationPrefix'
 
                     { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
@@ -399,7 +399,7 @@ try
                     $Splat.AddressFamily = 'IPv6'
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressFormatError -f 'fe8x::') `
+                        -Message ($script:localizedData.AddressFormatError -f 'fe8x::') `
                         -ArgumentName 'DestinationPrefix'
 
                     { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
@@ -416,7 +416,7 @@ try
                     $Splat.AddressFamily = 'IPv4'
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressIPv6MismatchError -f 'fe80::', 'IPv4') `
+                        -Message ($script:localizedData.AddressIPv6MismatchError -f 'fe80::', 'IPv4') `
                         -ArgumentName 'DestinationPrefix'
 
                     { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
@@ -433,7 +433,7 @@ try
                     $Splat.AddressFamily = 'IPv6'
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressIPv4MismatchError -f '10.0.0.0', 'IPv6') `
+                        -Message ($script:localizedData.AddressIPv4MismatchError -f '10.0.0.0', 'IPv6') `
                         -ArgumentName 'DestinationPrefix'
 
                     { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
@@ -450,7 +450,7 @@ try
                     $Splat.AddressFamily = 'IPv4'
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressFormatError -f '10.0.300.0') `
+                        -Message ($script:localizedData.AddressFormatError -f '10.0.300.0') `
                         -ArgumentName 'NextHop'
 
                     { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
@@ -467,7 +467,7 @@ try
                     $Splat.AddressFamily = 'IPv6'
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressFormatError -f 'fe9x::') `
+                        -Message ($script:localizedData.AddressFormatError -f 'fe9x::') `
                         -ArgumentName 'NextHop'
 
                     { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
@@ -484,7 +484,7 @@ try
                     $Splat.AddressFamily = 'IPv4'
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressIPv6MismatchError -f 'fe90::', 'IPv4') `
+                        -Message ($script:localizedData.AddressIPv6MismatchError -f 'fe90::', 'IPv4') `
                         -ArgumentName 'NextHop'
 
                     { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
@@ -501,7 +501,7 @@ try
                     $Splat.AddressFamily = 'IPv6'
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressIPv4MismatchError -f '10.0.1.0', 'IPv6') `
+                        -Message ($script:localizedData.AddressIPv4MismatchError -f '10.0.1.0', 'IPv6') `
                         -ArgumentName 'NextHop'
 
                     { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord

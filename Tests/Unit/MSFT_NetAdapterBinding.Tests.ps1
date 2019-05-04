@@ -212,7 +212,7 @@ try
 
                 It 'Should throw an InterfaceNotAvailable error' {
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.InterfaceNotAvailableError -f $testBindingEnabled.InterfaceAlias) `
+                        -Message ($script:localizedData.InterfaceNotAvailableError -f $testBindingEnabled.InterfaceAlias) `
                         -ArgumentName 'Interface'
 
                     { Get-Binding @testBindingEnabled } | Should -Throw $errorRecord

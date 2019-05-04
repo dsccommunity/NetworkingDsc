@@ -128,11 +128,20 @@ function New-InvalidOperationException
 
     .PARAMETER ResourceName
         The name of the resource as it appears before '.strings.psd1' of the localized string file.
-
         For example:
-            For WindowsOptionalFeature: MSFT_xWindowsOptionalFeature
-            For Service: MSFT_xServiceResource
-            For Registry: MSFT_xRegistryResource
+            For WindowsOptionalFeature: MSFT_WindowsOptionalFeature
+            For Service: MSFT_ServiceResource
+            For Registry: MSFT_RegistryResource
+            For Helper: SqlServerDscHelper
+
+    .PARAMETER ScriptRoot
+        Optional. The root path where to expect to find the culture folder. This is only needed
+        for localization in helper modules. This should not normally be used for resources.
+
+    .NOTES
+        To be able to use localization in the helper function, this function must
+        be first in the file, before Get-LocalizedData is used by itself to load
+        localized data for this helper module (see directly after this function).
 #>
 function Get-LocalizedData
 {
@@ -141,21 +150,31 @@ function Get-LocalizedData
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $ResourceName,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [String]
-        $ResourcePath
+        [System.String]
+        $ScriptRoot
     )
 
-    $localizedStringFileLocation = Join-Path -Path $ResourcePath -ChildPath $PSUICulture
+    if (-not $ScriptRoot)
+    {
+        $dscResourcesFolder = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'DSCResources'
+        $resourceDirectory = Join-Path -Path $dscResourcesFolder -ChildPath $ResourceName
+    }
+    else
+    {
+        $resourceDirectory = $ScriptRoot
+    }
+
+    $localizedStringFileLocation = Join-Path -Path $resourceDirectory -ChildPath $PSUICulture
 
     if (-not (Test-Path -Path $localizedStringFileLocation))
     {
         # Fallback to en-US
-        $localizedStringFileLocation = Join-Path -Path $ResourcePath -ChildPath 'en-US'
+        $localizedStringFileLocation = Join-Path -Path $resourceDirectory -ChildPath 'en-US'
     }
 
     Import-LocalizedData `
@@ -163,7 +182,7 @@ function Get-LocalizedData
         -FileName "$ResourceName.strings.psd1" `
         -BaseDirectory $localizedStringFileLocation
 
-    return $script:localizedData
+    return $localizedData
 }
 
 <#
@@ -884,7 +903,7 @@ function Test-DscObjectHasProperty
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData `
     -ResourceName 'NetworkingDsc.Common' `
-    -ResourcePath $PSScriptRoot
+    -ScriptRoot $PSScriptRoot
 
 
 Export-ModuleMember -Function `

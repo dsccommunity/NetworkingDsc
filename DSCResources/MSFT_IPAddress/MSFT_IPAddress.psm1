@@ -6,11 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
-$script:localizedDataSplat = @{
-    ResourceName = 'MSFT_IPAddress'
-    ResourcePath = (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
-}
-$script:localizedData = Get-LocalizedData @localizedDataSplat
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_IPAddress'
 
 <#
     .SYNOPSIS

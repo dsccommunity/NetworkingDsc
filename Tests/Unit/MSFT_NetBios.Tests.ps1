@@ -126,7 +126,7 @@ try
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.InterfaceNotFoundError -f $interfaceAlias)
+                    -Message ($script:localizedData.InterfaceNotFoundError -f $interfaceAlias)
 
                 It 'Should throw expected exception' {
                     {
@@ -182,7 +182,7 @@ try
                 Mock -CommandName Get-CimInstance -MockWith { }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.InterfaceNotFoundError -f $interfaceAlias)
+                    -Message ($script:localizedData.InterfaceNotFoundError -f $interfaceAlias)
 
                 It 'Should throw expected exception' {
                     {
@@ -257,7 +257,7 @@ try
                 Mock -CommandName Set-ItemProperty
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.FailedUpdatingNetBiosError -f 74, 'Enable')
+                    -Message ($script:localizedData.FailedUpdatingNetBiosError -f 74, 'Enable')
 
                 It 'Should throw expected exception' {
                     {
@@ -275,7 +275,7 @@ try
                 Mock -CommandName Get-CimInstance -MockWith { }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.InterfaceNotFoundError -f $interfaceAlias)
+                    -Message ($script:localizedData.InterfaceNotFoundError -f $interfaceAlias)
 
                 It 'Should throw expected exception' {
                     {

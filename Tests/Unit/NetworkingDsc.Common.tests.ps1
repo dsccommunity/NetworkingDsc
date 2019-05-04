@@ -20,8 +20,8 @@ try
 {
     #region Pester Tests
 
-    $LocalizedData = InModuleScope $script:ModuleName {
-        $LocalizedData
+    $script:localizedData = InModuleScope $script:ModuleName {
+        $script:localizedData
     }
 
     #region Function Convert-CIDRToSubhetMask
@@ -130,7 +130,7 @@ try
                     -MockWith { $adapterArray }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetAdapterNotFoundError)
+                    -Message ($script:localizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -Name 'NOMATCH' -Verbose } | Should -Throw $errorRecord
@@ -165,7 +165,7 @@ try
                     -MockWith { $adapterArray }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetAdapterNotFoundError)
+                    -Message ($script:localizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType 'NOMATCH' -Verbose } | Should -Throw $errorRecord
@@ -200,7 +200,7 @@ try
                     -MockWith { $adapterArray }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetAdapterNotFoundError)
+                    -Message ($script:localizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -Status 'Disabled' -Verbose } | Should -Throw $errorRecord
@@ -235,7 +235,7 @@ try
                     -MockWith { $adapterArray }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetAdapterNotFoundError)
+                    -Message ($script:localizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -MacAddress '00-00-00-00-00-00' -Verbose } | Should -Throw $errorRecord
@@ -270,7 +270,7 @@ try
                     -MockWith { $adapterArray }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetAdapterNotFoundError)
+                    -Message ($script:localizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceDescription 'NOMATCH' -Verbose } | Should -Throw $errorRecord
@@ -305,7 +305,7 @@ try
                     -MockWith { $adapterArray }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetAdapterNotFoundError)
+                    -Message ($script:localizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceIndex 99 -Verbose } | Should -Throw $errorRecord
@@ -340,7 +340,7 @@ try
                     -MockWith { $adapterArray }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetAdapterNotFoundError)
+                    -Message ($script:localizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -InterfaceGuid 'NOMATCH' -Verbose } | Should -Throw $errorRecord
@@ -375,7 +375,7 @@ try
                     -MockWith { $adapterArray }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NetAdapterNotFoundError)
+                    -Message ($script:localizedData.NetAdapterNotFoundError)
 
                 It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -DriverDescription 'NOMATCH' -Verbose } | Should -Throw $errorRecord
@@ -392,7 +392,7 @@ try
                     -MockWith { $adapterArray }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.MultipleMatchingNetAdapterFound -f 2)
+                    -Message ($script:localizedData.MultipleMatchingNetAdapterFound -f 2)
 
                 It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -Verbose } | Should -Throw $errorRecord
@@ -427,7 +427,7 @@ try
                     -MockWith { $multipleMatchingAdapterArray }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.MultipleMatchingNetAdapterFound -f 2)
+                    -Message ($script:localizedData.MultipleMatchingNetAdapterFound -f 2)
 
                 It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -Verbose } | Should -Throw $errorRecord
@@ -462,7 +462,7 @@ try
                     -MockWith { $multipleMatchingAdapterArray }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.InvalidNetAdapterNumberError -f 2, 3)
+                    -Message ($script:localizedData.InvalidNetAdapterNumberError -f 2, 3)
 
                 It 'Should throw the correct exception' {
                     { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -IgnoreMultipleMatchingAdapters:$true -InterfaceNumber 3 -Verbose } | Should -Throw $errorRecord
@@ -515,7 +515,7 @@ try
                     -MockWith { $nomatchAdapter }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.InterfaceAliasNotFoundError -f $interfaceAlias)
+                    -Message ($script:localizedData.InterfaceAliasNotFoundError -f $interfaceAlias)
 
                 It 'Should throw exception' {
                     { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should -Throw $errorRecord
