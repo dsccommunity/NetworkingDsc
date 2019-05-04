@@ -5,15 +5,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_NetworkTeamInterface' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_NetworkTeamInterface'
 
 <#
     .SYNOPSIS
@@ -45,7 +38,7 @@ function Get-TargetResource
         TeamName = $TeamName
     }
 
-    Write-Verbose -Message ($localizedData.GetTeamNicInfo -f $Name)
+    Write-Verbose -Message ($script:localizedData.GetTeamNicInfo -f $Name)
 
     $getNetLbfoTeamNicParameters = @{
         Name        = $Name
@@ -56,14 +49,14 @@ function Get-TargetResource
 
     if ($teamNic)
     {
-        Write-Verbose -Message ($localizedData.FoundTeamNic -f $Name)
+        Write-Verbose -Message ($script:localizedData.FoundTeamNic -f $Name)
 
         $configuration.Add('VlanId', $teamNic.VlanId)
         $configuration.Add('Ensure', 'Present')
     }
     else
     {
-        Write-Verbose -Message ($localizedData.TeamNicNotFound -f $Name)
+        Write-Verbose -Message ($script:localizedData.TeamNicNotFound -f $Name)
 
         $configuration.Add('Ensure', 'Absent')
     }
@@ -110,7 +103,7 @@ function Set-TargetResource
         $Ensure = 'Present'
     )
 
-    Write-Verbose -Message ($LocalizedData.GetTeamNicInfo -f $Name)
+    Write-Verbose -Message ($script:localizedData.GetTeamNicInfo -f $Name)
 
     $getNetLbfoTeamNicParameters = @{
         Name        = $Name
@@ -123,18 +116,18 @@ function Set-TargetResource
     {
         if ($teamNic)
         {
-            Write-Verbose -Message ($LocalizedData.FoundTeamNic -f $Name)
+            Write-Verbose -Message ($script:localizedData.FoundTeamNic -f $Name)
 
             if ($teamNic.VlanId -ne $VlanId)
             {
-                Write-Verbose -Message ($LocalizedData.TeamNicVlanMismatch -f $VlanId)
+                Write-Verbose -Message ($script:localizedData.TeamNicVlanMismatch -f $VlanId)
 
                 $isNetModifyRequired = $true
             }
 
             if ($isNetModifyRequired)
             {
-                Write-Verbose -Message ($LocalizedData.ModifyTeamNic -f $Name)
+                Write-Verbose -Message ($script:localizedData.ModifyTeamNic -f $Name)
 
                 if ($VlanId -eq 0)
                 {
@@ -172,7 +165,7 @@ function Set-TargetResource
         }
         else
         {
-            Write-Verbose -Message ($LocalizedData.CreateTeamNic -f $Name)
+            Write-Verbose -Message ($script:localizedData.CreateTeamNic -f $Name)
 
             if ($VlanId -ne 0)
             {
@@ -185,18 +178,18 @@ function Set-TargetResource
                 }
                 $null = Add-NetLbfoTeamNic @addNetLbfoTeamNicParameters
 
-                Write-Verbose -Message ($LocalizedData.CreatedNetTeamNic -f $Name)
+                Write-Verbose -Message ($script:localizedData.CreatedNetTeamNic -f $Name)
             }
             else
             {
                 New-InvalidOperationException `
-                    -Message ($localizedData.FailedToCreateTeamNic)
+                    -Message ($script:localizedData.FailedToCreateTeamNic)
             }
         }
     }
     else
     {
-        Write-Verbose -Message ($LocalizedData.RemoveTeamNic -f $Name)
+        Write-Verbose -Message ($script:localizedData.RemoveTeamNic -f $Name)
 
         $removeNetLbfoTeamNicParameters = @{
             Team        = $teamNic.Team
@@ -248,7 +241,7 @@ function Test-TargetResource
         $Ensure = 'Present'
     )
 
-    Write-Verbose -Message ($LocalizedData.GetTeamNicInfo -f $Name)
+    Write-Verbose -Message ($script:localizedData.GetTeamNicInfo -f $Name)
 
     $getNetLbfoTeamNicParameters = @{
         Name        = $Name
@@ -270,24 +263,24 @@ function Test-TargetResource
     {
         if ($teamNic)
         {
-            Write-Verbose -Message ($LocalizedData.FoundTeamNic -f $Name)
+            Write-Verbose -Message ($script:localizedData.FoundTeamNic -f $Name)
 
             if ($teamNic.VlanId -eq $VlanValue)
             {
-                Write-Verbose -Message ($LocalizedData.TeamNicExistsNoAction -f $Name)
+                Write-Verbose -Message ($script:localizedData.TeamNicExistsNoAction -f $Name)
 
                 return $true
             }
             else
             {
-                Write-Verbose -Message ($LocalizedData.TeamNicExistsWithDifferentConfig -f $Name)
+                Write-Verbose -Message ($script:localizedData.TeamNicExistsWithDifferentConfig -f $Name)
 
                 return $false
             }
         }
         else
         {
-            Write-Verbose -Message ($LocalizedData.TeamNicDoesNotExistShouldCreate -f $Name)
+            Write-Verbose -Message ($script:localizedData.TeamNicDoesNotExistShouldCreate -f $Name)
 
             return $false
         }
@@ -296,13 +289,13 @@ function Test-TargetResource
     {
         if ($teamNic)
         {
-            Write-Verbose -Message ($LocalizedData.TeamNicExistsShouldRemove -f $Name)
+            Write-Verbose -Message ($script:localizedData.TeamNicExistsShouldRemove -f $Name)
 
             return $false
         }
         else
         {
-            Write-Verbose -Message ($LocalizedData.TeamNicExistsNoAction -f $Name)
+            Write-Verbose -Message ($script:localizedData.TeamNicExistsNoAction -f $Name)
 
             return $true
         }

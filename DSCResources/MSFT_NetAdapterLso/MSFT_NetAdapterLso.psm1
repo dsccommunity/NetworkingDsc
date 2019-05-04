@@ -5,15 +5,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_NetAdapterLso' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_NetAdapterLso'
 
 <#
 .SYNOPSIS
@@ -50,7 +43,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $localizedData.CheckingNetAdapterMessage
+            $script:localizedData.CheckingNetAdapterMessage
         ) -join '')
 
     try
@@ -60,14 +53,14 @@ function Get-TargetResource
     catch
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+            -Message ($script:localizedData.NetAdapterNotFoundMessage)
     }
 
     if ($netAdapter)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $Protocol)
+                $($script:localizedData.NetAdapterTestingStateMessage -f $Name, $Protocol)
             ) -join '')
 
         $result = @{
@@ -131,7 +124,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $localizedData.CheckingNetAdapterMessage
+            $script:localizedData.CheckingNetAdapterMessage
         ) -join '')
 
     try
@@ -141,21 +134,21 @@ function Set-TargetResource
     catch
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+            -Message ($script:localizedData.NetAdapterNotFoundMessage)
     }
 
     if ($netAdapter)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetAdapterTestingStateMessage -f $Name, $Protocol)
+                $($script:localizedData.NetAdapterTestingStateMessage -f $Name, $Protocol)
             ) -join '')
 
         if ($Protocol -eq 'V1IPv4' -and $State -ne $netAdapter.V1IPv4Enabled)
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.NetAdapterApplyingChangesMessage -f `
+                    $($script:localizedData.NetAdapterApplyingChangesMessage -f `
                             $Name, $Protocol, $($netAdapter.V1IPv4Enabled.ToString()), $($State.ToString()) )
                 ) -join '')
 
@@ -165,7 +158,7 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.NetAdapterApplyingChangesMessage -f `
+                    $($script:localizedData.NetAdapterApplyingChangesMessage -f `
                             $Name, $Protocol, $($netAdapter.IPv4Enabled.ToString()), $($State.ToString()) )
                 ) -join '')
 
@@ -175,7 +168,7 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.NetAdapterApplyingChangesMessage -f `
+                    $($script:localizedData.NetAdapterApplyingChangesMessage -f `
                             $Name, $Protocol, $($netAdapter.IPv6Enabled.ToString()), $($State.ToString()) )
                 ) -join '')
 
@@ -219,7 +212,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $localizedData.CheckingNetAdapterMessage
+            $script:localizedData.CheckingNetAdapterMessage
         ) -join '')
 
     try
@@ -229,14 +222,14 @@ function Test-TargetResource
     catch
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundMessage)
+            -Message ($script:localizedData.NetAdapterNotFoundMessage)
     }
 
     if ($netAdapter)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $localizedData.NetAdapterTestingStateMessage -f `
+                $script:localizedData.NetAdapterTestingStateMessage -f `
                     $Name, $Protocol
             ) -join '')
 

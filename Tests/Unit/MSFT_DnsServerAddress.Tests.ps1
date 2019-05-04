@@ -583,7 +583,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.InterfaceNotAvailableError -f $assertResourcePropertySplat.InterfaceAlias) `
+                        -Message ($script:localizedData.InterfaceNotAvailableError -f $assertResourcePropertySplat.InterfaceAlias) `
                         -ArgumentName 'InterfaceAlias'
 
                     { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
@@ -600,7 +600,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressFormatError -f $assertResourcePropertySplat.Address) `
+                        -Message ($script:localizedData.AddressFormatError -f $assertResourcePropertySplat.Address) `
                         -ArgumentName 'Address'
 
                     { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
@@ -617,7 +617,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressIPv4MismatchError -f $assertResourcePropertySplat.Address,$assertResourcePropertySplat.AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv4MismatchError -f $assertResourcePropertySplat.Address,$assertResourcePropertySplat.AddressFamily) `
                         -ArgumentName 'Address'
 
                     { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
@@ -634,7 +634,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressIPv6MismatchError -f $assertResourcePropertySplat.Address,$assertResourcePropertySplat.AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv6MismatchError -f $assertResourcePropertySplat.Address,$assertResourcePropertySplat.AddressFamily) `
                         -ArgumentName 'Address'
 
                     { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord

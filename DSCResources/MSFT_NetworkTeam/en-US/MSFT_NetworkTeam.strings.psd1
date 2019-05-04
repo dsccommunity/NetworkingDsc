@@ -19,7 +19,6 @@ ConvertFrom-StringData @'
     TeamDoesNotExistShouldCreate = Network team with name '{0}' does not exist. It will be created.
     TeamExistsShouldRemove = Network team with name '{0}' exists. It will be removed.
     TeamDoesNotExistNoAction = Network team with name '{0}' does not exist. No action needed.
-    WaitingForTeam = Waiting for network team status to change to up.
     CreatedNetTeam = Network Team was created successfully.
     FailedToCreateTeam = Failed to create the network team with specific configuration: {0}.
 '@

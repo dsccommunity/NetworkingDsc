@@ -142,7 +142,7 @@ try
                 Mock -CommandName Set-NetLbfoTeamNic
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.FailedToCreateTeamNic)
+                    -Message ($script:localizedData.FailedToCreateTeamNic)
 
                 It 'Should not throw exception' {
                     {

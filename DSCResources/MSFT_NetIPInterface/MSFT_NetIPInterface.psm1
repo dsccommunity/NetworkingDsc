@@ -5,15 +5,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_NetIPInterface' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_NetIPInterface'
 
 <#
     This is an array of all the parameters used by this resource
@@ -60,7 +53,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingNetIPInterfaceMessage) -f $InterfaceAlias, $AddressFamily
+            $($script:localizedData.GettingNetIPInterfaceMessage) -f $InterfaceAlias, $AddressFamily
         ) -join '')
 
     $netIPInterfaceParameters = @{
@@ -82,7 +75,7 @@ function Get-TargetResource
         $netIPInterfaceParameters.Add($parameterName, $parameterValue)
 
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.NetIPInterfaceParameterValueMessage) -f `
+                $($script:localizedData.NetIPInterfaceParameterValueMessage) -f `
                     $InterfaceAlias, $AddressFamily, $parameterName, $parameterValue
             ) -join '')
     }
@@ -237,7 +230,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.ApplyingNetIPInterfaceMessage) `
+            $($script:localizedData.ApplyingNetIPInterfaceMessage) `
                 -f $InterfaceAlias, $AddressFamily
         ) -join '')
 
@@ -269,7 +262,7 @@ function Set-TargetResource
                 $null = $netIPInterfaceParameters.Add($parameterName, $parameterNewValue)
 
                 Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.SettingNetIPInterfaceParameterValueMessage) `
+                        $($script:localizedData.SettingNetIPInterfaceParameterValueMessage) `
                             -f $InterfaceAlias, $AddressFamily, $parameterName, $parameterNewValue
                     ) -join '')
 
@@ -432,7 +425,7 @@ function Test-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.CheckingNetIPInterfaceMessage) -f $InterfaceAlias, $AddressFamily
+            $($script:localizedData.CheckingNetIPInterfaceMessage) -f $InterfaceAlias, $AddressFamily
         ) -join '')
 
     $netIPInterfaceParameters = @{
@@ -466,7 +459,7 @@ function Test-TargetResource
                     if ($parameterNewValue -and ($parameterValue -ne $parameterNewValue))
                     {
                         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                                $($LocalizedData.PropertyNoMatchMessage) `
+                                $($script:localizedData.PropertyNoMatchMessage) `
                                     -f $parameterName, $parameterValue, $parameterNewValue
                             ) -join '')
 
@@ -510,7 +503,7 @@ function Get-NetworkIPInterface
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingNetIPInterfaceMessage) -f $InterfaceAlias, $AddressFamily
+            $($script:localizedData.GettingNetIPInterfaceMessage) -f $InterfaceAlias, $AddressFamily
         ) -join '')
 
     $netIPInterface = Get-NetIPInterface @PSBoundParameters -ErrorAction SilentlyContinue
@@ -519,7 +512,7 @@ function Get-NetworkIPInterface
     {
         # The Net IP Interface does not exist or address family is not bound
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetIPInterfaceDoesNotExistMessage -f $InterfaceAlias, $AddressFamily)
+            -Message ($script:localizedData.NetIPInterfaceDoesNotExistMessage -f $InterfaceAlias, $AddressFamily)
     }
 
     return $netIPInterface

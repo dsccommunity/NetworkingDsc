@@ -5,15 +5,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_NetBios' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_NetBios'
 
 #region check NetBiosSetting enum loaded, if not load
 try
@@ -62,7 +55,7 @@ function Get-TargetResource
         $Setting
     )
 
-    Write-Verbose -Message ($LocalizedData.GettingNetBiosSettingMessage -f $InterfaceAlias)
+    Write-Verbose -Message ($script:localizedData.GettingNetBiosSettingMessage -f $InterfaceAlias)
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
@@ -70,12 +63,12 @@ function Get-TargetResource
 
     if ($netAdapter)
     {
-        Write-Verbose -Message ($localizedData.InterfaceDetectedMessage -f $InterfaceAlias, $netAdapter.InterfaceIndex)
+        Write-Verbose -Message ($script:localizedData.InterfaceDetectedMessage -f $InterfaceAlias, $netAdapter.InterfaceIndex)
     }
     else
     {
         New-InvalidOperationException `
-            -Message ($localizedData.InterfaceNotFoundError -f $InterfaceAlias)
+            -Message ($script:localizedData.InterfaceNotFoundError -f $InterfaceAlias)
     }
 
     $netAdapterConfig = $netAdapter | Get-CimAssociatedInstance `
@@ -83,6 +76,7 @@ function Get-TargetResource
         -ErrorAction Stop
 
     $tcpipNetbiosOptions = $netAdapterConfig.TcpipNetbiosOptions
+
     if ($tcpipNetbiosOptions)
     {
         $Setting = $([NetBiosSetting].GetEnumValues()[$tcpipNetbiosOptions])
@@ -91,6 +85,8 @@ function Get-TargetResource
     {
         $Setting = 'Default'
     }
+
+    Write-Verbose -Message ($script:localizedData.CurrentNetBiosSettingMessage -f $Setting)
 
     return @{
         InterfaceAlias = $InterfaceAlias
@@ -124,7 +120,7 @@ function Set-TargetResource
         $Setting
     )
 
-    Write-Verbose -Message ($LocalizedData.SettingNetBiosSettingMessage -f $InterfaceAlias)
+    Write-Verbose -Message ($script:localizedData.SettingNetBiosSettingMessage -f $InterfaceAlias)
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
@@ -132,12 +128,12 @@ function Set-TargetResource
 
     if ($netAdapter)
     {
-        Write-Verbose -Message ($localizedData.InterfaceDetectedMessage -f $InterfaceAlias, $netAdapter.InterfaceIndex)
+        Write-Verbose -Message ($script:localizedData.InterfaceDetectedMessage -f $InterfaceAlias, $netAdapter.InterfaceIndex)
     }
     else
     {
         New-InvalidOperationException `
-            -Message ($localizedData.InterfaceNotFoundError -f $InterfaceAlias)
+            -Message ($script:localizedData.InterfaceNotFoundError -f $InterfaceAlias)
     }
 
     $netAdapterConfig = $netAdapter | Get-CimAssociatedInstance `
@@ -146,7 +142,7 @@ function Set-TargetResource
 
     if ($Setting -eq [NetBiosSetting]::Default)
     {
-        Write-Verbose -Message $LocalizedData.ResetToDefautMessage
+        Write-Verbose -Message $script:localizedData.ResetToDefaultMessage
 
         # If DHCP is not enabled, SetTcpipNetbios CIM Method won't take 0 so overwrite registry entry instead.
         $setItemPropertyParameters = @{
@@ -158,7 +154,7 @@ function Set-TargetResource
     }
     else
     {
-        Write-Verbose -Message ($LocalizedData.SetNetBiosMessage -f $Setting)
+        Write-Verbose -Message ($script:localizedData.SetNetBiosMessage -f $Setting)
 
         $result = $netAdapterConfig |
             Invoke-CimMethod `
@@ -171,7 +167,7 @@ function Set-TargetResource
         if ($result.ReturnValue -ne 0)
         {
             New-InvalidOperationException `
-                -Message ($localizedData.FailedUpdatingNetBiosError -f $result.ReturnValue, $Setting)
+                -Message ($script:localizedData.FailedUpdatingNetBiosError -f $result.ReturnValue, $Setting)
         }
     }
 }
@@ -203,7 +199,7 @@ function Test-TargetResource
         $Setting
     )
 
-    Write-Verbose -Message ($LocalizedData.TestingNetBiosSettingMessage -f $InterfaceAlias)
+    Write-Verbose -Message ($script:localizedData.TestingNetBiosSettingMessage -f $InterfaceAlias)
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
@@ -211,12 +207,12 @@ function Test-TargetResource
 
     if ($netAdapter)
     {
-        Write-Verbose -Message ($localizedData.InterfaceDetectedMessage -f $InterfaceAlias, $netAdapter.InterfaceIndex)
+        Write-Verbose -Message ($script:localizedData.InterfaceDetectedMessage -f $InterfaceAlias, $netAdapter.InterfaceIndex)
     }
     else
     {
         New-InvalidOperationException `
-            -Message ($localizedData.InterfaceNotFoundError -f $InterfaceAlias)
+            -Message ($script:localizedData.InterfaceNotFoundError -f $InterfaceAlias)
     }
 
     $currentState = Get-TargetResource @PSBoundParameters

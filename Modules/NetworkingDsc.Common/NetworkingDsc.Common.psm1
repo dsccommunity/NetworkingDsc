@@ -1,12 +1,351 @@
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
+<#
+    .SYNOPSIS
+        This function tests if a cmdlet exists.
 
-# Import Localization Strings
-$script:localizedData = Get-LocalizedData `
-    -ResourceName 'NetworkingDsc.Common' `
-    -ResourcePath $PSScriptRoot
+    .PARAMETER Name
+        The name of the cmdlet to check for.
+
+    .PARAMETER Module
+        The module containing the command.
+#>
+function Test-Command
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Name,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Module
+    )
+
+    return ($null -ne (Get-Command @PSBoundParameters -ErrorAction SilentlyContinue))
+} # function Test-Command
+
+<#
+    .SYNOPSIS
+    Tests if the current machine is a Nano server.
+#>
+function Test-IsNanoServer
+{
+    if (Test-Command -Name 'Get-ComputerInfo' -Module 'Microsoft.PowerShell.Management')
+    {
+        $computerInfo = Get-ComputerInfo
+
+        if ('Server' -eq $computerInfo.OsProductType `
+            -and 'NanoServer' -eq $computerInfo.OsServerLevel)
+        {
+            return $true
+        }
+    }
+
+    return $false
+}
+
+<#
+    .SYNOPSIS
+        Retrieves the localized string data based on the machine's culture.
+        Falls back to en-US strings if the machine's culture is not supported.
+
+    .PARAMETER ResourceName
+        The name of the resource as it appears before '.strings.psd1' of the localized string file.
+        For example:
+            For WindowsOptionalFeature: MSFT_WindowsOptionalFeature
+            For Service: MSFT_ServiceResource
+            For Registry: MSFT_RegistryResource
+            For Helper: SqlServerDscHelper
+
+    .PARAMETER ScriptRoot
+        Optional. The root path where to expect to find the culture folder. This is only needed
+        for localization in helper modules. This should not normally be used for resources.
+
+    .NOTES
+        To be able to use localization in the helper function, this function must
+        be first in the file, before Get-LocalizedData is used by itself to load
+        localized data for this helper module (see directly after this function).
+#>
+function Get-LocalizedData
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $ResourceName,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $ScriptRoot
+    )
+
+    if (-not $ScriptRoot)
+    {
+        $dscResourcesFolder = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'DSCResources'
+        $resourceDirectory = Join-Path -Path $dscResourcesFolder -ChildPath $ResourceName
+    }
+    else
+    {
+        $resourceDirectory = $ScriptRoot
+    }
+
+    $localizedStringFileLocation = Join-Path -Path $resourceDirectory -ChildPath $PSUICulture
+
+    if (-not (Test-Path -Path $localizedStringFileLocation))
+    {
+        # Fallback to en-US
+        $localizedStringFileLocation = Join-Path -Path $resourceDirectory -ChildPath 'en-US'
+    }
+
+    Import-LocalizedData `
+        -BindingVariable 'localizedData' `
+        -FileName "$ResourceName.strings.psd1" `
+        -BaseDirectory $localizedStringFileLocation
+
+    return $localizedData
+}
+
+<#
+    .SYNOPSIS
+        Creates and throws an invalid argument exception.
+
+    .PARAMETER Message
+        The message explaining why this error is being thrown.
+
+    .PARAMETER ArgumentName
+        The name of the invalid argument that is causing this error to be thrown.
+#>
+function New-InvalidArgumentException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Message,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $ArgumentName
+    )
+
+    $argumentException = New-Object -TypeName 'ArgumentException' `
+        -ArgumentList @($Message, $ArgumentName)
+
+    $newObjectParameters = @{
+        TypeName     = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @($argumentException, $ArgumentName, 'InvalidArgument', $null)
+    }
+
+    $errorRecord = New-Object @newObjectParameters
+
+    throw $errorRecord
+}
+
+<#
+    .SYNOPSIS
+        Creates and throws an invalid operation exception.
+
+    .PARAMETER Message
+        The message explaining why this error is being thrown.
+
+    .PARAMETER ErrorRecord
+        The error record containing the exception that is causing this terminating error.
+#>
+function New-InvalidOperationException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Message,
+
+        [Parameter()]
+        [ValidateNotNull()]
+        [System.Management.Automation.ErrorRecord]
+        $ErrorRecord
+    )
+
+    if ($null -eq $ErrorRecord)
+    {
+        $invalidOperationException = New-Object -TypeName 'InvalidOperationException' `
+            -ArgumentList @($Message)
+    }
+    else
+    {
+        $invalidOperationException = New-Object -TypeName 'InvalidOperationException' `
+            -ArgumentList @($Message, $ErrorRecord.Exception)
+    }
+
+    $newObjectParameters = @{
+        TypeName     = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @(
+            $invalidOperationException.ToString(),
+            'MachineStateIncorrect',
+            'InvalidOperation',
+            $null
+        )
+    }
+
+    $errorRecordToThrow = New-Object @newObjectParameters
+
+    throw $errorRecordToThrow
+}
+
+<#
+    .SYNOPSIS
+        Creates and throws an object not found exception.
+
+    .PARAMETER Message
+        The message explaining why this error is being thrown.
+
+    .PARAMETER ErrorRecord
+        The error record containing the exception that is causing this terminating error.
+#>
+function New-ObjectNotFoundException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Message,
+
+        [Parameter()]
+        [ValidateNotNull()]
+        [System.Management.Automation.ErrorRecord]
+        $ErrorRecord
+    )
+
+    if ($null -eq $ErrorRecord)
+    {
+        $exception = New-Object -TypeName 'System.Exception' `
+            -ArgumentList @($Message)
+    }
+    else
+    {
+        $exception = New-Object -TypeName 'System.Exception' `
+            -ArgumentList @($Message, $ErrorRecord.Exception)
+    }
+
+    $newObjectParameters = @{
+        TypeName     = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @(
+            $exception.ToString(),
+            'MachineStateIncorrect',
+            'ObjectNotFound',
+            $null
+        )
+    }
+
+    $errorRecordToThrow = New-Object @newObjectParameters
+
+    throw $errorRecordToThrow
+}
+
+<#
+    .SYNOPSIS
+        Creates and throws an invalid result exception.
+
+    .PARAMETER Message
+        The message explaining why this error is being thrown.
+
+    .PARAMETER ErrorRecord
+        The error record containing the exception that is causing this terminating error.
+#>
+function New-InvalidResultException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Message,
+
+        [Parameter()]
+        [ValidateNotNull()]
+        [System.Management.Automation.ErrorRecord]
+        $ErrorRecord
+    )
+
+    if ($null -eq $ErrorRecord)
+    {
+        $exception = New-Object -TypeName 'System.Exception' `
+            -ArgumentList @($Message)
+    }
+    else
+    {
+        $exception = New-Object -TypeName 'System.Exception' `
+            -ArgumentList @($Message, $ErrorRecord.Exception)
+    }
+
+    $newObjectParameters = @{
+        TypeName     = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @(
+            $exception.ToString(),
+            'MachineStateIncorrect',
+            'InvalidResult',
+            $null
+        )
+    }
+
+    $errorRecordToThrow = New-Object @newObjectParameters
+
+    throw $errorRecordToThrow
+}
+
+function New-NotImplementedException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Message,
+
+        [Parameter()]
+        [ValidateNotNull()]
+        [System.Management.Automation.ErrorRecord]
+        $ErrorRecord
+    )
+
+    if ($null -eq $ErrorRecord)
+    {
+        $invalidOperationException = New-Object -TypeName 'NotImplementedException' `
+            -ArgumentList @($Message)
+    }
+    else
+    {
+        $invalidOperationException = New-Object -TypeName 'NotImplementedException' `
+            -ArgumentList @($Message, $ErrorRecord.Exception)
+    }
+
+    $newObjectParameters = @{
+        TypeName     = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @(
+            $invalidOperationException.ToString(),
+            'MachineStateIncorrect',
+            'NotImplemented',
+            $null
+        )
+    }
+
+    $errorRecordToThrow = New-Object @newObjectParameters
+
+    throw $errorRecordToThrow
+}
 
 <#
     .SYNOPSIS
@@ -24,49 +363,60 @@ function Convert-CIDRToSubhetMask
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String[]] $Address
+        [System.String[]]
+        $Address
     )
 
-    $Results = @()
-    foreach ($Entry in $Address)
+    $results = @()
+
+    foreach ($entry in $Address)
     {
-        if (-not $Entry.Contains(':') -and -not $Entry.Contains('-'))
+        if (-not $entry.Contains(':') -and -not $entry.Contains('-'))
         {
-            $EntrySplit = $Entry -split '/'
-            if (-not [String]::IsNullOrEmpty($EntrySplit[1]))
+            $entrySplit = $entry -split '/'
+
+            if (-not [String]::IsNullOrEmpty($entrySplit[1]))
             {
                 # There was a / so this contains a Subnet Mask or CIDR
-                $Prefix = $EntrySplit[0]
-                $Postfix = $EntrySplit[1]
-                if ($Postfix -match '^[0-9]*$')
+                $prefix = $entrySplit[0]
+                $postfix = $entrySplit[1]
+
+                if ($postfix -match '^[0-9]*$')
                 {
                     # The postfix contains CIDR notation so convert this to Subnet Mask
-                    $Cidr = [Int] $Postfix
-                    $SubnetMaskInt64 = ([convert]::ToInt64(('1' * $Cidr + '0' * (32 - $Cidr)), 2))
-                    $SubnetMask = @(
-                            ([math]::Truncate($SubnetMaskInt64 / 16777216))
-                            ([math]::Truncate(($SubnetMaskInt64 % 16777216) / 65536))
-                            ([math]::Truncate(($SubnetMaskInt64 % 65536)/256))
-                            ([math]::Truncate($SubnetMaskInt64 % 256))
+                    $cidr = [System.Int32] $postfix
+                    $subnetMaskInt64 = ([convert]::ToInt64(('1' * $cidr + '0' * (32 - $cidr)), 2))
+                    $subnetMask = @(
+                            ([math]::Truncate($subnetMaskInt64 / 16777216))
+                            ([math]::Truncate(($subnetMaskInt64 % 16777216) / 65536))
+                            ([math]::Truncate(($subnetMaskInt64 % 65536)/256))
+                            ([math]::Truncate($subnetMaskInt64 % 256))
                         )
                 }
                 else
                 {
-                    $SubnetMask = $Postfix -split '\.'
+                    $subnetMask = $postfix -split '\.'
                 }
-                # Apply the Subnet Mast to the IP Address so that we end up with a correctly
-                # masked IP Address that will match what the Firewall rule returns.
-                $MaskedIp = $Prefix -split '\.'
-                for ([int] $Octet = 0; $Octet -lt 4; $Octet++)
+
+                <#
+                    Apply the Subnet Mast to the IP Address so that we end up with a correctly
+                    masked IP Address that will match what the Firewall rule returns.
+                #>
+                $maskedIp = $prefix -split '\.'
+
+                for ([System.Int32] $Octet = 0; $octet -lt 4; $octet++)
                 {
-                    $MaskedIp[$Octet] = $MaskedIp[$Octet] -band $SubnetMask[$Octet]
+                    $maskedIp[$Octet] = $maskedIp[$octet] -band $SubnetMask[$octet]
                 }
-                $Entry = '{0}/{1}' -f ($MaskedIp -join '.'),($SubnetMask -join '.')
+
+                $entry = '{0}/{1}' -f ($maskedIp -join '.'),($subnetMask -join '.')
             }
         }
-        $Results += $Entry
+
+        $results += $entry
     }
-    return $Results
+
+    return $results
 } # Convert-CIDRToSubhetMask
 
 <#
@@ -156,10 +506,11 @@ function Find-NetworkAdapter
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.FindingNetAdapterMessage)
+        $($script:localizedData.FindingNetAdapterMessage)
         ) -join '')
 
     $adapterFilters = @()
+
     if($PSBoundParameters.ContainsKey('Name'))
     {
         $adapterFilters += @('($_.Name -eq $Name)')
@@ -170,7 +521,8 @@ function Find-NetworkAdapter
         $adapterFilters += @('($_.PhysicalMediaType -eq $PhysicalMediaType)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('Status')) {
+    if($PSBoundParameters.ContainsKey('Status'))
+    {
         $adapterFilters += @('($_.Status -eq $Status)')
     } # if
 
@@ -202,7 +554,7 @@ function Find-NetworkAdapter
     if ($adapterFilters.Count -eq 0)
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.AllNetAdaptersFoundMessage)
+            $($script:localizedData.AllNetAdaptersFoundMessage)
             ) -join '')
 
         $matchingAdapters = @(Get-NetAdapter)
@@ -219,7 +571,7 @@ function Find-NetworkAdapter
     if ($matchingAdapters.Count -eq 0)
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundError)
+            -Message ($script:localizedData.NetAdapterNotFoundError)
 
         # Return a null so that ErrorAction SilentlyContinue works correctly
         return $null
@@ -227,7 +579,7 @@ function Find-NetworkAdapter
     else
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.NetAdapterFoundMessage -f $matchingAdapters.Count)
+            $($script:localizedData.NetAdapterFoundMessage -f $matchingAdapters.Count)
             ) -join '')
 
         if ($matchingAdapters.Count -gt 1)
@@ -238,7 +590,7 @@ function Find-NetworkAdapter
                 if (($InterfaceNumber -gt 1) -and ($InterfaceNumber -gt $matchingAdapters.Count))
                 {
                     New-InvalidOperationException `
-                        -Message ($LocalizedData.InvalidNetAdapterNumberError `
+                        -Message ($script:localizedData.InvalidNetAdapterNumberError `
                             -f $matchingAdapters.Count,$InterfaceNumber)
 
                     # Return a null so that ErrorAction SilentlyContinue works correctly
@@ -248,7 +600,7 @@ function Find-NetworkAdapter
             else
             {
                 New-InvalidOperationException `
-                    -Message ($LocalizedData.MultipleMatchingNetAdapterFound `
+                    -Message ($script:localizedData.MultipleMatchingNetAdapterFound `
                         -f $matchingAdapters.Count)
 
                 # Return a null so that ErrorAction SilentlyContinue works correctly
@@ -292,22 +644,22 @@ function Find-NetworkAdapter
 function Get-DnsClientServerStaticAddress
 {
     [CmdletBinding()]
-    [OutputType([String[]])]
+    [OutputType([System.String[]])]
     param
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.GettingDNSServerStaticAddressMessage) -f $AddressFamily,$InterfaceAlias
+        $($script:localizedData.GettingDNSServerStaticAddressMessage) -f $AddressFamily,$InterfaceAlias
         ) -join '')
 
     # Look up the interface Guid
@@ -318,7 +670,7 @@ function Get-DnsClientServerStaticAddress
     if (-not $adapter)
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.InterfaceAliasNotFoundError `
+            -Message ($script:localizedData.InterfaceAliasNotFoundError `
                 -f $InterfaceAlias)
 
         # Return null to support ErrorAction Silently Continue
@@ -336,18 +688,17 @@ function Get-DnsClientServerStaticAddress
         $interfaceRegKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\Interfaces\$interfaceGuid\"
     } # if
 
-
     $interfaceInformation = Get-ItemProperty `
         -Path $interfaceRegKeyPath `
         -ErrorAction SilentlyContinue
     $nameServerAddressString = $interfaceInformation.NameServer
 
     # Are any statically assigned addresses for this adapter?
-    if ([String]::IsNullOrWhiteSpace($nameServerAddressString))
+    if ([System.String]::IsNullOrWhiteSpace($nameServerAddressString))
     {
         # Static DNS Server addresses not found so return empty array
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily,$InterfaceAlias
+            $($script:localizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily,$InterfaceAlias
             ) -join '')
 
         return $null
@@ -356,7 +707,7 @@ function Get-DnsClientServerStaticAddress
     {
         # Static DNS Server addresses found so split them into an array using comma
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($LocalizedData.DNSServerStaticAddressFoundMessage) -f $AddressFamily,$InterfaceAlias,$nameServerAddressString
+            $($script:localizedData.DNSServerStaticAddressFoundMessage) -f $AddressFamily,$InterfaceAlias,$nameServerAddressString
             ) -join '')
 
         return @($nameServerAddressString -split ',')
@@ -379,12 +730,15 @@ function Get-IPAddressPrefix
     [cmdletbinding()]
     param
     (
-        [Parameter(Mandatory=$True, ValueFromPipeline)]
-        [string[]]$IPAddress,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline)]
+        [System.String[]]
+        $IPAddress,
 
         [Parameter()]
         [ValidateSet('IPv4','IPv6')]
-        [string]$AddressFamily = 'IPv4'
+        [System.String]
+        $AddressFamily = 'IPv4'
     )
 
     process
@@ -393,7 +747,7 @@ function Get-IPAddressPrefix
         {
             $prefixLength = ($singleIP -split '/')[1]
 
-            If (-not ($prefixLength) -and $AddressFamily -eq 'IPv4')
+            if (-not ($prefixLength) -and $AddressFamily -eq 'IPv4')
             {
                 if ($singleIP.split('.')[0] -in (0..127))
                 {
@@ -446,7 +800,9 @@ function Remove-CommonParameter
     $commonParameters = [System.Management.Automation.PSCmdlet]::CommonParameters
     $commonParameters += [System.Management.Automation.PSCmdlet]::OptionalCommonParameters
 
-    $Hashtable.Keys | Where-Object { $_ -in $commonParameters } | ForEach-Object {
+    $Hashtable.Keys | Where-Object -FilterScript {
+        $_ -in $commonParameters
+    } | ForEach-Object -Process {
         $inputClone.Remove($_)
     }
 
@@ -723,10 +1079,24 @@ function Test-DscObjectHasProperty
     return $false
 }
 
-Export-ModuleMember -Function `
-    Convert-CIDRToSubhetMask, `
-    Find-NetworkAdapter, `
-    Get-DnsClientServerStaticAddress, `
-    Get-IPAddressPrefix, `
-    Test-DscParameterState, `
-    Test-DscObjectHasProperty
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData `
+    -ResourceName 'NetworkingDsc.Common' `
+    -ScriptRoot $PSScriptRoot
+
+Export-ModuleMember -Function @(
+    'Test-Command',
+    'Test-IsNanoServer',
+    'New-InvalidArgumentException',
+    'New-InvalidOperationException',
+    'New-ObjectNotFoundException',
+    'New-InvalidResultException',
+    'New-NotImplementedException',
+    'Get-LocalizedData',
+    'Convert-CIDRToSubhetMask',
+    'Find-NetworkAdapter',
+    'Get-DnsClientServerStaticAddress',
+    'Get-IPAddressPrefix',
+    'Test-DscParameterState',
+    'Test-DscObjectHasProperty'
+)

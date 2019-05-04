@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
         Describe 'MSFT_DefaultGatewayAddress\Get-TargetResource' {
             Context 'Checking return with default gateway' {
@@ -227,7 +226,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($LocalizedData.InterfaceNotAvailableError -f $assertResourcePropertyParameters.InterfaceAlias)
+                        -Message ($script:localizedData.InterfaceNotAvailableError -f $assertResourcePropertyParameters.InterfaceAlias)
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
                 }
@@ -242,7 +241,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressFormatError -f $assertResourcePropertyParameters.Address) `
+                        -Message ($script:localizedData.AddressFormatError -f $assertResourcePropertyParameters.Address) `
                         -ArgumentName 'Address'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
@@ -258,7 +257,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressIPv4MismatchError -f $assertResourcePropertyParameters.Address,$assertResourcePropertyParameters.AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv4MismatchError -f $assertResourcePropertyParameters.Address,$assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'AddressFamily'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
@@ -274,7 +273,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($LocalizedData.AddressIPv6MismatchError -f $assertResourcePropertyParameters.Address,$assertResourcePropertyParameters.AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv6MismatchError -f $assertResourcePropertyParameters.Address,$assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'AddressFamily'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
@@ -306,7 +305,6 @@ try
             }
         }
     } #end InModuleScope $DSCResourceName
-    #endregion
 }
 finally
 {

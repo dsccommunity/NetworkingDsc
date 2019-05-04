@@ -5,15 +5,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
-$LocalizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_WinsSetting' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_WinsSetting'
 
 <#
     .SYNOPSIS
@@ -36,7 +29,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingWinsSettingMessage)
+            $($script:localizedData.GettingWinsSettingMessage)
         ) -join '' )
 
     # 0 equals off, 1 equals on
@@ -106,7 +99,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.SettingWinsSettingMessage)
+            $($script:localizedData.SettingWinsSettingMessage)
         ) -join '' )
 
     # Get the current values of the WINS settings
@@ -133,12 +126,12 @@ function Set-TargetResource
     if ($result.ReturnValue -ne 0)
     {
         New-InvalidOperationException `
-            -Message ($localizedData.FailedUpdatingWinsSettingError -f $result.ReturnValue)
+            -Message ($script:localizedData.FailedUpdatingWinsSettingError -f $result.ReturnValue)
     }
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.WinsSettingUpdatedMessage)
+            $($script:localizedData.WinsSettingUpdatedMessage)
         ) -join '' )
 } # Set-TargetResource
 
@@ -179,7 +172,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.TestingWinsSettingMessage)
+            $($script:localizedData.TestingWinsSettingMessage)
         ) -join '' )
 
     # Get the current values of the WINS settings

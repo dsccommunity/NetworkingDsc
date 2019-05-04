@@ -1215,7 +1215,7 @@ try
                 Mock -CommandName Get-NetFirewallRule -MockWith { $firewallRules }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.RuleNotUniqueError -f 2, $firewallRule.Name)
+                    -Message ($script:localizedData.RuleNotUniqueError -f 2, $firewallRule.Name)
 
                 It "Should throw RuleNotUnique exception on firewall rule $($firewallRule.Name)" {
                     { $result = Get-FirewallRule -Name $firewallRule.Name } | Should -Throw $errorRecord

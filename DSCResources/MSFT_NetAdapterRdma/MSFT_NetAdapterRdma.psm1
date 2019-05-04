@@ -5,15 +5,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_NetAdapterRdma' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_NetAdapterRdma'
 
 <#
 .SYNOPSIS
@@ -40,19 +33,19 @@ function Get-TargetResource
 
     try
     {
-        Write-Verbose -Message ($localizedData.GetNetAdapterRdmaMessage -f $Name)
+        Write-Verbose -Message ($script:localizedData.GetNetAdapterRdmaMessage -f $Name)
 
         $netAdapterRdma = Get-NetAdapterRdma -Name $Name -ErrorAction Stop
     }
     catch
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundError -f $Name)
+            -Message ($script:localizedData.NetAdapterNotFoundError -f $Name)
     }
 
     if ($netAdapterRdma)
     {
-        Write-Verbose -Message ($localizedData.CheckNetAdapterRdmaMessage -f $Name)
+        Write-Verbose -Message ($script:localizedData.CheckNetAdapterRdmaMessage -f $Name)
 
         $configuration.Add('Enabled', $netAdapterRdma.Enabled)
     }
@@ -92,23 +85,23 @@ function Set-TargetResource
 
     try
     {
-        Write-Verbose -Message ($localizedData.GetNetAdapterRdmaMessage -f $Name)
+        Write-Verbose -Message ($script:localizedData.GetNetAdapterRdmaMessage -f $Name)
 
         $netAdapterRdma = Get-NetAdapterRdma -Name $Name -ErrorAction Stop
     }
     catch
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundError -f $Name)
+            -Message ($script:localizedData.NetAdapterNotFoundError -f $Name)
     }
 
     if ($netAdapterRdma)
     {
-        Write-Verbose -Message ($localizedData.CheckNetAdapterRdmaMessage -f $Name)
+        Write-Verbose -Message ($script:localizedData.CheckNetAdapterRdmaMessage -f $Name)
 
         if ($netAdapterRdma.Enabled -ne $Enabled)
         {
-            Write-Verbose -Message ($localizedData.SetNetAdapterRdmaMessage -f $Name, $Enabled)
+            Write-Verbose -Message ($script:localizedData.SetNetAdapterRdmaMessage -f $Name, $Enabled)
 
             Set-NetAdapterRdma -Name $Name -Enabled $Enabled
         }
@@ -144,29 +137,29 @@ function Test-TargetResource
 
     try
     {
-        Write-Verbose -Message ($localizedData.GetNetAdapterRdmaMessage -f $Name)
+        Write-Verbose -Message ($script:localizedData.GetNetAdapterRdmaMessage -f $Name)
 
         $netAdapterRdma = Get-NetAdapterRdma -Name $Name -ErrorAction Stop
     }
     catch
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.NetAdapterNotFoundError -f $Name)
+            -Message ($script:localizedData.NetAdapterNotFoundError -f $Name)
     }
 
     if ($netAdapterRdma)
     {
-        Write-Verbose -Message ($localizedData.CheckNetAdapterRdmaMessage -f $Name)
+        Write-Verbose -Message ($script:localizedData.CheckNetAdapterRdmaMessage -f $Name)
 
         if ($netAdapterRdma.Enabled -ne $Enabled)
         {
-            Write-Verbose -Message ($localizedData.NetAdapterRdmaDifferentMessage -f $Name)
+            Write-Verbose -Message ($script:localizedData.NetAdapterRdmaDifferentMessage -f $Name)
 
             return $false
         }
         else
         {
-            Write-Verbose -Message ($localizedData.NetAdapterRdmaMatchesMessage -f $Name)
+            Write-Verbose -Message ($script:localizedData.NetAdapterRdmaMatchesMessage -f $Name)
 
             return $true
         }

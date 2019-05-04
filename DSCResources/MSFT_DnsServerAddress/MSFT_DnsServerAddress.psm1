@@ -5,15 +5,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
                                -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
                                                      -ChildPath 'NetworkingDsc.Common.psm1'))
 
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_DnsServerAddress' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_DnsServerAddress'
 
 <#
     .SYNOPSIS
@@ -51,7 +44,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.GettingDnsServerAddressesMessage)
+        $($script:localizedData.GettingDnsServerAddressesMessage)
         ) -join '')
 
     # Remove the parameters we don't want to splat
@@ -115,7 +108,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($LocalizedData.ApplyingDnsServerAddressesMessage)
+        $($script:localizedData.ApplyingDnsServerAddressesMessage)
         ) -join '')
 
     # If address not passed, set to an empty array
@@ -156,7 +149,7 @@ function Set-TargetResource
                 -ErrorAction Stop
 
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.DNSServersHaveBeenSetToDHCPMessage)
+                $($script:localizedData.DNSServersHaveBeenSetToDHCPMessage)
                 ) -join '' )
         }
         else
@@ -171,7 +164,7 @@ function Set-TargetResource
                 -ErrorAction Stop
 
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($LocalizedData.DNSServersHaveBeenSetCorrectlyMessage)
+                $($script:localizedData.DNSServersHaveBeenSetCorrectlyMessage)
                 ) -join '' )
         }
     }
@@ -179,7 +172,7 @@ function Set-TargetResource
     {
         # Test will return true in this case
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DNSServersAlreadySetMessage)
+            $($script:localizedData.DNSServersAlreadySetMessage)
             ) -join '' )
     }
 }
@@ -231,7 +224,7 @@ function Test-TargetResource
     [Boolean] $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($LocalizedData.CheckingDnsServerAddressesMessage)
+        $($script:localizedData.CheckingDnsServerAddressesMessage)
         ) -join '' )
 
     # Validate the Address passed or set to empty array if not passed
@@ -270,7 +263,7 @@ function Test-TargetResource
         $desiredConfigurationMatch = $false
 
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DNSServersNotCorrectMessage) `
+            $($script:localizedData.DNSServersNotCorrectMessage) `
                 -f ($Address -join ','),($currentAddress -join ',')
             ) -join '' )
     }
@@ -278,7 +271,7 @@ function Test-TargetResource
     {
         # Test will return true in this case
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DNSServersSetCorrectlyMessage)
+            $($script:localizedData.DNSServersSetCorrectlyMessage)
             ) -join '' )
     }
     return $desiredConfigurationMatch
@@ -322,14 +315,14 @@ function Assert-ResourceProperty
     if ( -not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
         New-InvalidArgumentException `
-            -Message ($LocalizedData.InterfaceNotAvailableError -f $InterfaceAlias) `
+            -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias) `
             -ArgumentName 'InterfaceAlias'
     }
 
     if ( -not ([System.Net.IPAddress]::TryParse($Address, [ref]0)))
     {
         New-InvalidArgumentException `
-            -Message ($LocalizedData.AddressFormatError -f $Address) `
+            -Message ($script:localizedData.AddressFormatError -f $Address) `
             -ArgumentName 'Address'
     }
 
@@ -338,7 +331,7 @@ function Assert-ResourceProperty
         -and ($AddressFamily -ne 'IPv4'))
     {
         New-InvalidArgumentException `
-            -Message ($LocalizedData.AddressIPv4MismatchError -f $Address,$AddressFamily) `
+            -Message ($script:localizedData.AddressIPv4MismatchError -f $Address,$AddressFamily) `
             -ArgumentName 'Address'
     }
 
@@ -346,7 +339,7 @@ function Assert-ResourceProperty
         -and ($AddressFamily -ne 'IPv6'))
     {
         New-InvalidArgumentException `
-            -Message ($LocalizedData.AddressIPv6MismatchError -f $Address,$AddressFamily) `
+            -Message ($script:localizedData.AddressIPv6MismatchError -f $Address,$AddressFamily) `
             -ArgumentName 'Address'
     }
 } # Assert-ResourceProperty
