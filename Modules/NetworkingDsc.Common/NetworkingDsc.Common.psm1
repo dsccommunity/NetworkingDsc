@@ -1,19 +1,30 @@
 <#
     .SYNOPSIS
-    Tests if the specified command can be found.
+        This function tests if a cmdlet exists.
 
-    .PARAMETER name
-    The name of the command to test.
+    .PARAMETER Name
+        The name of the cmdlet to check for.
+
+    .PARAMETER Module
+        The module containing the command.
 #>
 function Test-Command
 {
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
     param
     (
-        [String] $Name
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Name,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Module
     )
 
-    return ($null -ne (Get-Command -Name $Name -ErrorAction Continue 2> $null))
-}
+    return ($null -ne (Get-Command @PSBoundParameters -ErrorAction SilentlyContinue))
+} # function Test-Command
 
 <#
     .SYNOPSIS
@@ -21,11 +32,11 @@ function Test-Command
 #>
 function Test-IsNanoServer
 {
-    if(Test-Command -Name Get-ComputerInfo)
+    if (Test-Command -Name 'Get-ComputerInfo' -Module 'Microsoft.PowerShell.Management')
     {
         $computerInfo = Get-ComputerInfo
 
-        if('Server' -eq $computerInfo.OsProductType `
+        if ('Server' -eq $computerInfo.OsProductType `
             -and 'NanoServer' -eq $computerInfo.OsServerLevel)
         {
             return $true
@@ -33,92 +44,6 @@ function Test-IsNanoServer
     }
 
     return $false
-}
-
-<#
-    .SYNOPSIS
-        Creates and throws an invalid argument exception
-
-    .PARAMETER Message
-        The message explaining why this error is being thrown
-
-    .PARAMETER ArgumentName
-        The name of the invalid argument that is causing this error to be thrown
-#>
-function New-InvalidArgumentException
-{
-    [CmdletBinding()]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String]
-        $Message,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String]
-        $ArgumentName
-    )
-
-    $argumentException = New-Object -TypeName 'ArgumentException' -ArgumentList @( $Message,
-        $ArgumentName )
-    $newObjectParams = @{
-        TypeName = 'System.Management.Automation.ErrorRecord'
-        ArgumentList = @( $argumentException, $ArgumentName, 'InvalidArgument', $null )
-    }
-    $errorRecord = New-Object @newObjectParams
-
-    throw $errorRecord
-}
-
-<#
-    .SYNOPSIS
-        Creates and throws an invalid operation exception
-
-    .PARAMETER Message
-        The message explaining why this error is being thrown
-
-    .PARAMETER ErrorRecord
-        The error record containing the exception that is causing this terminating error
-#>
-function New-InvalidOperationException
-{
-    [CmdletBinding()]
-    param
-    (
-        [ValidateNotNullOrEmpty()]
-        [String]
-        $Message,
-
-        [ValidateNotNull()]
-        [System.Management.Automation.ErrorRecord]
-        $ErrorRecord
-    )
-
-    if ($null -eq $Message)
-    {
-        $invalidOperationException = New-Object -TypeName 'InvalidOperationException'
-    }
-    elseif ($null -eq $ErrorRecord)
-    {
-        $invalidOperationException =
-            New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message )
-    }
-    else
-    {
-        $invalidOperationException =
-            New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message,
-                $ErrorRecord.Exception )
-    }
-
-    $newObjectParams = @{
-        TypeName = 'System.Management.Automation.ErrorRecord'
-        ArgumentList = @( $invalidOperationException.ToString(), 'MachineStateIncorrect',
-            'InvalidOperation', $null )
-    }
-    $errorRecordToThrow = New-Object @newObjectParams
-    throw $errorRecordToThrow
 }
 
 <#
@@ -187,6 +112,243 @@ function Get-LocalizedData
 
 <#
     .SYNOPSIS
+        Creates and throws an invalid argument exception.
+
+    .PARAMETER Message
+        The message explaining why this error is being thrown.
+
+    .PARAMETER ArgumentName
+        The name of the invalid argument that is causing this error to be thrown.
+#>
+function New-InvalidArgumentException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Message,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $ArgumentName
+    )
+
+    $argumentException = New-Object -TypeName 'ArgumentException' `
+        -ArgumentList @($Message, $ArgumentName)
+
+    $newObjectParameters = @{
+        TypeName     = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @($argumentException, $ArgumentName, 'InvalidArgument', $null)
+    }
+
+    $errorRecord = New-Object @newObjectParameters
+
+    throw $errorRecord
+}
+
+<#
+    .SYNOPSIS
+        Creates and throws an invalid operation exception.
+
+    .PARAMETER Message
+        The message explaining why this error is being thrown.
+
+    .PARAMETER ErrorRecord
+        The error record containing the exception that is causing this terminating error.
+#>
+function New-InvalidOperationException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Message,
+
+        [Parameter()]
+        [ValidateNotNull()]
+        [System.Management.Automation.ErrorRecord]
+        $ErrorRecord
+    )
+
+    if ($null -eq $ErrorRecord)
+    {
+        $invalidOperationException = New-Object -TypeName 'InvalidOperationException' `
+            -ArgumentList @($Message)
+    }
+    else
+    {
+        $invalidOperationException = New-Object -TypeName 'InvalidOperationException' `
+            -ArgumentList @($Message, $ErrorRecord.Exception)
+    }
+
+    $newObjectParameters = @{
+        TypeName     = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @(
+            $invalidOperationException.ToString(),
+            'MachineStateIncorrect',
+            'InvalidOperation',
+            $null
+        )
+    }
+
+    $errorRecordToThrow = New-Object @newObjectParameters
+
+    throw $errorRecordToThrow
+}
+
+<#
+    .SYNOPSIS
+        Creates and throws an object not found exception.
+
+    .PARAMETER Message
+        The message explaining why this error is being thrown.
+
+    .PARAMETER ErrorRecord
+        The error record containing the exception that is causing this terminating error.
+#>
+function New-ObjectNotFoundException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Message,
+
+        [Parameter()]
+        [ValidateNotNull()]
+        [System.Management.Automation.ErrorRecord]
+        $ErrorRecord
+    )
+
+    if ($null -eq $ErrorRecord)
+    {
+        $exception = New-Object -TypeName 'System.Exception' `
+            -ArgumentList @($Message)
+    }
+    else
+    {
+        $exception = New-Object -TypeName 'System.Exception' `
+            -ArgumentList @($Message, $ErrorRecord.Exception)
+    }
+
+    $newObjectParameters = @{
+        TypeName     = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @(
+            $exception.ToString(),
+            'MachineStateIncorrect',
+            'ObjectNotFound',
+            $null
+        )
+    }
+
+    $errorRecordToThrow = New-Object @newObjectParameters
+
+    throw $errorRecordToThrow
+}
+
+<#
+    .SYNOPSIS
+        Creates and throws an invalid result exception.
+
+    .PARAMETER Message
+        The message explaining why this error is being thrown.
+
+    .PARAMETER ErrorRecord
+        The error record containing the exception that is causing this terminating error.
+#>
+function New-InvalidResultException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Message,
+
+        [Parameter()]
+        [ValidateNotNull()]
+        [System.Management.Automation.ErrorRecord]
+        $ErrorRecord
+    )
+
+    if ($null -eq $ErrorRecord)
+    {
+        $exception = New-Object -TypeName 'System.Exception' `
+            -ArgumentList @($Message)
+    }
+    else
+    {
+        $exception = New-Object -TypeName 'System.Exception' `
+            -ArgumentList @($Message, $ErrorRecord.Exception)
+    }
+
+    $newObjectParameters = @{
+        TypeName     = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @(
+            $exception.ToString(),
+            'MachineStateIncorrect',
+            'InvalidResult',
+            $null
+        )
+    }
+
+    $errorRecordToThrow = New-Object @newObjectParameters
+
+    throw $errorRecordToThrow
+}
+
+function New-NotImplementedException
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Message,
+
+        [Parameter()]
+        [ValidateNotNull()]
+        [System.Management.Automation.ErrorRecord]
+        $ErrorRecord
+    )
+
+    if ($null -eq $ErrorRecord)
+    {
+        $invalidOperationException = New-Object -TypeName 'NotImplementedException' `
+            -ArgumentList @($Message)
+    }
+    else
+    {
+        $invalidOperationException = New-Object -TypeName 'NotImplementedException' `
+            -ArgumentList @($Message, $ErrorRecord.Exception)
+    }
+
+    $newObjectParameters = @{
+        TypeName     = 'System.Management.Automation.ErrorRecord'
+        ArgumentList = @(
+            $invalidOperationException.ToString(),
+            'MachineStateIncorrect',
+            'NotImplemented',
+            $null
+        )
+    }
+
+    $errorRecordToThrow = New-Object @newObjectParameters
+
+    throw $errorRecordToThrow
+}
+
+<#
+    .SYNOPSIS
     Converts any IP Addresses containing CIDR notation filters in an array to use Subnet Mask
     notation.
 
@@ -201,49 +363,60 @@ function Convert-CIDRToSubhetMask
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String[]] $Address
+        [System.String[]]
+        $Address
     )
 
-    $Results = @()
-    foreach ($Entry in $Address)
+    $results = @()
+
+    foreach ($entry in $Address)
     {
-        if (-not $Entry.Contains(':') -and -not $Entry.Contains('-'))
+        if (-not $entry.Contains(':') -and -not $entry.Contains('-'))
         {
-            $EntrySplit = $Entry -split '/'
-            if (-not [String]::IsNullOrEmpty($EntrySplit[1]))
+            $entrySplit = $entry -split '/'
+
+            if (-not [String]::IsNullOrEmpty($entrySplit[1]))
             {
                 # There was a / so this contains a Subnet Mask or CIDR
-                $Prefix = $EntrySplit[0]
-                $Postfix = $EntrySplit[1]
-                if ($Postfix -match '^[0-9]*$')
+                $prefix = $entrySplit[0]
+                $postfix = $entrySplit[1]
+
+                if ($postfix -match '^[0-9]*$')
                 {
                     # The postfix contains CIDR notation so convert this to Subnet Mask
-                    $Cidr = [Int] $Postfix
-                    $SubnetMaskInt64 = ([convert]::ToInt64(('1' * $Cidr + '0' * (32 - $Cidr)), 2))
-                    $SubnetMask = @(
-                            ([math]::Truncate($SubnetMaskInt64 / 16777216))
-                            ([math]::Truncate(($SubnetMaskInt64 % 16777216) / 65536))
-                            ([math]::Truncate(($SubnetMaskInt64 % 65536)/256))
-                            ([math]::Truncate($SubnetMaskInt64 % 256))
+                    $cidr = [System.Int32] $postfix
+                    $subnetMaskInt64 = ([convert]::ToInt64(('1' * $cidr + '0' * (32 - $cidr)), 2))
+                    $subnetMask = @(
+                            ([math]::Truncate($subnetMaskInt64 / 16777216))
+                            ([math]::Truncate(($subnetMaskInt64 % 16777216) / 65536))
+                            ([math]::Truncate(($subnetMaskInt64 % 65536)/256))
+                            ([math]::Truncate($subnetMaskInt64 % 256))
                         )
                 }
                 else
                 {
-                    $SubnetMask = $Postfix -split '\.'
+                    $subnetMask = $postfix -split '\.'
                 }
-                # Apply the Subnet Mast to the IP Address so that we end up with a correctly
-                # masked IP Address that will match what the Firewall rule returns.
-                $MaskedIp = $Prefix -split '\.'
-                for ([int] $Octet = 0; $Octet -lt 4; $Octet++)
+
+                <#
+                    Apply the Subnet Mast to the IP Address so that we end up with a correctly
+                    masked IP Address that will match what the Firewall rule returns.
+                #>
+                $maskedIp = $prefix -split '\.'
+
+                for ([System.Int32] $Octet = 0; $octet -lt 4; $octet++)
                 {
-                    $MaskedIp[$Octet] = $MaskedIp[$Octet] -band $SubnetMask[$Octet]
+                    $maskedIp[$Octet] = $maskedIp[$octet] -band $SubnetMask[$octet]
                 }
-                $Entry = '{0}/{1}' -f ($MaskedIp -join '.'),($SubnetMask -join '.')
+
+                $entry = '{0}/{1}' -f ($maskedIp -join '.'),($subnetMask -join '.')
             }
         }
-        $Results += $Entry
+
+        $results += $entry
     }
-    return $Results
+
+    return $results
 } # Convert-CIDRToSubhetMask
 
 <#
@@ -337,6 +510,7 @@ function Find-NetworkAdapter
         ) -join '')
 
     $adapterFilters = @()
+
     if($PSBoundParameters.ContainsKey('Name'))
     {
         $adapterFilters += @('($_.Name -eq $Name)')
@@ -347,7 +521,8 @@ function Find-NetworkAdapter
         $adapterFilters += @('($_.PhysicalMediaType -eq $PhysicalMediaType)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('Status')) {
+    if($PSBoundParameters.ContainsKey('Status'))
+    {
         $adapterFilters += @('($_.Status -eq $Status)')
     } # if
 
@@ -469,17 +644,17 @@ function Find-NetworkAdapter
 function Get-DnsClientServerStaticAddress
 {
     [CmdletBinding()]
-    [OutputType([String[]])]
+    [OutputType([System.String[]])]
     param
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
-        [String]
+        [System.String]
         $AddressFamily
     )
 
@@ -513,14 +688,13 @@ function Get-DnsClientServerStaticAddress
         $interfaceRegKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\Interfaces\$interfaceGuid\"
     } # if
 
-
     $interfaceInformation = Get-ItemProperty `
         -Path $interfaceRegKeyPath `
         -ErrorAction SilentlyContinue
     $nameServerAddressString = $interfaceInformation.NameServer
 
     # Are any statically assigned addresses for this adapter?
-    if ([String]::IsNullOrWhiteSpace($nameServerAddressString))
+    if ([System.String]::IsNullOrWhiteSpace($nameServerAddressString))
     {
         # Static DNS Server addresses not found so return empty array
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
@@ -556,12 +730,15 @@ function Get-IPAddressPrefix
     [cmdletbinding()]
     param
     (
-        [Parameter(Mandatory=$True, ValueFromPipeline)]
-        [string[]]$IPAddress,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline)]
+        [System.String[]]
+        $IPAddress,
 
         [Parameter()]
         [ValidateSet('IPv4','IPv6')]
-        [string]$AddressFamily = 'IPv4'
+        [System.String]
+        $AddressFamily = 'IPv4'
     )
 
     process
@@ -570,7 +747,7 @@ function Get-IPAddressPrefix
         {
             $prefixLength = ($singleIP -split '/')[1]
 
-            If (-not ($prefixLength) -and $AddressFamily -eq 'IPv4')
+            if (-not ($prefixLength) -and $AddressFamily -eq 'IPv4')
             {
                 if ($singleIP.split('.')[0] -in (0..127))
                 {
@@ -623,7 +800,9 @@ function Remove-CommonParameter
     $commonParameters = [System.Management.Automation.PSCmdlet]::CommonParameters
     $commonParameters += [System.Management.Automation.PSCmdlet]::OptionalCommonParameters
 
-    $Hashtable.Keys | Where-Object { $_ -in $commonParameters } | ForEach-Object {
+    $Hashtable.Keys | Where-Object -FilterScript {
+        $_ -in $commonParameters
+    } | ForEach-Object -Process {
         $inputClone.Remove($_)
     }
 
@@ -905,15 +1084,19 @@ $script:localizedData = Get-LocalizedData `
     -ResourceName 'NetworkingDsc.Common' `
     -ScriptRoot $PSScriptRoot
 
-
-Export-ModuleMember -Function `
-    Test-IsNanoServer, `
-    New-InvalidArgumentException, `
-    New-InvalidOperationException, `
-    Get-LocalizedData, `
-    Convert-CIDRToSubhetMask, `
-    Find-NetworkAdapter, `
-    Get-DnsClientServerStaticAddress, `
-    Get-IPAddressPrefix, `
-    Test-DscParameterState, `
-    Test-DscObjectHasProperty
+Export-ModuleMember -Function @(
+    'Test-Command',
+    'Test-IsNanoServer',
+    'New-InvalidArgumentException',
+    'New-InvalidOperationException',
+    'New-ObjectNotFoundException',
+    'New-InvalidResultException',
+    'New-NotImplementedException',
+    'Get-LocalizedData',
+    'Convert-CIDRToSubhetMask',
+    'Find-NetworkAdapter',
+    'Get-DnsClientServerStaticAddress',
+    'Get-IPAddressPrefix',
+    'Test-DscParameterState',
+    'Test-DscObjectHasProperty'
+)

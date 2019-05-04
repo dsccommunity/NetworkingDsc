@@ -17,8 +17,12 @@
 - Renamed all localization strings so that they are detected by
   'Common Tests - Validate Localization'.
 - Fixed issues with mismatched localization strings.
-- Updated all `Get-LocalizationData` to latest version from
+- Updated all common functions with the latest versions from
   [DSCResource.Template](https://github.com/PowerShell/DSCResource.Template).
+- Fixed an issue with the helper function `Test-IsNanoServer` that
+  prevented it to work. Though the helper function is not used, so this
+  issue was not caught until now when unit tests was added.
+- Corrected style violations in `NetworkingDsc.Common`.
 
 ## 7.1.0.0
 
