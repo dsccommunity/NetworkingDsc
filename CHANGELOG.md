@@ -10,6 +10,8 @@
     parameters' error when updating rule when group name is specified - fixes
     [Issue #130](https://github.com/PowerShell/NetworkingDsc/issues/130) and
     [Issue #191](https://github.com/PowerShell/NetworkingDsc/issues/191)
+- Opted into Common Tests 'Common Tests - Validate Localization' -
+  fixes [Issue #393](https://github.com/PowerShell/NetworkingDsc/issues/393)
 
 ## 7.1.0.0
 
