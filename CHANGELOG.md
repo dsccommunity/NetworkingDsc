@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.2.0.0
+
 - NetAdapterAdvancedProperty:
   - Added support for RegistryKeyword `MaxRxRing1Length` and
     `NumRxBuffersSmall` - fixes [Issue #387](https://github.com/PowerShell/NetworkingDsc/issues/387).
