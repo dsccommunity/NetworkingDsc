@@ -163,7 +163,7 @@ try
 
                 It 'Should throw the correct exception' {
                     $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($LocalizedData.NetAdapterNotFoundMessage)
+                        -Message ($script:localizedData.NetAdapterNotFoundMessage)
 
                     { Get-TargetResource @testAdapterNotFound } | Should -Throw $errorRecord
                 }
@@ -376,7 +376,7 @@ try
 
                 It 'Should throw the correct exception' {
                     $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($LocalizedData.NetAdapterNotFoundMessage)
+                        -Message ($script:localizedData.NetAdapterNotFoundMessage)
 
                     { Set-TargetResource @testAdapterNotFound } | Should -Throw $errorRecord
                 }
@@ -566,7 +566,7 @@ try
 
                 It 'Should throw the correct exception' {
                     $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($LocalizedData.NetAdapterNotFoundMessage)
+                        -Message ($script:localizedData.NetAdapterNotFoundMessage)
 
                     { Test-TargetResource @testAdapterNotFound } | Should -Throw $errorRecord
                 }

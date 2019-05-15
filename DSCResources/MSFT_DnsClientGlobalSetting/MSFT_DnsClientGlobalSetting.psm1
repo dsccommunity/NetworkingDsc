@@ -5,15 +5,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
                                -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
                                                      -ChildPath 'NetworkingDsc.Common.psm1'))
 
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-                                                     -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
-$LocalizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_DnsClientGlobalSetting' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_DnsClientGlobalSetting'
 
 <#
     This is an array of all the parameters used by this resource.
@@ -46,7 +39,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingDnsClientGlobalSettingsMessage)
+            $($script:localizedData.GettingDnsClientGlobalSettingMessage)
         ) -join '' )
 
     # Get the current Dns Client Global Settings
@@ -110,7 +103,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.SettingDnsClientGlobalSettingMessage)
+            $($script:localizedData.SettingDnsClientGlobalSettingMessage)
         ) -join '' )
 
     # Get the current Dns Client Global Settings
@@ -134,7 +127,7 @@ function Set-TargetResource
 
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.DnsClientGlobalSettingUpdateParameterMessage) `
+                $($script:localizedData.DnsClientGlobalSettingUpdateParameterMessage) `
                     -f $parameter.Name,$parameterNewValue
                 ) -join '' )
         } # if
@@ -149,7 +142,7 @@ function Set-TargetResource
 
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DnsClientGlobalSettingUpdatedMessage)
+            $($script:localizedData.DnsClientGlobalSettingUpdatedMessage)
             ) -join '' )
     } # if
 } # Set-TargetResource
@@ -197,7 +190,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.TestingDnsClientGlobalSettingMessage)
+            $($script:localizedData.TestingDnsClientGlobalSettingMessage)
         ) -join '' )
 
     # Flag to signal whether settings are correct
@@ -218,7 +211,7 @@ function Test-TargetResource
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
+                $($script:localizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
                     -f $parameter.Name,$parameterSourceValue,$parameterNewValue
                 ) -join '' )
 

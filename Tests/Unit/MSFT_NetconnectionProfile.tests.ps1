@@ -149,7 +149,7 @@ try
 
                 It 'Should throw testValidInterfaceAliasOnlyPassed exception' {
                     $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($LocalizedData.InterfaceNotAvailableError -f $testValidInterfaceAliasOnlyPassed.InterfaceAlias)
+                        -Message ($script:localizedData.InterfaceNotAvailableError -f $testValidInterfaceAliasOnlyPassed.InterfaceAlias)
 
                     { Assert-ResourceProperty @testValidInterfaceAliasOnlyPassed } | Should -Throw $errorRecord
                 }
@@ -159,7 +159,7 @@ try
                 Mock -CommandName Get-NetAdapter -MockWith { return $mockNetAdapter }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.ParameterCombinationError)
+                    -Message ($script:localizedData.ParameterCombinationError)
 
                 It 'Should not ParameterCombinationError exception' {
                     { Assert-ResourceProperty @testValidInterfaceAliasOnlyPassed } | Should -Throw $errorRecord

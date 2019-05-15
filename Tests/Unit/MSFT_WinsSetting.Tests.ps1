@@ -219,7 +219,7 @@ try
                     -MockWith $mockInvokeCimMethodReturnValueError
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.FailedUpdatingWinsSettingError -f 74, 'Enable')
+                    -Message ($script:localizedData.FailedUpdatingWinsSettingError -f 74, 'Enable')
 
                 It 'Should throw an exception' {
                     {

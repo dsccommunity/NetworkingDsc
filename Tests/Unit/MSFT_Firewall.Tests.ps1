@@ -254,6 +254,25 @@ try
                 }
             }
 
+            Context 'Ensure is Present and the Firewall rule does exist with a specified Group that is unchanged but some other parameter is different' {
+                It "Should remove Group from parameters before calling Set-NetFirewallRule mock on firewall rule $($firewallRule.Name)" {
+                    Mock -CommandName Set-NetFirewallRule
+                    Mock -CommandName Test-RuleProperties -MockWith { return $false }
+
+                    # 1. Group is specified but unchanged
+                    # 2. Some other parameter is different (Description)
+                    Set-TargetResource `
+                        -Name $firewallRule.Name `
+                        -Group $firewallRule.Group `
+                        -Description 'Different' `
+                        -Ensure 'Present'
+
+                    Assert-MockCalled -CommandName Set-NetFirewallRule -ExclusiveFilter {
+                        -not $PSBoundParameters.ContainsKey('Group')
+                    } -Exactly -Times 1
+                }
+            }
+
             Context 'Ensure is Present and the Firewall rule does exist but has a different Enabled' {
                 It "Should call expected mocks on firewall rule $($firewallRule.Name)" {
                     Mock -CommandName Set-NetFirewallRule
@@ -1196,7 +1215,7 @@ try
                 Mock -CommandName Get-NetFirewallRule -MockWith { $firewallRules }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.RuleNotUniqueError -f 2, $firewallRule.Name)
+                    -Message ($script:localizedData.RuleNotUniqueError -f 2, $firewallRule.Name)
 
                 It "Should throw RuleNotUnique exception on firewall rule $($firewallRule.Name)" {
                     { $result = Get-FirewallRule -Name $firewallRule.Name } | Should -Throw $errorRecord

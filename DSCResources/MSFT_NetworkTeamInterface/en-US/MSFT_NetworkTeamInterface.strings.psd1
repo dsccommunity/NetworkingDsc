@@ -12,8 +12,6 @@ ConvertFrom-StringData @"
     TeamNicExistsWithDifferentConfig = Network team interface with name '{0}' exists but with different configuration. This will be modified.
     TeamNicDoesNotExistShouldCreate = Network team interface with name '{0}' does not exist. It will be created.
     TeamNicExistsShouldRemove = Network team interface with name '{0}' exists. It will be removed.
-    TeamNicDoesNotExistNoAction = Network team interface with name '{0}' does not exist. No action needed.
-    WaitingForTeamNic = Waiting for network team interface status to change to up.
     CreatedNetTeamNic = Network Team Interface was created successfully.
     FailedToCreateTeamNic = Failed to create the network team interface with specific configuration.
 "@

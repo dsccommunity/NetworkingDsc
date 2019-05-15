@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+## 7.2.0.0
+
+- NetAdapterAdvancedProperty:
+  - Added support for RegistryKeyword `MaxRxRing1Length` and
+    `NumRxBuffersSmall` - fixes [Issue #387](https://github.com/PowerShell/NetworkingDsc/issues/387).
+- Firewall:
+  - Prevent 'Parameter set cannot be resolved using the specified named
+    parameters' error when updating rule when group name is specified - fixes
+    [Issue #130](https://github.com/PowerShell/NetworkingDsc/issues/130) and
+    [Issue #191](https://github.com/PowerShell/NetworkingDsc/issues/191).
+- Opted into Common Tests 'Common Tests - Validate Localization' -
+  fixes [Issue #393](https://github.com/PowerShell/NetworkingDsc/issues/393).
+- Combined all `NetworkingDsc.ResourceHelper` module functions into
+  `NetworkingDsc.Common` module - fixes [Issue #394](https://github.com/PowerShell/NetworkingDsc/issues/394).
+- Renamed all localization strings so that they are detected by
+  'Common Tests - Validate Localization'.
+- Fixed issues with mismatched localization strings.
+- Updated all common functions with the latest versions from
+  [DSCResource.Template](https://github.com/PowerShell/DSCResource.Template).
+- Fixed an issue with the helper function `Test-IsNanoServer` that
+  prevented it to work. Though the helper function is not used, so this
+  issue was not caught until now when unit tests was added.
+- Corrected style violations in `NetworkingDsc.Common`.
+
 ## 7.1.0.0
 
 - New Resource: NetAdapterState to enable or disable a network adapter - fixes

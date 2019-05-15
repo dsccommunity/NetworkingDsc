@@ -5,15 +5,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_HostsFile' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_HostsFile'
 
 <#
     .SYNOPSIS
@@ -48,7 +41,7 @@ function Get-TargetResource
         $Ensure = 'Present'
     )
 
-    Write-Verbose -Message ($LocalizedData.StartingGet -f $HostName)
+    Write-Verbose -Message ($script:localizedData.StartingGet -f $HostName)
 
     $result = Get-HostEntry -HostName $HostName
 
@@ -105,18 +98,18 @@ function Set-TargetResource
     $hostPath = "$env:windir\System32\drivers\etc\hosts"
     $currentValues = Get-TargetResource @PSBoundParameters
 
-    Write-Verbose -Message ($LocalizedData.StartingSet -f $HostName)
+    Write-Verbose -Message ($script:localizedData.StartingSet -f $HostName)
 
     if ($Ensure -eq 'Present' -and $PSBoundParameters.ContainsKey('IPAddress') -eq $false)
     {
         New-InvalidArgumentException `
-            -Message $($($LocalizedData.UnableToEnsureWithoutIP) -f $Address, $AddressFamily) `
+            -Message $($($script:localizedData.UnableToEnsureWithoutIP) -f $Address, $AddressFamily) `
             -ArgumentName 'IPAddress'
     }
 
     if ($currentValues.Ensure -eq 'Absent' -and $Ensure -eq 'Present')
     {
-        Write-Verbose -Message ($LocalizedData.CreateNewEntry -f $HostName)
+        Write-Verbose -Message ($script:localizedData.CreateNewEntry -f $HostName)
         Add-Content -Path $hostPath -Value "`r`n$IPAddress`t$HostName"
     }
     else
@@ -136,7 +129,7 @@ function Set-TargetResource
 
         if ($Ensure -eq 'Present')
         {
-            Write-Verbose -Message ($LocalizedData.UpdateExistingEntry -f $HostName)
+            Write-Verbose -Message ($script:localizedData.UpdateExistingEntry -f $HostName)
 
             if ($multiLineEntry -eq $true)
             {
@@ -151,7 +144,7 @@ function Set-TargetResource
         }
         else
         {
-            Write-Verbose -Message ($LocalizedData.RemoveEntry -f $HostName)
+            Write-Verbose -Message ($script:localizedData.RemoveEntry -f $HostName)
 
             if ($multiLineEntry -eq $true)
             {
@@ -203,7 +196,7 @@ function Test-TargetResource
 
     $currentValues = Get-TargetResource @PSBoundParameters
 
-    Write-Verbose -Message ($LocalizedData.StartingTest -f $HostName)
+    Write-Verbose -Message ($script:localizedData.StartingTest -f $HostName)
 
     if ($Ensure -ne $currentValues.Ensure)
     {

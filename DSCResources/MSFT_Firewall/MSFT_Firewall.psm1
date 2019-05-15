@@ -5,15 +5,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
-# Import the Networking Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.ResourceHelper' `
-            -ChildPath 'NetworkingDsc.ResourceHelper.psm1'))
-
 # Import Localization Strings
-$localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_Firewall' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_Firewall'
 
 <#
     This is an array of all the parameters used by this resource
@@ -477,6 +470,9 @@ function Set-TargetResource
                 }
                 else
                 {
+                    # Group is a lookup key parameter that cannot be used in conjunction with Name
+                    $null = $PSBoundParameters.Remove('Group')
+
                     <#
                         If the DisplayName is provided then need to remove it
                         And change it to NewDisplayName if it is different.
@@ -1273,7 +1269,7 @@ function Get-FirewallRule
     if ($firewallRule.Count -gt 1)
     {
         New-InvalidOperationException `
-            -Message ($LocalizedData.RuleNotUniqueError -f $firewallRule.Count, $Name)
+            -Message ($script:localizedData.RuleNotUniqueError -f $firewallRule.Count, $Name)
     }
 
     # The array will only contain a single rule so only return the first one (not the array)
