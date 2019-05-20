@@ -2,7 +2,7 @@
     ParameterList = @(
         @{
             Name = 'SuffixSearchList'
-            Type = 'String'
+            Type = 'Array'
         },
         @{
             Name = 'UseDevolution'
