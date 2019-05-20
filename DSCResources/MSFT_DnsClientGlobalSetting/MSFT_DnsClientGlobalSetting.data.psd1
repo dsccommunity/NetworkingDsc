@@ -10,7 +10,7 @@
         },
         @{
             Name = 'DevolutionLevel'
-            Type = 'Uint32'
+            Type = 'Integer'
         }
     )
 }
