@@ -248,11 +248,6 @@ function Test-TargetResource
                     $parameterNewValue = @()
                 }
 
-                if ($parameter.Delimiter)
-                {
-                    $parameterSourceValue = $parameterSourceValue -split $parameter.Delimiter
-                }
-
                 if ($Null -ne $parameterNewValue `
                         -and ((Compare-Object `
                                 -ReferenceObject $parameterSourceValue `
