@@ -251,7 +251,7 @@ function Test-TargetResource
                 if ($Null -ne $parameterNewValue `
                         -and ((Compare-Object `
                                 -ReferenceObject $parameterSourceValue `
-                                -DifferenceObject $parameterNewValue).Count -ne 0))
+                                -DifferenceObject $parameterNewValue -SyncWindow 0).Count -ne 0))
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                             $($script:localizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
