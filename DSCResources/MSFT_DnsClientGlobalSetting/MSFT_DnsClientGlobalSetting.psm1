@@ -208,20 +208,6 @@ function Test-TargetResource
 
         switch ($parameter.Type)
         {
-            'String'
-            {
-                # Perform a plain string comparison.
-                if ($parameterNewValue -and ($parameterSourceValue -ne $parameterNewValue))
-                {
-                    Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                            $($script:localizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
-                                -f $parameter.Name, $parameterSourceValue, $parameterNewValue
-                        ) -join '')
-
-                    $desiredConfigurationMatch = $false
-                }
-            }
-
             'Integer'
             {
                 # Perform a plain integer comparison.
