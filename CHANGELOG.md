@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+DnsClientGlobalSettings:
+  - Fixed SuffixSearchList Empty String Handling - fixes [Issue #398](https://github.com/PowerShell/NetworkingDsc/issues/398).
+
 ## 7.2.0.0
 
 - NetAdapterAdvancedProperty:
