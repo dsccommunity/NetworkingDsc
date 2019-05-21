@@ -211,7 +211,7 @@ function Test-TargetResource
             'Integer'
             {
                 # Perform a plain integer comparison.
-                if ($null -ne $parameterNewValue -and $parameterSourceValue -ne $parameterNewValue)
+                if ($PSBoundParameters.ContainsKey($parameter.Name) -and $parameterSourceValue -ne $parameterNewValue)
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                             $($script:localizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
@@ -225,7 +225,7 @@ function Test-TargetResource
             'Boolean'
             {
                 # Perform a boolean comparison.
-                if ($null -ne $parameterNewValue -and $parameterSourceValue -ne $parameterNewValue)
+                if ($PSBoundParameters.ContainsKey($parameter.Name) -and $parameterSourceValue -ne $parameterNewValue)
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                             $($script:localizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
@@ -248,7 +248,7 @@ function Test-TargetResource
                     $parameterNewValue = @()
                 }
 
-                if ($Null -ne $parameterNewValue `
+                if ($PSBoundParameters.ContainsKey($parameter.Name) `
                         -and ((Compare-Object `
                                 -ReferenceObject $parameterSourceValue `
                                 -DifferenceObject $parameterNewValue -SyncWindow 0).Count -ne 0))
