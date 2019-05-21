@@ -206,7 +206,7 @@ function Test-TargetResource
         $parameterSourceValue = $dnsClientGlobalSetting.$($parameter.name)
         $parameterNewValue = (Get-Variable -Name ($parameter.name)).Value
 
-        switch -Wildcard ($parameter.Type)
+        switch ($parameter.Type)
         {
             'String'
             {
@@ -249,7 +249,7 @@ function Test-TargetResource
                 }
             }
 
-            'Array*'
+            'Array'
             {
                 # Array comparison uses Compare-Object
                 if ($parameterSourceValue -eq '')
