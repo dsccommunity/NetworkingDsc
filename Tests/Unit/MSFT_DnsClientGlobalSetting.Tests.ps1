@@ -40,10 +40,14 @@ try
 
         $dnsClientGlobalEmptyArraySuffixSettings = [PSObject]@{
             SuffixSearchList = @()
+            DevolutionLevel  = 1
+            UseDevolution    = $true
         }
 
         $dnsClientGlobalEmptyStringSuffixSettings = [PSObject]@{
             SuffixSearchList = ''
+            DevolutionLevel  = 1
+            UseDevolution    = $true
         }
 
         $dnsClientGlobalSettingsSplat = [PSObject]@{
