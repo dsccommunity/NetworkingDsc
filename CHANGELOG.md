@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- NetAdapterAdvancedProperty:
+  - Removed validation from RegistryKeyword parameter becauase the list
+    of valid registry keywords is not fixed and will depend on adapter
+    driver - fixes [Issue #388](https://github.com/PowerShell/NetworkingDsc/issues/388).
+
 ## 7.2.0.0
 
 - NetAdapterAdvancedProperty:

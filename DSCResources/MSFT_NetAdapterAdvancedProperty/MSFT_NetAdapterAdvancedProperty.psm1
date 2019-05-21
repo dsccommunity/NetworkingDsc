@@ -16,7 +16,7 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_NetAdapterAdvanced
     Specifies the Name of the network adapter to get the advanced property for.
 
 .PARAMETER RegistryKeyword
-    Specifies the settings registrykeyword that should be in desired state.
+    Specifies the settings registry keyword that should be in desired state.
 
 .PARAMETER RegistryValue
     Specifies the value of the settings.
@@ -32,7 +32,6 @@ function Get-TargetResource
         $NetworkAdapterName,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('*DcbxMode','*EncapsulatedPacketTaskOffload','*FlowControl','*InterruptModeration','*IPChecksumOffloadIPv4','*JumboPacket','*LsoV2IPv4','*LsoV2IPv6','*MaxRssProcessors','*NetworkDirect','*NumaNodeId','*NumRssQueues','*PacketDirect','*PriorityVLANTag','*QOS','*ReceiveBuffers','*RecvCompletionMethod','*RoceMaxFrameSize','*RscIPv4','*RSS','*RssBaseProcNumber','*RssMaxProcNumber','*RssOnHostVPorts','*RSSProfile','RxIntModeration','RxIntModerationProfile','*SpeedDuplex','*Sriov','*TCPChecksumOffloadIPv4','*TCPChecksumOffloadIPv6','*TCPUDPChecksumOffloadIPv4','*TCPUDPChecksumOffloadIPv6','*TransmitBuffers','TxIntModerationProfile','*UDPChecksumOffloadIPv4','*UDPChecksumOffloadIPv6','VlanID','*VMQ','*VMQVlanFiltering','AdaptiveIFS','ITR','LogLinkStateEvent','MasterSlave','NetworkAddress','WaitAutoNegComplete','MaxRxRing1Length','NumRxBuffersSmall')]
         [System.String]
         $RegistryKeyword,
 
@@ -85,7 +84,7 @@ function Get-TargetResource
     Specifies the Name of the network adapter to get the advanced property for.
 
 .PARAMETER RegistryKeyword
-    Specifies the settings registrykeyword that should be in desired state.
+    Specifies the settings registry keyword that should be in desired state.
 
 .PARAMETER RegistryValue
     Specifies the value of the settings.
@@ -100,7 +99,6 @@ function Set-TargetResource
         $NetworkAdapterName,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('*DcbxMode','*EncapsulatedPacketTaskOffload','*FlowControl','*InterruptModeration','*IPChecksumOffloadIPv4','*JumboPacket','*LsoV2IPv4','*LsoV2IPv6','*MaxRssProcessors','*NetworkDirect','*NumaNodeId','*NumRssQueues','*PacketDirect','*PriorityVLANTag','*QOS','*ReceiveBuffers','*RecvCompletionMethod','*RoceMaxFrameSize','*RscIPv4','*RSS','*RssBaseProcNumber','*RssMaxProcNumber','*RssOnHostVPorts','*RSSProfile','RxIntModeration','RxIntModerationProfile','*SpeedDuplex','*Sriov','*TCPChecksumOffloadIPv4','*TCPChecksumOffloadIPv6','*TCPUDPChecksumOffloadIPv4','*TCPUDPChecksumOffloadIPv6','*TransmitBuffers','TxIntModerationProfile','*UDPChecksumOffloadIPv4','*UDPChecksumOffloadIPv6','VlanID','*VMQ','*VMQVlanFiltering','AdaptiveIFS','ITR','LogLinkStateEvent','MasterSlave','NetworkAddress','WaitAutoNegComplete','MaxRxRing1Length','NumRxBuffersSmall')]
         [System.String]
         $RegistryKeyword,
 
@@ -159,7 +157,7 @@ function Set-TargetResource
     Specifies the Name of the network adapter to get the advanced property for.
 
 .PARAMETER RegistryKeyword
-    Specifies the settings registrykeyword that should be in desired state.
+    Specifies the settings registry keyword that should be in desired state.
 
 .PARAMETER RegistryValue
     Specifies the value of the settings.
@@ -175,7 +173,6 @@ function Test-TargetResource
         $NetworkAdapterName,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('*DcbxMode','*EncapsulatedPacketTaskOffload','*FlowControl','*InterruptModeration','*IPChecksumOffloadIPv4','*JumboPacket','*LsoV2IPv4','*LsoV2IPv6','*MaxRssProcessors','*NetworkDirect','*NumaNodeId','*NumRssQueues','*PacketDirect','*PriorityVLANTag','*QOS','*ReceiveBuffers','*RecvCompletionMethod','*RoceMaxFrameSize','*RscIPv4','*RSS','*RssBaseProcNumber','*RssMaxProcNumber','*RssOnHostVPorts','*RSSProfile','RxIntModeration','RxIntModerationProfile','*SpeedDuplex','*Sriov','*TCPChecksumOffloadIPv4','*TCPChecksumOffloadIPv6','*TCPUDPChecksumOffloadIPv4','*TCPUDPChecksumOffloadIPv6','*TransmitBuffers','TxIntModerationProfile','*UDPChecksumOffloadIPv4','*UDPChecksumOffloadIPv6','VlanID','*VMQ','*VMQVlanFiltering','AdaptiveIFS','ITR','LogLinkStateEvent','MasterSlave','NetworkAddress','WaitAutoNegComplete','MaxRxRing1Length','NumRxBuffersSmall')]
         [System.String]
         $RegistryKeyword,
 
