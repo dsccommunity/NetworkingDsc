@@ -211,7 +211,7 @@ function Test-TargetResource
             'Integer'
             {
                 # Perform a plain integer comparison.
-                if ($parameterNewValue -and ($parameterSourceValue -ne $parameterNewValue))
+                if ($null -ne $parameterNewValue -and $parameterSourceValue -ne $parameterNewValue)
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                             $($script:localizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
@@ -225,7 +225,7 @@ function Test-TargetResource
             'Boolean'
             {
                 # Perform a boolean comparison.
-                if ($parameterNewValue -and ($parameterSourceValue -ne $parameterNewValue))
+                if ($null -ne $parameterNewValue -and $parameterSourceValue -ne $parameterNewValue)
                 {
                     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                             $($script:localizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
