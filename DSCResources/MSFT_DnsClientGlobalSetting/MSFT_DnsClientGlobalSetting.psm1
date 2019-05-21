@@ -128,7 +128,7 @@ function Set-TargetResource
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($script:localizedData.DnsClientGlobalSettingUpdateParameterMessage) `
-                    -f $parameter.Name,$parameterNewValue
+                    -f $parameter.Name,($parameterNewValue -join ',')
                 ) -join '' )
         } # if
     } # foreach
