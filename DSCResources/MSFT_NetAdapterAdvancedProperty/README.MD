@@ -1,10 +1,27 @@
 # Description
 
-This resource is used to change advanced properties on a network adapter.
-Please check the supported registry values before creating a configuration.
+This resource is used to set advanced properties on a network adapter
+by setting the value of a registry keyword.
+The list of available registry keywords will be dependent on the network
+adapter driver.
+**Please check the supported registry keywords for your adapter before
+creating a configuration.**
 
-The list of available registry values exposed by the resource is:
+The following is a list of common registry keywords that may apply to
+your network adapter:
 
+- AdaptiveIFS
+- ITR
+- LogLinkStateEvent
+- MasterSlave
+- NetworkAddress
+- MaxRxRing1Length
+- NumRxBuffersSmall
+- RxIntModeration
+- RxIntModerationProfile
+- TxIntModerationProfile
+- VlanID
+- WaitAutoNegComplete
 - *DcbxMode
 - *EncapsulatedPacketTaskOffload
 - *FlowControl
@@ -29,8 +46,6 @@ The list of available registry values exposed by the resource is:
 - *RssMaxProcNumber
 - *RssOnHostVPorts
 - *RSSProfile
-- RxIntModeration
-- RxIntModerationProfile
 - *SpeedDuplex
 - *Sriov
 - *TCPChecksumOffloadIPv4
@@ -38,17 +53,7 @@ The list of available registry values exposed by the resource is:
 - *TCPUDPChecksumOffloadIPv4
 - *TCPUDPChecksumOffloadIPv6
 - *TransmitBuffers
-- TxIntModerationProfile
 - *UDPChecksumOffloadIPv4
 - *UDPChecksumOffloadIPv6
-- VlanID
 - *VMQ
 - *VMQVlanFiltering
-- AdaptiveIFS
-- ITR
-- LogLinkStateEvent
-- MasterSlave
-- NetworkAddress
-- WaitAutoNegComplete
-- MaxRxRing1Length
-- NumRxBuffersSmall
