@@ -205,7 +205,7 @@ function Test-TargetResource
     {
         $parameterSourceValue = $dnsClientGlobalSetting.$($parameter.name)
         $parameterNewValue = (Get-Variable -Name ($parameter.name)).Value
-        parameterValueMatch = $true
+        $parameterValueMatch = $true
 
         switch ($parameter.Type)
         {
@@ -214,7 +214,7 @@ function Test-TargetResource
                 # Perform a plain integer comparison.
                 if ($PSBoundParameters.ContainsKey($parameter.Name) -and $parameterSourceValue -ne $parameterNewValue)
                 {
-                    parameterValueMatch = $false
+                    $parameterValueMatch = $false
                 }
             }
 
@@ -223,7 +223,7 @@ function Test-TargetResource
                 # Perform a boolean comparison.
                 if ($PSBoundParameters.ContainsKey($parameter.Name) -and $parameterSourceValue -ne $parameterNewValue)
                 {
-                    parameterValueMatch = $false
+                    $parameterValueMatch = $false
                 }
             }
 
@@ -245,11 +245,11 @@ function Test-TargetResource
                                 -ReferenceObject $parameterSourceValue `
                                 -DifferenceObject $parameterNewValue -SyncWindow 0).Count -ne 0))
                 {
-                    parameterValueMatch = $false
+                    $parameterValueMatch = $false
                 }
             }
         }
-        if (parameterValueMatch -eq $false)
+        if ($parameterValueMatch -eq $false)
         {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                     $($script:localizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
