@@ -4,7 +4,6 @@
 
 - DnsClientGlobalSettings:
   - Fixed SuffixSearchList Empty String Handling - fixes [Issue #398](https://github.com/PowerShell/NetworkingDsc/issues/398).
-
 - NetAdapterAdvancedProperty:
   - Removed validation from RegistryKeyword parameter becauase the list
     of valid registry keywords is not fixed and will depend on adapter
