@@ -230,12 +230,12 @@ function Test-TargetResource
             'Array'
             {
                 # Array comparison uses Compare-Object
-                if ($parameterSourceValue -eq '')
+                if ([System.String]::IsNullOrEmpty($parameterSourceValue))
                 {
                     $parameterSourceValue = @()
                 }
 
-                if ($parameterNewValue -eq '')
+                if ([System.String]::IsNullOrEmpty($parameterNewValue))
                 {
                     $parameterNewValue = @()
                 }
