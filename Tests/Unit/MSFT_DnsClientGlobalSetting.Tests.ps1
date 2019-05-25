@@ -268,12 +268,12 @@ try
                 }
             }
 
-            Context 'The search list is an empty array' {
+            Context 'When the search list is an empty array' {
                 BeforeEach {
                     Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalEmptyArraySuffixSettings }
                 }
 
-                Context 'DNS Client Global Settings SuffixSearchList Array is different' {
+                Context 'When the DNS Client Global Settings SuffixSearchList Array is different' {
                     It 'Should return false' {
                         $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $testTargetResourceParameters.SuffixSearchList = @('fabrikam.com')
@@ -285,7 +285,7 @@ try
                     }
                 }
 
-                Context 'DNS Client Global Settings SuffixSearchList is same' {
+                Context 'When the DNS Client Global Settings SuffixSearchList is same' {
                     It 'Should return true' {
                         $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $testTargetResourceParameters.SuffixSearchList = @()
@@ -297,13 +297,13 @@ try
                     }
                 }
             }
-            
-            Context 'The search list is an empty string' {
+
+            Context 'When the search list is an empty string' {
                 BeforeEach {
                     Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalEmptyStringSuffixSettings }
                 }
 
-                Context 'DNS Client Global Settings SuffixSearchList Array is different' {
+                Context 'When the DNS Client Global Settings SuffixSearchList Array is different' {
                     It 'Should return false' {
                         $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $testTargetResourceParameters.SuffixSearchList = @('fabrikam.com')
@@ -315,7 +315,7 @@ try
                     }
                 }
 
-                Context 'DNS Client Global Settings SuffixSearchList is same' {
+                Context 'When the DNS Client Global Settings SuffixSearchList is same' {
                     It 'Should return true' {
                         $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
                         $testTargetResourceParameters.SuffixSearchList = @()
