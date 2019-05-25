@@ -2,8 +2,8 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
 
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_DnsClientGlobalSetting'
@@ -119,16 +119,16 @@ function Set-TargetResource
         $parameterNewValue = (Get-Variable -Name ($parameter.name)).Value
 
         if ($PSBoundParameters.ContainsKey($parameter.Name) `
-            -and (Compare-Object -ReferenceObject $parameterSourceValue -DifferenceObject $parameterNewValue -SyncWindow 0))
+                -and (Compare-Object -ReferenceObject $parameterSourceValue -DifferenceObject $parameterNewValue -SyncWindow 0))
         {
             $changeParameters += @{
                 $($parameter.name) = $parameterNewValue
             }
 
             Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($script:localizedData.DnsClientGlobalSettingUpdateParameterMessage) `
-                    -f $parameter.Name,($parameterNewValue -join ',')
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.DnsClientGlobalSettingUpdateParameterMessage) `
+                        -f $parameter.Name,($parameterNewValue -join ',')
                 ) -join '' )
         } # if
     } # foreach
@@ -141,8 +141,8 @@ function Set-TargetResource
             -ErrorAction Stop
 
         Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($script:localizedData.DnsClientGlobalSettingUpdatedMessage)
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.DnsClientGlobalSettingUpdatedMessage)
             ) -join '' )
     } # if
 } # Set-TargetResource
@@ -205,6 +205,7 @@ function Test-TargetResource
     {
         $parameterSourceValue = $dnsClientGlobalSetting.$($parameter.name)
         $parameterNewValue = (Get-Variable -Name ($parameter.name)).Value
+        parameterValueMatch = $true
 
         switch ($parameter.Type)
         {
@@ -213,12 +214,7 @@ function Test-TargetResource
                 # Perform a plain integer comparison.
                 if ($PSBoundParameters.ContainsKey($parameter.Name) -and $parameterSourceValue -ne $parameterNewValue)
                 {
-                    Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                            $($script:localizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
-                                -f $parameter.Name, $parameterSourceValue, $parameterNewValue
-                        ) -join '')
-
-                    $desiredConfigurationMatch = $false
+                    parameterValueMatch = $false
                 }
             }
 
@@ -227,11 +223,7 @@ function Test-TargetResource
                 # Perform a boolean comparison.
                 if ($PSBoundParameters.ContainsKey($parameter.Name) -and $parameterSourceValue -ne $parameterNewValue)
                 {
-                    Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                            $($script:localizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
-                                -f $parameter.Name, $parameterSourceValue, $parameterNewValue
-                        ) -join '')
-                    $desiredConfigurationMatch = $false
+                    parameterValueMatch = $false
                 }
             }
 
@@ -253,13 +245,17 @@ function Test-TargetResource
                                 -ReferenceObject $parameterSourceValue `
                                 -DifferenceObject $parameterNewValue -SyncWindow 0).Count -ne 0))
                 {
-                    Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                            $($script:localizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
-                                -f $parameter.Name, ($parameterSourceValue -join ','), ($parameterNewValue -join ',')
-                        ) -join '')
-                    $desiredConfigurationMatch = $false
+                    parameterValueMatch = $false
                 }
             }
+        }
+        if (parameterValueMatch -eq $false)
+        {
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.DnsClientGlobalSettingParameterNeedsUpdateMessage) `
+                        -f $parameter.Name, ($parameterSourceValue -join ','), ($parameterNewValue -join ',')
+                ) -join '')
+            $desiredConfigurationMatch = $false
         }
     } # foreach
 
