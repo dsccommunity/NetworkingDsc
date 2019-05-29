@@ -22,4 +22,5 @@ ConvertFrom-StringData @'
     NoMatchElementValueMismatchMessage   = NOTMATCH: Value [{0}] (type '{1}') for property '{2}' does match. Current state is '{3}' and desired state is '{4}'.
     MatchElementValueMessage             = MATCH: Value [{0}] (type '{1}') for property '{2}' does match. Current state is '{3}' and desired state is '{4}'.
     TestDscParameterResultMessage        = Test-DscParameter result is '{0}'.
+    StartingReverseCheck                 = Starting with a reverse check.
 '@

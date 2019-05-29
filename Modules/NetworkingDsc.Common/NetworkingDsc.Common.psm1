@@ -811,22 +811,28 @@ function Remove-CommonParameter
 
 <#
     .SYNOPSIS
-        Tests the status of DSC resource parameters
+        Tests the status of DSC resource parameters.
 
     .DESCRIPTION
-        This function tests the parameter status of DSC resource parameters against the current values present on the system
+        This function tests the parameter status of DSC resource parameters against the current values present on the system.
 
     .PARAMETER CurrentValues
-        A hashtable with the current values on the system, obtained by e.g. Get-TargetResource
+        A hashtable with the current values on the system, obtained by e.g. Get-TargetResource.
 
     .PARAMETER DesiredValues
-        The hashtable of desired values
+        The hashtable of desired values.
 
     .PARAMETER ValuesToCheck
-        The values to check if not all values should be checked
+        The values to check if not all values should be checked.
 
     .PARAMETER TurnOffTypeChecking
-        Indicates that the type of the parameter should not be checked
+        Indicates that the type of the parameter should not be checked.
+
+    .PARAMETER ReverseCheck
+        Indicates that a reverse check should be done. The current and desired state are swapped for another test.
+
+    .PARAMETER SortArrayValues
+        If the sorting of array values does not matter, values are sorted internally before doing the comparison.
 #>
 function Test-DscParameterState
 {
@@ -834,7 +840,7 @@ function Test-DscParameterState
     param
     (
         [Parameter(Mandatory = $true)]
-        [System.Collections.Hashtable]
+        [System.Object]
         $CurrentValues,
 
         [Parameter(Mandatory = $true)]
@@ -847,10 +853,28 @@ function Test-DscParameterState
 
         [Parameter()]
         [switch]
-        $TurnOffTypeChecking
+        $TurnOffTypeChecking,
+
+        [Parameter()]
+        [switch]
+        $ReverseCheck,
+
+        [Parameter()]
+        [switch]
+        $SortArrayValues
     )
 
     $returnValue = $true
+
+    if ($CurrentValues -is [Microsoft.Management.Infrastructure.CimInstance] -or $CurrentValues -is [Microsoft.Management.Infrastructure.CimInstance[]])
+    {
+        $CurrentValues = ConvertTo-HashTable -CimInstance $CurrentValues
+    }
+
+    if ($DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance] -or $DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance[]])
+    {
+        $DesiredValues = ConvertTo-HashTable -CimInstance $DesiredValues
+    }
 
     $types = 'System.Management.Automation.PSBoundParametersDictionary', 'System.Collections.Hashtable', 'Microsoft.Management.Infrastructure.CimInstance'
 
@@ -859,6 +883,13 @@ function Test-DscParameterState
         New-InvalidArgumentException `
             -Message ($script:localizedData.InvalidDesiredValuesError -f $DesiredValues.GetType().FullName) `
             -ArgumentName 'DesiredValues'
+    }
+
+    if ($CurrentValues.GetType().FullName -notin $types)
+    {
+        New-InvalidArgumentException `
+            -Message ($script:localizedData.InvalidCurrentValuesError -f $CurrentValues.GetType().FullName) `
+            -ArgumentName 'CurrentValues'
     }
 
     if ($DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance] -and -not $ValuesToCheck)
@@ -881,9 +912,21 @@ function Test-DscParameterState
 
     foreach ($key in $keyList)
     {
-        if ($null -ne $desiredValuesClean.$key)
+        $desiredValue = $desiredValuesClean.$key
+        $currentValue = $CurrentValues.$key
+
+        if ($desiredValue -is [Microsoft.Management.Infrastructure.CimInstance] -or $desiredValue -is [Microsoft.Management.Infrastructure.CimInstance[]])
         {
-            $desiredType = $desiredValuesClean.$key.GetType()
+            $desiredValue = ConvertTo-HashTable -CimInstance $desiredValue
+        }
+        if ($currentValue -is [Microsoft.Management.Infrastructure.CimInstance] -or $currentValue -is [Microsoft.Management.Infrastructure.CimInstance[]])
+        {
+            $currentValue = ConvertTo-HashTable -CimInstance $currentValue
+        }
+
+        if ($null -ne $desiredValue)
+        {
+            $desiredType = $desiredValue.GetType()
         }
         else
         {
@@ -892,9 +935,9 @@ function Test-DscParameterState
             }
         }
 
-        if ($null -ne $CurrentValues.$key)
+        if ($null -ne $currentValue)
         {
-            $currentType = $CurrentValues.$key.GetType()
+            $currentType = $currentValue.GetType()
         }
         else
         {
@@ -906,26 +949,26 @@ function Test-DscParameterState
         if ($currentType.Name -ne 'Unknown' -and $desiredType.Name -eq 'PSCredential')
         {
             # This is a credential object. Compare only the user name
-            if ($currentType.Name -eq 'PSCredential' -and $CurrentValues.$key.UserName -eq $desiredValuesClean.$key.UserName)
+            if ($currentType.Name -eq 'PSCredential' -and $currentValue.UserName -eq $desiredValue.UserName)
             {
-                Write-Verbose -Message ($script:localizedData.MatchPsCredentialUsernameMessage -f $CurrentValues.$key.UserName, $desiredValuesClean.$key.UserName)
+                Write-Verbose -Message ($script:localizedData.MatchPsCredentialUsernameMessage -f $currentValue.UserName, $desiredValue.UserName)
                 continue
             }
             else
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchPsCredentialUsernameMessage -f $CurrentValues.$key.UserName, $desiredValuesClean.$key.UserName)
+                Write-Verbose -Message ($script:localizedData.NoMatchPsCredentialUsernameMessage -f $currentValue.UserName, $desiredValue.UserName)
                 $returnValue = $false
             }
 
             # Assume the string is our username when the matching desired value is actually a credential
-            if ($currentType.Name -eq 'string' -and $CurrentValues.$key -eq $desiredValuesClean.$key.UserName)
+            if ($currentType.Name -eq 'string' -and $currentValue -eq $desiredValue.UserName)
             {
-                Write-Verbose -Message ($script:localizedData.MatchPsCredentialUsernameMessage -f $CurrentValues.$key, $desiredValuesClean.$key.UserName)
+                Write-Verbose -Message ($script:localizedData.MatchPsCredentialUsernameMessage -f $currentValue, $desiredValue.UserName)
                 continue
             }
             else
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchPsCredentialUsernameMessage -f $CurrentValues.$key, $desiredValuesClean.$key.UserName)
+                Write-Verbose -Message ($script:localizedData.NoMatchPsCredentialUsernameMessage -f $currentValue, $desiredValue.UserName)
                 $returnValue = $false
             }
         }
@@ -936,13 +979,14 @@ function Test-DscParameterState
                 $desiredType.FullName -ne $currentType.FullName)
             {
                 Write-Verbose -Message ($script:localizedData.NoMatchTypeMismatchMessage -f $key, $currentType.Name, $desiredType.Name)
+                $returnValue = $false
                 continue
             }
         }
 
-        if ($CurrentValues.$key -eq $desiredValuesClean.$key -and -not $desiredType.IsArray)
+        if ($currentValue -eq $desiredValue -and -not $desiredType.IsArray)
         {
-            Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
+            Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.Name, $key, $currentValue, $desiredValue)
             continue
         }
 
@@ -957,7 +1001,7 @@ function Test-DscParameterState
 
         if (-not $checkDesiredValue)
         {
-            Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
+            Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.Name, $key, $currentValue, $desiredValue)
             continue
         }
 
@@ -965,22 +1009,28 @@ function Test-DscParameterState
         {
             Write-Verbose -Message ($script:localizedData.TestDscParameterCompareMessage -f $key)
 
-            if (-not $CurrentValues.ContainsKey($key) -or -not $CurrentValues.$key)
+            if (-not $currentValue)
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
+                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $currentValue, $desiredValue)
                 $returnValue = $false
                 continue
             }
-            elseif ($CurrentValues.$key.Count -ne $DesiredValues.$key.Count)
+            elseif ($currentValue.Count -ne $desiredValue.Count)
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchValueDifferentCountMessage -f $desiredType.Name, $key, $CurrentValues.$key.Count, $desiredValuesClean.$key.Count)
+                Write-Verbose -Message ($script:localizedData.NoMatchValueDifferentCountMessage -f $desiredType.Name, $key, $currentValue.Count, $desiredValue.Count)
                 $returnValue = $false
                 continue
             }
             else
             {
-                $desiredArrayValues = $DesiredValues.$key
-                $currentArrayValues = $CurrentValues.$key
+                $desiredArrayValues = $desiredValue
+                $currentArrayValues = $currentValue
+
+                if ($SortArrayValues)
+                {
+                    $desiredArrayValues = $desiredArrayValues | Sort-Object
+                    $currentArrayValues = $currentArrayValues | Sort-Object
+                }
 
                 for ($i = 0; $i -lt $desiredArrayValues.Count; $i++)
                 {
@@ -1032,13 +1082,46 @@ function Test-DscParameterState
 
             }
         }
+        elseif ($desiredType -eq [hashtable] -and $currentType -eq [hashtable])
+        {
+            $param = $PSBoundParameters
+            $param.CurrentValues = $currentValue
+            $param.DesiredValues = $desiredValue
+            [void]$param.Remove('ValuesToCheck')
+            if ($returnValue)
+            {
+                $returnValue = Test-DscParameterState @param
+            }
+            else
+            {
+                Test-DscParameterState @param | Out-Null
+            }
+            continue
+        }
         else
         {
-            if ($desiredValuesClean.$key -ne $CurrentValues.$key)
+            if ($desiredValue -ne $currentValue)
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
+                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $currentValue, $desiredValue)
                 $returnValue = $false
             }
+        }
+    }
+
+    if ($ReverseCheck)
+    {
+        Write-Verbose -Message $script:localizedData.StartingReverseCheck
+        $param = $PSBoundParameters
+        $param.CurrentValues = $DesiredValues
+        $param.DesiredValues = $CurrentValues
+        [void]$param.Remove('ReverseCheck')
+        if ($returnValue)
+        {
+            $returnValue = Test-DscParameterState @param
+        }
+        else
+        {
+            Test-DscParameterState @param | Out-Null
         }
     }
 
