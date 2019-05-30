@@ -1162,6 +1162,49 @@ function Test-DscObjectHasProperty
     return $false
 }
 
+function ConvertTo-CimInstance
+{
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]
+        $Hashtable
+    )
+
+    [CimInstance[]]$result = foreach ($item in $Hashtable.GetEnumerator())
+    {
+        New-CimInstance -ClassName MSFT_KeyValuePair -Namespace root/microsoft/Windows/DesiredStateConfiguration -Property @{
+            Key   = $item.Key
+            Value = if ($item.Value -is [array])
+            {
+                $item.Value -join ','
+            }
+            else
+            {
+                $item.Value
+            }
+        } -ClientOnly
+    }
+
+    $result
+}
+
+function ConvertTo-HashTable
+{
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [CimInstance[]]
+        $CimInstance
+    )
+
+    $result = @{ }
+    foreach ($ci in $CimInstance)
+    {
+        $result.Add($ci.Key, $ci.Value)
+    }
+    $result
+}
+
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData `
     -ResourceName 'NetworkingDsc.Common' `
@@ -1182,4 +1225,6 @@ Export-ModuleMember -Function @(
     'Get-IPAddressPrefix',
     'Test-DscParameterState',
     'Test-DscObjectHasProperty'
+    'ConvertTo-HashTable',
+    'ConvertTo-CimInstance'
 )
