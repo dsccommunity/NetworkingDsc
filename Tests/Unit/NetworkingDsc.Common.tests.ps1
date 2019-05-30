@@ -1111,6 +1111,74 @@ try
                 }
             }
         }
+
+        Describe 'NetworkingDsc.Common\ConvertTo-CimInstance' {
+            $hashtable = @{
+                k1 = 'v1'
+                k2 = 100
+                k3 = 1, 2, 3
+            }
+
+            Context 'The array contains the expected record count' {
+                It 'Should not throw exception' {
+                    { $script:result = [CimInstance[]]($hashtable | ConvertTo-CimInstance) } | Should -Not -Throw
+                }
+
+                It 'Record count should be 3' {
+                    $script:result.Count | Should -Be $hashtable.Count
+                }
+
+                It 'Result should be of type CimInstance[]' {
+                    $script:result.GetType().Name | Should -Be 'CimInstance[]'
+                }
+
+                It 'Value "k1" in the CimInstance array should be "v1"' {
+                    ($script:result | Where-Object Key -eq k1).Value | Should -Be 'v1'
+                }
+
+                It 'Value "k2" in the CimInstance array should be "100"' {
+                    ($script:result | Where-Object Key -eq k2).Value | Should -Be 100
+                }
+
+                It 'Value "k3" in the CimInstance array should be "1,2,3"' {
+                    ($script:result | Where-Object Key -eq k3).Value | Should -Be '1,2,3'
+                }
+            }
+        }
+
+        Describe 'NetworkingDsc.Common\ConvertTo-HashTable' {
+            [CimInstance[]]$cimInstances = ConvertTo-CimInstance -Hashtable @{
+                k1 = 'v1'
+                k2 = 100
+                k3 = 1, 2, 3
+            }
+
+            Context 'The array contains the expected record count' {
+                It 'Should not throw exception' {
+                    { $script:result = $cimInstances | ConvertTo-HashTable } | Should -Not -Throw
+                }
+
+                It 'Record count should be 3' {
+                    $script:result.Count | Should -Be $cimInstances.Count
+                }
+
+                It 'Result should be of type CimInstance[]' {
+                    $script:result | Should -BeOfType [hashtable]
+                }
+
+                It 'Value "k1" in the hashtable should be "v1"' {
+                    $script:result.k1 | Should -Be 'v1'
+                }
+
+                It 'Value "k2" in the hashtable should be "100"' {
+                    $script:result.k2 | Should -Be 100
+                }
+
+                It 'Value "k3" in the hashtable should be "1,2,3"' {
+                    $script:result.k3 | Should -Be '1,2,3'
+                }
+            }
+        }
     }
 }
 finally
