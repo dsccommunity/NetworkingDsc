@@ -1,11 +1,11 @@
 <#
-    .SYNOPSIS
+        .SYNOPSIS
         This function tests if a cmdlet exists.
 
-    .PARAMETER Name
+        .PARAMETER Name
         The name of the cmdlet to check for.
 
-    .PARAMETER Module
+        .PARAMETER Module
         The module containing the command.
 #>
 function Test-Command
@@ -27,8 +27,8 @@ function Test-Command
 } # function Test-Command
 
 <#
-    .SYNOPSIS
-    Tests if the current machine is a Nano server.
+        .SYNOPSIS
+        Tests if the current machine is a Nano server.
 #>
 function Test-IsNanoServer
 {
@@ -47,11 +47,11 @@ function Test-IsNanoServer
 }
 
 <#
-    .SYNOPSIS
+        .SYNOPSIS
         Retrieves the localized string data based on the machine's culture.
         Falls back to en-US strings if the machine's culture is not supported.
 
-    .PARAMETER ResourceName
+        .PARAMETER ResourceName
         The name of the resource as it appears before '.strings.psd1' of the localized string file.
         For example:
             For WindowsOptionalFeature: MSFT_WindowsOptionalFeature
@@ -59,11 +59,11 @@ function Test-IsNanoServer
             For Registry: MSFT_RegistryResource
             For Helper: SqlServerDscHelper
 
-    .PARAMETER ScriptRoot
+        .PARAMETER ScriptRoot
         Optional. The root path where to expect to find the culture folder. This is only needed
         for localization in helper modules. This should not normally be used for resources.
 
-    .NOTES
+        .NOTES
         To be able to use localization in the helper function, this function must
         be first in the file, before Get-LocalizedData is used by itself to load
         localized data for this helper module (see directly after this function).
@@ -111,13 +111,13 @@ function Get-LocalizedData
 }
 
 <#
-    .SYNOPSIS
+        .SYNOPSIS
         Creates and throws an invalid argument exception.
 
-    .PARAMETER Message
+        .PARAMETER Message
         The message explaining why this error is being thrown.
 
-    .PARAMETER ArgumentName
+        .PARAMETER ArgumentName
         The name of the invalid argument that is causing this error to be thrown.
 #>
 function New-InvalidArgumentException
@@ -150,13 +150,13 @@ function New-InvalidArgumentException
 }
 
 <#
-    .SYNOPSIS
+        .SYNOPSIS
         Creates and throws an invalid operation exception.
 
-    .PARAMETER Message
+        .PARAMETER Message
         The message explaining why this error is being thrown.
 
-    .PARAMETER ErrorRecord
+        .PARAMETER ErrorRecord
         The error record containing the exception that is causing this terminating error.
 #>
 function New-InvalidOperationException
@@ -202,13 +202,13 @@ function New-InvalidOperationException
 }
 
 <#
-    .SYNOPSIS
+        .SYNOPSIS
         Creates and throws an object not found exception.
 
-    .PARAMETER Message
+        .PARAMETER Message
         The message explaining why this error is being thrown.
 
-    .PARAMETER ErrorRecord
+        .PARAMETER ErrorRecord
         The error record containing the exception that is causing this terminating error.
 #>
 function New-ObjectNotFoundException
@@ -254,13 +254,13 @@ function New-ObjectNotFoundException
 }
 
 <#
-    .SYNOPSIS
+        .SYNOPSIS
         Creates and throws an invalid result exception.
 
-    .PARAMETER Message
+        .PARAMETER Message
         The message explaining why this error is being thrown.
 
-    .PARAMETER ErrorRecord
+        .PARAMETER ErrorRecord
         The error record containing the exception that is causing this terminating error.
 #>
 function New-InvalidResultException
@@ -348,12 +348,12 @@ function New-NotImplementedException
 }
 
 <#
-    .SYNOPSIS
-    Converts any IP Addresses containing CIDR notation filters in an array to use Subnet Mask
-    notation.
+        .SYNOPSIS
+        Converts any IP Addresses containing CIDR notation filters in an array to use Subnet Mask
+        notation.
 
-    .PARAMETER Address
-    The array of addresses to that need to be converted.
+        .PARAMETER Address
+        The array of addresses to that need to be converted.
 #>
 function Convert-CIDRToSubhetMask
 {
@@ -399,8 +399,8 @@ function Convert-CIDRToSubhetMask
                 }
 
                 <#
-                    Apply the Subnet Mast to the IP Address so that we end up with a correctly
-                    masked IP Address that will match what the Firewall rule returns.
+                        Apply the Subnet Mast to the IP Address so that we end up with a correctly
+                        masked IP Address that will match what the Firewall rule returns.
                 #>
                 $maskedIp = $prefix -split '\.'
 
@@ -420,41 +420,41 @@ function Convert-CIDRToSubhetMask
 } # Convert-CIDRToSubhetMask
 
 <#
-    .SYNOPSIS
-    This function will find a network adapter based on the provided
-    search parameters.
+        .SYNOPSIS
+        This function will find a network adapter based on the provided
+        search parameters.
 
-    .PARAMETER Name
-    This is the name of network adapter to find.
+        .PARAMETER Name
+        This is the name of network adapter to find.
 
-    .PARAMETER PhysicalMediaType
-    This is the media type of the network adapter to find.
+        .PARAMETER PhysicalMediaType
+        This is the media type of the network adapter to find.
 
-    .PARAMETER Status
-    This is the status of the network adapter to find.
+        .PARAMETER Status
+        This is the status of the network adapter to find.
 
-    .PARAMETER MacAddress
-    This is the MAC address of the network adapter to find.
+        .PARAMETER MacAddress
+        This is the MAC address of the network adapter to find.
 
-    .PARAMETER InterfaceDescription
-    This is the interface description of the network adapter to find.
+        .PARAMETER InterfaceDescription
+        This is the interface description of the network adapter to find.
 
-    .PARAMETER InterfaceIndex
-    This is the interface index of the network adapter to find.
+        .PARAMETER InterfaceIndex
+        This is the interface index of the network adapter to find.
 
-    .PARAMETER InterfaceGuid
-    This is the interface GUID of the network adapter to find.
+        .PARAMETER InterfaceGuid
+        This is the interface GUID of the network adapter to find.
 
-    .PARAMETER DriverDescription
-    This is the driver description of the network adapter.
+        .PARAMETER DriverDescription
+        This is the driver description of the network adapter.
 
-    .PARAMETER InterfaceNumber
-    This is the interface number of the network adapter if more than one
-    are returned by the parameters.
+        .PARAMETER InterfaceNumber
+        This is the interface number of the network adapter if more than one
+        are returned by the parameters.
 
-    .PARAMETER IgnoreMultipleMatchingAdapters
-    This switch will suppress an error occurring if more than one matching
-    adapter matches the parameters passed.
+        .PARAMETER IgnoreMultipleMatchingAdapters
+        This switch will suppress an error occurring if more than one matching
+        adapter matches the parameters passed.
 #>
 function Find-NetworkAdapter
 {
@@ -506,7 +506,7 @@ function Find-NetworkAdapter
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.FindingNetAdapterMessage)
+            $($script:localizedData.FindingNetAdapterMessage)
         ) -join '')
 
     $adapterFilters = @()
@@ -554,7 +554,7 @@ function Find-NetworkAdapter
     if ($adapterFilters.Count -eq 0)
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($script:localizedData.AllNetAdaptersFoundMessage)
+                $($script:localizedData.AllNetAdaptersFoundMessage)
             ) -join '')
 
         $matchingAdapters = @(Get-NetAdapter)
@@ -579,7 +579,7 @@ function Find-NetworkAdapter
     else
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($script:localizedData.NetAdapterFoundMessage -f $matchingAdapters.Count)
+                $($script:localizedData.NetAdapterFoundMessage -f $matchingAdapters.Count)
             ) -join '')
 
         if ($matchingAdapters.Count -gt 1)
@@ -627,19 +627,19 @@ function Find-NetworkAdapter
 } # Find-NetworkAdapter
 
 <#
-    .SYNOPSIS
-    Returns the DNS Client Server static address that are assigned to a network
-    adapter. This is required because Get-DnsClientServerAddress always returns
-    the currently assigned server addresses whether regardless if they were
-    assigned as static or by DHCP.
+        .SYNOPSIS
+        Returns the DNS Client Server static address that are assigned to a network
+        adapter. This is required because Get-DnsClientServerAddress always returns
+        the currently assigned server addresses whether regardless if they were
+        assigned as static or by DHCP.
 
-    The only way that could be found to do this is to query the registry.
+        The only way that could be found to do this is to query the registry.
 
-    .PARAMETER InterfaceAlias
-    Alias of the network interface to get the static DNS Server addresses from.
+        .PARAMETER InterfaceAlias
+        Alias of the network interface to get the static DNS Server addresses from.
 
-    .PARAMETER AddressFamily
-    IP address family.
+        .PARAMETER AddressFamily
+        IP address family.
 #>
 function Get-DnsClientServerStaticAddress
 {
@@ -659,7 +659,7 @@ function Get-DnsClientServerStaticAddress
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.GettingDNSServerStaticAddressMessage) -f $AddressFamily,$InterfaceAlias
+            $($script:localizedData.GettingDNSServerStaticAddressMessage) -f $AddressFamily,$InterfaceAlias
         ) -join '')
 
     # Look up the interface Guid
@@ -698,7 +698,7 @@ function Get-DnsClientServerStaticAddress
     {
         # Static DNS Server addresses not found so return empty array
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($script:localizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily,$InterfaceAlias
+                $($script:localizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily,$InterfaceAlias
             ) -join '')
 
         return $null
@@ -707,7 +707,7 @@ function Get-DnsClientServerStaticAddress
     {
         # Static DNS Server addresses found so split them into an array using comma
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($script:localizedData.DNSServerStaticAddressFoundMessage) -f $AddressFamily,$InterfaceAlias,$nameServerAddressString
+                $($script:localizedData.DNSServerStaticAddressFoundMessage) -f $AddressFamily,$InterfaceAlias,$nameServerAddressString
             ) -join '')
 
         return @($nameServerAddressString -split ',')
@@ -715,14 +715,14 @@ function Get-DnsClientServerStaticAddress
 } # Get-DnsClientServerStaticAddress
 
 <#
-.SYNOPSIS
-    Gets the IP Address prefix from a provided IP Address in CIDR notation.
+        .SYNOPSIS
+        Gets the IP Address prefix from a provided IP Address in CIDR notation.
 
-.PARAMETER IPAddress
-    IP Address to get prefix for, can be in CIDR notation.
+        .PARAMETER IPAddress
+        IP Address to get prefix for, can be in CIDR notation.
 
-.PARAMETER AddressFamily
-    Address family for provided IP Address, defaults to IPv4.
+        .PARAMETER AddressFamily
+        Address family for provided IP Address, defaults to IPv4.
 
 #>
 function Get-IPAddressPrefix
@@ -776,13 +776,13 @@ function Get-IPAddressPrefix
 }
 
 <#
-    .SYNOPSIS
+        .SYNOPSIS
         Removes common parameters from a hashtable
 
-    .DESCRIPTION
+        .DESCRIPTION
         This function serves the purpose of removing common parameters and option common parameters from a parameter hashtable
 
-    .PARAMETER Hashtable
+        .PARAMETER Hashtable
         The parameter hashtable that should be pruned
 #>
 function Remove-CommonParameter
@@ -810,28 +810,28 @@ function Remove-CommonParameter
 }
 
 <#
-    .SYNOPSIS
+        .SYNOPSIS
         Tests the status of DSC resource parameters.
 
-    .DESCRIPTION
+        .DESCRIPTION
         This function tests the parameter status of DSC resource parameters against the current values present on the system.
 
-    .PARAMETER CurrentValues
+        .PARAMETER CurrentValues
         A hashtable with the current values on the system, obtained by e.g. Get-TargetResource.
 
-    .PARAMETER DesiredValues
+        .PARAMETER DesiredValues
         The hashtable of desired values.
 
-    .PARAMETER ValuesToCheck
+        .PARAMETER ValuesToCheck
         The values to check if not all values should be checked.
 
-    .PARAMETER TurnOffTypeChecking
+        .PARAMETER TurnOffTypeChecking
         Indicates that the type of the parameter should not be checked.
 
-    .PARAMETER ReverseCheck
+        .PARAMETER ReverseCheck
         Indicates that a reverse check should be done. The current and desired state are swapped for another test.
 
-    .PARAMETER SortArrayValues
+        .PARAMETER SortArrayValues
         If the sorting of array values does not matter, values are sorted internally before doing the comparison.
 #>
 function Test-DscParameterState
@@ -1130,13 +1130,13 @@ function Test-DscParameterState
 }
 
 <#
-    .SYNOPSIS
+        .SYNOPSIS
         Tests of an object has a property
 
-    .PARAMETER Object
+        .PARAMETER Object
         The object to test
 
-    .PARAMETER PropertyName
+        .PARAMETER PropertyName
         The property name
 #>
 function Test-DscObjectHasProperty
@@ -1165,44 +1165,58 @@ function Test-DscObjectHasProperty
 function ConvertTo-CimInstance
 {
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [hashtable]
         $Hashtable
     )
 
-    [CimInstance[]]$result = foreach ($item in $Hashtable.GetEnumerator())
+    process
     {
-        New-CimInstance -ClassName MSFT_KeyValuePair -Namespace root/microsoft/Windows/DesiredStateConfiguration -Property @{
-            Key   = $item.Key
-            Value = if ($item.Value -is [array])
-            {
-                $item.Value -join ','
-            }
-            else
-            {
-                $item.Value
-            }
-        } -ClientOnly
-    }
+        [CimInstance[]]$result = foreach ($item in $Hashtable.GetEnumerator())
+        {
+            New-CimInstance -ClassName MSFT_KeyValuePair -Namespace root/microsoft/Windows/DesiredStateConfiguration -Property @{
+                Key   = $item.Key
+                Value = if ($item.Value -is [array])
+                {
+                    $item.Value -join ','
+                }
+                else
+                {
+                    $item.Value
+                }
+            } -ClientOnly
+        }
 
-    $result
+        [ciminstance[]]$result
+    }
 }
 
 function ConvertTo-HashTable
 {
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [AllowEmptyCollection()]
         [CimInstance[]]
         $CimInstance
     )
-
-    $result = @{ }
-    foreach ($ci in $CimInstance)
+    
+    begin
     {
-        $result.Add($ci.Key, $ci.Value)
+        $result = @{}
     }
-    $result
+
+    process
+    {
+        foreach ($ci in $CimInstance)
+        {
+            $result.Add($ci.Key, $ci.Value)
+        }
+    }
+    
+    end
+    {
+        $result
+    }
 }
 
 # Import Localization Strings
