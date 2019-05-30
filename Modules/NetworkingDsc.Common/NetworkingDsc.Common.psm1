@@ -1162,8 +1162,23 @@ function Test-DscObjectHasProperty
     return $false
 }
 
+<#
+        .SYNOPSIS
+        Converts a hashtable into a CimInstance array.
+
+        .DESCRIPTION
+        This function is used to convert a hashtable into MSFT_KeyValuePair objects. These are stored as an CimInstance array.
+        DSC cannot handle hashtables but CimInstances arrays storing MSFT_KeyValuePair.
+
+        .PARAMETER Hashtable
+        A hashtable with the values to convert.
+
+        .OUTPUTS
+        An object array with CimInstance objects.
+#>
 function ConvertTo-CimInstance
 {
+    [OutputType([object[]])]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [hashtable]
@@ -1172,7 +1187,7 @@ function ConvertTo-CimInstance
 
     process
     {
-        [CimInstance[]]$result = foreach ($item in $Hashtable.GetEnumerator())
+        foreach ($item in $Hashtable.GetEnumerator())
         {
             New-CimInstance -ClassName MSFT_KeyValuePair -Namespace root/microsoft/Windows/DesiredStateConfiguration -Property @{
                 Key   = $item.Key
@@ -1186,20 +1201,32 @@ function ConvertTo-CimInstance
                 }
             } -ClientOnly
         }
-
-        [ciminstance[]]$result
     }
 }
 
+<#
+        .SYNOPSIS
+        Converts CimInstances into a hashtable.
+
+        .DESCRIPTION
+        This function is used to convert a CimInstance array containing MSFT_KeyValuePair objects into a hashtable.
+
+        .PARAMETER CimInstance
+        An array of CimInstances or a single CimInstance object to convert.
+
+        .OUTPUTS
+        Hashtable
+#>
 function ConvertTo-HashTable
 {
+    [OutputType([hashtable])]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [AllowEmptyCollection()]
         [CimInstance[]]
         $CimInstance
     )
-    
+
     begin
     {
         $result = @{}
@@ -1212,7 +1239,7 @@ function ConvertTo-HashTable
             $result.Add($ci.Key, $ci.Value)
         }
     }
-    
+
     end
     {
         $result
