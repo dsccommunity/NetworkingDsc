@@ -8,6 +8,8 @@
   - Removed validation from RegistryKeyword parameter becauase the list
     of valid registry keywords is not fixed and will depend on adapter
     driver - fixes [Issue #388](https://github.com/PowerShell/NetworkingDsc/issues/388).
+- MSFT_WinsServerAddress
+  Added MSFT_WinsServerAddress to control the WINS servers for a given network adapter.
 
 ## 7.2.0.0
 
