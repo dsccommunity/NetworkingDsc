@@ -853,6 +853,39 @@ try
                     }
                 }
             }
+
+            Context 'Parameter type tests' {
+
+                Context 'Should fail as desired value is of wrong type' {
+                    $currentValues = @{
+                        String = 'a string'
+                    }
+
+                    $desiredValues = 1, 2, 3
+
+                    It 'Should throw exception' {
+                        { $script:result = Test-DscParameterState `
+                                -CurrentValues $currentValues `
+                                -DesiredValues $desiredValues `
+                                -Verbose:$verbose } | Should -Throw
+                    }
+                }
+
+                Context 'Should fail as current value is of wrong type' {
+                    $currentValues = 1, 2, 3
+
+                    $desiredValues = @{
+                        String = 'a string'
+                    }
+
+                    It 'Should throw exception' {
+                        { $script:result = Test-DscParameterState `
+                                -CurrentValues $currentValues `
+                                -DesiredValues $desiredValues `
+                                -Verbose:$verbose } | Should -Throw
+                    }
+                }
+            }
         }
     }
 }
