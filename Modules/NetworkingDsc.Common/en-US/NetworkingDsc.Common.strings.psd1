@@ -9,6 +9,7 @@ ConvertFrom-StringData @'
     GettingDNSServerStaticAddressMessage = Getting staticly assigned DNS server {0} address for interface alias '{1}'.
     DNSServerStaticAddressNotSetMessage  = Statically assigned DNS server {0} address for interface alias '{1}' is not set.
     DNSServerStaticAddressFoundMessage   = Statically assigned DNS server {0} address for interface alias '{1}' is '{2}'.
+    InvalidCurrentValuesError            = Property 'CurrentValues' in Test-DscParameterState must be either a Hashtable, CimInstance or CimIntance[]. Type detected was '{0}'.
     InvalidDesiredValuesError            = Property 'DesiredValues' in Test-DscParameterState must be either a Hashtable or CimInstance. Type detected was '{0}'.
     InvalidValuesToCheckError            = If 'DesiredValues' is a CimInstance then property 'ValuesToCheck' must contain a value.
     TestDscParameterCompareMessage       = Comparing values in property '{0}'.
