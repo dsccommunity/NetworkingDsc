@@ -9,8 +9,10 @@
     of valid registry keywords is not fixed and will depend on adapter
     driver - fixes [Issue #388](https://github.com/PowerShell/NetworkingDsc/issues/388).
 - Test-DscParameterState:
-  - This function was enhanced with an optional reversecheck, optional internal sorting for arrays.
-  - The functions ConvertTo-CimInstance and ConvertTo-Hashtable were added required by Test-DscParameterState.
+  - This function was enhanced with an optional reversecheck, optional internal
+    sorting for arrays.
+  - The functions ConvertTo-CimInstance and ConvertTo-Hashtable were added
+    required by Test-DscParameterState.
 
 ## 7.2.0.0
 
