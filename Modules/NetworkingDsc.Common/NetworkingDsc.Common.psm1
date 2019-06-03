@@ -932,7 +932,7 @@ function Test-DscParameterState
         }
         else
         {
-            $desiredType = [System.Management.Automation.PSCustomObject] @{
+            $desiredType = @{
                 Name = 'Unknown'
             }
         }
@@ -943,7 +943,7 @@ function Test-DscParameterState
         }
         else
         {
-            $currentType = [System.Management.Automation.PSCustomObject] @{
+            $currentType = @{
                 Name = 'Unknown'
             }
         }
@@ -1042,7 +1042,7 @@ function Test-DscParameterState
                     }
                     else
                     {
-                        $desiredType = [System.Management.Automation.PSCustomObject] @{
+                        $desiredType = @{
                             Name = 'Unknown'
                         }
                     }
@@ -1053,7 +1053,7 @@ function Test-DscParameterState
                     }
                     else
                     {
-                        $currentType = [System.Management.Automation.PSCustomObject] @{
+                        $currentType = @{
                             Name = 'Unknown'
                         }
                     }
