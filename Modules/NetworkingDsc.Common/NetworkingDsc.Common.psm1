@@ -932,7 +932,7 @@ function Test-DscParameterState
         }
         else
         {
-            $desiredType = [psobject] @{
+            $desiredType = [System.Management.Automation.PSCustomObject] @{
                 Name = 'Unknown'
             }
         }
@@ -943,7 +943,7 @@ function Test-DscParameterState
         }
         else
         {
-            $currentType = [psobject] @{
+            $currentType = [System.Management.Automation.PSCustomObject] @{
                 Name = 'Unknown'
             }
         }
@@ -1042,7 +1042,7 @@ function Test-DscParameterState
                     }
                     else
                     {
-                        $desiredType = [psobject]@{
+                        $desiredType = [System.Management.Automation.PSCustomObject] @{
                             Name = 'Unknown'
                         }
                     }
@@ -1053,7 +1053,7 @@ function Test-DscParameterState
                     }
                     else
                     {
-                        $currentType = [psobject]@{
+                        $currentType = [System.Management.Automation.PSCustomObject] @{
                             Name = 'Unknown'
                         }
                     }
@@ -1084,7 +1084,7 @@ function Test-DscParameterState
 
             }
         }
-        elseif ($desiredType -eq [hashtable] -and $currentType -eq [hashtable])
+        elseif ($desiredType -eq [System.Collections.Hashtable] -and $currentType -eq [System.Collections.Hashtable])
         {
             $param = $PSBoundParameters
             $param.CurrentValues = $currentValue
