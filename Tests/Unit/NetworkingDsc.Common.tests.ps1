@@ -1124,7 +1124,7 @@ try
                     { $script:result = [CimInstance[]]($hashtable | ConvertTo-CimInstance) } | Should -Not -Throw
                 }
 
-                It 'Record count should be 3' {
+                It "Record count should be $($hashTable.Count)" {
                     $script:result.Count | Should -Be $hashtable.Count
                 }
 
@@ -1158,12 +1158,12 @@ try
                     { $script:result = $cimInstances | ConvertTo-HashTable } | Should -Not -Throw
                 }
 
-                It 'Record count should be 3' {
+                It "Record count should be $($cimInstances.Count)" {
                     $script:result.Count | Should -Be $cimInstances.Count
                 }
 
-                It 'Result should be of type CimInstance[]' {
-                    $script:result | Should -BeOfType [hashtable]
+                It 'Result should be of type [System.Collections.Hashtable]' {
+                    $script:result | Should -BeOfType [System.Collections.Hashtable]
                 }
 
                 It 'Value "k1" in the hashtable should be "v1"' {

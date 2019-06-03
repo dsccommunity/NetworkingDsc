@@ -37,7 +37,7 @@ function Test-IsNanoServer
         $computerInfo = Get-ComputerInfo
 
         if ('Server' -eq $computerInfo.OsProductType `
-            -and 'NanoServer' -eq $computerInfo.OsServerLevel)
+                -and 'NanoServer' -eq $computerInfo.OsServerLevel)
         {
             return $true
         }
@@ -387,11 +387,11 @@ function Convert-CIDRToSubhetMask
                     $cidr = [System.Int32] $postfix
                     $subnetMaskInt64 = ([convert]::ToInt64(('1' * $cidr + '0' * (32 - $cidr)), 2))
                     $subnetMask = @(
-                            ([math]::Truncate($subnetMaskInt64 / 16777216))
-                            ([math]::Truncate(($subnetMaskInt64 % 16777216) / 65536))
-                            ([math]::Truncate(($subnetMaskInt64 % 65536)/256))
-                            ([math]::Truncate($subnetMaskInt64 % 256))
-                        )
+                        ([math]::Truncate($subnetMaskInt64 / 16777216))
+                        ([math]::Truncate(($subnetMaskInt64 % 16777216) / 65536))
+                        ([math]::Truncate(($subnetMaskInt64 % 65536) / 256))
+                        ([math]::Truncate($subnetMaskInt64 % 256))
+                    )
                 }
                 else
                 {
@@ -409,7 +409,7 @@ function Convert-CIDRToSubhetMask
                     $maskedIp[$Octet] = $maskedIp[$octet] -band $SubnetMask[$octet]
                 }
 
-                $entry = '{0}/{1}' -f ($maskedIp -join '.'),($subnetMask -join '.')
+                $entry = '{0}/{1}' -f ($maskedIp -join '.'), ($subnetMask -join '.')
             }
         }
 
@@ -472,7 +472,7 @@ function Find-NetworkAdapter
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet('Up','Disconnected','Disabled')]
+        [ValidateSet('Up', 'Disconnected', 'Disabled')]
         [System.String]
         $Status = 'Up',
 
@@ -511,42 +511,42 @@ function Find-NetworkAdapter
 
     $adapterFilters = @()
 
-    if($PSBoundParameters.ContainsKey('Name'))
+    if ($PSBoundParameters.ContainsKey('Name'))
     {
         $adapterFilters += @('($_.Name -eq $Name)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('PhysicalMediaType'))
+    if ($PSBoundParameters.ContainsKey('PhysicalMediaType'))
     {
         $adapterFilters += @('($_.PhysicalMediaType -eq $PhysicalMediaType)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('Status'))
+    if ($PSBoundParameters.ContainsKey('Status'))
     {
         $adapterFilters += @('($_.Status -eq $Status)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('MacAddress'))
+    if ($PSBoundParameters.ContainsKey('MacAddress'))
     {
         $adapterFilters += @('($_.MacAddress -eq $MacAddress)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('InterfaceDescription'))
+    if ($PSBoundParameters.ContainsKey('InterfaceDescription'))
     {
         $adapterFilters += @('($_.InterfaceDescription -eq $InterfaceDescription)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('InterfaceIndex'))
+    if ($PSBoundParameters.ContainsKey('InterfaceIndex'))
     {
         $adapterFilters += @('($_.InterfaceIndex -eq $InterfaceIndex)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('InterfaceGuid'))
+    if ($PSBoundParameters.ContainsKey('InterfaceGuid'))
     {
         $adapterFilters += @('($_.InterfaceGuid -eq $InterfaceGuid)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('DriverDescription'))
+    if ($PSBoundParameters.ContainsKey('DriverDescription'))
     {
         $adapterFilters += @('($_.DriverDescription -eq $DriverDescription)')
     } # if
@@ -591,7 +591,7 @@ function Find-NetworkAdapter
                 {
                     New-InvalidOperationException `
                         -Message ($script:localizedData.InvalidNetAdapterNumberError `
-                            -f $matchingAdapters.Count,$InterfaceNumber)
+                            -f $matchingAdapters.Count, $InterfaceNumber)
 
                     # Return a null so that ErrorAction SilentlyContinue works correctly
                     return $null
@@ -659,7 +659,7 @@ function Get-DnsClientServerStaticAddress
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($script:localizedData.GettingDNSServerStaticAddressMessage) -f $AddressFamily,$InterfaceAlias
+            $($script:localizedData.GettingDNSServerStaticAddressMessage) -f $AddressFamily, $InterfaceAlias
         ) -join '')
 
     # Look up the interface Guid
@@ -698,7 +698,7 @@ function Get-DnsClientServerStaticAddress
     {
         # Static DNS Server addresses not found so return empty array
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($script:localizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily,$InterfaceAlias
+                $($script:localizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily, $InterfaceAlias
             ) -join '')
 
         return $null
@@ -707,7 +707,7 @@ function Get-DnsClientServerStaticAddress
     {
         # Static DNS Server addresses found so split them into an array using comma
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($script:localizedData.DNSServerStaticAddressFoundMessage) -f $AddressFamily,$InterfaceAlias,$nameServerAddressString
+                $($script:localizedData.DNSServerStaticAddressFoundMessage) -f $AddressFamily, $InterfaceAlias, $nameServerAddressString
             ) -join '')
 
         return @($nameServerAddressString -split ',')
@@ -736,7 +736,7 @@ function Get-IPAddressPrefix
         $IPAddress,
 
         [Parameter()]
-        [ValidateSet('IPv4','IPv6')]
+        [ValidateSet('IPv4', 'IPv6')]
         [System.String]
         $AddressFamily = 'IPv4'
     )
@@ -768,7 +768,7 @@ function Get-IPAddressPrefix
             }
 
             [PSCustomObject]@{
-                IPAddress = $singleIP.split('/')[0]
+                IPAddress    = $singleIP.split('/')[0]
                 prefixLength = $prefixLength
             }
         }
@@ -866,12 +866,14 @@ function Test-DscParameterState
 
     $returnValue = $true
 
-    if ($CurrentValues -is [Microsoft.Management.Infrastructure.CimInstance] -or $CurrentValues -is [Microsoft.Management.Infrastructure.CimInstance[]])
+    if ($CurrentValues -is [Microsoft.Management.Infrastructure.CimInstance] -or
+        $CurrentValues -is [Microsoft.Management.Infrastructure.CimInstance[]])
     {
         $CurrentValues = ConvertTo-HashTable -CimInstance $CurrentValues
     }
 
-    if ($DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance] -or $DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance[]])
+    if ($DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance] -or
+    $DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance[]])
     {
         $DesiredValues = ConvertTo-HashTable -CimInstance $DesiredValues
     }
@@ -1111,17 +1113,17 @@ function Test-DscParameterState
     if ($ReverseCheck)
     {
         Write-Verbose -Message $script:localizedData.StartingReverseCheck
-        $param = $PSBoundParameters
-        $param.CurrentValues = $DesiredValues
-        $param.DesiredValues = $CurrentValues
-        [void]$param.Remove('ReverseCheck')
+        $reverseCheckParameters = $PSBoundParameters
+        $reverseCheckParameters.CurrentValues = $DesiredValues
+        $reverseCheckParameters.DesiredValues = $CurrentValues
+        [void] $reverseCheckParameters.Remove('ReverseCheck')
         if ($returnValue)
         {
-            $returnValue = Test-DscParameterState @param
+            $returnValue = Test-DscParameterState @reverseCheckParameters
         }
         else
         {
-            Test-DscParameterState @param | Out-Null
+            Test-DscParameterState @reverseCheckParameters | Out-Null
         }
     }
 
@@ -1178,10 +1180,11 @@ function Test-DscObjectHasProperty
 #>
 function ConvertTo-CimInstance
 {
-    [OutputType([object[]])]
+    [CmdletBinding()]
+    [OutputType([System.Object[]])]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [hashtable]
+        [System.Collections.Hashtable]
         $Hashtable
     )
 
@@ -1219,17 +1222,18 @@ function ConvertTo-CimInstance
 #>
 function ConvertTo-HashTable
 {
-    [OutputType([hashtable])]
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [AllowEmptyCollection()]
-        [CimInstance[]]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
         $CimInstance
     )
 
     begin
     {
-        $result = @{}
+        $result = @{ }
     }
 
     process
