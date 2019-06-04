@@ -917,11 +917,13 @@ function Test-DscParameterState
         $desiredValue = $desiredValuesClean.$key
         $currentValue = $CurrentValues.$key
 
-        if ($desiredValue -is [Microsoft.Management.Infrastructure.CimInstance] -or $desiredValue -is [Microsoft.Management.Infrastructure.CimInstance[]])
+        if ($desiredValue -is [Microsoft.Management.Infrastructure.CimInstance] -or
+            $desiredValue -is [Microsoft.Management.Infrastructure.CimInstance[]])
         {
             $desiredValue = ConvertTo-HashTable -CimInstance $desiredValue
         }
-        if ($currentValue -is [Microsoft.Management.Infrastructure.CimInstance] -or $currentValue -is [Microsoft.Management.Infrastructure.CimInstance[]])
+        if ($currentValue -is [Microsoft.Management.Infrastructure.CimInstance] -or
+            $currentValue -is [Microsoft.Management.Infrastructure.CimInstance[]])
         {
             $currentValue = ConvertTo-HashTable -CimInstance $currentValue
         }
@@ -1182,7 +1184,8 @@ function ConvertTo-CimInstance
 {
     [CmdletBinding()]
     [OutputType([System.Object[]])]
-    param(
+    param
+    (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [System.Collections.Hashtable]
         $Hashtable
@@ -1224,7 +1227,8 @@ function ConvertTo-HashTable
 {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
-    param(
+    param
+    (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [AllowEmptyCollection()]
         [Microsoft.Management.Infrastructure.CimInstance[]]

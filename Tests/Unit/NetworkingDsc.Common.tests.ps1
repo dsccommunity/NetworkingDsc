@@ -1090,7 +1090,7 @@ try
         Describe 'NetworkingDsc.Common\Test-DscParameterState' {
             $verbose = $true
 
-            Context 'Single value tests' {
+            Context 'When testing single values' {
                 $currentValues = @{
                     String    = 'a string'
                     Bool      = $true
@@ -1270,7 +1270,7 @@ try
                 }
             }
 
-            Context 'Array tests' {
+            Context 'When testing array values' {
                 $currentValues = @{
                     String    = 'a string'
                     Bool      = $true
@@ -1432,7 +1432,7 @@ try
                 }
             }
 
-            Context 'Hashtable tests' {
+            Context 'When testing hashtables' {
                 $currentValues = @{
                     String    = 'a string'
                     Bool      = $true
@@ -1624,7 +1624,7 @@ try
                 }
             }
 
-            Context 'CimInstance / hashtable tests' {
+            Context 'When testing CimInstances / hashtables' {
                 $currentValues = @{
                     String       = 'a string'
                     Bool         = $true
@@ -1862,7 +1862,7 @@ try
                 }
             }
 
-            Context 'Reverse checking' {
+            Context 'When reverse checking' {
                 $currentValues = @{
                     String    = 'a string'
                     Bool      = $true
@@ -1921,9 +1921,9 @@ try
                 }
             }
 
-            Context 'Parameter type tests' {
+            Context 'When testing parameter types' {
 
-                Context 'Should fail as desired value is of wrong type' {
+                Context 'When desired value is of the wrong type' {
                     $currentValues = @{
                         String = 'a string'
                     }
@@ -1938,7 +1938,7 @@ try
                     }
                 }
 
-                Context 'Should fail as current value is of wrong type' {
+                Context 'When current value is of the wrong type' {
                     $currentValues = 1, 2, 3
 
                     $desiredValues = @{
