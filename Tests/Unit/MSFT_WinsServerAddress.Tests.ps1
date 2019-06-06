@@ -66,7 +66,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Set-WinsClientServerStaticAddress -.Exactly 1
+                        Assert-MockCalled -commandName Set-WinsClientServerStaticAddress -Exactly 1
                     }
                 }
 
