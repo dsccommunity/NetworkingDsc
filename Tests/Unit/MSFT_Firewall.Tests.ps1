@@ -22,10 +22,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
-
-        #region Pester Test Initialization
         # Get the rule that will be used for testing
         $firewallRule = Get-NetFirewallRule |
                 Sort-Object -Property Name |
@@ -34,7 +31,8 @@ try
                 } |
                 Select-Object -First 1
         $firewallRuleName = $firewallRule.Name
-        $Properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
+        $firewallRuleProperties = Get-FirewallRuleProperty -FirewallRule $firewallRule
+
         # Pull two rules to use testing that error is thrown when this occurs
         $firewallRules = Get-NetFirewallRule |
                 Sort-Object -Property Name |
@@ -42,10 +40,8 @@ try
                     $_.DisplayGroup -ne $null
                 } |
                 Select-Object -First 2
-        #endregion
 
-        #region Function Get-TargetResource
-        Describe 'MSFT_Firewall\Get-TargetResource' {
+        Describe 'MSFT_Firewall\Get-TargetResource' -Tag 'Get' {
             Context 'Absent should return correctly' {
                 Mock -CommandName Get-NetFirewallRule
 
@@ -86,10 +82,8 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function Test-TargetResource
-        Describe 'MSFT_Firewall\Test-TargetResource' {
+        Describe 'MSFT_Firewall\Test-TargetResource' -Tag 'Test' {
             Context 'Ensure is Absent and the Firewall is not Present' {
                 Mock -CommandName Get-FirewallRule
 
@@ -134,14 +128,12 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function Set-TargetResource
-        Describe 'MSFT_Firewall\Set-TargetResource' {
+        Describe 'MSFT_Firewall\Set-TargetResource' -Tag 'Set' {
             BeforeEach {
                 # To speed up all these tests create Mocks so that these functions are not repeatedly called
                 Mock -CommandName Get-FirewallRule -MockWith { $firewallRule }
-                Mock -CommandName Get-FirewallRuleProperty -MockWith { $Properties }
+                Mock -CommandName Get-FirewallRuleProperty -MockWith { $firewallRuleProperties }
             }
 
             Context 'Ensure is Absent and Firewall rule exists' {
@@ -473,7 +465,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    if ( $properties.SecurityFilters.Authentication -eq 'Required')
+                    if ( $firewallRuleProperties.SecurityFilters.Authentication -eq 'Required')
                     {
                         $NewAuthentication = 'NotRequired'
                     }
@@ -497,7 +489,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    if ( $properties.SecurityFilters.Encryption -eq 'Required')
+                    if ( $firewallRuleProperties.SecurityFilters.Encryption -eq 'Required')
                     {
                         $NewEncryption = 'NotRequired'
                     }
@@ -536,7 +528,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    if ( $properties.InterfaceTypeFilters.InterfaceType -eq 'Wired')
+                    if ( $firewallRuleProperties.InterfaceTypeFilters.InterfaceType -eq 'Wired')
                     {
                         $NewInterfaceType = 'Wireless'
                     }
@@ -776,9 +768,7 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function Test-RuleProperties
         Describe 'MSFT_Firewall\Test-RuleProperties' {
             # Make an object that can be splatted onto the function
             $Splat = @{}
@@ -807,7 +797,7 @@ try
             BeforeEach {
                 # To speed up all these tests create Mocks so that these functions are not repeatedly called
                 Mock -CommandName Get-FirewallRule -MockWith { $firewallRule }
-                Mock -CommandName Get-FirewallRuleProperty -MockWith { $Properties }
+                Mock -CommandName Get-FirewallRuleProperty -MockWith { $firewallRuleProperties }
             }
 
             Context 'When testing with a rule with no property differences' {
@@ -1193,9 +1183,7 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function Get-FirewallRule
         Describe 'MSFT_Firewall\Get-FirewallRule' {
             Context 'esting with firewall that exists' {
                 It "Should return a firewall rule when name is passed on firewall rule $($firewallRule.Name)" {
@@ -1245,10 +1233,8 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function Get-FirewallRuleProperty
-        Describe "MSFT_Firewall\Get-FirewallRuleProperty" {
+        Describe 'MSFT_Firewall\Get-FirewallRuleProperty' {
             Context 'All Properties' {
                 $result = Get-FirewallRuleProperty -FirewallRule $firewallRule
 
@@ -1310,10 +1296,8 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function ConvertTo-FirewallRuleNameEscapedString
-        Describe "MSFT_Firewall\ConvertTo-FirewallRuleNameEscapedString" {
+        Describe 'MSFT_Firewall\ConvertTo-FirewallRuleNameEscapedString' {
             Context 'Rule name that contains no escaped characters' {
                 It 'Should return the rule name with no backticks added' {
                     ConvertTo-FirewallRuleNameEscapedString -Name 'No Escaped Characters' | Should -Be 'No Escaped Characters'
@@ -1326,9 +1310,7 @@ try
                 }
             }
         }
-        #endregion
     } #end InModuleScope $DSCResourceName
-    #endregion
 }
 finally
 {

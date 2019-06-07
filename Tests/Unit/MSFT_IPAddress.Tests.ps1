@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
         Describe 'MSFT_IPAddress\Get-TargetResource' -Tag 'Get' {
             Context 'Invoked with a single IP address' {
@@ -1256,7 +1255,6 @@ try
             }
         }
     } #end InModuleScope $DSCResourceName
-    #endregion
 }
 finally
 {

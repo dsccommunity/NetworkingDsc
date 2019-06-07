@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
         # Create the Mock Objects that will be used for running tests
         $mockEnabledLmHostsRegistryKey = {
@@ -99,7 +98,7 @@ try
             -and $Arguments.WINSEnableLMHostsLookup -eq $false
         }
 
-        Describe 'MSFT_WinsSetting\Get-TargetResource' {
+        Describe 'MSFT_WinsSetting\Get-TargetResource' -Tag 'Get' {
             Context 'EnableLmHosts is enabled and EnableDns is enabled' {
                 Mock `
                     -CommandName Get-ItemProperty `
@@ -167,7 +166,7 @@ try
             }
         }
 
-        Describe 'MSFT_DnsClientGlobalSetting\Set-TargetResource' {
+        Describe 'MSFT_DnsClientGlobalSetting\Set-TargetResource' -Tag 'Set' {
             BeforeEach {
                 Mock -CommandName Get-TargetResource -MockWith { $mockGetTargetResourceAllEnabled }
             }
@@ -236,7 +235,7 @@ try
             }
         }
 
-        Describe 'MSFT_DnsClientGlobalSetting\Test-TargetResource' {
+        Describe 'MSFT_DnsClientGlobalSetting\Test-TargetResource' -Tag 'Test' {
             Context 'EnableLmHosts is enabled and EnableDns is enabled' {
                 Context 'Set EnableLmHosts to true and EnableDns to true' {
                     Mock -CommandName Get-TargetResource -MockWith $mockGetTargetResourceAllEnabled
@@ -326,7 +325,6 @@ try
             }
         }
     }
-    #endregion
 }
 finally
 {

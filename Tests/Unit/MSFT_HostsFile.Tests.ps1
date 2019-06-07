@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
         Describe 'MSFT_HostsFile' {
             BeforeEach {
@@ -30,7 +29,7 @@ try
                 Mock -CommandName Set-Content
             }
 
-            Context 'A host entry does not exist, and should' {
+            Context 'When a host entry does not exist, and should' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
@@ -61,7 +60,7 @@ try
                 }
             }
 
-            Context 'A host entry exists but has the wrong IP address' {
+            Context 'When a host entry exists but has the wrong IP address' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
@@ -93,7 +92,7 @@ try
                 }
             }
 
-            Context 'A host entry exists with the correct IP address' {
+            Context 'When a host entry exists with the correct IP address' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
@@ -120,7 +119,7 @@ try
                 }
             }
 
-            Context 'A host entry exists but it should not' {
+            Context 'When a host entry exists but it should not' {
                 $testParams = @{
                     HostName = 'www.contoso.com'
                     Ensure   = 'Absent'
@@ -152,7 +151,7 @@ try
                 }
             }
 
-            Context 'A commented out host entry exists' {
+            Context 'When a commented out host entry exists' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '127.0.0.1'
@@ -184,7 +183,7 @@ try
                 }
             }
 
-            Context 'A host entry does not it exist and should not' {
+            Context 'When a host entry does not it exist and should not' {
                 $testParams = @{
                     HostName = 'www.contoso.com'
                     Ensure   = 'Absent'
@@ -210,7 +209,7 @@ try
                 }
             }
 
-            Context 'A host entry exists and is correct, but it listed with multiple entries on one line' {
+            Context 'When a host entry exists and is correct, but it listed with multiple entries on one line' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
@@ -237,7 +236,7 @@ try
                 }
             }
 
-            Context 'A host entry exists and is not correct, but it listed with multiple entries on one line' {
+            Context 'When a host entry exists and is not correct, but it listed with multiple entries on one line' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
@@ -269,7 +268,7 @@ try
                 }
             }
 
-            Context 'Invalid parameters will throw meaningful errors' {
+            Context 'When called with invalid parameters' {
                 $testParams = @{
                     HostName = 'www.contoso.com'
                     Verbose  = $true
@@ -291,7 +290,6 @@ try
             }
         }
     } #end InModuleScope $DSCResourceName
-    #endregion
 }
 finally
 {

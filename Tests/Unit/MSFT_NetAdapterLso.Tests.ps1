@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
         $testV1IPv4LsoEnabled = @{
             Name     = 'Ethernet'
@@ -67,7 +66,7 @@ try
         }
 
 
-        Describe "$($script:DSCResourceName)\Get-TargetResource" {
+        Describe 'MSFT_NetAdapterLso\Get-TargetResource' -Tag 'Get' {
             Context 'Adapter exist and LSO for V1IPv4 is enabled' {
                 Mock -CommandName Get-NetAdapterLso -MockWith {
                     @{ V1IPv4Enabled = $testV1IPv4LsoEnabled.State }
@@ -174,7 +173,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Set-TargetResource" {
+        Describe 'MSFT_NetAdapterLso\Set-TargetResource' -Tag 'Set' {
             # V1IPv4
             Context 'Adapter exist, LSO is enabled for V1IPv4, no action required' {
                 Mock -CommandName Get-NetAdapterLso -MockWith {
@@ -388,7 +387,7 @@ try
 
         }
 
-        Describe "$($script:DSCResourceName)\Test-TargetResource" {
+        Describe 'MSFT_NetAdapterLso\Test-TargetResource' -Tag 'Test' {
             # V1IPv4
             Context 'Adapter exist, LSO is enabled for V1IPv4, no action required' {
                 Mock -CommandName Get-NetAdapterLso -MockWith {
@@ -577,7 +576,6 @@ try
             }
         }
     }
-    #endregion
 }
 finally
 {

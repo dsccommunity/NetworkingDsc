@@ -71,7 +71,7 @@ try
             }
         )
 
-        Describe "MSFT_NetAdapterBinding\Get-TargetResource" {
+        Describe 'MSFT_NetAdapterBinding\Get-TargetResource' -Tag 'Get' {
             Context 'Adapter exists and binding Enabled' {
                 Mock -CommandName Get-Binding -MockWith { $mockBindingEnabled }
 
@@ -122,7 +122,7 @@ try
 
         }
 
-        Describe "MSFT_NetAdapterBinding\Set-TargetResource" {
+        Describe 'MSFT_NetAdapterBinding\Set-TargetResource' -Tag 'Set' {
             Context 'Adapter exists and set binding to Enabled' {
                 Mock -CommandName Get-Binding -MockWith { $mockBindingDisabled }
                 Mock -CommandName Enable-NetAdapterBinding
@@ -156,7 +156,7 @@ try
             }
         }
 
-        Describe "MSFT_NetAdapterBinding\Test-TargetResource" {
+        Describe 'MSFT_NetAdapterBinding\Test-TargetResource' -Tag 'Test' {
             Context 'Adapter exists, current binding set to Enabled but want it Disabled' {
                 Mock -CommandName Get-Binding -MockWith { $mockBindingEnabled }
 
@@ -206,7 +206,7 @@ try
             }
         }
 
-        Describe "MSFT_NetAdapterBinding\Get-Binding" {
+        Describe 'MSFT_NetAdapterBinding\Get-Binding' {
             Context 'Adapter does not exist' {
                 Mock -CommandName Get-NetAdapter
 

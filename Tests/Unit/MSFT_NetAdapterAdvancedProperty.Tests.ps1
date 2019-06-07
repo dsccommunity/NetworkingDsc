@@ -44,7 +44,7 @@ try
 
         function Get-NetAdapterAdvancedProperty { }
 
-        Describe "$($script:DSCResourceName)\Get-TargetResource" -Tag 'Get' {
+        Describe 'MSFT_NetAdapterAdvancedProperty\Get-TargetResource' -Tag 'Get' {
 
             Context 'Adapter exist and JumboPacket is enabled 9014' {
                 Mock Get-NetAdapterAdvancedProperty -Verbose -MockWith {
@@ -98,7 +98,7 @@ try
                 }
             }
 
-            Describe "$($script:DSCResourceName)\Set-TargetResource" {
+            Describe 'MSFT_NetAdapterAdvancedProperty\Set-TargetResource' -Tag 'Set' {
 
                 Context 'Adapter exist, JumboPacket is 9014, no action required' {
                     Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith {
@@ -175,7 +175,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Test-TargetResource" {
+        Describe 'MSFT_NetAdapterAdvancedProperty\Test-TargetResource' -Tag 'Test' {
 
             # JumboPacket
             Context 'Adapter exist, JumboPacket is 9014, no action required' {

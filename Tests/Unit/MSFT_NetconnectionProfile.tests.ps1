@@ -22,9 +22,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
-
         # Create the Mock Objects that will be used for running tests
         $mockNetAdapter = [PSCustomObject] @{
             Name = 'TestAdapter'
@@ -71,7 +69,7 @@ try
             IPv6Connectivity = 'Disconnected'
         }
 
-        Describe 'MSFT_NetConnectionProfile\Get-TargetResource' {
+        Describe 'MSFT_NetConnectionProfile\Get-TargetResource' -Tag 'Get' {
             Mock -CommandName Get-NetConnectionProfile {
                 return $mockNetConnnectionProfileAll
             }
@@ -86,7 +84,7 @@ try
             }
         }
 
-        Describe 'MSFT_NetConnectionProfile\Test-TargetResource' {
+        Describe 'MSFT_NetConnectionProfile\Test-TargetResource' -Tag 'Test' {
             BeforeEach {
                 Mock -CommandName Get-TargetResource -MockWith {
                     return $mockNetConnnectionProfileAll
@@ -132,7 +130,7 @@ try
             }
         }
 
-        Describe 'MSFT_NetConnectionProfile\Set-TargetResource' {
+        Describe 'MSFT_NetConnectionProfile\Set-TargetResource' -Tag 'Set' {
             It 'Should call all the mocks' {
                 Mock -CommandName Set-NetConnectionProfile
                 Mock -CommandName Assert-ResourceProperty
@@ -191,7 +189,6 @@ try
             }
         }
     } #end InModuleScope $DSCResourceName
-    #endregion
 }
 finally
 {
