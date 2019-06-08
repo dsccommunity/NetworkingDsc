@@ -31,7 +31,7 @@ try
                 } |
                 Select-Object -First 1
         $firewallRuleName = $firewallRule.Name
-        $firewallRuleProperties = Get-FirewallRuleProperty -FirewallRule $firewallRule
+        $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
 
         # Pull two rules to use testing that error is thrown when this occurs
         $firewallRules = Get-NetFirewallRule |
@@ -133,7 +133,7 @@ try
             BeforeEach {
                 # To speed up all these tests create Mocks so that these functions are not repeatedly called
                 Mock -CommandName Get-FirewallRule -MockWith { $firewallRule }
-                Mock -CommandName Get-FirewallRuleProperty -MockWith { $firewallRuleProperties }
+                Mock -CommandName Get-FirewallRuleProperty -MockWith { $properties }
             }
 
             Context 'Ensure is Absent and Firewall rule exists' {
@@ -465,7 +465,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    if ( $firewallRuleProperties.SecurityFilters.Authentication -eq 'Required')
+                    if ( $properties.SecurityFilters.Authentication -eq 'Required')
                     {
                         $NewAuthentication = 'NotRequired'
                     }
@@ -489,7 +489,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    if ( $firewallRuleProperties.SecurityFilters.Encryption -eq 'Required')
+                    if ( $properties.SecurityFilters.Encryption -eq 'Required')
                     {
                         $NewEncryption = 'NotRequired'
                     }
@@ -528,7 +528,7 @@ try
                     Mock -CommandName Set-NetFirewallRule
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
-                    if ( $firewallRuleProperties.InterfaceTypeFilters.InterfaceType -eq 'Wired')
+                    if ( $properties.InterfaceTypeFilters.InterfaceType -eq 'Wired')
                     {
                         $NewInterfaceType = 'Wireless'
                     }
@@ -797,7 +797,7 @@ try
             BeforeEach {
                 # To speed up all these tests create Mocks so that these functions are not repeatedly called
                 Mock -CommandName Get-FirewallRule -MockWith { $firewallRule }
-                Mock -CommandName Get-FirewallRuleProperty -MockWith { $firewallRuleProperties }
+                Mock -CommandName Get-FirewallRuleProperty -MockWith { $properties }
             }
 
             Context 'When testing with a rule with no property differences' {
