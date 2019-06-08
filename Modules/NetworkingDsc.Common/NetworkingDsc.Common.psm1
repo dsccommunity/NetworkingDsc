@@ -1365,6 +1365,8 @@ Export-ModuleMember -Function @(
     'Convert-CIDRToSubhetMask',
     'Find-NetworkAdapter',
     'Get-DnsClientServerStaticAddress',
+    'Get-WinsClientServerStaticAddress',
+    'Set-WinsClientServerStaticAddress',
     'Get-IPAddressPrefix',
     'Test-DscParameterState',
     'Test-DscObjectHasProperty'
