@@ -28,6 +28,7 @@ try
             Context 'Test' {
                 Context 'Invoking with an address and one address is currently set' {
                     Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
+                    Mock Assert-ResourceProperty -MockWith { }
 
                     It 'Should return true' {
                         $getTargetResourceSplat = @{
@@ -42,6 +43,7 @@ try
 
                     It 'Should call all the mocks' {
                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 1
                     }
                 }
             }
@@ -52,6 +54,7 @@ try
                 BeforeEach {
                     Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
                     Mock Set-WinsClientServerStaticAddress -MockWith { }
+                    Mock Assert-ResourceProperty -MockWith { }
                 }
 
                 Context 'Invoking with single server address' {
@@ -66,7 +69,8 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Set-WinsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -CommandName Set-WinsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 1
                     }
                 }
 
@@ -83,6 +87,7 @@ try
 
                     It 'Should call all the mocks' {
                         Assert-MockCalled -commandName Set-WinsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 1
                     }
                 }
             }
@@ -92,6 +97,7 @@ try
             Context 'Test single value' {
                 BeforeEach {
                     Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
+                    Mock Assert-ResourceProperty -MockWith { }
                 }
 
                 Context 'Invoking with single server address that is the same as current' {
@@ -107,6 +113,7 @@ try
 
                     It 'Should call all the mocks' {
                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
                     }
                 }
 
@@ -123,6 +130,7 @@ try
 
                     It 'Should call all the mocks' {
                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
                     }
                 }
 
@@ -139,6 +147,7 @@ try
 
                     It 'Should call all the mocks' {
                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
                     }
                 }
             }
@@ -146,6 +155,7 @@ try
             Context 'Test multi value' {
                 BeforeEach {
                     Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1', '192.168.0.2' }
+                    Mock Assert-ResourceProperty -MockWith { }
                 }
 
                 Context 'Invoking with multiple server addresses that are the same as current' {
@@ -161,6 +171,7 @@ try
 
                     It 'Should call all the mocks' {
                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
                     }
                 }
 
@@ -177,6 +188,7 @@ try
 
                     It 'Should call all the mocks' {
                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
                     }
                 }
 
@@ -193,6 +205,7 @@ try
 
                     It 'Should call all the mocks' {
                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
                     }
                 }
 
@@ -209,6 +222,7 @@ try
 
                     It 'Should call all the mocks' {
                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
                     }
                 }
             }
