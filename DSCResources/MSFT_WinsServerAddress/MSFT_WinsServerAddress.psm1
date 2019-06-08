@@ -35,6 +35,8 @@ function Get-TargetResource
         $Address
     )
 
+    Assert-ResourceProperty  @PSBoundParameters
+
     Write-Verbose -Message "$($MyInvocation.MyCommand): $($script:localizedData.GettingWinsServerAddressesMessage)"
 
     # Get the current WINS Server Addresses based on the parameters given.
@@ -74,13 +76,7 @@ function Set-TargetResource
         $Address
     )
 
-    foreach ($ip in $Address)
-    {
-        if (-not [System.Net.IPAddress]::TryParse($ip, [ref]0))
-        {
-            New-InvalidArgumentException -Message ($script:localizedData.AddressFormatError -f $Address) -ArgumentName 'Address'
-        }
-    }
+    Assert-ResourceProperty @PSBoundParameters
 
     Write-Verbose -Message "$($MyInvocation.MyCommand): $($script:localizedData.ApplyingWinsServerAddressesMessage)"
 
@@ -117,15 +113,9 @@ function Test-TargetResource
 
     Write-Verbose -Message "$($MyInvocation.MyCommand): $($script:localizedData.CheckingWinsServerAddressesMessage)"
 
-    foreach ($ip in $Address)
-    {
-        if (-not [System.Net.IPAddress]::TryParse($ip, [ref]0))
-        {
-            New-InvalidArgumentException -Message ($script:localizedData.AddressFormatError -f $Address) -ArgumentName 'Address'
-        }
-    }
+    Assert-ResourceProperty @PSBoundParameters
 
-    $currentState = Get-TargetResource -InterfaceAlias $InterfaceAlias
+    $currentState = Get-TargetResource @PSBoundParameters
     $desiredState = $PSBoundParameters
 
     $result = Test-DscParameterState -CurrentValues $currentState -DesiredValues $desiredState
@@ -141,6 +131,40 @@ function Test-TargetResource
     }
 
     return $result
+}
+
+function Assert-ResourceProperty
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $InterfaceAlias,
+
+        [Parameter()]
+        [AllowEmptyCollection()]
+        [String[]]
+        $Address
+    )
+
+    if (-not (Get-NetAdapter | Where-Object Name -EQ $InterfaceAlias))
+    {
+        New-InvalidArgumentException `
+            -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias) `
+            -ArgumentName 'InterfaceAlias'
+    }
+
+    foreach ($ip in $Address)
+    {
+        if (-not ([System.Net.IPAddress]::TryParse($ip, [ref]0)))
+        {
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.AddressFormatError -f $ip)
+                -ArgumentName 'Address'
+        }
+    }
 }
 
 Export-ModuleMember -Function *-TargetResource
