@@ -31,7 +31,6 @@ Configuration WinsServerAddress_Config
         {
             Address        = '192.168.0.1'
             InterfaceAlias = 'Ethernet'
-            Validate       = $true
         }
     }
 }

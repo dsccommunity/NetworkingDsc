@@ -31,7 +31,6 @@ Configuration WinsServerAddress_PrimaryAndSecondary_Config
         {
             Address        = '192.168.0.1', '192.168.0.2'
             InterfaceAlias = 'Ethernet'
-            Validate       = $true
         }
     }
 }
