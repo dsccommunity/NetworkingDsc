@@ -1142,7 +1142,6 @@ function Test-RuleProperties
     )
 
     $properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
-
     $desiredConfigurationMatch = $true
 
     <#
@@ -1201,7 +1200,7 @@ function Test-RuleProperties
                     $parameterValue = $parameterValue -split $parameter.Delimiter
                 }
 
-                if ($parameter.Type -eq 'IPArray')
+                if ($parameter.Type -eq 'ArrayIP')
                 {
                     <#
                         IPArray comparison uses Compare-Object, except needs to convert any IP addresses
