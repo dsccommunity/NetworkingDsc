@@ -1208,7 +1208,10 @@ function Test-RuleProperties
                         format that the Get-NetFirewallAddressFilter will return the IP addresses in
                         even if they were set using CIDR notation.
                     #>
-                    $parameterNew = Convert-CIDRToSubhetMask -Address $parameterNew
+                    if ($null -ne $parameterNew)
+                    {
+                        $parameterNew = Convert-CIDRToSubhetMask -Address $parameterNew
+                    }
                 }
 
                 if ($parameterNew `
