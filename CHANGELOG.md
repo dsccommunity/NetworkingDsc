@@ -13,6 +13,11 @@
     sorting for arrays.
   - The functions ConvertTo-CimInstance and ConvertTo-Hashtable were added
     required by Test-DscParameterState.
+- Firewall:
+  - Fix bug when LocalAddress or RemoteAddress is specified using CIDR
+    notation with number of bits specified in subnet mask (e.g.
+    10.0.0.1/8) rather than using CIDR subnet mask notation (e.g
+    10.0.0.1/255.0.0.0) - fixes [Issue #404](https://github.com/PowerShell/NetworkingDsc/issues/404).
 
 ## 7.2.0.0
 
