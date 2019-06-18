@@ -1,11 +1,11 @@
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         This function tests if a cmdlet exists.
 
-        .PARAMETER Name
+    .PARAMETER Name
         The name of the cmdlet to check for.
 
-        .PARAMETER Module
+    .PARAMETER Module
         The module containing the command.
 #>
 function Test-Command
@@ -27,7 +27,7 @@ function Test-Command
 } # function Test-Command
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Tests if the current machine is a Nano server.
 #>
 function Test-IsNanoServer
@@ -47,11 +47,11 @@ function Test-IsNanoServer
 }
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Retrieves the localized string data based on the machine's culture.
         Falls back to en-US strings if the machine's culture is not supported.
 
-        .PARAMETER ResourceName
+    .PARAMETER ResourceName
         The name of the resource as it appears before '.strings.psd1' of the localized string file.
         For example:
             For WindowsOptionalFeature: MSFT_WindowsOptionalFeature
@@ -59,11 +59,11 @@ function Test-IsNanoServer
             For Registry: MSFT_RegistryResource
             For Helper: SqlServerDscHelper
 
-        .PARAMETER ScriptRoot
+    .PARAMETER ScriptRoot
         Optional. The root path where to expect to find the culture folder. This is only needed
         for localization in helper modules. This should not normally be used for resources.
 
-        .NOTES
+    .NOTES
         To be able to use localization in the helper function, this function must
         be first in the file, before Get-LocalizedData is used by itself to load
         localized data for this helper module (see directly after this function).
@@ -111,13 +111,13 @@ function Get-LocalizedData
 }
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Creates and throws an invalid argument exception.
 
-        .PARAMETER Message
+    .PARAMETER Message
         The message explaining why this error is being thrown.
 
-        .PARAMETER ArgumentName
+    .PARAMETER ArgumentName
         The name of the invalid argument that is causing this error to be thrown.
 #>
 function New-InvalidArgumentException
@@ -150,13 +150,13 @@ function New-InvalidArgumentException
 }
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Creates and throws an invalid operation exception.
 
-        .PARAMETER Message
+    .PARAMETER Message
         The message explaining why this error is being thrown.
 
-        .PARAMETER ErrorRecord
+    .PARAMETER ErrorRecord
         The error record containing the exception that is causing this terminating error.
 #>
 function New-InvalidOperationException
@@ -202,13 +202,13 @@ function New-InvalidOperationException
 }
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Creates and throws an object not found exception.
 
-        .PARAMETER Message
+    .PARAMETER Message
         The message explaining why this error is being thrown.
 
-        .PARAMETER ErrorRecord
+    .PARAMETER ErrorRecord
         The error record containing the exception that is causing this terminating error.
 #>
 function New-ObjectNotFoundException
@@ -254,13 +254,13 @@ function New-ObjectNotFoundException
 }
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Creates and throws an invalid result exception.
 
-        .PARAMETER Message
+    .PARAMETER Message
         The message explaining why this error is being thrown.
 
-        .PARAMETER ErrorRecord
+    .PARAMETER ErrorRecord
         The error record containing the exception that is causing this terminating error.
 #>
 function New-InvalidResultException
@@ -348,11 +348,11 @@ function New-NotImplementedException
 }
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Converts any IP Addresses containing CIDR notation filters in an array to use Subnet Mask
         notation.
 
-        .PARAMETER Address
+    .PARAMETER Address
         The array of addresses to that need to be converted.
 #>
 function Convert-CIDRToSubhetMask
@@ -420,39 +420,39 @@ function Convert-CIDRToSubhetMask
 } # Convert-CIDRToSubhetMask
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         This function will find a network adapter based on the provided
         search parameters.
 
-        .PARAMETER Name
+    .PARAMETER Name
         This is the name of network adapter to find.
 
-        .PARAMETER PhysicalMediaType
+    .PARAMETER PhysicalMediaType
         This is the media type of the network adapter to find.
 
-        .PARAMETER Status
+    .PARAMETER Status
         This is the status of the network adapter to find.
 
-        .PARAMETER MacAddress
+    .PARAMETER MacAddress
         This is the MAC address of the network adapter to find.
 
-        .PARAMETER InterfaceDescription
+    .PARAMETER InterfaceDescription
         This is the interface description of the network adapter to find.
 
-        .PARAMETER InterfaceIndex
+    .PARAMETER InterfaceIndex
         This is the interface index of the network adapter to find.
 
-        .PARAMETER InterfaceGuid
+    .PARAMETER InterfaceGuid
         This is the interface GUID of the network adapter to find.
 
-        .PARAMETER DriverDescription
+    .PARAMETER DriverDescription
         This is the driver description of the network adapter.
 
-        .PARAMETER InterfaceNumber
+    .PARAMETER InterfaceNumber
         This is the interface number of the network adapter if more than one
         are returned by the parameters.
 
-        .PARAMETER IgnoreMultipleMatchingAdapters
+    .PARAMETER IgnoreMultipleMatchingAdapters
         This switch will suppress an error occurring if more than one matching
         adapter matches the parameters passed.
 #>
@@ -627,7 +627,7 @@ function Find-NetworkAdapter
 } # Find-NetworkAdapter
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Returns the DNS Client Server static address that are assigned to a network
         adapter. This is required because Get-DnsClientServerAddress always returns
         the currently assigned server addresses whether regardless if they were
@@ -635,10 +635,10 @@ function Find-NetworkAdapter
 
         The only way that could be found to do this is to query the registry.
 
-        .PARAMETER InterfaceAlias
+    .PARAMETER InterfaceAlias
         Alias of the network interface to get the static DNS Server addresses from.
 
-        .PARAMETER AddressFamily
+    .PARAMETER AddressFamily
         IP address family.
 #>
 function Get-DnsClientServerStaticAddress
@@ -809,13 +809,13 @@ function Set-WinsClientServerStaticAddress
 } # Set-WinsClientServerStaticAddress
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Gets the IP Address prefix from a provided IP Address in CIDR notation.
 
-        .PARAMETER IPAddress
+    .PARAMETER IPAddress
         IP Address to get prefix for, can be in CIDR notation.
 
-        .PARAMETER AddressFamily
+    .PARAMETER AddressFamily
         Address family for provided IP Address, defaults to IPv4.
 
 #>
@@ -870,13 +870,13 @@ function Get-IPAddressPrefix
 }
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Removes common parameters from a hashtable
 
-        .DESCRIPTION
+    .DESCRIPTION
         This function serves the purpose of removing common parameters and option common parameters from a parameter hashtable
 
-        .PARAMETER Hashtable
+    .PARAMETER Hashtable
         The parameter hashtable that should be pruned
 #>
 function Remove-CommonParameter
@@ -904,28 +904,28 @@ function Remove-CommonParameter
 }
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Tests the status of DSC resource parameters.
 
-        .DESCRIPTION
+    .DESCRIPTION
         This function tests the parameter status of DSC resource parameters against the current values present on the system.
 
-        .PARAMETER CurrentValues
+    .PARAMETER CurrentValues
         A hashtable with the current values on the system, obtained by e.g. Get-TargetResource.
 
-        .PARAMETER DesiredValues
+    .PARAMETER DesiredValues
         The hashtable of desired values.
 
-        .PARAMETER ValuesToCheck
+    .PARAMETER ValuesToCheck
         The values to check if not all values should be checked.
 
-        .PARAMETER TurnOffTypeChecking
+    .PARAMETER TurnOffTypeChecking
         Indicates that the type of the parameter should not be checked.
 
-        .PARAMETER ReverseCheck
+    .PARAMETER ReverseCheck
         Indicates that a reverse check should be done. The current and desired state are swapped for another test.
 
-        .PARAMETER SortArrayValues
+    .PARAMETER SortArrayValues
         If the sorting of array values does not matter, values are sorted internally before doing the comparison.
 #>
 function Test-DscParameterState
@@ -1228,13 +1228,13 @@ function Test-DscParameterState
 }
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Tests of an object has a property
 
-        .PARAMETER Object
+    .PARAMETER Object
         The object to test
 
-        .PARAMETER PropertyName
+    .PARAMETER PropertyName
         The property name
 #>
 function Test-DscObjectHasProperty
@@ -1261,17 +1261,17 @@ function Test-DscObjectHasProperty
 }
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Converts a hashtable into a CimInstance array.
 
-        .DESCRIPTION
+    .DESCRIPTION
         This function is used to convert a hashtable into MSFT_KeyValuePair objects. These are stored as an CimInstance array.
         DSC cannot handle hashtables but CimInstances arrays storing MSFT_KeyValuePair.
 
-        .PARAMETER Hashtable
+    .PARAMETER Hashtable
         A hashtable with the values to convert.
 
-        .OUTPUTS
+    .OUTPUTS
         An object array with CimInstance objects.
 #>
 function ConvertTo-CimInstance
@@ -1305,16 +1305,16 @@ function ConvertTo-CimInstance
 }
 
 <#
-        .SYNOPSIS
+    .SYNOPSIS
         Converts CimInstances into a hashtable.
 
-        .DESCRIPTION
+    .DESCRIPTION
         This function is used to convert a CimInstance array containing MSFT_KeyValuePair objects into a hashtable.
 
-        .PARAMETER CimInstance
+    .PARAMETER CimInstance
         An array of CimInstances or a single CimInstance object to convert.
 
-        .OUTPUTS
+    .OUTPUTS
         Hashtable
 #>
 function ConvertTo-HashTable

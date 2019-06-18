@@ -23,7 +23,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     InModuleScope $script:DSCResourceName {
-        Describe 'MSFT_DefaultGatewayAddress\Get-TargetResource' {
+        Describe 'MSFT_DefaultGatewayAddress\Get-TargetResource' -Tag 'Get' {
             Context 'Checking return with default gateway' {
                 #region Mocks
                 Mock Get-NetRoute -MockWith {
@@ -67,7 +67,7 @@ try
             }
         }
 
-        Describe 'MSFT_DefaultGatewayAddress\Set-TargetResource' {
+        Describe 'MSFT_DefaultGatewayAddress\Set-TargetResource' -Tag 'Set' {
             BeforeEach {
                 #region Mocks
                 Mock Get-NetRoute -MockWith {
@@ -126,7 +126,7 @@ try
             }
         }
 
-        Describe 'MSFT_DefaultGatewayAddress\Test-TargetResource' {
+        Describe 'MSFT_DefaultGatewayAddress\Test-TargetResource' -Tag 'Test' {
             BeforeEach {
                 #region Mocks
                 Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }

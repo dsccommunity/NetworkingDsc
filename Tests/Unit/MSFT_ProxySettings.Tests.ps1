@@ -100,7 +100,7 @@ try
 
         [System.Byte[]] $testBinary = @(0x46, 0x0, 0x0, 0x0, 0x8, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0)
 
-        Describe "$script:DSCResourceName\Get-TargetResource" {
+        Describe 'MSFT_ProxySettings\Get-TargetResource' -Tag 'Get' {
             Context 'No Proxy Settings are Defined in the Registry' {
                 Mock `
                     -CommandName Get-ItemProperty `
@@ -190,7 +190,7 @@ try
             }
         }
 
-        Describe "$script:DSCResourceName\Set-TargetResource" {
+        Describe 'MSFT_ProxySettings\Set-TargetResource' -Tag 'Set' {
             Context 'Ensure Proxy Settings not Defined for All Connection Types' {
                 Mock `
                     -CommandName Remove-ItemProperty `
@@ -348,7 +348,7 @@ try
             }
         }
 
-        Describe "$script:DSCResourceName\Test-TargetResource" {
+        Describe 'MSFT_ProxySettings\Test-TargetResource' -Tag 'Test' {
             Context 'No Proxy Settings are Defined in the Registry and None Required for All Connection Types' {
                 Mock `
                     -CommandName Get-ItemProperty `
@@ -654,7 +654,7 @@ try
             }
         }
 
-        Describe "$script:DSCResourceName\Test-ProxySettings" {
+        Describe 'MSFT_ProxySettings\Test-ProxySettings' {
             Context 'All Proxy Types Disabled' {
                 It 'Should not throw an exception' {
                     { $script:testProxySettingsResult = Test-ProxySettings `
@@ -734,7 +734,7 @@ try
             }
         }
 
-        Describe "$script:DSCResourceName\Get-StringLengthInHexBytes" {
+        Describe 'MSFT_ProxySettings\Get-StringLengthInHexBytes' {
             Context 'When an empty value string is passed' {
                 It 'Should return @(0x00,0x00,0x00,0x00)' {
                     Get-StringLengthInHexBytes -Value '' | Should -Be @( '0x00', '0x00', '0x00', '0x00' )
@@ -754,7 +754,7 @@ try
             }
         }
 
-        Describe "$script:DSCResourceName\Get-Int32FromByteArray" {
+        Describe 'MSFT_ProxySettings\Get-Int32FromByteArray' {
             Context 'When a byte array with a little endian integer less than 256 starting at byte 0' {
                 It 'Should return 255' {
                     Get-Int32FromByteArray -Byte ([System.Byte[]] @(255,0,0,0,99)) -StartByte 0 | Should -Be 255
@@ -780,7 +780,7 @@ try
             }
         }
 
-        Describe "$script:DSCResourceName\Convert*-ProxySettingsBinary" {
+        Describe 'MSFT_ProxySettings\Convert*-ProxySettingsBinary' {
             Context 'All Proxy Types Disabled' {
                 It 'Should not throw an exception when converting to Proxy Settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllDisabledSettings -Verbose } | Should -Not -Throw

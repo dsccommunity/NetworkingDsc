@@ -22,9 +22,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
-
         # Import the NetAdapter module to load the required NET_IF_ADMIN_STATUS enums
         Import-Module -Name NetAdapter
 
@@ -43,8 +41,7 @@ try
             AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Testing
         }
 
-        Describe "$($DSCResourceName)\Get-TargetResource" {
-
+        Describe 'MSFT_NetAdapterState\Get-TargetResource' -Tag 'Get' {
             BeforeEach {
                 $getTargetResource = @{
                     Name = 'Ethernet'
@@ -105,8 +102,7 @@ try
             }
         }
 
-        Describe "$($DSCResourceName)\Set-TargetResource" {
-
+        Describe 'MSFT_NetAdapterState\Set-TargetResource' -Tag 'Set' {
             BeforeEach {
                 $setTargetResourceEnabled = @{
                     Name = 'Ethernet'
@@ -217,8 +213,7 @@ try
             }
         }
 
-        Describe "$($DSCResourceName)\Test-TargetResource" {
-
+        Describe 'MSFT_NetAdapterState\Test-TargetResource' -Tag 'Test' {
             BeforeEach {
                 $testTargetResourceEnabled = @{
                     Name = 'Ethernet'
@@ -292,7 +287,6 @@ try
             }
         }
     }
-    #endregion
 }
 finally
 {

@@ -23,7 +23,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
 
         $testDnsSuffix = 'example.local'
@@ -47,7 +46,7 @@ try
         $fakeDnsSuffixAbsent['ConnectionSpecificSuffix'] = ''
 
 
-        Describe "MSFT_DnsConnectionSuffix\Get-TargetResource" {
+        Describe 'MSFT_DnsConnectionSuffix\Get-TargetResource' -Tag 'Get' {
             Context 'Validates "Get-TargetResource" method' {
                 It 'Should return a "System.Collections.Hashtable" object type' {
                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
@@ -100,7 +99,7 @@ try
             } #end Context 'Validates "Get-TargetResource" method'
         }
 
-        Describe "MSFT_DnsConnectionSuffix\Test-TargetResource" {
+        Describe 'MSFT_DnsConnectionSuffix\Test-TargetResource' -Tag 'Test' {
             Context 'Validates "Test-TargetResource" method' {
                 It 'Should pass when all properties match and "Ensure" = "Present"' {
                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
@@ -177,7 +176,7 @@ try
             } #end Context 'Validates "Test-TargetResource" method'
         }
 
-        Describe "MSFT_DnsConnectionSuffix\Test-TargetResource" {
+        Describe 'MSFT_DnsConnectionSuffix\Set-TargetResource' -Tag 'Set' {
             Context 'Validates "Set-TargetResource" method' {
                 It 'Should call "Set-DnsClient" with specified DNS suffix when "Ensure" = "Present"' {
                     Mock Set-DnsClient -ParameterFilter { $InterfaceAlias -eq $testInterfaceAlias -and $ConnectionSpecificSuffix -eq $testDnsSuffix } { }
@@ -197,7 +196,6 @@ try
             } #end Context 'Validates "Set-TargetResource" method'
         }
     } #end InModuleScope $DSCResourceName
-    #endregion
 }
 finally
 {

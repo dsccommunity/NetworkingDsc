@@ -47,7 +47,7 @@ try
             Verbose          = $true
         }
 
-        Describe 'MSFT_WaitForVolume\Get-TargetResource' {
+        Describe 'MSFT_WaitForVolume\Get-TargetResource' -Tag 'Get' {
             Context 'When the network team exists' {
                 Mock `
                     -CommandName Get-NetLbfoTeamStatus `
@@ -96,7 +96,7 @@ try
             }
         }
 
-        Describe 'MSFT_WaitForVolume\Set-TargetResource' {
+        Describe 'MSFT_WaitForVolume\Set-TargetResource' -Tag 'Set' {
             Context 'When network team is Up' {
                 Mock Start-Sleep
                 Mock -CommandName Get-NetLbfoTeamStatus -MockWith { 'Up' }
@@ -133,7 +133,7 @@ try
             }
         }
 
-        Describe 'MSFT_WaitForVolume\Test-TargetResource' {
+        Describe 'MSFT_WaitForVolume\Test-TargetResource' -Tag 'Test' {
             Context 'When network team is Up' {
                 Mock -CommandName Get-NetLbfoTeamStatus -MockWith { 'Up' }
 

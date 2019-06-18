@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
         $interfaceAlias = 'Test Adapter'
 
@@ -62,8 +61,7 @@ try
             -Value 2 `
             -PassThru
 
-        #region Function Get-TargetResource
-        Describe 'MSFT_NetBios\Get-TargetResource' {
+        Describe 'MSFT_NetBios\Get-TargetResource' -Tag 'Get' {
             Context 'NetBios over TCP/IP is set to "Default"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDefault}
@@ -135,10 +133,8 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function Test-TargetResource
-        Describe 'MSFT_NetBios\Test-TargetResource' {
+        Describe 'MSFT_NetBios\Test-TargetResource' -Tag 'Test' {
             Context 'NetBios over TCP/IP is set to "Default"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDefault }
@@ -191,10 +187,8 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function Set-TargetResource
-        Describe 'MSFT_NetBios\Set-TargetResource' {
+        Describe 'MSFT_NetBios\Set-TargetResource' -Tag 'Set' {
             Context 'NetBios over TCP/IP should be set to "Default"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsEnable }
@@ -284,9 +278,7 @@ try
                 }
             }
         }
-        #endregion
     }
-    #endregion
 }
 finally
 {

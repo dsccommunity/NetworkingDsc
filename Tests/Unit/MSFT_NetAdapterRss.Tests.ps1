@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
 
         $TestRssEnabled = @{
@@ -40,7 +39,7 @@ try
             Enabled = $true
         }
 
-        Describe "$($script:DSCResourceName)\Get-TargetResource" -Tag 'Get' {
+        Describe 'MSFT_NetAdapterRss\Get-TargetResource' -Tag 'Get' {
             Context 'Adapter exist and RSS is enabled' {
                 Mock Get-NetAdapterRss -Verbose -MockWith { @{ Enabled = $true } }
 
@@ -84,7 +83,7 @@ try
                 }
             }
 
-            Describe "$($script:DSCResourceName)\Set-TargetResource" {
+            Describe 'MSFT_NetAdapterRss\Set-TargetResource' -Tag 'Set' {
 
                 Context 'Adapter exist, RSS is enabled, no action required' {
                     Mock -CommandName Get-NetAdapterRSS -MockWith {
@@ -168,7 +167,7 @@ try
 
             }
 
-            Describe "$($script:DSCResourceName)\Test-TargetResource" {
+            Describe 'MSFT_NetAdapterRss\Test-TargetResource' -Tag 'Test' {
                 # All
                 Context 'Adapter exist, RSS is enabled, no action required' {
                     Mock -CommandName Get-NetAdapterRSS -MockWith {
@@ -242,8 +241,8 @@ try
                     }
                 }
             }
-        }}
-    #endregion
+        }
+    }
 }
 finally
 {

@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
         # Create the Mock -CommandName Objects that will be used for running tests
         $script:testNicName = 'HostTeamNic'
@@ -84,7 +83,7 @@ try
             -and $VlanId -eq 100
         }
 
-        Describe "$($script:DSCResourceName)\Get-TargetResource" {
+        Describe 'MSFT_NetworkTeamInterface\Get-TargetResource' -Tag 'Get' {
             Context 'When team Interface does not exist' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
@@ -132,7 +131,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Set-TargetResource" {
+        Describe 'MSFT_NetworkTeamInterface\Set-TargetResource' -Tag 'Set' {
             Context 'When team Interface does not exist but invalid VlanId (0) is passed' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
@@ -282,7 +281,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Test-TargetResource" {
+        Describe 'MSFT_NetworkTeamInterface\Test-TargetResource' -Tag 'Test' {
             Context 'When team Interface does not exist but should' {
                 Mock `
                     -CommandName Get-NetLbfoTeamNic `
@@ -425,7 +424,6 @@ try
             }
         }
     }
-    #endregion
 }
 finally
 {
