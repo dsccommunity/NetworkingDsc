@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
 
         # Create the Mock Objects that will be used for running tests
@@ -57,7 +56,7 @@ try
             UseDevolution    = $dnsClientGlobalSettings.UseDevolution
         }
 
-        Describe "MSFT_DnsClientGlobalSetting\Get-TargetResource" {
+        Describe 'MSFT_DnsClientGlobalSetting\Get-TargetResource' -Tag 'Get' {
             BeforeEach {
                 Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalSettings }
             }
@@ -76,7 +75,7 @@ try
             }
         }
 
-        Describe "MSFT_DnsClientGlobalSetting\Set-TargetResource" {
+        Describe 'MSFT_DnsClientGlobalSetting\Set-TargetResource' -Tag 'Set' {
             BeforeEach {
                 Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalSettings }
             }
@@ -172,7 +171,7 @@ try
             }
         }
 
-        Describe "MSFT_DnsClientGlobalSetting\Test-TargetResource" {
+        Describe 'MSFT_DnsClientGlobalSetting\Test-TargetResource' -Tag 'Test' {
             Context 'Single suffix is in the search list' {
                 BeforeEach {
                     Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalSettings }
@@ -329,7 +328,6 @@ try
             }
         }
     }
-    #endregion
 }
 finally
 {

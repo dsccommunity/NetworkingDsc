@@ -13,6 +13,12 @@
     sorting for arrays.
   - The functions ConvertTo-CimInstance and ConvertTo-Hashtable were added
     required by Test-DscParameterState.
+- Fix missing context message content in unit tests - fixes [Issue #405](https://github.com/PowerShell/NetworkingDsc/issues/405).
+- Correct style violations in unit tests:
+  - Adding `Get`, `Set` and `Test` tags to appropriate `describe` blocks.
+  - Removing uneccesary `#region` blocks.
+  - Conversion of double quotes to single quotes where possible.
+  - Replace variables with string litterals in `describe` block description.
 
 ## 7.2.0.0
 

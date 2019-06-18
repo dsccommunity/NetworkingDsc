@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
         # Create the Mock -CommandName Objects that will be used for running tests
         $testAdapterName = 'SMB1_1'
@@ -40,7 +39,7 @@ try
             Enabled = $false
         }
 
-        Describe "$($script:DSCResourceName)\Get-TargetResource" {
+        Describe 'MSFT_NetAdapterRdma\Get-TargetResource' -Tag 'Get' {
             function Get-NetAdapterRdma
             {
             }
@@ -79,7 +78,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Set-TargetResource" {
+        Describe 'MSFT_NetAdapterRdma\Set-TargetResource' -Tag 'Set' {
             function Get-NetAdapterRdma
             {
             }
@@ -194,7 +193,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Test-TargetResource" {
+        Describe 'MSFT_NetAdapterRdma\Test-TargetResource' -Tag 'Test' {
             function Get-NetAdapterRdma
             {
             }
@@ -278,7 +277,6 @@ try
             }
         }
     }
-    #endregion
 }
 finally
 {

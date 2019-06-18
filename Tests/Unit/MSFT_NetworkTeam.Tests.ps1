@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
         # Create the Mock -CommandName Objects that will be used for running tests
         $mockNetTeam = [PSCustomObject] @{
@@ -55,7 +54,7 @@ try
             }
         }
 
-        Describe 'MSFT_NetworkTeam\Get-TargetResource' {
+        Describe 'MSFT_NetworkTeam\Get-TargetResource' -Tag 'Get' {
             Context 'When network team does not exist' {
                 Mock -CommandName Get-NetLbfoTeam
 
@@ -115,7 +114,7 @@ try
             }
         }
 
-        Describe 'MSFT_NetworkTeam\Set-TargetResource' {
+        Describe 'MSFT_NetworkTeam\Set-TargetResource' -Tag 'Set' {
             Context 'When team does not exist but should' {
                 Mock -CommandName Get-NetLbfoTeam
                 Mock -CommandName New-NetLbfoTeam
@@ -259,7 +258,7 @@ try
             }
         }
 
-        Describe 'MSFT_NetworkTeam\Test-TargetResource' {
+        Describe 'MSFT_NetworkTeam\Test-TargetResource' -Tag 'Test' {
             Context 'When team does not exist but should' {
                 Mock -CommandName Get-NetLbfoTeam
 

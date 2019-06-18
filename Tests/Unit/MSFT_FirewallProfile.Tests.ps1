@@ -31,7 +31,6 @@ $script:parameterList = $resourceData.ParameterList
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
         # Create the Mock Objects that will be used for running tests
         $firewallProfile = [PSObject] @{
@@ -99,7 +98,7 @@ try
             )
         }
 
-        Describe 'MSFT_FirewallProfile\Get-TargetResource' {
+        Describe 'MSFT_FirewallProfile\Get-TargetResource' -Tag 'Get' {
             BeforeEach {
                 Mock -CommandName Get-NetFirewallProfile -MockWith { $firewallProfile }
             }
@@ -133,7 +132,7 @@ try
             }
         }
 
-        Describe 'MSFT_FirewallProfile\Set-TargetResource' {
+        Describe 'MSFT_FirewallProfile\Set-TargetResource' -Tag 'Set' {
             BeforeEach {
                 Mock -CommandName Get-NetFirewallProfile -MockWith { $firewallProfile }
             }
@@ -231,7 +230,7 @@ try
             }
         }
 
-        Describe 'MSFT_FirewallProfile\Test-TargetResource' {
+        Describe 'MSFT_FirewallProfile\Test-TargetResource' -Tag 'Test' {
             BeforeEach {
                 Mock -CommandName Get-NetFirewallProfile -MockWith { $firewallProfile }
             }
@@ -304,7 +303,6 @@ try
             }
         }
     }
-    #endregion
 }
 finally
 {
