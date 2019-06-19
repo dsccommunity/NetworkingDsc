@@ -19,6 +19,11 @@
   - Removing uneccesary `#region` blocks.
   - Conversion of double quotes to single quotes where possible.
   - Replace variables with string litterals in `describe` block description.
+- Firewall:
+  - Fix bug when LocalAddress or RemoteAddress is specified using CIDR
+    notation with number of bits specified in subnet mask (e.g.
+    10.0.0.1/8) rather than using CIDR subnet mask notation (e.g
+    10.0.0.1/255.0.0.0) - fixes [Issue #404](https://github.com/PowerShell/NetworkingDsc/issues/404).
 
 ## 7.2.0.0
 
