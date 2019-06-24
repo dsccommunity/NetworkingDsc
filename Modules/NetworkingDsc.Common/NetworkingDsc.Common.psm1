@@ -714,6 +714,15 @@ function Get-DnsClientServerStaticAddress
     } # if
 } # Get-DnsClientServerStaticAddress
 
+<#
+    .SYNOPSIS
+    Returns the WINS Client Server static address that are assigned to a network
+    adapter. The CIM class Win32_NetworkAdapterConfiguration unfortunately only supports
+    the primary and secondary WINS server. The registry gives more flexibility.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface to get the static WINS Server addresses from.
+#>
 function Get-WinsClientServerStaticAddress
 {
     [CmdletBinding()]
@@ -756,20 +765,21 @@ function Get-WinsClientServerStaticAddress
     else
     {
         # Static DNS Server addresses found so split them into an array using comma
-        Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.WinsServerStaticAddressFoundMessage -f $InterfaceAlias, ($nameServerAddressString -join ','))")
+        Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.WinsServerStaticAddressFoundMessage -f
+        $InterfaceAlias, ($nameServerAddressString -join ','))")
 
-        return $nameServerAddressString -split ','
+        return $nameServerAddressString
     }
 } # Get-WinsClientServerStaticAddress
 
 <#
     .SYNOPSIS
-    Returns the WINS Client Server static address that are assigned to a network
-    adapter. The CIM class Win32_NetworkAdapterConfiguration unfortunately only supports
-    the primary and secondary WINS server. The registry gives more flexibility.
+    Sets the WINS Client Server static address on a network adapter. The CIM class
+    Win32_NetworkAdapterConfiguration unfortunately only supports the primary and
+    secondary WINS server. The registry gives more flexibility.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface to get the static WINS Server addresses from.
+    Alias of the network interface to set the static WINS Server addresses on.
 #>
 function Set-WinsClientServerStaticAddress
 {
@@ -805,7 +815,6 @@ function Set-WinsClientServerStaticAddress
 
     $interfaceInformation = Get-ItemProperty -Path $interfaceRegKeyPath -ErrorAction SilentlyContinue
     $nameServerAddressString = $interfaceInformation.NameServerList
-
 } # Set-WinsClientServerStaticAddress
 
 <#

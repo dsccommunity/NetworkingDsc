@@ -106,9 +106,6 @@ try
         #endregion
     }
 
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Configured.config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
-
     Describe "$($script:DSCResourceName)_Integration using no addresses" {
         #region DEFAULT TESTS
         It 'Should compile and apply the MOF without throwing' {

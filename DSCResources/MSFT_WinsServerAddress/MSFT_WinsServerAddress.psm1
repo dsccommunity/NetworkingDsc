@@ -27,15 +27,10 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $InterfaceAlias,
-
-        [Parameter()]
-        [AllowEmptyCollection()]
-        [String[]]
-        $Address
+        $InterfaceAlias
     )
 
-    Assert-ResourceProperty  @PSBoundParameters
+    Assert-ResourceProperty @PSBoundParameters
 
     Write-Verbose -Message "$($MyInvocation.MyCommand): $($script:localizedData.GettingWinsServerAddressesMessage)"
 
@@ -67,12 +62,12 @@ function Set-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter()]
         [AllowEmptyCollection()]
-        [String[]]
+        [System.String[]]
         $Address
     )
 
@@ -102,12 +97,12 @@ function Test-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter()]
         [AllowEmptyCollection()]
-        [String[]]
+        [System.String[]]
         $Address
     )
 
@@ -115,7 +110,7 @@ function Test-TargetResource
 
     Assert-ResourceProperty @PSBoundParameters
 
-    $currentState = Get-TargetResource @PSBoundParameters
+    $currentState = Get-TargetResource -InterfaceAlias $InterfaceAlias
     $desiredState = $PSBoundParameters
 
     $result = Test-DscParameterState -CurrentValues $currentState -DesiredValues $desiredState
@@ -126,7 +121,8 @@ function Test-TargetResource
     }
     else
     {
-        $message = "$($MyInvocation.MyCommand): $($script:localizedData.WinsServersNotCorrectMessage -f ($currentState.Address -join ', '), ($desiredState.Address -join ', '))"
+        $message = "$($MyInvocation.MyCommand): $($script:localizedData.WinsServersNotCorrectMessage -f
+        ($currentState.Address -join ', '), ($desiredState.Address -join ', '))"
         Write-Verbose -Message $message
     }
 
@@ -140,12 +136,12 @@ function Assert-ResourceProperty
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $InterfaceAlias,
 
         [Parameter()]
         [AllowEmptyCollection()]
-        [String[]]
+        [System.String[]]
         $Address
     )
 

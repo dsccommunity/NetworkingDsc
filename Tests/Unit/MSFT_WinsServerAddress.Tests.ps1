@@ -25,82 +25,77 @@ try
     #region Pester Tests
     InModuleScope $script:DSCResourceName {
         Describe 'MSFT_WinsServerAddress\Get-TargetResource' {
-            Context 'Test' {
-                Context 'Invoking with an address and one address is currently set' {
-                    Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
-                    Mock Assert-ResourceProperty -MockWith { }
+            Context 'When invoking with an address and one address is currently set' {
+                Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
+                Mock Assert-ResourceProperty -MockWith { }
 
-                    It 'Should return true' {
-                        $getTargetResourceSplat = @{
-                            Address        = '192.168.0.1'
-                            InterfaceAlias = 'Ethernet'
-                            Verbose        = $true
-                        }
-
-                        $result = Get-TargetResource @getTargetResourceSplat
-                        $result.Address | Should -Be '192.168.0.1'
+                It 'Should return current WINS address' {
+                    $getTargetResourceSplat = @{
+                        InterfaceAlias = 'Ethernet'
+                        Verbose        = $true
                     }
 
-                    It 'Should call all the mocks' {
-                        Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
-                        Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 1
-                    }
+                    $result = Get-TargetResource @getTargetResourceSplat
+                    $result.Address | Should -Be '192.168.0.1'
+                }
+
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1 #-ParameterFilter { Write-Host "--$($InterfaceName)--"; $InterfaceName -eq 'Ethernet' }
+                    Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 1 #-ParameterFilter { $InterfaceName -eq 'Ethernet' }
                 }
             }
         }
 
         Describe 'MSFT_WinsServerAddress\Set-TargetResource' {
-            Context 'Test' {
-                BeforeEach {
-                    Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
-                    Mock Set-WinsClientServerStaticAddress -MockWith { }
-                    Mock Assert-ResourceProperty -MockWith { }
+            BeforeEach {
+                Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
+                Mock Set-WinsClientServerStaticAddress -MockWith { }
+                Mock Assert-ResourceProperty -MockWith { }
+            }
+
+            Context 'When invoking with single server address' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        Address        = '192.168.0.1'
+                        InterfaceAlias = 'Ethernet'
+                        Verbose        = $true
+                    }
+
+                    { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                 }
 
-                Context 'Invoking with single server address' {
-                    It 'Should not throw an exception' {
-                        $setTargetResourceSplat = @{
-                            Address        = '192.168.0.1'
-                            InterfaceAlias = 'Ethernet'
-                            Verbose        = $true
-                        }
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -CommandName Set-WinsClientServerStaticAddress -Exactly 1
+                    Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 1
+                }
+            }
 
-                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
+            Context 'When invoking with multiple server addresses' {
+                It 'Should not throw an exception' {
+                    $setTargetResourceSplat = @{
+                        Address        = @( '192.168.0.99', '192.168.0.100' )
+                        InterfaceAlias = 'Ethernet'
+                        Verbose        = $true
                     }
 
-                    It 'Should call all the mocks' {
-                        Assert-MockCalled -CommandName Set-WinsClientServerStaticAddress -Exactly 1
-                        Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 1
-                    }
+                    { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
                 }
 
-                Context 'Invoking with multiple server addresses' {
-                    It 'Should not throw an exception' {
-                        $setTargetResourceSplat = @{
-                            Address        = @( '192.168.0.99', '192.168.0.100' )
-                            InterfaceAlias = 'Ethernet'
-                            Verbose        = $true
-                        }
-
-                        { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
-                    }
-
-                    It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Set-WinsClientServerStaticAddress -Exactly 1
-                        Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 1
-                    }
+                It 'Should call all the mocks' {
+                    Assert-MockCalled -commandName Set-WinsClientServerStaticAddress -Exactly 1
+                    Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 1
                 }
             }
         }
 
         Describe 'MSFT_WinsServerAddress\Test-TargetResource' {
-            Context 'Test single value' {
+            Context 'When a single WINS server is currently configured' {
                 BeforeEach {
                     Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
                     Mock Assert-ResourceProperty -MockWith { }
                 }
 
-                Context 'Invoking with single server address that is the same as current' {
+                Context 'When invoking with single server address that is the same as current' {
                     It 'Should return true' {
                         $testTargetResourceSplat = @{
                             Address        = '192.168.0.1'
@@ -117,7 +112,7 @@ try
                     }
                 }
 
-                Context 'Invoking with single server address that is different to current' {
+                Context 'When invoking with single server address that is different to current' {
                     It 'Should return false' {
                         $testTargetResourceSplat = @{
                             Address        = '192.168.0.2'
@@ -152,13 +147,13 @@ try
                 }
             }
 
-            Context 'Test multi value' {
+            Context 'When two WINS servers are currently configured' {
                 BeforeEach {
                     Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1', '192.168.0.2' }
                     Mock Assert-ResourceProperty -MockWith { }
                 }
 
-                Context 'Invoking with multiple server addresses that are the same as current' {
+                Context 'When invoking with multiple server addresses that are the same as current' {
                     It 'Should return true' {
                         $testTargetResourceSplat = @{
                             Address        = '192.168.0.1', '192.168.0.2'
@@ -175,7 +170,7 @@ try
                     }
                 }
 
-                Context 'Invoking with multiple server addresses that are different to current 1' {
+                Context 'When invoking with multiple server addresses that are different to current 1' {
                     It 'Should return false' {
                         $testTargetResourceSplat = @{
                             Address        = '192.168.0.2', '192.168.0.99'
@@ -192,7 +187,7 @@ try
                     }
                 }
 
-                Context 'Invoking with multiple server addresses that are different to current 2' {
+                Context 'When invoking with multiple server addresses that are different to current 2' {
                     It 'Should return false' {
                         $testTargetResourceSplat = @{
                             Address        = '192.168.0.1', '192.168.0.2', '192.168.0.3'
@@ -209,7 +204,7 @@ try
                     }
                 }
 
-                Context 'Invoking with multiple server addresses that are in a different order to current' {
+                Context 'When invoking with multiple server addresses that are in a different order to current' {
                     It 'Should return false' {
                         $testTargetResourceSplat = @{
                             Address        = '192.168.0.2', '192.168.0.1'
