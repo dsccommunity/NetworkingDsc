@@ -813,8 +813,6 @@ function Set-WinsClientServerStaticAddress
 
     Set-ItemProperty -Path $interfaceRegKeyPath -Name NameServerList -Value $Address
 
-    $interfaceInformation = Get-ItemProperty -Path $interfaceRegKeyPath -ErrorAction SilentlyContinue
-    $nameServerAddressString = $interfaceInformation.NameServerList
 } # Set-WinsClientServerStaticAddress
 
 <#
