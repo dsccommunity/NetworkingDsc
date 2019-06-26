@@ -8,6 +8,8 @@
   - Removed validation from RegistryKeyword parameter because the list
     of valid registry keywords is not fixed and will depend on adapter
     driver - fixes [Issue #388](https://github.com/PowerShell/NetworkingDsc/issues/388).
+- MSFT_WinsServerAddress
+  Added MSFT_WinsServerAddress to control the WINS servers for a given network adapter.
 - Test-DscParameterState:
   - This function was enhanced with an optional reversecheck, optional internal
     sorting for arrays.

@@ -2047,6 +2047,199 @@ try
                 }
             }
         }
+
+        Describe 'NetworkingDsc.Common\Get-WinsClientServerStaticAddress' {
+
+            # Generate the adapter data to be used for Mocking
+            $interfaceAlias = 'Adapter'
+            $interfaceGuid = [Guid]::NewGuid().ToString()
+            $nomatchAdapter = $null
+            $matchAdapter = @{
+                InterfaceGuid = $interfaceGuid
+            }
+            $parameters = @{
+                InterfaceAlias = $interfaceAlias
+            }
+            $noIpStaticAddressString = ''
+            $oneIpStaticAddressString = '8.8.8.8'
+            $secondIpStaticAddressString = '4.4.4.4'
+            $twoIpStaticAddressString = $oneIpStaticAddressString, $secondIpStaticAddressString
+
+            Context 'When interface alias does not match adapter in system' {
+                Mock Get-NetAdapter -MockWith { $nomatchAdapter }
+
+                $errorRecord = Get-InvalidOperationRecord -Message ($script:localizedData.InterfaceAliasNotFoundError -f $interfaceAlias)
+
+                It 'Should throw exception' {
+                    { $script:result = Get-WinsClientServerStaticAddress @parameters -Verbose } | Should -Throw $errorRecord
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                }
+            }
+
+            Context 'When interface alias was found in system and WINS server is empty' {
+                Mock Get-NetAdapter -MockWith { $matchAdapter }
+                Mock Get-ItemProperty -MockWith {
+                    @{
+                        NameServer = $noIpStaticAddressString
+                    }
+                }
+
+                It 'Should not throw exception' {
+                    { $script:result = Get-WinsClientServerStaticAddress @parameters -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return null' {
+                    $script:result | Should -BeNullOrEmpty
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
+                }
+            }
+
+            Context 'When interface alias was found in system and WINS server list contains one entry' {
+                Mock Get-NetAdapter -MockWith { $matchAdapter }
+                Mock Get-ItemProperty -MockWith {
+                    @{
+                        NameServerList = $oneIpStaticAddressString
+                    }
+                }
+
+                It 'Should not throw exception' {
+                    { $script:result = Get-WinsClientServerStaticAddress @parameters -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return expected address' {
+                    $script:result | Should -Be $oneIpStaticAddressString
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
+                }
+            }
+
+            Context 'When interface alias was found in system and WINS server list contains two entries' {
+                Mock Get-NetAdapter -MockWith { $matchAdapter }
+                Mock Get-ItemProperty -MockWith {
+                    @{
+                        NameServerList = $twoIpStaticAddressString
+                    }
+                }
+
+                It 'Should not throw exception' {
+                    { $script:result = Get-WinsClientServerStaticAddress @parameters -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return two expected addresses' {
+                    $script:result[0] | Should -Be $oneIpStaticAddressString
+                    $script:result[1] | Should -Be $secondIpStaticAddressString
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
+                }
+            }
+        }
+
+        Describe 'NetworkingDsc.Common\Set-WinsClientServerStaticAddress' {
+
+            # Generate the adapter data to be used for Mocking
+            $interfaceAlias = 'Adapter'
+            $interfaceGuid = [Guid]::NewGuid().ToString()
+            $nomatchAdapter = $null
+            $matchAdapter = @{
+                InterfaceGuid = $interfaceGuid
+            }
+            $parameters = @{
+                InterfaceAlias = $interfaceAlias
+            }
+            $noIpStaticAddressString = ''
+            $oneIpStaticAddressString = '8.8.8.8'
+            $secondIpStaticAddressString = '4.4.4.4'
+            $twoIpStaticAddressString = $oneIpStaticAddressString, $secondIpStaticAddressString
+
+            Context 'When interface alias does not match adapter in system' {
+                Mock Get-NetAdapter -MockWith { $nomatchAdapter }
+
+                $parameters.Address = @()
+
+                $errorRecord = Get-InvalidOperationRecord -Message ($script:localizedData.InterfaceAliasNotFoundError -f $interfaceAlias)
+
+                It 'Should throw exception' {
+                    { $script:result = Set-WinsClientServerStaticAddress @parameters -Verbose } | Should -Throw $errorRecord
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                }
+            }
+
+            Context 'When interface alias was found in system and WINS server address is set to $null' {
+                Mock Get-NetAdapter -MockWith { $matchAdapter }
+                Mock Set-ItemProperty -MockWith { }
+
+                $parameters.Address = @()
+
+                It 'Should not throw exception' {
+                    { $script:result = Set-WinsClientServerStaticAddress @parameters -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return null' {
+                    $script:result | Should -BeNullOrEmpty
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 1
+                }
+            }
+
+            Context 'When interface alias was found in system and WINS server address is set to a single entry' {
+                Mock Get-NetAdapter -MockWith { $matchAdapter }
+                Mock Set-ItemProperty -MockWith { }
+
+                $parameters.Address = $oneIpStaticAddressString
+
+                It 'Should not throw exception' {
+                    { $script:result = Set-WinsClientServerStaticAddress @parameters -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return null' {
+                    $script:result | Should -BeNullOrEmpty
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 1
+                }
+            }
+
+            Context 'When interface alias was found in system and WINS server address is set to two enties' {
+                Mock Get-NetAdapter -MockWith { $matchAdapter }
+                Mock Set-ItemProperty -MockWith { }
+
+                $parameters.Address = $twoIpStaticAddressString
+
+                It 'Should not throw exception' {
+                    { $script:result = Set-WinsClientServerStaticAddress @parameters -Verbose } | Should -Not -Throw
+                }
+
+                It 'Should return null' {
+                    $script:result | Should -BeNullOrEmpty
+                }
+
+                It 'Should call expected mocks' {
+                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 1
+                }
+            }
+        }
     }
 }
 finally
