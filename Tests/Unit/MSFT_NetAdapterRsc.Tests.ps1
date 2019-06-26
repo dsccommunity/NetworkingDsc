@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
         $TestAllRscEnabled = @{
             Name = 'Ethernet'
@@ -66,7 +65,7 @@ try
             State = $true
         }
 
-        Describe "$($script:DSCResourceName)\Get-TargetResource" {
+        Describe 'MSFT_NetAdapterRsc\Get-TargetResource' -Tag 'Get' {
             Context 'Adapter exists and Rsc is enabled' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith {
                     @{
@@ -191,8 +190,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)\Set-TargetResource" {
-
+        Describe 'MSFT_NetAdapterRsc\Set-TargetResource' -Tag 'Set' {
             # All
             Context 'Adapter exists, Rsc is enabled, no action required' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith {
@@ -456,7 +454,7 @@ try
 
         }
 
-        Describe "$($script:DSCResourceName)\Test-TargetResource" {
+        Describe 'MSFT_NetAdapterRsc\Test-TargetResource' -Tag 'Test' {
             # All
             Context 'Adapter exists, Rsc is enabled, no action required' {
                 Mock -CommandName Get-NetAdapterRsc -MockWith {
@@ -655,7 +653,6 @@ try
             }
         }
     }
-    #endregion
 }
 finally
 {

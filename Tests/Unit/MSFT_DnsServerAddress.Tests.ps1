@@ -22,9 +22,8 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
-        Describe 'MSFT_DnsServerAddress\Get-TargetResource' {
+        Describe 'MSFT_DnsServerAddress\Get-TargetResource' -Tag 'Get' {
             Context 'Test IPv4' {
                 Context 'Invoking with an IPv4 address and one address is currently set' {
                     Mock Get-DnsClientServerStaticAddress -MockWith { '192.168.0.1' }
@@ -92,7 +91,7 @@ try
             }
         }
 
-        Describe 'MSFT_DnsServerAddress\Set-TargetResource' {
+        Describe 'MSFT_DnsServerAddress\Set-TargetResource' -Tag 'Set' {
             Context 'Test IPv4' {
                 BeforeEach {
                     Mock Get-DnsClientServerStaticAddress -MockWith { '192.168.0.1' }
@@ -378,7 +377,7 @@ try
             }
         }
 
-        Describe 'MSFT_DnsServerAddress\Test-TargetResource' {
+        Describe 'MSFT_DnsServerAddress\Test-TargetResource' -Tag 'Test' {
             Context 'Test IPv4' {
                 BeforeEach {
                     Mock Get-NetAdapter -MockWith { [PSObject]@{ Name = 'Ethernet' } }
@@ -668,7 +667,6 @@ try
             }
         }
     } #end InModuleScope $DSCResourceName
-    #endregion
 }
 finally
 {

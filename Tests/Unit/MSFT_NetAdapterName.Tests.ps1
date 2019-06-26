@@ -81,7 +81,7 @@ try
             )
         }
 
-        Describe 'MSFT_NetAdapterName\Get-TargetResource' {
+        Describe 'MSFT_NetAdapterName\Get-TargetResource' -Tag 'Get' {
             Context 'Renamed adapter can be found' {
                 Mock `
                     -CommandName Find-NetworkAdapter `
@@ -146,7 +146,7 @@ try
             }
         }
 
-        Describe 'MSFT_NetAdapterName\Set-TargetResource' {
+        Describe 'MSFT_NetAdapterName\Set-TargetResource' -Tag 'Set' {
             Context 'Matching adapter can be found' {
                 Mock `
                     -CommandName Find-NetworkAdapter `
@@ -172,7 +172,7 @@ try
             }
         }
 
-        Describe 'MSFT_NetAdapterName\Test-TargetResource' {
+        Describe 'MSFT_NetAdapterName\Test-TargetResource' -Tag 'Test' {
             Context 'Matching adapter can be found and has correct Name' {
                 Mock -CommandName Find-NetworkAdapter -MockWith { $script:mockRenamedAdapter }
 

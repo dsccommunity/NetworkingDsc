@@ -22,10 +22,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
-
-        #region Pester Test Initialization
         # Get the rule that will be used for testing
         $firewallRule = Get-NetFirewallRule |
                 Sort-Object -Property Name |
@@ -34,7 +31,8 @@ try
                 } |
                 Select-Object -First 1
         $firewallRuleName = $firewallRule.Name
-        $Properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
+        $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
+
         # Pull two rules to use testing that error is thrown when this occurs
         $firewallRules = Get-NetFirewallRule |
                 Sort-Object -Property Name |
@@ -42,10 +40,8 @@ try
                     $_.DisplayGroup -ne $null
                 } |
                 Select-Object -First 2
-        #endregion
 
-        #region Function Get-TargetResource
-        Describe 'MSFT_Firewall\Get-TargetResource' {
+        Describe 'MSFT_Firewall\Get-TargetResource' -Tag 'Get' {
             Context 'Absent should return correctly' {
                 Mock -CommandName Get-NetFirewallRule
 
@@ -86,16 +82,14 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function Test-TargetResource
-        Describe 'MSFT_Firewall\Test-TargetResource' {
+        Describe 'MSFT_Firewall\Test-TargetResource' -Tag 'Test' {
             Context 'Ensure is Absent and the Firewall is not Present' {
                 Mock -CommandName Get-FirewallRule
 
                 It "Should return $true on firewall rule $($firewallRule.Name)" {
                     $result = Test-TargetResource -Name 'FirewallRule' -Ensure 'Absent'
-                    $result | Should -Be $true
+                    $result | Should -BeTrue
                 }
             }
 
@@ -104,7 +98,7 @@ try
 
                 It "Should return $false on firewall rule $($firewallRule.Name)" {
                     $result = Test-TargetResource -Name $firewallRule.Name -Ensure 'Absent'
-                    $result | Should -Be $false
+                    $result | Should -BeFalse
                 }
             }
 
@@ -113,7 +107,7 @@ try
 
                 It "Should return $true on firewall rule $($firewallRule.Name)" {
                     $result = Test-TargetResource -Name $firewallRule.Name
-                    $result | Should -Be $true
+                    $result | Should -BeTrue
                 }
             }
 
@@ -122,7 +116,7 @@ try
 
                 It "Should return $false on firewall rule $($firewallRule.Name)" {
                     $result = Test-TargetResource -Name $firewallRule.Name
-                    $result | Should -Be $false
+                    $result | Should -BeFalse
                 }
             }
 
@@ -130,18 +124,16 @@ try
                 Mock -CommandName Get-FirewallRule
                 It "Should return $false on firewall rule $($firewallRule.Name)" {
                     $result = Test-TargetResource -Name $firewallRule.Name
-                    $result | Should -Be $false
+                    $result | Should -BeFalse
                 }
             }
         }
-        #endregion
 
-        #region Function Set-TargetResource
-        Describe 'MSFT_Firewall\Set-TargetResource' {
+        Describe 'MSFT_Firewall\Set-TargetResource' -Tag 'Set' {
             BeforeEach {
                 # To speed up all these tests create Mocks so that these functions are not repeatedly called
                 Mock -CommandName Get-FirewallRule -MockWith { $firewallRule }
-                Mock -CommandName Get-FirewallRuleProperty -MockWith { $Properties }
+                Mock -CommandName Get-FirewallRuleProperty -MockWith { $properties }
             }
 
             Context 'Ensure is Absent and Firewall rule exists' {
@@ -776,12 +768,12 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function Test-RuleProperties
         Describe 'MSFT_Firewall\Test-RuleProperties' {
             # Make an object that can be splatted onto the function
-            $Splat = @{}
+            $testRuleProperties = @{
+                Verbose = $true
+            }
 
             foreach ($parameter in $ParameterList)
             {
@@ -801,403 +793,446 @@ try
                     $parameterValue = $parameterValue -split $parameter.Delimiter
                 }
 
-                $Splat += @{ $parameter.Name = $parameterValue }
+                $testRuleProperties += @{ $parameter.Name = $parameterValue }
             }
 
-            BeforeEach {
-                # To speed up all these tests create Mocks so that these functions are not repeatedly called
-                Mock -CommandName Get-FirewallRule -MockWith { $firewallRule }
-                Mock -CommandName Get-FirewallRuleProperty -MockWith { $Properties }
-            }
+            Context 'When testing with a rule that has property differences' {
+                BeforeEach {
+                    # To speed up all these tests create Mocks so that these functions are not repeatedly called
+                    Mock -CommandName Get-FirewallRule -MockWith { $firewallRule }
+                    Mock -CommandName Get-FirewallRuleProperty -MockWith { $properties }
+                }
 
-            Context 'When testing with a rule with no property differences' {
-                $compareRule = $Splat.Clone()
+                Context 'When testing with a rule with a different name' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.Name = 'Different'
 
-                It "Should return True on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $true
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different displayname' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.DisplayName = 'Different'
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different group' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.Group = 'Different'
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different enabled' {
+                    $compareRule = $testRuleProperties.Clone()
+
+                    if ( $compareRule.Enabled -eq 'True' )
+                    {
+                        $compareRule.Enabled = 'False'
+                    }
+                    else
+                    {
+                        $compareRule.Enabled = 'True'
+                    }
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different action' {
+                    $compareRule = $testRuleProperties.Clone()
+
+                    if ($compareRule.Action -eq 'Allow')
+                    {
+                        $compareRule.Action = 'Block'
+                    }
+                    else
+                    {
+                        $compareRule.Action = 'Allow'
+                    }
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different profile' {
+                    $compareRule = $testRuleProperties.Clone()
+
+                    if ( $compareRule.Profile -ccontains 'Domain')
+                    {
+                        $compareRule.Profile = @('Public', 'Private')
+                    }
+                    else
+                    {
+                        $compareRule.Profile = @('Domain', 'Public')
+                    }
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different direction' {
+                    $compareRule = $testRuleProperties.Clone()
+
+                    if ($compareRule.Direction -eq 'Inbound')
+                    {
+                        $compareRule.Direction = 'Outbound'
+                    }
+                    else
+                    {
+                        $compareRule.Direction = 'Inbound'
+                    }
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different remote port' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.RemotePort = 1
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different local port' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.LocalPort = 1
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different protocol' {
+                    $compareRule = $testRuleProperties.Clone()
+
+                    if ( $compareRule.Protocol -eq 'TCP')
+                    {
+                        $compareRule.Protocol = 'UDP'
+                    }
+                    else
+                    {
+                        $compareRule.Protocol = 'TCP'
+                    }
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different description' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.Description = 'Different'
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different program' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.Program = 'Different'
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different service' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.Service = 'Different'
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different Authentication' {
+                    $compareRule = $testRuleProperties.Clone()
+
+                    if ( $compareRule.Authentication -eq 'Required')
+                    {
+                        $compareRule.Authentication = 'NotRequired'
+                    }
+                    else
+                    {
+                        $compareRule.Authentication = 'Required'
+                    }
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different Encryption' {
+                    $compareRule = $testRuleProperties.Clone()
+
+                    if ( $compareRule.Encryption -eq 'Required')
+                    {
+                        $compareRule.Encryption = 'NotRequired'
+                    }
+                    else
+                    {
+                        $compareRule.Encryption = 'Required'
+                    }
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different InterfaceAlias' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.InterfaceAlias = 'Different'
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different InterfaceType' {
+                    $compareRule = $testRuleProperties.Clone()
+
+                    if ( $compareRule.InterfaceType -eq 'Wired')
+                    {
+                        $compareRule.InterfaceType = 'Wireless'
+                    }
+                    else
+                    {
+                        $compareRule.InterfaceType = 'Wired'
+                    }
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different LocalAddress' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.LocalAddress = @('10.0.0.1/255.0.0.0', '10.1.1.0-10.1.2.0')
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different LocalUser' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.LocalUser = 'Different'
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different Package' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.Package = 'Different'
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different Platform' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.Platform = @('6.2')
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different RemoteAddress' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.RemoteAddress = @('10.0.0.1/255.0.0.0', '10.1.1.0-10.1.2.0')
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different RemoteMachine' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.RemoteMachine = 'Different'
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different RemoteUser' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.RemoteUser = 'Different'
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different DynamicTransport' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.DynamicTransport = 'WifiDirectDevices'
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different EdgeTraversalPolicy' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.EdgeTraversalPolicy = 'DeferToApp'
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different IcmpType' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.IcmpType = @('53', '54')
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different LocalOnlyMapping' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.LocalOnlyMapping = ! $compareRule.LocalOnlyMapping
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different LooseSourceMapping' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.LooseSourceMapping = ! $compareRule.LooseSourceMapping
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different OverrideBlockRules' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.OverrideBlockRules = ! $compareRule.OverrideBlockRules
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
+                }
+
+                Context 'When testing with a rule with a different Owner' {
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.Owner = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
+
+                    It "Should return False on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeFalse
+                    }
                 }
             }
 
-            Context 'When testing with a rule with a different name' {
-                $compareRule = $Splat.Clone()
-                $compareRule.Name = 'Different'
+            Context 'When testing with a rule with no differences' {
+                Context 'When there are no format differences' {
+                    Mock -CommandName Get-FirewallRule -MockWith { $firewallRule }
+                    Mock -CommandName Get-FirewallRuleProperty -MockWith { $properties }
 
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
+                    $compareRule = $testRuleProperties.Clone()
 
-            Context 'When testing with a rule with a different displayname' {
-                $compareRule = $Splat.Clone()
-                $compareRule.DisplayName = 'Different'
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different group' {
-                $compareRule = $Splat.Clone()
-                $compareRule.Group = 'Different'
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different enabled' {
-                $compareRule = $Splat.Clone()
-
-                if ( $compareRule.Enabled -eq 'True' )
-                {
-                    $compareRule.Enabled = 'False'
-                }
-                else
-                {
-                    $compareRule.Enabled = 'True'
+                    It "Should return True on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeTrue
+                    }
                 }
 
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
+                Context 'When the LocalAddress subnet mask uses CIDR bits format' {
+                    $localAddressProperties = $properties.Clone()
+                    $localAddressProperties.AddressFilters = [PSCustomObject] @{
+                        LocalAddress = '10.0.0.0/255.0.0.0'
+                        RemoteAddress = $localAddressProperties.AddressFilters.RemoteAddress
+                    }
 
-            Context 'When testing with a rule with a different action' {
-                $compareRule = $Splat.Clone()
+                    Mock -CommandName Get-FirewallRule -MockWith { $firewallRule }
+                    Mock -CommandName Get-FirewallRuleProperty -MockWith { $localAddressProperties }
 
-                if ($compareRule.Action -eq 'Allow')
-                {
-                    $compareRule.Action = 'Block'
-                }
-                else
-                {
-                    $compareRule.Action = 'Allow'
-                }
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.LocalAddress = '10.0.0.0/8'
 
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different profile' {
-                $compareRule = $Splat.Clone()
-
-                if ( $compareRule.Profile -ccontains 'Domain')
-                {
-                    $compareRule.Profile = @('Public', 'Private')
-                }
-                else
-                {
-                    $compareRule.Profile = @('Domain', 'Public')
+                    It "Should return True on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeTrue
+                    }
                 }
 
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
+                Context 'When the RemoteAddress subnet mask uses CIDR bits format' {
+                    $remoteAddressProperties = $properties.Clone()
+                    $remoteAddressProperties.AddressFilters = [PSCustomObject] @{
+                        LocalAddress = $remoteAddressProperties.AddressFilters.LocalAddress
+                        RemoteAddress = '10.0.0.0/255.0.0.0'
+                    }
 
-            Context 'When testing with a rule with a different direction' {
-                $compareRule = $Splat.Clone()
+                    Mock -CommandName Get-FirewallRule -MockWith { $firewallRule }
+                    Mock -CommandName Get-FirewallRuleProperty -MockWith { $remoteAddressProperties }
 
-                if ($compareRule.Direction -eq 'Inbound')
-                {
-                    $compareRule.Direction = 'Outbound'
-                }
-                else
-                {
-                    $compareRule.Direction = 'Inbound'
-                }
+                    $compareRule = $testRuleProperties.Clone()
+                    $compareRule.RemoteAddress = '10.0.0.0/8'
 
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different remote port' {
-                $compareRule = $Splat.Clone()
-                $compareRule.RemotePort = 1
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different local port' {
-                $compareRule = $Splat.Clone()
-                $compareRule.LocalPort = 1
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different protocol' {
-                $compareRule = $Splat.Clone()
-
-                if ( $compareRule.Protocol -eq 'TCP')
-                {
-                    $compareRule.Protocol = 'UDP'
-                }
-                else
-                {
-                    $compareRule.Protocol = 'TCP'
-                }
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different description' {
-                $compareRule = $Splat.Clone()
-                $compareRule.Description = 'Different'
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different program' {
-                $compareRule = $Splat.Clone()
-                $compareRule.Program = 'Different'
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different service' {
-                $compareRule = $Splat.Clone()
-                $compareRule.Service = 'Different'
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different Authentication' {
-                $compareRule = $Splat.Clone()
-
-                if ( $compareRule.Authentication -eq 'Required')
-                {
-                    $compareRule.Authentication = 'NotRequired'
-                }
-                else
-                {
-                    $compareRule.Authentication = 'Required'
-                }
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different Encryption' {
-                $compareRule = $Splat.Clone()
-
-                if ( $compareRule.Encryption -eq 'Required')
-                {
-                    $compareRule.Encryption = 'NotRequired'
-                }
-                else
-                {
-                    $compareRule.Encryption = 'Required'
-                }
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different InterfaceAlias' {
-                $compareRule = $Splat.Clone()
-                $compareRule.InterfaceAlias = 'Different'
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different InterfaceType' {
-                $compareRule = $Splat.Clone()
-
-                if ( $compareRule.InterfaceType -eq 'Wired')
-                {
-                    $compareRule.InterfaceType = 'Wireless'
-                }
-                else
-                {
-                    $compareRule.InterfaceType = 'Wired'
-                }
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different LocalAddress' {
-                $compareRule = $Splat.Clone()
-                $compareRule.LocalAddress = @('10.0.0.1/255.0.0.0', '10.1.1.0-10.1.2.0')
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different LocalUser' {
-                $compareRule = $Splat.Clone()
-                $compareRule.LocalUser = 'Different'
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different Package' {
-                $compareRule = $Splat.Clone()
-                $compareRule.Package = 'Different'
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different Platform' {
-                $compareRule = $Splat.Clone()
-                $compareRule.Platform = @('6.2')
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different RemoteAddress' {
-                $compareRule = $Splat.Clone()
-                $compareRule.RemoteAddress = @('10.0.0.1/255.0.0.0', '10.1.1.0-10.1.2.0')
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different RemoteMachine' {
-                $compareRule = $Splat.Clone()
-                $compareRule.RemoteMachine = 'Different'
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different RemoteUser' {
-                $compareRule = $Splat.Clone()
-                $compareRule.RemoteUser = 'Different'
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different DynamicTransport' {
-                $compareRule = $Splat.Clone()
-                $compareRule.DynamicTransport = 'WifiDirectDevices'
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different EdgeTraversalPolicy' {
-                $compareRule = $Splat.Clone()
-                $compareRule.EdgeTraversalPolicy = 'DeferToApp'
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different IcmpType' {
-                $compareRule = $Splat.Clone()
-                $compareRule.IcmpType = @('53', '54')
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different LocalOnlyMapping' {
-                $compareRule = $Splat.Clone()
-                $compareRule.LocalOnlyMapping = ! $compareRule.LocalOnlyMapping
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different LooseSourceMapping' {
-                $compareRule = $Splat.Clone()
-                $compareRule.LooseSourceMapping = ! $compareRule.LooseSourceMapping
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different OverrideBlockRules' {
-                $compareRule = $Splat.Clone()
-                $compareRule.OverrideBlockRules = ! $compareRule.OverrideBlockRules
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
-                }
-            }
-
-            Context 'When testing with a rule with a different Owner' {
-                $compareRule = $Splat.Clone()
-                $compareRule.Owner = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
-
-                It "Should return False on firewall rule $($firewallRule.Name)" {
-                    $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
-                    $result | Should -Be $False
+                    It "Should return True on firewall rule $($firewallRule.Name)" {
+                        $result = Test-RuleProperties -FirewallRule $firewallRule @compareRule
+                        $result | Should -BeTrue
+                    }
                 }
             }
         }
-        #endregion
 
-        #region Function Get-FirewallRule
         Describe 'MSFT_Firewall\Get-FirewallRule' {
-            Context 'esting with firewall that exists' {
+            Context 'Testing with firewall that exists' {
                 It "Should return a firewall rule when name is passed on firewall rule $($firewallRule.Name)" {
                     $result = Get-FirewallRule -Name $firewallRule.Name
                     $result | Should -Not -BeNullOrEmpty
@@ -1245,10 +1280,8 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function Get-FirewallRuleProperty
-        Describe "MSFT_Firewall\Get-FirewallRuleProperty" {
+        Describe 'MSFT_Firewall\Get-FirewallRuleProperty' {
             Context 'All Properties' {
                 $result = Get-FirewallRuleProperty -FirewallRule $firewallRule
 
@@ -1310,10 +1343,8 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function ConvertTo-FirewallRuleNameEscapedString
-        Describe "MSFT_Firewall\ConvertTo-FirewallRuleNameEscapedString" {
+        Describe 'MSFT_Firewall\ConvertTo-FirewallRuleNameEscapedString' {
             Context 'Rule name that contains no escaped characters' {
                 It 'Should return the rule name with no backticks added' {
                     ConvertTo-FirewallRuleNameEscapedString -Name 'No Escaped Characters' | Should -Be 'No Escaped Characters'
@@ -1326,9 +1357,7 @@ try
                 }
             }
         }
-        #endregion
     } #end InModuleScope $DSCResourceName
-    #endregion
 }
 finally
 {

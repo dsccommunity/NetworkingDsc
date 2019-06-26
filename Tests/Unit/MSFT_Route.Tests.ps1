@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
         # Create the Mock Objects that will be used for running tests
         $mockNetAdapter = [PSCustomObject] @{
@@ -58,7 +57,7 @@ try
             PreferredLifetime = ([Timespan]::FromSeconds($testRoute.PreferredLifetime))
         }
 
-        Describe 'MSFT_Route\Get-TargetResource' {
+        Describe 'MSFT_Route\Get-TargetResource' -Tag 'Get' {
             Context 'Route does not exist' {
                 Mock -CommandName Get-NetRoute
 
@@ -93,7 +92,7 @@ try
             }
         }
 
-        Describe 'MSFT_Route\Set-TargetResource' {
+        Describe 'MSFT_Route\Set-TargetResource' -Tag 'Set' {
             Context 'Route does not exist but should' {
                 Mock -CommandName Get-NetRoute
                 Mock -CommandName New-NetRoute
@@ -241,7 +240,7 @@ try
             }
         }
 
-        Describe "MSFT_Route\Test-TargetResource" {
+        Describe 'MSFT_Route\Test-TargetResource' -Tag 'Test' {
             Context 'Route does not exist but should' {
                 Mock -CommandName Get-NetAdapter -MockWith { $mockNetAdapter }
                 Mock -CommandName Get-NetRoute
@@ -509,7 +508,6 @@ try
             }
         }
     }
-    #endregion
 }
 finally
 {

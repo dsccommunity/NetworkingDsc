@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+## 7.3.0.0
+
+- DnsClientGlobalSettings:
+  - Fixed SuffixSearchList Empty String Handling - fixes [Issue #398](https://github.com/PowerShell/NetworkingDsc/issues/398).
+- NetAdapterAdvancedProperty:
+  - Removed validation from RegistryKeyword parameter because the list
+    of valid registry keywords is not fixed and will depend on adapter
+    driver - fixes [Issue #388](https://github.com/PowerShell/NetworkingDsc/issues/388).
+- MSFT_WinsServerAddress
+  Added MSFT_WinsServerAddress to control the WINS servers for a given network adapter.
+- Test-DscParameterState:
+  - This function was enhanced with an optional reversecheck, optional internal
+    sorting for arrays.
+  - The functions ConvertTo-CimInstance and ConvertTo-Hashtable were added
+    required by Test-DscParameterState.
+- Fix missing context message content in unit tests - fixes [Issue #405](https://github.com/PowerShell/NetworkingDsc/issues/405).
+- Correct style violations in unit tests:
+  - Adding `Get`, `Set` and `Test` tags to appropriate `describe` blocks.
+  - Removing uneccesary `#region` blocks.
+  - Conversion of double quotes to single quotes where possible.
+  - Replace variables with string litterals in `describe` block description.
+- Firewall:
+  - Fix bug when LocalAddress or RemoteAddress is specified using CIDR
+    notation with number of bits specified in subnet mask (e.g.
+    10.0.0.1/8) rather than using CIDR subnet mask notation (e.g
+    10.0.0.1/255.0.0.0) - fixes [Issue #404](https://github.com/PowerShell/NetworkingDsc/issues/404).
+
 ## 7.2.0.0
 
 - NetAdapterAdvancedProperty:

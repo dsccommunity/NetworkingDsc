@@ -7,8 +7,13 @@ ConvertFrom-StringData @'
     MultipleMatchingNetAdapterFound      = Please adjust the parameters or specify IgnoreMultipleMatchingAdapters to only use the first and try again.
     InvalidNetAdapterNumberError         = network adapter interface number {0} was specified but only {1} was found. Please correct the interface number and try again.
     GettingDNSServerStaticAddressMessage = Getting staticly assigned DNS server {0} address for interface alias '{1}'.
+    GettingWinsServerStaticAddressMessage = Getting staticly assigned WINS server address for interface alias '{0}'.
+    SettingWinsServerStaticAddressMessage = Setting staticly assigned WINS server address for interface alias '{0}' to '{1}'.
     DNSServerStaticAddressNotSetMessage  = Statically assigned DNS server {0} address for interface alias '{1}' is not set.
+    WinsServerStaticAddressNotSetMessage  = Statically assigned WINS server address for interface alias '{0}' is not set.
     DNSServerStaticAddressFoundMessage   = Statically assigned DNS server {0} address for interface alias '{1}' is '{2}'.
+    WinsServerStaticAddressFoundMessage   = Statically assigned WINS server address for interface alias '{0}' is '{1}'.
+    InvalidCurrentValuesError            = Property 'CurrentValues' in Test-DscParameterState must be either a Hashtable, CimInstance or CimIntance[]. Type detected was '{0}'.
     InvalidDesiredValuesError            = Property 'DesiredValues' in Test-DscParameterState must be either a Hashtable or CimInstance. Type detected was '{0}'.
     InvalidValuesToCheckError            = If 'DesiredValues' is a CimInstance then property 'ValuesToCheck' must contain a value.
     TestDscParameterCompareMessage       = Comparing values in property '{0}'.
@@ -22,4 +27,5 @@ ConvertFrom-StringData @'
     NoMatchElementValueMismatchMessage   = NOTMATCH: Value [{0}] (type '{1}') for property '{2}' does match. Current state is '{3}' and desired state is '{4}'.
     MatchElementValueMessage             = MATCH: Value [{0}] (type '{1}') for property '{2}' does match. Current state is '{3}' and desired state is '{4}'.
     TestDscParameterResultMessage        = Test-DscParameter result is '{0}'.
+    StartingReverseCheck                 = Starting with a reverse check.
 '@

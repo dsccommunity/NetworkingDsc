@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
         <#
             This is an array of parameters that will be used with pester test cases
@@ -188,8 +187,7 @@ try
             $InterfaceAlias -eq 'EthernetDoesNotExist' -and $AddressFamily -eq 'IPv4'
         }
 
-        #region Function Get-TargetResource
-        Describe 'MSFT_NetIPInterface\Get-TargetResource' {
+        Describe 'MSFT_NetIPInterface\Get-TargetResource' -Tag 'Get' {
             Context 'When called with alias and address family of an existing interface' {
                 Mock `
                     -CommandName Get-NetworkIPInterface `
@@ -212,10 +210,8 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function Test-TargetResource
-        Describe 'MSFT_NetIPInterface\Test-TargetResource' {
+        Describe 'MSFT_NetIPInterface\Test-TargetResource' -Tag 'Test' {
             Context 'When called with alias and address family of an existing interface and a mismatching value' {
                 Mock `
                     -CommandName Get-NetworkIPInterface `
@@ -260,10 +256,8 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function Set-TargetResource
-        Describe 'MSFT_NetIPInterface\Set-TargetResource' {
+        Describe 'MSFT_NetIPInterface\Set-TargetResource' -Tag 'Set' {
             Context 'When called with alias and address family of an existing interface and a mismatching value' {
                 Mock `
                     -CommandName Get-NetworkIPInterface `
@@ -315,9 +309,7 @@ try
                 }
             }
         }
-        #endregion
 
-        #region Function Get-NetworkIPInterface
         Describe 'MSFT_NetIPInterface\Get-NetworkIPInterface' {
             Context 'When called with alias and address family of an interface that does not exist' {
                 Mock `
@@ -361,9 +353,7 @@ try
                 }
             }
         }
-        #endregion
     } #end InModuleScope $DSCResourceName
-    #endregion
 }
 finally
 {

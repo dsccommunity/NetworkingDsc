@@ -31,6 +31,7 @@ The **NetworkingDsc** module contains the following resources:
 - **WaitForNetworkTeam**: Wait for a network team to achieve the 'Up' status.
 - **WinsSetting**: Configure the WINS settings that enable or disable LMHOSTS lookups
   and enable or disable DNS for name resolution over WINS.
+- **WinsServerAddress**: Sets a node's WINS server address(s).
 
 This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 

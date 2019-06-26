@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Begin Testing
 try
 {
-    #region Pester Tests
     InModuleScope $script:DSCResourceName {
 
         # Create the Mock Objects that will be used for running tests
@@ -38,6 +37,18 @@ try
             UseDevolution    = $true
         }
 
+        $dnsClientGlobalEmptyArraySuffixSettings = [PSObject]@{
+            SuffixSearchList = @()
+            DevolutionLevel  = 1
+            UseDevolution    = $true
+        }
+
+        $dnsClientGlobalEmptyStringSuffixSettings = [PSObject]@{
+            SuffixSearchList = ''
+            DevolutionLevel  = 1
+            UseDevolution    = $true
+        }
+
         $dnsClientGlobalSettingsSplat = [PSObject]@{
             IsSingleInstance = 'Yes'
             SuffixSearchList = $dnsClientGlobalSettings.SuffixSearchList
@@ -45,7 +56,7 @@ try
             UseDevolution    = $dnsClientGlobalSettings.UseDevolution
         }
 
-        Describe "MSFT_DnsClientGlobalSetting\Get-TargetResource" {
+        Describe 'MSFT_DnsClientGlobalSetting\Get-TargetResource' -Tag 'Get' {
             BeforeEach {
                 Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalSettings }
             }
@@ -64,7 +75,7 @@ try
             }
         }
 
-        Describe "MSFT_DnsClientGlobalSetting\Set-TargetResource" {
+        Describe 'MSFT_DnsClientGlobalSetting\Set-TargetResource' -Tag 'Set' {
             BeforeEach {
                 Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalSettings }
             }
@@ -160,7 +171,7 @@ try
             }
         }
 
-        Describe "MSFT_DnsClientGlobalSetting\Test-TargetResource" {
+        Describe 'MSFT_DnsClientGlobalSetting\Test-TargetResource' -Tag 'Test' {
             Context 'Single suffix is in the search list' {
                 BeforeEach {
                     Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalSettings }
@@ -255,9 +266,68 @@ try
                     }
                 }
             }
+
+            Context 'When the search list is an empty array' {
+                BeforeEach {
+                    Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalEmptyArraySuffixSettings }
+                }
+
+                Context 'When the DNS Client Global Settings SuffixSearchList Array is different' {
+                    It 'Should return false' {
+                        $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
+                        $testTargetResourceParameters.SuffixSearchList = @('fabrikam.com')
+                        Test-TargetResource @testTargetResourceParameters | Should -Be $False
+                    }
+
+                    It 'Should call expected Mocks' {
+                        Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    }
+                }
+
+                Context 'When the DNS Client Global Settings SuffixSearchList is same' {
+                    It 'Should return true' {
+                        $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
+                        $testTargetResourceParameters.SuffixSearchList = @()
+                        Test-TargetResource @testTargetResourceParameters | Should -Be $true
+                    }
+
+                    It 'Should call expected Mocks' {
+                        Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    }
+                }
+            }
+
+            Context 'When the search list is an empty string' {
+                BeforeEach {
+                    Mock -CommandName Get-DnsClientGlobalSetting -MockWith { $dnsClientGlobalEmptyStringSuffixSettings }
+                }
+
+                Context 'When the DNS Client Global Settings SuffixSearchList Array is different' {
+                    It 'Should return false' {
+                        $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
+                        $testTargetResourceParameters.SuffixSearchList = @('fabrikam.com')
+                        Test-TargetResource @testTargetResourceParameters | Should -Be $False
+                    }
+
+                    It 'Should call expected Mocks' {
+                        Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    }
+                }
+
+                Context 'When the DNS Client Global Settings SuffixSearchList is same' {
+                    It 'Should return true' {
+                        $testTargetResourceParameters = $dnsClientGlobalSettingsSplat.Clone()
+                        $testTargetResourceParameters.SuffixSearchList = @()
+                        Test-TargetResource @testTargetResourceParameters | Should -Be $true
+                    }
+
+                    It 'Should call expected Mocks' {
+                        Assert-MockCalled -commandName Get-DnsClientGlobalSetting -Exactly -Times 1
+                    }
+                }
+            }
         }
     }
-    #endregion
 }
 finally
 {

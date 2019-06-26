@@ -28,7 +28,7 @@ function Test-Command
 
 <#
     .SYNOPSIS
-    Tests if the current machine is a Nano server.
+        Tests if the current machine is a Nano server.
 #>
 function Test-IsNanoServer
 {
@@ -37,7 +37,7 @@ function Test-IsNanoServer
         $computerInfo = Get-ComputerInfo
 
         if ('Server' -eq $computerInfo.OsProductType `
-            -and 'NanoServer' -eq $computerInfo.OsServerLevel)
+                -and 'NanoServer' -eq $computerInfo.OsServerLevel)
         {
             return $true
         }
@@ -349,11 +349,11 @@ function New-NotImplementedException
 
 <#
     .SYNOPSIS
-    Converts any IP Addresses containing CIDR notation filters in an array to use Subnet Mask
-    notation.
+        Converts any IP Addresses containing CIDR notation filters in an array to use Subnet Mask
+        notation.
 
     .PARAMETER Address
-    The array of addresses to that need to be converted.
+        The array of addresses to that need to be converted.
 #>
 function Convert-CIDRToSubhetMask
 {
@@ -387,11 +387,11 @@ function Convert-CIDRToSubhetMask
                     $cidr = [System.Int32] $postfix
                     $subnetMaskInt64 = ([convert]::ToInt64(('1' * $cidr + '0' * (32 - $cidr)), 2))
                     $subnetMask = @(
-                            ([math]::Truncate($subnetMaskInt64 / 16777216))
-                            ([math]::Truncate(($subnetMaskInt64 % 16777216) / 65536))
-                            ([math]::Truncate(($subnetMaskInt64 % 65536)/256))
-                            ([math]::Truncate($subnetMaskInt64 % 256))
-                        )
+                        ([math]::Truncate($subnetMaskInt64 / 16777216))
+                        ([math]::Truncate(($subnetMaskInt64 % 16777216) / 65536))
+                        ([math]::Truncate(($subnetMaskInt64 % 65536) / 256))
+                        ([math]::Truncate($subnetMaskInt64 % 256))
+                    )
                 }
                 else
                 {
@@ -399,8 +399,8 @@ function Convert-CIDRToSubhetMask
                 }
 
                 <#
-                    Apply the Subnet Mast to the IP Address so that we end up with a correctly
-                    masked IP Address that will match what the Firewall rule returns.
+                        Apply the Subnet Mast to the IP Address so that we end up with a correctly
+                        masked IP Address that will match what the Firewall rule returns.
                 #>
                 $maskedIp = $prefix -split '\.'
 
@@ -409,7 +409,7 @@ function Convert-CIDRToSubhetMask
                     $maskedIp[$Octet] = $maskedIp[$octet] -band $SubnetMask[$octet]
                 }
 
-                $entry = '{0}/{1}' -f ($maskedIp -join '.'),($subnetMask -join '.')
+                $entry = '{0}/{1}' -f ($maskedIp -join '.'), ($subnetMask -join '.')
             }
         }
 
@@ -421,40 +421,40 @@ function Convert-CIDRToSubhetMask
 
 <#
     .SYNOPSIS
-    This function will find a network adapter based on the provided
-    search parameters.
+        This function will find a network adapter based on the provided
+        search parameters.
 
     .PARAMETER Name
-    This is the name of network adapter to find.
+        This is the name of network adapter to find.
 
     .PARAMETER PhysicalMediaType
-    This is the media type of the network adapter to find.
+        This is the media type of the network adapter to find.
 
     .PARAMETER Status
-    This is the status of the network adapter to find.
+        This is the status of the network adapter to find.
 
     .PARAMETER MacAddress
-    This is the MAC address of the network adapter to find.
+        This is the MAC address of the network adapter to find.
 
     .PARAMETER InterfaceDescription
-    This is the interface description of the network adapter to find.
+        This is the interface description of the network adapter to find.
 
     .PARAMETER InterfaceIndex
-    This is the interface index of the network adapter to find.
+        This is the interface index of the network adapter to find.
 
     .PARAMETER InterfaceGuid
-    This is the interface GUID of the network adapter to find.
+        This is the interface GUID of the network adapter to find.
 
     .PARAMETER DriverDescription
-    This is the driver description of the network adapter.
+        This is the driver description of the network adapter.
 
     .PARAMETER InterfaceNumber
-    This is the interface number of the network adapter if more than one
-    are returned by the parameters.
+        This is the interface number of the network adapter if more than one
+        are returned by the parameters.
 
     .PARAMETER IgnoreMultipleMatchingAdapters
-    This switch will suppress an error occurring if more than one matching
-    adapter matches the parameters passed.
+        This switch will suppress an error occurring if more than one matching
+        adapter matches the parameters passed.
 #>
 function Find-NetworkAdapter
 {
@@ -472,7 +472,7 @@ function Find-NetworkAdapter
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet('Up','Disconnected','Disabled')]
+        [ValidateSet('Up', 'Disconnected', 'Disabled')]
         [System.String]
         $Status = 'Up',
 
@@ -506,47 +506,47 @@ function Find-NetworkAdapter
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.FindingNetAdapterMessage)
+            $($script:localizedData.FindingNetAdapterMessage)
         ) -join '')
 
     $adapterFilters = @()
 
-    if($PSBoundParameters.ContainsKey('Name'))
+    if ($PSBoundParameters.ContainsKey('Name'))
     {
         $adapterFilters += @('($_.Name -eq $Name)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('PhysicalMediaType'))
+    if ($PSBoundParameters.ContainsKey('PhysicalMediaType'))
     {
         $adapterFilters += @('($_.PhysicalMediaType -eq $PhysicalMediaType)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('Status'))
+    if ($PSBoundParameters.ContainsKey('Status'))
     {
         $adapterFilters += @('($_.Status -eq $Status)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('MacAddress'))
+    if ($PSBoundParameters.ContainsKey('MacAddress'))
     {
         $adapterFilters += @('($_.MacAddress -eq $MacAddress)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('InterfaceDescription'))
+    if ($PSBoundParameters.ContainsKey('InterfaceDescription'))
     {
         $adapterFilters += @('($_.InterfaceDescription -eq $InterfaceDescription)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('InterfaceIndex'))
+    if ($PSBoundParameters.ContainsKey('InterfaceIndex'))
     {
         $adapterFilters += @('($_.InterfaceIndex -eq $InterfaceIndex)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('InterfaceGuid'))
+    if ($PSBoundParameters.ContainsKey('InterfaceGuid'))
     {
         $adapterFilters += @('($_.InterfaceGuid -eq $InterfaceGuid)')
     } # if
 
-    if($PSBoundParameters.ContainsKey('DriverDescription'))
+    if ($PSBoundParameters.ContainsKey('DriverDescription'))
     {
         $adapterFilters += @('($_.DriverDescription -eq $DriverDescription)')
     } # if
@@ -554,7 +554,7 @@ function Find-NetworkAdapter
     if ($adapterFilters.Count -eq 0)
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($script:localizedData.AllNetAdaptersFoundMessage)
+                $($script:localizedData.AllNetAdaptersFoundMessage)
             ) -join '')
 
         $matchingAdapters = @(Get-NetAdapter)
@@ -579,7 +579,7 @@ function Find-NetworkAdapter
     else
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($script:localizedData.NetAdapterFoundMessage -f $matchingAdapters.Count)
+                $($script:localizedData.NetAdapterFoundMessage -f $matchingAdapters.Count)
             ) -join '')
 
         if ($matchingAdapters.Count -gt 1)
@@ -591,7 +591,7 @@ function Find-NetworkAdapter
                 {
                     New-InvalidOperationException `
                         -Message ($script:localizedData.InvalidNetAdapterNumberError `
-                            -f $matchingAdapters.Count,$InterfaceNumber)
+                            -f $matchingAdapters.Count, $InterfaceNumber)
 
                     # Return a null so that ErrorAction SilentlyContinue works correctly
                     return $null
@@ -628,18 +628,18 @@ function Find-NetworkAdapter
 
 <#
     .SYNOPSIS
-    Returns the DNS Client Server static address that are assigned to a network
-    adapter. This is required because Get-DnsClientServerAddress always returns
-    the currently assigned server addresses whether regardless if they were
-    assigned as static or by DHCP.
+        Returns the DNS Client Server static address that are assigned to a network
+        adapter. This is required because Get-DnsClientServerAddress always returns
+        the currently assigned server addresses whether regardless if they were
+        assigned as static or by DHCP.
 
-    The only way that could be found to do this is to query the registry.
+        The only way that could be found to do this is to query the registry.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface to get the static DNS Server addresses from.
+        Alias of the network interface to get the static DNS Server addresses from.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 #>
 function Get-DnsClientServerStaticAddress
 {
@@ -659,7 +659,7 @@ function Get-DnsClientServerStaticAddress
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.GettingDNSServerStaticAddressMessage) -f $AddressFamily,$InterfaceAlias
+            $($script:localizedData.GettingDNSServerStaticAddressMessage) -f $AddressFamily, $InterfaceAlias
         ) -join '')
 
     # Look up the interface Guid
@@ -698,7 +698,7 @@ function Get-DnsClientServerStaticAddress
     {
         # Static DNS Server addresses not found so return empty array
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($script:localizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily,$InterfaceAlias
+                $($script:localizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily, $InterfaceAlias
             ) -join '')
 
         return $null
@@ -707,7 +707,7 @@ function Get-DnsClientServerStaticAddress
     {
         # Static DNS Server addresses found so split them into an array using comma
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($script:localizedData.DNSServerStaticAddressFoundMessage) -f $AddressFamily,$InterfaceAlias,$nameServerAddressString
+                $($script:localizedData.DNSServerStaticAddressFoundMessage) -f $AddressFamily, $InterfaceAlias, $nameServerAddressString
             ) -join '')
 
         return @($nameServerAddressString -split ',')
@@ -715,14 +715,115 @@ function Get-DnsClientServerStaticAddress
 } # Get-DnsClientServerStaticAddress
 
 <#
-.SYNOPSIS
-    Gets the IP Address prefix from a provided IP Address in CIDR notation.
+    .SYNOPSIS
+    Returns the WINS Client Server static address that are assigned to a network
+    adapter. The CIM class Win32_NetworkAdapterConfiguration unfortunately only supports
+    the primary and secondary WINS server. The registry gives more flexibility.
 
-.PARAMETER IPAddress
-    IP Address to get prefix for, can be in CIDR notation.
+    .PARAMETER InterfaceAlias
+    Alias of the network interface to get the static WINS Server addresses from.
+#>
+function Get-WinsClientServerStaticAddress
+{
+    [CmdletBinding()]
+    [OutputType([System.String[]])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $InterfaceAlias
+    )
 
-.PARAMETER AddressFamily
-    Address family for provided IP Address, defaults to IPv4.
+    Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.GettingWinsServerStaticAddressMessage -f $InterfaceAlias)")
+
+    # Look up the interface Guid
+    $adapter = Get-NetAdapter -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
+
+    if (-not $adapter)
+    {
+        New-InvalidOperationException -Message ($script:localizedData.InterfaceAliasNotFoundError -f $InterfaceAlias)
+
+        # Return null to support ErrorAction Silently Continue
+        return $null
+    }
+
+    $interfaceGuid = $adapter.InterfaceGuid.ToLower()
+
+    $interfaceRegKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$interfaceGuid\"
+
+    $interfaceInformation = Get-ItemProperty -Path $interfaceRegKeyPath -ErrorAction SilentlyContinue
+    $nameServerAddressString = $interfaceInformation.NameServerList
+
+    # Are any statically assigned addresses for this adapter?
+    if (-not $nameServerAddressString)
+    {
+        # Static DNS Server addresses not found so return empty array
+        Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.WinsServerStaticAddressNotSetMessage -f $InterfaceAlias)")
+        return $null
+    }
+    else
+    {
+        # Static DNS Server addresses found so split them into an array using comma
+        Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.WinsServerStaticAddressFoundMessage -f
+        $InterfaceAlias, ($nameServerAddressString -join ','))")
+
+        return $nameServerAddressString
+    }
+} # Get-WinsClientServerStaticAddress
+
+<#
+    .SYNOPSIS
+    Sets the WINS Client Server static address on a network adapter. The CIM class
+    Win32_NetworkAdapterConfiguration unfortunately only supports the primary and
+    secondary WINS server. The registry gives more flexibility.
+
+    .PARAMETER InterfaceAlias
+    Alias of the network interface to set the static WINS Server addresses on.
+#>
+function Set-WinsClientServerStaticAddress
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $InterfaceAlias,
+
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [System.String[]]
+        $Address
+    )
+
+    Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.SettingWinsServerStaticAddressMessage -f $InterfaceAlias, ($Address -join ', '))")
+
+    # Look up the interface Guid
+    $adapter = Get-NetAdapter -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
+
+    if (-not $adapter)
+    {
+        New-InvalidOperationException -Message ($script:localizedData.InterfaceAliasNotFoundError -f $InterfaceAlias)
+    }
+
+    $interfaceGuid = $adapter.InterfaceGuid.ToLower()
+
+    $interfaceRegKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$interfaceGuid\"
+
+    Set-ItemProperty -Path $interfaceRegKeyPath -Name NameServerList -Value $Address
+
+} # Set-WinsClientServerStaticAddress
+
+<#
+    .SYNOPSIS
+        Gets the IP Address prefix from a provided IP Address in CIDR notation.
+
+    .PARAMETER IPAddress
+        IP Address to get prefix for, can be in CIDR notation.
+
+    .PARAMETER AddressFamily
+        Address family for provided IP Address, defaults to IPv4.
 
 #>
 function Get-IPAddressPrefix
@@ -736,7 +837,7 @@ function Get-IPAddressPrefix
         $IPAddress,
 
         [Parameter()]
-        [ValidateSet('IPv4','IPv6')]
+        [ValidateSet('IPv4', 'IPv6')]
         [System.String]
         $AddressFamily = 'IPv4'
     )
@@ -768,7 +869,7 @@ function Get-IPAddressPrefix
             }
 
             [PSCustomObject]@{
-                IPAddress = $singleIP.split('/')[0]
+                IPAddress    = $singleIP.split('/')[0]
                 prefixLength = $prefixLength
             }
         }
@@ -811,22 +912,28 @@ function Remove-CommonParameter
 
 <#
     .SYNOPSIS
-        Tests the status of DSC resource parameters
+        Tests the status of DSC resource parameters.
 
     .DESCRIPTION
-        This function tests the parameter status of DSC resource parameters against the current values present on the system
+        This function tests the parameter status of DSC resource parameters against the current values present on the system.
 
     .PARAMETER CurrentValues
-        A hashtable with the current values on the system, obtained by e.g. Get-TargetResource
+        A hashtable with the current values on the system, obtained by e.g. Get-TargetResource.
 
     .PARAMETER DesiredValues
-        The hashtable of desired values
+        The hashtable of desired values.
 
     .PARAMETER ValuesToCheck
-        The values to check if not all values should be checked
+        The values to check if not all values should be checked.
 
     .PARAMETER TurnOffTypeChecking
-        Indicates that the type of the parameter should not be checked
+        Indicates that the type of the parameter should not be checked.
+
+    .PARAMETER ReverseCheck
+        Indicates that a reverse check should be done. The current and desired state are swapped for another test.
+
+    .PARAMETER SortArrayValues
+        If the sorting of array values does not matter, values are sorted internally before doing the comparison.
 #>
 function Test-DscParameterState
 {
@@ -834,7 +941,7 @@ function Test-DscParameterState
     param
     (
         [Parameter(Mandatory = $true)]
-        [System.Collections.Hashtable]
+        [System.Object]
         $CurrentValues,
 
         [Parameter(Mandatory = $true)]
@@ -847,10 +954,30 @@ function Test-DscParameterState
 
         [Parameter()]
         [switch]
-        $TurnOffTypeChecking
+        $TurnOffTypeChecking,
+
+        [Parameter()]
+        [switch]
+        $ReverseCheck,
+
+        [Parameter()]
+        [switch]
+        $SortArrayValues
     )
 
     $returnValue = $true
+
+    if ($CurrentValues -is [Microsoft.Management.Infrastructure.CimInstance] -or
+        $CurrentValues -is [Microsoft.Management.Infrastructure.CimInstance[]])
+    {
+        $CurrentValues = ConvertTo-HashTable -CimInstance $CurrentValues
+    }
+
+    if ($DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance] -or
+    $DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance[]])
+    {
+        $DesiredValues = ConvertTo-HashTable -CimInstance $DesiredValues
+    }
 
     $types = 'System.Management.Automation.PSBoundParametersDictionary', 'System.Collections.Hashtable', 'Microsoft.Management.Infrastructure.CimInstance'
 
@@ -859,6 +986,13 @@ function Test-DscParameterState
         New-InvalidArgumentException `
             -Message ($script:localizedData.InvalidDesiredValuesError -f $DesiredValues.GetType().FullName) `
             -ArgumentName 'DesiredValues'
+    }
+
+    if ($CurrentValues.GetType().FullName -notin $types)
+    {
+        New-InvalidArgumentException `
+            -Message ($script:localizedData.InvalidCurrentValuesError -f $CurrentValues.GetType().FullName) `
+            -ArgumentName 'CurrentValues'
     }
 
     if ($DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance] -and -not $ValuesToCheck)
@@ -881,24 +1015,38 @@ function Test-DscParameterState
 
     foreach ($key in $keyList)
     {
-        if ($null -ne $desiredValuesClean.$key)
+        $desiredValue = $desiredValuesClean.$key
+        $currentValue = $CurrentValues.$key
+
+        if ($desiredValue -is [Microsoft.Management.Infrastructure.CimInstance] -or
+            $desiredValue -is [Microsoft.Management.Infrastructure.CimInstance[]])
         {
-            $desiredType = $desiredValuesClean.$key.GetType()
+            $desiredValue = ConvertTo-HashTable -CimInstance $desiredValue
+        }
+        if ($currentValue -is [Microsoft.Management.Infrastructure.CimInstance] -or
+            $currentValue -is [Microsoft.Management.Infrastructure.CimInstance[]])
+        {
+            $currentValue = ConvertTo-HashTable -CimInstance $currentValue
+        }
+
+        if ($null -ne $desiredValue)
+        {
+            $desiredType = $desiredValue.GetType()
         }
         else
         {
-            $desiredType = [psobject] @{
+            $desiredType = @{
                 Name = 'Unknown'
             }
         }
 
-        if ($null -ne $CurrentValues.$key)
+        if ($null -ne $currentValue)
         {
-            $currentType = $CurrentValues.$key.GetType()
+            $currentType = $currentValue.GetType()
         }
         else
         {
-            $currentType = [psobject] @{
+            $currentType = @{
                 Name = 'Unknown'
             }
         }
@@ -906,26 +1054,26 @@ function Test-DscParameterState
         if ($currentType.Name -ne 'Unknown' -and $desiredType.Name -eq 'PSCredential')
         {
             # This is a credential object. Compare only the user name
-            if ($currentType.Name -eq 'PSCredential' -and $CurrentValues.$key.UserName -eq $desiredValuesClean.$key.UserName)
+            if ($currentType.Name -eq 'PSCredential' -and $currentValue.UserName -eq $desiredValue.UserName)
             {
-                Write-Verbose -Message ($script:localizedData.MatchPsCredentialUsernameMessage -f $CurrentValues.$key.UserName, $desiredValuesClean.$key.UserName)
+                Write-Verbose -Message ($script:localizedData.MatchPsCredentialUsernameMessage -f $currentValue.UserName, $desiredValue.UserName)
                 continue
             }
             else
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchPsCredentialUsernameMessage -f $CurrentValues.$key.UserName, $desiredValuesClean.$key.UserName)
+                Write-Verbose -Message ($script:localizedData.NoMatchPsCredentialUsernameMessage -f $currentValue.UserName, $desiredValue.UserName)
                 $returnValue = $false
             }
 
             # Assume the string is our username when the matching desired value is actually a credential
-            if ($currentType.Name -eq 'string' -and $CurrentValues.$key -eq $desiredValuesClean.$key.UserName)
+            if ($currentType.Name -eq 'string' -and $currentValue -eq $desiredValue.UserName)
             {
-                Write-Verbose -Message ($script:localizedData.MatchPsCredentialUsernameMessage -f $CurrentValues.$key, $desiredValuesClean.$key.UserName)
+                Write-Verbose -Message ($script:localizedData.MatchPsCredentialUsernameMessage -f $currentValue, $desiredValue.UserName)
                 continue
             }
             else
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchPsCredentialUsernameMessage -f $CurrentValues.$key, $desiredValuesClean.$key.UserName)
+                Write-Verbose -Message ($script:localizedData.NoMatchPsCredentialUsernameMessage -f $currentValue, $desiredValue.UserName)
                 $returnValue = $false
             }
         }
@@ -936,13 +1084,14 @@ function Test-DscParameterState
                 $desiredType.FullName -ne $currentType.FullName)
             {
                 Write-Verbose -Message ($script:localizedData.NoMatchTypeMismatchMessage -f $key, $currentType.Name, $desiredType.Name)
+                $returnValue = $false
                 continue
             }
         }
 
-        if ($CurrentValues.$key -eq $desiredValuesClean.$key -and -not $desiredType.IsArray)
+        if ($currentValue -eq $desiredValue -and -not $desiredType.IsArray)
         {
-            Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
+            Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.Name, $key, $currentValue, $desiredValue)
             continue
         }
 
@@ -957,7 +1106,7 @@ function Test-DscParameterState
 
         if (-not $checkDesiredValue)
         {
-            Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
+            Write-Verbose -Message ($script:localizedData.MatchValueMessage -f $desiredType.Name, $key, $currentValue, $desiredValue)
             continue
         }
 
@@ -965,22 +1114,28 @@ function Test-DscParameterState
         {
             Write-Verbose -Message ($script:localizedData.TestDscParameterCompareMessage -f $key)
 
-            if (-not $CurrentValues.ContainsKey($key) -or -not $CurrentValues.$key)
+            if (-not $currentValue)
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
+                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $currentValue, $desiredValue)
                 $returnValue = $false
                 continue
             }
-            elseif ($CurrentValues.$key.Count -ne $DesiredValues.$key.Count)
+            elseif ($currentValue.Count -ne $desiredValue.Count)
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchValueDifferentCountMessage -f $desiredType.Name, $key, $CurrentValues.$key.Count, $desiredValuesClean.$key.Count)
+                Write-Verbose -Message ($script:localizedData.NoMatchValueDifferentCountMessage -f $desiredType.Name, $key, $currentValue.Count, $desiredValue.Count)
                 $returnValue = $false
                 continue
             }
             else
             {
-                $desiredArrayValues = $DesiredValues.$key
-                $currentArrayValues = $CurrentValues.$key
+                $desiredArrayValues = $desiredValue
+                $currentArrayValues = $currentValue
+
+                if ($SortArrayValues)
+                {
+                    $desiredArrayValues = $desiredArrayValues | Sort-Object
+                    $currentArrayValues = $currentArrayValues | Sort-Object
+                }
 
                 for ($i = 0; $i -lt $desiredArrayValues.Count; $i++)
                 {
@@ -990,7 +1145,7 @@ function Test-DscParameterState
                     }
                     else
                     {
-                        $desiredType = [psobject]@{
+                        $desiredType = @{
                             Name = 'Unknown'
                         }
                     }
@@ -1001,7 +1156,7 @@ function Test-DscParameterState
                     }
                     else
                     {
-                        $currentType = [psobject]@{
+                        $currentType = @{
                             Name = 'Unknown'
                         }
                     }
@@ -1032,13 +1187,46 @@ function Test-DscParameterState
 
             }
         }
+        elseif ($desiredType -eq [System.Collections.Hashtable] -and $currentType -eq [System.Collections.Hashtable])
+        {
+            $param = $PSBoundParameters
+            $param.CurrentValues = $currentValue
+            $param.DesiredValues = $desiredValue
+            [void]$param.Remove('ValuesToCheck')
+            if ($returnValue)
+            {
+                $returnValue = Test-DscParameterState @param
+            }
+            else
+            {
+                Test-DscParameterState @param | Out-Null
+            }
+            continue
+        }
         else
         {
-            if ($desiredValuesClean.$key -ne $CurrentValues.$key)
+            if ($desiredValue -ne $currentValue)
             {
-                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $CurrentValues.$key, $desiredValuesClean.$key)
+                Write-Verbose -Message ($script:localizedData.NoMatchValueMessage -f $desiredType.Name, $key, $currentValue, $desiredValue)
                 $returnValue = $false
             }
+        }
+    }
+
+    if ($ReverseCheck)
+    {
+        Write-Verbose -Message $script:localizedData.StartingReverseCheck
+        $reverseCheckParameters = $PSBoundParameters
+        $reverseCheckParameters.CurrentValues = $DesiredValues
+        $reverseCheckParameters.DesiredValues = $CurrentValues
+        [void] $reverseCheckParameters.Remove('ReverseCheck')
+        if ($returnValue)
+        {
+            $returnValue = Test-DscParameterState @reverseCheckParameters
+        }
+        else
+        {
+            Test-DscParameterState @reverseCheckParameters | Out-Null
         }
     }
 
@@ -1079,6 +1267,94 @@ function Test-DscObjectHasProperty
     return $false
 }
 
+<#
+    .SYNOPSIS
+        Converts a hashtable into a CimInstance array.
+
+    .DESCRIPTION
+        This function is used to convert a hashtable into MSFT_KeyValuePair objects. These are stored as an CimInstance array.
+        DSC cannot handle hashtables but CimInstances arrays storing MSFT_KeyValuePair.
+
+    .PARAMETER Hashtable
+        A hashtable with the values to convert.
+
+    .OUTPUTS
+        An object array with CimInstance objects.
+#>
+function ConvertTo-CimInstance
+{
+    [CmdletBinding()]
+    [OutputType([System.Object[]])]
+    param
+    (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [System.Collections.Hashtable]
+        $Hashtable
+    )
+
+    process
+    {
+        foreach ($item in $Hashtable.GetEnumerator())
+        {
+            New-CimInstance -ClassName MSFT_KeyValuePair -Namespace root/microsoft/Windows/DesiredStateConfiguration -Property @{
+                Key   = $item.Key
+                Value = if ($item.Value -is [array])
+                {
+                    $item.Value -join ','
+                }
+                else
+                {
+                    $item.Value
+                }
+            } -ClientOnly
+        }
+    }
+}
+
+<#
+    .SYNOPSIS
+        Converts CimInstances into a hashtable.
+
+    .DESCRIPTION
+        This function is used to convert a CimInstance array containing MSFT_KeyValuePair objects into a hashtable.
+
+    .PARAMETER CimInstance
+        An array of CimInstances or a single CimInstance object to convert.
+
+    .OUTPUTS
+        Hashtable
+#>
+function ConvertTo-HashTable
+{
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param
+    (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [AllowEmptyCollection()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $CimInstance
+    )
+
+    begin
+    {
+        $result = @{ }
+    }
+
+    process
+    {
+        foreach ($ci in $CimInstance)
+        {
+            $result.Add($ci.Key, $ci.Value)
+        }
+    }
+
+    end
+    {
+        $result
+    }
+}
+
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData `
     -ResourceName 'NetworkingDsc.Common' `
@@ -1096,7 +1372,11 @@ Export-ModuleMember -Function @(
     'Convert-CIDRToSubhetMask',
     'Find-NetworkAdapter',
     'Get-DnsClientServerStaticAddress',
+    'Get-WinsClientServerStaticAddress',
+    'Set-WinsClientServerStaticAddress',
     'Get-IPAddressPrefix',
     'Test-DscParameterState',
     'Test-DscObjectHasProperty'
+    'ConvertTo-HashTable',
+    'ConvertTo-CimInstance'
 )
