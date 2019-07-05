@@ -305,6 +305,16 @@ function New-InvalidResultException
     throw $errorRecordToThrow
 }
 
+<#
+    .SYNOPSIS
+        Creates and throws a not implemented exception.
+
+    .PARAMETER Message
+        The message explaining why this error is being thrown.
+
+    .PARAMETER ErrorRecord
+        The error record containing the exception that is causing this terminating error.
+#>
 function New-NotImplementedException
 {
     [CmdletBinding()]
