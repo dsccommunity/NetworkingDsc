@@ -56,7 +56,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ($script:localizedData.GettingNetBiosSettingMessage -f $InterfaceAlias)
-    If( $InterfaceAlias.contains('*') )
+    if( $InterfaceAlias.contains('*') )
     {
         $InterfaceAlias = $InterfaceAlias.replace('*','%')
         $Operator = " LIKE "
@@ -131,7 +131,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.SettingNetBiosSettingMessage -f $InterfaceAlias)
 
-    If( $InterfaceAlias.contains('*') )
+    if( $InterfaceAlias.contains('*') )
     {
         $InterfaceAlias = $InterfaceAlias.replace('*','%')
         $Operator = " LIKE "
@@ -220,7 +220,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.TestingNetBiosSettingMessage -f $InterfaceAlias)
 
-    If( $InterfaceAlias.contains('*') )
+    if( $InterfaceAlias.contains('*') )
     {
         $InterfaceAlias = $InterfaceAlias.replace('*','%')
         $Operator = " LIKE "
