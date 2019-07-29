@@ -56,10 +56,19 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ($script:localizedData.GettingNetBiosSettingMessage -f $InterfaceAlias)
+    If( $InterfaceAlias.contains('*') )
+    {
+        $InterfaceAlias = $InterfaceAlias.replace('*','%')
+        $Operator = " LIKE "
+    }
+    else
+    {
+        $Operator = "="
+    }
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter ('NetConnectionID="{0}"' -f $InterfaceAlias)
+        -Filter ('NetConnectionID{0}"{1}"' -f $Operator,$InterfaceAlias)
 
     if ($netAdapter)
     {
@@ -122,9 +131,19 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.SettingNetBiosSettingMessage -f $InterfaceAlias)
 
+    If( $InterfaceAlias.contains('*') )
+    {
+        $InterfaceAlias = $InterfaceAlias.replace('*','%')
+        $Operator = " LIKE "
+    }
+    else
+    {
+        $Operator = "="
+    }
+
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter ('NetConnectionID="{0}"' -f $InterfaceAlias)
+        -Filter ('NetConnectionID{0}"{1}"' -f $Operator,$InterfaceAlias)
 
     if ($netAdapter)
     {
@@ -201,9 +220,19 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.TestingNetBiosSettingMessage -f $InterfaceAlias)
 
+    If( $InterfaceAlias.contains('*') )
+    {
+        $InterfaceAlias = $InterfaceAlias.replace('*','%')
+        $Operator = " LIKE "
+    }
+    else
+    {
+        $Operator = "="
+    }
+
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter ('NetConnectionID="{0}"' -f $InterfaceAlias)
+        -Filter ('NetConnectionID{0}"{1}"' -f $Operator,$InterfaceAlias)
 
     if ($netAdapter)
     {
