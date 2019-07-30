@@ -1384,9 +1384,13 @@ function Format-Win32NetworkADapterFilterByNetConnectionID
 
     process
     {
-        if($InterfaceAlias.contains('*') -or $InterfaceAlias.contains('%'))
+        if($InterfaceAlias.contains('*'))
         {
             $InterfaceAlias = $InterfaceAlias.replace('*','%')
+        }
+
+        if($InterfaceAlias.contains('%'))
+        {
             $operator = ' LIKE '
         }
         else
