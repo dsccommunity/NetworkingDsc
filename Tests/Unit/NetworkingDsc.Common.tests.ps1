@@ -2248,8 +2248,8 @@ try
                 $interfaceAlias = "Ether*"
 
                 It 'Should convert the ''*'' to a '%'' {
-                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).contains('%') | Should -Be $True
-                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).contains('*') | Should -Be $False
+                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).contains('%') -eq $True -and
+                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).contains('*') -eq $False | Should -Be $True
                 }
 
                 It 'Should change the operator to ''LIKE''' {
