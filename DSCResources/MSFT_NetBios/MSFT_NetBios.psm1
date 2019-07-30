@@ -31,7 +31,7 @@ catch
     Returns the current state of the Net Bios on an interface.
 
 .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*'.
+    Specifies the alias of a network interface. Supports the use of '*' and '%'.
 
 .PARAMETER Setting
     Specifies if NetBIOS should be enabled or disabled or obtained from
@@ -101,7 +101,7 @@ function Get-TargetResource
     Sets the state of the Net Bios on an interface.
 
 .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*'.
+    Specifies the alias of a network interface. Supports the use of '*' and '%'.
 
 .PARAMETER Setting
     Specifies if NetBIOS should be enabled or disabled or obtained from
@@ -181,7 +181,7 @@ function Set-TargetResource
     Tests the current state the Net Bios on an interface.
 
 .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*'.
+    Specifies the alias of a network interface. Supports the use of '*' and '%'.
 
 .PARAMETER Setting
     Specifies if NetBIOS should be enabled or disabled or obtained from
