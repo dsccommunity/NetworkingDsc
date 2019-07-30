@@ -2247,7 +2247,7 @@ try
 
                 $interfaceAlias = "Ether*"
 
-                It 'Should convert the ''*'' to a '%'' {
+                It 'Should convert the ''*'' to a ''%''' {
                     (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).contains('%') -eq $True -and
                     (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).contains('*') -eq $False | Should -Be $True
                 }
