@@ -56,19 +56,12 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ($script:localizedData.GettingNetBiosSettingMessage -f $InterfaceAlias)
-    if( $InterfaceAlias.contains('*') )
-    {
-        $InterfaceAlias = $InterfaceAlias.replace('*','%')
-        $Operator = " LIKE "
-    }
-    else
-    {
-        $Operator = "="
-    }
+
+    $Win32NetworkADapterFilter = Format-Win32NetworkADapterFilter -InterfaceAlias $InterfaceAlias
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter ('NetConnectionID{0}"{1}"' -f $Operator,$InterfaceAlias)
+        -Filter $Win32NetworkADapterFilter
 
     if ($netAdapter)
     {
@@ -131,19 +124,11 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.SettingNetBiosSettingMessage -f $InterfaceAlias)
 
-    if( $InterfaceAlias.contains('*') )
-    {
-        $InterfaceAlias = $InterfaceAlias.replace('*','%')
-        $Operator = " LIKE "
-    }
-    else
-    {
-        $Operator = "="
-    }
+    $Win32NetworkADapterFilter = Format-Win32NetworkADapterFilter -InterfaceAlias $InterfaceAlias
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter ('NetConnectionID{0}"{1}"' -f $Operator,$InterfaceAlias)
+        -Filter $Win32NetworkADapterFilter
 
     if ($netAdapter)
     {
@@ -220,19 +205,11 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.TestingNetBiosSettingMessage -f $InterfaceAlias)
 
-    if( $InterfaceAlias.contains('*') )
-    {
-        $InterfaceAlias = $InterfaceAlias.replace('*','%')
-        $Operator = " LIKE "
-    }
-    else
-    {
-        $Operator = "="
-    }
+    $Win32NetworkADapterFilter = Format-Win32NetworkADapterFilter -InterfaceAlias $InterfaceAlias
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter ('NetConnectionID{0}"{1}"' -f $Operator,$InterfaceAlias)
+        -Filter $Win32NetworkADapterFilter
 
     if ($netAdapter)
     {
@@ -247,6 +224,29 @@ function Test-TargetResource
     $currentState = Get-TargetResource @PSBoundParameters
 
     return Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
+}
+
+function Format-Win32NetworkADapterFilter
+{
+[CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $InterfaceAlias
+    )
+
+    if( $InterfaceAlias.contains('*') )
+    {
+        $InterfaceAlias = $InterfaceAlias.replace('*','%')
+        $operator = ' LIKE '
+    }
+    else
+    {
+        $operator = '='
+    }
+
+    'NetConnectionID{0}"{1}"' -f $operator,$InterfaceAlias
 }
 
 Export-ModuleMember -Function *-TargetResource
