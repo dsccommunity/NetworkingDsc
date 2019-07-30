@@ -236,7 +236,7 @@ function Format-Win32NetworkADapterFilter
         $InterfaceAlias
     )
 
-    if( $InterfaceAlias.contains('*') )
+    if($InterfaceAlias.contains('*'))
     {
         $InterfaceAlias = $InterfaceAlias.replace('*','%')
         $operator = ' LIKE '
