@@ -226,6 +226,13 @@ function Test-TargetResource
     return Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
 }
 
+<#
+.SYNOPSIS
+    Returns a filter string for the net adapter CIM instances. Will detect wild cards and replace them and the operator accordingly.
+
+.PARAMETER InterfaceAlias
+    Specifies the alias of a network interface. Supports the use of '*' or '%'.
+#>
 function Format-Win32NetworkADapterFilter
 {
 [CmdletBinding()]
@@ -236,7 +243,7 @@ function Format-Win32NetworkADapterFilter
         $InterfaceAlias
     )
 
-    if($InterfaceAlias.contains('*'))
+    if($InterfaceAlias.contains('*') -or $InterfaceAlias.contains('%'))
     {
         $InterfaceAlias = $InterfaceAlias.replace('*','%')
         $operator = ' LIKE '
