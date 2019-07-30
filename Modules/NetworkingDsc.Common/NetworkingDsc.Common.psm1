@@ -1365,6 +1365,39 @@ function ConvertTo-HashTable
     }
 }
 
+<#
+.SYNOPSIS
+    Returns a filter string for the net adapter CIM instances. Will detect wild cards and replace them and the operator accordingly.
+
+.PARAMETER InterfaceAlias
+    Specifies the alias of a network interface. Supports the use of '*' or '%'.
+#>
+function Format-Win32NetworkADapterFilterByNetConnectionID
+{
+[CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $InterfaceAlias
+    )
+
+    process
+    {
+        if($InterfaceAlias.contains('*') -or $InterfaceAlias.contains('%'))
+        {
+            $InterfaceAlias = $InterfaceAlias.replace('*','%')
+            $operator = ' LIKE '
+        }
+        else
+        {
+            $operator = '='
+        }
+
+        'NetConnectionID{0}"{1}"' -f $operator,$InterfaceAlias
+    }
+}
+
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData `
     -ResourceName 'NetworkingDsc.Common' `
@@ -1388,5 +1421,6 @@ Export-ModuleMember -Function @(
     'Test-DscParameterState',
     'Test-DscObjectHasProperty'
     'ConvertTo-HashTable',
-    'ConvertTo-CimInstance'
+    'ConvertTo-CimInstance',
+    'Format-Win32NetworkADapterFilterByNetConnectionID'
 )

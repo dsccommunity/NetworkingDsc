@@ -57,7 +57,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ($script:localizedData.GettingNetBiosSettingMessage -f $InterfaceAlias)
 
-    $Win32NetworkADapterFilter = Format-Win32NetworkADapterFilter -InterfaceAlias $InterfaceAlias
+    $Win32NetworkADapterFilter = Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $InterfaceAlias
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
@@ -124,7 +124,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.SettingNetBiosSettingMessage -f $InterfaceAlias)
 
-    $Win32NetworkADapterFilter = Format-Win32NetworkADapterFilter -InterfaceAlias $InterfaceAlias
+    $Win32NetworkADapterFilter = Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $InterfaceAlias
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
@@ -205,7 +205,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.TestingNetBiosSettingMessage -f $InterfaceAlias)
 
-    $Win32NetworkADapterFilter = Format-Win32NetworkADapterFilter -InterfaceAlias $InterfaceAlias
+    $Win32NetworkADapterFilter = Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $InterfaceAlias
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
@@ -224,36 +224,6 @@ function Test-TargetResource
     $currentState = Get-TargetResource @PSBoundParameters
 
     return Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
-}
-
-<#
-.SYNOPSIS
-    Returns a filter string for the net adapter CIM instances. Will detect wild cards and replace them and the operator accordingly.
-
-.PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*' or '%'.
-#>
-function Format-Win32NetworkADapterFilter
-{
-[CmdletBinding()]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $InterfaceAlias
-    )
-
-    if($InterfaceAlias.contains('*') -or $InterfaceAlias.contains('%'))
-    {
-        $InterfaceAlias = $InterfaceAlias.replace('*','%')
-        $operator = ' LIKE '
-    }
-    else
-    {
-        $operator = '='
-    }
-
-    'NetConnectionID{0}"{1}"' -f $operator,$InterfaceAlias
 }
 
 Export-ModuleMember -Function *-TargetResource
