@@ -2254,7 +2254,7 @@ try
                     (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) -like 'NetConnectionID LIKE *' | Should -Be $True
                 }
 
-                It 'Looks like a usable filter' {
+                It 'Should look like a usable filter' {
                     Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -Be 'NetConnectionID LIKE "Ether%"'
                 }
 
@@ -2267,7 +2267,7 @@ try
                     (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) -like 'NetConnectionID LIKE *' | Should -Be $True
                 }
 
-                It 'Looks like a usable filter' {
+                It 'Should look like a usable filter' {
                     Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -Be 'NetConnectionID LIKE "Ether%"'
                 }
 
@@ -2276,7 +2276,7 @@ try
             Context 'When interface alias has no wildcards' {
                 $interfaceAlias = 'Ethernet'
 
-                It 'Looks like a usable filter' {
+                It 'Should look like a usable filter' {
                     Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -Be 'NetConnectionID="Ethernet"'
                 }
             }
