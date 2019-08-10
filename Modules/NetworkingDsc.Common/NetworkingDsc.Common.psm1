@@ -1383,24 +1383,21 @@ function Format-Win32NetworkAdapterFilterByNetConnectionID
         $InterfaceAlias
     )
 
-    process
+    if($InterfaceAlias.contains('*'))
     {
-        if($InterfaceAlias.contains('*'))
-        {
-            $InterfaceAlias = $InterfaceAlias.replace('*','%')
-        }
-
-        if($InterfaceAlias.contains('%'))
-        {
-            $operator = ' LIKE '
-        }
-        else
-        {
-            $operator = '='
-        }
-
-        'NetConnectionID{0}"{1}"' -f $operator,$InterfaceAlias
+        $InterfaceAlias = $InterfaceAlias.replace('*','%')
     }
+
+    if($InterfaceAlias.contains('%'))
+    {
+        $operator = ' LIKE '
+    }
+    else
+    {
+        $operator = '='
+    }
+
+    'NetConnectionID{0}"{1}"' -f $operator,$InterfaceAlias
 }
 
 # Import Localization Strings
