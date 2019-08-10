@@ -2243,7 +2243,7 @@ try
 
         Describe 'NetworkingDsc.Common\Format-Win32NetworkADapterFilterByNetConnectionID'{
             Context 'When interface alias has an ''*''' {
-                $interfaceAlias = "Ether*"
+                $interfaceAlias = 'Ether*'
 
                 It 'Should convert the ''*'' to a ''%''' {
                     (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).contains('%') -eq $True -and
@@ -2251,7 +2251,7 @@ try
                 }
 
                 It 'Should change the operator to ''LIKE''' {
-                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) -like "NetConnectionID LIKE *" | Should -Be $True
+                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) -like 'NetConnectionID LIKE *' | Should -Be $True
                 }
 
                 It 'Looks like a usable filter' {
@@ -2261,10 +2261,10 @@ try
             }
 
             Context 'When interface alias has a ''%''' {
-                $interfaceAlias = "Ether%"
+                $interfaceAlias = 'Ether%'
 
                 It 'Should change the operator to ''LIKE''' {
-                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) -like "NetConnectionID LIKE *" | Should -Be $True
+                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) -like 'NetConnectionID LIKE *' | Should -Be $True
                 }
 
                 It 'Looks like a usable filter' {
@@ -2274,7 +2274,7 @@ try
             }
 
             Context 'When interface alias has no wildcards' {
-                $interfaceAlias = "Ethernet"
+                $interfaceAlias = 'Ethernet'
 
                 It 'Looks like a usable filter' {
                     Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -Be 'NetConnectionID="Ethernet"'
