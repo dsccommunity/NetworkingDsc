@@ -2244,7 +2244,6 @@ try
         Describe 'NetworkingDsc.Common\Format-Win32NetworkADapterFilterByNetConnectionID'{
 
             Context 'When interface alias has an ''*''' {
-
                 $interfaceAlias = "Ether*"
 
                 It 'Should convert the ''*'' to a ''%''' {
@@ -2263,7 +2262,6 @@ try
             }
 
             Context 'When interface alias has a ''%''' {
-
                 $interfaceAlias = "Ether%"
 
                 It 'Should change the operator to ''LIKE''' {
@@ -2277,7 +2275,6 @@ try
             }
 
             Context 'When interface alias has no wildcards' {
-
                 $interfaceAlias = "Ethernet"
 
                 It 'Looks like a usable filter' {
