@@ -1426,5 +1426,5 @@ Export-ModuleMember -Function @(
     'Test-DscObjectHasProperty'
     'ConvertTo-HashTable',
     'ConvertTo-CimInstance',
-    'Format-Win32NetworkADapterFilterByNetConnectionID'
+    'Format-Win32NetworkAdapterFilterByNetConnectionID'
 )
