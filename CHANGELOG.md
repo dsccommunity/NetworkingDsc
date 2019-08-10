@@ -4,10 +4,8 @@
 
 - Added Comment Based Help for `New-NotImplementedException` common
   function - fixes [Issue #411](https://github.com/PowerShell/NetworkingDsc/issues/411).
-
 - Added common function 'Format-Win32NetworkADapterFilterByNetConnectionID'
   to properly accept wild cards for Win32_NetworkAdapter filters.
-
 - Updated MSFT_Netbios to use 'Format-Win32NetworkADapterFilterByNetConnectionID'
   - fixes [Issue #413](https://github.com/PowerShell/NetworkingDsc/issues/413).
 
