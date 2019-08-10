@@ -1367,14 +1367,15 @@ function ConvertTo-HashTable
 
 <#
 .SYNOPSIS
-    Returns a filter string for the net adapter CIM instances. Will detect wild cards and replace them and the operator accordingly.
+    Returns a filter string for the net adapter CIM instances. Wildcards supported.
 
 .PARAMETER InterfaceAlias
     Specifies the alias of a network interface. Supports the use of '*' or '%'.
 #>
-function Format-Win32NetworkADapterFilterByNetConnectionID
+function Format-Win32NetworkAdapterFilterByNetConnectionID
 {
-[CmdletBinding()]
+    [CmdletBinding()]
+    [OutputType([System.String])]
     param
     (
         [Parameter(Mandatory = $true)]

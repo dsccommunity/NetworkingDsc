@@ -57,11 +57,11 @@ function Get-TargetResource
 
     Write-Verbose -Message ($script:localizedData.GettingNetBiosSettingMessage -f $InterfaceAlias)
 
-    $Win32NetworkADapterFilter = Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $InterfaceAlias
+    $win32NetworkAdapterFilter = Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $InterfaceAlias
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter $Win32NetworkADapterFilter
+        -Filter $win32NetworkAdapterFilter
 
     if ($netAdapter)
     {
@@ -124,11 +124,11 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.SettingNetBiosSettingMessage -f $InterfaceAlias)
 
-    $Win32NetworkADapterFilter = Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $InterfaceAlias
+    $win32NetworkAdapterFilter = Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $InterfaceAlias
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter $Win32NetworkADapterFilter
+        -Filter $win32NetworkAdapterFilter
 
     if ($netAdapter)
     {
@@ -205,11 +205,11 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.TestingNetBiosSettingMessage -f $InterfaceAlias)
 
-    $Win32NetworkADapterFilter = Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $InterfaceAlias
+    $win32NetworkAdapterFilter = Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $InterfaceAlias
 
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter $Win32NetworkADapterFilter
+        -Filter $win32NetworkAdapterFilter
 
     if ($netAdapter)
     {
