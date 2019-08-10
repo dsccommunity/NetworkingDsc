@@ -2242,7 +2242,6 @@ try
         }
 
         Describe 'NetworkingDsc.Common\Format-Win32NetworkADapterFilterByNetConnectionID'{
-
             Context 'When interface alias has an ''*''' {
                 $interfaceAlias = "Ether*"
 
