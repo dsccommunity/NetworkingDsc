@@ -2251,11 +2251,11 @@ try
                 }
 
                 It 'Should change the operator to ''LIKE''' {
-                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -be -Exactly 'NetConnectionID LIKE "Ether%"'
+                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
                 }
 
                 It 'Should look like a usable filter' {
-                    Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -Be -Exactly 'NetConnectionID LIKE "Ether%"'
+                    Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
                 }
 
             }
@@ -2264,11 +2264,11 @@ try
                 $interfaceAlias = 'Ether%'
 
                 It 'Should change the operator to ''LIKE''' {
-                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -be -Exactly 'NetConnectionID LIKE "Ether%"'
+                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
                 }
 
                 It 'Should look like a usable filter' {
-                    Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -Be -Exactly 'NetConnectionID LIKE "Ether%"'
+                    Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
                 }
 
             }
@@ -2277,7 +2277,7 @@ try
                 $interfaceAlias = 'Ethernet'
 
                 It 'Should look like a usable filter' {
-                    Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -Be -Exactly 'NetConnectionID="Ethernet"'
+                    Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID="Ethernet"'
                 }
             }
         }
