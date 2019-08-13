@@ -31,7 +31,7 @@ catch
     Returns the current state of the Net Bios on an interface.
 
 .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*'.
+    Specifies the alias of a network interface. Supports the use of '*' and '%'.
 
 .PARAMETER Setting
     Specifies if NetBIOS should be enabled or disabled or obtained from
@@ -57,9 +57,11 @@ function Get-TargetResource
 
     Write-Verbose -Message ($script:localizedData.GettingNetBiosSettingMessage -f $InterfaceAlias)
 
+    $win32NetworkAdapterFilter = Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $InterfaceAlias
+
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter ('NetConnectionID="{0}"' -f $InterfaceAlias)
+        -Filter $win32NetworkAdapterFilter
 
     if ($netAdapter)
     {
@@ -99,7 +101,7 @@ function Get-TargetResource
     Sets the state of the Net Bios on an interface.
 
 .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*'.
+    Specifies the alias of a network interface. Supports the use of '*' and '%'.
 
 .PARAMETER Setting
     Specifies if NetBIOS should be enabled or disabled or obtained from
@@ -122,9 +124,11 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.SettingNetBiosSettingMessage -f $InterfaceAlias)
 
+    $win32NetworkAdapterFilter = Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $InterfaceAlias
+
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter ('NetConnectionID="{0}"' -f $InterfaceAlias)
+        -Filter $win32NetworkAdapterFilter
 
     if ($netAdapter)
     {
@@ -177,7 +181,7 @@ function Set-TargetResource
     Tests the current state the Net Bios on an interface.
 
 .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*'.
+    Specifies the alias of a network interface. Supports the use of '*' and '%'.
 
 .PARAMETER Setting
     Specifies if NetBIOS should be enabled or disabled or obtained from
@@ -201,9 +205,11 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.TestingNetBiosSettingMessage -f $InterfaceAlias)
 
+    $win32NetworkAdapterFilter = Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $InterfaceAlias
+
     $netAdapter = Get-CimInstance `
         -ClassName Win32_NetworkAdapter `
-        -Filter ('NetConnectionID="{0}"' -f $InterfaceAlias)
+        -Filter $win32NetworkAdapterFilter
 
     if ($netAdapter)
     {

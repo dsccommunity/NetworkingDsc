@@ -2240,6 +2240,47 @@ try
                 }
             }
         }
+
+        Describe 'NetworkingDsc.Common\Format-Win32NetworkADapterFilterByNetConnectionID'{
+            Context 'When interface alias has an ''*''' {
+                $interfaceAlias = 'Ether*'
+
+                It 'Should convert the ''*'' to a ''%''' {
+                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).Contains('%') -eq $True -and
+                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).Contains('*') -eq $False | Should -Be $True
+                }
+
+                It 'Should change the operator to ''LIKE''' {
+                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
+                }
+
+                It 'Should look like a usable filter' {
+                    Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
+                }
+
+            }
+
+            Context 'When interface alias has a ''%''' {
+                $interfaceAlias = 'Ether%'
+
+                It 'Should change the operator to ''LIKE''' {
+                    (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
+                }
+
+                It 'Should look like a usable filter' {
+                    Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
+                }
+
+            }
+
+            Context 'When interface alias has no wildcards' {
+                $interfaceAlias = 'Ethernet'
+
+                It 'Should look like a usable filter' {
+                    Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID="Ethernet"'
+                }
+            }
+        }
     }
 }
 finally
