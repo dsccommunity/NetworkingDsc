@@ -1959,7 +1959,7 @@ try
             # Use the Get-Verb cmdlet to just get a simple object fast
             $testDscObject = (Get-Verb)[0]
 
-            Context 'The object contains the expected property' {
+            Context 'When the object contains the expected property' {
                 It 'Should not throw exception' {
                     { $script:result = Test-DscObjectHasProperty -Object $testDscObject -PropertyName 'Verb' -Verbose } | Should -Not -Throw
                 }
@@ -1969,7 +1969,7 @@ try
                 }
             }
 
-            Context 'The object does not contain the expected property' {
+            Context 'When the object does not contain the expected property' {
                 It 'Should not throw exception' {
                     { $script:result = Test-DscObjectHasProperty -Object $testDscObject -PropertyName 'Missing' -Verbose } | Should -Not -Throw
                 }
@@ -1987,28 +1987,28 @@ try
                 k3 = 1, 2, 3
             }
 
-            Context 'The array contains the expected record count' {
+            Context 'When the array contains the expected record count' {
                 It 'Should not throw exception' {
                     { $script:result = [CimInstance[]]($hashtable | ConvertTo-CimInstance) } | Should -Not -Throw
                 }
 
-                It "Record count should be $($hashTable.Count)" {
+                It "Should record count should be $($hashTable.Count)" {
                     $script:result.Count | Should -Be $hashtable.Count
                 }
 
-                It 'Result should be of type CimInstance[]' {
+                It 'Should return result of type CimInstance[]' {
                     $script:result.GetType().Name | Should -Be 'CimInstance[]'
                 }
 
-                It 'Value "k1" in the CimInstance array should be "v1"' {
+                It 'Should return value "k1" in the CimInstance array should be "v1"' {
                     ($script:result | Where-Object Key -eq k1).Value | Should -Be 'v1'
                 }
 
-                It 'Value "k2" in the CimInstance array should be "100"' {
+                It 'Should return value "k2" in the CimInstance array should be "100"' {
                     ($script:result | Where-Object Key -eq k2).Value | Should -Be 100
                 }
 
-                It 'Value "k3" in the CimInstance array should be "1,2,3"' {
+                It 'Should return value "k3" in the CimInstance array should be "1,2,3"' {
                     ($script:result | Where-Object Key -eq k3).Value | Should -Be '1,2,3'
                 }
             }
@@ -2021,28 +2021,28 @@ try
                 k3 = 1, 2, 3
             }
 
-            Context 'The array contains the expected record count' {
+            Context 'When the array contains the expected record count' {
                 It 'Should not throw exception' {
                     { $script:result = $cimInstances | ConvertTo-HashTable } | Should -Not -Throw
                 }
 
-                It "Record count should be $($cimInstances.Count)" {
+                It "Should return record count of $($cimInstances.Count)" {
                     $script:result.Count | Should -Be $cimInstances.Count
                 }
 
-                It 'Result should be of type [System.Collections.Hashtable]' {
+                It 'Should return result of type [System.Collections.Hashtable]' {
                     $script:result | Should -BeOfType [System.Collections.Hashtable]
                 }
 
-                It 'Value "k1" in the hashtable should be "v1"' {
+                It 'Should return value "k1" in the hashtable should be "v1"' {
                     $script:result.k1 | Should -Be 'v1'
                 }
 
-                It 'Value "k2" in the hashtable should be "100"' {
+                It 'Should return value "k2" in the hashtable should be "100"' {
                     $script:result.k2 | Should -Be 100
                 }
 
-                It 'Value "k3" in the hashtable should be "1,2,3"' {
+                It 'Should return value "k3" in the hashtable should be "1,2,3"' {
                     $script:result.k3 | Should -Be '1,2,3'
                 }
             }
