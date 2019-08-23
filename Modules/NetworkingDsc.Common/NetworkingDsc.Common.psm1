@@ -984,7 +984,7 @@ function Test-DscParameterState
     }
 
     if ($DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance] -or
-    $DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance[]])
+        $DesiredValues -is [Microsoft.Management.Infrastructure.CimInstance[]])
     {
         $DesiredValues = ConvertTo-HashTable -CimInstance $DesiredValues
     }
@@ -1202,7 +1202,8 @@ function Test-DscParameterState
             $param = $PSBoundParameters
             $param.CurrentValues = $currentValue
             $param.DesiredValues = $desiredValue
-            [void]$param.Remove('ValuesToCheck')
+            $null = $param.Remove('ValuesToCheck')
+
             if ($returnValue)
             {
                 $returnValue = Test-DscParameterState @param
@@ -1229,14 +1230,15 @@ function Test-DscParameterState
         $reverseCheckParameters = $PSBoundParameters
         $reverseCheckParameters.CurrentValues = $DesiredValues
         $reverseCheckParameters.DesiredValues = $CurrentValues
-        [void] $reverseCheckParameters.Remove('ReverseCheck')
+        $null = $reverseCheckParameters.Remove('ReverseCheck')
+
         if ($returnValue)
         {
             $returnValue = Test-DscParameterState @reverseCheckParameters
         }
         else
         {
-            Test-DscParameterState @reverseCheckParameters | Out-Null
+            $null = Test-DscParameterState @reverseCheckParameters
         }
     }
 

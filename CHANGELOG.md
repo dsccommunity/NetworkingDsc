@@ -8,7 +8,8 @@
   to properly accept wild cards for Win32_NetworkAdapter filters.
 - Updated MSFT_Netbios to use 'Format-Win32NetworkADapterFilterByNetConnectionID'
   - fixes [Issue #413](https://github.com/PowerShell/NetworkingDsc/issues/413).
-- Corrected minor style issues in `NetworkingDsc.Common.tests.ps1`.
+- Corrected minor style and consistency issues in `NetworkingDsc.Common.tests.ps1`
+  and `NetworkingDsc.Common.ps1`.
 
 ## 7.3.0.0
 
