@@ -12,6 +12,8 @@
   and `NetworkingDsc.Common.ps1`.
 - Changed verbose messages in `Test-DscParameterState` to include
   full type name.
+- Fixed bug in `Test-DscParameterState` that causes it to return true when
+  both the current array and desired array is empty.
 
 ## 7.3.0.0
 
