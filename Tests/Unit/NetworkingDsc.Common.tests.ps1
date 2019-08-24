@@ -1087,7 +1087,7 @@ try
             }
         }
 
-        Describe 'NetworkingDsc.Common\Test-DscParameterState' {
+        Describe 'ComputerManagementDsc.Common\Test-DscParameterState' {
             $verbose = $true
 
             Context 'When testing single values' {
@@ -1103,7 +1103,7 @@ try
                     }
                 }
 
-                Context '== All match' {
+                Context 'When all values match' {
                     $desiredValues = [PSObject] @{
                         String    = 'a string'
                         Bool      = $true
@@ -1128,7 +1128,7 @@ try
                     }
                 }
 
-                Context '!= string mismatch' {
+                Context 'When a string is mismatched' {
                     $desiredValues = [PSObject] @{
                         String    = 'different string'
                         Bool      = $true
@@ -1153,7 +1153,7 @@ try
                     }
                 }
 
-                Context '!= boolean mismatch' {
+                Context 'When a boolean is mismatched' {
                     $desiredValues = [PSObject] @{
                         String    = 'a string'
                         Bool      = $false
@@ -1178,7 +1178,7 @@ try
                     }
                 }
 
-                Context '!= int mismatch' {
+                Context 'When an int is mismatched' {
                     $desiredValues = [PSObject] @{
                         String    = 'a string'
                         Bool      = $true
@@ -1203,7 +1203,7 @@ try
                     }
                 }
 
-                Context '!= Type mismatch' {
+                Context 'When a type is mismatched' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -1223,7 +1223,7 @@ try
                     }
                 }
 
-                Context '!= Type mismatch but TurnOffTypeChecking is used' {
+                Context 'When a type is mismatched but TurnOffTypeChecking is used' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -1244,7 +1244,7 @@ try
                     }
                 }
 
-                Context '== mismatches but valuesToCheck is used to exclude them' {
+                Context 'When a value is mismatched but valuesToCheck is used to exclude them' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $false
@@ -1271,19 +1271,21 @@ try
             }
 
             Context 'When testing array values' {
-                $currentValues = @{
-                    String    = 'a string'
-                    Bool      = $true
-                    Int       = 99
-                    Array     = 'a', 'b', 'c', 1
-                    Hashtable = @{
-                        k1 = 'Test'
-                        k2 = 123
-                        k3 = 'v1', 'v2', 'v3'
+                BeforeAll {
+                    $currentValues = @{
+                        String    = 'a string'
+                        Bool      = $true
+                        Int       = 99
+                        Array     = 'a', 'b', 'c', 1
+                        Hashtable = @{
+                            k1 = 'Test'
+                            k2 = 123
+                            k3 = 'v1', 'v2', 'v3'
+                        }
                     }
                 }
 
-                Context '!= Array missing a value' {
+                Context 'When array is missing a value' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -1308,7 +1310,7 @@ try
                     }
                 }
 
-                Context '!= Array has an additional value' {
+                Context 'When array has an additional value' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -1328,7 +1330,7 @@ try
                     }
                 }
 
-                Context '!= Array has a different value' {
+                Context 'When array has a different value' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -1348,7 +1350,7 @@ try
                     }
                 }
 
-                Context '!= Array has different order' {
+                Context 'When array has different order' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -1368,7 +1370,7 @@ try
                     }
                 }
 
-                Context '== Array has different order but SortArrayValues is used' {
+                Context 'When array has different order but SortArrayValues is used' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -1390,7 +1392,7 @@ try
                 }
 
 
-                Context '!= Array has a value with a different type' {
+                Context 'When array has a value with a different type' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -1410,7 +1412,7 @@ try
                     }
                 }
 
-                Context '== Array has a value with a different type but TurnOffTypeChecking is used' {
+                Context 'When array has a value with a different type but TurnOffTypeChecking is used' {
                     $desiredValues = [PSObject] @{
                         String = 'a string'
                         Bool   = $true
@@ -1423,6 +1425,43 @@ try
                                 -CurrentValues $currentValues `
                                 -DesiredValues $desiredValues `
                                 -TurnOffTypeChecking `
+                                -Verbose:$verbose } | Should -Not -Throw
+                    }
+
+                    It 'Should return $true' {
+                        $script:result | Should -Be $true
+                    }
+                }
+
+                Context 'When both arrays are empty' {
+                    $currentValues = @{
+                        String    = 'a string'
+                        Bool      = $true
+                        Int       = 99
+                        Array     = @()
+                        Hashtable = @{
+                            k1 = 'Test'
+                            k2 = 123
+                            k3 = @()
+                        }
+                    }
+
+                    $desiredValues = [PSObject]@{
+                        String    = 'a string'
+                        Bool      = $true
+                        Int       = 99
+                        Array     = @()
+                        Hashtable = @{
+                            k1 = 'Test'
+                            k2 = 123
+                            k3 = @()
+                        }
+                    }
+
+                    It 'Should not throw exception' {
+                        { $script:result = Test-DscParameterState `
+                                -CurrentValues $currentValues `
+                                -DesiredValues $desiredValues `
                                 -Verbose:$verbose } | Should -Not -Throw
                     }
 
@@ -1445,7 +1484,7 @@ try
                     }
                 }
 
-                Context '!= Hashtable missing a value' {
+                Context 'When hashtable is missing a value' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -1470,7 +1509,7 @@ try
                     }
                 }
 
-                Context '!= Hashtable has an additional value' {
+                Context 'When hashtable has an additional value' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -1495,7 +1534,7 @@ try
                     }
                 }
 
-                Context '!= Hashtable has a different value' {
+                Context 'When hashtable has a different value' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -1520,7 +1559,7 @@ try
                     }
                 }
 
-                Context '!= Array in hashtable has different order' {
+                Context 'When an array in hashtable has different order' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -1545,7 +1584,7 @@ try
                     }
                 }
 
-                Context '== Array in hashtable has different order but SortArrayValues is used' {
+                Context 'When an array in hashtable has different order but SortArrayValues is used' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -1572,7 +1611,7 @@ try
                 }
 
 
-                Context '!= Hashtable has a value with a different type' {
+                Context 'When hashtable has a value with a different type' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -1597,7 +1636,7 @@ try
                     }
                 }
 
-                Context '== Hashtable has a value with a different type but TurnOffTypeChecking is used' {
+                Context 'When hashtable has a value with a different type but TurnOffTypeChecking is used' {
                     $desiredValues = [PSObject]@{
                         String    = 'a string'
                         Bool      = $true
@@ -1643,7 +1682,7 @@ try
                         })
                 }
 
-                Context '== Everything matches' {
+                Context 'When everything matches' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true
@@ -1674,7 +1713,7 @@ try
                     }
                 }
 
-                Context '== CimInstances missing a value in the desired state (not recognized)' {
+                Context 'When CimInstances missing a value in the desired state (not recognized)' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true
@@ -1704,7 +1743,7 @@ try
                     }
                 }
 
-                Context '!= CimInstances missing a value in the desired state (recognized using ReverseCheck)' {
+                Context 'When CimInstances missing a value in the desired state (recognized using ReverseCheck)' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true
@@ -1735,7 +1774,7 @@ try
                     }
                 }
 
-                Context '!= CimInstances have an additional value' {
+                Context 'When CimInstances have an additional value' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true
@@ -1767,7 +1806,7 @@ try
                     }
                 }
 
-                Context '!= CimInstances have a different value' {
+                Context 'When CimInstances have a different value' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true
@@ -1798,7 +1837,7 @@ try
                     }
                 }
 
-                Context '!= CimInstaces have a value with a different type' {
+                Context 'When CimInstances have a value with a different type' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true
@@ -1829,7 +1868,7 @@ try
                     }
                 }
 
-                Context '== CimInstaces have a value with a different type but TurnOffTypeChecking is used' {
+                Context 'When CimInstances have a value with a different type but TurnOffTypeChecking is used' {
                     $desiredValues = [PSObject]@{
                         String       = 'a string'
                         Bool         = $true
@@ -1875,7 +1914,7 @@ try
                     }
                 }
 
-                Context '== even if missing property in the desired state' {
+                Context 'When even if missing property in the desired state' {
                     $desiredValues = [PSObject] @{
                         Array     = 'a', 'b', 'c', 1
                         Hashtable = @{
@@ -1897,7 +1936,7 @@ try
                     }
                 }
 
-                Context '!= missing property in the desired state' {
+                Context 'When missing property in the desired state' {
                     $currentValues = @{
                         String = 'a string'
                         Bool   = $true
@@ -1922,7 +1961,6 @@ try
             }
 
             Context 'When testing parameter types' {
-
                 Context 'When desired value is of the wrong type' {
                     $currentValues = @{
                         String = 'a string'
@@ -1959,7 +1997,7 @@ try
             # Use the Get-Verb cmdlet to just get a simple object fast
             $testDscObject = (Get-Verb)[0]
 
-            Context 'The object contains the expected property' {
+            Context 'When the object contains the expected property' {
                 It 'Should not throw exception' {
                     { $script:result = Test-DscObjectHasProperty -Object $testDscObject -PropertyName 'Verb' -Verbose } | Should -Not -Throw
                 }
@@ -1969,7 +2007,7 @@ try
                 }
             }
 
-            Context 'The object does not contain the expected property' {
+            Context 'When the object does not contain the expected property' {
                 It 'Should not throw exception' {
                     { $script:result = Test-DscObjectHasProperty -Object $testDscObject -PropertyName 'Missing' -Verbose } | Should -Not -Throw
                 }
@@ -1987,28 +2025,28 @@ try
                 k3 = 1, 2, 3
             }
 
-            Context 'The array contains the expected record count' {
+            Context 'When the array contains the expected record count' {
                 It 'Should not throw exception' {
                     { $script:result = [CimInstance[]]($hashtable | ConvertTo-CimInstance) } | Should -Not -Throw
                 }
 
-                It "Record count should be $($hashTable.Count)" {
+                It "Should record count should be $($hashTable.Count)" {
                     $script:result.Count | Should -Be $hashtable.Count
                 }
 
-                It 'Result should be of type CimInstance[]' {
+                It 'Should return result of type CimInstance[]' {
                     $script:result.GetType().Name | Should -Be 'CimInstance[]'
                 }
 
-                It 'Value "k1" in the CimInstance array should be "v1"' {
+                It 'Should return value "k1" in the CimInstance array should be "v1"' {
                     ($script:result | Where-Object Key -eq k1).Value | Should -Be 'v1'
                 }
 
-                It 'Value "k2" in the CimInstance array should be "100"' {
+                It 'Should return value "k2" in the CimInstance array should be "100"' {
                     ($script:result | Where-Object Key -eq k2).Value | Should -Be 100
                 }
 
-                It 'Value "k3" in the CimInstance array should be "1,2,3"' {
+                It 'Should return value "k3" in the CimInstance array should be "1,2,3"' {
                     ($script:result | Where-Object Key -eq k3).Value | Should -Be '1,2,3'
                 }
             }
@@ -2021,28 +2059,28 @@ try
                 k3 = 1, 2, 3
             }
 
-            Context 'The array contains the expected record count' {
+            Context 'When the array contains the expected record count' {
                 It 'Should not throw exception' {
                     { $script:result = $cimInstances | ConvertTo-HashTable } | Should -Not -Throw
                 }
 
-                It "Record count should be $($cimInstances.Count)" {
+                It "Should return record count of $($cimInstances.Count)" {
                     $script:result.Count | Should -Be $cimInstances.Count
                 }
 
-                It 'Result should be of type [System.Collections.Hashtable]' {
+                It 'Should return result of type [System.Collections.Hashtable]' {
                     $script:result | Should -BeOfType [System.Collections.Hashtable]
                 }
 
-                It 'Value "k1" in the hashtable should be "v1"' {
+                It 'Should return value "k1" in the hashtable should be "v1"' {
                     $script:result.k1 | Should -Be 'v1'
                 }
 
-                It 'Value "k2" in the hashtable should be "100"' {
+                It 'Should return value "k2" in the hashtable should be "100"' {
                     $script:result.k2 | Should -Be 100
                 }
 
-                It 'Value "k3" in the hashtable should be "1,2,3"' {
+                It 'Should return value "k3" in the hashtable should be "1,2,3"' {
                     $script:result.k3 | Should -Be '1,2,3'
                 }
             }
