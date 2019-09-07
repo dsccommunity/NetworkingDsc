@@ -468,7 +468,7 @@ function Test-TargetResource
     .PARAMETER PreferredLifetime
     Specifies a preferred lifetime in seconds of an IP route.
 #>
-Function Get-Route
+function Get-Route
 {
     param
     (
@@ -566,7 +566,7 @@ Function Get-Route
     .PARAMETER PreferredLifetime
     Specifies a preferred lifetime in seconds of an IP route.
 #>
-Function Assert-ResourceProperty
+function Assert-ResourceProperty
 {
     [CmdletBinding()]
     param

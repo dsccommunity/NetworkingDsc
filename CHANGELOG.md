@@ -14,8 +14,7 @@
   full type name.
 - Fixed bug in `Test-DscParameterState` that causes it to return true when
   both the current array and desired array is empty.
-- MSFT_NetworkTeam:
-  - Fix minor style issues in statement case.
+- Fix minor style issues in statement case.
 
 ## 7.3.0.0
 
