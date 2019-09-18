@@ -1,6 +1,6 @@
 @{
     # Version number of this module.
-    moduleVersion = '7.3.0.0'
+    moduleVersion = '7.4.0.0'
 
     # ID used to uniquely identify this module
     GUID                 = 'e6647cc3-ce9c-4c86-9eb8-2ee8919bf358'
@@ -82,36 +82,26 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-        ReleaseNotes = '- DnsClientGlobalSettings:
-  - Fixed SuffixSearchList Empty String Handling - fixes [Issue 398](https://github.com/PowerShell/NetworkingDsc/issues/398).
-- NetAdapterAdvancedProperty:
-  - Removed validation from RegistryKeyword parameter because the list
-    of valid registry keywords is not fixed and will depend on adapter
-    driver - fixes [Issue 388](https://github.com/PowerShell/NetworkingDsc/issues/388).
-- MSFT_WinsServerAddress
-  Added MSFT_WinsServerAddress to control the WINS servers for a given network adapter.
-- Test-DscParameterState:
-  - This function was enhanced with an optional reversecheck, optional internal
-    sorting for arrays.
-  - The functions ConvertTo-CimInstance and ConvertTo-Hashtable were added
-    required by Test-DscParameterState.
-- Fix missing context message content in unit tests - fixes [Issue 405](https://github.com/PowerShell/NetworkingDsc/issues/405).
-- Correct style violations in unit tests:
-  - Adding `Get`, `Set` and `Test` tags to appropriate `describe` blocks.
-  - Removing uneccesary `region` blocks.
-  - Conversion of double quotes to single quotes where possible.
-  - Replace variables with string litterals in `describe` block description.
-- Firewall:
-  - Fix bug when LocalAddress or RemoteAddress is specified using CIDR
-    notation with number of bits specified in subnet mask (e.g.
-    10.0.0.1/8) rather than using CIDR subnet mask notation (e.g
-    10.0.0.1/255.0.0.0) - fixes [Issue 404](https://github.com/PowerShell/NetworkingDsc/issues/404).
+        ReleaseNotes = '- Added Comment Based Help for `New-NotImplementedException` common
+  function - fixes [Issue 411](https://github.com/PowerShell/NetworkingDsc/issues/411).
+- Added common function "Format-Win32NetworkADapterFilterByNetConnectionID"
+  to properly accept wild cards for Win32_NetworkAdapter filters.
+- Updated MSFT_Netbios to use "Format-Win32NetworkADapterFilterByNetConnectionID"
+  - fixes [Issue 413](https://github.com/PowerShell/NetworkingDsc/issues/413).
+- Corrected minor style and consistency issues in `NetworkingDsc.Common.tests.ps1`
+  and `NetworkingDsc.Common.ps1`.
+- Changed verbose messages in `Test-DscParameterState` to include
+  full type name.
+- Fixed bug in `Test-DscParameterState` that causes it to return true when
+  both the current array and desired array is empty.
+- Fix minor style issues in statement case.
 
 '
 
 } # End of PSData hashtable
     } # End of PrivateData hashtable
 }
+
 
 
 

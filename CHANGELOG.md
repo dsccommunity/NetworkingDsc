@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.4.0.0
+
 - Added Comment Based Help for `New-NotImplementedException` common
   function - fixes [Issue #411](https://github.com/PowerShell/NetworkingDsc/issues/411).
 - Added common function 'Format-Win32NetworkADapterFilterByNetConnectionID'
