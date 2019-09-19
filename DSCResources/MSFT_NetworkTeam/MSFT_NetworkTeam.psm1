@@ -19,11 +19,11 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_NetworkTeam'
     Specifies the network interfaces that should be a part of the network team.
     This is a comma-separated list.
 #>
-Function Get-TargetResource
+function Get-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -88,10 +88,10 @@ Function Get-TargetResource
     .PARAMETER Ensure
     Specifies if the network team should be created or deleted.
 #>
-Function Set-TargetResource
+function Set-TargetResource
 {
     [CmdletBinding()]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -243,11 +243,11 @@ Function Set-TargetResource
     .PARAMETER Ensure
     Specifies if the network team should be created or deleted.
 #>
-Function Test-TargetResource
+function Test-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [System.String]
