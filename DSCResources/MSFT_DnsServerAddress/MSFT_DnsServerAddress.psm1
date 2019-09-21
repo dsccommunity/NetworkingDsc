@@ -51,9 +51,17 @@ function Get-TargetResource
     $null = $PSBoundParameters.Remove('Address')
 
     # Get the current DNS Server Addresses based on the parameters given.
-    [String[]] $currentAddress = Get-DnsClientServerStaticAddress `
-        @PSBoundParameters `
-        -ErrorAction Stop
+    [String[]] $currentAddress = try {
+        Get-DnsClientServerStaticAddress @PSBoundParameters -ErrorAction Stop
+    } catch {
+        Write-Verbose -Message (
+            -join @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.GettingDnsServerAddressesMessage -f $InterfaceAlias, $_.Message)
+            )
+        )
+        @()
+    }
 
     $returnValue = @{
         Address        = $currentAddress
@@ -248,9 +256,19 @@ function Test-TargetResource
     $null = $PSBoundParameters.Remove('Validate')
 
     # Get the current DNS Server Addresses based on the parameters given.
-    [String[]] $currentAddress = @(Get-DnsClientServerStaticAddress `
-        @PSBoundParameters `
-        -ErrorAction Stop)
+    [String[]] $currentAddress = @(
+        try {
+            Get-DnsClientServerStaticAddress @PSBoundParameters -ErrorAction Stop
+        } catch {
+            Write-Verbose -Message (
+                -join @(
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.GettingDnsServerAddressesMessage -f $InterfaceAlias, $_.Message)
+                )
+            )
+            return $false
+        }
+    )
 
     # Check if the Server addresses are the same as the desired addresses.
     [Boolean] $addressDifferent = (@(Compare-Object `

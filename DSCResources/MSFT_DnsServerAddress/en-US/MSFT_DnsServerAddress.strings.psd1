@@ -13,4 +13,5 @@ ConvertFrom-StringData @'
     AddressFormatError                    = Address "{0}" is not in the correct format. Please correct the Address parameter in the configuration and try again.
     AddressIPv4MismatchError              = Address "{0}" is in IPv4 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
     AddressIPv6MismatchError              = Address "{0}" is in IPv6 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
+    DnsInformationNotFound                = Could not retrieve DNS address for interface "{0}" - "{1}".
 '@
