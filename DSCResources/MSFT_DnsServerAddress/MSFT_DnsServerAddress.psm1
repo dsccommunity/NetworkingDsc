@@ -134,10 +134,10 @@ function Set-TargetResource
     $null = $PSBoundParameters.Remove('Validate')
 
     # Get the current DNS Server Addresses based on the parameters given.
-    [String[]] $currentAddress =
+    [String[]] $currentAddress = @(
         try
         {
-            @(Get-DnsClientServerStaticAddress @PSBoundParameters -ErrorAction Stop)
+            Get-DnsClientServerStaticAddress @PSBoundParameters -ErrorAction Stop
         }
         catch
         {
@@ -149,6 +149,7 @@ function Set-TargetResource
             )
             return
         }
+    )
 
     # Check if the Server addresses are the same as the desired addresses.
     [Boolean] $addressDifferent = (@(Compare-Object `
