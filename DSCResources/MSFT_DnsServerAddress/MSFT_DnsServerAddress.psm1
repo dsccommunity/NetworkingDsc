@@ -61,7 +61,7 @@ function Get-TargetResource
             Write-Warning -Message (
                 -join @(
                     "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.DnsInformationNotFound -f $InterfaceAlias, $_.Message)
+                    $($script:localizedData.DnsInformationNotFound -f $InterfaceAlias, $_.Exception.Message)
                 )
             )
             @()
@@ -134,9 +134,21 @@ function Set-TargetResource
     $null = $PSBoundParameters.Remove('Validate')
 
     # Get the current DNS Server Addresses based on the parameters given.
-    [String[]] $currentAddress = @(Get-DnsClientServerStaticAddress `
-        @PSBoundParameters `
-        -ErrorAction Stop)
+    [String[]] $currentAddress =
+        try
+        {
+            @(Get-DnsClientServerStaticAddress @PSBoundParameters -ErrorAction Stop)
+        }
+        catch
+        {
+            Write-Error -Message (
+                -join @(
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.DnsInformationNotFound -f $InterfaceAlias, $_.Exception.Message)
+                )
+            )
+            return
+        }
 
     # Check if the Server addresses are the same as the desired addresses.
     [Boolean] $addressDifferent = (@(Compare-Object `
@@ -270,7 +282,7 @@ function Test-TargetResource
             Write-Warning -Message (
                 -join @(
                     "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.DnsInformationNotFound -f $InterfaceAlias, $_.Message)
+                    $($script:localizedData.DnsInformationNotFound -f $InterfaceAlias, $_.Exception.Message)
                 )
             )
             return $false
