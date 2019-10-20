@@ -51,17 +51,21 @@ function Get-TargetResource
     $null = $PSBoundParameters.Remove('Address')
 
     # Get the current DNS Server Addresses based on the parameters given.
-    [String[]] $currentAddress = try {
-        Get-DnsClientServerStaticAddress @PSBoundParameters -ErrorAction Stop
-    } catch {
-        Write-Verbose -Message (
-            -join @(
-                "$($MyInvocation.MyCommand): "
-                $($script:localizedData.GettingDnsServerAddressesMessage -f $InterfaceAlias, $_.Message)
+    [String[]] $currentAddress =
+        try
+        {
+            Get-DnsClientServerStaticAddress @PSBoundParameters -ErrorAction Stop
+        }
+        catch
+        {
+            Write-Warning -Message (
+                -join @(
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.DnsInformationNotFound -f $InterfaceAlias, $_.Message)
+                )
             )
-        )
-        @()
-    }
+            @()
+        }
 
     $returnValue = @{
         Address        = $currentAddress
@@ -257,13 +261,16 @@ function Test-TargetResource
 
     # Get the current DNS Server Addresses based on the parameters given.
     [String[]] $currentAddress = @(
-        try {
+        try
+        {
             Get-DnsClientServerStaticAddress @PSBoundParameters -ErrorAction Stop
-        } catch {
-            Write-Verbose -Message (
+        }
+        catch
+        {
+            Write-Warning -Message (
                 -join @(
                     "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.GettingDnsServerAddressesMessage -f $InterfaceAlias, $_.Message)
+                    $($script:localizedData.DnsInformationNotFound -f $InterfaceAlias, $_.Message)
                 )
             )
             return $false
