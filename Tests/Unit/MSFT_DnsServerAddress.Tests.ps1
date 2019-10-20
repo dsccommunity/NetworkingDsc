@@ -89,6 +89,25 @@ try
                     }
                 }
             }
+
+            Context 'Test missing interface' {
+                Mock -CommandName Get-DnsClientServerStaticAddress -MockWith {
+                    throw 'Interface not found'
+                }
+
+                It 'Should return empty list and write-warning' {
+                    $getTargetResourceSplat = @{
+                        Address        = '192.168.0.1'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
+                    }
+
+                    $result = Get-TargetResource @getTargetResourceSplat 3>&1
+                    $result[0].Message | Should -BeLike '*Could not retrieve DNS address for interface "Ethernet" - "Interface not found".'
+                    $result[1].Address | Should -BeNullOrEmpty
+                }
+            }
         }
 
         Describe 'MSFT_DnsServerAddress\Set-TargetResource' -Tag 'Set' {
@@ -375,6 +394,27 @@ try
                     }
                 }
             }
+
+            Context 'Test missing interface' {
+                Mock -CommandName Get-DnsClientServerStaticAddress -MockWith {
+                    throw 'Interface not found'
+                }
+                Mock -CommandName Set-DnsClientServerAddress
+
+                It 'Should not set anything and write-error' {
+                    $setTargetResourceSplat = @{
+                        Address        = '192.168.0.99'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
+                    }
+
+                    $result = Set-TargetResource @setTargetResourceSplat 2>&1
+                    $result.Exception.Message | Should -BeLike '*Could not retrieve DNS address for interface "Ethernet" - "Interface not found".'
+                    Assert-MockCalled -commandName Set-DnsClientServerAddress -Times 0 -Exactly
+                }
+            }
+
         }
 
         Describe 'MSFT_DnsServerAddress\Test-TargetResource' -Tag 'Test' {
@@ -563,6 +603,25 @@ try
                     It 'Should call all the mocks' {
                         Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
                     }
+                }
+            }
+
+            Context 'Test missing interface' {
+                Mock -CommandName Get-DnsClientServerStaticAddress -MockWith {
+                    throw 'Interface not found'
+                }
+
+                It 'Should return false and write-warning' {
+                    $testTargetResourceSplat = @{
+                        Address        = '192.168.0.2'
+                        InterfaceAlias = 'Ethernet'
+                        AddressFamily  = 'IPv4'
+                        Verbose        = $true
+                    }
+
+                    $result = Test-TargetResource @testTargetResourceSplat 3>&1
+                    $result[0].Message | Should -BeLike '*Could not retrieve DNS address for interface "Ethernet" - "Interface not found".'
+                    $result[1].Address | Should -BeFalse
                 }
             }
         }
