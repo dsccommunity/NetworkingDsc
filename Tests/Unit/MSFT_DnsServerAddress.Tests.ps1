@@ -610,6 +610,11 @@ try
                 Mock -CommandName Get-DnsClientServerStaticAddress -MockWith {
                     throw 'Interface not found'
                 }
+                Mock -CommandName Get-NetAdapter -MockWith {
+                    [PSObject]@{
+                        Name = 'Ethernet'
+                    }
+                }
 
                 It 'Should return false and write-warning' {
                     $testTargetResourceSplat = @{
