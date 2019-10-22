@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- NetworkingDsc.Common:
+  - Fixed Network Adapter renaming - fixes [Issue #382](https://github.com/PowerShell/NetworkingDsc/issues/382).
+
 ## 7.4.0.0
 
 - Added Comment Based Help for `New-NotImplementedException` common
