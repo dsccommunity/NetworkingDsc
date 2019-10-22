@@ -594,18 +594,16 @@ function Find-NetworkAdapter
 
         if ($matchingAdapters.Count -gt 1)
         {
-            if ($IgnoreMultipleMatchingAdapters)
+            if ($PSBoundParameters.ContainsKey('InterfaceNumber'))
             {
-                # Was the number of matching adapters found matching the adapter number?
-                if (($InterfaceNumber -gt 1) -and ($InterfaceNumber -gt $matchingAdapters.Count))
+                if ($PSBoundParameters.ContainsKey('IgnoreMultipleMatchingAdapters'))
                 {
-                    New-InvalidOperationException `
-                        -Message ($script:localizedData.InvalidNetAdapterNumberError `
-                            -f $matchingAdapters.Count, $InterfaceNumber)
-
-                    # Return a null so that ErrorAction SilentlyContinue works correctly
-                    return $null
-                } # if
+                    $IgnoreMultipleMatchingAdapters = $_.IgnoreMultipleMatchingAdapters
+                }
+                else
+                {
+                    $IgnoreMultipleMatchingAdapters = $true
+                }
             }
             else
             {
