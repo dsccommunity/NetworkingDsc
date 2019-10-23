@@ -605,7 +605,6 @@ function Find-NetworkAdapter
     
                         # Return a null so that ErrorAction SilentlyContinue works correctly
                         $IgnoreMultipleMatchingAdapters = $true
-                        return $null
                     }
                     else {
                         $IgnoreMultipleMatchingAdapters = $_.IgnoreMultipleMatchingAdapters
