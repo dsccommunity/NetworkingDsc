@@ -269,39 +269,39 @@ try
         }
 
         Describe 'NetworkingDsc.Common\Convert-CIDRToSubhetMask' {
-            Context 'Subnet Mask Notation Used "192.168.0.0/255.255.0.0"' {
+            Context 'When a Subnet Mask Notation used "192.168.0.0/255.255.0.0"' {
                 It 'Should Return "192.168.0.0/255.255.0.0"' {
                     Convert-CIDRToSubhetMask -Address @('192.168.0.0/255.255.0.0') | Should -Be '192.168.0.0/255.255.0.0'
                 }
             }
-            Context 'Subnet Mask Notation Used "192.168.0.10/255.255.0.0" resulting in source bits masked' {
+            Context 'When a Subnet Mask Notation used "192.168.0.10/255.255.0.0" resulting in source bits masked' {
                 It 'Should Return "192.168.0.0/255.255.0.0" with source bits masked' {
                     Convert-CIDRToSubhetMask -Address @('192.168.0.10/255.255.0.0') | Should -Be '192.168.0.0/255.255.0.0'
                 }
             }
-            Context 'CIDR Notation Used "192.168.0.0/16"' {
+            Context 'When a CIDR Notation used "192.168.0.0/16"' {
                 It 'Should Return "192.168.0.0/255.255.0.0"' {
                     Convert-CIDRToSubhetMask -Address @('192.168.0.0/16') | Should -Be '192.168.0.0/255.255.0.0'
                 }
             }
-            Context 'CIDR Notation Used "192.168.0.10/16" resulting in source bits masked' {
+            Context 'When a CIDR Notation used "192.168.0.10/16" resulting in source bits masked' {
                 It 'Should Return "192.168.0.0/255.255.0.0" with source bits masked' {
                     Convert-CIDRToSubhetMask -Address @('192.168.0.10/16') | Should -Be '192.168.0.0/255.255.0.0'
                 }
             }
-            Context 'Multiple Notations Used "192.168.0.0/16,10.0.0.24/255.255.255.0"' {
+            Context 'When multiple Notations used "192.168.0.0/16,10.0.0.24/255.255.255.0"' {
                 $Result = Convert-CIDRToSubhetMask -Address @('192.168.0.0/16', '10.0.0.24/255.255.255.0')
                 It 'Should Return "192.168.0.0/255.255.0.0,10.0.0.0/255.255.255.0"' {
                     $Result[0] | Should -Be '192.168.0.0/255.255.0.0'
                     $Result[1] | Should -Be '10.0.0.0/255.255.255.0'
                 }
             }
-            Context 'Range Used "192.168.1.0-192.168.1.128"' {
+            Context 'When Range used "192.168.1.0-192.168.1.128"' {
                 It 'Should Return "192.168.1.0-192.168.1.128"' {
                     Convert-CIDRToSubhetMask -Address @('192.168.1.0-192.168.1.128') | Should -Be '192.168.1.0-192.168.1.128'
                 }
             }
-            Context 'IPv6 Used "fe80::/112"' {
+            Context 'When IPv6 used "fe80::/112"' {
                 It 'Should Return "fe80::/112"' {
                     Convert-CIDRToSubhetMask -Address @('fe80::/112') | Should -Be 'fe80::/112'
                 }
@@ -347,7 +347,7 @@ try
             $adapterArray = @( $nomatchAdapter, $matchAdapter )
             $multipleMatchingAdapterArray = @( $matchAdapter, $matchAdapter )
 
-            Context 'Name is passed and one adapter matches' {
+            Context 'When a Name is passed and one adapter matches' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -365,7 +365,7 @@ try
                 }
             }
 
-            Context 'Name is passed and no adapters match' {
+            Context 'When a Name is passed and no adapters match' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -382,7 +382,7 @@ try
                 }
             }
 
-            Context 'PhysicalMediaType is passed and one adapter matches' {
+            Context 'When a PhysicalMediaType is passed and one adapter matches' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -400,7 +400,7 @@ try
                 }
             }
 
-            Context 'PhysicalMediaType is passed and no adapters match' {
+            Context 'When a PhysicalMediaType is passed and no adapters match' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -417,7 +417,7 @@ try
                 }
             }
 
-            Context 'Status is passed and one adapter matches' {
+            Context 'When a Status is passed and one adapter matches' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -435,7 +435,7 @@ try
                 }
             }
 
-            Context 'Status is passed and no adapters match' {
+            Context 'When a Status is passed and no adapters match' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -452,7 +452,7 @@ try
                 }
             }
 
-            Context 'MacAddress is passed and one adapter matches' {
+            Context 'When a MacAddress is passed and one adapter matches' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -470,7 +470,7 @@ try
                 }
             }
 
-            Context 'MacAddress is passed and no adapters match' {
+            Context 'When a MacAddress is passed and no adapters match' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -487,7 +487,7 @@ try
                 }
             }
 
-            Context 'InterfaceDescription is passed and one adapter matches' {
+            Context 'When a InterfaceDescription is passed and one adapter matches' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -505,7 +505,7 @@ try
                 }
             }
 
-            Context 'InterfaceDescription is passed and no adapters match' {
+            Context 'When a InterfaceDescription is passed and no adapters match' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -522,7 +522,7 @@ try
                 }
             }
 
-            Context 'InterfaceIndex is passed and one adapter matches' {
+            Context 'When a InterfaceIndex is passed and one adapter matches' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -540,7 +540,7 @@ try
                 }
             }
 
-            Context 'InterfaceIndex is passed and no adapters match' {
+            Context 'When a InterfaceIndex is passed and no adapters match' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -557,7 +557,7 @@ try
                 }
             }
 
-            Context 'InterfaceGuid is passed and one adapter matches' {
+            Context 'When a InterfaceGuid is passed and one adapter matches' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -575,7 +575,7 @@ try
                 }
             }
 
-            Context 'InterfaceGuid is passed and no adapters match' {
+            Context 'When a InterfaceGuid is passed and no adapters match' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -592,7 +592,7 @@ try
                 }
             }
 
-            Context 'DriverDescription is passed and one adapter matches' {
+            Context 'When a DriverDescription is passed and one adapter matches' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -610,7 +610,7 @@ try
                 }
             }
 
-            Context 'DriverDescription is passed and no adapters match' {
+            Context 'When a DriverDescription is passed and no adapters match' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -627,7 +627,7 @@ try
                 }
             }
 
-            Context 'No parameters are passed and multiple Adapters adapters match but IgnoreMultipleMatchingAdapters is not set' {
+            Context 'When no parameters are passed and multiple Adapters adapters match but IgnoreMultipleMatchingAdapters is not set' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -644,7 +644,7 @@ try
                 }
             }
 
-            Context 'No parameters are passed and multiple Adapters adapters match and IgnoreMultipleMatchingAdapters is set and interface number is 2' {
+            Context 'When no parameters are passed and multiple Adapters adapters match and IgnoreMultipleMatchingAdapters is set and interface number is 2' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $adapterArray }
@@ -662,7 +662,7 @@ try
                 }
             }
 
-            Context 'Multiple Adapters adapters match but IgnoreMultipleMatchingAdapters is not set' {
+            Context 'When multiple Adapters adapters match but IgnoreMultipleMatchingAdapters is not set' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $multipleMatchingAdapterArray }
@@ -679,13 +679,13 @@ try
                 }
             }
 
-            Context 'Multiple Adapters adapters match and IgnoreMultipleMatchingAdapters is set' {
+            Context 'When multiple Adapters adapters match and IgnoreMultipleMatchingAdapters is set' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $multipleMatchingAdapterArray }
 
                 It 'Should not throw exception' {
-                    { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -IgnoreMultipleMatchingAdapters:$true -Verbose } | Should -Not -Throw
+                    { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -InterfaceNumber 1 -IgnoreMultipleMatchingAdapters:$true -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return expected adapter' {
@@ -697,7 +697,7 @@ try
                 }
             }
 
-            Context 'Multiple Adapters adapters match and IgnoreMultipleMatchingAdapters is set and InterfaceNumber is greater than matching adapters' {
+            Context 'When multiple Adapters adapters match and IgnoreMultipleMatchingAdapters is set and InterfaceNumber is greater than matching adapters' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $multipleMatchingAdapterArray }
@@ -746,7 +746,7 @@ try
             $secondIpv6StaticAddressString = '::2'
             $twoIpv6StaticAddressString = "$oneIpv6StaticAddressString,$secondIpv6StaticAddressString"
 
-            Context 'Interface Alias does not match adapter in system' {
+            Context 'When a Interface Alias does not match adapter in system' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $nomatchAdapter }
@@ -763,7 +763,7 @@ try
                 }
             }
 
-            Context 'Interface Alias was found in system but IPv4 NameServer is empty' {
+            Context 'When a Interface Alias was found in system but IPv4 NameServer is empty' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $matchAdapter }
@@ -790,7 +790,7 @@ try
                 }
             }
 
-            Context 'Interface Alias was found in system but IPv4 NameServer property does not exist' {
+            Context 'When a Interface Alias was found in system but IPv4 NameServer property does not exist' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $matchAdapter }
@@ -817,7 +817,7 @@ try
                 }
             }
 
-            Context 'Interface Alias was found in system but IPv4 NameServer contains one DNS entry' {
+            Context 'When a Interface Alias was found in system but IPv4 NameServer contains one DNS entry' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $matchAdapter }
@@ -844,7 +844,7 @@ try
                 }
             }
 
-            Context 'Interface Alias was found in system but IPv4 NameServer contains two DNS entries' {
+            Context 'When a Interface Alias was found in system but IPv4 NameServer contains two DNS entries' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $matchAdapter }
@@ -872,7 +872,7 @@ try
                 }
             }
 
-            Context 'Interface Alias was found in system but IPv6 NameServer is empty' {
+            Context 'When a Interface Alias was found in system but IPv6 NameServer is empty' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $matchAdapter }
@@ -899,7 +899,7 @@ try
                 }
             }
 
-            Context 'Interface Alias was found in system but IPv6 NameServer property does not exist' {
+            Context 'When a Interface Alias was found in system but IPv6 NameServer property does not exist' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $matchAdapter }
@@ -926,7 +926,7 @@ try
                 }
             }
 
-            Context 'Interface Alias was found in system but IPv6 NameServer contains one DNS entry' {
+            Context 'When a Interface Alias was found in system but IPv6 NameServer contains one DNS entry' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $matchAdapter }
@@ -953,7 +953,7 @@ try
                 }
             }
 
-            Context 'Interface Alias was found in system but IPv6 NameServer contains two DNS entries' {
+            Context 'When a Interface Alias was found in system but IPv6 NameServer contains two DNS entries' {
                 Mock `
                     -CommandName Get-NetAdapter `
                     -MockWith { $matchAdapter }
@@ -983,7 +983,7 @@ try
         }
 
         Describe 'NetworkingDsc.Common\Get-IPAddressPrefix' {
-            Context 'IPv4 CIDR notation provided' {
+            Context 'When IPv4 CIDR notation is provided' {
                 it 'Should return the provided IP and prefix as separate properties' {
                     $IPaddress = Get-IPAddressPrefix -IPAddress '192.168.10.0/24'
 
@@ -992,7 +992,7 @@ try
                 }
             }
 
-            Context 'IPv4 Class A address with no CIDR notation' {
+            Context 'When IPv4 Class A address has no CIDR notation' {
                 it 'Should return correct prefix when Class A address provided' {
                     $IPaddress = Get-IPAddressPrefix -IPAddress '10.1.2.3'
 
@@ -1001,7 +1001,7 @@ try
                 }
             }
 
-            Context 'IPv4 Class B address with no CIDR notation' {
+            Context 'When a IPv4 Class B address has no CIDR notation' {
                 it 'Should return correct prefix when Class B address provided' {
                     $IPaddress = Get-IPAddressPrefix -IPAddress '172.16.2.3'
 
@@ -1010,7 +1010,7 @@ try
                 }
             }
 
-            Context 'IPv4 Class C address with no CIDR notation' {
+            Context 'When a IPv4 Class C address has no CIDR notation' {
                 it 'Should return correct prefix when Class C address provided' {
                     $IPaddress = Get-IPAddressPrefix -IPAddress '192.168.20.3'
 
@@ -1019,7 +1019,7 @@ try
                 }
             }
 
-            Context 'IPv6 CIDR notation provided' {
+            Context 'When a IPv6 CIDR notation is provided' {
                 it 'Should return provided IP and prefix as separate properties' {
                     $IPaddress = Get-IPAddressPrefix -IPAddress 'FF12::12::123/64' -AddressFamily IPv6
 
@@ -1028,7 +1028,7 @@ try
                 }
             }
 
-            Context 'IPv6 with no CIDR notation provided' {
+            Context 'When a IPv6 with no CIDR notation is provided' {
                 it 'Should return provided IP and correct IPv6 prefix' {
                     $IPaddress = Get-IPAddressPrefix -IPAddress 'FF12::12::123' -AddressFamily IPv6
 
@@ -1058,7 +1058,7 @@ try
                 UseTransaction      = $true
             }
 
-            Context 'Hashtable contains all common parameters' {
+            Context 'When a Hashtable contains all common parameters' {
                 It 'Should not throw exception' {
                     { $script:result = Remove-CommonParameter -Hashtable $removeCommonParameter -Verbose } | Should -Not -Throw
                 }

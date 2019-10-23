@@ -592,29 +592,35 @@ function Find-NetworkAdapter
                 $($script:localizedData.NetAdapterFoundMessage -f $matchingAdapters.Count)
             ) -join '')
 
-        if ($matchingAdapters.Count -gt 1)
-        {
-            if ($PSBoundParameters.ContainsKey('InterfaceNumber'))
+            if ($matchingAdapters.Count -gt 1)
             {
                 if ($PSBoundParameters.ContainsKey('IgnoreMultipleMatchingAdapters'))
                 {
-                    $IgnoreMultipleMatchingAdapters = $_.IgnoreMultipleMatchingAdapters
+                    # Was the number of matching adapters found matching the adapter number?
+                    if (($InterfaceNumber -gt 1) -and ($InterfaceNumber -gt $matchingAdapters.Count))
+                    {
+                        New-InvalidOperationException `
+                            -Message ($script:localizedData.InvalidNetAdapterNumberError `
+                                -f $matchingAdapters.Count, $InterfaceNumber)
+    
+                        # Return a null so that ErrorAction SilentlyContinue works correctly
+                        $IgnoreMultipleMatchingAdapters = $true
+                        return $null
+                    }
+                    else {
+                        $IgnoreMultipleMatchingAdapters = $_.IgnoreMultipleMatchingAdapters
+                    }
                 }
                 else
                 {
-                    $IgnoreMultipleMatchingAdapters = $true
-                }
-            }
-            else
-            {
-                New-InvalidOperationException `
-                    -Message ($script:localizedData.MultipleMatchingNetAdapterFound `
-                        -f $matchingAdapters.Count)
-
-                # Return a null so that ErrorAction SilentlyContinue works correctly
-                return $null
+                    New-InvalidOperationException `
+                        -Message ($script:localizedData.MultipleMatchingNetAdapterFound `
+                            -f $matchingAdapters.Count)
+    
+                    # Return a null so that ErrorAction SilentlyContinue works correctly
+                    return $null
+                } # if
             } # if
-        } # if
     } # if
 
     # Identify the exact adapter from the adapters that match
