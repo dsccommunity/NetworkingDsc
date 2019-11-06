@@ -604,10 +604,7 @@ function Find-NetworkAdapter
                                 -f $matchingAdapters.Count, $InterfaceNumber)
     
                         # Return a null so that ErrorAction SilentlyContinue works correctly
-                        $IgnoreMultipleMatchingAdapters = $true
-                    }
-                    else {
-                        $IgnoreMultipleMatchingAdapters = $_.IgnoreMultipleMatchingAdapters
+                        $IgnoreMultipleMatchingAdapters = [Switch]::Present
                     }
                 }
                 else
