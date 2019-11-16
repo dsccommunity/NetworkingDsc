@@ -50,7 +50,7 @@ try
             }
 
             Context 'When interface has no default gateway set' {
-                Mock -CommandName Get-NetRoute -MockWith { }
+                Mock -CommandName Get-NetRoute
 
                 It 'Should return no default gateway' {
                     $getTargetResourceParameters = @{
@@ -151,7 +151,7 @@ try
             }
 
             Context 'Checking return with default gateway but none are currently set' {
-                Mock -CommandName Get-NetRoute -MockWith { }
+                Mock -CommandName Get-NetRoute
 
                 It 'Should return false' {
                     $testTargetResourceParameters = @{
@@ -165,7 +165,7 @@ try
             }
 
             Context 'Checking return with no gateway and none are currently set' {
-                Mock -CommandName Get-NetRoute -MockWith { }
+                Mock -CommandName Get-NetRoute
 
                 It 'Should return true' {
                     $testTargetResourceParameters = @{
@@ -314,7 +314,7 @@ try
             }
 
             Context 'When interface has no default gateway set' {
-                Mock -CommandName Get-NetRoute -MockWith { }
+                Mock -CommandName Get-NetRoute
 
                 It 'Should return no default gateway' {
                     $GetNetDefaultRouteParameters = @{
