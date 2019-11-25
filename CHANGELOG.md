@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- DefaultGatewayAddress:
+  - Refactored to reduce code duplication.
+  - Fixed hash table style violations - fixes [Issue #429](https://github.com/PowerShell/NetworkingDsc/issues/429).
+  - Fixed general style violations.
+
 ## 7.4.0.0
 
 - Added Comment Based Help for `New-NotImplementedException` common
