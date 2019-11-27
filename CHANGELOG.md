@@ -4,6 +4,10 @@
 
 - NetworkingDsc.Common:
   - Fixed Network Adapter renaming - fixes [Issue #382](https://github.com/PowerShell/NetworkingDsc/issues/382).
+- DefaultGatewayAddress:
+  - Refactored to reduce code duplication.
+  - Fixed hash table style violations - fixes [Issue #429](https://github.com/PowerShell/NetworkingDsc/issues/429).
+  - Fixed general style violations.
 
 ## 7.4.0.0
 
