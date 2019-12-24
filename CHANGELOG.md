@@ -6,6 +6,8 @@
   - Refactored to reduce code duplication.
   - Fixed hash table style violations - fixes [Issue #429](https://github.com/PowerShell/NetworkingDsc/issues/429).
   - Fixed general style violations.
+- Added `.gitattributes` to ensure CRLF is used when pulling repository - Fixes
+  [Issue #430](https://github.com/PowerShell/NetworkingDsc/issues/430).
 
 ## 7.4.0.0
 
