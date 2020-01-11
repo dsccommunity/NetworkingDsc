@@ -1,1009 +1,734 @@
-# Historic change log for xPSDesiredStateConfiguration
+# Historic change log for NetworkingDsc
 
 The release notes in the PowerShell Module manifest cannot exceed 10000
 characters. Due to a bug in the CI deploy pipeline this is not handled.
 This file is to temporary move the older change log history to keep the
 change log short.
 
-## [8.10.0.0] - 2019-09-19
+## [7.4.0.0]
 
 ### Changed
 
-- Changes to xPSDesiredStateConfiguration
-  - Fix keywords to lower-case to align with guideline.
-- Added SMB PullServer support for publishing.
+- Added Comment Based Help for `New-NotImplementedException` common
+  function - fixes [Issue #411](https://github.com/PowerShell/NetworkingDsc/issues/411).
+- Added common function 'Format-Win32NetworkADapterFilterByNetConnectionID'
+  to properly accept wild cards for Win32_NetworkAdapter filters.
+- Updated MSFT_Netbios to use 'Format-Win32NetworkADapterFilterByNetConnectionID'
+  - fixes [Issue #413](https://github.com/PowerShell/NetworkingDsc/issues/413).
+- Corrected minor style and consistency issues in `NetworkingDsc.Common.tests.ps1`
+  and `NetworkingDsc.Common.ps1`.
+- Changed verbose messages in `Test-DscParameterState` to include
+  full type name.
+- Fixed bug in `Test-DscParameterState` that causes it to return true when
+  both the current array and desired array is empty.
+- Fix minor style issues in statement case.
 
-## [8.9.0.0] - 2019-08-08
-
-### Changed
-
-- MSFT_xRemoteFile:
-  - Add a retry mechanism when the download fails.
-- Fixes #631, typo in SQL connection string property name
-
-## [8.8.0.0] - 2019-06-26
-
-### Changed
-
-- Ports fix for the following issue:
-  [Issue #142](https://github.com/PowerShell/PSDscResources/issues/142)
-  Fixes issue where MsiPackage Integration tests fail if the test HttpListener
-  fails to start. Moves the test HttpListener objects to dynamically assigned,
-  higher numbered ports to avoid conflicts with other services, and also checks
-  to ensure that the ports are available before using them. Adds checks to
-  ensure that no outstanding HTTP server jobs are running before attempting to
-  setup a new one. Also adds additional instrumentation to make it easier to
-  troubleshoot issues with the test HttpListener objects in the future.
-
-## [8.7.0.0] - 2019-05-15
+## [7.3.0.0]
 
 ### Changed
 
-- MSFT_xWindowsProcess:
-  - Fixes issue where a process will fail to be created if a $Path is passed
-    that contains one or more spaces, and the resource is using $Credentials.
-  - Fixes issue where a process will fail to be created if $Arguments are
-    passed that contain one or more spaces (with or without credentials).
-  - Fixes issue where Integration tests fail if empty Arguments are passed.
-    [issue #605](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/605)
-  - Heavily refactors MSFT_xWindowsProcess.Integration.Tests.ps1 and adds more
-    Path and Arguments related test cases.
-  - Removes reliance on test file WindowsProcessTestProcess.
-- Fixes test failures in xWindowsOptionalFeatureSet.Integration.Tests.ps1 due
-  to accessing the windowsOptionalFeatureName variable before it is assigned.
-  [issue #612](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/612)
-- MSFT_xDSCWebService
-  - Fixes [issue
-    #536](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/536)
-    and starts the deprecation process for configuring a windows firewall
-    (exception) rule using xDSCWebService
-  - Fixes [issue
-    #463](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/463)
-    and fixes some bugs introduced with the new firewall rule handling
+- DnsClientGlobalSettings:
+  - Fixed SuffixSearchList Empty String Handling - fixes [Issue #398](https://github.com/PowerShell/NetworkingDsc/issues/398).
+- NetAdapterAdvancedProperty:
+  - Removed validation from RegistryKeyword parameter because the list
+    of valid registry keywords is not fixed and will depend on adapter
+    driver - fixes [Issue #388](https://github.com/PowerShell/NetworkingDsc/issues/388).
+- MSFT_WinsServerAddress
+  Added MSFT_WinsServerAddress to control the WINS servers for a given network adapter.
+- Test-DscParameterState:
+  - This function was enhanced with an optional reversecheck, optional internal
+    sorting for arrays.
+  - The functions ConvertTo-CimInstance and ConvertTo-Hashtable were added
+    required by Test-DscParameterState.
+- Fix missing context message content in unit tests - fixes [Issue #405](https://github.com/PowerShell/NetworkingDsc/issues/405).
+- Correct style violations in unit tests:
+  - Adding `Get`, `Set` and `Test` tags to appropriate `describe` blocks.
+  - Removing uneccesary `#region` blocks.
+  - Conversion of double quotes to single quotes where possible.
+  - Replace variables with string litterals in `describe` block description.
+- Firewall:
+  - Fix bug when LocalAddress or RemoteAddress is specified using CIDR
+    notation with number of bits specified in subnet mask (e.g.
+    10.0.0.1/8) rather than using CIDR subnet mask notation (e.g
+    10.0.0.1/255.0.0.0) - fixes [Issue #404](https://github.com/PowerShell/NetworkingDsc/issues/404).
 
-## [8.6.0.0] - 2019-04-03
-
-### Changed
-
-- Fixes style inconsistencies in PublishModulesAndMofsToPullServer.psm1.
-  [issue #530](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/530)
-- Suppresses forced Verbose output in MSFT_xArchive.EndToEnd.Tests.ps1,
-  MSFT_xDSCWebService.Integration.tests.ps1,
-  MSFT_xPackageResource.Integration.Tests.ps1, MSFT_xRemoteFile.Tests.ps1,
-  MSFT_xUserResource.Integration.Tests.ps1,
-  MSFT_xWindowsProcess.Integration.Tests.ps1, and
-  xFileUpload.Integration.Tests.ps1.
-  [issue #514](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/514)
-- Fixes issue in xGroupResource Integration tests where the tests would fail
-  if the System.DirectoryServices.AccountManagement namespace was not loaded.
-- Tests\Integration\MSFT_xDSCWebService.Integration.tests.ps1:
-  - Fixes issue where tests fail if a self signed certificate for DSC does not
-    already exist.
-    [issue #581](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/581)
-- Fixes all instances of the following PSScriptAnalyzer issues:
-  - PSUseOutputTypeCorrectly
-  - PSAvoidUsingConvertToSecureStringWithPlainText
-  - PSPossibleIncorrectComparisonWithNull
-  - PSAvoidDefaultValueForMandatoryParameter
-  - PSAvoidUsingInvokeExpression
-  - PSUseDeclaredVarsMoreThanAssignments
-  - PSAvoidGlobalVars
-- xPackage and xMsiPackage
-  - Add an ability to ignore a pending reboot if requested by package installation.
-- xRemoteFile
-  - Updated MatchSource description in README.md.
-    [issue #409](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/409)
-  - Improved layout of MOF file to move description left.
-  - Added function help for all functions.
-  - Moved `New-InvalidDataException` to CommonResourceHelper.psm1.
-    [issue #544](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/544)
-- Added full stops to the end of all functions help in CommonResourceHelper.psm1.
-- Added unit tests for `New-InvalidArgumentException`,
-  `New-InvalidDataException` and `New-InvalidOperationException`
-  CommonResourceHelper.psm1 functions.
-- Changes to `MSFT_xDSCWebService`
-  - Fixed
-    [issue #528](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/528)
-    : Unable to disable selfsigned certificates using AcceptSelfSignedCertificates=$false
-  - Fixed
-    [issue #460](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/460)
-    : Redeploy DSC Pull Server fails with error
-- Opt-in to the following Meta tests:
-  - Common Tests - Custom Script Analyzer Rules
-  - Common Tests - Flagged Script Analyzer Rules
-  - Common Tests - New Error-Level Script Analyzer Rules
-  - Common Tests - Relative Path Length
-  - Common Tests - Required Script Analyzer Rules
-  - Common Tests - Validate Markdown Links
-- Add .markdownlint.json file using settings from
-  [here](https://raw.githubusercontent.com/PowerShell/SqlServerDsc/dev/.markdownlint.json)
-  as a starting point.
-- Changes to `Tests\Unit\MSFT_xMsiPackage.Tests.ps1`
-  - Fixes issue where tests fail if executed from a drive other than C:.
-    [issue #573](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/573)
-- Changes to
-  `Tests\Integration\xWindowsOptionalFeatureSet.Integration.Tests.ps1`
-  - Fixes issue where tests fail if a Windows Optional Feature that is expected
-    to be disabled has a feature state of 'DisabledWithPayloadRemoved'.
-    [issue #586](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/586)
-- Changes to
-  `Tests\Unit\MSFT_xPackageResource.Tests.ps1`
-  - Fixes issue where tests fail if run from a folder that contains spaces.
-    [issue #580](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/580)
-- Changes to test helper Enter-DscResourceTestEnvironment so that it only
-  updates DSCResource.Tests when it is longer than 60 minutes since
-  it was last pulled. This is to improve performance of test execution
-  and reduce the likelihood of connectivity issues caused by inability to
-  pull DSCResource.Tests.
-  [issue #505](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/505)
-- Updated `CommonTestHelper.psm1` to resolve style guideline violations.
-- Adds helper functions for use when creating test administrator user accounts,
-  and updates the following tests to use credentials created with these
-  functions:
-  - MSFT_xScriptResource.Integration.Tests.ps1
-  - MSFT_xServiceResource.Integration.Tests.ps1
-  - MSFT_xWindowsProcess.Integration.Tests.ps1
-  - xServiceSet.Integration.Tests.ps1
-- Fixes the following issues:
-  - [issue #582](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/582)
-  - [issue #583](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/583)
-  - [issue #584](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/584)
-  - [issue #585](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/585)
-
-## [8.5.0.0] - 2019-02-21
+## [7.2.0.0]
 
 ### Changed
 
-- Pull server module publishing
-  - Removed forced verbose logging from CreateZipFromSource,
-    Publish-DSCModulesAndMof and Publish-MOFToPullServer as it polluted the
-    console.
-- Corrected GitHub Pull Request template to remove referral to
-  `BestPractices.MD` which has been combined into `StyleGuidelines.md`
-  ([issue #520](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/520)).
-- xWindowsOptionalFeature
-  - Suppress useless verbose output from `Import-Module` cmdlet.
-    ([issue #453](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/453)).
-- Changes to xRemoteFile
-  - Corrected a resource name in the example xRemoteFile_DownloadFileConfig.ps1
-- Fix `MSFT_xDSCWebService` to find
- `Microsoft.Powershell.DesiredStateConfiguration.Service.Resources.dll`
-  when server is configured with pt-BR Locales
-  ([issue #284](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/284)).
-- Changes to xDSCWebService
-  - Fixed an issue which prevented the removal of the IIS Application Pool
-    created during deployment of an DSC Pull Server instance.
-    ([issue #464](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/464))
-  - Fixed an issue where a Pull Server cannot be deployed on a machine when IIS
-    Express is installed aside a full blown IIS
-    ([issue #191](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/191))
-- Update `CommonResourceHelper` unit tests to meet Pester 4.0.0
-  standards
-  ([issue #473](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/473)).
-- Update `ResourceHelper` unit tests to meet Pester 4.0.0
-  standards
-  ([issue #473](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/473)).
-- Update `MSFT_xDSCWebService` unit tests to meet Pester 4.0.0
-  standards
-  ([issue #473](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/473)).
-- Update `MSFT_xDSCWebService` integration tests to meet Pester 4.0.0
-  standards
-  ([issue #473](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/473)).
-- Refactored `MSFT_xDSCWebService` integration tests to meet current
-  standards and to use Pester TestDrive.
-- xArchive
-  - Fix end-to-end tests
-    ([issue #457](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/457)).
-  - Update integration tests to meet Pester 4.0.0 standards.
-  - Update end-to-end tests to meet Pester 4.0.0 standards.
-  - Update unit and integration tests to meet Pester 4.0.0 standards.
-  - Wrapped all path and identifier strings in verbose messages with
-    quotes to make it easier to identify the limit of the string when
-    debugging.
-  - Refactored date/time checksum code to improve testability and ensure
-    tests can run on machines with localized datetime formats that are not
-    US.
-  - Fix 'Get-ArchiveEntryLastWriteTime' to return `[datetime]`
-    ([issue #471](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/471)).
-  - Improved verbose logging to make debugging path issues easier.
-  - Added handling for '/' as a path seperator by backporting code from
-    PSDscResources -
-    ([issue #469](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/469)).
-  - Copied unit tests from
-    [PSDscResources](https://github.com/PowerShell/PSDscResources).
-  - Added .gitattributes file and removed git configuration from AppVeyor
-    to ensure CRLF settings are configured correctly for the repository.
-- Updated '.vscode\settings.json' to refer to AnalyzerSettings.psd1 so that
-  custom syntax problems are highlighted in Visual Studio Code.
-- Fixed style guideline violations in `CommonResourceHelper.psm1`.
-- Changes to xService
-  - Fixes issue where Get-TargetResource or Test-TargetResource will throw an
-    exception if the target service is configured with a non-existent
-    dependency.
-  - Refactored Get-TargetResource Unit tests.
-- Changes to xPackage
-  - Fixes an issue where incorrect verbose output was displayed if product
-    found.
-    ([issue #446](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/446))
-- Fixes files which are getting triggered for re-encoding after recent pull
-  request (possibly #472).
-- Moves version and change history from README.MD to new file, CHANGELOG.MD.
-- Fixes markdown issues in README.MD and HighQualityResourceModulePlan.md.
-- Opted in to 'Common Tests - Validate Markdown Files'
-- Changes to xPSDesiredStateConfiguration
-  - In AppVeyor CI the tests are split into three separate jobs, and also
-    run tests on two different build worker images (Windows Server 2012R2
-    and Windows Server 2016). The common tests are only run on the
-    Windows Server 2016 build worker image. Helps with
-    [issue #477](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/477).
-- xGroup
-  - Corrected style guideline violations. ([issue #485](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/485))
-- xWindowsProcess
-  - Corrected style guideline violations. ([issue #496](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/496))
-- Changes to PSWSIISEndpoint.psm1
-  - Fixes most PSScriptAnalyzer issues.
-- Changes to xRegistry
-  - Fixed an issue that fails to remove reg key when the `Key` is specified as
-    common registry path.
-    ([issue #444](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/444))
-- Changes to xService
-  - Added support for Group Managed Service Accounts
-- Adds new Integration tests for MSFT_xDSCWebService and removes old
-  Integration test file, MSFT_xDSCWebService.xxx.ps1.
-- xRegistry
-  - Corrected style guideline violations. ([issue #489](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/489))
-- Fix script analyzer issues in UseSecurityBestPractices.psm1.
-  [issue #483](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/483)
-- Fixes script analyzer issues in xEnvironmentResource.
-  [issue #484](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/484)
-- Fixes script analyzer issues in MSFT_xMsiPackage.psm1.
-  [issue #486](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/486)
-- Fixes script analyzer issues in MSFT_xPackageResource.psm1.
-  [issue #487](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/487)
-- Adds spaces between variable types and variables, and changes Type
-  Accelerators to Fully Qualified Type Names on affected code.
-- Fixes script analyzer issues in MSFT_xPSSessionConfiguration.psm1
-  and convert Type Accelerators to Fully Qualified Type Names
-  [issue #488](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/488).
-- Adds spaces between array members.
-- Fixes script analyzer issues in MSFT_xRemoteFile.psm1 and
-  correct general style violations.
-  ([issue #490](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/490))
-- Remove unnecessary whitespace from line endings.
-- Add statement to README.md regarding the lack of testing of this module with
-  PowerShell 4
-  [issue #522](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/522).
-- Fixes script analyzer issues in MSFT_xWindowsOptionalFeature.psm1 and
-  correct general style violations.
-  [issue #494](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/494))
-- Fixes script analyzer issues in MSFT_xRemoteFile.psm1 missed from
-  [issue #490](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/490).
-- Fix script analyzer issues in MSFT_xWindowsFeature.psm1.
-  [issue #493](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/493)
-- Fix script analyzer issues in MSFT_xUserResource.psm1.
-  [issue #492](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/492)
-- Moves calls to set $global:DSCMachineStatus = 1 into a helper function to
-  reduce the number of locations where we need to suppress PSScriptAnalyzer
-  rules PSAvoidGlobalVars and PSUseDeclaredVarsMoreThanAssignments.
-- Adds spaces between comment hashtags and comments.
-- Fixes script analyzer issues in MSFT_xServiceResource.psm1.
-  [issue #491](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/491)
-- Fixes script analyzer issues in MSFT_xWindowsPackageCab.psm1.
-  [issue #495](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/495)
-- xFileUpload:
-  - Fixes script analyzer issues in xFileUpload.schema.psm1.
-    [issue #497](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/497)
-  - Update to meet style guidelines.
-  - Added Integration tests.
-  - Updated manifest Author, Company and Copyright to match
-    standards.
-- Updated module manifest Copyright to match standards and remove
-  year.
-- Auto-formatted the module manifest to improve layout.
-- Fix Run-On Words in README.md.
-- Changes to xPackage
-  - Fix an misnamed variable that causes an error during error message output.
-    [issue #449](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/449))
-- Fixes script analyzer issues in MSFT_xPSSessionConfiguration.psm1.
-  [issue #566](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/566)
-- Fixes script analyzer issues in xGroupSet.schema.psm1.
-  [issue #498](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/498)
-- Fixes script analyzer issues in xProcessSet.schema.psm1.
-  [issue #499](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/499)
-- Fixes script analyzer issues in xServiceSet.schema.psm1.
-  [issue #500](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/500)
-- Fixes script analyzer issues in xWindowsFeatureSet.schema.psm1.
-  [issue #501](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/501)
-- Fixes script analyzer issues in xWindowsOptionalFeatureSet.schema.psm1
-  [issue #502](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/502)
-- Updates Should statements in Pester tests to use dashes before parameters.
-- Added a CODE\_OF\_CONDUCT.md with the same content as in the README.md
-  [issue #562](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/562)
-- Replaces Type Accelerators with fully qualified type names.
+- NetAdapterAdvancedProperty:
+  - Added support for RegistryKeyword `MaxRxRing1Length` and
+    `NumRxBuffersSmall` - fixes [Issue #387](https://github.com/PowerShell/NetworkingDsc/issues/387).
+- Firewall:
+  - Prevent 'Parameter set cannot be resolved using the specified named
+    parameters' error when updating rule when group name is specified - fixes
+    [Issue #130](https://github.com/PowerShell/NetworkingDsc/issues/130) and
+    [Issue #191](https://github.com/PowerShell/NetworkingDsc/issues/191).
+- Opted into Common Tests 'Common Tests - Validate Localization' -
+  fixes [Issue #393](https://github.com/PowerShell/NetworkingDsc/issues/393).
+- Combined all `NetworkingDsc.ResourceHelper` module functions into
+  `NetworkingDsc.Common` module - fixes [Issue #394](https://github.com/PowerShell/NetworkingDsc/issues/394).
+- Renamed all localization strings so that they are detected by
+  'Common Tests - Validate Localization'.
+- Fixed issues with mismatched localization strings.
+- Updated all common functions with the latest versions from
+  [DSCResource.Template](https://github.com/PowerShell/DSCResource.Template).
+- Fixed an issue with the helper function `Test-IsNanoServer` that
+  prevented it to work. Though the helper function is not used, so this
+  issue was not caught until now when unit tests was added.
+- Corrected style violations in `NetworkingDsc.Common`.
 
-## [8.4.0.0] - 2018-07-25
+## [7.1.0.0]
 
 ### Changed
 
-- Changes to xPSDesiredStateConfiguration
-  - Opt-in for the common tests validate module files and script files.
-  - All files change to encoding UTF-8 (without byte order mark).
-  - Opt-in for the common test for example validation.
-  - Added Visual Studio Code workspace settings that helps with formatting
-    against the style guideline.
-  - Update all examples for them to be able pass the common test validation.
-- xEnvironment path documentation update demonstrating usage with multiple
-  values
-  ([issue #415](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/415).
-  [Alex Kokkinos (@alexkokkinos)](https://github.com/alexkokkinos)
-- Changes to xWindowsProcess
-  - Increased the wait time in the integration tests since the tests
-    still failed randomly
-    ([issue #420](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/420)).
-- Renamed and updated examples to be able to publish them to PowerShell
-  Gallery.
-  - Sample\_xScript.ps1 → xScript\_WatchFileContentConfig.ps1
-  - Sample\_xService\_UpdateStartupTypeIgnoreState.ps1 →
-    xService\_UpdateStartupTypeIgnoreStateConfig.ps1
-  - Sample\_xWindowsProcess\_Start.ps1 →
-    xWindowsProcess\_StartProcessConfig.ps1
-  - Sample\_xWindowsProcess\_StartUnderUser.ps1 →
-    xWindowsProcess\_StartProcessUnderUserConfig.ps1
-  - Sample\_xWindowsProcess\_Stop.ps1 → xWindowsProcess\_StopProcessConfig.ps1
-  - Sample\_xWindowsProcess\_StopUnderUser.ps1 →
-    xWindowsProcess\_StopProcessUnderUserConfig.ps1
-  - Sample\_xUser\_CreateUser.ps1.ps1 → xUser\_CreateUserConfig.ps1
-  - Sample\_xUser\_Generic.ps1.ps1 → xUser\_CreateUserDetailedConfig.ps1
-  - Sample\_xWindowsFeature.ps1 → xWindowsFeature\_AddFeatureConfig.ps1
-  - Sample\_xWindowsFeatureSet\_Install.ps1 →
-    xWindowsFeatureSet\_AddFeaturesConfig.ps1
-  - Sample\_xWindowsFeatureSet\_Uninstall.ps1 →
-    xWindowsFeatureSet\_RemoveFeaturesConfig.ps1
-  - Sample\_xRegistryResource\_AddKey.ps1 → xRegistryResource\_AddKeyConfig.ps1
-  - Sample\_xRegistryResource\_RemoveKey.ps1 →
-    xRegistryResource\_RemoveKeyConfig.ps1
-  - Sample\_xRegistryResource\_AddOrModifyValue.ps1 →
-    xRegistryResource\_AddOrModifyValueConfig.ps1
-  - Sample\_xRegistryResource\_RemoveValue.ps1 →
-    xRegistryResource\_RemoveValueConfig.ps1
-  - Sample\_xService\_CreateService.ps1 → xService\_CreateServiceConfig.ps1
-  - Sample\_xService\_DeleteService.ps1 → xService\_RemoveServiceConfig.ps1
-  - Sample\_xServiceSet\_StartServices.ps1 →
-    xServiceSet\_StartServicesConfig.ps1
-  - Sample\_xServiceSet\_BuiltInAccount →
-    xServiceSet\_EnsureBuiltInAccountConfig.ps1
-  - Sample\_xWindowsPackageCab → xWindowsPackageCab\_InstallPackageConfig
-  - Sample\_xWindowsOptionalFeature.ps1 →
-    xWindowsOptionalFeature\_EnableConfig.ps1
-  - Sample\_xWindowsOptionalFeatureSet\_Enable.ps1 →
-    xWindowsOptionalFeatureSet\_EnableConfig.ps1
-  - Sample\_xWindowsOptionalFeatureSet\_Disable.ps1 →
-    xWindowsOptionalFeatureSet\_DisableConfig.ps1
-  - Sample\_xRemoteFileUsingProxy.ps1 →
-    xRemoteFile\_DownloadFileUsingProxyConfig.ps1
-  - Sample\_xRemoteFile.ps1 → xRemoteFile\_DownloadFileConfig.ps1
-  - Sample\_xProcessSet\_Start.ps1 → xProcessSet\_StartProcessConfig.ps1
-  - Sample\_xProcessSet\_Stop.ps1 → xProcessSet\_StopProcessConfig.ps1
-  - Sample\_xMsiPackage\_UninstallPackageFromHttps.ps1 →
-    xMsiPackage\_UninstallPackageFromHttpsConfig.ps1
-  - Sample\_xMsiPackage\_UninstallPackageFromFile.ps1 →
-    xMsiPackage\_UninstallPackageFromFileConfig.ps1
-  - Sample\_xMsiPackage\_InstallPackageFromFile →
-    xMsiPackage\_InstallPackageConfig.ps1
-  - Sample\_xGroup\_SetMembers.ps1 → xGroup\_SetMembersConfig.ps1
-  - Sample\_xGroup\_RemoveMembers.ps1 → xGroup\_RemoveMembersConfig.ps1
-  - Sample\_xGroupSet\_AddMembers.ps1 → xGroupSet\_AddMembersConfig.ps1
-  - Sample\_xFileUpload.ps1 → xFileUpload\_UploadToSMBShareConfig.ps1
-  - Sample\_xEnvironment\_CreateMultiplePathVariables.ps1 →
-    xEnvironment\_AddMultiplePathsConfig.ps1
-  - Sample\_xEnvironment\_RemovePathVariables.ps1 →
-    xEnvironment\_RemoveMultiplePathsConfig.ps1
-  - Sample\_xEnvironment\_CreateNonPathVariable.ps1 →
-    xEnvironment\_CreateNonPathVariableConfig.ps1
-  - Sample\_xEnvironment\_Remove.ps1 → xEnvironment\_RemoveVariableConfig.ps1
-  - Sample\_xArchive\_ExpandArchiveChecksumAndForce.ps1 →
-    xArchive\_ExpandArchiveChecksumAndForceConfig.ps1
-  - Sample\_xArchive\_ExpandArchiveDefaultValidationAndForce.ps1 →
-    xArchive\_ExpandArchiveDefaultValidationAndForceConfig.ps1
-  - Sample\_xArchive\_ExpandArchiveNoValidation.ps1 →
-    xArchive\_ExpandArchiveNoValidationConfig.ps1
-  - Sample\_xArchive\_ExpandArchiveNoValidationCredential.ps1 →
-    xArchive\_ExpandArchiveNoValidationCredentialConfig.ps1
-  - Sample\_xArchive\_RemoveArchiveChecksum.ps1 →
-    xArchive\_RemoveArchiveChecksumConfig.ps1
-  - Sample\_xArchive\_RemoveArchiveNoValidation.ps1 →
-    xArchive\_RemoveArchiveNoValidationConfig.ps1
-  - Sample\_InstallExeCreds\_xPackage.ps1 →
-    xPackage\_InstallExeUsingCredentialsConfig.ps1
-  - Sample\_InstallExeCredsRegistry\_xPackage.ps1 →
-    xPackage\_InstallExeUsingCredentialsAndRegistryConfig.ps1
-  - Sample\_InstallMSI\_xPackage.ps1 → xPackage\_InstallMsiConfig.ps1
-  - Sample\_InstallMSIProductId\_xPackage.ps1 →
-    xPackage\_InstallMsiUsingProductIdConfig.ps1
-- New examples
-  - xUser\_RemoveUserConfig.ps1
-  - xWindowsFeature\_AddFeatureUsingCredentialConfig.ps1
-  - xWindowsFeature\_AddFeatureWithLogPathConfig.ps1
-  - xWindowsFeature\_RemoveFeatureConfig.ps1
-  - xService\_ChangeServiceStateConfig.ps1
-  - xWindowsOptionalFeature\_DisableConfig.ps1
-  - xPSEndpoint\_NewConfig.ps1
-  - xPSEndpoint\_NewWithDefaultsConfig.ps1
-  - xPSEndpoint\_RemoveConfig.ps1
-  - xPSEndpoint\_NewCustomConfig.ps1
-- Removed examples
-  - Sample\_xPSSessionConfiguration.ps1 - This file was split up in several
-    examples, those starting with 'xPSEndpoint*'.
-  - Sample\_xMsiPackage\_InstallPackageFromHttp - This was added to the example
-    xMsiPackage\_InstallPackageConfig.ps1 so the example sows either URI
-    scheme.
-  - Sample\_xEnvironment\_CreatePathVariable.ps1 - Same as the new example
-    xEnvironment\_AddMultiplePaths.ps1
+- New Resource: NetAdapterState to enable or disable a network adapter - fixes
+  [Issue #365](https://github.com/PowerShell/NetworkingDsc/issues/365)
+- Fix example publish to PowerShell Gallery by adding `gallery_api`
+  environment variable to `AppVeyor.yml` - fixes [Issue #385](https://github.com/PowerShell/NetworkingDsc/issues/385).
+- MSFT_Proxy:
+  - Fixed `ProxyServer`, `ProxyServerExceptions` and `AutoConfigURL`
+    parameters so that they correctly support strings longer than 255
+    characters - fixes [Issue #378](https://github.com/PowerShell/NetworkingDsc/issues/378).
 
-## [8.3.0.0] - 2018-06-13
+## [7.0.0.0]
 
 ### Changed
 
-- Changes to xPSDesiredStateConfiguration
-  - README.md: Fixed typo.
-    [Steve Banik (@stevebanik-ndsc)](https://github.com/stevebanik-ndsc)
-  - Adding a Branches section to the README.md with Codecov badges for both
-    master and dev branch
-    ([issue #416](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/416)).
-- Changes to xWindowsProcess
-  - Integration tests for this resource should no longer fail randomly. A
-    timing issue made the tests fail in certain scenarios
-    ([issue #420](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/420)).
-- Changes to xDSCWebService
-  - Added the option to use a certificate based on it's subject and template
-    name instead of it's thumbprint. Resolves
-    [issue #205](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/205).
-  - xDSCWebService: Fixed an issue where Test-WebConfigModulesSetting would
-    return $true when web.config contains a module and the desired state was
-    for it to be absent. Resolves
-    [issue #418](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/418).
-- Updated the main DSCPullServerSetup readme to read easier, then updates the
-  PowerShell comment based help for each function to follow normal help
-  standards. [James Pogran (@jpogran)](https://github.com/jpogran)
-- xRemoteFile: Remove progress bar for file download. This resolves issues
-  [#165](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/165)
-  and
-  [#383](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/383)
-  [Claudio Spizzi (@claudiospizzi)](https://github.com/claudiospizzi)
+- Refactored module folder structure to move resource to root folder of
+  repository and remove test harness - fixes [Issue #372](https://github.com/PowerShell/NetworkingDsc/issues/372).
+- Removed module conflict tests because only required for harness style
+  modules.
+- Opted into Common Tests 'Validate Example Files To Be Published',
+  'Validate Markdown Links' and 'Relative Path Length'.
+- Added 'DscResourcesToExport' to manifest to improve information in
+  PowerShell Gallery and removed wildcards from 'FunctionsToExport',
+  'CmdletsToExport', 'VariablesToExport' and 'AliasesToExport' - fixes
+  [Issue #376](https://github.com/PowerShell/NetworkingDsc/issues/376).
+- MSFT_NetIPInterface:
+  - Added `Dhcp`, `WeakHostReceive` and `WeakHostSend` parameters so that
+    MSFT_DHCPClient, MSFT_WeakHostReceive, MSFT_WeakHostSend can be
+    deprecated - fixes [Issue #360](https://github.com/PowerShell/NetworkingDsc/issues/360).
+- MSFT_DhcpClient:
+  - BREAKING CHANGE: Resource has been deprecated and replaced by `Dhcp`
+    parameter in MSFT_NetIPInterface.
+- MSFT_WeakHostReceive:
+  - BREAKING CHANGE: Resource has been deprecated and replaced by `WeakHostReceive`
+    parameter in MSFT_NetIPInterface.
+- MSFT_WeakHostSend:
+  - BREAKING CHANGE: Resource has been deprecated and replaced by `WeakHostSend`
+    parameter in MSFT_NetIPInterface.
+- MSFT_IPAddress:
+  - Updated examples to use NetIPInterface.
+- MSFT_NetAdapterName:
+  - Updated examples to use NetIPInterface.
+- MSFT_DnsServerAddress:
+  - Updated examples to use NetIPInterface.
+- MSFT_NetworkTeam:
+  - Change `Get-TargetResource` to return actual TeamMembers if network team
+    exists and 'Ensure' returns 'Present' even when actual TeamMembers do
+    not match 'TeamMembers' parameter - fixes [Issue #342](https://github.com/PowerShell/NetworkingDsc/issues/342).
+- Updated examples to format required for publishing to PowerShell Gallery - fixes
+  [Issue #374](https://github.com/PowerShell/NetworkingDsc/issues/374).
+- MSFT_NetAdapterAdvancedProperty:
+  - Fixes NetworkAdapterName being returned in Name property when calling
+    Get-TargetResourceFixes - fixes [Issue #370](https://github.com/PowerShell/NetworkingDsc/issues/370).
 
-## [8.2.0.0] - 2018-04-20
-
-### Changed
-
-- xDSCWebService: Disable installing
-  Microsoft.Powershell.Desiredstateconfiguration.Service.Resources.dll as a
-  temporary workaround since the binary is missing on the latest Windows
-  builds.
-
-## [8.1.0.0] - 2018-03-22
-
-### Changed
-
-- xDSCWebService: Enable SQL provider configuration
-
-## [8.0.0.0] - 2017-11-15
+## [6.3.0.0]
 
 ### Changed
 
-- xDSCWebService
-  - BREAKING CHANGE: The Pull Server will now run in a 64 bit IIS process by
-    default. Enable32BitAppOnWin64 needs to be set to TRUE for the Pull
-    Server to run in a 32 bit process.
+- MSFT_IPAddress:
+  - Updated to allow retaining existing addresses in order to support cluster
+    configurations as well.
 
-## [7.0.0.0] - 2017-08-23
-
-### Changed
-
-- xService
-  - BREAKING CHANGE: The service will now return as compliant if the service
-    is not installed and the StartupType is set to Disabled regardless of the
-    value of the Ensure property.
-- Fixed misnamed certificate thumbprint variable in example
-  Sample_xDscWebServiceRegistrationWithSecurityBestPractices
-
-## [6.4.0.0] - 2017-05-09
+## [6.2.0.0]
 
 ### Changed
 
-- xGroup:
-  - Added updates from PSDscResources:
-    - Added support for domain based group members on Nano server
+- Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #357](https://github.com/PowerShell/NetworkingDsc/issues/357).
+- Updated LICENSE file to match the Microsoft Open Source Team standard - fixes
+  [Issue #363](https://github.com/PowerShell/NetworkingDsc/issues/363)
+- MSFT_NetIPInterface:
+  - Added a new resource for configuring the IP interface settings for a network
+    interface.
 
-## [6.3.0.0] - 2017-05-01
-
-### Changed
-
-- xDSCWebService
-  - Fixed an issue where all 64bit IIS application pools stop working after
-    installing DSC Pull Server, because IISSelfSignedCertModule(32bit) module
-    was registered without bitness32 precondition.
-
-## [6.2.0.0] - 2017-04-19
+## [6.1.0.0]
 
 ### Changed
 
-- xMsiPackage:
-  - Created high quality MSI package manager resource
-- xArchive:
-  - Fixed a minor bug in the unit tests where sometimes the incorrect
-    DateTime format was used.
-- xWindowsFeatureSet:
-  - Had the wrong parameter name in one test case.
+- MSFT_Firewall:
+  - Added full stop to end of MOF field descriptions.
+  - Support for `[`, `]` and `*` characters in the Name property
+    added - fixes [Issue #348](https://github.com/PowerShell/NetworkingDsc/issues/348).
+  - Improved unit tests to meet style guidelines.
 
-## [6.1.0.0] - 2017-03-08
+## [6.0.0.0]
 
 ### Changed
 
-- Moved DSC pull server setup tests to DSCPullServerSetup folder for new common
-  tests.
-- xArchive:
-  - Updated the resource to be a high quality resource
-  - Transferred the existing "unit" tests to integration tests
-  - Added unit and end-to-end tests
-  - Updated documentation and examples
-- xUser
-  - Fixed error handling in xUser
-- xRegistry
-  - Fixed bug where an error was thrown when running Get-DscConfiguration if
-    the registry key already existed
-- Updated Test-IsNanoServer cmdlet to properly test for a Nano server rather
-  than the core version of PowerShell
+- New Example 2-ConfigureSuffixSearchList.ps1 for multiple
+  SuffixSearchList entries for resource DnsClientGlobalSetting.
+- BREAKING CHANGE:
+  - Renamed xNetworking to NetworkingDsc - fixes [Issue #119](https://github.com/PowerShell/NetworkingDsc/issues/290).
+  - Changed all MSFT\_xResourceName to MSFT\_ResourceName.
+  - Updated DSCResources, Examples, Modules and Tests with new naming.
+  - Updated Year to 2018 in License and Manifest.
+  - Updated README.md from xNetworking to NetworkingDsc.
+- MSFT_IPAddress:
+  - Updated to allow setting multiple IP Addresses
+    when one is already set - Fixes [Issue #323](https://github.com/PowerShell/NetworkingDsc/issues/323)
+- Corrected CHANGELOG.MD to report that issue with InterfaceAlias matching
+  on Adapter description rather than Adapter Name was released in 5.7.0.0
+  rather than 5.6.0.0 - See [Issue #315](https://github.com/PowerShell/xNetworking/issues/315).
+- MSFT_WaitForNetworkTeam:
+  - Added a new resource to set the wait for a network team to become 'Up'.
+- MSFT_NetworkTeam:
+  - Improved detection of environmemt for running network team integration
+    tests.
+- MSFT_NetworkTeamInterface:
+  - Improved detection of environmemt for running network team integration
+    tests.
+- Added a CODE\_OF\_CONDUCT.md with the same content as in the README.md - fixes
+  [Issue #337](https://github.com/PowerShell/NetworkingDsc/issues/337).
 
-## [6.0.0.0] - 2017-02-303
-
-### Changed
-
-- xEnvironment
-  - Updated resource to follow HQRM guidelines.
-  - Added examples.
-  - Added unit and end-to-end tests.
-  - Significantly cleaned the resource.
-  - Minor Breaking Change where the resource will now throw an error if no
-    value is provided, Ensure is set to present, and the variable does not
-    exist, whereas before it would create an empty registry key on the
-    machine in this case (if this is the desired outcome then use the
-    Registry resource).
-  - Added a new Write property 'Target', which specifies whether the user
-    wants to set the machine variable, the process variable, or both
-    (previously it was setting both in most cases).
-- xGroup:
-  - Group members in the "NT Authority", "BuiltIn" and "NT Service" scopes
-    should now be resolved without an error. If you were seeing the errors
-    "Exception calling ".ctor" with "4" argument(s): "Server names cannot
-    contain a space character."" or "Exception calling ".ctor" with "2"
-    argument(s): "Server names cannot contain a space character."", this fix
-    should resolve those errors. If you are still seeing one of the errors,
-    there is probably another local scope we need to add. Please let us know.
-  - The resource will no longer attempt to resolve group members if Members,
-    MembersToInclude, and MembersToExclude are not specified.
-
-## [5.2.0.0] - 2017-01-26
+## [5.7.0.0]
 
 ### Changed
 
-- xWindowsProcess
-  - Minor updates to integration tests because one of the tests was flaky.
-- xRegistry:
-  - Added support for forward slashes in registry key names. This resolves
-    issue
-    [#285](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/285).
+- Enabled PSSA rule violations to fail build - Fixes [Issue #320](https://github.com/PowerShell/xNetworking/issues/320).
+- MSFT_xNetAdapterAdvancedProperty:
+  - Enabled setting the same property on multiple network
+    adapters - Fixes [issue #324](https://github.com/PowerShell/xNetworking/issues/324).
+- MSFT_xNetBIOS:
+  - Fix issue with InterfaceAlias matching on Adapter description
+    rather than Adapter Name - Fixes [Issue #315](https://github.com/PowerShell/xNetworking/issues/315).
 
-## [5.1.0.0] - 2017-12-17
-
-### Changed
-
-- xWindowsFeature:
-  - Added Catch to ignore RuntimeException when importing ServerManager
-    module. This resolves issue
-    [#69](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/69).
-  - Updated unit tests.
-- xPackage:
-  - No longer checks for package installation when a reboot is required. This
-    resolves issue
-    [#52](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/52).
-  - Ensures a space is added to MSI installation arguments. This resolves
-    issue
-    [#195](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/195).
-  - Adds RunAsCredential parameter to permit installing packages with
-    specific user account. This resolves issue
-    [#221](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/221).
-  - Fixes null verbose log output error. This resolves issue
-    [#224](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/224).
-- xDSCWebService
-  - Fixed issue where resource would fail to read redirection.config file.
-    This resolves issue
-    [#191](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/191)
-- xArchive
-  - Fixed issue where resource would throw exception when file name contains
-    brackets. This resolves issue
-    [#255](https://github.com/PowerShell/xPSDesiredStateConfiguration/issues/255).
-- xScript
-  - Cleaned resource for high quality requirements
-  - Added unit tests
-  - Added integration tests
-  - Updated documentation and example
-- ResourceSetHelper:
-  - Updated common functions for all 'Set' resources.
-  - Added unit tests
-- xGroupSet:
-  - Updated resource to use new ResouceSetHelper functions and added
-    integration tests.
-- xGroup:
-  - Cleaned module imports, fixed PSSA issues, and set ErrorActionPreference
-    to stop.
-- xService:
-  - Cleaned resource functions to enable StrictMode.
-  - Fixed bug in which Set-TargetResource would create a service when Ensure
-    set to Absent and Path specified.
-  - Added unit tests.
-  - Added integration tests for BuiltInAccount and Credential.
-- xServiceSet:
-  - Updated resource to use new ResouceSetHelper functions and added
-    integration tests.
-  - Updated documentation and example
-- xWindowsProcess
-  - Cleaned resource as per high quality guidelines.
-  - Added unit tests.
-  - Added integration tests.
-  - Updated documentation.
-  - Updated examples.
-  - Fixed bug in Get-TargetResource.
-  - Added a 'Count' value to the hashtable returned by Get-TargetResource so
-    that the user can see how many instances of the process are running.
-  - Fixed bug in finding the path to the executable.
-  - Changed name to be xWindowsProcess everywhere.
-- xWindowsOptionalFeatureSet
-  - Updated resource to use new ResouceSetHelper functions and added
-    integration tests.
-  - Updated documentation and examples
-- xWindowsFeatureSet
-  - Updated resource to use new ResouceSetHelper functions and added
-    integration tests.
-  - Updated documentation and examples
-- xProcessSet
-  - Updated resource to use new ResouceSetHelper functions and added
-    integration tests.
-  - Updated documentation and examples
-- xRegistry
-  - Updated resource to be high-quality
-  - Fixed bug in which the user could not set a Binary registry value to 0
-  - Added unit and integration tests
-  - Added examples and updated documentation
-
-## [5.0.0.0] - 2017-11-02
+## [5.6.0.0]
 
 ### Changed
 
-- xWindowsFeature:
-  - Cleaned up resource (PSSA issues, formatting, etc.)
-  - Added/Updated Tests and Examples
-  - BREAKING CHANGE: Removed the unused Source parameter
-  - Updated to a high quality resource
-- xDSCWebService:
-  - Add DatabasePath property to specify a custom database path and enable
-    multiple pull server instances on one server.
-  - Rename UseUpToDateSecuritySettings property to UseSecurityBestPractices.
-  - Add DisableSecurityBestPractices property to specify items that are
-    excepted from following best practice security settings.
-- xGroup:
-  - Fixed PSSA issues
-  - Formatting updated as per style guidelines
-  - Missing comment-based help added for Get-/Set-/Test-TargetResource
-  - Typos fixed in Unit test script
-  - Unit test 'Get-TargetResource/Should return hashtable with correct values
-    when group has no members' updated to handle the expected empty Members
-    array correctly
-  - Added a lot of unit tests
-  - Cleaned resource
-- xUser:
-  - Fixed PSSA/Style violations
-  - Added/Updated Tests and Examples
-- Added xWindowsPackageCab
-- xService:
-  - Fixed PSSA/Style violations
-  - Updated Tests
-  - Added 'Ignore' state
+- Reordered resource list in README.MD to be alphabetical and added
+  missing resource xNetAdapterAdvancedProperty - Fixes [issue #309](https://github.com/PowerShell/xNetworking/issues/309).
+- MSFT_xNetworkTeamInterface:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Changed unit tests to output Verbose logs.
+- MSFT_xNetAdapterAdvancedProperty:
+  - Added a number of additional advanced properties.
+  - Fixes [issue #314](https://github.com/PowerShell/xNetworking/issues/314).
+- MSFT_xNetBIOS:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Ensured CommonTestHelper.psm1 is loaded before running unit tests.
+- MSFT_xNetworkTeam:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Added missing default from MOF description of Ensure parameter.
+  - Fixed `Get-TargetResource` to always output Ensure parameter.
+  - Changed unit tests to output Verbose logs.
+- MSFT_xNetConnectionProfile:
+  - Corrected style and formatting to meet HQRM guidelines.
+- Updated tests to meet Pester V4 guidelines - Fixes [Issue #272](https://github.com/PowerShell/xNetworking/issues/272).
 
-## [4.0.0.0] - 2017-09-21
+## [5.5.0.0]
 
 ### Changed
 
-- xDSCWebService:
-  - Added setting of enhanced security
-  - Cleaned up Examples
-  - Cleaned up pull server verification test
-- xProcess:
-  - Fixed PSSA issues
-  - Corrected most style guideline issues
-- xPSSessionConfiguration:
-  - Fixed PSSA and style issues
-  - Renamed internal functions to follow verb-noun formats
-  - Decorated all functions with comment-based help
-- xRegistry:
-  - Fixed PSSA and style issues
-  - Renamed internal functions to follow verb-noun format
-  - Decorated all functions with comment-based help
-  - Merged with in-box Registry
-  - Fixed registry key and value removal
-  - Added unit tests
-- xService:
-  - Added descriptions to MOF file.
-  - Added additional details to parameters in Readme.md in a format that can
-    be generated from the MOF.
-  - Added DesktopInteract parameter.
-  - Added standard help headers to *-TargetResource functions.
-  - Changed indent/format of all function help headers to be consistent.
-  - Fixed line length violations.
-  - Changed localization code so only a single copy of localization strings
-    are required.
-  - Removed localization strings from inside module file.
-  - Updated unit tests to use standard test enviroment configuration and
-    header.
-  - Recreated unit tests to be non-destructive.
-  - Created integration tests.
-  - Allowed service to be restarted immediately rather than wait for next LCM
-    run.
-  - Changed helper function names to valid verb-noun format.
-  - Removed New-TestService function from
-    MSFT_xServiceResource.TestHelper.psm1 because it should not be used.
-  - Fixed error calling Get-TargetResource when service does not exist.
-  - Fixed bug with Get-TargetResource returning StartupType 'Auto' instead of
-    'Automatic'.
-  - Converted to HQRM standards.
-  - Removed obfuscation of exception in Get-Win32ServiceObject function.
-  - Fixed bug where service start mode would be set to auto when it already
-    was set to auto.
-  - Fixed error message content when start mode can not be changed.
-  - Removed shouldprocess from functions as not required.
-  - Optimized Test-TargetResource and Set-TargetResource by removing repeated
-    calls to Get-Service and Get-CimInstance.
-  - Added integration test for testing changes to additional service
-    properties as well as changing service binary path.
-  - Modified Set-TargetResource so that newly created service created with
-    minimal properties and then all additional properties updated
-    (simplification of code).
-  - Added support for changing Service Description and DisplayName
-    parameters.
-  - Fixed bug when changing binary path of existing service.
-- Removed test log output from repo.
-- xWindowsOptionalFeature:
-  - Cleaned up resource (PSSA issues, formatting, etc.)
-  - Added example script
-  - Added integration test
-  - BREAKING CHANGE: Removed the unused Source parameter
-  - Updated to a high quality resource
-- Removed test log output from repo.
-- Removed the prefix MSFT_ from all files and folders of the composite
-  resources in this module because they were unavailable to Get-DscResource and
-  Import-DscResource.
-  - xFileUpload
-  - xGroupSet
-  - xProcessSet
-  - xServiceSet
-  - xWindowsFeatureSet
-  - xWindowsOptionalFeatureSet
+- MSFT_xNetAdapterAdvancedProperty:
+  - Created new resource configuring AdvancedProperties for NetAdapter
+- MSFT_xNetAdapterLso:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+- MSFT_xNetAdapterName:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+- MSFT_xNetAdapterRDMA:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Improved integration tests to preserve system status and run in more
+    scenarios.
+- MSFT_xNetBIOS:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Improved integration tests to preserve system status, run in more
+    scenarios and more effectively test the resource.
+  - Changed to report back error if unable to set NetBIOS setting.
+- MSFT_xWinsSetting:
+  - Created new resource for enabling/disabling LMHOSTS lookup and
+    enabling/disabling WINS name resoluton using DNS.
+- MSFT_xNetworkTeam:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Updated tests to meet Pester v4 guidelines.
+  - Converted exceptions to use ResourceHelper functions.
 
-## [3.13.0.0] - 2017-10-08
+## [5.4.0.0]
 
 ### Changed
 
-- Converted appveyor.yml to install Pester from PSGallery instead of from
-  Chocolatey.
-- Updated appveyor.yml to use the default image.
-- Merged xPackage with in-box Package resource and added tests.
-- xPackage: Re-implemented parameters for installation check from registry key
-  value.
-- xGroup:
-  - Fixed Verbose output in Get-MembersAsPrincipals function.
-  - Fixed bug when credential parameter passed does not contain local or
-    domain context.
-  - Fixed logic bug in MembersToInclude and MembersToExclude.
-  - Fixed bug when trying to include the built-in Administrator in Members.
-  - Fixed bug where Test-TargetResource would check for members when none
-    specified.
-  - Fix bug in Test-TargetResourceOnFullSKU function when group being set to
-    a single member.
-  - Fix bug in Set-TargetResourceOnFullSKU function when group being set to a
-    single member.
-  - Fix bugs in Assert-GroupNameValid to throw correct exception.
-- xService
-  - Updated xService resource to allow empty string for Description
-    parameter.
-- Merged xProcess with in-box Process resource and added tests.
-- Fixed PSSA issues in xPackageResource.
+- MSFT_xIPAddressOption:
+  - Added a new resource to set the SkipAsSource option for an IP address.
+- MSFT_xWeakHostSend:
+  - Created the new Weak Host Send resource.
+- MSFT_xWeakHostReceive:
+  - Created the new Weak Host Receive resource.
+- MSFT_xRoute:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Changed unit tests so that they can be run in any order.
+  - Included default values in MOF file so that they are displayed
+    in Wiki documentation.
+  - Converted tests to meet Pester V4 standards.
 
-## [3.12.0.0] - 2017-06-30
+## [5.3.0.0]
 
 ### Changed
 
-- Removed localization for now so that resources can run on non-English
-  systems.
+- MSFT_xProxySettings:
+  - Created new resource configuring proxy settings.
+- MSFT_xDefaultGatewayAddress:
+  - Correct `2-SetDefaultGateway.md` address family and improve example
+    description - fixes [Issue #275](https://github.com/PowerShell/xNetworking/issues/275).
+- MSFT_xIPAddress:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+  - Changed unit tests so that they can be run in any order.
+- MSFT_xNetAdapterBinding:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
 
-## [3.11.0.0] - 2017-06-29
-
-### Changed
-
-- xRemoteFile:
-  - Added parameters:
-    - TimeoutSec
-    - Proxy
-    - ProxyCredential
-  - Added unit tests.
-  - Corrected Style Guidelines issues.
-  - Added Localization support.
-  - URI parameter supports File://.
-  - Get-TargetResource returns URI parameter.
-  - Fixed logging of error message reported when download fails.
-  - Added new example Sample_xRemoteFileUsingProxy.ps1.
-- Examples: Fixed missing newline at end of PullServerSetupTests.ps1.
-- xFileUpload: Added PSSA rule suppression attribute.
-- xPackageResource: Removed hardcoded ComputerName 'localhost' parameter from
-  Get-WMIObject to eliminate PSSA rule violation. The parameter is not
-  required.
-- Added .gitignore to prevent DSCResource.Tests from being commited to repo.
-- Updated AppVeyor.yml to use WMF 5 build OS so that latest test methods work.
-- Updated xWebService resource to not deploy Devices.mdb if esent provider is
-  used
-- Fixed $script:netsh parameter initialization in xWebService resource that was
-  causing CIM exception when EnableFirewall flag was specified.
-- xService:
-  - Fixed a bug where, despite no state specified in the config, the resource
-    test returns false if the service is not running
-  - Fixed bug in which Automatice StartupType did not match the 'Auto'
-    StartMode in Test-TargetResource.
-- xPackage: Fixes bug where CreateCheckRegValue was not being removed when
-  uninstalling packages
-- Replaced New-NetFirewallRule cmdlets with netsh as this cmdlet is not
-  available by default on some downlevel OS such as Windows 2012 R2 Core.
-- Added the xEnvironment resource
-- Added the xWindowsFeature resource
-- Added the xScript resource
-- Added the xUser resource
-- Added the xGroupSet resource
-- Added the xProcessSet resource
-- Added the xServiceSet resource
-- Added the xWindowsFeatureSet resource
-- Added the xWindowsOptionalFeatureSet resource
-- Merged the in-box Service resource with xService and added tests for xService
-- Merged the in-box Archive resource with xArchive and added tests for xArchive
-- Merged the in-box Group resource with xGroup and added tests for xGroup
-
-## [3.10.0.0] - 2016-05-18
+## [5.2.0.0]
 
 ### Changed
 
-- **Publish-ModuleToPullServer**
-- **Publish-MOFToPullServer**
+- Added `Documentation and Examples` section to Readme.md file - see
+  [issue #259](https://github.com/PowerShell/xNetworking/issues/259).
+- Prevent unit tests from DSCResource.Tests from running during test
+  execution - fixes [Issue #264](https://github.com/PowerShell/xNetworking/issues/264).
+- MSFT_xNetworkTeamInterface:
+  - Updated Test-TargetResource to substitute VLANID value 0 to $null
+- MSFT_xNetAdapterRsc:
+  - Created new resource configuring Rsc
+- MSFT_xNetAdapterRss:
+  - Created new resource configuring Rss
+- MSFT_xHostsFile:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
 
-## [3.9.0.0] - 2016-03-31
-
-### Changed
-
-- Added more information how to use Publish-DSCModuleAndMof cmdlet and samples
-- Removed compliance server samples
-
-## [3.8.0.0] - 2016-03-13
-
-### Changed
-
-- Added Pester tests to validate pullserver deployement.
-- Removed Compliance Server deployment from xWebservice resource. Fixed
-  database provider selection issue depending on OS flavor
-- Added Publish-DSCModuleAndMof cmdlet to package DSC modules and mof and
-  publish them on DSC enterprise pull server
-- xRemoteFile resource: Added size verification in cache
-
-## [3.7.0.0] - 2016-02-03
+## [5.1.0.0]
 
 ### Changed
 
-- xService:
-  - Fixed a bug where 'Dependencies' property was not picked up and caused
-    exception when set.
-- xWindowsOptionalFeature:
-  - Fixed bug where Test-TargetResource method always failed.
-  - Added support for Windows Server 2012 (and later) SKUs.
-- Added xRegistry resource
+- MSFT_xDhcpClient:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- README.MD:
+  - Cleaned up badges by putting them into a table.
+- MSFT_xDnsConnectionSuffix:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- README.MD:
+  - Converted badges to use branch header as used in xSQLServer.
+- Added standard .markdownlint.json to configure rules to run on
+  Markdown files.
+- MSFT_xDnsClientGlobalSetting:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- Updated year to 2017 in LICENSE and module manifest.
+- MSFT_xDnsServerAddress:
+  - Fix error when setting address on adapter where NameServer
+    Property does not exist in registry for interface - see
+    [issue #237](https://github.com/PowerShell/xNetworking/issues/237).
+  - Corrected style and formatting to meet HQRM guidelines.
+- MSFT_xIPAddress:
+  - Improved examples to clarify how to set IP Address prefix -
+    see [issue #239](https://github.com/PowerShell/xNetworking/issues/239).
+- MSFT_xFirewall:
+  - Fixed bug with DisplayName not being set correctly in some
+    situations - see [issue #234](https://github.com/PowerShell/xNetworking/issues/234).
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- Added .github support files:
+  - CONTRIBUTING.md
+  - ISSUE_TEMPLATE.md
+  - PULL_REQUEST_TEMPLATE.md
+- Opted into Common Tests 'Validate Module Files' and 'Validate Script Files'.
+- Converted files with UTF8 with BOM over to UTF8 - fixes [Issue 250](https://github.com/PowerShell/xNetworking/issues/250).
+- MSFT_xFirewallProfile:
+  - Created new resource configuring firewall profiles.
+- MSFT_xNetConnectionProfile:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Added validation for provided parameters.
+  - Prevent testing parameter values of connection that aren't set in resource -
+    fixes [Issue 254](https://github.com/PowerShell/xNetworking/issues/254).
+  - Improved unit test coverage for this resource.
 
-## [3.6.0.0] - 2015-12-03
-
-### Changed
-
-- Added CreateCheckRegValue parameter to xPackage resource
-- Added MatchSource parameter to xRemoteFile resource
-
-## [3.5.0.0] - 2015-09-11
-
-### Changed
-
-- MSFT_xPackageResource: Added ValidateSet to Get/Set/Test-TargetResource to
-  match MSFT_xPackageResource.schema.mof
-- Fixed bug causing xService to throw error when service already exists
-- Added StartupTimeout to xService resource
-- Removed UTF8 BOM
-- Added code for pull server removal
-
-## [3.4.0.0] - 2015-07-24
-
-### Changed
-
-- Added logging inner exception messages in xArchive and xPackage resources
-- Fixed hash calculation in Get-CacheEntry
-- Fixed issue with PSDSCComplianceServer returning HTTP Error 401.2
-
-## [3.3.0.0] - 2015-06-09
-
-### Changed
-
-- Add support to xPackage resource for checking different registry hives
-- Added support for new registration properties in xDscWebService resource
-
-## [3.2.0.0] - 2015-05-02
-
-### Changed
-
-- xArchive:
-  - Fix problems with file names containing square brackets.
-- xDSCWebService:
-  - Fix default culture issue.
-- xPackage:
-  - Security enhancements.
-
-## [3.0.3.4] - 2014-12-18
+## [5.0.0.0]
 
 ### Changed
 
-- Multiple issues addressed
-  - Corrected output type for Set- and Test-TargetResource functions in
-    xWebSite, xPackage, xArchive, xGroup, xProcess, xService
-  - xRemoteFile modified to support creating a directory that does not exist
-    when specified, ensuring idempotency. Also improved error messages.
-  - xDSCWebService updated so that Get-TargetResource returns the OData
-    Endpoint URL correctly.
-  - In xWindowsOptionalFeature, fixed Test-TargetResource issue requiring
-    Ensure = True. Note: this change requires the previous Ensure values of
-    Enable and Disable to change to Present and Absent
+- Find-NetworkAdapter:
+  - Fixed to return null if exception thrown.
+  - Allowed passing no selection parameters.
+- MSFT_xNetAdapterName:
+  - Fixed bug in Get-TargetResource when Name is the only adapter selector parameter.
+  - Improved verbose logging.
+  - More improvements to verbose logging.
+- Added Get-DnsClientServerStaticAddress to NetworkingDsc.Common to return statically
+  assigned DNS server addresses to support fix for [issue 113](https://github.com/PowerShell/xNetworking/issues/113).
+- MSFT_xDNSserverAddress:
+  - Added support for setting DNS Client to DHCP for [issue 113](https://github.com/PowerShell/xNetworking/issues/113).
+  - Added new examples to show how to enable DHCP on DNS Client.
+  - Improved integration test coverage to enable testing of multiple addresses and
+    DHCP.
+  - Converted exception creation to use common exception functions.
+- MSFT_xDhcpClient:
+  - Updated example to also cover setting DNS Client to DHCP.
+- Added the VS Code PowerShell extension formatting settings that cause PowerShell
+  files to be formatted as per the DSC Resource kit style guidelines.
+- MSFT_xDefaultGatewayAddress:
+  - Corrected style and formatting to meet HQRM guidelines.
+  - Converted exceptions to use ResourceHelper functions.
+- Updated badges in README.MD to match the layout from PSDscResources.
+- MSFT_xIPAddress:
+  - BREAKING CHANGE: Adding support for multiple IP addresses being assigned.
 
-## [3.0.2.0] - 2014-08-22
-
-### Changed
-
-- Adding following resources:
-  - xGroup
-
-## [3.0.1.0] - 2017-07-22
-
-### Changed
-
-- Adding following resources:
-  - xFileUpload
-
-## [2.0.0.0] - 2017-08-04
-
-### Changed
-
-- Adding following resources:
-  - xWindowsProcess
-  - xService
-  - xRemoteFile
-  - xPackage
-
-## [1.1.0.0] - 2017-08-04
+## [4.1.0.0]
 
 ### Changed
 
-- Fix to remove and recreate the SSL bindings when performing a new HTTPS IIS
-  Endpoint setup.
-- Fix in the resource module to consume WebSite Name parameter correctly
+- Added integration test to test for conflicts with other common resource kit modules.
+- Prevented ResourceHelper and Common module cmdlets from being exported to resolve
+  conflicts with other resource modules.
 
-## [1.0.0.0] - 2017-08-04
+## [4.0.0.0]
+
+### Changed
+
+- Converted to use AppVeyor.psm1 in DSCResource.Tests repository.
+- Converted to use Example and Markdown tests in DSCResource.Tests repository.
+- Added CodeCov.io support.
+- Added a new example to xDNSServerAddress to clarify setting multiple DNS Servers.
+- Fix examples to correct display in auto documentation generation.
+- BREAKING CHANGE: Migrated xNetworkAdapter module functionality to xNetAdapterName
+  resource.
+- Added CommonTestHelper module for aiding testing.
+- MSFT_xNetAdapterName:
+  - Created new resource for renaming network adapters.
+  - Added Find-NetAdapter cmdlet to NetworkingDsc.Common.
+- Correct example parameters format to meet style guidelines.
+
+## [3.2.0.0]
+
+### Changed
+
+- Fixed typo in the example's Action property from "Blocked" (which isn't a valid
+  value) to "Block"
+- Added support for auto generating wiki, help files, markdown linting
+  and checking examples.
+- Added NetworkingDsc.ResourceHelper module based on copy from [PSDscResources](https://github.com/PowerShell/PSDscResources/blob/dev/DscResources/CommonResourceHelper.psm1).
+- MSFT_xFirewall:
+  - Cleaned up ParameterList table layout and moved into a new file
+    (MSFT_xFirewall.data.psd1).
+  - Separated Localization strings into strings file.
+  - Added standard help blocks to all functions to meet HQRM standards.
+  - Added CmdletBinding attribute to all functions to meet HQRM standards.
+  - Style changes to meet HQRM standards.
+  - Fixed issue using CIDR notation for LocalAddress or RemoteAddress.
+    See [GitHub issue](https://github.com/PowerShell/xNetworking/issues/169).
+  - Fixed integration tests so that values being set are correctly tested.
+  - Added integration tests for Removal of Firewall rule.
+- Added NetworkingDsc.Common module to contain shared networking functions.
+- MSFT_xDNSServerAddress:
+  - Separated Localization strings into strings file.
+- MSFT_xDefaultGatewayAddress:
+  - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
+- MSFT_xDhcpClient:
+  - Separated Localization strings into strings file.
+  - Fix parameter descriptions in MOF file.
+  - Style changes to meet HQRM standards.
+- MSFT_xDnsClientGlobalSetting:
+  - Renamed Localization strings file to be standard naming format.
+  - Moved ParameterList into a new file (MSFT_xDnsClientGlobalSetting.data.psd1).
+  - Style changes to meet HQRM standards.
+  - Removed New-TerminatingError function because never called.
+  - Converted to remove Invoke-Expression.
+- MSFT_xDnsConnectionSuffix:
+  - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
+- MSFT_xHostsFile:
+  - Renamed Localization strings file to be standard naming format.
+  - Style changes to meet HQRM standards.
+  - Refactored for performance
+    - Code now reads 38k lines in > 1 second vs 4
+  - Now ignores inline comments
+  - Added more integration tests
+- MSFT_xIPAddress:
+  - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
+- MSFT_xNetAdapterBinding:
+  - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
+- MSFT_xNetAdapterRDMA:
+  - Renamed Localization strings file to be standard naming format.
+  - Style changes to meet HQRM standards.
+- MSFT_xNetBIOS:
+  - Renamed Localization strings file to be standard naming format.
+  - Style changes to meet HQRM standards.
+- MSFT_xNetConnectionProfile:
+  - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
+- MSFT_xNetworkTeam:
+  - Style changes to meet HQRM standards.
+- MSFT_xNetworkTeamInterface:
+  - Updated integration tests to remove Invoke-Expression.
+  - Style changes to meet HQRM standards.
+- MSFT_xRoute:
+  - Separated Localization strings into strings file.
+  - Style changes to meet HQRM standards.
+- MSFT_xFirewall:
+  - Converted to remove Invoke-Expression.
+
+## [3.1.0.0]
+
+### Changed
+
+- Changed parameter format in Readme.md to improve information coverage and consistency.
+- Changed all MOF files to be consistent and meet HQRM guidelines.
+- Removed most markdown errors (MD*) in Readme.md.
+- Added xNetAdapterRDMA resource
+- Fixes to support changes to DSCResource.Tests.
+
+## [3.0.0.0]
+
+### Changed
+
+- Corrected integration test filenames:
+  - MSFT_xDefaultGatewayAddress.Integration.Tests.ps1
+  - MSFT_xDhcpClient.Integration.Tests.ps1
+  - MSFT_xDNSConnectionSuffix.Integration.Tests.ps1
+  - MSFT_xNetAdapterBinding.Integration.Tests.ps1
+- Updated all integration tests to use v1.1.0 header and script variable context.
+- Updated all unit tests to use v1.1.0 header and script variable context.
+- Removed uneccessary global variable from MSFT_xNetworkTeam.integration.tests.ps1
+- Converted Invoke-Expression in all integration tests to &.
+- Fixed unit test description in xNetworkAdapter.Tests.ps1
+- xNetAdapterBinding
+  - Added support for the use of wildcard (*) in InterfaceAlias parameter.
+- BREAKING CHANGE - MSFT_xIPAddress: SubnetMask parameter renamed to PrefixLength.
+
+## [2.12.0.0]
+
+### Changed
+
+- Fixed bug in MSFT_xIPAddress resource when xIPAddress follows xVMSwitch.
+- Added the following resources:
+  - MSFT_xNetworkTeamInterface resource to add/remove network team interfaces
+- Added conditional loading of LocalizedData to MSFT_xHostsFile and
+  MSFT_xNetworkTeam to prevent failures while loading those resources on systems
+  with $PSUICulture other than en-US
+
+## [2.11.0.0]
+
+### Changed
+
+- Added the following resources:
+  - MSFT_xDnsClientGlobalSetting resource to configure the DNS Suffix Search List
+    and Devolution.
+- Converted AppVeyor.yml to pull Pester from PSGallery instead of Chocolatey.
+- Changed AppVeyor.yml to use default image.
+- Fix xNetBios unit tests to work on default appveyor image.
+- Fix bug in xRoute when removing an existing route.
+- Updated xRoute integration tests to use v1.1.0 test header.
+- Extended xRoute integration tests to perform both add and remove route tests.
+
+## [2.10.0.0]
+
+### Changed
+
+- Added the following resources:
+  - MSFT_xNetAdapterBinding resource to enable/disable network adapter bindings.
+- Fixed bug where xHostsFile would duplicate an entry instead of updating an
+  existing one
+- Updated Sample_xIPAddress_*.ps1 examples to show correct usage of setting a
+  Static IP address to prevent issue when DHCP assigned IP address already
+  matches staticly assigned IP address.
+
+## [2.9.0.0]
+
+### Changed
+
+- MSFT_xDefaultGatewayAddress: Added Integration Tests.
+- MSFT_xDhcpClient: Added Integration Tests.
+- MSFT_xDnsConnectionSuffix: Added Integration Tests.
+- MSFT_xDnsServerAddress: Added Integration Tests.
+- MSFT_xIPAddress: Added Integration Tests.
+- MSFT_xDhcpClient: Fixed logged message in Test-TargetResource.
+- Added functions:
+  - Get-xNetworkAdapterName
+  - Test-xNetworkAdapterName
+  - Set-xNetworkAdapterName
+
+## [2.8.0.0]
+
+### Changed
+
+- Templates folder removed. Use the test templates in them
+  [Tests.Template folder in the DSCResources repository](https://github.com/PowerShell/DscResources/tree/master/Tests.Template)
+  instead.
+- Added the following resources:
+  - MSFT_xHostsFile resource to manage hosts file entries.
+- MSFT_xFirewall: Fix test of Profile parameter status.
+- MSFT_xIPAddress: Fix false negative when desired IP is a substring of current IP.
+
+## [2.7.0.0]
+
+### Changed
+
+- Added the following resources:
+  - MSFT_xNetworkTeam resource to manage native network adapter teaming.
+
+## [2.6.0.0]
+
+### Changed
+
+- Added the following resources:
+  - MSFT_xDhcpClient resource to enable/disable DHCP on individual interfaces.
+  - MSFT_xRoute resource to manage network routes.
+  - MSFT_xNetBIOS resource to configure NetBIOS over TCP/IP settings on
+    individual interfaces.
+- MSFT_*: Unit and Integration tests updated to use
+    DSCResource.Tests\TestHelper.psm1 functions.
+- MSFT_*: Resource Name added to all unit test Desribes.
+- Templates update to use DSCResource.Tests\TestHelper.psm1 functions.
+- MSFT_xNetConnectionProfile: Integration tests fixed when more than one
+  connection profile present.
+- Changed AppVeyor.yml to use WMF 5 build environment.
+- MSFT_xIPAddress: Removed test for DHCP Status.
+- MSFT_xFirewall: New parameters added:
+  - DynamicTransport
+  - EdgeTraversalPolicy
+  - LocalOnlyMapping
+  - LooseSourceMapping
+  - OverrideBlockRules
+  - Owner
+- All unit & integration tests updated to be able to be run from any folder under
+  tests directory.
+- Unit & Integration test template headers updated to match DSCResource templates.
+
+## [2.5.0.0]
+
+### Changed
+
+- Added the following resources:
+  - MSFT_xDNSConnectionSuffix resource to manage connection-specific DNS suffixes.
+  - MSFT_xNetConnectionProfile resource to manage Connection Profiles for interfaces.
+- MSFT_xDNSServerAddress: Corrected Verbose logging messages when multiple DNS
+  adddressed specified.
+- MSFT_xDNSServerAddress: Change to ensure resource terminates if DNS Server
+  validation fails.
+- MSFT_xDNSServerAddress: Added Validate parameter to enable DNS server validation
+  when changing server addresses.
+- MSFT_xFirewall: ApplicationPath Parameter renamed to Program for consistency
+  with Cmdlets.
+- MSFT_xFirewall: Fix to prevent error when DisplayName parameter is set on an
+  existing rule.
+- MSFT_xFirewall: Setting a different DisplayName parameter on an existing rule
+  now correctly reports as needs change.
+- MSFT_xFirewall: Changed DisplayGroup parameter to Group for consistency with
+  Cmdlets and reduce confusion.
+- MSFT_xFirewall: Changing the Group of an existing Firewall rule will recreate
+  the Firewall rule rather than change it.
+- MSFT_xFirewall: New parameters added:
+  - Authentication
+  - Encryption
+  - InterfaceAlias
+  - InterfaceType
+  - LocalAddress
+  - LocalUser
+  - Package
+  - Platform
+  - RemoteAddress
+  - RemoteMachine
+  - RemoteUser
+- MSFT_xFirewall: Profile parameter now handled as an Array.
+
+## [2.4.0.0]
+
+### Changed
+
+- Added following resources:
+  - MSFT_xDefaultGatewayAddress
+- MSFT_xFirewall: Removed code using DisplayGroup to lookup Firewall Rule because
+  it was redundant.
+- MSFT_xFirewall: Set-TargetResource now updates firewall rules instead of
+  recreating them.
+- MSFT_xFirewall: Added message localization support.
+- MSFT_xFirewall: Removed unnecessary code for handling multiple rules with same
+  name.
+- MSFT_xDefaultGatewayAddress: Removed unnecessary try/catch logic from around
+  networking cmdlets.
+- MSFT_xIPAddress: Removed unnecessary try/catch logic from around networking cmdlets.
+- MSFT_xDNSServerAddress: Removed unnecessary try/catch logic from around
+  networking cmdlets.
+- MSFT_xDefaultGatewayAddress: Refactored to add more unit tests and cleanup logic.
+- MSFT_xIPAddress: Network Connection Profile no longer forced to Private when
+  IP address changed.
+- MSFT_xIPAddress: Refactored to add more unit tests and cleanup logic.
+- MSFT_xDNSServerAddress: Refactored to add more unit tests and cleanup logic.
+- MSFT_xFirewall: Refactored to add more unit tests and cleanup logic.
+- MSFT_xIPAddress: Removed default gateway parameter - use xDefaultGatewayAddress
+  resource.
+- MSFT_xIPAddress: Added check for IP address format not matching address family.
+- MSFT_xDNSServerAddress: Corrected error message when address format doesn't
+  match address family.
+
+## [2.3.0.0]
+
+### Changed
+
+- MSFT_xDNSServerAddress: Added support for setting DNS for both IPv4 and IPv6
+  on the same Interface
+- MSFT_xDNSServerAddress: AddressFamily parameter has been changed to mandatory.
+- Removed xDscResourceDesigner tests (moved to common tests)
+- Fixed Test-TargetResource to test against all provided parameters
+- Modified tests to not copy file to Program Files
+
+- Changes to xFirewall causes Get-DSCConfiguration to no longer crash
+  - Modified Schema to reduce needed functions.
+  - General re-factoring and clean up of xFirewall.
+  - Added Unit and Integration tests to resource.
+
+## [2.2.0.0]
+
+### Changed
+
+- Changes in xFirewall resources to meet Test-xDscResource criteria
+
+## [2.1.1.1]
+
+### Changed
+
+- Updated to fix issue with Get-DscConfiguration and xFirewall
+
+## [2.1.0]
+
+### Changed
+
+- Added validity check that IPAddress and IPAddressFamily conforms with each other
+
+## [2.0.0.0]
+
+### Changed
+
+- Adding the xFirewall resource
+
+## [1.0.0.0]
 
 ### Changed
 
 - Initial release with the following resources:
-  - DscWebService
+  - xIPAddress
+  - xDnsServerAddress

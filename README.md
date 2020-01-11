@@ -1,5 +1,32 @@
 # NetworkingDsc
 
+[![Build Status](https://dev.azure.com/dsccommunity/NetworkingDsc/_apis/build/status/dsccommunity.NetworkingDsc?branchName=master)](https://dev.azure.com/dsccommunity/NetworkingDsc/_build/latest?definitionId=8&branchName=master)
+![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/NetworkingDsc/8/master)
+[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/NetworkingDsc/8/master)](https://dsccommunity.visualstudio.com/NetworkingDsc/_test/analytics?definitionId=8&contextType=build)
+[![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/NetworkingDsc?label=NetworkingDsc%20Preview)](https://www.powershellgallery.com/packages/NetworkingDsc/)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/NetworkingDsc?label=NetworkingDsc)](https://www.powershellgallery.com/packages/NetworkingDsc/)
+
+## Code of Conduct
+
+This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
+
+## Releases
+
+For each merge to the branch `master` a preview release will be
+deployed to [PowerShell Gallery](https://www.powershellgallery.com/).
+Periodically a release version tag will be pushed which will deploy a
+full release to [PowerShell Gallery](https://www.powershellgallery.com/).
+
+## Contributing
+
+Please check out common DSC Community [contributing guidelines](https://dsccommunity.org/guidelines/contributing).
+
+## Change log
+
+A full list of changes in each version can be found in the [change log](CHANGELOG.md).
+
+## Resources
+
 The **NetworkingDsc** module contains the following resources:
 
 - **DefaultGatewayAddress**: Sets a node's default gateway address.
@@ -33,35 +60,10 @@ The **NetworkingDsc** module contains the following resources:
   and enable or disable DNS for name resolution over WINS.
 - **WinsServerAddress**: Sets a node's WINS server address(s).
 
-This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
-
 ## Documentation and Examples
 
 For a full list of resources in NetworkingDsc and examples on their use, check out
-the [NetworkingDsc wiki](https://github.com/PowerShell/NetworkingDsc/wiki).
-
-## Branches
-
-### master
-
-[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/NetworkingDsc/branch/master)
-[![codecov](https://codecov.io/gh/PowerShell/NetworkingDsc/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/NetworkingDsc/branch/master)
-
-This is the branch containing the latest release - no contributions should be made
-directly to this branch.
-
-### dev
-
-[![Build status](https://ci.appveyor.com/api/projects/status/obmudad7gy8usbx2/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/NetworkingDsc/branch/dev)
-[![codecov](https://codecov.io/gh/PowerShell/NetworkingDsc/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/NetworkingDsc/branch/dev)
-
-This is the development branch to which contributions should be proposed by contributors
-as pull requests. This development branch will periodically be merged to the master
-branch, and be released to [PowerShell Gallery](https://www.powershellgallery.com/).
-
-## Contributing
-
-Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
+the [NetworkingDsc wiki](https://github.com/dsccomunnity/NetworkingDsc/wiki).
 
 ## Known Issues
 
