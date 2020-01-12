@@ -1,45 +1,54 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_Firewall'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_Firewall'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-#region HEADER
-# Unit Test Template Version: 1.1.0
-[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
-    -TestType Unit
-#endregion HEADER
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
+
+Invoke-TestSetup
 
 # Begin Testing
 try
 {
-    InModuleScope $script:DSCResourceName {
+    InModuleScope $script:dscResourceName {
         # Get the rule that will be used for testing
         $firewallRule = Get-NetFirewallRule |
-                Sort-Object -Property Name |
-                Where-Object {
-                    $_.DisplayGroup -ne $null
-                } |
-                Select-Object -First 1
+        Sort-Object -Property Name |
+        Where-Object {
+            $_.DisplayGroup -ne $null
+        } |
+        Select-Object -First 1
         $firewallRuleName = $firewallRule.Name
         $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
 
         # Pull two rules to use testing that error is thrown when this occurs
         $firewallRules = Get-NetFirewallRule |
-                Sort-Object -Property Name |
-                Where-Object -FilterScript {
-                    $_.DisplayGroup -ne $null
-                } |
-                Select-Object -First 2
+        Sort-Object -Property Name |
+        Where-Object -FilterScript {
+            $_.DisplayGroup -ne $null
+        } |
+        Select-Object -First 2
 
         Describe 'DSC_Firewall\Get-TargetResource' -Tag 'Get' {
             Context 'Absent should return correctly' {
@@ -151,16 +160,16 @@ try
                     Mock `
                         -CommandName Remove-NetFirewallRule `
                         -ParameterFilter {
-                            $Name -eq 'Test `[With`] Wildcard`*'
-                        }
+                        $Name -eq 'Test `[With`] Wildcard`*'
+                    }
 
                     Set-TargetResource -Name 'Test [With] Wildcard*' -Ensure 'Absent'
 
                     Assert-MockCalled `
                         -CommandName Remove-NetFirewallRule `
                         -ParameterFilter {
-                            $Name -eq 'Test `[With`] Wildcard`*'
-                        } `
+                        $Name -eq 'Test `[With`] Wildcard`*'
+                    } `
                         -Exactly -Times 1
                 }
             }
@@ -208,8 +217,8 @@ try
                     Mock `
                         -CommandName Set-NetFirewallRule `
                         -ParameterFilter {
-                            $Name -eq 'Test `[With`] Wildcard`*'
-                        }
+                        $Name -eq 'Test `[With`] Wildcard`*'
+                    }
                     Mock -CommandName Test-RuleProperties -MockWith { return $false }
 
                     Set-TargetResource `
@@ -220,8 +229,8 @@ try
                     Assert-MockCalled `
                         -CommandName Set-NetFirewallRule `
                         -ParameterFilter {
-                            $Name -eq 'Test `[With`] Wildcard`*'
-                        } `
+                        $Name -eq 'Test `[With`] Wildcard`*'
+                    } `
                         -Exactly -Times 1
 
                     Assert-MockCalled -CommandName Test-RuleProperties -Exactly -Times 1
@@ -1194,7 +1203,7 @@ try
                 Context 'When the LocalAddress subnet mask uses CIDR bits format' {
                     $localAddressProperties = $properties.Clone()
                     $localAddressProperties.AddressFilters = [PSCustomObject] @{
-                        LocalAddress = '10.0.0.0/255.0.0.0'
+                        LocalAddress  = '10.0.0.0/255.0.0.0'
                         RemoteAddress = $localAddressProperties.AddressFilters.RemoteAddress
                     }
 
@@ -1213,7 +1222,7 @@ try
                 Context 'When the RemoteAddress subnet mask uses CIDR bits format' {
                     $remoteAddressProperties = $properties.Clone()
                     $remoteAddressProperties.AddressFilters = [PSCustomObject] @{
-                        LocalAddress = $remoteAddressProperties.AddressFilters.LocalAddress
+                        LocalAddress  = $remoteAddressProperties.AddressFilters.LocalAddress
                         RemoteAddress = '10.0.0.0/255.0.0.0'
                     }
 
@@ -1261,8 +1270,8 @@ try
                 Mock `
                     -CommandName Get-NetFirewallRule `
                     -ParameterFilter {
-                        $Name -eq 'Test `[With`] Wildcard`*'
-                    } `
+                    $Name -eq 'Test `[With`] Wildcard`*'
+                } `
                     -MockWith { $firewallRule }
 
                 It 'Should return a firewall rule when name is passed with wildcard characters' {
@@ -1274,8 +1283,8 @@ try
                     Assert-MockCalled `
                         -CommandName Get-NetFirewallRule `
                         -ParameterFilter {
-                            $Name -eq 'Test `[With`] Wildcard`*'
-                        } `
+                        $Name -eq 'Test `[With`] Wildcard`*'
+                    } `
                         -Exactly -Times 1
                 }
             }
@@ -1289,57 +1298,57 @@ try
                     $expected = Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $firewallRule
 
                     $($result.AddressFilters | Out-String -Stream) |
-                        Should -Be $($expected | Out-String -Stream)
+                    Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right application filter on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallApplicationFilter -AssociatedNetFirewallRule $firewallRule
 
                     $($result.ApplicationFilters | Out-String -Stream) |
-                        Should -Be $($expected | Out-String -Stream)
+                    Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right interface filter on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallInterfaceFilter -AssociatedNetFirewallRule $firewallRule
 
                     $($result.InterfaceFilters | Out-String -Stream) |
-                        Should -Be $($expected | Out-String -Stream)
+                    Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right interface type filter on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallInterfaceTypeFilter -AssociatedNetFirewallRule $firewallRule
                     $($result.InterfaceTypeFilters | Out-String -Stream) |
-                        Should -Be $($expected | Out-String -Stream)
+                    Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right port filter on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallPortFilter -AssociatedNetFirewallRule $firewallRule
                     $($result.PortFilters | Out-String -Stream) |
-                        Should -Be $($expected | Out-String -Stream)
+                    Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right Profile on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallProfile -AssociatedNetFirewallRule $firewallRule
                     $($result.Profile | Out-String -Stream) |
-                        Should -Be $($expected | Out-String -Stream)
+                    Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right Profile on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallProfile -AssociatedNetFirewallRule $firewallRule
                     $($result.Profile | Out-String -Stream) |
-                        Should -Be $($expected | Out-String -Stream)
+                    Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right Security Filters on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallSecurityFilter -AssociatedNetFirewallRule $firewallRule
                     $($result.SecurityFilters | Out-String -Stream) |
-                        Should -Be $($expected | Out-String -Stream)
+                    Should -Be $($expected | Out-String -Stream)
                 }
 
                 It "Should return the right Service Filters on firewall rule $($firewallRule.Name)" {
                     $expected = Get-NetFirewallServiceFilter -AssociatedNetFirewallRule $firewallRule
                     $($result.ServiceFilters | Out-String -Stream) |
-                        Should -Be $($expected | Out-String -Stream)
+                    Should -Be $($expected | Out-String -Stream)
                 }
             }
         }
@@ -1361,7 +1370,5 @@ try
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }

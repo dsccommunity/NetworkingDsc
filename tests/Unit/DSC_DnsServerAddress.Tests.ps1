@@ -1,28 +1,37 @@
-$script:DSCModuleName      = 'NetworkingDsc'
-$script:DSCResourceName    = 'DSC_DnsServerAddress'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_DnsServerAddress'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-#region HEADER
-# Unit Test Template Version: 1.1.0
-[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
-    -TestType Unit
-#endregion HEADER
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
+
+Invoke-TestSetup
 
 # Begin Testing
 try
 {
-    InModuleScope $script:DSCResourceName {
+    InModuleScope $script:dscResourceName {
         Describe 'DSC_DnsServerAddress\Get-TargetResource' -Tag 'Get' {
             Context 'Test IPv4' {
                 Context 'Invoking with an IPv4 address and one address is currently set' {
@@ -164,7 +173,7 @@ try
                 Context 'Invoking with multiple IPv4 server addresses that are different to current' {
                     It 'Should not throw an exception' {
                         $setTargetResourceSplat = @{
-                            Address        = @( '192.168.0.99','192.168.0.100' )
+                            Address        = @( '192.168.0.99', '192.168.0.100' )
                             InterfaceAlias = 'Ethernet'
                             AddressFamily  = 'IPv4'
                             Verbose        = $true
@@ -201,11 +210,11 @@ try
                 }
 
                 Context 'Invoking with multiple IPv4 server addresses when there are different ones currently assigned' {
-                    Mock -commandName Get-DnsClientServerStaticAddress -MockWith { @( '192.168.0.1','192.168.0.2' ) }
+                    Mock -commandName Get-DnsClientServerStaticAddress -MockWith { @( '192.168.0.1', '192.168.0.2' ) }
 
                     It 'Should not throw an exception' {
                         $setTargetResourceSplat = @{
-                            Address        = @( '192.168.0.3','192.168.0.4' )
+                            Address        = @( '192.168.0.3', '192.168.0.4' )
                             InterfaceAlias = 'Ethernet'
                             AddressFamily  = 'IPv4'
                             Verbose        = $true
@@ -227,7 +236,7 @@ try
 
                     It 'Should not throw an exception' {
                         $setTargetResourceSplat = @{
-                            Address        = @( '192.168.0.2','192.168.0.3' )
+                            Address        = @( '192.168.0.2', '192.168.0.3' )
                             InterfaceAlias = 'Ethernet'
                             AddressFamily  = 'IPv4'
                             Verbose        = $true
@@ -317,7 +326,7 @@ try
                 Context 'Invoking with multiple IPv6 server addresses that are different to current' {
                     It 'Should not throw an exception' {
                         $setTargetResourceSplat = @{
-                            Address        = @( 'fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2' )
+                            Address        = @( 'fe80:ab04:30F5:002b::1', 'fe80:ab04:30F5:002b::2' )
                             InterfaceAlias = 'Ethernet'
                             AddressFamily  = 'IPv6'
                             Verbose        = $true
@@ -358,7 +367,7 @@ try
 
                     It 'Should not throw an exception' {
                         $setTargetResourceSplat = @{
-                            Address        = @( 'fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::1' )
+                            Address        = @( 'fe80:ab04:30F5:002b::1', 'fe80:ab04:30F5:002b::1' )
                             InterfaceAlias = 'Ethernet'
                             AddressFamily  = 'IPv6'
                             Verbose        = $true
@@ -421,7 +430,7 @@ try
                 Context 'Invoking with multiple IPv4 server addresses that are different to current' {
                     It 'Should return false' {
                         $testTargetResourceSplat = @{
-                            Address        = @( '192.168.0.2','192.168.0.3' )
+                            Address        = @( '192.168.0.2', '192.168.0.3' )
                             InterfaceAlias = 'Ethernet'
                             AddressFamily  = 'IPv4'
                             Verbose        = $true
@@ -457,7 +466,7 @@ try
 
                     It 'Should return false' {
                         $testTargetResourceSplat = @{
-                            Address        = @( '192.168.0.2','192.168.0.3' )
+                            Address        = @( '192.168.0.2', '192.168.0.3' )
                             InterfaceAlias = 'Ethernet'
                             AddressFamily  = 'IPv4'
                             Verbose        = $true
@@ -515,7 +524,7 @@ try
                 Context 'Invoking with multiple IPv6 server addresses that are different to current' {
                     It 'Should return false' {
                         $testTargetResourceSplat = @{
-                            Address        = @( 'fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2' )
+                            Address        = @( 'fe80:ab04:30F5:002b::1', 'fe80:ab04:30F5:002b::2' )
                             InterfaceAlias = 'Ethernet'
                             AddressFamily  = 'IPv6'
                             Verbose        = $true
@@ -551,7 +560,7 @@ try
 
                     It 'Should return false' {
                         $testTargetResourceSplat = @{
-                            Address        = @( 'fe80:ab04:30F5:002b::1','fe80:ab04:30F5:002b::2' )
+                            Address        = @( 'fe80:ab04:30F5:002b::1', 'fe80:ab04:30F5:002b::2' )
                             InterfaceAlias = 'Ethernet'
                             AddressFamily  = 'IPv6'
                             Verbose        = $true
@@ -616,7 +625,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressIPv4MismatchError -f $assertResourcePropertySplat.Address,$assertResourcePropertySplat.AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv4MismatchError -f $assertResourcePropertySplat.Address, $assertResourcePropertySplat.AddressFamily) `
                         -ArgumentName 'Address'
 
                     { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
@@ -633,7 +642,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressIPv6MismatchError -f $assertResourcePropertySplat.Address,$assertResourcePropertySplat.AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv6MismatchError -f $assertResourcePropertySplat.Address, $assertResourcePropertySplat.AddressFamily) `
                         -ArgumentName 'Address'
 
                     { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
@@ -670,7 +679,5 @@ try
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }

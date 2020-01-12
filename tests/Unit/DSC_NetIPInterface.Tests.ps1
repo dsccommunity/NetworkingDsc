@@ -1,28 +1,37 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_NetIPInterface'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_NetIPInterface'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-#region HEADER
-# Unit Test Template Version: 1.1.0
-[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
-    -TestType Unit
-#endregion HEADER
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
+
+Invoke-TestSetup
 
 # Begin Testing
 try
 {
-    InModuleScope $script:DSCResourceName {
+    InModuleScope $script:dscResourceName {
         <#
             This is an array of parameters that will be used with pester test cases
             to test each individual parameter. The array contains a hash table
@@ -36,121 +45,121 @@ try
         #>
         $testParameterList = @(
             @{
-                Name = 'AdvertiseDefaultRoute'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'AdvertiseDefaultRoute'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $AdvertiseDefaultRoute -eq 'Disabled'
                 }
             },
             @{
-                Name = 'Advertising'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'Advertising'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $Advertising -eq 'Disabled'
                 }
             },
             @{
-                Name = 'AutomaticMetric'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'AutomaticMetric'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $AutomaticMetric -eq 'Disabled'
                 }
             },
             @{
-                Name = 'Dhcp'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'Dhcp'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $Dhcp -eq 'Disabled'
                 }
             },
             @{
-                Name = 'DirectedMacWolPattern'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'DirectedMacWolPattern'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $DirectedMacWolPattern -eq 'Disabled'
                 }
             },
             @{
-                Name = 'EcnMarking'
-                MockedValue = 'AppDecide'
-                TestValue = 'Disabled'
+                Name            = 'EcnMarking'
+                MockedValue     = 'AppDecide'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $EcnMarking -eq 'Disabled'
                 }
             },
             @{
-                Name = 'ForceArpNdWolPattern'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'ForceArpNdWolPattern'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $ForceArpNdWolPattern -eq 'Disabled'
                 }
             },
             @{
-                Name = 'Forwarding'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'Forwarding'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $Forwarding -eq 'Disabled'
                 }
             },
             @{
-                Name = 'IgnoreDefaultRoutes'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'IgnoreDefaultRoutes'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $IgnoreDefaultRoutes -eq 'Disabled'
                 }
             },
             @{
-                Name = 'ManagedAddressConfiguration'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'ManagedAddressConfiguration'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $ManagedAddressConfiguration -eq 'Disabled'
                 }
             },
             @{
-                Name = 'NeighborUnreachabilityDetection'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'NeighborUnreachabilityDetection'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $NeighborUnreachabilityDetection -eq 'Disabled'
                 }
             },
             @{
-                Name = 'OtherStatefulConfiguration'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'OtherStatefulConfiguration'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $OtherStatefulConfiguration -eq 'Disabled'
                 }
             },
             @{
-                Name = 'RouterDiscovery'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'RouterDiscovery'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $RouterDiscovery -eq 'Disabled'
                 }
             },
             @{
-                Name = 'WeakHostReceive'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'WeakHostReceive'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $WeakHostReceive -eq 'Disabled'
                 }
             },
             @{
-                Name = 'WeakHostSend'
-                MockedValue = 'Enabled'
-                TestValue = 'Disabled'
+                Name            = 'WeakHostSend'
+                MockedValue     = 'Enabled'
+                TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $WeakHostSend -eq 'Disabled'
                 }
@@ -174,7 +183,7 @@ try
 
         foreach ($parameter in $testParameterList)
         {
-            $null = $script:netIPInterfaceExists_Settings.Add($parameter.Name,$parameter.MockedValue)
+            $null = $script:netIPInterfaceExists_Settings.Add($parameter.Name, $parameter.MockedValue)
         }
 
         $script:netIPInterfaceMissing = @{
@@ -357,7 +366,5 @@ try
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }

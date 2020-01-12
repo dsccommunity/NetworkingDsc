@@ -1,28 +1,37 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_IPAddress'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_IPAddress'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-#region HEADER
-# Unit Test Template Version: 1.1.0
-[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
-    -TestType Unit
-#endregion HEADER
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
+
+Invoke-TestSetup
 
 # Begin Testing
 try
 {
-    InModuleScope $script:DSCResourceName {
+    InModuleScope $script:dscResourceName {
         Describe 'DSC_IPAddress\Get-TargetResource' -Tag 'Get' {
             Context 'Invoked with a single IP address' {
                 Mock -CommandName Get-NetIPAddress -MockWith {
@@ -506,9 +515,9 @@ try
                 Context 'Invoked with parameter "KeepExistingAddress" and different prefixes' {
                     It 'Should return $null' {
                         $setTargetResourceParameters = @{
-                            IPAddress      = '10.0.0.2/24', '172.16.4.19/16'
-                            InterfaceAlias = 'Ethernet'
-                            AddressFamily  = 'IPv4'
+                            IPAddress           = '10.0.0.2/24', '172.16.4.19/16'
+                            InterfaceAlias      = 'Ethernet'
+                            AddressFamily       = 'IPv4'
                             KeepExistingAddress = $true
                         }
 
@@ -528,9 +537,9 @@ try
                 Context 'Invoked with parameter "KeepExistingAddress" and existing IP with different prefix' {
                     It 'Should return $null' {
                         $setTargetResourceParameters = @{
-                            IPAddress      = '172.16.4.19/24'
-                            InterfaceAlias = 'Ethernet'
-                            AddressFamily  = 'IPv4'
+                            IPAddress           = '172.16.4.19/24'
+                            InterfaceAlias      = 'Ethernet'
+                            AddressFamily       = 'IPv4'
                             KeepExistingAddress = $true
                         }
 
@@ -586,7 +595,7 @@ try
                 }
 
                 Context 'Invoked with different IPv4 Address' {
-                    It 'Should return $false'  {
+                    It 'Should return $false' {
                         $testGetResourceParameters = @{
                             IPAddress      = '192.168.0.1/16'
                             InterfaceAlias = 'Ethernet'
@@ -603,7 +612,7 @@ try
                 }
 
                 Context 'Invoked with the same IPv4 Address' {
-                    It 'Should return $true'  {
+                    It 'Should return $true' {
                         $testGetResourceParameters = @{
                             IPAddress      = '192.168.0.15/16'
                             InterfaceAlias = 'Ethernet'
@@ -620,7 +629,7 @@ try
                 }
 
                 Context 'Invoked with the same IPv4 Address but different prefix length' {
-                    It 'Should return $false'  {
+                    It 'Should return $false' {
                         $testGetResourceParameters = @{
                             IPAddress      = '192.168.0.15/24'
                             InterfaceAlias = 'Ethernet'
@@ -1258,7 +1267,5 @@ try
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }

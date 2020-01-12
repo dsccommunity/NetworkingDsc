@@ -1,29 +1,37 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_NetAdapterBinding'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_NetAdapterBinding'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-#region HEADER
-# Unit Test Template Version: 1.1.0
-[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
-    -TestType Unit
-#endregion HEADER
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
+
+Invoke-TestSetup
 
 # Begin Testing
 try
 {
-    InModuleScope $script:DSCResourceName {
-
+    InModuleScope $script:dscResourceName {
         $testBindingEnabled = @{
             InterfaceAlias = 'Ethernet'
             ComponentId    = 'ms_tcpip63'
@@ -230,8 +238,8 @@ try
                 It 'Should return the adapter binding' {
                     $result = Get-Binding @testBindingEnabled
                     $result.InterfaceAlias | Should -Be $mockBindingEnabled.InterfaceAlias
-                    $result.ComponentId    | Should -Be $mockBindingEnabled.ComponentId
-                    $result.Enabled        | Should -Be $mockBindingEnabled.Enabled
+                    $result.ComponentId | Should -Be $mockBindingEnabled.ComponentId
+                    $result.Enabled | Should -Be $mockBindingEnabled.Enabled
                 }
 
                 It 'Should call all the mocks' {
@@ -247,8 +255,8 @@ try
                 It 'Should return the adapter binding' {
                     $result = Get-Binding @testBindingDisabled
                     $result.InterfaceAlias | Should -Be $mockBindingDisabled.InterfaceAlias
-                    $result.ComponentId    | Should -Be $mockBindingDisabled.ComponentId
-                    $result.Enabled        | Should -Be $mockBindingDisabled.Enabled
+                    $result.ComponentId | Should -Be $mockBindingDisabled.ComponentId
+                    $result.Enabled | Should -Be $mockBindingDisabled.Enabled
                 }
 
                 It 'Should call all the mocks' {
@@ -258,11 +266,8 @@ try
             }
         }
     } #end InModuleScope $DSCResourceName
-    #endregion
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }

@@ -1,40 +1,49 @@
-$script:DSCModuleName      = 'NetworkingDsc'
-$script:DSCResourceName    = 'DSC_WaitForNetworkTeam'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_WaitForNetworkTeam'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-#region HEADER
-# Unit Test Template Version: 1.1.0
-[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
-    -TestType Unit
-#endregion HEADER
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
+
+Invoke-TestSetup
 
 # Begin Testing
 try
 {
-    InModuleScope $script:DSCResourceName {
+    InModuleScope $script:dscResourceName {
         $testTeamName = 'TestTeam'
         $mockedGetNetLbfoTeamUp = [pscustomobject] @{
-            Name      = $testTeamName
-            Status    = 'Up'
+            Name   = $testTeamName
+            Status = 'Up'
         }
         $mockedGetNetLbfoTeamDegraded = [pscustomobject] @{
-            Name      = $testTeamName
-            Status    = 'Degraded'
+            Name   = $testTeamName
+            Status = 'Degraded'
         }
         $testTeamParametersGet = @{
-            Name             = $testTeamName
-            Verbose          = $true
+            Name    = $testTeamName
+            Verbose = $true
         }
         $testTeamParameters = @{
             Name             = $testTeamName
@@ -43,8 +52,8 @@ try
             Verbose          = $true
         }
         $getNetLbfoTeamStatusParameters = @{
-            Name             = $testTeamName
-            Verbose          = $true
+            Name    = $testTeamName
+            Verbose = $true
         }
 
         Describe 'DSC_WaitForVolume\Get-TargetResource' -Tag 'Get' {
@@ -75,8 +84,8 @@ try
                 Mock `
                     -CommandName Get-NetLbfoTeamStatus `
                     -MockWith {
-                        New-InvalidOperationException -Message $($script:localizedData.NetworkTeamNotFoundMessage -f $testTeamName)
-                    }
+                    New-InvalidOperationException -Message $($script:localizedData.NetworkTeamNotFoundMessage -f $testTeamName)
+                }
 
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($script:localizedData.NetworkTeamNotFoundMessage -f $testTeamName)
@@ -231,7 +240,5 @@ try
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }

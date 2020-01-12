@@ -1,28 +1,37 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_Route'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_Route'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-#region HEADER
-# Unit Test Template Version: 1.1.0
-[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
-    -TestType Unit
-#endregion HEADER
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
+
+Invoke-TestSetup
 
 # Begin Testing
 try
 {
-    InModuleScope $script:DSCResourceName {
+    InModuleScope $script:dscResourceName {
         # Create the Mock Objects that will be used for running tests
         $mockNetAdapter = [PSCustomObject] @{
             Name = 'Ethernet'
@@ -76,13 +85,13 @@ try
 
                 It 'Should return correct Route' {
                     $result = Get-TargetResource @testRouteKeys
-                    $result.Ensure            | Should -Be 'Present'
-                    $result.InterfaceAlias    | Should -Be $testRoute.InterfaceAlias
-                    $result.AddressFamily     | Should -Be $testRoute.AddressFamily
+                    $result.Ensure | Should -Be 'Present'
+                    $result.InterfaceAlias | Should -Be $testRoute.InterfaceAlias
+                    $result.AddressFamily | Should -Be $testRoute.AddressFamily
                     $result.DestinationPrefix | Should -Be $testRoute.DestinationPrefix
-                    $result.NextHop           | Should -Be $testRoute.NextHop
-                    $result.RouteMetric       | Should -Be $testRoute.RouteMetric
-                    $result.Publish           | Should -Be $testRoute.Publish
+                    $result.NextHop | Should -Be $testRoute.NextHop
+                    $result.RouteMetric | Should -Be $testRoute.RouteMetric
+                    $result.Publish | Should -Be $testRoute.Publish
                     $result.PreferredLifetime | Should -Be $testRoute.PreferredLifetime
                 }
 
@@ -207,12 +216,12 @@ try
                     Assert-MockCalled -CommandName Set-NetRoute -Exactly -Times 0
                     Assert-MockCalled -CommandName Remove-NetRoute `
                         -ParameterFilter {
-                            ($InterfaceAlias -eq $testRoute.InterfaceAlias) -and `
-                            ($AddressFamily -eq $testRoute.AddressFamily) -and `
-                            ($DestinationPrefix -eq $testRoute.DestinationPrefix) -and `
-                            ($NextHop -eq $testRoute.NextHop) -and `
-                            ($RouteMetric -eq $testRoute.RouteMetric)
-                        } `
+                        ($InterfaceAlias -eq $testRoute.InterfaceAlias) -and `
+                        ($AddressFamily -eq $testRoute.AddressFamily) -and `
+                        ($DestinationPrefix -eq $testRoute.DestinationPrefix) -and `
+                        ($NextHop -eq $testRoute.NextHop) -and `
+                        ($RouteMetric -eq $testRoute.RouteMetric)
+                    } `
                         -Exactly -Times 1
                 }
             }
@@ -511,7 +520,5 @@ try
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }

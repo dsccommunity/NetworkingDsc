@@ -1,29 +1,37 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_NetAdapterRss'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_NetAdapterRss'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-#region HEADER
-# Unit Test Template Version: 1.1.0
-[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
-    -TestType Unit
-#endregion HEADER
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
+
+Invoke-TestSetup
 
 # Begin Testing
 try
 {
-    InModuleScope $script:DSCResourceName {
-
+    InModuleScope $script:dscResourceName {
         $TestRssEnabled = @{
             Name    = 'Ethernet'
             Enabled = $true
@@ -55,7 +63,7 @@ try
 
             Context 'Adapter exist and RSS is disabled' {
                 Mock -CommandName Get-NetAdapterRSS -MockWith {
-                    @{ Enabled = $TestRSSDisabled.Enabled}
+                    @{ Enabled = $TestRSSDisabled.Enabled }
                 }
 
                 It 'Should return the RSS Enabled' {
@@ -87,7 +95,7 @@ try
 
                 Context 'Adapter exist, RSS is enabled, no action required' {
                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-                        @{ Enabled = $TestRSSEnabled.Enabled}
+                        @{ Enabled = $TestRSSEnabled.Enabled }
                     }
                     Mock -CommandName Set-NetAdapterRSS
 
@@ -119,7 +127,7 @@ try
 
                 Context 'Adapter exist, RSS is disabled, no action required' {
                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-                        @{ Enabled = $TestRSSDisabled.Enabled}
+                        @{ Enabled = $TestRSSDisabled.Enabled }
                     }
                     Mock -CommandName Set-NetAdapterRSS
 
@@ -135,7 +143,7 @@ try
 
                 Context 'Adapter exist, RSS is disabled, should be enabled.' {
                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-                        @{ Enabled = $TestRSSDisabled.Enabled}
+                        @{ Enabled = $TestRSSDisabled.Enabled }
                     }
                     Mock -CommandName Set-NetAdapterRSS
 
@@ -171,7 +179,7 @@ try
                 # All
                 Context 'Adapter exist, RSS is enabled, no action required' {
                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-                        @{ Enabled = $TestRSSEnabled.Enabled}
+                        @{ Enabled = $TestRSSEnabled.Enabled }
                     }
 
                     It 'Should return true' {
@@ -185,7 +193,7 @@ try
 
                 Context 'Adapter exist, RSS is enabled, should be disabled' {
                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-                        @{ Enabled = $TestRSSEnabled.Enabled}
+                        @{ Enabled = $TestRSSEnabled.Enabled }
                     }
 
                     It 'Should return false' {
@@ -199,7 +207,7 @@ try
 
                 Context 'Adapter exist, RSS is disabled, no action required' {
                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-                        @{ Enabled = $TestRSSDisabled.Enabled}
+                        @{ Enabled = $TestRSSDisabled.Enabled }
                     }
 
                     It 'Should return true' {
@@ -213,7 +221,7 @@ try
 
                 Context 'Adapter exist, RSS is disabled, should be enabled.' {
                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-                        @{ Enabled = $TestRSSDisabled.Enabled}
+                        @{ Enabled = $TestRSSDisabled.Enabled }
                     }
 
                     It 'Should return false' {
@@ -246,7 +254,5 @@ try
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }

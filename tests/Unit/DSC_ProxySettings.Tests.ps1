@@ -1,29 +1,37 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_ProxySettings'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_ProxySettings'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-#region HEADER
-# Unit Test Template Version: 1.1.0
-[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
-    -TestType Unit
-#endregion HEADER
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
+
+Invoke-TestSetup
 
 # Begin Testing
 try
 {
-    #region Pester Tests
-    InModuleScope $script:DSCResourceName {
+    InModuleScope $script:dscResourceName {
         $script:DSCResourceName = 'DSC_ProxySettings'
 
         # Create the Mock Objects that will be used for running tests
@@ -123,15 +131,15 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ DefaultConnectionSettings = $testBinary }
-                    } `
+                    @{ DefaultConnectionSettings = $testBinary }
+                } `
                     -Verifiable
 
                 Mock `
                     -CommandName ConvertFrom-ProxySettingsBinary `
                     -MockWith {
-                        return $testProxyAllEnabledWithBypassLocalSettings
-                    } `
+                    return $testProxyAllEnabledWithBypassLocalSettings
+                } `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -158,15 +166,15 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ SavedLegacySettings = $testBinary }
-                    } `
+                    @{ SavedLegacySettings = $testBinary }
+                } `
                     -Verifiable
 
                 Mock `
                     -CommandName ConvertFrom-ProxySettingsBinary `
                     -MockWith {
-                        return $testProxyAllEnabledWithBypassLocalSettings
-                    } `
+                    return $testProxyAllEnabledWithBypassLocalSettings
+                } `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -373,8 +381,8 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ DefaultConnectionSettings = $testBinary }
-                    } `
+                    @{ DefaultConnectionSettings = $testBinary }
+                } `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -396,8 +404,8 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ DefaultConnectionSettings = $testBinary }
-                    } `
+                    @{ DefaultConnectionSettings = $testBinary }
+                } `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -419,8 +427,8 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ SavedLegacySettings = $testBinary }
-                    } `
+                    @{ SavedLegacySettings = $testBinary }
+                } `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -442,8 +450,8 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ SavedLegacySettings = $testBinary }
-                    } `
+                    @{ SavedLegacySettings = $testBinary }
+                } `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -465,8 +473,8 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ DefaultConnectionSettings = $testBinary }
-                    } `
+                    @{ DefaultConnectionSettings = $testBinary }
+                } `
                     -Verifiable
 
                 Mock `
@@ -497,8 +505,8 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ SavedLegacySettings = $testBinary }
-                    } `
+                    @{ SavedLegacySettings = $testBinary }
+                } `
                     -Verifiable
 
                 Mock `
@@ -529,8 +537,8 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ DefaultConnectionSettings = $testBinary }
-                    } `
+                    @{ DefaultConnectionSettings = $testBinary }
+                } `
                     -Verifiable
 
                 Mock `
@@ -561,8 +569,8 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ SavedLegacySettings = $testBinary }
-                    } `
+                    @{ SavedLegacySettings = $testBinary }
+                } `
                     -Verifiable
 
                 Mock `
@@ -593,8 +601,8 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ DefaultConnectionSettings = $testBinary }
-                    } `
+                    @{ DefaultConnectionSettings = $testBinary }
+                } `
                     -Verifiable
 
                 Mock `
@@ -625,8 +633,8 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                        @{ SavedLegacySettings = $testBinary }
-                    } `
+                    @{ SavedLegacySettings = $testBinary }
+                } `
                     -Verifiable
 
                 Mock `
@@ -673,7 +681,7 @@ try
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllEnabledWithoutBypassLocalSettings `
                             -DesiredValues $testProxyAllEnabledWithoutBypassLocalSettings `
-                            -Verbose  } | Should -Not -Throw
+                            -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
@@ -686,7 +694,7 @@ try
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllEnabledWithBypassLocalSettings `
                             -DesiredValues $testProxyAllEnabledWithBypassLocalSettings `
-                            -Verbose  } | Should -Not -Throw
+                            -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
@@ -699,7 +707,7 @@ try
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllEnabledWithBypassLocalSettings `
                             -DesiredValues $testProxyAllEnabledWithoutBypassLocalSettings `
-                            -Verbose  } | Should -Not -Throw
+                            -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
@@ -712,7 +720,7 @@ try
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyManualProxyWithExceptionsSettings `
                             -DesiredValues $testProxyManualProxyWithExceptionsSettings `
-                            -Verbose  } | Should -Not -Throw
+                            -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
@@ -725,7 +733,7 @@ try
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyManualProxyWithExceptionsSettings `
                             -DesiredValues $testProxyManualProxyWithAlternateExceptionsSettings `
-                            -Verbose  } | Should -Not -Throw
+                            -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
@@ -757,25 +765,25 @@ try
         Describe 'DSC_ProxySettings\Get-Int32FromByteArray' {
             Context 'When a byte array with a little endian integer less than 256 starting at byte 0' {
                 It 'Should return 255' {
-                    Get-Int32FromByteArray -Byte ([System.Byte[]] @(255,0,0,0,99)) -StartByte 0 | Should -Be 255
+                    Get-Int32FromByteArray -Byte ([System.Byte[]] @(255, 0, 0, 0, 99)) -StartByte 0 | Should -Be 255
                 }
             }
 
             Context 'When a byte array with a little endian integer less than 256 starting at byte 1' {
                 It 'Should return 255' {
-                    Get-Int32FromByteArray -Byte ([System.Byte[]] @(99,255,0,0,0,99)) -StartByte 1 | Should -Be 255
+                    Get-Int32FromByteArray -Byte ([System.Byte[]] @(99, 255, 0, 0, 0, 99)) -StartByte 1 | Should -Be 255
                 }
             }
 
             Context 'When a byte array with a little endian integer more than 256 starting at byte 0' {
                 It 'Should return 256' {
-                    Get-Int32FromByteArray -Byte ([System.Byte[]] @(1,1,0,0,99)) -StartByte 0 | Should -Be 257
+                    Get-Int32FromByteArray -Byte ([System.Byte[]] @(1, 1, 0, 0, 99)) -StartByte 0 | Should -Be 257
                 }
             }
 
             Context 'When a byte array with a little endian integer more than 256 starting at byte 1' {
                 It 'Should return 256' {
-                    Get-Int32FromByteArray -Byte ([System.Byte[]] @(99,1,1,0,0,99)) -StartByte 1 | Should -Be 257
+                    Get-Int32FromByteArray -Byte ([System.Byte[]] @(99, 1, 1, 0, 0, 99)) -StartByte 1 | Should -Be 257
                 }
             }
         }
@@ -922,11 +930,8 @@ try
             }
         }
     }
-    #endregion
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }

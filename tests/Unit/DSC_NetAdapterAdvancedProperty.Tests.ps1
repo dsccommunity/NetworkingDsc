@@ -1,55 +1,65 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_NetAdapterAdvancedProperty'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_NetAdapterAdvancedProperty'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-#region HEADER
-# Unit Test Template Version: 1.1.0
-[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
-    -TestType Unit
-#endregion HEADER
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
+
+Invoke-TestSetup
+
 # Begin Testing
 try
 {
-    #region Pester Tests
-    InModuleScope $script:DSCResourceName {
-
+    InModuleScope $script:dscResourceName {
         $TestJumboPacket9014 = @{
-            NetworkAdapterName    = 'Ethernet'
-            RegistryKeyword = "*JumboPacket"
-            RegistryValue = 9014
+            NetworkAdapterName = 'Ethernet'
+            RegistryKeyword    = "*JumboPacket"
+            RegistryValue      = 9014
         }
 
         $TestJumboPacket1514 = @{
-            NetworkAdapterName    = 'Ethernet'
-            RegistryKeyword = '*JumboPacket'
-            RegistryValue = 1514
+            NetworkAdapterName = 'Ethernet'
+            RegistryKeyword    = '*JumboPacket'
+            RegistryValue      = 1514
         }
 
         $TestAdapterNotFound = @{
-            NetworkAdapterName    = 'Ethe'
-            RegistryKeyword = "*JumboPacket"
-            RegistryValue = 1514
+            NetworkAdapterName = 'Ethe'
+            RegistryKeyword    = "*JumboPacket"
+            RegistryValue      = 1514
         }
 
-        function Get-NetAdapterAdvancedProperty { }
+        function Get-NetAdapterAdvancedProperty
+        {
+        }
 
         Describe 'DSC_NetAdapterAdvancedProperty\Get-TargetResource' -Tag 'Get' {
 
             Context 'Adapter exist and JumboPacket is enabled 9014' {
                 Mock Get-NetAdapterAdvancedProperty -Verbose -MockWith {
                     @{
-                        RegistryValue = $TestJumboPacket9014.RegistryValue
+                        RegistryValue   = $TestJumboPacket9014.RegistryValue
                         RegistryKeyword = $TestJumboPacket9014.RegistryKeyword
                     }
                 }
@@ -67,7 +77,7 @@ try
             Context 'Adapter exist and JumboPacket is 1514' {
                 Mock Get-NetAdapterAdvancedProperty -Verbose -MockWith {
                     @{
-                        RegistryValue = $TestJumboPacket1514.RegistryValue
+                        RegistryValue   = $TestJumboPacket1514.RegistryValue
                         RegistryKeyword = $TestJumboPacket1514.RegistryKeyword
                     }
                 }
@@ -103,7 +113,7 @@ try
                 Context 'Adapter exist, JumboPacket is 9014, no action required' {
                     Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith {
                         @{
-                            RegistryValue = $TestJumboPacket9014.RegistryValue
+                            RegistryValue   = $TestJumboPacket9014.RegistryValue
                             RegistryKeyword = $TestJumboPacket9014.RegistryKeyword
                         }
                     }
@@ -122,7 +132,7 @@ try
                 Context 'Adapter exist, JumboPacket is 9014, should be 1514' {
                     Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith {
                         @{
-                            RegistryValue = $TestJumboPacket9014.RegistryValue
+                            RegistryValue   = $TestJumboPacket9014.RegistryValue
                             RegistryKeyword = $TestJumboPacket9014.RegistryKeyword
                         }
                     }
@@ -141,7 +151,7 @@ try
                 Context 'Adapter exist, JumboPacket is 1514, should be 9014' {
                     Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith {
                         @{
-                            RegistryValue = $TestJumboPacket1514.RegistryValue
+                            RegistryValue   = $TestJumboPacket1514.RegistryValue
                             RegistryKeyword = $TestJumboPacket1514.RegistryKeyword
                         }
                     }
@@ -181,7 +191,7 @@ try
             Context 'Adapter exist, JumboPacket is 9014, no action required' {
                 Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith {
                     @{
-                        RegistryValue = $TestJumboPacket9014.RegistryValue
+                        RegistryValue   = $TestJumboPacket9014.RegistryValue
                         RegistryKeyword = $TestJumboPacket9014.RegistryKeyword
                     }
                 }
@@ -198,7 +208,7 @@ try
             Context 'Adapter exist, JumboPacket is 9014 should be 1514' {
                 Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith {
                     @{
-                        RegistryValue = $TestJumboPacket9014.RegistryValue
+                        RegistryValue   = $TestJumboPacket9014.RegistryValue
                         RegistryKeyword = $TestJumboPacket9014.RegistryKeyword
                     }
                 }
@@ -227,11 +237,8 @@ try
             }
         }
     }
-    #endregion
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }

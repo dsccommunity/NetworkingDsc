@@ -16,7 +16,4 @@
     Sampler                     = 'latest'
     'DscResource.Test'          = 'latest'
     'DscResource.AnalyzerRules' = 'latest'
-    xDscResourceDesigner        = 'latest'
-    NetworkingDsc               = '7.4.0.0'
-    xWebAdministration          = '3.0.0.0'
 }

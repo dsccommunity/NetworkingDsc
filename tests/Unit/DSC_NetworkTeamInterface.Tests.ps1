@@ -1,28 +1,38 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_NetworkTeamInterface'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_NetworkTeamInterface'
 
-#region HEADER
-# Unit Test Template Version: 1.1.0
-[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
-    -TestType Unit
-#endregion HEADER
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
+
+Invoke-TestSetup
 
 # Begin Testing
 try
 {
-    InModuleScope $script:DSCResourceName {
+    InModuleScope $script:dscResourceName {
         # Create the Mock -CommandName Objects that will be used for running tests
         $script:testNicName = 'HostTeamNic'
         $script:testTeamName = 'HostTeam'
@@ -63,24 +73,24 @@ try
 
         $getNetLbfoTeamNic_ParameterFilter = {
             $Name -eq $script:testNicName `
-            -and $Team -eq $script:testTeamName
+                -and $Team -eq $script:testTeamName
         }
 
         $addNetLbfoTeamNic_ParameterFilter = {
             $Name -eq $script:testNicName `
-            -and $Team -eq $script:testTeamName `
-            -and $VlanId -eq 100
+                -and $Team -eq $script:testTeamName `
+                -and $VlanId -eq 100
         }
 
         $setNetLbfoTeamNic_ParameterFilter = {
             $Name -eq $script:testNicName `
-            -and $Team -eq $script:testTeamName `
-            -and $VlanId -eq 105
+                -and $Team -eq $script:testTeamName `
+                -and $VlanId -eq 105
         }
 
         $removeNetLbfoTeamNic_ParameterFilter = {
             $Team -eq $script:testTeamName `
-            -and $VlanId -eq 100
+                -and $VlanId -eq 100
         }
 
         Describe 'DSC_NetworkTeamInterface\Get-TargetResource' -Tag 'Get' {
@@ -116,10 +126,10 @@ try
                 }
 
                 It 'Should return team properties' {
-                    $script:result.Ensure   | Should -Be 'Present'
-                    $script:result.Name     | Should -Be $testTeamNic.Name
+                    $script:result.Ensure | Should -Be 'Present'
+                    $script:result.Name | Should -Be $testTeamNic.Name
                     $script:result.TeamName | Should -Be $testTeamNic.TeamName
-                    $script:result.VlanId   | Should -Be 100
+                    $script:result.VlanId | Should -Be 100
                 }
 
                 It 'Should call the expected mocks' {
@@ -427,7 +437,5 @@ try
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }

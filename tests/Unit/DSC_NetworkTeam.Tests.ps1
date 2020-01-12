@@ -1,28 +1,38 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_NetworkTeam'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_NetworkTeam'
 
-#region HEADER
-# Unit Test Template Version: 1.1.0
-[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+function Invoke-TestSetup
 {
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    try
+    {
+        Import-Module -Name DscResource.Test -Force
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+    }
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
-    -TestType Unit
-#endregion HEADER
+function Invoke-TestCleanup
+{
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
+
+Invoke-TestSetup
 
 # Begin Testing
 try
 {
-    InModuleScope $script:DSCResourceName {
+    InModuleScope $script:dscResourceName {
         # Create the Mock -CommandName Objects that will be used for running tests
         $mockNetTeam = [PSCustomObject] @{
             Name    = 'HostTeam'
@@ -79,11 +89,11 @@ try
                 }
 
                 It 'Should return team properties' {
-                    $script:result.Ensure                 | Should -Be 'Present'
-                    $script:result.Name                   | Should -Be $testTeam.Name
-                    $script:result.TeamMembers            | Should -Be $testTeam.TeamMembers
+                    $script:result.Ensure | Should -Be 'Present'
+                    $script:result.Name | Should -Be $testTeam.Name
+                    $script:result.TeamMembers | Should -Be $testTeam.TeamMembers
                     $script:result.LoadBalancingAlgorithm | Should -Be 'Dynamic'
-                    $script:result.TeamingMode            | Should -Be 'SwitchIndependent'
+                    $script:result.TeamingMode | Should -Be 'SwitchIndependent'
                 }
 
                 It 'Should call the expected mocks' {
@@ -96,16 +106,16 @@ try
 
                 It 'Should not throw exception' {
                     $getTestTeam = $testTeam.Clone()
-                    $getTestTeam.TeamMembers = @('NIC1','NIC3')
+                    $getTestTeam.TeamMembers = @('NIC1', 'NIC3')
                     $script:result = Get-TargetResource @getTestTeam
                 }
 
                 It 'Should return team properties' {
-                    $result.Ensure                 | Should -Be 'Present'
-                    $result.Name                   | Should -Be $testTeam.Name
-                    $result.TeamMembers            | Should -Be @('NIC1','NIC2')
+                    $result.Ensure | Should -Be 'Present'
+                    $result.Name | Should -Be $testTeam.Name
+                    $result.TeamMembers | Should -Be @('NIC1', 'NIC2')
                     $result.LoadBalancingAlgorithm | Should -Be 'Dynamic'
-                    $result.TeamingMode            | Should -Be 'SwitchIndependent'
+                    $result.TeamingMode | Should -Be 'SwitchIndependent'
                 }
 
                 It 'Should call the expected mocks' {
@@ -418,11 +428,8 @@ try
         }
 
     }
-    #endregion
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Invoke-TestCleanup
 }
