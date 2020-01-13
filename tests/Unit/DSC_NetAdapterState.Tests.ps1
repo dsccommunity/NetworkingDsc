@@ -199,10 +199,11 @@ try
                 }
 
                 Mock -CommandName Enable-NetAdapter -MockWith {
-                    Throw "Throwing from Enable-NetAdapter"
+                    Throw 'Throwing from Enable-NetAdapter'
                 }
 
                 $errorText = "Set-TargetResource: Failed to set network adapter 'Ethernet' to state 'Enabled'. Error: 'Throwing from Enable-NetAdapter'."
+
                 It 'Should raise a non terminating error' {
                     $netAdapterError = Set-TargetResource @setTargetResourceEnabled 2>&1
                     $netAdapterError.Exception.Message | Should -Be $errorText
@@ -211,10 +212,11 @@ try
 
             Context 'When adapter does not exist and desired state is enabled' {
                 Mock -CommandName Get-NetAdapter -MockWith {
-                    throw "Throwing from Get-NetAdapter"
+                    throw 'Throwing from Get-NetAdapter'
                 }
 
                 $errorText = "Set-TargetResource: Network adapter 'Ethernet' not found."
+
                 It 'Should raise a non terminating error' {
                     $netAdapterError = Set-TargetResource @setTargetResourceEnabled 2>&1
                     $netAdapterError.Exception.Message | Should -Be $errorText
