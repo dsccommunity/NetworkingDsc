@@ -56,8 +56,8 @@ Set-NetIPInterface @setNetIPInterfaceParameters
 try
 {
     #region Integration Tests
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+    . $configFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
         Context 'When all settings are enabled' {

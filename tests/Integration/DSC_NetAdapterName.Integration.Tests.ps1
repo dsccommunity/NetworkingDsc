@@ -27,8 +27,8 @@ try
 {
     #region Integration Tests with all parameters
     Describe "$($script:DSCResourceName)_Integration using all parameters" {
-        $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_all.config.ps1"
-        . $ConfigFile -Verbose -ErrorAction Stop
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_all.config.ps1"
+        . $configFile -Verbose -ErrorAction Stop
 
         BeforeAll {
             $adapterName = 'NetworkingDscLBA'
@@ -107,8 +107,8 @@ try
 
     #region Integration Tests with name parameter only
     Describe "$($script:DSCResourceName)_Integration using name parameter only" {
-        $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_nameonly.config.ps1"
-        . $ConfigFile -Verbose -ErrorAction Stop
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_nameonly.config.ps1"
+        . $configFile -Verbose -ErrorAction Stop
 
         BeforeAll {
             $adapterName = 'NetworkingDscLBA'

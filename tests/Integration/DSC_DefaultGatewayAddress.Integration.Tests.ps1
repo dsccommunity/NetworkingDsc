@@ -23,11 +23,10 @@ try
 {
     Describe 'DefaultGatewayAddress Integration Tests' {
         # Configure Loopback Adapter
-        . (Join-Path -Path (Split-Path -Parent $Script:MyInvocation.MyCommand.Path) -ChildPath 'IntegrationHelper.ps1')
         New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
 
-        $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
-        . $ConfigFile -Verbose -ErrorAction Stop
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+        . $configFile -Verbose -ErrorAction Stop
 
         Describe "$($script:DSCResourceName)_Integration" {
             It 'Should compile and apply the MOF without throwing' {
@@ -47,7 +46,7 @@ try
             }
 
             It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration   | Where-Object {
+                $current = Get-DscConfiguration   | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
                 $current.InterfaceAlias           | Should -Be $TestDefaultGatewayAddress.InterfaceAlias

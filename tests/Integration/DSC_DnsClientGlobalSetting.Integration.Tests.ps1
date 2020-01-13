@@ -49,26 +49,27 @@ try
             )
         }
 
-        #region Integration Tests
-        $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
-        . $ConfigFile
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+        . $configFile
 
         Describe "$($script:DSCResourceName)_Integration" {
-            #region DEFAULT TESTS
             It 'Should compile and apply the MOF without throwing' {
                 {
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration `
-                        -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force
                 } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
             }
-            #endregion
 
             # Get the DNS Client Global Settings details
             $dnsClientGlobalSettingNew = Get-DnsClientGlobalSetting

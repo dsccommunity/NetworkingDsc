@@ -133,7 +133,78 @@ function Test-NetworkTeamIntegrationEnvironment
     return $executeTests
 }
 
+<#
+    .SYNOPSIS
+        Create a loopback adapter for use in integration testing.
+
+    .PARAMETER AdapterName
+        The name of the loopback adapter to create.
+#>
+function New-IntegrationLoopbackAdapter
+{
+    [cmdletbinding()]
+    param
+    (
+        [Parameter()]
+        [System.String]
+        $AdapterName
+    )
+
+    try
+    {
+        # Does the loopback adapter already exist?
+        $null = Get-LoopbackAdapter `
+            -Name $AdapterName
+    }
+    catch
+    {
+        # The loopback Adapter does not exist so create it
+        $null = New-LoopbackAdapter `
+            -Name $AdapterName `
+            -Force `
+            -ErrorAction Stop
+    } # try
+} # function New-IntegrationLoopbackAdapter
+
+<#
+    .SYNOPSIS
+        Remove a loopback adapter that was created for use in integration testing.
+
+    .PARAMETER AdapterName
+        The name of the loopback adapter to remove.
+#>
+function Remove-IntegrationLoopbackAdapter
+{
+    [cmdletbinding()]
+    param
+    (
+        [Parameter()]
+        [System.String]
+        $AdapterName
+    )
+
+    try
+    {
+        # Does the loopback adapter exist?
+        $null = Get-LoopbackAdapter `
+            -Name $AdapterName
+    }
+    catch
+    {
+        # Loopback Adapter does not exist - do nothing
+        return
+    }
+
+    # Remove Loopback Adapter
+    Remove-LoopbackAdapter `
+        -Name $AdapterName `
+        -Force
+
+} # function Remove-IntegrationLoopbackAdapter
+
 Export-ModuleMember -Function `
     Get-InvalidArgumentRecord, `
     Get-InvalidOperationRecord, `
-    Test-NetworkTeamIntegrationEnvironment
+    Test-NetworkTeamIntegrationEnvironment, `
+    New-IntegrationLoopbackAdapter, `
+    Remove-IntegrationLoopbackAdapter

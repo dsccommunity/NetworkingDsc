@@ -95,8 +95,8 @@ try
     }
 
     #region Integration Tests
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
-    . $ConfigFile
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+    . $configFile
 
     Describe "$($script:DSCResourceName)_Integration" {
         #region DEFAULT TESTS

@@ -45,8 +45,8 @@ try
     }
 
     Describe "$($script:DSCResourceName)_Present_Integration" {
-        $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Present.config.ps1"
-        . $ConfigFile -Verbose -ErrorAction Stop
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Present.config.ps1"
+        . $configFile -Verbose -ErrorAction Stop
 
         It 'Should compile without throwing' {
             {
@@ -90,8 +90,8 @@ try
     }
 
     Describe "$($script:DSCResourceName)_Absent_Integration" {
-        $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Absent.config.ps1"
-        . $ConfigFile -Verbose -ErrorAction Stop
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Absent.config.ps1"
+        . $configFile -Verbose -ErrorAction Stop
 
         It 'Should compile without throwing' {
             {
