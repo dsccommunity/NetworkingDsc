@@ -6,7 +6,6 @@ CopyDirectories:
   - en-US
   - DSCResources
   - Modules
-  - ResourceDesignerScripts
 Encoding: UTF8
 VersionedOutputDirectory: true
 
