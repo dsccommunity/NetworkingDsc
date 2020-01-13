@@ -209,9 +209,11 @@ function Test-TargetResource
     {
         if ($defaultRoutes)
         {
-            if ($defaultRoutes.Where( {
+            $nextHopRoute = $defaultRoutes.Where( {
                 $_.NextHop -eq $Address
-            } ))
+            } )
+
+            if ($nextHopRoute)
             {
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                         $($script:localizedData.DefaultGatewayCorrectMessage)
