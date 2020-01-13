@@ -241,14 +241,14 @@ stages:
 
   - stage: Deploy
     dependsOn: Test
-    # Only execute deploy stage if we're on master and previous stage succeeded
     condition: |
       and(
         succeeded(),
         or(
           eq(variables['Build.SourceBranch'], 'refs/heads/master'),
           startsWith(variables['Build.SourceBranch'], 'refs/tags/')
-        )
+        ),
+        startsWith(variables['Build.Repository.Name'], 'dsccommunity')
       )
     jobs:
       - job: Deploy_Module

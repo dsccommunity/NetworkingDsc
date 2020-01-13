@@ -1,5 +1,5 @@
 TOPIC
-    about_xPSDesiredStateConfiguration
+    about_NetworkingDsc
 
 SHORT DESCRIPTION
     DSC resources for configuring common operating systems features, files and
@@ -10,7 +10,7 @@ LONG DESCRIPTION
     features, files and settings.
 
 EXAMPLES
-    PS C:\> Get-DscResource -Module xPSDesiredStateConfiguration
+    PS C:\> Get-DscResource -Module NetworkingDsc
 
 NOTE:
     Thank you to the DSC Community contributors who contributed to this module by
@@ -18,10 +18,10 @@ NOTE:
 
 TROUBLESHOOTING NOTE:
     Go to the Github repository for read about issues, submit a new issue, and read
-    about new releases. https://github.com/dsccommunity/xPSDesiredStateConfiguration
+    about new releases. https://github.com/dsccommunity/NetworkingDsc
 
 SEE ALSO
-  - https://github.com/dsccommunity/xPSDesiredStateConfiguration
+  - https://github.com/dsccommunity/NetworkingDsc
 
 KEYWORDS
       DSC, DscResource, Archive, Environment, Group, MSI, Package, File,
