@@ -29,8 +29,9 @@ function Invoke-TestCleanup
 Invoke-TestSetup
 
 # Load the parameter List from the data file
+$moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $resourceData = Import-LocalizedData `
-    -BaseDirectory (Join-Path -Path $script:moduleRoot -ChildPath 'Source\DscResources\DSC_FirewallProfile') `
+    -BaseDirectory (Join-Path -Path $moduleRoot -ChildPath 'source\DscResources\DSC_FirewallProfile') `
     -FileName 'DSC_FirewallProfile.data.psd1'
 
 $script:parameterList = $resourceData.ParameterList

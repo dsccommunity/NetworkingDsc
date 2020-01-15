@@ -23,7 +23,8 @@ try
 {
     Describe 'DnsServerAddress Integration Tests' {
         # Configure Loopback Adapter
-        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
+        $adapterName = 'NetworkingDscLBA'
+        New-IntegrationLoopbackAdapter -AdapterName $adapterName
 
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Static.config.ps1"
         . $configFile -Verbose -ErrorAction Stop

@@ -19,8 +19,9 @@ $script:testEnvironment = Initialize-TestEnvironment `
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
 # Load the parameter List from the data file
+$moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $resourceData = Import-LocalizedData `
-    -BaseDirectory (Join-Path -Path $script:moduleRoot -ChildPath 'Source\DscResources\DSC_DnsClientGlobalSetting') `
+    -BaseDirectory (Join-Path -Path $moduleRoot -ChildPath 'Source\DscResources\DSC_DnsClientGlobalSetting') `
     -FileName 'DSC_DnsClientGlobalSetting.data.psd1'
 
 $parameterList = $resourceData.ParameterList | Where-Object -Property IntTest -eq $True
