@@ -23,8 +23,7 @@ try
 {
     Describe 'DnsServerAddress Integration Tests' {
         # Configure Loopback Adapter
-        $adapterName = 'NetworkingDscLBA'
-        New-IntegrationLoopbackAdapter -AdapterName $adapterName
+        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
 
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Static.config.ps1"
         . $configFile -Verbose -ErrorAction Stop
@@ -37,7 +36,7 @@ try
                         AllNodes = @(
                             @{
                                 NodeName             = 'localhost'
-                                InterfaceAlias       = $adapterName
+                                InterfaceAlias       = 'NetworkingDscLBA'
                                 AddressFamily        = 'IPv4'
                                 Address              = '10.139.17.99'
                                 Validate             = $False
@@ -61,7 +60,7 @@ try
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_Static"
                 }
-                $current.InterfaceAlias             | Should -Be $adapterName
+                $current.InterfaceAlias             | Should -Be 'NetworkingDscLBA'
                 $current.AddressFamily              | Should -Be 'IPv4'
                 $current.Address.Count              | Should -Be 1
                 $current.Address                    | Should -Be '10.139.17.99'
@@ -76,7 +75,7 @@ try
                         AllNodes = @(
                             @{
                                 NodeName             = 'localhost'
-                                InterfaceAlias       = $adapterName
+                                InterfaceAlias       = 'NetworkingDscLBA'
                                 AddressFamily        = 'IPv4'
                                 Address              = @('10.139.17.99','10.139.17.100')
                                 Validate             = $False
@@ -104,7 +103,7 @@ try
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_Static"
                 }
-                $current.InterfaceAlias             | Should -Be $adapterName
+                $current.InterfaceAlias             | Should -Be 'NetworkingDscLBA'
                 $current.AddressFamily              | Should -Be 'IPv4'
                 $current.Address.Count              | Should -Be 2
                 $current.Address[0]                 | Should -Be '10.139.17.99'
@@ -123,7 +122,7 @@ try
                         AllNodes = @(
                             @{
                                 NodeName             = 'localhost'
-                                InterfaceAlias       = $adapterName
+                                InterfaceAlias       = 'NetworkingDscLBA'
                                 AddressFamily        = 'IPv4'
                             }
                         )
@@ -149,7 +148,7 @@ try
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_DHCP"
                 }
-                $current.InterfaceAlias             | Should -Be $adapterName
+                $current.InterfaceAlias             | Should -Be 'NetworkingDscLBA'
                 $current.AddressFamily              | Should -Be 'IPv4'
                 $current.Address.Count              | Should -Be 0
                 $current.Address                    | Should -BeNullOrEmpty
@@ -160,7 +159,7 @@ try
 finally
 {
     # Remove Loopback Adapter
-    Remove-IntegrationLoopbackAdapter -AdapterName $adapterName
+    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

@@ -31,14 +31,14 @@ try
 {
     Describe 'DnsServerAddress Integration Tests' {
         # Create a config data object to pass to the Add Rule Config
-        $ruleNameGuid = [Guid]::NewGuid().ToString()
-        $ruleName = $ruleNameGuid + '[]*'
-        $ruleNameEscaped = $ruleNameGuid + '`[`]`*'
+        $script:ruleNameGuid = [Guid]::NewGuid().ToString()
+        $script:ruleName = $script:ruleNameGuid + '[]*'
+        $script:ruleNameEscaped = $script:ruleNameGuid + '`[`]`*'
         $configData = @{
             AllNodes = @(
                 @{
                     NodeName            = 'localhost'
-                    RuleName            = $ruleName
+                    RuleName            = $script:ruleName
                     Ensure              = 'Present'
                     DisplayName         = 'Test Rule'
                     Group               = 'Test Group'
@@ -137,7 +137,7 @@ try
 
             Context 'The current firewall rule state' {
                 # Get the Rule details
-                $firewallRule = Get-NetFireWallRule -Name $ruleNameEscaped
+                $firewallRule = Get-NetFireWallRule -Name $script:ruleNameEscaped
 
                 $properties = @{
                     AddressFilters       = @(Get-NetFirewallAddressFilter -AssociatedNetFirewallRule $FirewallRule)
@@ -231,7 +231,7 @@ try
             Context 'The current firewall rule state' {
                 It 'Should have deleted the rule' {
                     # Get the Rule details
-                    $firewallRule = Get-NetFireWallRule -Name $ruleNameEscaped -ErrorAction SilentlyContinue
+                    $firewallRule = Get-NetFireWallRule -Name $script:ruleNameEscaped -ErrorAction SilentlyContinue
                     $firewallRule | Should -BeNullOrEmpty
                 }
             }
@@ -240,9 +240,9 @@ try
 }
 finally
 {
-    if (Get-NetFirewallRule -Name $ruleNameEscaped -ErrorAction SilentlyContinue)
-    {
-        Remove-NetFirewallRule -Name $ruleNameEscaped
+    if (Get-NetFirewallRule -Name $script:ruleNameEscaped -ErrorAction SilentlyContinue)
+        {
+        Remove-NetFirewallRule -Name $script:ruleNameEscaped
     }
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
