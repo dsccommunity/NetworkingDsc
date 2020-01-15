@@ -29,7 +29,7 @@ $parameterList = $resourceData.ParameterList | Where-Object -Property IntTest -e
 # Begin Testing
 try
 {
-    Describe 'DnsServerAddress Integration Tests' {
+    Describe 'Firewall Integration Tests' {
         # Create a config data object to pass to the Add Rule Config
         $script:ruleNameGuid = [Guid]::NewGuid().ToString()
         $script:ruleName = $script:ruleNameGuid + '[]*'

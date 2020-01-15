@@ -22,12 +22,10 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    #region Integration Tests
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $configFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        #region DEFAULT TESTS
         It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
@@ -38,7 +36,6 @@ try
         It 'Should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
-        #endregion
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object {$_.ConfigurationName -eq "$($script:DSCResourceName)_Config"}
@@ -50,11 +47,8 @@ try
             $rule.AddressFamily    | Should -Be $current.AddressFamily
         }
     }
-    #endregion
 }
 finally
 {
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

@@ -29,12 +29,10 @@ New-IntegrationLoopbackAdapter -AdapterName $adapterName
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    #region Integration Tests
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Configured.config.ps1"
     . $configFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration using single address" {
-        #region DEFAULT TESTS
         It 'Should compile and apply the MOF without throwing' {
             {
                 # This is to pass to the Config
@@ -66,11 +64,9 @@ try
             $current.Address.Count | Should -Be 1
             $current.Address | Should -Be '10.139.17.99'
         }
-        #endregion
     }
 
     Describe "$($script:DSCResourceName)_Integration using two addresses" {
-        #region DEFAULT TESTS
         It 'Should compile and apply the MOF without throwing' {
             {
                 # This is to pass to the Config
@@ -103,11 +99,9 @@ try
             $current.Address[0] | Should -Be '10.139.17.99'
             $current.Address[1] | Should -Be '10.139.17.100'
         }
-        #endregion
     }
 
     Describe "$($script:DSCResourceName)_Integration using no addresses" {
-        #region DEFAULT TESTS
         It 'Should compile and apply the MOF without throwing' {
             {
                 # This is to pass to the Config
@@ -138,16 +132,12 @@ try
             $current.InterfaceAlias | Should -Be $adapterName
             $current.Address | Should -BeNullOrEmpty
         }
-        #endregion
     }
-    #endregion
 }
 finally
 {
     # Remove Loopback Adapter
     Remove-IntegrationLoopbackAdapter -AdapterName $adapterName
 
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

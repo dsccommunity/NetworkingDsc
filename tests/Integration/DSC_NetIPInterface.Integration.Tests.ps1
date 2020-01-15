@@ -55,7 +55,6 @@ Set-NetIPInterface @setNetIPInterfaceParameters
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    #region Integration Tests
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $configFile -Verbose -ErrorAction Stop
 
@@ -200,7 +199,5 @@ finally
     # Remove Loopback Adapter
     Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
 
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

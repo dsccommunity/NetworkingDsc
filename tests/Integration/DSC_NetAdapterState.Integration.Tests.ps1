@@ -29,7 +29,6 @@ try
     $adapterName = 'NetworkingDscLBA'
     New-IntegrationLoopbackAdapter -AdapterName $adapterName
 
-    #region Integration Tests
     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $configFile -Verbose -ErrorAction Stop
 
@@ -60,13 +59,10 @@ try
             $current.State    | Should -Be $TestNetAdapterState.State
         }
     }
-    #endregion
 }
 finally
 {
-    #region FOOTER
     Remove-IntegrationLoopbackAdapter -AdapterName $adapterName
 
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

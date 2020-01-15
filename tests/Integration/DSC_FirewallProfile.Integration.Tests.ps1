@@ -29,7 +29,7 @@ $parameterList = $resourceData.ParameterList | Where-Object -Property IntTest -e
 # Begin Testing
 try
 {
-    Describe 'DnsServerAddress Integration Tests' {
+    Describe 'FirewallProfile Integration Tests' {
         # Backup the existing settings
         $script:firewallProfileName = 'Public'
         $script:currentFirewallProfile = Get-NetFirewallProfile -Name $script:firewallProfileName
@@ -86,12 +86,10 @@ try
             )
         }
 
-        #region Integration Tests
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
         . $configFile
 
         Describe "$($script:DSCResourceName)_Integration" {
-            #region DEFAULT TESTS
             It 'Should compile and apply the MOF without throwing' {
                 {
                     & "$($script:DSCResourceName)_Config" `
@@ -105,7 +103,6 @@ try
             It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
             }
-            #endregion
 
             # Get the DNS Client Global Settings details
             $firewallProfileNew = Get-NetFirewallProfile -Name $script:firewallProfileName

@@ -128,8 +128,6 @@ try
 }
 finally
 {
-    #region FOOTER
-
     # Clean up any proxy settings in case the tests fail
     $connectionsRegistryKeyPath = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections'
 
@@ -143,6 +141,5 @@ finally
         -Name 'SavedLegacySettings' `
         -ErrorAction SilentlyContinue
 
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

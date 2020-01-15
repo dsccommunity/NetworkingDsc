@@ -193,7 +193,6 @@ try
 }
 finally
 {
-    #region FOOTER
     # Restore the Net Bios setting
     $null = $netAdapterConfig | Invoke-CimMethod `
         -MethodName SetTcpipNetbios `
@@ -202,6 +201,5 @@ finally
             TcpipNetbiosOptions = $currentNetBiosSetting
         }
 
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

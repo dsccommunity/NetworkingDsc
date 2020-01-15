@@ -22,7 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    #region Integration Tests
     $interfaceAlias = (Get-NetAdapter -Physical | Select-Object -First 1).Name
 
     $dummyRoute = [PSObject] @{
@@ -52,7 +51,6 @@ try
             )
         }
 
-        #region DEFAULT TESTS
         It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:DSCResourceName)_Config" `
@@ -72,7 +70,6 @@ try
         It 'Should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
-        #endregion
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
@@ -109,7 +106,6 @@ try
             )
         }
 
-        #region DEFAULT TESTS
         It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:DSCResourceName)_Config" `
@@ -129,7 +125,6 @@ try
         It 'Should be able to call Get-DscConfiguration without throwing' {
             { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
-        #endregion
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
@@ -147,7 +142,6 @@ try
             Get-NetRoute @dummyRoute -ErrorAction SilentlyContinue | Should -BeNullOrEmpty
         }
     }
-    #endregion
 }
 finally
 {
@@ -156,7 +150,5 @@ finally
         -Confirm:$false `
         -ErrorAction SilentlyContinue
 
-    #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
-    #endregion
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
