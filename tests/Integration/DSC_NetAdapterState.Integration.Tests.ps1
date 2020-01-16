@@ -58,7 +58,7 @@ try
 }
 finally
 {
-    Remove-IntegrationLoopbackAdapter -AdapterName $adapterName
+    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

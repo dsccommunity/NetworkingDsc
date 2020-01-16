@@ -21,7 +21,7 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 # Begin Testing
 try
 {
-    Describe 'NetAdapterState Integration Tests' {
+    Describe 'NetIPInterface Integration Tests' {
         New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
 
         <#

@@ -35,7 +35,7 @@ try
                         AllNodes = @(
                             @{
                                 NodeName       = 'localhost'
-                                InterfaceAlias = $adapterName
+                                InterfaceAlias = 'NetworkingDscLBA'
                                 Address        = '10.139.17.99'
                             }
                         )
@@ -55,7 +55,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured" }
-                $current.InterfaceAlias | Should -Be $adapterName
+                $current.InterfaceAlias | Should -Be 'NetworkingDscLBA'
                 $current.Address.Count | Should -Be 1
                 $current.Address | Should -Be '10.139.17.99'
             }
@@ -69,7 +69,7 @@ try
                         AllNodes = @(
                             @{
                                 NodeName       = 'localhost'
-                                InterfaceAlias = $adapterName
+                                InterfaceAlias = 'NetworkingDscLBA'
                                 Address        = '10.139.17.99', '10.139.17.100'
                             }
                         )
@@ -89,7 +89,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured" }
-                $current.InterfaceAlias | Should -Be $adapterName
+                $current.InterfaceAlias | Should -Be 'NetworkingDscLBA'
                 $current.Address.Count | Should -Be 2
                 $current.Address[0] | Should -Be '10.139.17.99'
                 $current.Address[1] | Should -Be '10.139.17.100'
@@ -104,7 +104,7 @@ try
                         AllNodes = @(
                             @{
                                 NodeName       = 'localhost'
-                                InterfaceAlias = $adapterName
+                                InterfaceAlias = 'NetworkingDscLBA'
                                 Address        = @()
                             }
                         )
@@ -124,7 +124,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured" }
-                $current.InterfaceAlias | Should -Be $adapterName
+                $current.InterfaceAlias | Should -Be 'NetworkingDscLBA'
                 $current.Address | Should -BeNullOrEmpty
             }
         }
@@ -133,7 +133,7 @@ try
 finally
 {
     # Remove Loopback Adapter
-    Remove-IntegrationLoopbackAdapter -AdapterName $adapterName
+    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
