@@ -54,6 +54,23 @@ try
 
         $tcpipNetbiosOptions = $netAdapterConfig.TcpipNetbiosOptions
 
+        # Check NetBiosSetting enum loaded, if not load
+        try
+        {
+            [void][System.Reflection.Assembly]::GetAssembly([NetBiosSetting])
+        }
+        catch
+        {
+            Add-Type -TypeDefinition @'
+public enum NetBiosSetting
+{
+    Default,
+    Enable,
+    Disable
+}
+'@
+        }
+
         # Store the current Net Bios setting
         if ($null -eq $tcpipNetbiosOptions)
         {

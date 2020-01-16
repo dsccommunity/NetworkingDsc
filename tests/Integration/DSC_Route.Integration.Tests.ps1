@@ -22,10 +22,10 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 try
 {
     Describe 'Route Integration Tests' {
-        $interfaceAlias = (Get-NetAdapter -Physical | Select-Object -First 1).Name
+        $script:interfaceAlias = (Get-NetAdapter -Physical | Select-Object -First 1).Name
 
         $dummyRoute = [PSObject] @{
-            InterfaceAlias    = $interfaceAlias
+            InterfaceAlias    = $script:interfaceAlias
             AddressFamily     = 'IPv4'
             DestinationPrefix = '11.0.0.0/8'
             NextHop           = '11.0.1.0'
@@ -40,7 +40,7 @@ try
                 AllNodes = @(
                     @{
                         NodeName          = 'localhost'
-                        InterfaceAlias    = $interfaceAlias
+                        InterfaceAlias    = $script:interfaceAlias
                         AddressFamily     = $dummyRoute.AddressFamily
                         DestinationPrefix = $dummyRoute.DestinationPrefix
                         NextHop           = $dummyRoute.NextHop
@@ -95,7 +95,7 @@ try
                 AllNodes = @(
                     @{
                         NodeName          = 'localhost'
-                        InterfaceAlias    = $interfaceAlias
+                        InterfaceAlias    = $script:interfaceAlias
                         AddressFamily     = $dummyRoute.AddressFamily
                         DestinationPrefix = $dummyRoute.DestinationPrefix
                         NextHop           = $dummyRoute.NextHop
