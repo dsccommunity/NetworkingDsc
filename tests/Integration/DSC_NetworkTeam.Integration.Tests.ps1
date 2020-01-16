@@ -14,8 +14,8 @@
     $script:NetworkTeamMembers = @('Ethernet','Ethernet 2')
 #>
 $script:NetworkTeamMembers = @()
-$script:DSCModuleName      = 'NetworkingDsc'
-$script:DSCResourceName    = 'DSC_NetworkTeam'
+$script:dscModuleName      = 'NetworkingDsc'
+$script:dscResourceName    = 'DSC_NetworkTeam'
 
 # Load the common test helper
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
@@ -38,18 +38,18 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
     -TestType Integration
 #endregion
 
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
     . $configFile -Verbose -ErrorAction Stop
 
-    Describe "$($script:DSCResourceName)_Integration" {
+    Describe "$($script:dscResourceName)_Integration" {
         $configurationData = @{
             AllNodes = @(
                 @{
@@ -66,7 +66,7 @@ try
         Context 'When the network team is created' {
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config" `
+                    & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configurationData
 
@@ -100,7 +100,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
                 $result.Ensure                 | Should -Be $configurationData.AllNodes[0].Ensure
                 $result.Name                   | Should -Be $configurationData.AllNodes[0].Name
@@ -115,7 +115,7 @@ try
         Context 'When the network team is deleted' {
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config" `
+                    & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configurationData
 
@@ -149,7 +149,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
                 $result.Ensure                 | Should -Be $configurationData.AllNodes[0].Ensure
                 $result.Name                   | Should -Be $configurationData.AllNodes[0].Name

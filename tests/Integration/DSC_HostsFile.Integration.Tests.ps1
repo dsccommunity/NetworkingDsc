@@ -24,7 +24,7 @@ try
     Describe 'HostsFile Integration Tests' {
         Copy-Item -Path "${env:SystemRoot}\System32\Drivers\Etc\Hosts" -Destination "${env:Temp}\Hosts" -Force
 
-        Describe "$($script:DSCResourceName)_Integration - Add Single Line" {
+        Describe "$($script:dscResourceName)_Integration - Add Single Line" {
             $configData = @{
                 AllNodes = @(
                     @{
@@ -36,12 +36,12 @@ try
                 )
             }
 
-            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
             . $configFile -Verbose -ErrorAction Stop
 
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config" `
+                    & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration `
@@ -55,7 +55,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
                 $result.Ensure                 | Should -Be $configData.AllNodes[0].Ensure
                 $result.HostName               | Should -Be $configData.AllNodes[0].HostName
@@ -63,7 +63,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)_Integration - Add Multiple Line" {
+        Describe "$($script:dscResourceName)_Integration - Add Multiple Line" {
             $configData = @{
                 AllNodes = @(
                     @{
@@ -75,12 +75,12 @@ try
                 )
             }
 
-            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
             . $configFile -Verbose -ErrorAction Stop
 
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config" `
+                    & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration `
@@ -94,7 +94,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
                 $result.Ensure                 | Should -Be $configData.AllNodes[0].Ensure
                 $result.HostName               | Should -Be $configData.AllNodes[0].HostName
@@ -102,7 +102,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)_Integration - Remove Single Line" {
+        Describe "$($script:dscResourceName)_Integration - Remove Single Line" {
             $configData = @{
                 AllNodes = @(
                     @{
@@ -114,12 +114,12 @@ try
                 )
             }
 
-            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
             . $configFile -Verbose -ErrorAction Stop
 
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config" `
+                    & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration `
@@ -133,7 +133,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
                 $result.Ensure                 | Should -Be $configData.AllNodes[0].Ensure
                 $result.HostName               | Should -Be $configData.AllNodes[0].HostName

@@ -26,13 +26,13 @@ try
         New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
         New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
 
-        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile -Verbose -ErrorAction Stop
 
-        Describe "$($script:DSCResourceName)_Integration" {
+        Describe "$($script:dscResourceName)_Integration" {
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
+                    & "$($script:dscResourceName)_Config" -OutputPath $TestDrive
 
                     Start-DscConfiguration `
                         -Path $TestDrive `
@@ -50,7 +50,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
                 $current[0].InterfaceAlias | Should -Be $TestIPAddress.InterfaceAlias
                 $current[0].AddressFamily  | Should -Be $TestIPAddress.AddressFamily

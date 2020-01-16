@@ -39,7 +39,8 @@ $script:parameterList = $resourceData.ParameterList
 # Begin Testing
 try
 {
-    InModuleScope $script:DSCResourceName {
+    InModuleScope $script:dscResourceName
+ {
         # Create the Mock Objects that will be used for running tests
         $firewallProfile = [PSObject] @{
             Name                            = 'Private'

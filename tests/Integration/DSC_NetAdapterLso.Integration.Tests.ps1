@@ -22,13 +22,13 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 try
 {
     Describe 'NetAdapterLso Integration Tests' {
-        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile -Verbose -ErrorAction Stop
 
-        Describe "$($script:DSCResourceName)_Integration" {
+        Describe "$($script:dscResourceName)_Integration" {
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
+                    & "$($script:dscResourceName)_Config" -OutputPath $TestDrive
 
                     Start-DscConfiguration `
                         -Path $TestDrive `
@@ -46,7 +46,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
                 $current.Name | Should -Be $TestEnableLsoIPv6.Name
                 $current.Protocol | Should -Be $TestEnableLsoIPv6.Protocol

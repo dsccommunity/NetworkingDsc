@@ -1,5 +1,5 @@
-$script:DSCModuleName      = 'NetworkingDsc'
-$script:DSCResourceName    = 'DSC_ProxySettings'
+$script:dscModuleName      = 'NetworkingDsc'
+$script:dscResourceName    = 'DSC_ProxySettings'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -14,8 +14,8 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
     -TestType Integration
 #endregion
 
@@ -44,13 +44,13 @@ try
         )
     }
 
-    Describe "$($script:DSCResourceName)_Present_Integration" {
-        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Present.config.ps1"
+    Describe "$($script:dscResourceName)_Present_Integration" {
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_Present.config.ps1"
         . $configFile -Verbose -ErrorAction Stop
 
         It 'Should compile without throwing' {
             {
-                & "$($script:DSCResourceName)_Present_Config" `
+                & "$($script:dscResourceName)_Present_Config" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
 
@@ -77,7 +77,7 @@ try
         }
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:DSCResourceName)_Present_Config" }
+            $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Present_Config" }
             $current.Ensure                  | Should -Be 'Present'
             $current.EnableAutoDetection     | Should -Be $True
             $current.EnableAutoConfiguration | Should -Be $True
@@ -89,13 +89,13 @@ try
         }
     }
 
-    Describe "$($script:DSCResourceName)_Absent_Integration" {
-        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Absent.config.ps1"
+    Describe "$($script:dscResourceName)_Absent_Integration" {
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_Absent.config.ps1"
         . $configFile -Verbose -ErrorAction Stop
 
         It 'Should compile without throwing' {
             {
-                & "$($script:DSCResourceName)_Absent_Config" `
+                & "$($script:dscResourceName)_Absent_Config" `
                     -OutputPath $TestDrive
 
                 Start-DscConfiguration `
@@ -121,7 +121,7 @@ try
         }
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:DSCResourceName)_Absent_Config" }
+            $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Absent_Config" }
             $current.Ensure            | Should -Be 'Absent'
         }
     }

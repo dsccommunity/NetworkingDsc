@@ -22,8 +22,8 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 try
 {
     Describe 'NetAdapterName Integration Tests' {
-        Describe "$($script:DSCResourceName)_Integration using all parameters" {
-            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_all.config.ps1"
+        Describe "$($script:dscResourceName)_Integration using all parameters" {
+            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_all.config.ps1"
             . $configFile -Verbose -ErrorAction Stop
 
             BeforeAll {
@@ -56,7 +56,7 @@ try
                         )
                     }
 
-                    & "$($script:DSCResourceName)_Config_All" `
+                    & "$($script:dscResourceName)_Config_All" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
 
@@ -90,14 +90,14 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_All"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config_All"
                 }
                 $current.Name | Should -Be 'NetworkingDscLBANew'
             }
         }
 
-        Describe "$($script:DSCResourceName)_Integration using name parameter only" {
-            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_nameonly.config.ps1"
+        Describe "$($script:dscResourceName)_Integration using name parameter only" {
+            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_nameonly.config.ps1"
             . $configFile -Verbose -ErrorAction Stop
 
             BeforeAll {
@@ -124,7 +124,7 @@ try
                         )
                     }
 
-                    & "$($script:DSCResourceName)_Config_NameOnly" `
+                    & "$($script:dscResourceName)_Config_NameOnly" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
 
@@ -158,7 +158,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_NameOnly"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config_NameOnly"
                 }
                 $current.Name | Should -Be 'NetworkingDscLBANew'
             }

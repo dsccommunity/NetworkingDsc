@@ -1,5 +1,5 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_WinsSetting'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_WinsSetting'
 
 # Find an adapter we can test with. It needs to be enabled and have IP enabled.
 $netAdapter = $null
@@ -41,15 +41,15 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
     -TestType Integration
 #endregion
 
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
     . $configFile
 
     # Store the current WINS settings
@@ -84,7 +84,7 @@ try
             WINSEnableLMHostsLookup     = $true
         }
 
-    Describe "$($script:DSCResourceName)_Integration" {
+    Describe "$($script:dscResourceName)_Integration" {
         Context 'Disable all settings' {
             $configurationData = @{
                 AllNodes = @(
@@ -98,7 +98,7 @@ try
 
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config" `
+                    & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configurationData
 
@@ -118,7 +118,7 @@ try
 
             It 'Should have set the resource and all setting should match current state' {
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
                 $result.EnableLmHosts | Should -Be $false
                 $result.EnableDns | Should -Be $false
@@ -138,7 +138,7 @@ try
 
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config" `
+                    & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configurationData
 
@@ -158,7 +158,7 @@ try
 
             It 'Should have set the resource and all setting should match current state' {
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
                 $result.EnableLmHosts | Should -Be $true
                 $result.EnableDns | Should -Be $true

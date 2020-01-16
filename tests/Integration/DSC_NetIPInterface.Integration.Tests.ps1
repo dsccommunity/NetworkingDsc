@@ -1,5 +1,5 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_NetIPInterface'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_NetIPInterface'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -14,8 +14,8 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
     -TestType Integration
 #endregion
 
@@ -55,10 +55,10 @@ Set-NetIPInterface @setNetIPInterfaceParameters
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
     . $configFile -Verbose -ErrorAction Stop
 
-    Describe "$($script:DSCResourceName)_Integration" {
+    Describe "$($script:dscResourceName)_Integration" {
         Context 'When all settings are enabled' {
             # This is to pass to the Config
             $script:configData = @{
@@ -87,7 +87,7 @@ try
 
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config_Enabled" `
+                    & "$($script:dscResourceName)_Config_Enabled" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $script:configData
 
@@ -107,7 +107,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_Enabled"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Enabled"
                 }
                 $current.InterfaceAlias                  | Should -Be $script:configData.AllNodes[0].InterfaceAlias
                 $current.AddressFamily                   | Should -Be $script:configData.AllNodes[0].AddressFamily
@@ -154,7 +154,7 @@ try
 
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config_Disabled" `
+                    & "$($script:dscResourceName)_Config_Disabled" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $script:configData
 
@@ -174,7 +174,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_Disabled"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Disabled"
                 }
                 $current.InterfaceAlias                  | Should -Be $script:configData.AllNodes[0].InterfaceAlias
                 $current.AddressFamily                   | Should -Be $script:configData.AllNodes[0].AddressFamily

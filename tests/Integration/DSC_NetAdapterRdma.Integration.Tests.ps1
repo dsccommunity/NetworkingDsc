@@ -11,8 +11,8 @@
     testing, so do not specify an adapter used for connectivity to the test client. This
     is why these tests can not be executed in AppVeyor.
 #>
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_NetAdapterRdma'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_NetAdapterRdma'
 $script:AdapterName = 'vEthernet (Default Switch)'
 
 # Check the adapter selected for use in testing is RDMA compatible and preserve state
@@ -48,7 +48,7 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 try
 {
     Describe 'NetAdapterName Integration Tests' {
-        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile -Verbose -ErrorAction Stop
 
         # This is to pass to the Config
@@ -62,7 +62,7 @@ try
             )
         }
 
-        Describe "$($script:DSCResourceName)_Integration" {
+        Describe "$($script:dscResourceName)_Integration" {
             AfterAll {
                 Set-NetAdapterRdma `
                     -Name $configData.AllNodes[0].Name `
@@ -71,7 +71,7 @@ try
 
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config" `
+                    & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
 
@@ -91,7 +91,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
                 $result.Name                   | Should -Be $configData.AllNodes[0].Name
                 $result.Enabled                | Should -Be $configData.AllNodes[0].Enabled

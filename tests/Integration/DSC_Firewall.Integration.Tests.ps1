@@ -75,13 +75,13 @@ try
             )
         }
 
-        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_add.config.ps1"
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_add.config.ps1"
         . $configFile
 
-        Describe "$($script:DSCResourceName)_Add_Integration" {
+        Describe "$($script:dscResourceName)_Add_Integration" {
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Add_Config" `
+                    & "$($script:dscResourceName)_Add_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration `
@@ -199,13 +199,13 @@ try
         # Modify the config data object to pass to the Remove Rule Config
         $configData.AllNodes[0].Ensure = 'Absent'
 
-        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_remove.config.ps1"
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_remove.config.ps1"
         . $configFile
 
-        Describe "$($script:DSCResourceName)_Remove_Integration" {
+        Describe "$($script:dscResourceName)_Remove_Integration" {
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Remove_Config" `
+                    & "$($script:dscResourceName)_Remove_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration `

@@ -1,5 +1,5 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_WinsServerAddress'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_WinsServerAddress'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -14,8 +14,8 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
     -TestType Integration
 #endregion
 
@@ -29,10 +29,10 @@ New-IntegrationLoopbackAdapter -AdapterName $adapterName
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Configured.config.ps1"
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_Configured.config.ps1"
     . $configFile -Verbose -ErrorAction Stop
 
-    Describe "$($script:DSCResourceName)_Integration using single address" {
+    Describe "$($script:dscResourceName)_Integration using single address" {
         It 'Should compile and apply the MOF without throwing' {
             {
                 # This is to pass to the Config
@@ -46,7 +46,7 @@ try
                     )
                 }
 
-                & "$($script:DSCResourceName)_Config_Configured" `
+                & "$($script:dscResourceName)_Config_Configured" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
                 Start-DscConfiguration -Path $TestDrive `
@@ -59,14 +59,14 @@ try
         }
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_Configured" }
+            $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured" }
             $current.InterfaceAlias | Should -Be $adapterName
             $current.Address.Count | Should -Be 1
             $current.Address | Should -Be '10.139.17.99'
         }
     }
 
-    Describe "$($script:DSCResourceName)_Integration using two addresses" {
+    Describe "$($script:dscResourceName)_Integration using two addresses" {
         It 'Should compile and apply the MOF without throwing' {
             {
                 # This is to pass to the Config
@@ -80,7 +80,7 @@ try
                     )
                 }
 
-                & "$($script:DSCResourceName)_Config_Configured" `
+                & "$($script:dscResourceName)_Config_Configured" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
                 Start-DscConfiguration -Path $TestDrive `
@@ -93,7 +93,7 @@ try
         }
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_Configured" }
+            $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured" }
             $current.InterfaceAlias | Should -Be $adapterName
             $current.Address.Count | Should -Be 2
             $current.Address[0] | Should -Be '10.139.17.99'
@@ -101,7 +101,7 @@ try
         }
     }
 
-    Describe "$($script:DSCResourceName)_Integration using no addresses" {
+    Describe "$($script:dscResourceName)_Integration using no addresses" {
         It 'Should compile and apply the MOF without throwing' {
             {
                 # This is to pass to the Config
@@ -115,7 +115,7 @@ try
                     )
                 }
 
-                & "$($script:DSCResourceName)_Config_Configured" `
+                & "$($script:dscResourceName)_Config_Configured" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
                 Start-DscConfiguration -Path $TestDrive `
@@ -128,7 +128,7 @@ try
         }
 
         It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_Configured" }
+            $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured" }
             $current.InterfaceAlias | Should -Be $adapterName
             $current.Address | Should -BeNullOrEmpty
         }

@@ -86,13 +86,13 @@ try
             )
         }
 
-        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile
 
-        Describe "$($script:DSCResourceName)_Integration" {
+        Describe "$($script:dscResourceName)_Integration" {
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config" `
+                    & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration `

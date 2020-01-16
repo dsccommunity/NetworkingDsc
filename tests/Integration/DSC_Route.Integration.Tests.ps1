@@ -1,5 +1,5 @@
-$script:DSCModuleName = 'NetworkingDsc'
-$script:DSCResourceName = 'DSC_Route'
+$script:dscModuleName = 'NetworkingDsc'
+$script:dscResourceName = 'DSC_Route'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -14,8 +14,8 @@ if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCR
 
 Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
 $TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:DSCModuleName `
-    -DSCResourceName $script:DSCResourceName `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
     -TestType Integration
 #endregion
 
@@ -32,10 +32,10 @@ try
         RouteMetric       = 200
     }
 
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
     . $configFile -Verbose -ErrorAction Stop
 
-    Describe "$($script:DSCResourceName)_Add_Integration" {
+    Describe "$($script:dscResourceName)_Add_Integration" {
         $configData = @{
             AllNodes = @(
                 @{
@@ -53,7 +53,7 @@ try
 
         It 'Should compile and apply the MOF without throwing' {
             {
-                & "$($script:DSCResourceName)_Config" `
+                & "$($script:dscResourceName)_Config" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
 
@@ -73,7 +73,7 @@ try
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
             }
 
             $current.InterfaceAlias    | Should -Be $configData.AllNodes[0].InterfaceAlias
@@ -90,7 +90,7 @@ try
         }
     }
 
-    Describe "$($script:DSCResourceName)_Remove_Integration" {
+    Describe "$($script:dscResourceName)_Remove_Integration" {
         $configData = @{
             AllNodes = @(
                 @{
@@ -108,7 +108,7 @@ try
 
         It 'Should compile and apply the MOF without throwing' {
             {
-                & "$($script:DSCResourceName)_Config" `
+                & "$($script:dscResourceName)_Config" `
                     -OutputPath $TestDrive `
                     -ConfigurationData $configData
 
@@ -128,7 +128,7 @@ try
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
             }
 
             $current.InterfaceAlias    | Should -Be $configData.AllNodes[0].InterfaceAlias

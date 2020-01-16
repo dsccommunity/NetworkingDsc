@@ -25,10 +25,10 @@ try
         # Configure Loopback Adapter
         New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
 
-        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_Static.config.ps1"
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_Static.config.ps1"
         . $configFile -Verbose -ErrorAction Stop
 
-        Describe "$($script:DSCResourceName)_Integration using single address" {
+        Describe "$($script:dscResourceName)_Integration using single address" {
             It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
@@ -44,7 +44,7 @@ try
                         )
                     }
 
-                    & "$($script:DSCResourceName)_Config_Static" `
+                    & "$($script:dscResourceName)_Config_Static" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
@@ -58,7 +58,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_Static"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Static"
                 }
                 $current.InterfaceAlias             | Should -Be 'NetworkingDscLBA'
                 $current.AddressFamily              | Should -Be 'IPv4'
@@ -67,7 +67,7 @@ try
             }
         }
 
-        Describe "$($script:DSCResourceName)_Integration using two addresses" {
+        Describe "$($script:dscResourceName)_Integration using two addresses" {
             It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
@@ -83,7 +83,7 @@ try
                         )
                     }
 
-                    & "$($script:DSCResourceName)_Config_Static" `
+                    & "$($script:dscResourceName)_Config_Static" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration `
@@ -101,7 +101,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_Static"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Static"
                 }
                 $current.InterfaceAlias             | Should -Be 'NetworkingDscLBA'
                 $current.AddressFamily              | Should -Be 'IPv4'
@@ -111,10 +111,10 @@ try
             }
         }
 
-        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_DHCP.config.ps1"
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_DHCP.config.ps1"
         . $configFile -Verbose -ErrorAction Stop
 
-        Describe "$($script:DSCResourceName)_Integration using no addresses" {
+        Describe "$($script:dscResourceName)_Integration using no addresses" {
             It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
@@ -128,7 +128,7 @@ try
                         )
                     }
 
-                    & "$($script:DSCResourceName)_Config_DHCP" `
+                    & "$($script:dscResourceName)_Config_DHCP" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration `
@@ -146,7 +146,7 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config_DHCP"
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config_DHCP"
                 }
                 $current.InterfaceAlias             | Should -Be 'NetworkingDscLBA'
                 $current.AddressFamily              | Should -Be 'IPv4'
