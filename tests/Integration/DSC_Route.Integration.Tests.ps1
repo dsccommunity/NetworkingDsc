@@ -1,145 +1,146 @@
 $script:dscModuleName = 'NetworkingDsc'
 $script:dscResourceName = 'DSC_Route'
 
-Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
-
-#region HEADER
-# Integration Test Template Version: 1.1.1
-[System.String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
-{
-    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
-}
-
-Import-Module -Name (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:dscModuleName `
-    -DSCResourceName $script:dscResourceName `
-    -TestType Integration
-#endregion
-
-# Using try/finally to always cleanup even if something awful happens.
 try
 {
-    $interfaceAlias = (Get-NetAdapter -Physical | Select-Object -First 1).Name
+    Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
+}
+catch [System.IO.FileNotFoundException]
+{
+    throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+}
 
-    $dummyRoute = [PSObject] @{
-        InterfaceAlias    = $interfaceAlias
-        AddressFamily     = 'IPv4'
-        DestinationPrefix = '11.0.0.0/8'
-        NextHop           = '11.0.1.0'
-        RouteMetric       = 200
-    }
+$script:testEnvironment = Initialize-TestEnvironment `
+    -DSCModuleName $script:dscModuleName `
+    -DSCResourceName $script:dscResourceName `
+    -ResourceType 'Mof' `
+    -TestType 'Integration'
 
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
-    . $configFile -Verbose -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
-    Describe "$($script:dscResourceName)_Add_Integration" {
-        $configData = @{
-            AllNodes = @(
-                @{
-                    NodeName          = 'localhost'
-                    InterfaceAlias    = $interfaceAlias
-                    AddressFamily     = $dummyRoute.AddressFamily
-                    DestinationPrefix = $dummyRoute.DestinationPrefix
-                    NextHop           = $dummyRoute.NextHop
-                    Ensure            = 'Present'
-                    RouteMetric       = $dummyRoute.RouteMetric
-                    Publish           = 'No'
-                }
-            )
+# Begin Testing
+try
+{
+    Describe 'Route Integration Tests' {
+        $interfaceAlias = (Get-NetAdapter -Physical | Select-Object -First 1).Name
+
+        $dummyRoute = [PSObject] @{
+            InterfaceAlias    = $interfaceAlias
+            AddressFamily     = 'IPv4'
+            DestinationPrefix = '11.0.0.0/8'
+            NextHop           = '11.0.1.0'
+            RouteMetric       = 200
         }
 
-        It 'Should compile and apply the MOF without throwing' {
-            {
-                & "$($script:dscResourceName)_Config" `
-                    -OutputPath $TestDrive `
-                    -ConfigurationData $configData
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+        . $configFile -Verbose -ErrorAction Stop
 
-                Start-DscConfiguration `
-                    -Path $TestDrive `
-                    -ComputerName localhost `
-                    -Wait `
-                    -Verbose `
-                    -Force `
-                    -ErrorAction Stop
-            } | Should -Not -Throw
-        }
-
-        It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-        }
-
-        It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+        Describe "$($script:dscResourceName)_Add_Integration" {
+            $configData = @{
+                AllNodes = @(
+                    @{
+                        NodeName          = 'localhost'
+                        InterfaceAlias    = $interfaceAlias
+                        AddressFamily     = $dummyRoute.AddressFamily
+                        DestinationPrefix = $dummyRoute.DestinationPrefix
+                        NextHop           = $dummyRoute.NextHop
+                        Ensure            = 'Present'
+                        RouteMetric       = $dummyRoute.RouteMetric
+                        Publish           = 'No'
+                    }
+                )
             }
 
-            $current.InterfaceAlias    | Should -Be $configData.AllNodes[0].InterfaceAlias
-            $current.AddressFamily     | Should -Be $configData.AllNodes[0].AddressFamily
-            $current.DestinationPrefix | Should -Be $configData.AllNodes[0].DestinationPrefix
-            $current.NextHop           | Should -Be $configData.AllNodes[0].NextHop
-            $current.Ensure            | Should -Be $configData.AllNodes[0].Ensure
-            $current.RouteMetric       | Should -Be $configData.AllNodes[0].RouteMetric
-            $current.Publish           | Should -Be $configData.AllNodes[0].Publish
-        }
+            It 'Should compile and apply the MOF without throwing' {
+                {
+                    & "$($script:dscResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
 
-        It 'Should have created the route' {
-            Get-NetRoute @dummyRoute -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty
-        }
-    }
-
-    Describe "$($script:dscResourceName)_Remove_Integration" {
-        $configData = @{
-            AllNodes = @(
-                @{
-                    NodeName          = 'localhost'
-                    InterfaceAlias    = $interfaceAlias
-                    AddressFamily     = $dummyRoute.AddressFamily
-                    DestinationPrefix = $dummyRoute.DestinationPrefix
-                    NextHop           = $dummyRoute.NextHop
-                    Ensure            = 'Absent'
-                    RouteMetric       = $dummyRoute.RouteMetric
-                    Publish           = 'No'
-                }
-            )
-        }
-
-        It 'Should compile and apply the MOF without throwing' {
-            {
-                & "$($script:dscResourceName)_Config" `
-                    -OutputPath $TestDrive `
-                    -ConfigurationData $configData
-
-                Start-DscConfiguration `
-                    -Path $TestDrive `
-                    -ComputerName localhost `
-                    -Wait `
-                    -Verbose `
-                    -Force `
-                    -ErrorAction Stop
-            } | Should -Not -Throw
-        }
-
-        It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-        }
-
-        It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
             }
 
-            $current.InterfaceAlias    | Should -Be $configData.AllNodes[0].InterfaceAlias
-            $current.AddressFamily     | Should -Be $configData.AllNodes[0].AddressFamily
-            $current.DestinationPrefix | Should -Be $configData.AllNodes[0].DestinationPrefix
-            $current.NextHop           | Should -Be $configData.AllNodes[0].NextHop
-            $current.Ensure            | Should -Be $configData.AllNodes[0].Ensure
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                }
+
+                $current.InterfaceAlias    | Should -Be $configData.AllNodes[0].InterfaceAlias
+                $current.AddressFamily     | Should -Be $configData.AllNodes[0].AddressFamily
+                $current.DestinationPrefix | Should -Be $configData.AllNodes[0].DestinationPrefix
+                $current.NextHop           | Should -Be $configData.AllNodes[0].NextHop
+                $current.Ensure            | Should -Be $configData.AllNodes[0].Ensure
+                $current.RouteMetric       | Should -Be $configData.AllNodes[0].RouteMetric
+                $current.Publish           | Should -Be $configData.AllNodes[0].Publish
+            }
+
+            It 'Should have created the route' {
+                Get-NetRoute @dummyRoute -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty
+            }
         }
 
-        It 'Should have deleted the route' {
-            Get-NetRoute @dummyRoute -ErrorAction SilentlyContinue | Should -BeNullOrEmpty
+        Describe "$($script:dscResourceName)_Remove_Integration" {
+            $configData = @{
+                AllNodes = @(
+                    @{
+                        NodeName          = 'localhost'
+                        InterfaceAlias    = $interfaceAlias
+                        AddressFamily     = $dummyRoute.AddressFamily
+                        DestinationPrefix = $dummyRoute.DestinationPrefix
+                        NextHop           = $dummyRoute.NextHop
+                        Ensure            = 'Absent'
+                        RouteMetric       = $dummyRoute.RouteMetric
+                        Publish           = 'No'
+                    }
+                )
+            }
+
+            It 'Should compile and apply the MOF without throwing' {
+                {
+                    & "$($script:dscResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
+
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                }
+
+                $current.InterfaceAlias    | Should -Be $configData.AllNodes[0].InterfaceAlias
+                $current.AddressFamily     | Should -Be $configData.AllNodes[0].AddressFamily
+                $current.DestinationPrefix | Should -Be $configData.AllNodes[0].DestinationPrefix
+                $current.NextHop           | Should -Be $configData.AllNodes[0].NextHop
+                $current.Ensure            | Should -Be $configData.AllNodes[0].Ensure
+            }
+
+            It 'Should have deleted the route' {
+                Get-NetRoute @dummyRoute -ErrorAction SilentlyContinue | Should -BeNullOrEmpty
+            }
         }
     }
 }
