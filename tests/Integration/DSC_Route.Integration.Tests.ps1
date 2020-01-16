@@ -24,7 +24,7 @@ try
     Describe 'Route Integration Tests' {
         $script:interfaceAlias = (Get-NetAdapter -Physical | Select-Object -First 1).Name
 
-        $dummyRoute = [PSObject] @{
+        $script:dummyRoute = [PSObject] @{
             InterfaceAlias    = $script:interfaceAlias
             AddressFamily     = 'IPv4'
             DestinationPrefix = '11.0.0.0/8'
@@ -41,11 +41,11 @@ try
                     @{
                         NodeName          = 'localhost'
                         InterfaceAlias    = $script:interfaceAlias
-                        AddressFamily     = $dummyRoute.AddressFamily
-                        DestinationPrefix = $dummyRoute.DestinationPrefix
-                        NextHop           = $dummyRoute.NextHop
+                        AddressFamily     = $script:dummyRoute.AddressFamily
+                        DestinationPrefix = $script:dummyRoute.DestinationPrefix
+                        NextHop           = $script:dummyRoute.NextHop
                         Ensure            = 'Present'
-                        RouteMetric       = $dummyRoute.RouteMetric
+                        RouteMetric       = $script:dummyRoute.RouteMetric
                         Publish           = 'No'
                     }
                 )
@@ -96,11 +96,11 @@ try
                     @{
                         NodeName          = 'localhost'
                         InterfaceAlias    = $script:interfaceAlias
-                        AddressFamily     = $dummyRoute.AddressFamily
-                        DestinationPrefix = $dummyRoute.DestinationPrefix
-                        NextHop           = $dummyRoute.NextHop
+                        AddressFamily     = $script:dummyRoute.AddressFamily
+                        DestinationPrefix = $script:dummyRoute.DestinationPrefix
+                        NextHop           = $script:dummyRoute.NextHop
                         Ensure            = 'Absent'
-                        RouteMetric       = $dummyRoute.RouteMetric
+                        RouteMetric       = $script:dummyRoute.RouteMetric
                         Publish           = 'No'
                     }
                 )
