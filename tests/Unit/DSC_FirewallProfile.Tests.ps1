@@ -39,8 +39,7 @@ $script:parameterList = $resourceData.ParameterList
 # Begin Testing
 try
 {
-    InModuleScope $script:dscResourceName
- {
+    InModuleScope $script:dscResourceName {
         # Create the Mock Objects that will be used for running tests
         $firewallProfile = [PSObject] @{
             Name                            = 'Private'
@@ -84,7 +83,7 @@ try
             DisabledInterfaceAliases        = $firewallProfile.DisabledInterfaceAliases
         }
 
-        $gpoTypeParameters = $script:parameterList | Where-Object {
+        $gpoTypeParameters = $script:parameterList | Where-Object -FilterScript {
             $_.Name -in @(
                 'AllowInboundRules'
                 'AllowLocalFirewallRules'
@@ -100,7 +99,7 @@ try
                 'NotifyOnListen'
             )
         }
-        $actionTypeParameters = $script:parameterList | Where-Object {
+        $actionTypeParameters = $script:parameterList | Where-Object -FilterScript {
             $_.Name -in @(
                 'DefaultInboundAction'
                 'DefaultOutboundAction'

@@ -1,12 +1,12 @@
 <#PSScriptInfo
 .VERSION 1.0.0
 .GUID a675798c-d2b7-4f1b-b59a-b90f2f2e6178
-.AUTHOR Microsoft Corporation
-.COMPANYNAME Microsoft Corporation
-.COPYRIGHT
+.AUTHOR DSC Community
+.COMPANYNAME DSC Community
+.COPYRIGHT Copyright the DSC Community contributors. All rights reserved.
 .TAGS DSCConfiguration
-.LICENSEURI https://github.com/PowerShell/NetworkingDsc/blob/master/LICENSE
-.PROJECTURI https://github.com/PowerShell/NetworkingDsc
+.LICENSEURI https://github.com/dsccommunity/NetworkingDsc/blob/master/LICENSE
+.PROJECTURI https://github.com/dsccommunity/NetworkingDsc
 .ICONURI
 .EXTERNALMODULEDEPENDENCIES
 .REQUIREDSCRIPTS

@@ -32,8 +32,7 @@ Invoke-TestSetup
 try
 {
     InModuleScope $script:dscResourceName {
-        $script:dscResourceName
- = 'DSC_ProxySettings'
+        $script:dscResourceName = 'DSC_ProxySettings'
 
         # Create the Mock Objects that will be used for running tests
         $testProxyServer = 'testproxy:8888'

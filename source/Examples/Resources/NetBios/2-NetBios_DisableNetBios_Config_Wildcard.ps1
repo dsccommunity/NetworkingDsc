@@ -3,10 +3,10 @@
 .GUID b43f8fac-cc5a-45ec-ab7d-344dff0b31e7
 .AUTHOR Mike Kletz
 .COMPANYNAME
-.COPYRIGHT
+.COPYRIGHT Copyright the DSC Community contributors. All rights reserved.
 .TAGS DSCConfiguration
-.LICENSEURI https://github.com/PowerShell/NetworkingDsc/blob/master/LICENSE
-.PROJECTURI https://github.com/PowerShell/NetworkingDsc
+.LICENSEURI https://github.com/dsccommunity/NetworkingDsc/blob/master/LICENSE
+.PROJECTURI https://github.com/dsccommunity/NetworkingDsc
 .ICONURI
 .EXTERNALMODULEDEPENDENCIES
 .REQUIREDSCRIPTS

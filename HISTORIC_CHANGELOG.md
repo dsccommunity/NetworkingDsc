@@ -10,11 +10,11 @@ change log short.
 ### Changed
 
 - Added Comment Based Help for `New-NotImplementedException` common
-  function - fixes [Issue #411](https://github.com/PowerShell/NetworkingDsc/issues/411).
+  function - fixes [Issue #411](https://github.com/dsccommunity/NetworkingDsc/issues/411).
 - Added common function 'Format-Win32NetworkADapterFilterByNetConnectionID'
   to properly accept wild cards for Win32_NetworkAdapter filters.
 - Updated MSFT_Netbios to use 'Format-Win32NetworkADapterFilterByNetConnectionID'
-  - fixes [Issue #413](https://github.com/PowerShell/NetworkingDsc/issues/413).
+  - fixes [Issue #413](https://github.com/dsccommunity/NetworkingDsc/issues/413).
 - Corrected minor style and consistency issues in `NetworkingDsc.Common.tests.ps1`
   and `NetworkingDsc.Common.ps1`.
 - Changed verbose messages in `Test-DscParameterState` to include
@@ -28,11 +28,11 @@ change log short.
 ### Changed
 
 - DnsClientGlobalSettings:
-  - Fixed SuffixSearchList Empty String Handling - fixes [Issue #398](https://github.com/PowerShell/NetworkingDsc/issues/398).
+  - Fixed SuffixSearchList Empty String Handling - fixes [Issue #398](https://github.com/dsccommunity/NetworkingDsc/issues/398).
 - NetAdapterAdvancedProperty:
   - Removed validation from RegistryKeyword parameter because the list
     of valid registry keywords is not fixed and will depend on adapter
-    driver - fixes [Issue #388](https://github.com/PowerShell/NetworkingDsc/issues/388).
+    driver - fixes [Issue #388](https://github.com/dsccommunity/NetworkingDsc/issues/388).
 - MSFT_WinsServerAddress
   Added MSFT_WinsServerAddress to control the WINS servers for a given network adapter.
 - Test-DscParameterState:
@@ -40,7 +40,7 @@ change log short.
     sorting for arrays.
   - The functions ConvertTo-CimInstance and ConvertTo-Hashtable were added
     required by Test-DscParameterState.
-- Fix missing context message content in unit tests - fixes [Issue #405](https://github.com/PowerShell/NetworkingDsc/issues/405).
+- Fix missing context message content in unit tests - fixes [Issue #405](https://github.com/dsccommunity/NetworkingDsc/issues/405).
 - Correct style violations in unit tests:
   - Adding `Get`, `Set` and `Test` tags to appropriate `describe` blocks.
   - Removing uneccesary `#region` blocks.
@@ -50,7 +50,7 @@ change log short.
   - Fix bug when LocalAddress or RemoteAddress is specified using CIDR
     notation with number of bits specified in subnet mask (e.g.
     10.0.0.1/8) rather than using CIDR subnet mask notation (e.g
-    10.0.0.1/255.0.0.0) - fixes [Issue #404](https://github.com/PowerShell/NetworkingDsc/issues/404).
+    10.0.0.1/255.0.0.0) - fixes [Issue #404](https://github.com/dsccommunity/NetworkingDsc/issues/404).
 
 ## [7.2.0.0]
 
@@ -58,16 +58,16 @@ change log short.
 
 - NetAdapterAdvancedProperty:
   - Added support for RegistryKeyword `MaxRxRing1Length` and
-    `NumRxBuffersSmall` - fixes [Issue #387](https://github.com/PowerShell/NetworkingDsc/issues/387).
+    `NumRxBuffersSmall` - fixes [Issue #387](https://github.com/dsccommunity/NetworkingDsc/issues/387).
 - Firewall:
   - Prevent 'Parameter set cannot be resolved using the specified named
     parameters' error when updating rule when group name is specified - fixes
-    [Issue #130](https://github.com/PowerShell/NetworkingDsc/issues/130) and
-    [Issue #191](https://github.com/PowerShell/NetworkingDsc/issues/191).
+    [Issue #130](https://github.com/dsccommunity/NetworkingDsc/issues/130) and
+    [Issue #191](https://github.com/dsccommunity/NetworkingDsc/issues/191).
 - Opted into Common Tests 'Common Tests - Validate Localization' -
-  fixes [Issue #393](https://github.com/PowerShell/NetworkingDsc/issues/393).
+  fixes [Issue #393](https://github.com/dsccommunity/NetworkingDsc/issues/393).
 - Combined all `NetworkingDsc.ResourceHelper` module functions into
-  `NetworkingDsc.Common` module - fixes [Issue #394](https://github.com/PowerShell/NetworkingDsc/issues/394).
+  `NetworkingDsc.Common` module - fixes [Issue #394](https://github.com/dsccommunity/NetworkingDsc/issues/394).
 - Renamed all localization strings so that they are detected by
   'Common Tests - Validate Localization'.
 - Fixed issues with mismatched localization strings.
@@ -83,20 +83,20 @@ change log short.
 ### Changed
 
 - New Resource: NetAdapterState to enable or disable a network adapter - fixes
-  [Issue #365](https://github.com/PowerShell/NetworkingDsc/issues/365)
+  [Issue #365](https://github.com/dsccommunity/NetworkingDsc/issues/365)
 - Fix example publish to PowerShell Gallery by adding `gallery_api`
-  environment variable to `AppVeyor.yml` - fixes [Issue #385](https://github.com/PowerShell/NetworkingDsc/issues/385).
+  environment variable to `AppVeyor.yml` - fixes [Issue #385](https://github.com/dsccommunity/NetworkingDsc/issues/385).
 - MSFT_Proxy:
   - Fixed `ProxyServer`, `ProxyServerExceptions` and `AutoConfigURL`
     parameters so that they correctly support strings longer than 255
-    characters - fixes [Issue #378](https://github.com/PowerShell/NetworkingDsc/issues/378).
+    characters - fixes [Issue #378](https://github.com/dsccommunity/NetworkingDsc/issues/378).
 
 ## [7.0.0.0]
 
 ### Changed
 
 - Refactored module folder structure to move resource to root folder of
-  repository and remove test harness - fixes [Issue #372](https://github.com/PowerShell/NetworkingDsc/issues/372).
+  repository and remove test harness - fixes [Issue #372](https://github.com/dsccommunity/NetworkingDsc/issues/372).
 - Removed module conflict tests because only required for harness style
   modules.
 - Opted into Common Tests 'Validate Example Files To Be Published',
@@ -104,11 +104,11 @@ change log short.
 - Added 'DscResourcesToExport' to manifest to improve information in
   PowerShell Gallery and removed wildcards from 'FunctionsToExport',
   'CmdletsToExport', 'VariablesToExport' and 'AliasesToExport' - fixes
-  [Issue #376](https://github.com/PowerShell/NetworkingDsc/issues/376).
+  [Issue #376](https://github.com/dsccommunity/NetworkingDsc/issues/376).
 - MSFT_NetIPInterface:
   - Added `Dhcp`, `WeakHostReceive` and `WeakHostSend` parameters so that
     MSFT_DHCPClient, MSFT_WeakHostReceive, MSFT_WeakHostSend can be
-    deprecated - fixes [Issue #360](https://github.com/PowerShell/NetworkingDsc/issues/360).
+    deprecated - fixes [Issue #360](https://github.com/dsccommunity/NetworkingDsc/issues/360).
 - MSFT_DhcpClient:
   - BREAKING CHANGE: Resource has been deprecated and replaced by `Dhcp`
     parameter in MSFT_NetIPInterface.
@@ -127,12 +127,12 @@ change log short.
 - MSFT_NetworkTeam:
   - Change `Get-TargetResource` to return actual TeamMembers if network team
     exists and 'Ensure' returns 'Present' even when actual TeamMembers do
-    not match 'TeamMembers' parameter - fixes [Issue #342](https://github.com/PowerShell/NetworkingDsc/issues/342).
+    not match 'TeamMembers' parameter - fixes [Issue #342](https://github.com/dsccommunity/NetworkingDsc/issues/342).
 - Updated examples to format required for publishing to PowerShell Gallery - fixes
-  [Issue #374](https://github.com/PowerShell/NetworkingDsc/issues/374).
+  [Issue #374](https://github.com/dsccommunity/NetworkingDsc/issues/374).
 - MSFT_NetAdapterAdvancedProperty:
   - Fixes NetworkAdapterName being returned in Name property when calling
-    Get-TargetResourceFixes - fixes [Issue #370](https://github.com/PowerShell/NetworkingDsc/issues/370).
+    Get-TargetResourceFixes - fixes [Issue #370](https://github.com/dsccommunity/NetworkingDsc/issues/370).
 
 ## [6.3.0.0]
 
@@ -146,9 +146,9 @@ change log short.
 
 ### Changed
 
-- Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #357](https://github.com/PowerShell/NetworkingDsc/issues/357).
+- Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #357](https://github.com/dsccommunity/NetworkingDsc/issues/357).
 - Updated LICENSE file to match the Microsoft Open Source Team standard - fixes
-  [Issue #363](https://github.com/PowerShell/NetworkingDsc/issues/363)
+  [Issue #363](https://github.com/dsccommunity/NetworkingDsc/issues/363)
 - MSFT_NetIPInterface:
   - Added a new resource for configuring the IP interface settings for a network
     interface.
@@ -160,7 +160,7 @@ change log short.
 - MSFT_Firewall:
   - Added full stop to end of MOF field descriptions.
   - Support for `[`, `]` and `*` characters in the Name property
-    added - fixes [Issue #348](https://github.com/PowerShell/NetworkingDsc/issues/348).
+    added - fixes [Issue #348](https://github.com/dsccommunity/NetworkingDsc/issues/348).
   - Improved unit tests to meet style guidelines.
 
 ## [6.0.0.0]
@@ -170,14 +170,14 @@ change log short.
 - New Example 2-ConfigureSuffixSearchList.ps1 for multiple
   SuffixSearchList entries for resource DnsClientGlobalSetting.
 - BREAKING CHANGE:
-  - Renamed xNetworking to NetworkingDsc - fixes [Issue #119](https://github.com/PowerShell/NetworkingDsc/issues/290).
+  - Renamed xNetworking to NetworkingDsc - fixes [Issue #119](https://github.com/dsccommunity/NetworkingDsc/issues/290).
   - Changed all MSFT\_xResourceName to MSFT\_ResourceName.
   - Updated DSCResources, Examples, Modules and Tests with new naming.
   - Updated Year to 2018 in License and Manifest.
   - Updated README.md from xNetworking to NetworkingDsc.
 - MSFT_IPAddress:
   - Updated to allow setting multiple IP Addresses
-    when one is already set - Fixes [Issue #323](https://github.com/PowerShell/NetworkingDsc/issues/323)
+    when one is already set - Fixes [Issue #323](https://github.com/dsccommunity/NetworkingDsc/issues/323)
 - Corrected CHANGELOG.MD to report that issue with InterfaceAlias matching
   on Adapter description rather than Adapter Name was released in 5.7.0.0
   rather than 5.6.0.0 - See [Issue #315](https://github.com/PowerShell/xNetworking/issues/315).
@@ -190,7 +190,7 @@ change log short.
   - Improved detection of environmemt for running network team integration
     tests.
 - Added a CODE\_OF\_CONDUCT.md with the same content as in the README.md - fixes
-  [Issue #337](https://github.com/PowerShell/NetworkingDsc/issues/337).
+  [Issue #337](https://github.com/dsccommunity/NetworkingDsc/issues/337).
 
 ## [5.7.0.0]
 

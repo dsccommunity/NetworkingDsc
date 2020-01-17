@@ -13,13 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - DefaultGatewayAddress:
   - Refactored to reduce code duplication.
-  - Fixed hash table style violations - fixes [Issue #429](https://github.com/PowerShell/NetworkingDsc/issues/429).
+  - Fixed hash table style violations - fixes [Issue #429](https://github.com/dsccommunity/NetworkingDsc/issues/429).
   - Fixed general style violations.
 - Added `.gitattributes` to ensure CRLF is used when pulling repository - Fixes
-  [Issue #430](https://github.com/PowerShell/NetworkingDsc/issues/430).
+  [Issue #430](https://github.com/dsccommunity/NetworkingDsc/issues/430).
 - BREAKING CHANGE: Changed resource prefix from MSFT to DSC.
 - Updated to use continuous delivery pattern using Azure DevOps - Fixes
-  [Issue #435](https://github.com/PowerShell/NetworkingDsc/issues/435).
+  [Issue #435](https://github.com/dsccommunity/NetworkingDsc/issues/435).
 
 ### Deprecated
 
