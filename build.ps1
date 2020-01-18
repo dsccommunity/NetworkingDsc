@@ -53,7 +53,8 @@ param
 
     [Parameter()]
     [Alias('bootstrap')]
-    [switch]$ResolveDependency,
+    [switch]
+    $ResolveDependency,
 
     [Parameter(DontShow)]
     [AllowNull()]

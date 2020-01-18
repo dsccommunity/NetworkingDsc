@@ -53,8 +53,9 @@ try
         Describe 'DSC_NetAdapterState\Get-TargetResource' -Tag 'Get' {
             BeforeEach {
                 $getTargetResource = @{
-                    Name  = 'Ethernet'
-                    State = 'Enabled'
+                    Name    = 'Ethernet'
+                    State   = 'Enabled'
+                    Verbose = $true
                 }
             }
 
@@ -114,13 +115,15 @@ try
         Describe 'DSC_NetAdapterState\Set-TargetResource' -Tag 'Set' {
             BeforeEach {
                 $setTargetResourceEnabled = @{
-                    Name  = 'Ethernet'
-                    State = 'Enabled'
+                    Name    = 'Ethernet'
+                    State   = 'Enabled'
+                    Verbose = $true
                 }
 
                 $setTargetResourceDisabled = @{
-                    Name  = 'Ethernet'
-                    State = 'Disabled'
+                    Name    = 'Ethernet'
+                    State   = 'Disabled'
+                    Verbose = $true
                 }
             }
 
@@ -227,13 +230,15 @@ try
         Describe 'DSC_NetAdapterState\Test-TargetResource' -Tag 'Test' {
             BeforeEach {
                 $testTargetResourceEnabled = @{
-                    Name  = 'Ethernet'
-                    State = 'Enabled'
+                    Name    = 'Ethernet'
+                    State   = 'Enabled'
+                    Verbose = $true
                 }
 
                 $testTargetResourceDisabled = @{
-                    Name  = 'Ethernet'
-                    State = 'Disabled'
+                    Name    = 'Ethernet'
+                    State   = 'Disabled'
+                    Verbose = $true
                 }
             }
 
