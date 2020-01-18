@@ -208,7 +208,7 @@ try
                 $errorText = "Set-TargetResource: Failed to set network adapter 'Ethernet' to state 'Enabled'. Error: 'Throwing from Enable-NetAdapter'."
 
                 It 'Should raise a non terminating error' {
-                    $netAdapterError = Set-TargetResource @setTargetResourceEnabled 2>&1
+                    $netAdapterError = Set-TargetResource @setTargetResourceEnabled -ErrorAction Continue 2>&1
                     $netAdapterError.Exception.Message | Should -Be $errorText
                 }
             }
@@ -221,7 +221,7 @@ try
                 $errorText = "Set-TargetResource: Network adapter 'Ethernet' not found."
 
                 It 'Should raise a non terminating error' {
-                    $netAdapterError = Set-TargetResource @setTargetResourceEnabled 2>&1
+                    $netAdapterError = Set-TargetResource @setTargetResourceEnabled -ErrorAction Continue 2>&1
                     $netAdapterError.Exception.Message | Should -Be $errorText
                 }
             }
