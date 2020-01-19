@@ -1,8 +1,8 @@
 # NetworkingDsc
 
-[![Build Status](https://dev.azure.com/dsccommunity/NetworkingDsc/_apis/build/status/dsccommunity.NetworkingDsc?branchName=master)](https://dev.azure.com/dsccommunity/NetworkingDsc/_build/latest?definitionId=8&branchName=master)
-![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/NetworkingDsc/8/master)
-[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/NetworkingDsc/8/master)](https://dsccommunity.visualstudio.com/NetworkingDsc/_test/analytics?definitionId=8&contextType=build)
+[![Build Status](https://dev.azure.com/dsccommunity/NetworkingDsc/_apis/build/status/dsccommunity.NetworkingDsc?branchName=master)](https://dev.azure.com/dsccommunity/NetworkingDsc/_build/latest?definitionId=16&branchName=master)
+![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/NetworkingDsc/16/master)
+[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/NetworkingDsc/16/master)](https://dsccommunity.visualstudio.com/NetworkingDsc/_test/analytics?definitionId=16&contextType=build)
 [![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/NetworkingDsc?label=NetworkingDsc%20Preview)](https://www.powershellgallery.com/packages/NetworkingDsc/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/NetworkingDsc?label=NetworkingDsc)](https://www.powershellgallery.com/packages/NetworkingDsc/)
 
