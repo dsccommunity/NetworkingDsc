@@ -31,7 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- None
+- Fixed IDs of Azure DevOps pipeline in badges in README.MD - Fixes
+  [Issue #438](https://github.com/dsccommunity/NetworkingDsc/issues/438).
 
 ### Security
 
