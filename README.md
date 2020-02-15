@@ -63,7 +63,7 @@ The **NetworkingDsc** module contains the following resources:
 ## Documentation and Examples
 
 For a full list of resources in NetworkingDsc and examples on their use, check out
-the [NetworkingDsc wiki](https://github.com/dsccomunnity/NetworkingDsc/wiki).
+the [NetworkingDsc wiki](https://github.com/dsccommunity/NetworkingDsc/wiki).
 
 ## Known Issues
 
