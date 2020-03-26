@@ -22,7 +22,7 @@ BuildWorkflow:
     - Build_Module_ModuleBuilder
     - Build_NestedModules_ModuleBuilder
     - Create_changelog_release_output
-	  - Generate_Conceptual_Help
+    - Generate_Conceptual_Help
     - Generate_Wiki_Content
 
   pack:
@@ -50,7 +50,6 @@ Pester:
   ExcludeFromCodeCoverage:
   Script:
     - tests/Unit
-    - tests/Integration
   ExcludeTag:
   Tag:
   CodeCoverageThreshold: 70
