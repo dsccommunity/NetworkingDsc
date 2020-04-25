@@ -18,6 +18,8 @@ $script:subModuleName = (Split-Path -Path $PSCommandPath -Leaf) -replace '\.Test
 $script:subModuleFile = Join-Path -Path $script:subModulesFolder -ChildPath "$($script:subModuleName)/$($script:subModuleName).psm1"
 
 Import-Module $script:subModuleFile -Force -ErrorAction Stop
+
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 #endregion HEADER
 
 InModuleScope $script:subModuleName {
@@ -2365,6 +2367,24 @@ InModuleScope $script:subModuleName {
                 param ( $Address )
 
                 Test-IPAddress -Address $Address -AddressFamily $addressFamily
+            }
+        }
+        Context 'When Address is invalid' {
+            It 'Should throw Invalid Argument Exception' -TestCases @(
+                @{
+                    Address = '*'
+                },
+                @{
+                    Address = 'Not a valid address'
+                }
+            ) {
+                param ( $Address )
+
+                $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($script:localizedData.AddressFormatError -f $Address) `
+                        -ArgumentName 'Address'
+
+                { Test-IPAddress -Address $Address -AddressFamily 'IPv4' } | Should -Throw $errorRecord
             }
         }
     }
