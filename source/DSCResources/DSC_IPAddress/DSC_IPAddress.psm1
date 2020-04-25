@@ -478,30 +478,7 @@ function Assert-ResourceProperty
     {
         $singleIP = ($singleIPAddress -split '/')[0]
 
-        if (-not ([System.Net.Ipaddress]::TryParse($singleIP, [ref]0)))
-        {
-            New-InvalidArgumentException `
-                -Message $($($script:localizedData.AddressFormatError) -f $singleIPAddress) `
-                -ArgumentName 'IPAddress'
-        }
-
-        $detectedAddressFamily = ([System.Net.IPAddress]$singleIP).AddressFamily.ToString()
-
-        if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
-                -and ($AddressFamily -ne 'IPv4'))
-        {
-            New-InvalidArgumentException `
-                -Message $($($script:localizedData.AddressIPv4MismatchError) -f $singleIPAddress, $AddressFamily) `
-                -ArgumentName 'IPAddress'
-        }
-
-        if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6.ToString()) `
-                -and ($AddressFamily -ne 'IPv6'))
-        {
-            New-InvalidArgumentException `
-                -Message $($($script:localizedData.AddressIPv6MismatchError) -f $singleIPAddress, $AddressFamily) `
-                -ArgumentName 'IPAddress'
-        }
+        Test-IPAddress -Address $singleIP -AddressFamily $AddressFamily
     }
 
     foreach ($prefixLength in $prefixLengthArray)
