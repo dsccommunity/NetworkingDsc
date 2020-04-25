@@ -2387,5 +2387,17 @@ InModuleScope $script:subModuleName {
                 { Test-IPAddress -Address $Address -AddressFamily 'IPv4' } | Should -Throw $errorRecord
             }
         }
+        Context 'When address is valid IPv4 and IPv6 family' {
+            It 'Should throw AddressMismatchError' {
+                $address = '127.0.0.1'
+                $addressFamily = 'IPv6'
+
+                $errorRecord = Get-InvalidArgumentRecord `
+                        -Message ($script:localizedData.AddressIPv4MismatchError -f $Address, $AddressFamily) `
+                        -ArgumentName 'AddressFamily'
+
+                { Test-IPAddress -Address $Address -AddressFamily $addressFamily } | Should -Throw $errorRecord
+            }
+        }
     }
 }
