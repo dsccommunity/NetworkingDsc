@@ -2326,8 +2326,20 @@ InModuleScope $script:subModuleName {
         Context 'When Address is valid IPv4' {
             $addressFamily = 'IPv4'
 
-            It 'Should not error' {
-                Test-IPAddress -Address '0.0.0.0' -AddressFamily $addressFamily
+            It 'Should not error' -TestCases @(
+                @{
+                    Address = '0.0.0.0'
+                },
+                @{
+                    Address = '255.255.255'
+                },
+                @{
+                    Address = '1.12.123.4'
+                }
+            ) {
+                param ( $Address )
+
+                Test-IPAddress -Address $Address -AddressFamily $addressFamily
             }
         }
     }
