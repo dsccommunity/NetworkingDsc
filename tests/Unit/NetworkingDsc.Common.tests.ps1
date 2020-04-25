@@ -2342,5 +2342,30 @@ InModuleScope $script:subModuleName {
                 Test-IPAddress -Address $Address -AddressFamily $addressFamily
             }
         }
+        Context 'When Address is valid IPv6' {
+            $addressFamily = 'IPv6'
+
+            It 'Should not error' -TestCases @(
+                @{
+                    Address = '2001:0db8:85a3:0000:0000:8a2e:0370:7334'
+                },
+                @{
+                    Address = '2001:db8:85a3:0:0:8a2e:370:7334'
+                },
+                @{
+                    Address = '2001:db8:85a3::8a2e:370:7334'
+                },
+                @{
+                    Address = '::1'
+                },
+                @{
+                    Address = '::'
+                }
+            ) {
+                param ( $Address )
+
+                Test-IPAddress -Address $Address -AddressFamily $addressFamily
+            }
+        }
     }
 }
