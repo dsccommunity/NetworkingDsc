@@ -1409,6 +1409,34 @@ function Format-Win32NetworkAdapterFilterByNetConnectionID
     $returnNetAdapaterFilter
 }
 
+<#
+    .SYNOPSIS
+    Check the Address details are valid and do not conflict with Address family.
+    If any problems are detected an exception will be thrown.
+
+    .PARAMETER AddressFamily
+    IP address family.
+
+    .PARAMETER Address
+    The desired default gateway address - if not provided default gateway will be removed.
+#>
+function Test-IPAddress
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('IPv4', 'IPv6')]
+        [System.String]
+        $AddressFamily,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Address
+    )
+    New-NotImplementedException "Not Implemented"
+}
+
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData `
     -ResourceName 'NetworkingDsc.Common' `
@@ -1433,5 +1461,6 @@ Export-ModuleMember -Function @(
     'Test-DscObjectHasProperty'
     'ConvertTo-HashTable',
     'ConvertTo-CimInstance',
-    'Format-Win32NetworkAdapterFilterByNetConnectionID'
+    'Format-Win32NetworkAdapterFilterByNetConnectionID',
+    'Test-IPAddress'
 )
