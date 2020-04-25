@@ -2321,4 +2321,14 @@ InModuleScope $script:subModuleName {
             }
         }
     }
+
+    Describe 'NetworkingDsc.Common\Test-IPAddress' {
+        Context 'When Address is valid IPv4' {
+            $addressFamily = 'IPv4'
+
+            It 'Should not error' {
+                Test-IPAddress -Address '0.0.0.0' -AddressFamily $addressFamily
+            }
+        }
+    }
 }
