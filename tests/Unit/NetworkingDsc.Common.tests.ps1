@@ -18,8 +18,6 @@ $script:subModuleName = (Split-Path -Path $PSCommandPath -Leaf) -replace '\.Test
 $script:subModuleFile = Join-Path -Path $script:subModulesFolder -ChildPath "$($script:subModuleName)/$($script:subModuleName).psm1"
 
 Import-Module $script:subModuleFile -Force -ErrorAction Stop
-
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 #endregion HEADER
 
 InModuleScope $script:subModuleName {
