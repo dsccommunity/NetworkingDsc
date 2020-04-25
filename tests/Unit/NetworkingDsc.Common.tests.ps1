@@ -2325,90 +2325,66 @@ InModuleScope $script:subModuleName {
     }
 
     Describe 'NetworkingDsc.Common\Test-IPAddress' {
-        Context 'When Address is valid IPv4' {
-            $addressFamily = 'IPv4'
-
-            It 'Should not error' -TestCases @(
-                @{
-                    Address = '0.0.0.0'
-                },
-                @{
-                    Address = '255.255.255'
-                },
-                @{
-                    Address = '1.12.123.4'
+        Context 'When invoking with valid IPv4 Address' {
+            It 'Should not throw an error' {
+                $testIPAddressParameters = @{
+                    Address        = '192.168.0.1'
+                    AddressFamily  = 'IPv4'
                 }
-            ) {
-                param ( $Address )
 
-                Test-IPAddress -Address $Address -AddressFamily $addressFamily
+                { Test-IPAddress @testIPAddressParameters } | Should -Not -Throw
             }
         }
-        Context 'When Address is valid IPv6' {
-            $addressFamily = 'IPv6'
-
-            It 'Should not error' -TestCases @(
-                @{
-                    Address = '2001:0db8:85a3:0000:0000:8a2e:0370:7334'
-                },
-                @{
-                    Address = '2001:db8:85a3:0:0:8a2e:370:7334'
-                },
-                @{
-                    Address = '2001:db8:85a3::8a2e:370:7334'
-                },
-                @{
-                    Address = '::1'
-                },
-                @{
-                    Address = '::'
+        Context 'When invoking with valid IPv6 Address' {
+            It 'Should not throw an error' {
+                $testIPAddressParameters = @{
+                    Address        = 'fe80:ab04:30F5:002b::1'
+                    AddressFamily  = 'IPv6'
                 }
-            ) {
-                param ( $Address )
 
-                Test-IPAddress -Address $Address -AddressFamily $addressFamily
+                { Test-IPAddress @testIPAddressParameters } | Should -Not -Throw
             }
         }
-        Context 'When Address is invalid' {
-            It 'Should throw Invalid Argument Exception' -TestCases @(
-                @{
-                    Address = '*'
-                },
-                @{
-                    Address = 'Not a valid address'
+        Context 'When invoking with invalid IP Address' {
+            It 'Should throw an AddressFormatError error' {
+                $testIPAddressParameters = @{
+                    Address        = 'NotReal'
+                    AddressFamily  = 'IPv4'
                 }
-            ) {
-                param ( $Address )
 
                 $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressFormatError -f $Address) `
-                        -ArgumentName 'Address'
+                    -Message ($script:localizedData.AddressFormatError -f $testIPAddressParameters.Address) `
+                    -ArgumentName 'Address'
 
-                { Test-IPAddress -Address $Address -AddressFamily 'IPv4' } | Should -Throw $errorRecord
+                { $script:result = Test-IPAddress @testIPAddressParameters } | Should -Throw $errorRecord
             }
         }
-        Context 'When address is valid IPv4 and IPv6 family' {
-            It 'Should throw AddressMismatchError' {
-                $address = '127.0.0.1'
-                $addressFamily = 'IPv6'
+        Context 'When invoking with IPv4 Address and family mismatch' {
+            It 'Should throw an AddressMismatchError error' {
+                $testIPAddressParameters = @{
+                    Address        = '192.168.0.1'
+                    AddressFamily  = 'IPv6'
+                }
 
                 $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressIPv4MismatchError -f $Address, $AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv4MismatchError -f $testIPAddressParameters.Address, $testIPAddressParameters.AddressFamily) `
                         -ArgumentName 'AddressFamily'
 
-                { Test-IPAddress -Address $Address -AddressFamily $addressFamily } | Should -Throw $errorRecord
+                { $script:result = Test-IPAddress @testIPAddressParameters } | Should -Throw $errorRecord
             }
         }
-        Context 'When address is valid IPv6 and IPv4 family' {
-            It 'Should throw AddressMismatchError' {
-                $address = '2001:0db8:85a3:0000:0000:8a2e:0370:7334'
-                $addressFamily = 'IPv4'
+        Context 'When invoking with IPv6 Address and family mismatch' {
+            It 'Should throw an AddressMismatchError error' {
+                $testIPAddressParameters = @{
+                    Address        = 'fe80::'
+                    AddressFamily  = 'IPv4'
+                }
 
                 $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressIPv6MismatchError -f $Address, $AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv6MismatchError -f $testIPAddressParameters.Address, $testIPAddressParameters.AddressFamily) `
                         -ArgumentName 'AddressFamily'
 
-                { Test-IPAddress -Address $Address -AddressFamily $addressFamily } | Should -Throw $errorRecord
+                { $script:result = Test-IPAddress @testIPAddressParameters } | Should -Throw $errorRecord
             }
         }
     }
