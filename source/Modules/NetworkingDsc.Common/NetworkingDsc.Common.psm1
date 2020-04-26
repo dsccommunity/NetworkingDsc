@@ -1418,7 +1418,7 @@ function Format-Win32NetworkAdapterFilterByNetConnectionID
     IP address family.
 
     .PARAMETER Address
-    The desired default gateway address - if not provided default gateway will be removed.
+    IP Address
 #>
 function Test-IPAddress
 {
