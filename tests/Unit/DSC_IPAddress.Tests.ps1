@@ -32,6 +32,12 @@ Invoke-TestSetup
 try
 {
     InModuleScope $script:dscResourceName {
+
+        $commonLocalizedData = Get-LocalizedData `
+            -ResourceName 'NetworkingDsc.Common' `
+            -ScriptRoot (Join-Path -Path $PSScriptRoot `
+                -ChildPath '..\..\source\Modules\NetworkingDsc.Common\')
+
         Describe 'DSC_IPAddress\Get-TargetResource' -Tag 'Get' {
             Context 'Invoked with a single IP address' {
                 Mock -CommandName Get-NetIPAddress -MockWith {
@@ -587,8 +593,8 @@ try
                         }
 
                         $errorRecord = Get-InvalidArgumentRecord `
-                            -Message ($script:localizedData.AddressFormatError -f $testGetResourceParameters.IPAddress) `
-                            -ArgumentName 'IPAddress'
+                            -Message ($commonLocalizedData.AddressFormatError -f $testGetResourceParameters.IPAddress) `
+                            -ArgumentName 'Address'
 
                         { $result = Test-TargetResource @testGetResourceParameters } | Should -Throw $errorRecord
                     }
@@ -923,8 +929,8 @@ try
                         }
 
                         $errorRecord = Get-InvalidArgumentRecord `
-                            -Message ($script:localizedData.AddressFormatError -f $testGetResourceParameters.IPAddress) `
-                            -ArgumentName 'IPAddress'
+                            -Message ($commonLocalizedData.AddressFormatError -f $testGetResourceParameters.IPAddress) `
+                            -ArgumentName 'Address'
 
                         { $result = Test-TargetResource @testGetResourceParameters } | Should -Throw $errorRecord
                     }
@@ -1121,8 +1127,8 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressFormatError -f $assertResourcePropertyParameters.IPAddress) `
-                        -ArgumentName 'IPAddress'
+                        -Message ($commonLocalizedData.AddressFormatError -f $assertResourcePropertyParameters.IPAddress) `
+                        -ArgumentName 'Address'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
                 }
@@ -1136,9 +1142,11 @@ try
                         AddressFamily  = 'IPv6'
                     }
 
+                    $address = ($assertResourcePropertyParameters.IPAddress -split '/')[0]
+
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressIPv4MismatchError -f $assertResourcePropertyParameters.IPAddress, $assertResourcePropertyParameters.AddressFamily) `
-                        -ArgumentName 'IPAddress'
+                        -Message ($commonLocalizedData.AddressIPv4MismatchError -f $address, $assertResourcePropertyParameters.AddressFamily) `
+                        -ArgumentName 'Address'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
                 }
@@ -1153,8 +1161,8 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressIPv6MismatchError -f $assertResourcePropertyParameters.IPAddress, $assertResourcePropertyParameters.AddressFamily) `
-                        -ArgumentName 'IPAddress'
+                        -Message ($commonLocalizedData.AddressIPv6MismatchError -f $assertResourcePropertyParameters.IPAddress, $assertResourcePropertyParameters.AddressFamily) `
+                        -ArgumentName 'Address'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $errorRecord
                 }
