@@ -53,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - None
 
-## [7.4.0.0]
+## [7.4.0.0] - 2019-09-19
 
 ### Changed
 
@@ -71,7 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   both the current array and desired array is empty.
 - Fix minor style issues in statement case.
 
-## [7.3.0.0]
+## [7.3.0.0] - 2019-06-26
 
 ### Changed
 
@@ -100,7 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     10.0.0.1/8) rather than using CIDR subnet mask notation (e.g
     10.0.0.1/255.0.0.0) - fixes [Issue #404](https://github.com/dsccommunity/NetworkingDsc/issues/404).
 
-## [7.2.0.0]
+## [7.2.0.0] - 2019-05-15
 
 ### Changed
 
@@ -126,7 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   issue was not caught until now when unit tests was added.
 - Corrected style violations in `NetworkingDsc.Common`.
 
-## [7.1.0.0]
+## [7.1.0.0] - 2019-04-03
 
 ### Changed
 
@@ -139,7 +139,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     parameters so that they correctly support strings longer than 255
     characters - fixes [Issue #378](https://github.com/dsccommunity/NetworkingDsc/issues/378).
 
-## [7.0.0.0]
+## [7.0.0.0] - 2019-02-20
 
 ### Changed
 
@@ -182,7 +182,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixes NetworkAdapterName being returned in Name property when calling
     Get-TargetResourceFixes - fixes [Issue #370](https://github.com/dsccommunity/NetworkingDsc/issues/370).
 
-## [6.3.0.0]
+## [6.3.0.0] - 2019-01-10
 
 ### Changed
 
@@ -190,7 +190,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated to allow retaining existing addresses in order to support cluster
     configurations as well.
 
-## [6.2.0.0]
+## [6.2.0.0] - 2018-11-29
 
 ### Changed
 
@@ -201,7 +201,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added a new resource for configuring the IP interface settings for a network
     interface.
 
-## [6.1.0.0]
+## [6.1.0.0] - 2018-09-05
 
 ### Changed
 
@@ -211,7 +211,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     added - fixes [Issue #348](https://github.com/dsccommunity/NetworkingDsc/issues/348).
   - Improved unit tests to meet style guidelines.
 
-## [6.0.0.0]
+## [6.0.0.0] - 2018-09-05
 
 ### Changed
 
@@ -240,7 +240,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a CODE\_OF\_CONDUCT.md with the same content as in the README.md - fixes
   [Issue #337](https://github.com/dsccommunity/NetworkingDsc/issues/337).
 
-## [5.7.0.0]
+## [5.7.0.0] - 2018-01-01
 
 ### Changed
 
@@ -252,7 +252,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fix issue with InterfaceAlias matching on Adapter description
     rather than Adapter Name - Fixes [Issue #315](https://github.com/PowerShell/xNetworking/issues/315).
 
-## [5.6.0.0]
+## [5.6.0.0] - 2018-01-01
 
 ### Changed
 
@@ -278,7 +278,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Corrected style and formatting to meet HQRM guidelines.
 - Updated tests to meet Pester V4 guidelines - Fixes [Issue #272](https://github.com/PowerShell/xNetworking/issues/272).
 
-## [5.5.0.0]
+## [5.5.0.0] - 2018-01-01
 
 ### Changed
 
@@ -311,7 +311,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated tests to meet Pester v4 guidelines.
   - Converted exceptions to use ResourceHelper functions.
 
-## [5.4.0.0]
+## [5.4.0.0] - 2018-01-01
 
 ### Changed
 
@@ -329,7 +329,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     in Wiki documentation.
   - Converted tests to meet Pester V4 standards.
 
-## [5.3.0.0]
+## [5.3.0.0] - 2018-01-01
 
 ### Changed
 
@@ -346,7 +346,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
 
-## [5.2.0.0]
+## [5.2.0.0] - 2018-01-01
 
 ### Changed
 
@@ -364,7 +364,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Corrected style and formatting to meet HQRM guidelines.
   - Converted exceptions to use ResourceHelper functions.
 
-## [5.1.0.0]
+## [5.1.0.0] - 2018-01-01
 
 ### Changed
 
@@ -412,7 +412,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     fixes [Issue 254](https://github.com/PowerShell/xNetworking/issues/254).
   - Improved unit test coverage for this resource.
 
-## [5.0.0.0]
+## [5.0.0.0] - 2018-01-01
 
 ### Changed
 
@@ -442,7 +442,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MSFT_xIPAddress:
   - BREAKING CHANGE: Adding support for multiple IP addresses being assigned.
 
-## [4.1.0.0]
+## [4.1.0.0] - 2018-01-01
 
 ### Changed
 
@@ -450,7 +450,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prevented ResourceHelper and Common module cmdlets from being exported to resolve
   conflicts with other resource modules.
 
-## [4.0.0.0]
+## [4.0.0.0] - 2018-01-01
 
 ### Changed
 
@@ -467,7 +467,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added Find-NetAdapter cmdlet to NetworkingDsc.Common.
 - Correct example parameters format to meet style guidelines.
 
-## [3.2.0.0]
+## [3.2.0.0] - 2018-01-01
 
 ### Changed
 
@@ -539,7 +539,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MSFT_xFirewall:
   - Converted to remove Invoke-Expression.
 
-## [3.1.0.0]
+## [3.1.0.0] - 2018-01-01
 
 ### Changed
 
@@ -549,7 +549,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added xNetAdapterRDMA resource
 - Fixes to support changes to DSCResource.Tests.
 
-## [3.0.0.0]
+## [3.0.0.0] - 2018-01-01
 
 ### Changed
 
@@ -567,7 +567,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added support for the use of wildcard (*) in InterfaceAlias parameter.
 - BREAKING CHANGE - MSFT_xIPAddress: SubnetMask parameter renamed to PrefixLength.
 
-## [2.12.0.0]
+## [2.12.0.0] - 2018-01-01
 
 ### Changed
 
@@ -578,7 +578,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   MSFT_xNetworkTeam to prevent failures while loading those resources on systems
   with $PSUICulture other than en-US
 
-## [2.11.0.0]
+## [2.11.0.0] - 2018-01-01
 
 ### Changed
 
@@ -592,7 +592,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated xRoute integration tests to use v1.1.0 test header.
 - Extended xRoute integration tests to perform both add and remove route tests.
 
-## [2.10.0.0]
+## [2.10.0.0] - 2018-01-01
 
 ### Changed
 
@@ -604,7 +604,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Static IP address to prevent issue when DHCP assigned IP address already
   matches staticly assigned IP address.
 
-## [2.9.0.0]
+## [2.9.0.0] - 2018-01-01
 
 ### Changed
 
@@ -619,7 +619,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Test-xNetworkAdapterName
   - Set-xNetworkAdapterName
 
-## [2.8.0.0]
+## [2.8.0.0] - 2018-01-01
 
 ### Changed
 
@@ -631,14 +631,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MSFT_xFirewall: Fix test of Profile parameter status.
 - MSFT_xIPAddress: Fix false negative when desired IP is a substring of current IP.
 
-## [2.7.0.0]
+## [2.7.0.0] - 2018-01-01
 
 ### Changed
 
 - Added the following resources:
   - MSFT_xNetworkTeam resource to manage native network adapter teaming.
 
-## [2.6.0.0]
+## [2.6.0.0] - 2018-01-01
 
 ### Changed
 
@@ -666,7 +666,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   tests directory.
 - Unit & Integration test template headers updated to match DSCResource templates.
 
-## [2.5.0.0]
+## [2.5.0.0] - 2018-01-01
 
 ### Changed
 
@@ -703,7 +703,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - RemoteUser
 - MSFT_xFirewall: Profile parameter now handled as an Array.
 
-## [2.4.0.0]
+## [2.4.0.0] - 2018-01-01
 
 ### Changed
 
@@ -733,7 +733,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MSFT_xDNSServerAddress: Corrected error message when address format doesn't
   match address family.
 
-## [2.3.0.0]
+## [2.3.0.0] - 2018-01-01
 
 ### Changed
 
@@ -749,31 +749,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - General re-factoring and clean up of xFirewall.
   - Added Unit and Integration tests to resource.
 
-## [2.2.0.0]
+## [2.2.0.0] - 2018-01-01
 
 ### Changed
 
 - Changes in xFirewall resources to meet Test-xDscResource criteria
 
-## [2.1.1.1]
+## [2.1.1.1] - 2018-01-01
 
 ### Changed
 
 - Updated to fix issue with Get-DscConfiguration and xFirewall
 
-## [2.1.0]
+## [2.1.0] - 2018-01-01
 
 ### Changed
 
 - Added validity check that IPAddress and IPAddressFamily conforms with each other
 
-## [2.0.0.0]
+## [2.0.0.0] - 2018-01-01
 
 ### Changed
 
 - Adding the xFirewall resource
 
-## [1.0.0.0]
+## [1.0.0.0] - 2018-01-01
 
 ### Changed
 
