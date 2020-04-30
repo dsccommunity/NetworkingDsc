@@ -298,7 +298,7 @@ function Assert-ResourceProperty
 
     if ($Address)
     {
-        Test-IPAddress -Address $Address -AddressFamily $AddressFamily
+        Assert-IPAddress -Address $Address -AddressFamily $AddressFamily
     }
 } # Assert-ResourceProperty
 

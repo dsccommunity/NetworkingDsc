@@ -1420,7 +1420,7 @@ function Format-Win32NetworkAdapterFilterByNetConnectionID
     .PARAMETER Address
     IP Address
 #>
-function Test-IPAddress
+function Assert-IPAddress
 {
     [CmdletBinding()]
     param
@@ -1486,5 +1486,5 @@ Export-ModuleMember -Function @(
     'ConvertTo-HashTable',
     'ConvertTo-CimInstance',
     'Format-Win32NetworkAdapterFilterByNetConnectionID',
-    'Test-IPAddress'
+    'Assert-IPAddress'
 )

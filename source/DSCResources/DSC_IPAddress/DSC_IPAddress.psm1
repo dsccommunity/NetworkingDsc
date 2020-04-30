@@ -478,7 +478,7 @@ function Assert-ResourceProperty
     {
         $singleIP = ($singleIPAddress -split '/')[0]
 
-        Test-IPAddress -Address $singleIP -AddressFamily $AddressFamily
+        Assert-IPAddress -Address $singleIP -AddressFamily $AddressFamily
     }
 
     foreach ($prefixLength in $prefixLengthArray)

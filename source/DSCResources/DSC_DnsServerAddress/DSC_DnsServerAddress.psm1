@@ -319,7 +319,7 @@ function Assert-ResourceProperty
             -ArgumentName 'InterfaceAlias'
     }
 
-    Test-IPAddress -Address $Address -AddressFamily $AddressFamily
+    Assert-IPAddress -Address $Address -AddressFamily $AddressFamily
 } # Assert-ResourceProperty
 
 Export-ModuleMember -function *-TargetResource

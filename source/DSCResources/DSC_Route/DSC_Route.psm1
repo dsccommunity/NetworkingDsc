@@ -622,10 +622,10 @@ function Assert-ResourceProperty
     $components = $DestinationPrefix -split '/'
     $prefix = $components[0]
 
-    Test-IPAddress -Address $prefix -AddressFamily $AddressFamily
+    Assert-IPAddress -Address $prefix -AddressFamily $AddressFamily
 
     # Validate the NextHop Parameter
-    Test-IPAddress -Address $NextHop -AddressFamily $AddressFamily
+    Assert-IPAddress -Address $NextHop -AddressFamily $AddressFamily
 }
 
 Export-ModuleMember -Function *-TargetResource

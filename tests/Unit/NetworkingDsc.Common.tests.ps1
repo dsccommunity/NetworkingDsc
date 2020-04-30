@@ -2322,7 +2322,7 @@ InModuleScope $script:subModuleName {
         }
     }
 
-    Describe 'NetworkingDsc.Common\Test-IPAddress' {
+    Describe 'NetworkingDsc.Common\Assert-IPAddress' {
         Context 'When invoking with valid IPv4 Address' {
             It 'Should not throw an error' {
                 $testIPAddressParameters = @{
@@ -2330,7 +2330,7 @@ InModuleScope $script:subModuleName {
                     AddressFamily  = 'IPv4'
                 }
 
-                { Test-IPAddress @testIPAddressParameters } | Should -Not -Throw
+                { Assert-IPAddress @testIPAddressParameters } | Should -Not -Throw
             }
         }
         Context 'When invoking with valid IPv6 Address' {
@@ -2340,7 +2340,7 @@ InModuleScope $script:subModuleName {
                     AddressFamily  = 'IPv6'
                 }
 
-                { Test-IPAddress @testIPAddressParameters } | Should -Not -Throw
+                { Assert-IPAddress @testIPAddressParameters } | Should -Not -Throw
             }
         }
         Context 'When invoking with invalid IP Address' {
@@ -2354,7 +2354,7 @@ InModuleScope $script:subModuleName {
                     -Message ($script:localizedData.AddressFormatError -f $testIPAddressParameters.Address) `
                     -ArgumentName 'Address'
 
-                { $script:result = Test-IPAddress @testIPAddressParameters } | Should -Throw $errorRecord
+                { $script:result = Assert-IPAddress @testIPAddressParameters } | Should -Throw $errorRecord
             }
         }
         Context 'When invoking with IPv4 Address and family mismatch' {
@@ -2368,7 +2368,7 @@ InModuleScope $script:subModuleName {
                         -Message ($script:localizedData.AddressIPv4MismatchError -f $testIPAddressParameters.Address, $testIPAddressParameters.AddressFamily) `
                         -ArgumentName 'AddressFamily'
 
-                { $script:result = Test-IPAddress @testIPAddressParameters } | Should -Throw $errorRecord
+                { $script:result = Assert-IPAddress @testIPAddressParameters } | Should -Throw $errorRecord
             }
         }
         Context 'When invoking with IPv6 Address and family mismatch' {
@@ -2382,7 +2382,7 @@ InModuleScope $script:subModuleName {
                         -Message ($script:localizedData.AddressIPv6MismatchError -f $testIPAddressParameters.Address, $testIPAddressParameters.AddressFamily) `
                         -ArgumentName 'AddressFamily'
 
-                { $script:result = Test-IPAddress @testIPAddressParameters } | Should -Throw $errorRecord
+                { $script:result = Assert-IPAddress @testIPAddressParameters } | Should -Throw $errorRecord
             }
         }
     }
