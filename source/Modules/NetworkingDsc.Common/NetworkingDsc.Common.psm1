@@ -1435,7 +1435,8 @@ function Assert-IPAddress
         $Address
     )
 
-    if (-not ([System.Net.IPAddress]::TryParse($Address, [ref]0)))
+    [System.Net.IPAddress] $ipAddress = $null
+    if (-not ([System.Net.IPAddress]::TryParse($Address, [ref] $ipAddress)))
     {
         New-InvalidArgumentException `
             -Message ($script:localizedData.AddressFormatError -f $Address) `
@@ -1444,9 +1445,7 @@ function Assert-IPAddress
 
     if ($AddressFamily)
     {
-        $detectedAddressFamily = ([System.Net.IPAddress] $Address).AddressFamily.ToString()
-
-        if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
+        if (($ipAddress.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
                 -and ($AddressFamily -ne 'IPv4'))
         {
             New-InvalidArgumentException `
@@ -1454,7 +1453,7 @@ function Assert-IPAddress
                 -ArgumentName 'AddressFamily'
         }
 
-        if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6.ToString()) `
+        if (($ipAddress.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6.ToString()) `
                 -and ($AddressFamily -ne 'IPv6'))
         {
             New-InvalidArgumentException `
