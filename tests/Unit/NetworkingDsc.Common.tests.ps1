@@ -2385,5 +2385,23 @@ InModuleScope $script:subModuleName {
                 { $script:result = Assert-IPAddress @testIPAddressParameters } | Should -Throw $errorRecord
             }
         }
+        Context 'When invoking with valid IPv4 Address with no address family' {
+            It 'Should not throw an error' {
+                $testIPAddressParameters = @{
+                    Address        = '192.168.0.1'
+                }
+
+                { Assert-IPAddress @testIPAddressParameters } | Should -Not -Throw
+            }
+        }
+        Context 'When invoking with valid IPv6 Address with no address family' {
+            It 'Should not throw an error' {
+                $testIPAddressParameters = @{
+                    Address        = 'fe80:ab04:30F5:002b::1'
+                }
+
+                { Assert-IPAddress @testIPAddressParameters } | Should -Not -Throw
+            }
+        }
     }
 }

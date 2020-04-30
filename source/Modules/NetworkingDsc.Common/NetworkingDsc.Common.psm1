@@ -1425,7 +1425,7 @@ function Assert-IPAddress
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [ValidateSet('IPv4', 'IPv6')]
         [System.String]
         $AddressFamily,
