@@ -1445,20 +1445,26 @@ function Assert-IPAddress
 
     if ($AddressFamily)
     {
-        if (($ipAddress.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
-                -and ($AddressFamily -ne 'IPv4'))
+        switch ($AddressFamily)
         {
-            New-InvalidArgumentException `
-                -Message ($script:localizedData.AddressIPv4MismatchError -f $Address, $AddressFamily) `
-                -ArgumentName 'AddressFamily'
-        }
-
-        if (($ipAddress.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6.ToString()) `
-                -and ($AddressFamily -ne 'IPv6'))
-        {
-            New-InvalidArgumentException `
-                -Message ($script:localizedData.AddressIPv6MismatchError -f $Address, $AddressFamily) `
-                -ArgumentName 'AddressFamily'
+            'IPv4'
+            {
+                if ($ipAddress.AddressFamily -ne [System.Net.Sockets.AddressFamily]::InterNetwork.ToString())
+                {
+                    New-InvalidArgumentException `
+                        -Message ($script:localizedData.AddressIPv6MismatchError -f $Address, $AddressFamily) `
+                        -ArgumentName 'AddressFamily'
+                }
+            }
+            'IPv6'
+            {
+                if ($ipAddress.AddressFamily -ne [System.Net.Sockets.AddressFamily]::InterNetworkV6.ToString())
+                {
+                    New-InvalidArgumentException `
+                        -Message ($script:localizedData.AddressIPv4MismatchError -f $Address, $AddressFamily) `
+                        -ArgumentName 'AddressFamily'
+                }
+            }
         }
     }
 }
