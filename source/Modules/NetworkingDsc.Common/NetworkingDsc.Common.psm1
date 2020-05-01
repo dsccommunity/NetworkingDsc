@@ -1411,14 +1411,14 @@ function Format-Win32NetworkAdapterFilterByNetConnectionID
 
 <#
     .SYNOPSIS
-    Check the Address details are valid and do not conflict with Address family.
-    If any problems are detected an exception will be thrown.
+        Check the Address details are valid and do not conflict with Address family.
+        If any problems are detected an exception will be thrown.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 
     .PARAMETER Address
-    IP Address
+        IP Address
 #>
 function Assert-IPAddress
 {
@@ -1429,6 +1429,7 @@ function Assert-IPAddress
         [ValidateSet('IPv4', 'IPv6')]
         [System.String]
         $AddressFamily,
+
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
@@ -1436,6 +1437,7 @@ function Assert-IPAddress
     )
 
     [System.Net.IPAddress] $ipAddress = $null
+
     if (-not ([System.Net.IPAddress]::TryParse($Address, [ref] $ipAddress)))
     {
         New-InvalidArgumentException `
