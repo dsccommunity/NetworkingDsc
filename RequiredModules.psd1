@@ -1,5 +1,5 @@
 @{
-    PSDependOptions      = @{
+    PSDependOptions             = @{
         AddToPath  = $true
         Target     = 'output\RequiredModules'
         Parameters = @{
