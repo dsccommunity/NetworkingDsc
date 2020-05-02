@@ -32,12 +32,6 @@ Invoke-TestSetup
 try
 {
     InModuleScope $script:dscResourceName {
-
-        $commonLocalizedData = Get-LocalizedData `
-            -ResourceName 'NetworkingDsc.Common' `
-            -ScriptRoot (Join-Path -Path $PSScriptRoot `
-                -ChildPath '..\..\source\Modules\NetworkingDsc.Common\')
-
         Describe 'DSC_DnsServerAddress\Get-TargetResource' -Tag 'Get' {
             Context 'Test IPv4' {
                 Context 'Invoking with an IPv4 address and one address is currently set' {
@@ -614,7 +608,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($commonLocalizedData.AddressFormatError -f $assertResourcePropertySplat.Address) `
+                        -Message ($script:localizedData.AddressFormatError -f $assertResourcePropertySplat.Address) `
                         -ArgumentName 'Address'
 
                     { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
@@ -631,7 +625,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($commonLocalizedData.AddressIPv4MismatchError -f $assertResourcePropertySplat.Address, $assertResourcePropertySplat.AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv4MismatchError -f $assertResourcePropertySplat.Address, $assertResourcePropertySplat.AddressFamily) `
                         -ArgumentName 'Address'
 
                     { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
@@ -648,7 +642,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($commonLocalizedData.AddressIPv6MismatchError -f $assertResourcePropertySplat.Address, $assertResourcePropertySplat.AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv6MismatchError -f $assertResourcePropertySplat.Address, $assertResourcePropertySplat.AddressFamily) `
                         -ArgumentName 'Address'
 
                     { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord

@@ -42,11 +42,6 @@ try
             }
         }
 
-        $commonLocalizedData = Get-LocalizedData `
-            -ResourceName 'NetworkingDsc.Common' `
-            -ScriptRoot (Join-Path -Path $PSScriptRoot `
-                -ChildPath '..\..\source\Modules\NetworkingDsc.Common\')
-
         Describe 'DSC_DefaultGatewayAddress\Get-TargetResource' -Tag 'Get' {
             Context 'When interface has a default gateway set' {
                 Mock -CommandName Get-NetRoute -MockWith $getNetRouteIpv4_Mock
@@ -225,7 +220,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($commonLocalizedData.AddressFormatError -f $assertResourcePropertyParameters.Address) `
+                        -Message ($script:localizedData.AddressFormatError -f $assertResourcePropertyParameters.Address) `
                         -ArgumentName 'Address'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
@@ -241,7 +236,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($commonLocalizedData.AddressIPv4MismatchError -f $assertResourcePropertyParameters.Address, $assertResourcePropertyParameters.AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv4MismatchError -f $assertResourcePropertyParameters.Address, $assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'AddressFamily'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
@@ -257,7 +252,7 @@ try
                     }
 
                     $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($commonLocalizedData.AddressIPv6MismatchError -f $assertResourcePropertyParameters.Address, $assertResourcePropertyParameters.AddressFamily) `
+                        -Message ($script:localizedData.AddressIPv6MismatchError -f $assertResourcePropertyParameters.Address, $assertResourcePropertyParameters.AddressFamily) `
                         -ArgumentName 'AddressFamily'
 
                     { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
