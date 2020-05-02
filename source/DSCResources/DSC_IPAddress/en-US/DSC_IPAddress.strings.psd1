@@ -11,8 +11,5 @@ ConvertFrom-StringData @'
     PrefixLengthDoesNotMatchMessage = Prefix Length does NOT match desired state. Expected {0}, actual {1}.
     PrefixLengthMatchMessage = Prefix Length is in desired state.
     InterfaceNotAvailableError = Interface "{0}" is not available. Please select a valid interface and try again.
-    AddressFormatError = Address "{0}" is not in the correct format. Please correct the Address parameter in the configuration and try again.
-    AddressIPv4MismatchError = Address "{0}" is in IPv4 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
-    AddressIPv6MismatchError = Address "{0}" is in IPv6 format, which does not match server address family {1}. Please correct either of them in the configuration and try again.
     PrefixLengthError = A Prefix Length of {0} is not valid for {1} addresses. Please correct the Prefix Length and try again.
 '@

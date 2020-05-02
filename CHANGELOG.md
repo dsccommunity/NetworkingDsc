@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     for the DSC resource.
   - Added build task `Generate_Wiki_Content` to generate the wiki content
     that can be used to update the GitHub Wiki.
+- Common
+  - Added Assert-IPAddress function to reduce code duplication - Fixes
+    [Issue #408](https://github.com/dsccommunity/NetworkingDsc/issues/408).
 
 ### Changed
 

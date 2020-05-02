@@ -622,56 +622,10 @@ function Assert-ResourceProperty
     $components = $DestinationPrefix -split '/'
     $prefix = $components[0]
 
-    if (-not ([System.Net.Ipaddress]::TryParse($prefix, [ref]0)))
-    {
-        New-InvalidArgumentException `
-            -Message $($($script:localizedData.AddressFormatError) -f $prefix) `
-            -ArgumentName 'DestinationPrefix'
-    }
-
-    $detectedAddressFamily = ([System.Net.IPAddress] $prefix).AddressFamily.ToString()
-
-    if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
-            -and ($AddressFamily -ne 'IPv4'))
-    {
-        New-InvalidArgumentException `
-            -Message $($($script:localizedData.AddressIPv4MismatchError) -f $prefix, $AddressFamily) `
-            -ArgumentName 'DestinationPrefix'
-    }
-
-    if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6.ToString()) `
-            -and ($AddressFamily -ne 'IPv6'))
-    {
-        New-InvalidArgumentException `
-            -Message $($($script:localizedData.AddressIPv6MismatchError) -f $prefix, $AddressFamily) `
-            -ArgumentName 'DestinationPrefix'
-    }
+    Assert-IPAddress -Address $prefix -AddressFamily $AddressFamily
 
     # Validate the NextHop Parameter
-    if (-not ([System.Net.Ipaddress]::TryParse($NextHop, [ref]0)))
-    {
-        New-InvalidArgumentException `
-            -Message $($($script:localizedData.AddressFormatError) -f $NextHop) `
-            -ArgumentName 'NextHop'
-    }
-
-    $detectedAddressFamily = ([System.Net.IPAddress] $NextHop).AddressFamily.ToString()
-
-    if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork.ToString()) `
-            -and ($AddressFamily -ne 'IPv4'))
-    {
-        New-InvalidArgumentException `
-            -Message $($($script:localizedData.AddressIPv4MismatchError) -f $NextHop, $AddressFamily) `
-            -ArgumentName 'NextHop'
-    }
-
-    if (($detectedAddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6.ToString()) `
-            -and ($AddressFamily -ne 'IPv6'))
-    {
-        New-InvalidArgumentException `
-            -Message $($($script:localizedData.AddressIPv6MismatchError) -f $NextHop, $AddressFamily) `
-            -ArgumentName 'NextHop'
-    }
+    Assert-IPAddress -Address $NextHop -AddressFamily $AddressFamily
 }
 
 Export-ModuleMember -Function *-TargetResource
