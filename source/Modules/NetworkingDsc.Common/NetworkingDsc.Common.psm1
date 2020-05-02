@@ -1,33 +1,5 @@
 <#
     .SYNOPSIS
-        This function tests if a cmdlet exists.
-
-    .PARAMETER Name
-        The name of the cmdlet to check for.
-
-    .PARAMETER Module
-        The module containing the command.
-#>
-function Test-Command
-{
-    [CmdletBinding()]
-    [OutputType([System.Boolean])]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $Name,
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $Module
-    )
-
-    return ($null -ne (Get-Command @PSBoundParameters -ErrorAction SilentlyContinue))
-} # function Test-Command
-
-<#
-    .SYNOPSIS
         Converts any IP Addresses containing CIDR notation filters in an array to use Subnet Mask
         notation.
 
@@ -556,127 +528,6 @@ function Get-IPAddressPrefix
 }
 
 <#
-    .SYNOPSIS
-        Tests of an object has a property
-
-    .PARAMETER Object
-        The object to test
-
-    .PARAMETER PropertyName
-        The property name
-#>
-function Test-DscObjectHasProperty
-{
-    [CmdletBinding()]
-    [OutputType([System.Boolean])]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [System.Object]
-        $Object,
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $PropertyName
-    )
-
-    if ($Object.PSObject.Properties.Name -contains $PropertyName)
-    {
-        return [System.Boolean] $Object.$PropertyName
-    }
-
-    return $false
-}
-
-<#
-    .SYNOPSIS
-        Converts a hashtable into a CimInstance array.
-
-    .DESCRIPTION
-        This function is used to convert a hashtable into MSFT_KeyValuePair objects. These are stored as an CimInstance array.
-        DSC cannot handle hashtables but CimInstances arrays storing MSFT_KeyValuePair.
-
-    .PARAMETER Hashtable
-        A hashtable with the values to convert.
-
-    .OUTPUTS
-        An object array with CimInstance objects.
-#>
-function ConvertTo-CimInstance
-{
-    [CmdletBinding()]
-    [OutputType([System.Object[]])]
-    param
-    (
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [System.Collections.Hashtable]
-        $Hashtable
-    )
-
-    process
-    {
-        foreach ($item in $Hashtable.GetEnumerator())
-        {
-            New-CimInstance -ClassName MSFT_KeyValuePair -Namespace root/microsoft/Windows/DesiredStateConfiguration -Property @{
-                Key   = $item.Key
-                Value = if ($item.Value -is [array])
-                {
-                    $item.Value -join ','
-                }
-                else
-                {
-                    $item.Value
-                }
-            } -ClientOnly
-        }
-    }
-}
-
-<#
-    .SYNOPSIS
-        Converts CimInstances into a hashtable.
-
-    .DESCRIPTION
-        This function is used to convert a CimInstance array containing MSFT_KeyValuePair objects into a hashtable.
-
-    .PARAMETER CimInstance
-        An array of CimInstances or a single CimInstance object to convert.
-
-    .OUTPUTS
-        Hashtable
-#>
-function ConvertTo-HashTable
-{
-    [CmdletBinding()]
-    [OutputType([System.Collections.Hashtable])]
-    param
-    (
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [AllowEmptyCollection()]
-        [Microsoft.Management.Infrastructure.CimInstance[]]
-        $CimInstance
-    )
-
-    begin
-    {
-        $result = @{ }
-    }
-
-    process
-    {
-        foreach ($ci in $CimInstance)
-        {
-            $result.Add($ci.Key, $ci.Value)
-        }
-    }
-
-    end
-    {
-        $result
-    }
-}
-
-<#
 .SYNOPSIS
     Returns a filter string for the net adapter CIM instances. Wildcards supported.
 
@@ -781,14 +632,12 @@ $script:localizedData = Get-LocalizedData `
     -ScriptRoot $PSScriptRoot
 
 Export-ModuleMember -Function @(
-    'Test-Command',
     'Convert-CIDRToSubhetMask',
     'Find-NetworkAdapter',
     'Get-DnsClientServerStaticAddress',
     'Get-WinsClientServerStaticAddress',
     'Set-WinsClientServerStaticAddress',
     'Get-IPAddressPrefix',
-    'Test-DscObjectHasProperty'
     'ConvertTo-HashTable',
     'ConvertTo-CimInstance',
     'Format-Win32NetworkAdapterFilterByNetConnectionID',
