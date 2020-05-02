@@ -599,7 +599,7 @@ try
             }
 
             Context 'Invoking with invalid IP Address' {
-                It 'Should throw the expected exception' {
+                It 'Should throw an exception' {
                     $assertResourcePropertySplat = @{
                         Address        = 'NotReal'
                         InterfaceAlias = 'Ethernet'
@@ -607,16 +607,12 @@ try
                         Verbose        = $true
                     }
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressFormatError -f $assertResourcePropertySplat.Address) `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw
                 }
             }
 
             Context 'Invoking with IPv4 Address and family mismatch' {
-                It 'Should throw the expected exception' {
+                It 'Should throw an exception' {
                     $assertResourcePropertySplat = @{
                         Address        = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
@@ -624,16 +620,12 @@ try
                         Verbose        = $true
                     }
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressIPv4MismatchError -f $assertResourcePropertySplat.Address, $assertResourcePropertySplat.AddressFamily) `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw
                 }
             }
 
             Context 'Invoking with IPv6 Address and family mismatch' {
-                It 'Should throw the expected exception' {
+                It 'Should throw an exception' {
                     $assertResourcePropertySplat = @{
                         Address        = 'fe80::'
                         InterfaceAlias = 'Ethernet'
@@ -641,11 +633,7 @@ try
                         Verbose        = $true
                     }
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressIPv6MismatchError -f $assertResourcePropertySplat.Address, $assertResourcePropertySplat.AddressFamily) `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw
                 }
             }
 

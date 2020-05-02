@@ -383,136 +383,104 @@ try
             Context 'Invoking with bad IPv4 DestinationPrefix address' {
                 Mock -CommandName Get-NetAdapter -MockWith { $mockNetAdapter }
 
-                It 'Should throw an AddressFormatError error' {
+                It 'Should throw an exception' {
                     $Splat = $testRoute.Clone()
                     $Splat.DestinationPrefix = '10.0.300.0/24'
                     $Splat.NextHop = '10.0.1.0'
                     $Splat.AddressFamily = 'IPv4'
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressFormatError -f '10.0.300.0') `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
+                    { Assert-ResourceProperty @Splat } | Should -Throw
                 }
             }
 
             Context 'Invoking with bad IPv6 DestinationPrefix address' {
                 Mock -CommandName Get-NetAdapter -MockWith { $mockNetAdapter }
 
-                It 'Should throw an AddressFormatError error' {
+                It 'Should throw an exception' {
                     $Splat = $testRoute.Clone()
                     $Splat.DestinationPrefix = 'fe8x::/64'
                     $Splat.NextHop = 'fe90::'
                     $Splat.AddressFamily = 'IPv6'
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressFormatError -f 'fe8x::') `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
+                    { Assert-ResourceProperty @Splat } | Should -Throw
                 }
             }
 
             Context 'Invoking with IPv4 DestinationPrefix mismatch' {
                 Mock -CommandName Get-NetAdapter -MockWith { $mockNetAdapter }
 
-                It 'Should throw an AddressIPv6MismatchError error' {
+                It 'Should throw an exception' {
                     $Splat = $testRoute.Clone()
                     $Splat.DestinationPrefix = 'fe80::/64'
                     $Splat.NextHop = '10.0.1.0'
                     $Splat.AddressFamily = 'IPv4'
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressIPv6MismatchError -f 'fe80::', 'IPv4') `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
+                    { Assert-ResourceProperty @Splat } | Should -Throw
                 }
             }
 
             Context 'Invoking with IPv6 DestinationPrefix mismatch' {
                 Mock -CommandName Get-NetAdapter -MockWith { $mockNetAdapter }
 
-                It 'Should throw an AddressIPv4MismatchError error' {
+                It 'Should throw an exception' {
                     $Splat = $testRoute.Clone()
                     $Splat.DestinationPrefix = '10.0.0.0/24'
                     $Splat.NextHop = 'fe81::'
                     $Splat.AddressFamily = 'IPv6'
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressIPv4MismatchError -f '10.0.0.0', 'IPv6') `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
+                    { Assert-ResourceProperty @Splat } | Should -Throw
                 }
             }
 
             Context 'Invoking with bad IPv4 NextHop address' {
                 Mock -CommandName Get-NetAdapter -MockWith { $mockNetAdapter }
 
-                It 'Should throw an AddressFormatError error' {
+                It 'Should throw an exception' {
                     $Splat = $testRoute.Clone()
                     $Splat.DestinationPrefix = '10.0.0.0/24'
                     $Splat.NextHop = '10.0.300.0'
                     $Splat.AddressFamily = 'IPv4'
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressFormatError -f '10.0.300.0') `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
+                    { Assert-ResourceProperty @Splat } | Should -Throw
                 }
             }
 
             Context 'Invoking with bad IPv6 NextHop address' {
                 Mock -CommandName Get-NetAdapter -MockWith { $mockNetAdapter }
 
-                It 'Should throw an AddressFormatError error' {
+                It 'Should throw an exception' {
                     $Splat = $testRoute.Clone()
                     $Splat.DestinationPrefix = 'fe80::/64'
                     $Splat.NextHop = 'fe9x::'
                     $Splat.AddressFamily = 'IPv6'
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressFormatError -f 'fe9x::') `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
+                    { Assert-ResourceProperty @Splat } | Should -Throw
                 }
             }
 
             Context 'Invoking with IPv4 NextHop mismatch' {
                 Mock -CommandName Get-NetAdapter -MockWith { $mockNetAdapter }
 
-                It 'Should throw an AddressIPv6MismatchError error' {
+                It 'Should throw an exception' {
                     $Splat = $testRoute.Clone()
                     $Splat.DestinationPrefix = '10.0.0.0/24'
                     $Splat.NextHop = 'fe90::'
                     $Splat.AddressFamily = 'IPv4'
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressIPv6MismatchError -f 'fe90::', 'IPv4') `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
+                    { Assert-ResourceProperty @Splat } | Should -Throw
                 }
             }
 
             Context 'Invoking with IPv6 NextHop mismatch' {
                 Mock -CommandName Get-NetAdapter -MockWith { $mockNetAdapter }
 
-                It 'Should throw an AddressIPv4MismatchError error' {
+                It 'Should throw an exception' {
                     $Splat = $testRoute.Clone()
                     $Splat.DestinationPrefix = 'fe80::/64'
                     $Splat.NextHop = '10.0.1.0'
                     $Splat.AddressFamily = 'IPv6'
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($script:localizedData.AddressIPv4MismatchError -f '10.0.1.0', 'IPv6') `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @Splat } | Should -Throw $errorRecord
+                    { Assert-ResourceProperty @Splat } | Should -Throw
                 }
             }
         }
