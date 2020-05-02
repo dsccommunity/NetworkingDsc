@@ -572,13 +572,13 @@ function Format-Win32NetworkAdapterFilterByNetConnectionID
 }
 
 Export-ModuleMember -Function @(
-    'Convert-CIDRToSubhetMask',
-    'Find-NetworkAdapter',
-    'Get-DnsClientServerStaticAddress',
-    'Get-WinsClientServerStaticAddress',
-    'Set-WinsClientServerStaticAddress',
-    'Get-IPAddressPrefix',
-    'ConvertTo-HashTable',
-    'ConvertTo-CimInstance',
-    'Format-Win32NetworkAdapterFilterByNetConnectionID',
+    'Convert-CIDRToSubhetMask'
+    'Find-NetworkAdapter'
+    'Get-DnsClientServerStaticAddress'
+    'Get-WinsClientServerStaticAddress'
+    'Set-WinsClientServerStaticAddress'
+    'Get-IPAddressPrefix'
+    'ConvertTo-HashTable'
+    'ConvertTo-CimInstance'
+    'Format-Win32NetworkAdapterFilterByNetConnectionID'
 )
