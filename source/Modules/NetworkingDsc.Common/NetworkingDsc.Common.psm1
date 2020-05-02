@@ -578,7 +578,5 @@ Export-ModuleMember -Function @(
     'Get-WinsClientServerStaticAddress'
     'Set-WinsClientServerStaticAddress'
     'Get-IPAddressPrefix'
-    'ConvertTo-HashTable'
-    'ConvertTo-CimInstance'
     'Format-Win32NetworkAdapterFilterByNetConnectionID'
 )
