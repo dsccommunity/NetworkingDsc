@@ -1,3 +1,10 @@
+$script:resourceHelperModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\DscResource.Common'
+
+Import-Module -Name $script:resourceHelperModulePath
+
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
+
 <#
     .SYNOPSIS
         Converts any IP Addresses containing CIDR notation filters in an array to use Subnet Mask
@@ -625,11 +632,6 @@ function Assert-IPAddress
         }
     }
 }
-
-# Import Localization Strings
-$script:localizedData = Get-LocalizedData `
-    -ResourceName 'NetworkingDsc.Common' `
-    -ScriptRoot $PSScriptRoot
 
 Export-ModuleMember -Function @(
     'Convert-CIDRToSubhetMask',
