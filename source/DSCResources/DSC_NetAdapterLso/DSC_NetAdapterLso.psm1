@@ -5,9 +5,12 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
-# Import Localization Strings
-$script:localizedData = Get-LocalizedData -ResourceName 'DSC_NetAdapterLso'
+$script:resourceHelperModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\DscResource.Common'
 
+Import-Module -Name $script:resourceHelperModulePath
+
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 <#
 .SYNOPSIS
     Gets the current state of NetAdapterLso for a adapter.

@@ -5,13 +5,17 @@ param ()
 
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
-# Import the Storage Common Modules
+# Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
             -ChildPath 'NetworkingDsc.Common.psm1'))
 
+$script:resourceHelperModulePath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\Modules\DscResource.Common'
+
+Import-Module -Name $script:resourceHelperModulePath
+
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData -ResourceName 'DSC_WaitForNetworkTeam'
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
