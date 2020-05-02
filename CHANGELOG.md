@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- NetworkingDsc
+  - Updated to use the common module _DscResource.Common_.
 - DefaultGatewayAddress:
   - Refactored to reduce code duplication.
   - Fixed hash table style violations - fixes [Issue #429](https://github.com/dsccommunity/NetworkingDsc/issues/429).
