@@ -42,11 +42,6 @@ try
             }
         }
 
-        $commonLocalizedData = Get-LocalizedData `
-            -ResourceName 'NetworkingDsc.Common' `
-            -ScriptRoot (Join-Path -Path $PSScriptRoot `
-                -ChildPath '..\..\source\Modules\NetworkingDsc.Common\')
-
         Describe 'DSC_DefaultGatewayAddress\Get-TargetResource' -Tag 'Get' {
             Context 'When interface has a default gateway set' {
                 Mock -CommandName Get-NetRoute -MockWith $getNetRouteIpv4_Mock
@@ -217,50 +212,38 @@ try
             }
 
             Context 'When invoking with invalid IP Address' {
-                It 'Should throw an AddressFormatError error' {
+                It 'Should throw an exception' {
                     $assertResourcePropertyParameters = @{
                         Address        = 'NotReal'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily  = 'IPv4'
                     }
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($commonLocalizedData.AddressFormatError -f $assertResourcePropertyParameters.Address) `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw
                 }
             }
 
             Context 'When invoking with IPv4 Address and family mismatch' {
-                It 'Should throw an AddressMismatchError error' {
+                It 'Should throw an exception' {
                     $assertResourcePropertyParameters = @{
                         Address        = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily  = 'IPv6'
                     }
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($commonLocalizedData.AddressIPv4MismatchError -f $assertResourcePropertyParameters.Address, $assertResourcePropertyParameters.AddressFamily) `
-                        -ArgumentName 'AddressFamily'
-
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw
                 }
             }
 
             Context 'When invoking with IPv6 Address and family mismatch' {
-                It 'Should throw an AddressMismatchError error' {
+                It 'Should throw an exception' {
                     $assertResourcePropertyParameters = @{
                         Address        = 'fe80::'
                         InterfaceAlias = 'Ethernet'
                         AddressFamily  = 'IPv4'
                     }
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($commonLocalizedData.AddressIPv6MismatchError -f $assertResourcePropertyParameters.Address, $assertResourcePropertyParameters.AddressFamily) `
-                        -ArgumentName 'AddressFamily'
-
-                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertyParameters } | Should -Throw
                 }
             }
 

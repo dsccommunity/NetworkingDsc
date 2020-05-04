@@ -32,12 +32,6 @@ Invoke-TestSetup
 try
 {
     InModuleScope $script:dscResourceName {
-
-        $commonLocalizedData = Get-LocalizedData `
-            -ResourceName 'NetworkingDsc.Common' `
-            -ScriptRoot (Join-Path -Path $PSScriptRoot `
-                -ChildPath '..\..\source\Modules\NetworkingDsc.Common\')
-
         Describe 'DSC_DnsServerAddress\Get-TargetResource' -Tag 'Get' {
             Context 'Test IPv4' {
                 Context 'Invoking with an IPv4 address and one address is currently set' {
@@ -605,7 +599,7 @@ try
             }
 
             Context 'Invoking with invalid IP Address' {
-                It 'Should throw the expected exception' {
+                It 'Should throw an exception' {
                     $assertResourcePropertySplat = @{
                         Address        = 'NotReal'
                         InterfaceAlias = 'Ethernet'
@@ -613,16 +607,12 @@ try
                         Verbose        = $true
                     }
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($commonLocalizedData.AddressFormatError -f $assertResourcePropertySplat.Address) `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw
                 }
             }
 
             Context 'Invoking with IPv4 Address and family mismatch' {
-                It 'Should throw the expected exception' {
+                It 'Should throw an exception' {
                     $assertResourcePropertySplat = @{
                         Address        = '192.168.0.1'
                         InterfaceAlias = 'Ethernet'
@@ -630,16 +620,12 @@ try
                         Verbose        = $true
                     }
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($commonLocalizedData.AddressIPv4MismatchError -f $assertResourcePropertySplat.Address, $assertResourcePropertySplat.AddressFamily) `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw
                 }
             }
 
             Context 'Invoking with IPv6 Address and family mismatch' {
-                It 'Should throw the expected exception' {
+                It 'Should throw an exception' {
                     $assertResourcePropertySplat = @{
                         Address        = 'fe80::'
                         InterfaceAlias = 'Ethernet'
@@ -647,11 +633,7 @@ try
                         Verbose        = $true
                     }
 
-                    $errorRecord = Get-InvalidArgumentRecord `
-                        -Message ($commonLocalizedData.AddressIPv6MismatchError -f $assertResourcePropertySplat.Address, $assertResourcePropertySplat.AddressFamily) `
-                        -ArgumentName 'Address'
-
-                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw $ErrorRecord
+                    { Assert-ResourceProperty @assertResourcePropertySplat } | Should -Throw
                 }
             }
 

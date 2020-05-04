@@ -2,11 +2,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Networking Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-                                                     -ChildPath 'NetworkingDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
+
+Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
 # Import Localization Strings
-$script:localizedData = Get-LocalizedData -ResourceName 'DSC_FirewallProfile'
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     This is an array of all the parameters used by this resource.
