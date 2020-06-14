@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - NetworkingDsc
   - Updated to use the common module _DscResource.Common_.
+  - Fixed build failures caused by changes in `ModuleBuilder` module v1.7.0
+    by changing `CopyDirectories` to `CopyPaths` - Fixes [Issue #455](https://github.com/dsccommunity/NetworkingDsc/issues/455).
+  - Pin `Pester` module to 4.10.1 because Pester 5.0 is missing code
+    coverage - Fixes [Issue #456](https://github.com/dsccommunity/NetworkingDsc/issues/456).
 - DefaultGatewayAddress:
   - Refactored to reduce code duplication.
   - Fixed hash table style violations - fixes [Issue #429](https://github.com/dsccommunity/NetworkingDsc/issues/429).
