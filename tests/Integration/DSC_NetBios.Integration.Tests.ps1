@@ -116,15 +116,15 @@ function Invoke-NetBiosIntegrationTest
 
             Context 'When applying to a all network adapters' {
                 Context 'When setting NetBios over TCP/IP to Disable' {
-                    Invoke-NetBiosIntegrationTest -InterfaceAlias '*' -Setting 'Disable'
+                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA*' -Setting 'Disable'
                 }
 
                 Context 'When setting NetBios over TCP/IP to Enable' {
-                    Invoke-NetBiosIntegrationTest -InterfaceAlias '*' -Setting 'Enable'
+                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA*' -Setting 'Enable'
                 }
 
                 Context 'When setting NetBios over TCP/IP to Default' {
-                    Invoke-NetBiosIntegrationTest -InterfaceAlias '*' -Setting 'Default'
+                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA*' -Setting 'Default'
                 }
             }
         }

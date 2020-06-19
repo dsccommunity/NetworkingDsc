@@ -246,7 +246,7 @@ function Test-TargetResource
 
     $currentState = Get-TargetResource @PSBoundParameters
 
-    return Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters -Verbose
+    return Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
 }
 
 Export-ModuleMember -Function *-TargetResource
