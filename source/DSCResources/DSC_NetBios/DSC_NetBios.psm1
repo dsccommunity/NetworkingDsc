@@ -106,7 +106,7 @@ function Get-TargetResource
         if ($interfaceSetting -ne $Setting)
         {
             $Setting = $interfaceSetting
-            exit
+            break
         }
     }
 
