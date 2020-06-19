@@ -23,8 +23,11 @@ try
 {
     Describe 'NetBios Integration Tests' {
         # Configure Loopback Adapters
-        $netAdapter1 = New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
-        $netAdapter2 = New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
+        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
+        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
+
+        $netAdapter1 = Get-NetAdapter -Name 'NetworkingDscLBA1'
+        $netAdapter2 = Get-NetAdapter -Name 'NetworkingDscLBA2'
 
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile -Verbose -ErrorAction Stop
@@ -182,5 +185,9 @@ public enum NetBiosSetting
 }
 finally
 {
+    # Remove Loopback Adapters
+    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
+    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
+
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
