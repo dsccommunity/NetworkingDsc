@@ -101,16 +101,30 @@ function Invoke-NetBiosIntegrationTest
 
         Describe "$($script:dscResourceName)_Integration" {
             Context 'When applying to a single network adapter' {
-                Context 'When Disable NetBios over TCP/IP' {
+                Context 'When setting NetBios over TCP/IP to Disable' {
                     Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA1' -Setting 'Disable'
                 }
 
-                Context 'Enable NetBios over TCP/IP' {
+                Context 'When setting NetBios over TCP/IP to Enable' {
                     Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA1' -Setting 'Enable'
                 }
 
-                Context 'Default NetBios over TCP/IP' {
+                Context 'When setting NetBios over TCP/IP to Default' {
                     Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA1' -Setting 'Default'
+                }
+            }
+
+            Context 'When applying to a all network adapters' {
+                Context 'When setting NetBios over TCP/IP to Disable' {
+                    Invoke-NetBiosIntegrationTest -InterfaceAlias '*' -Setting 'Disable'
+                }
+
+                Context 'When setting NetBios over TCP/IP to Enable' {
+                    Invoke-NetBiosIntegrationTest -InterfaceAlias '*' -Setting 'Enable'
+                }
+
+                Context 'When setting NetBios over TCP/IP to Default' {
+                    Invoke-NetBiosIntegrationTest -InterfaceAlias '*' -Setting 'Default'
                 }
             }
         }
