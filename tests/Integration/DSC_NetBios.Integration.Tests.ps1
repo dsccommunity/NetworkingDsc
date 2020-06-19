@@ -1,33 +1,6 @@
 $script:dscModuleName = 'NetworkingDsc'
 $script:dscResourceName = 'DSC_NetBios'
 
-# Find an adapter we can test with. It needs to be enabled and have IP enabled.
-$netAdapter = $null
-$netAdapterConfig = $null
-$netAdapterEnabled = Get-CimInstance -ClassName Win32_NetworkAdapter -Filter 'NetEnabled="True"'
-if (-not $netAdapterEnabled)
-{
-    Write-Verbose -Message ('There are no enabled network adapters in this system. Integration tests will be skipped.') -Verbose
-    return
-}
-
-foreach ($netAdapter in $netAdapterEnabled)
-{
-    $netAdapterConfig = $netAdapter |
-        Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration |
-        Where-Object -FilterScript { $_.IPEnabled -eq $True }
-    if ($netAdapterConfig)
-    {
-        break
-    }
-}
-if (-not $netAdapterConfig)
-{
-    Write-Verbose -Message ('There are no enabled network adapters with IP enabled in this system. Integration tests will be skipped.') -Verbose
-    return
-}
-Write-Verbose -Message ('A network adapter ({0}) was found in this system that meets requirements for integration testing.' -f $netAdapter.NetConnectionID) -Verbose
-
 try
 {
     Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
@@ -49,10 +22,12 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 try
 {
     Describe 'NetBios Integration Tests' {
+        # Configure Loopback Adapters
+        $netAdapter1 = New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
+        $netAdapter2 = New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
+
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile -Verbose -ErrorAction Stop
-
-        $tcpipNetbiosOptions = $netAdapterConfig.TcpipNetbiosOptions
 
         # Check NetBiosSetting enum loaded, if not load
         try
@@ -71,18 +46,14 @@ public enum NetBiosSetting
 '@
         }
 
-        # Store the current Net Bios setting
-        if ($null -eq $tcpipNetbiosOptions)
-        {
-            $currentNetBiosSetting = [NetBiosSetting]::Default
-        }
-        else
-        {
-            $currentNetBiosSetting = [NetBiosSetting].GetEnumValues()[$tcpipNetbiosOptions]
-        }
-
         # Ensure the Net Bios setting is in a known state (enabled)
-        $null = $netAdapterConfig | Invoke-CimMethod `
+        $null = $netAdapter1 | Invoke-CimMethod `
+            -MethodName SetTcpipNetbios `
+            -ErrorAction Stop `
+            -Arguments @{
+                TcpipNetbiosOptions = [uint32][NetBiosSetting]::Enable
+            }
+        $null = $netAdapter2 | Invoke-CimMethod `
             -MethodName SetTcpipNetbios `
             -ErrorAction Stop `
             -Arguments @{
@@ -95,7 +66,7 @@ public enum NetBiosSetting
                     AllNodes = @(
                         @{
                             NodeName            = 'localhost'
-                            InterfaceAlias      = $netAdapter.NetConnectionID
+                            InterfaceAlias      = $netAdapter1.NetConnectionID
                             Setting             = 'Disable'
                         }
                     )
@@ -134,7 +105,7 @@ public enum NetBiosSetting
                     AllNodes = @(
                         @{
                             NodeName            = 'localhost'
-                            InterfaceAlias      = $netAdapter.NetConnectionID
+                            InterfaceAlias      = $netAdapter1.NetConnectionID
                             Setting             = 'Enable'
                         }
                     )
@@ -173,7 +144,7 @@ public enum NetBiosSetting
                     AllNodes = @(
                         @{
                             NodeName            = 'localhost'
-                            InterfaceAlias      = $netAdapter.NetConnectionID
+                            InterfaceAlias      = $netAdapter1.NetConnectionID
                             Setting             = 'Default'
                         }
                     )
@@ -211,13 +182,5 @@ public enum NetBiosSetting
 }
 finally
 {
-    # Restore the Net Bios setting
-    $null = $netAdapterConfig | Invoke-CimMethod `
-        -MethodName SetTcpipNetbios `
-        -ErrorAction Stop `
-        -Arguments @{
-            TcpipNetbiosOptions = $currentNetBiosSetting
-        }
-
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

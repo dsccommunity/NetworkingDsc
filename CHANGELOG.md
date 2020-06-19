@@ -7,18 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- ComputerManagementDsc
+- NetworkingDsc:
   - Added build task `Generate_Conceptual_Help` to generate conceptual help
     for the DSC resource.
   - Added build task `Generate_Wiki_Content` to generate the wiki content
     that can be used to update the GitHub Wiki.
-- Common
+- Common:
   - Added Assert-IPAddress function to reduce code duplication - Fixes
     [Issue #408](https://github.com/dsccommunity/NetworkingDsc/issues/408).
 
 ### Changed
 
-- NetworkingDsc
+- NetworkingDsc:
   - Updated to use the common module _DscResource.Common_.
   - Fixed build failures caused by changes in `ModuleBuilder` module v1.7.0
     by changing `CopyDirectories` to `CopyPaths` - Fixes [Issue #455](https://github.com/dsccommunity/NetworkingDsc/issues/455).
@@ -43,6 +43,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change Azure DevOps Pipeline definition to include `source/*` - Fixes [Issue #450](https://github.com/dsccommunity/NetworkingDsc/issues/450).
 - Updated pipeline to use `latest` version of `ModuleBuilder` - Fixes [Issue #451](https://github.com/dsccommunity/NetworkingDsc/issues/451).
 - Merge `HISTORIC_CHANGELOG.md` into `CHANGELOG.md` - Fixes [Issue #451](https://github.com/dsccommunity/NetworkingDsc/issues/451).
+- NetBios:
+  - Improved integration tests by using loopback adapter.
 
 ### Deprecated
 
