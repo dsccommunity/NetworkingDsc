@@ -541,7 +541,7 @@ function Get-IPAddressPrefix
 .PARAMETER InterfaceAlias
     Specifies the alias of a network interface. Supports the use of '*' or '%'.
 #>
-function Format-Win32NetworkAdapterFilterByNetConnectionID
+function Format-Win32NetworkAdapterFilterByNetConnectionId
 {
     [CmdletBinding()]
     [OutputType([System.String])]
@@ -566,9 +566,9 @@ function Format-Win32NetworkAdapterFilterByNetConnectionID
         $operator = '='
     }
 
-    $returnNetAdapaterFilter = 'NetConnectionID{0}"{1}"' -f $operator,$InterfaceAlias
+    $returnNetAdapaterFilter = 'NetConnectionID{0}"{1}"' -f $operator, $InterfaceAlias
 
-    $returnNetAdapaterFilter
+    return $returnNetAdapaterFilter
 }
 
 Export-ModuleMember -Function @(
@@ -578,5 +578,5 @@ Export-ModuleMember -Function @(
     'Get-WinsClientServerStaticAddress'
     'Set-WinsClientServerStaticAddress'
     'Get-IPAddressPrefix'
-    'Format-Win32NetworkAdapterFilterByNetConnectionID'
+    'Format-Win32NetworkAdapterFilterByNetConnectionId'
 )
