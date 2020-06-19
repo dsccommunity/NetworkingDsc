@@ -71,7 +71,7 @@ try
             -PassThru
 
         Describe 'DSC_NetBios\Get-TargetResource' -Tag 'Get' {
-            Context 'NetBios over TCP/IP is set to "Default"' {
+            Context 'When NetBios over TCP/IP is set to "Default"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDefault }
 
@@ -90,7 +90,7 @@ try
                 }
             }
 
-            Context 'NetBios over TCP/IP is set to "Enable"' {
+            Context 'When NetBios over TCP/IP is set to "Enable"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsEnable }
 
@@ -109,7 +109,7 @@ try
                 }
             }
 
-            Context 'NetBios over TCP/IP is set to "Disable"' {
+            Context 'When NetBios over TCP/IP is set to "Disable"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
 
@@ -128,7 +128,7 @@ try
                 }
             }
 
-            Context 'Interface does not exist' {
+            Context 'When interface does not exist' {
                 Mock -CommandName Get-CimInstance -MockWith { }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
 
@@ -144,7 +144,7 @@ try
         }
 
         Describe 'DSC_NetBios\Test-TargetResource' -Tag 'Test' {
-            Context 'NetBios over TCP/IP is set to "Default"' {
+            Context 'When NetBios over TCP/IP is set to "Default"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDefault }
 
@@ -157,7 +157,7 @@ try
                 }
             }
 
-            Context 'NetBios over TCP/IP is set to "Disable"' {
+            Context 'When NetBios over TCP/IP is set to "Disable"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
 
@@ -170,7 +170,7 @@ try
                 }
             }
 
-            Context 'NetBios over TCP/IP is set to "Enable"' {
+            Context 'When NetBios over TCP/IP is set to "Enable"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsEnable }
 
@@ -183,7 +183,7 @@ try
                 }
             }
 
-            Context 'Interface does not exist' {
+            Context 'When interface does not exist' {
                 Mock -CommandName Get-CimInstance -MockWith { }
 
                 $errorRecord = Get-InvalidOperationRecord `
@@ -198,11 +198,15 @@ try
         }
 
         Describe 'DSC_NetBios\Set-TargetResource' -Tag 'Set' {
-            Context 'NetBios over TCP/IP should be set to "Default"' {
+            Context 'When NetBios over TCP/IP should be set to "Default"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsEnable }
                 Mock -CommandName Set-ItemProperty
-                Mock -CommandName Invoke-CimMethod -MockWith { @{ ReturnValue = 0 } }
+                Mock -CommandName Invoke-CimMethod -MockWith {
+                    @{
+                        ReturnValue = 0
+                    }
+                }
 
                 It 'Should not throw exception' {
                     {
@@ -216,11 +220,13 @@ try
                 }
             }
 
-            Context 'NetBios over TCP/IP should be set to "Disable"' {
+            Context 'When NetBios over TCP/IP should be set to "Disable"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsEnable }
                 Mock -CommandName Set-ItemProperty
-                Mock -CommandName Invoke-CimMethod -MockWith { @{ ReturnValue = 0 } }
+                Mock -CommandName Invoke-CimMethod -MockWith { @{
+                    ReturnValue = 0
+                } }
 
                 It 'Should not throw exception' {
                     {
@@ -234,11 +240,15 @@ try
                 }
             }
 
-            Context 'NetBios over TCP/IP should be set to "Enable"' {
+            Context 'When NetBios over TCP/IP should be set to "Enable"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
                 Mock -CommandName Set-ItemProperty
-                Mock -CommandName Invoke-CimMethod -MockWith { @{ ReturnValue = 0 } }
+                Mock -CommandName Invoke-CimMethod -MockWith {
+                    @{
+                        ReturnValue = 0
+                    }
+                }
 
                 It 'Should not throw exception' {
                     {
@@ -253,14 +263,18 @@ try
                 }
             }
 
-            Context 'NetBios over TCP/IP should be set to "Enable" but error returned from "Invoke-CimMethod"' {
+            Context 'When NetBios over TCP/IP should be set to "Enable" but error returned from "Invoke-CimMethod"' {
                 Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
                 Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
-                Mock -CommandName Invoke-CimMethod -MockWith { @{ ReturnValue = 74 } }
+                Mock -CommandName Invoke-CimMethod -MockWith {
+                    @{
+                        ReturnValue = 74
+                    }
+                }
                 Mock -CommandName Set-ItemProperty
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($script:localizedData.FailedUpdatingNetBiosError -f 74, 'Enable')
+                    -Message ($script:localizedData.FailedUpdatingNetBiosError -f $interfaceAlias, 74, 'Enable')
 
                 It 'Should throw expected exception' {
                     {
@@ -274,7 +288,7 @@ try
                 }
             }
 
-            Context 'Interface does not exist' {
+            Context 'When interface does not exist' {
                 Mock -CommandName Get-CimInstance -MockWith { }
 
                 $errorRecord = Get-InvalidOperationRecord `
