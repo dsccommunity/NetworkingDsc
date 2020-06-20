@@ -32,52 +32,66 @@ Invoke-TestSetup
 try
 {
     InModuleScope $script:dscResourceName {
-        $interfaceAlias = 'Test Adapter'
+        $script:interfaceAliasA = 'Test Adapter A'
+        $script:interfaceAliasB = 'Test Adapter B'
 
-        $mockNetadapter = New-Object `
-            -TypeName CimInstance `
-            -ArgumentList 'Win32_NetworkAdapter' |
-        Add-Member `
-            -MemberType NoteProperty `
-            -Name Name `
-            -Value $interfaceAlias `
-            -PassThru
+        $script:mockNetadapterA = {
+            New-Object `
+                -TypeName CimInstance `
+                -ArgumentList 'Win32_NetworkAdapter' |
+                Add-Member `
+                    -MemberType NoteProperty `
+                    -Name Name `
+                    -Value $script:interfaceAliasA `
+                    -PassThru
+        }
 
-        $mockNetadapterSettingsDefault = New-Object `
-            -TypeName CimInstance `
-            -ArgumentList 'Win32_NetworkAdapterConfiguration' |
-        Add-Member `
-            -MemberType NoteProperty `
-            -Name TcpipNetbiosOptions `
-            -Value 0 `
-            -PassThru
+        $script:mockNetadapterASettingsDefault = {
+                New-Object `
+                -TypeName CimInstance `
+                -ArgumentList 'Win32_NetworkAdapterConfiguration' |
+                Add-Member `
+                    -MemberType NoteProperty `
+                    -Name TcpipNetbiosOptions `
+                    -Value 0 `
+                    -PassThru
+        }
 
-        $mockNetadapterSettingsEnable = New-Object `
-            -TypeName CimInstance `
-            -ArgumentList 'Win32_NetworkAdapterConfiguration' |
-        Add-Member `
-            -MemberType NoteProperty `
-            -Name TcpipNetbiosOptions `
-            -Value 1 `
-            -PassThru
+        $script:mockNetadapterASettingsEnable = {
+            New-Object `
+                -TypeName CimInstance `
+                -ArgumentList 'Win32_NetworkAdapterConfiguration' |
+                Add-Member `
+                    -MemberType NoteProperty `
+                    -Name TcpipNetbiosOptions `
+                    -Value 1 `
+                    -PassThru
+        }
 
-        $mockNetadapterSettingsDisable = New-Object `
-            -TypeName CimInstance `
-            -ArgumentList 'Win32_NetworkAdapterConfiguration' |
-        Add-Member `
-            -MemberType NoteProperty `
-            -Name TcpipNetbiosOptions `
-            -Value 2 `
-            -PassThru
+        $script:mockNetadapterASettingsDisable = {
+            New-Object `
+                -TypeName CimInstance `
+                -ArgumentList 'Win32_NetworkAdapterConfiguration' |
+                Add-Member `
+                    -MemberType NoteProperty `
+                    -Name TcpipNetbiosOptions `
+                    -Value 2 `
+                    -PassThru
+        }
+
+        $script:getCimInstanceParameterFilter = {
+            $ClassName -eq '-Win32_NetworkAdapter' -and `
+            $Filter -eq 'NetConnectionID = "Test Adapter A"'
+        }
 
         Describe 'DSC_NetBios\Get-TargetResource' -Tag 'Get' {
             Context 'When NetBios over TCP/IP is set to "Default"' {
-                Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
-                Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDefault }
+                Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterA
+                Mock -CommandName Get-CimAssociatedInstance -MockWith $script:mockNetadapterASettingsDefault
 
                 It 'Should not throw exception' {
                     {
-                        $script:result = Get-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Default' -Verbose
+                        $script:result = Get-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Default' -Verbose
                     } | Should -Not -Throw
                 }
 
@@ -91,12 +105,12 @@ try
             }
 
             Context 'When NetBios over TCP/IP is set to "Enable"' {
-                Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
-                Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsEnable }
+                Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterA
+                Mock -CommandName Get-CimAssociatedInstance -MockWith $script:mockNetadapterASettingsEnable
 
                 It 'Should not throw exception' {
                     {
-                        $script:result = Get-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Default' -Verbose
+                        $script:result = Get-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Default' -Verbose
                     } | Should -Not -Throw
                 }
 
@@ -110,12 +124,12 @@ try
             }
 
             Context 'When NetBios over TCP/IP is set to "Disable"' {
-                Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
-                Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
+                Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterA
+                Mock -CommandName Get-CimAssociatedInstance -MockWith $script:mockNetadapterASettingsDisable
 
                 It 'Should not throw exception' {
                     {
-                        $script:result = Get-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Default' -Verbose
+                        $script:result = Get-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Default' -Verbose
                     } | Should -Not -Throw
                 }
 
@@ -129,15 +143,15 @@ try
             }
 
             Context 'When interface does not exist' {
-                Mock -CommandName Get-CimInstance -MockWith { }
-                Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
+                Mock -CommandName Get-CimInstance
+                Mock -CommandName Get-CimAssociatedInstance -MockWith $script:mockNetadapterASettingsDisable
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($script:localizedData.InterfaceNotFoundError -f $interfaceAlias)
+                    -Message ($script:localizedData.InterfaceNotFoundError -f $script:interfaceAliasA)
 
                 It 'Should throw expected exception' {
                     {
-                        $script:result = Get-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Default' -Verbose
+                        $script:result = Get-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Default' -Verbose
                     } | Should -Throw $errorRecord
                 }
             }
@@ -145,41 +159,41 @@ try
 
         Describe 'DSC_NetBios\Test-TargetResource' -Tag 'Test' {
             Context 'When NetBios over TCP/IP is set to "Default"' {
-                Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
-                Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDefault }
+                Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterA
+                Mock -CommandName Get-CimAssociatedInstance -MockWith $script:mockNetadapterASettingsDefault
 
                 It 'Should return true when value "Default" is set' {
-                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Default' -Verbose | Should -Be $true
+                    Test-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Default' -Verbose | Should -Be $true
                 }
 
                 It 'Should return false when value "Disable" is set' {
-                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Disable' -Verbose | Should -Be $false
+                    Test-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Disable' -Verbose | Should -Be $false
                 }
             }
 
             Context 'When NetBios over TCP/IP is set to "Disable"' {
-                Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
-                Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
+                Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterA
+                Mock -CommandName Get-CimAssociatedInstance -MockWith $script:mockNetadapterASettingsDisable
 
                 It 'Should return true when value "Disable" is set' {
-                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Disable' -Verbose | Should -Be $true
+                    Test-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Disable' -Verbose | Should -Be $true
                 }
 
                 It 'Should return false when value "Enable" is set' {
-                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Enable' -Verbose | Should -Be $false
+                    Test-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Enable' -Verbose | Should -Be $false
                 }
             }
 
             Context 'When NetBios over TCP/IP is set to "Enable"' {
-                Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
-                Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsEnable }
+                Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterA
+                Mock -CommandName Get-CimAssociatedInstance -MockWith $script:mockNetadapterASettingsEnable
 
                 It 'Should return true when value "Enable" is set' {
-                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Enable' -Verbose | Should -Be $true
+                    Test-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Enable' -Verbose | Should -Be $true
                 }
 
                 It 'Should return false when value "Disable" is set' {
-                    Test-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Disable' -Verbose | Should -Be $false
+                    Test-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Disable' -Verbose | Should -Be $false
                 }
             }
 
@@ -187,11 +201,11 @@ try
                 Mock -CommandName Get-CimInstance -MockWith { }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($script:localizedData.InterfaceNotFoundError -f $interfaceAlias)
+                    -Message ($script:localizedData.InterfaceNotFoundError -f $script:interfaceAliasA)
 
                 It 'Should throw expected exception' {
                     {
-                        Test-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Enable' -Verbose
+                        Test-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Enable' -Verbose
                     } | Should -Throw $errorRecord
                 }
             }
@@ -199,8 +213,8 @@ try
 
         Describe 'DSC_NetBios\Set-TargetResource' -Tag 'Set' {
             Context 'When NetBios over TCP/IP should be set to "Default"' {
-                Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
-                Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsEnable }
+                Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterA
+                Mock -CommandName Get-CimAssociatedInstance -MockWith $script:mockNetadapterASettingsEnable
                 Mock -CommandName Set-ItemProperty
                 Mock -CommandName Invoke-CimMethod -MockWith {
                     @{
@@ -210,7 +224,7 @@ try
 
                 It 'Should not throw exception' {
                     {
-                        Set-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Default' -Verbose
+                        Set-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Default' -Verbose
                     } | Should -Not -Throw
                 }
 
@@ -221,8 +235,8 @@ try
             }
 
             Context 'When NetBios over TCP/IP should be set to "Disable"' {
-                Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
-                Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsEnable }
+                Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterA
+                Mock -CommandName Get-CimAssociatedInstance -MockWith $script:mockNetadapterASettingsEnable
                 Mock -CommandName Set-ItemProperty
                 Mock -CommandName Invoke-CimMethod -MockWith { @{
                     ReturnValue = 0
@@ -230,7 +244,7 @@ try
 
                 It 'Should not throw exception' {
                     {
-                        Set-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Disable' -Verbose
+                        Set-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Disable' -Verbose
                     } | Should -Not -Throw
                 }
 
@@ -241,8 +255,8 @@ try
             }
 
             Context 'When NetBios over TCP/IP should be set to "Enable"' {
-                Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
-                Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
+                Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterA
+                Mock -CommandName Get-CimAssociatedInstance -MockWith $script:mockNetadapterASettingsDisable
                 Mock -CommandName Set-ItemProperty
                 Mock -CommandName Invoke-CimMethod -MockWith {
                     @{
@@ -252,7 +266,7 @@ try
 
                 It 'Should not throw exception' {
                     {
-                        Set-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Enable' -Verbose
+                        Set-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Enable' -Verbose
                     } | Should -Not -Throw
                 }
 
@@ -264,8 +278,8 @@ try
             }
 
             Context 'When NetBios over TCP/IP should be set to "Enable" but error returned from "Invoke-CimMethod"' {
-                Mock -CommandName Get-CimInstance -MockWith { $mockNetadapter }
-                Mock -CommandName Get-CimAssociatedInstance -MockWith { $mockNetadapterSettingsDisable }
+                Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterA
+                Mock -CommandName Get-CimAssociatedInstance -MockWith $script:mockNetadapterASettingsDisable
                 Mock -CommandName Invoke-CimMethod -MockWith {
                     @{
                         ReturnValue = 74
@@ -274,11 +288,11 @@ try
                 Mock -CommandName Set-ItemProperty
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($script:localizedData.FailedUpdatingNetBiosError -f $interfaceAlias, 74, 'Enable')
+                    -Message ($script:localizedData.FailedUpdatingNetBiosError -f $script:interfaceAliasA, 74, 'Enable')
 
                 It 'Should throw expected exception' {
                     {
-                        Set-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Enable' -Verbose
+                        Set-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Enable' -Verbose
                     } | Should -Throw $errorRecord
                 }
 
@@ -292,11 +306,11 @@ try
                 Mock -CommandName Get-CimInstance -MockWith { }
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($script:localizedData.InterfaceNotFoundError -f $interfaceAlias)
+                    -Message ($script:localizedData.InterfaceNotFoundError -f $script:interfaceAliasA)
 
                 It 'Should throw expected exception' {
                     {
-                        Set-TargetResource -InterfaceAlias $interfaceAlias -Setting 'Enable' -Verbose
+                        Set-TargetResource -InterfaceAlias $script:interfaceAliasA -Setting 'Enable' -Verbose
                     } | Should -Throw $errorRecord
                 }
             }
