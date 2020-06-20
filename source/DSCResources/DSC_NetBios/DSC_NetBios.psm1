@@ -82,7 +82,7 @@ function Get-TargetResource
         be returned for the first adapter that does not match
         the desired value. This is to ensure that when testing
         the resource state it will return a mismatch if any adapters
-        are don't have the correct setting
+        don't have the correct setting.
     #>
     foreach ($netAdapterItem in $netAdapter)
     {
