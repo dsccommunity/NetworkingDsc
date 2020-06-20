@@ -45,6 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Merge `HISTORIC_CHANGELOG.md` into `CHANGELOG.md` - Fixes [Issue #451](https://github.com/dsccommunity/NetworkingDsc/issues/451).
 - NetBios:
   - Improved integration tests by using loopback adapter.
+  - Refactored unit tests to reduce code duplication and
+    increase coverage.
   - Fix exception when specifying wildcard '*' in the
     `InterfaceAlias` - Fixes [Issue #444](https://github.com/dsccommunity/NetworkingDsc/issues/444).
 
