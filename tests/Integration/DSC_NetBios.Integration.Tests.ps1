@@ -26,9 +26,6 @@ try
         New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
         New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
 
-        Get-NetAdapter -Name 'NetworkingDscLBA1'
-        Get-NetAdapter -Name 'NetworkingDscLBA2'
-
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile -Verbose -ErrorAction Stop
 
@@ -133,8 +130,8 @@ function Invoke-NetBiosIntegrationTest
 finally
 {
     # Remove Loopback Adapters
-    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
     Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
+    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

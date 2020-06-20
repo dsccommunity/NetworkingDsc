@@ -228,22 +228,6 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.TestingNetBiosSettingMessage -f $InterfaceAlias)
 
-    $win32NetworkAdapterFilter = Format-Win32NetworkAdapterFilterByNetConnectionId -InterfaceAlias $InterfaceAlias
-
-    $netAdapter = Get-CimInstance `
-        -ClassName Win32_NetworkAdapter `
-        -Filter $win32NetworkAdapterFilter
-
-    if ($netAdapter)
-    {
-        Write-Verbose -Message ($script:localizedData.InterfaceDetectedMessage -f $InterfaceAlias, ($netAdapter.InterfaceIndex -Join ','))
-    }
-    else
-    {
-        New-InvalidOperationException `
-            -Message ($script:localizedData.InterfaceNotFoundError -f $InterfaceAlias)
-    }
-
     $currentState = Get-TargetResource @PSBoundParameters
 
     return Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
