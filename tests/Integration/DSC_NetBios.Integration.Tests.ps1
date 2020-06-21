@@ -1,33 +1,6 @@
 $script:dscModuleName = 'NetworkingDsc'
 $script:dscResourceName = 'DSC_NetBios'
 
-# Find an adapter we can test with. It needs to be enabled and have IP enabled.
-$netAdapter = $null
-$netAdapterConfig = $null
-$netAdapterEnabled = Get-CimInstance -ClassName Win32_NetworkAdapter -Filter 'NetEnabled="True"'
-if (-not $netAdapterEnabled)
-{
-    Write-Verbose -Message ('There are no enabled network adapters in this system. Integration tests will be skipped.') -Verbose
-    return
-}
-
-foreach ($netAdapter in $netAdapterEnabled)
-{
-    $netAdapterConfig = $netAdapter |
-        Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration |
-        Where-Object -FilterScript { $_.IPEnabled -eq $True }
-    if ($netAdapterConfig)
-    {
-        break
-    }
-}
-if (-not $netAdapterConfig)
-{
-    Write-Verbose -Message ('There are no enabled network adapters with IP enabled in this system. Integration tests will be skipped.') -Verbose
-    return
-}
-Write-Verbose -Message ('A network adapter ({0}) was found in this system that meets requirements for integration testing.' -f $netAdapter.NetConnectionID) -Verbose
-
 try
 {
     Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
@@ -49,10 +22,12 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 try
 {
     Describe 'NetBios Integration Tests' {
+        # Configure Loopback Adapters
+        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
+        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
+
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile -Verbose -ErrorAction Stop
-
-        $tcpipNetbiosOptions = $netAdapterConfig.TcpipNetbiosOptions
 
         # Check NetBiosSetting enum loaded, if not load
         try
@@ -71,139 +46,82 @@ public enum NetBiosSetting
 '@
         }
 
-        # Store the current Net Bios setting
-        if ($null -eq $tcpipNetbiosOptions)
-        {
-            $currentNetBiosSetting = [NetBiosSetting]::Default
-        }
-        else
-        {
-            $currentNetBiosSetting = [NetBiosSetting].GetEnumValues()[$tcpipNetbiosOptions]
-        }
+function Invoke-NetBiosIntegrationTest
+{
+    param (
+        [Parameter()]
+        [System.String]
+        $InterfaceAlias,
 
-        # Ensure the Net Bios setting is in a known state (enabled)
-        $null = $netAdapterConfig | Invoke-CimMethod `
-            -MethodName SetTcpipNetbios `
-            -ErrorAction Stop `
-            -Arguments @{
-                TcpipNetbiosOptions = [uint32][NetBiosSetting]::Enable
+        [Parameter()]
+        [System.String]
+        $Setting = 'Disable'
+    )
+
+    $configData = @{
+        AllNodes = @(
+            @{
+                NodeName       = 'localhost'
+                InterfaceAlias = $InterfaceAlias
+                Setting        = $Setting
             }
+        )
+    }
+
+    It 'Should compile and apply the MOF without throwing' {
+        {
+            & "DSC_NetBios_Config" `
+                -OutputPath $TestDrive `
+                -ConfigurationData $configData
+
+            Start-DscConfiguration `
+                -Path $TestDrive `
+                -ComputerName localhost `
+                -Wait `
+                -Verbose `
+                -Force `
+                -ErrorAction Stop
+        } | Should -Not -Throw
+    }
+
+    It 'Should be able to call Get-DscConfiguration without throwing' {
+        { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+    }
+
+    It 'Should have set the resource and all setting should match current state' {
+        $result = Get-DscConfiguration | Where-Object -FilterScript {
+            $_.ConfigurationName -eq "DSC_NetBios_Config"
+        }
+        $result.Setting | Should -Be $Setting
+    }
+}
 
         Describe "$($script:dscResourceName)_Integration" {
-            Context 'Disable NetBios over TCP/IP' {
-                $configData = @{
-                    AllNodes = @(
-                        @{
-                            NodeName            = 'localhost'
-                            InterfaceAlias      = $netAdapter.NetConnectionID
-                            Setting             = 'Disable'
-                        }
-                    )
+            Context 'When applying to a single network adapter' {
+                Context 'When setting NetBios over TCP/IP to Disable' {
+                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA1' -Setting 'Disable'
                 }
 
-                It 'Should compile and apply the MOF without throwing' {
-                    {
-                        & "$($script:dscResourceName)_Config" `
-                            -OutputPath $TestDrive `
-                            -ConfigurationData $configData
-
-                        Start-DscConfiguration `
-                            -Path $TestDrive `
-                            -ComputerName localhost `
-                            -Wait `
-                            -Verbose `
-                            -Force `
-                            -ErrorAction Stop
-                    } | Should -Not -Throw
+                Context 'When setting NetBios over TCP/IP to Enable' {
+                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA1' -Setting 'Enable'
                 }
 
-                It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-                }
-
-                It 'Should have set the resource and all setting should match current state' {
-                    $result = Get-DscConfiguration | Where-Object -FilterScript {
-                        $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
-                    }
-                    $result.Setting | Should -Be 'Disable'
+                Context 'When setting NetBios over TCP/IP to Default' {
+                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA1' -Setting 'Default'
                 }
             }
 
-            Context 'Enable NetBios over TCP/IP' {
-                $configData = @{
-                    AllNodes = @(
-                        @{
-                            NodeName            = 'localhost'
-                            InterfaceAlias      = $netAdapter.NetConnectionID
-                            Setting             = 'Enable'
-                        }
-                    )
+            Context 'When applying to a all network adapters' {
+                Context 'When setting NetBios over TCP/IP to Disable' {
+                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA*' -Setting 'Disable'
                 }
 
-                It 'Should compile and apply the MOF without throwing' {
-                    {
-                        & "$($script:dscResourceName)_Config" `
-                            -OutputPath $TestDrive `
-                            -ConfigurationData $configData
-
-                        Start-DscConfiguration `
-                            -Path $TestDrive `
-                            -ComputerName localhost `
-                            -Wait `
-                            -Verbose `
-                            -Force `
-                            -ErrorAction Stop
-                    } | Should -Not -Throw
+                Context 'When setting NetBios over TCP/IP to Enable' {
+                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA*' -Setting 'Enable'
                 }
 
-                It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-                }
-
-                It 'Should have set the resource and all setting should match current state' {
-                    $result = Get-DscConfiguration | Where-Object -FilterScript {
-                        $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
-                    }
-                    $result.Setting | Should -Be 'Enable'
-                }
-            }
-
-            Context 'Default NetBios over TCP/IP' {
-                $configData = @{
-                    AllNodes = @(
-                        @{
-                            NodeName            = 'localhost'
-                            InterfaceAlias      = $netAdapter.NetConnectionID
-                            Setting             = 'Default'
-                        }
-                    )
-                }
-
-                It 'Should compile and apply the MOF without throwing' {
-                    {
-                        & "$($script:dscResourceName)_Config" `
-                            -OutputPath $TestDrive `
-                            -ConfigurationData $configData
-
-                        Start-DscConfiguration `
-                            -Path $TestDrive `
-                            -ComputerName localhost `
-                            -Wait `
-                            -Verbose `
-                            -Force `
-                            -ErrorAction Stop
-                    } | Should -Not -Throw
-                }
-
-                It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-                }
-
-                It 'Should have set the resource and all setting should match current state' {
-                    $result = Get-DscConfiguration | Where-Object -FilterScript {
-                        $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
-                    }
-                    $result.Setting | Should -Be 'Default'
+                Context 'When setting NetBios over TCP/IP to Default' {
+                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA*' -Setting 'Default'
                 }
             }
         }
@@ -211,13 +129,9 @@ public enum NetBiosSetting
 }
 finally
 {
-    # Restore the Net Bios setting
-    $null = $netAdapterConfig | Invoke-CimMethod `
-        -MethodName SetTcpipNetbios `
-        -ErrorAction Stop `
-        -Arguments @{
-            TcpipNetbiosOptions = $currentNetBiosSetting
-        }
+    # Remove Loopback Adapters
+    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
+    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
