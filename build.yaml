@@ -45,12 +45,12 @@ BuildWorkflow:
 
   test:
     - Pester_Tests_Stop_On_Fail
-    - Pester_if_Code_Coverage_Under_Threshold
+    - Pester_If_Code_Coverage_Under_Threshold
 
   publish:
-    - Publish_release_to_GitHub
-    - publish_module_to_gallery
-
+    - Publish_Release_to_GitHub
+    - Publish_Module_to_gallery
+    - Publish_GitHub_Wiki_Content
 
 ####################################################
 #       PESTER Configuration                       #
