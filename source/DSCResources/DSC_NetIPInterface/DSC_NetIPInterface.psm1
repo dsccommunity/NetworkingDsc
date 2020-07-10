@@ -252,16 +252,16 @@ function Set-TargetResource
 
     foreach ($parameter in $parameterUpdateList)
     {
-        $parameterValue = $netIPInterface.$($parameter)
-        $parameterNewValue = (Get-Variable -Name ($parameter)).Value
+        $currentParameterValue = $currentState.$($parameter)
+        $desiredParameterValue = (Get-Variable -Name ($parameter)).Value
 
-        if ($parameterNewValue -and ($parameterValue -ne $parameterNewValue))
+        if ($desiredParameterValue -and ($currentParameterValue -ne $desiredParameterValue))
         {
-            $null = $setNetIPInterfaceParameters.Add($parameter, $parameterNewValue)
+            $null = $setNetIPInterfaceParameters.Add($parameter, $desiredParameterValue)
 
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                     $($script:localizedData.SettingNetIPInterfaceParameterValueMessage) `
-                        -f $InterfaceAlias, $AddressFamily, $parameter, $parameterNewValue
+                        -f $InterfaceAlias, $AddressFamily, $parameter, $desiredParameterValue
                 ) -join '')
 
             $parameterUpdated = $true
@@ -417,6 +417,11 @@ function Test-TargetResource
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
         $WeakHostReceive,
+
+        [Parameter()]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $WeakHostSend,
 
         [Parameter()]
         [System.UInt32]
