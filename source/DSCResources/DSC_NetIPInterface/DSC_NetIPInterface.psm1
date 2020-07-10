@@ -11,21 +11,27 @@ Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common'
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
-    This is an array of all the parameters used by this resource
-    It can be used by several of the functions to reduce the amount of code required
-    Each element contains 4 properties:
-    Name: The parameter name
-    Type: This is the content type of the paramater (it is either array or string or blank)
-    A blank type means it will not be compared
-    MockedValue: This value is used for unit testing and will be used as the value that
-    will be returned in mocks.
-    TestValue: This value is used for unit testing and will be used to compare with the
-    value returned by the mocks.
+    This is an array of all the parameters used by this resource.
+    It is used by Get
 #>
-$script:resourceData = Import-LocalizedData `
-    -BaseDirectory $PSScriptRoot `
-    -FileName 'DSC_NetIPInterface.data.psd1'
-$script:parameterList = $script:resourceData.ParameterList
+$parameterList = @(
+    'AdvertiseDefaultRoute'
+    'Advertising'
+    'AutomaticMetric'
+    'DirectedMacWolPattern'
+    'Dhcp'
+    'EcnMarking'
+    'ForceArpNdWolPattern'
+    'Forwarding'
+    'IgnoreDefaultRoutes'
+    'ManagedAddressConfiguration'
+    'NeighborUnreachabilityDetection'
+    'OtherStatefulConfiguration'
+    'RouterDiscovery'
+    'WeakHostReceive'
+    'WeakHostSend'
+    'NlMtu'
+)
 
 <#
     .SYNOPSIS
@@ -58,31 +64,12 @@ function Get-TargetResource
             $($script:localizedData.GettingNetIPInterfaceMessage) -f $InterfaceAlias, $AddressFamily
         ) -join '')
 
-    $netIPInterfaceParameters = @{
+    $getNetworkIPInterfaceParameters = @{
         InterfaceAlias = $InterfaceAlias
         AddressFamily  = $AddressFamily
     }
 
-    $netIPInterface = Get-NetworkIPInterface @netIPInterfaceParameters
-
-    <#
-        Populate the properties for get target resource by looping through
-        the parameter array list and adding the values to the result array
-    #>
-
-    foreach ($parameter in $script:parameterList)
-    {
-        $parameterName = $parameter.Name
-        $parameterValue = $netIPInterface.$($parameter.Name)
-        $netIPInterfaceParameters.Add($parameterName, $parameterValue)
-
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($script:localizedData.NetIPInterfaceParameterValueMessage) -f `
-                    $InterfaceAlias, $AddressFamily, $parameterName, $parameterValue
-            ) -join '')
-    }
-
-    return $netIPInterfaceParameters
+    return Get-NetworkIPInterface @getNetworkIPInterfaceParameters
 }
 
 <#
@@ -139,6 +126,9 @@ function Get-TargetResource
 
     .PARAMETER WeakHostSend
     Specifies the send value for a weak host model.
+
+    .PARAMETER NlMtu
+    Specifies the network layer Maximum Transmission Unit (MTU) value, in bytes, for an IP interface.
 #>
 function Set-TargetResource
 {
@@ -228,7 +218,11 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
-        $WeakHostSend
+        $WeakHostSend,
+
+        [Parameter()]
+        [System.UInt32]
+        $NlMtu
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -236,12 +230,12 @@ function Set-TargetResource
                 -f $InterfaceAlias, $AddressFamily
         ) -join '')
 
-    $netIPInterfaceParameters = @{
+    $getTargetResourceParameters = @{
         InterfaceAlias = $InterfaceAlias
-        AddressFamily  = $AddressFamily
+        AddressFamily = $AddressFamily
     }
 
-    $netIPInterface = Get-NetworkIPInterface @netIPInterfaceParameters
+    $currentState = Get-TargetResource @getTargetResourceParameters
 
     <#
         Loop through each possible property and if it is passed to the resource
@@ -249,33 +243,34 @@ function Set-TargetResource
         netIPInterfaceParameters array that will be used to update the
         net IP interface settings.
     #>
+    $parameterUpdateList = Remove-CommonParameter -Hashtable $PSBoundParameters
     $parameterUpdated = $false
-    foreach ($parameter in $script:parameterList)
+    $setNetIPInterfaceParameters = @{
+        InterfaceAlias = $InterfaceAlias
+        AddressFamily = $AddressFamily
+    }
+
+    foreach ($parameter in $parameterUpdateList)
     {
-        $parameterName = $parameter.Name
+        $parameterValue = $netIPInterface.$($parameter)
+        $parameterNewValue = (Get-Variable -Name ($parameter)).Value
 
-        if ($PSBoundParameters.ContainsKey($parameterName))
+        if ($parameterNewValue -and ($parameterValue -ne $parameterNewValue))
         {
-            $parameterValue = $netIPInterface.$($parameterName)
-            $parameterNewValue = (Get-Variable -Name ($parameterName)).Value
+            $null = $setNetIPInterfaceParameters.Add($parameter, $parameterNewValue)
 
-            if ($parameterNewValue -and ($parameterValue -ne $parameterNewValue))
-            {
-                $null = $netIPInterfaceParameters.Add($parameterName, $parameterNewValue)
+            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.SettingNetIPInterfaceParameterValueMessage) `
+                        -f $InterfaceAlias, $AddressFamily, $parameter, $parameterNewValue
+                ) -join '')
 
-                Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                        $($script:localizedData.SettingNetIPInterfaceParameterValueMessage) `
-                            -f $InterfaceAlias, $AddressFamily, $parameterName, $parameterNewValue
-                    ) -join '')
-
-                $parameterUpdated = $true
-            }
+            $parameterUpdated = $true
         }
     }
 
     if ($parameterUpdated)
     {
-        $null = Set-NetIPInterface @netIPInterfaceParameters
+        $null = Set-NetIPInterface @setNetIPInterfaceParameters
     }
 }
 
@@ -333,6 +328,9 @@ function Set-TargetResource
 
     .PARAMETER WeakHostSend
     Specifies the send value for a weak host model.
+
+    .PARAMETER NlMtu
+    Specifies the network layer Maximum Transmission Unit (MTU) value, in bytes, for an IP interface.
 #>
 function Test-TargetResource
 {
@@ -421,18 +419,20 @@ function Test-TargetResource
         $WeakHostReceive,
 
         [Parameter()]
-        [ValidateSet('Enabled', 'Disabled')]
-        [System.String]
-        $WeakHostSend
+        [System.UInt32]
+        $NlMtu
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($script:localizedData.CheckingNetIPInterfaceMessage) -f $InterfaceAlias, $AddressFamily
         ) -join '')
 
-    $currentState = Get-TargetResource `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily
+    $getTargetResourceParameters = @{
+        InterfaceAlias = $InterfaceAlias
+        AddressFamily = $AddressFamily
+    }
+
+    $currentState = Get-TargetResource @getTargetResourceParameters
 
     return Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
 }
@@ -442,6 +442,10 @@ function Test-TargetResource
     Get the network IP interface for the address family.
     If the network interface is not found or the address family
     is not bound to the inerface then an exception will be thrown.
+
+    It will return an hash table with only the parameters in found
+    in the $script:parameterList array and the InterfaceAlias and
+    AddressFamily parameters.
 
     .PARAMETER InterfaceAlias
     Alias of the network interface to configure.
@@ -476,10 +480,30 @@ function Get-NetworkIPInterface
     {
         # The Net IP Interface does not exist or address family is not bound
         New-InvalidOperationException `
-            -Message ($script:localizedData.NetIPInterfaceDoesNotExistMessage -f $InterfaceAlias, $AddressFamily)
+            -Message ($script:localizedData.NetworkIPInterfaceDoesNotExistMessage -f $InterfaceAlias, $AddressFamily)
     }
 
-    return $netIPInterface
+    <#
+        Populate the properties for get target resource by looping through
+        the parameter array list and adding the values to the result array
+    #>
+    $networkIPInterface = @{
+        InterfaceAlias = $InterfaceAlias
+        AddressFamily = $AddressFamily
+    }
+
+    foreach ($parameter in $script:parameterList)
+    {
+        $parameterValue = $netIPInterface.$($parameter)
+        $null = $networkIPInterface.Add($parameter, $parameterValue)
+
+        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                $($script:localizedData.NetworkIPInterfaceParameterValueMessage) -f `
+                    $InterfaceAlias, $AddressFamily, $parameter, $parameterValue
+            ) -join '')
+    }
+
+    return $networkIPInterface
 }
 
 Export-ModuleMember -Function *-TargetResource

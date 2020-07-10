@@ -163,6 +163,14 @@ try
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $WeakHostSend -eq 'Disabled'
                 }
+            },
+            @{
+                Name            = 'NlNtu'
+                MockedValue     = 1600
+                TestValue       = 1500
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $NlNtu -eq 1500
+                }
             }
         )
 
