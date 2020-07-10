@@ -430,49 +430,11 @@ function Test-TargetResource
             $($script:localizedData.CheckingNetIPInterfaceMessage) -f $InterfaceAlias, $AddressFamily
         ) -join '')
 
-    $netIPInterfaceParameters = @{
-        InterfaceAlias = $InterfaceAlias
-        AddressFamily  = $AddressFamily
-    }
+    $currentState = Get-TargetResource `
+        -InterfaceAlias $InterfaceAlias `
+        -AddressFamily $AddressFamily
 
-    $netIPInterface = Get-NetworkIPInterface @netIPInterfaceParameters
-
-    $desiredConfigurationMatch = $true
-
-    <#
-        Loop through the $script:parameterList array and compare the source
-        with the value of each parameter. If different then set $desiredConfigurationMatch
-        to false.
-    #>
-    foreach ($parameter in $script:parameterList)
-    {
-        $parameterName = $parameter.Name
-
-        if ($PSBoundParameters.ContainsKey($parameterName))
-        {
-            $parameterValue = $netIPInterface.$($parameterName)
-            $parameterNewValue = (Get-Variable -Name ($parameterName)).Value
-
-            switch -Wildcard ($parameter.Type)
-            {
-                'String'
-                {
-                    # Perform a plain string comparison.
-                    if ($parameterNewValue -and ($parameterValue -ne $parameterNewValue))
-                    {
-                        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                                $($script:localizedData.PropertyNoMatchMessage) `
-                                    -f $parameterName, $parameterValue, $parameterNewValue
-                            ) -join '')
-
-                        $desiredConfigurationMatch = $false
-                    }
-                }
-            }
-        }
-    }
-
-    return $desiredConfigurationMatch
+    return Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
 }
 
 <#

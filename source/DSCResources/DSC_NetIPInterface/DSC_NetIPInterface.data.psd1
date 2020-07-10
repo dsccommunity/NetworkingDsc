@@ -59,6 +59,10 @@
         @{
             Name = 'WeakHostSend'
             Type = 'String'
+        },
+        @{
+            Name = 'NlMtu'
+            Type = 'Integer'
         }
     )
 }
