@@ -247,7 +247,7 @@ try
 
                     $script:result = Test-TargetResource @script:netIPInterfaceExists @comparisonParameter
 
-                    $script:result | Should -Be $false
+                    $script:result | Should -BeFalse
                 }
             }
 
@@ -269,7 +269,7 @@ try
 
                     $script:result = Test-TargetResource @script:netIPInterfaceExists @comparisonParameter
 
-                    $script:result | Should -Be $true
+                    $script:result | Should -BeTrue
                 }
             }
         }
@@ -335,7 +335,7 @@ try
 
                 It 'Should throw expected exception' {
                     $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($script:localizedData.NetIPInterfaceDoesNotExistMessage -f $script:netIPInterfaceMissing.InterfaceAlias, $script:netIPInterfaceMissing.AddressFamily)
+                        -Message ($script:localizedData.NetworkIPInterfaceParameterValueMessage -f $script:netIPInterfaceMissing.InterfaceAlias, $script:netIPInterfaceMissing.AddressFamily)
 
                     {
                         $script:result = Get-NetworkIPInterface @script:netIPInterfaceMissing

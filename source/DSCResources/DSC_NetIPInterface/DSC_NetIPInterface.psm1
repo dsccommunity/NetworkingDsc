@@ -430,7 +430,7 @@ function Test-TargetResource
 
     $currentState = Get-TargetResource @getTargetResourceParameters
 
-    return Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
+    return Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters -Verbose
 }
 
 <#
