@@ -165,11 +165,11 @@ try
                 }
             },
             @{
-                Name            = 'NlNtu'
+                Name            = 'NlMtu'
                 MockedValue     = 1600
                 TestValue       = 1500
                 ParameterFilter = {
-                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $NlNtu -eq 1500
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $NlMtu -eq 1500
                 }
             }
         )

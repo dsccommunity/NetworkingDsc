@@ -20,7 +20,7 @@ configuration DSC_NetIPInterface_Config_Enabled {
             RouterDiscovery                 = $Node.RouterDiscovery
             WeakHostReceive                 = $Node.WeakHostReceive
             WeakHostSend                    = $Node.WeakHostSend
-            NlNtu                           = $Node.NlNtu
+            NlMtu                           = $Node.NlMtu
         }
     }
 }
@@ -45,7 +45,7 @@ configuration DSC_NetIPInterface_Config_Disabled {
             RouterDiscovery                 = $Node.RouterDiscovery
             WeakHostReceive                 = $Node.WeakHostReceive
             WeakHostSend                    = $Node.WeakHostSend
-            NlNtu                           = $Node.NlNtu
+            NlMtu                           = $Node.NlMtu
         }
     }
 }

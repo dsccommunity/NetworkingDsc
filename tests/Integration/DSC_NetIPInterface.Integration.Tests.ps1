@@ -79,7 +79,7 @@ try
                             RouterDiscovery                 = 'ControlledByDHCP'
                             WeakHostReceive                 = 'Enabled'
                             WeakHostSend                    = 'Enabled'
-                            NlNtu                           = 1600
+                            NlMtu                           = 1600
                         }
                     )
                 }
@@ -189,7 +189,7 @@ try
                     $current.RouterDiscovery                 | Should -Be $script:configData.AllNodes[0].RouterDiscovery
                     $current.WeakHostReceive                 | Should -Be $script:configData.AllNodes[0].WeakHostReceive
                     $current.WeakHostSend                    | Should -Be $script:configData.AllNodes[0].WeakHostSend
-                    $current.NlNtu                           | Should -Be $script:configData.AllNodes[0].NlNtu
+                    $current.NlMtu                           | Should -Be $script:configData.AllNodes[0].NlMtu
                 }
             }
         }
