@@ -12,26 +12,15 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     This is an array of all the parameters used by this resource.
-    It is used by Get
+    The PropertyName is the name of the property that is returned when
+    getting the object. The ParameterName is the parameter name when
+    setting the value. These are usually the same, but do differ in
+    some cases.
 #>
-$parameterList = @(
-    'AdvertiseDefaultRoute'
-    'Advertising'
-    'AutomaticMetric'
-    'DirectedMacWolPattern'
-    'Dhcp'
-    'EcnMarking'
-    'ForceArpNdWolPattern'
-    'Forwarding'
-    'IgnoreDefaultRoutes'
-    'ManagedAddressConfiguration'
-    'NeighborUnreachabilityDetection'
-    'OtherStatefulConfiguration'
-    'RouterDiscovery'
-    'WeakHostReceive'
-    'WeakHostSend'
-    'NlMtu'
-)
+$script:resourceData = Import-LocalizedData `
+    -BaseDirectory $PSScriptRoot `
+    -FileName 'DSC_NetIPInterface.data.psd1'
+$script:parameterList = $script:resourceData.ParameterList
 
 <#
     .SYNOPSIS
@@ -243,28 +232,30 @@ function Set-TargetResource
         netIPInterfaceParameters array that will be used to update the
         net IP interface settings.
     #>
-    $parameterUpdateList = Remove-CommonParameter -Hashtable $PSBoundParameters
     $parameterUpdated = $false
     $setNetIPInterfaceParameters = @{
         InterfaceAlias = $InterfaceAlias
         AddressFamily = $AddressFamily
     }
 
-    foreach ($parameter in $parameterUpdateList)
+    foreach ($parameter in $script:parameterList)
     {
-        $currentParameterValue = $currentState.$($parameter)
-        $desiredParameterValue = (Get-Variable -Name ($parameter)).Value
-
-        if ($desiredParameterValue -and ($currentParameterValue -ne $desiredParameterValue))
+        if ($PSBoundParameters.ContainsKey($parameter.PropertyName))
         {
-            $null = $setNetIPInterfaceParameters.Add($parameter, $desiredParameterValue)
+            $currentPropertyValue = $currentState.$($parameter.PropertyName)
+            $newParameterValue = (Get-Variable -Name ($parameter.PropertyName)).Value
 
-            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.SettingNetIPInterfaceParameterValueMessage) `
-                        -f $InterfaceAlias, $AddressFamily, $parameter, $desiredParameterValue
-                ) -join '')
+            if ($newParameterValue -and ($currentPropertyValue -ne $newParameterValue))
+            {
+                $null = $setNetIPInterfaceParameters.Add($parameter.ParameterName, $newParameterValue)
 
-            $parameterUpdated = $true
+                Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
+                        $($script:localizedData.SettingNetIPInterfaceParameterValueMessage) `
+                            -f $InterfaceAlias, $AddressFamily, $parameter.ParameterName, $newParameterValue
+                    ) -join '')
+
+                $parameterUpdated = $true
+            }
         }
     }
 
@@ -499,12 +490,12 @@ function Get-NetworkIPInterface
 
     foreach ($parameter in $script:parameterList)
     {
-        $parameterValue = $netIPInterface.$($parameter)
-        $null = $networkIPInterface.Add($parameter, $parameterValue)
+        $propertyValue = $netIPInterface.$($parameter.PropertyName)
+        $null = $networkIPInterface.Add($parameter.PropertyName, $propertyValue)
 
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                 $($script:localizedData.NetworkIPInterfaceParameterValueMessage) -f `
-                    $InterfaceAlias, $AddressFamily, $parameter, $parameterValue
+                    $InterfaceAlias, $AddressFamily, $parameter.PropertyName, $propertyValue
             ) -join '')
     }
 
