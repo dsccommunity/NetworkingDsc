@@ -147,6 +147,7 @@ try
                             RouterDiscovery             = 'Disabled'
                             WeakHostReceive             = 'Disabled'
                             WeakHostSend                = 'Disabled'
+                            NlMtu                       = 1500
                         }
                     )
                 }
