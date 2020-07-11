@@ -32,6 +32,7 @@
     - NeighborUnreachabilityDetection
     - OtherStatefulConfiguration
     - RouterDiscovery
+    - NlMtu
     The EcnMarking parameter will be set to AppDecide.
 #>
 Configuration NetIPInterface_MultipleSettings_Config
@@ -56,6 +57,7 @@ Configuration NetIPInterface_MultipleSettings_Config
             NeighborUnreachabilityDetection = 'Enabled'
             OtherStatefulConfiguration      = 'Enabled'
             RouterDiscovery                 = 'Enabled'
+            NlMtu                           = 1576
         }
     }
 }
