@@ -166,8 +166,8 @@ try
             },
             @{
                 Name            = 'NlMtu'
-                MockedValue     = 1600
-                TestValue       = 1500
+                MockedValue     = [System.Uint32] 1600
+                TestValue       = [System.Uint32] 1500
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $NlMtuBytes -eq 1500
                 }
