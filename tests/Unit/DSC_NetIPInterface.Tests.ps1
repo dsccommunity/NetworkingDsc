@@ -335,7 +335,7 @@ try
 
                 It 'Should throw expected exception' {
                     $errorRecord = Get-InvalidOperationRecord `
-                        -Message ($script:localizedData.NetworkIPInterfaceParameterValueMessage -f $script:netIPInterfaceMissing.InterfaceAlias, $script:netIPInterfaceMissing.AddressFamily)
+                        -Message ($script:localizedData.NetworkIPInterfaceDoesNotExistMessage -f $script:netIPInterfaceMissing.InterfaceAlias, $script:netIPInterfaceMissing.AddressFamily)
 
                     {
                         $script:result = Get-NetworkIPInterface @script:netIPInterfaceMissing
