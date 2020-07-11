@@ -1,64 +1,68 @@
 @{
     ParameterList = @(
         @{
-            Name = 'AdvertiseDefaultRoute'
-            Type = 'String'
+            ParameterName = 'AdvertiseDefaultRoute'
+            PropertyName = 'AdvertiseDefaultRoute'
         },
         @{
-            Name = 'Advertising'
-            Type = 'String'
+            ParameterName = 'Advertising'
+            PropertyName = 'Advertising'
         },
         @{
-            Name = 'AutomaticMetric'
-            Type = 'String'
+            ParameterName = 'AutomaticMetric'
+            PropertyName = 'AutomaticMetric'
         },
         @{
-            Name = 'DirectedMacWolPattern'
-            Type = 'String'
+            ParameterName = 'DirectedMacWolPattern'
+            PropertyName = 'DirectedMacWolPattern'
         },
         @{
-            Name = 'Dhcp'
-            Type = 'String'
+            ParameterName = 'Dhcp'
+            PropertyName = 'Dhcp'
         },
         @{
-            Name = 'EcnMarking'
-            Type = 'String'
+            ParameterName = 'EcnMarking'
+            PropertyName = 'EcnMarking'
         },
         @{
-            Name = 'ForceArpNdWolPattern'
-            Type = 'String'
+            ParameterName = 'ForceArpNdWolPattern'
+            PropertyName = 'ForceArpNdWolPattern'
         },
         @{
-            Name = 'Forwarding'
-            Type = 'String'
+            ParameterName = 'Forwarding'
+            PropertyName = 'Forwarding'
         },
         @{
-            Name = 'IgnoreDefaultRoutes'
-            Type = 'String'
+            ParameterName = 'IgnoreDefaultRoutes'
+            PropertyName = 'IgnoreDefaultRoutes'
         },
         @{
-            Name = 'ManagedAddressConfiguration'
-            Type = 'String'
+            ParameterName = 'ManagedAddressConfiguration'
+            PropertyName = 'ManagedAddressConfiguration'
         },
         @{
-            Name = 'NeighborUnreachabilityDetection'
-            Type = 'String'
+            ParameterName = 'NeighborUnreachabilityDetection'
+            PropertyName = 'NeighborUnreachabilityDetection'
         },
         @{
-            Name = 'OtherStatefulConfiguration'
-            Type = 'String'
+            ParameterName = 'OtherStatefulConfiguration'
+            PropertyName = 'OtherStatefulConfiguration'
         },
         @{
-            Name = 'RouterDiscovery'
-            Type = 'String'
+            ParameterName = 'RouterDiscovery'
+            PropertyName = 'RouterDiscovery'
         },
         @{
-            Name = 'WeakHostReceive'
-            Type = 'String'
+            ParameterName = 'WeakHostReceive'
+            PropertyName = 'WeakHostReceive'
         },
         @{
-            Name = 'WeakHostSend'
-            Type = 'String'
+            ParameterName = 'WeakHostSend'
+            PropertyName = 'WeakHostSend'
+        },
+        @{
+            ParameterName = 'NlMtuBytes'
+            PropertyName = 'NlMtu'
         }
     )
 }

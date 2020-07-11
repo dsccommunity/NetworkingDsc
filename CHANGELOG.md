@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - NetworkingDsc
   - Automatically publish documentation to GitHub Wiki - Fixes [Issue #462](https://github.com/dsccommunity/NetworkingDsc/issues/462).
 
+## Added
+
+- NetIPInterface
+  - Added `NlMtu` parameter - Fixes [Issue #460](https://github.com/dsccommunity/NetworkingDsc/issues/460).
+
 ## [8.0.0] - 2020-06-21
 
 ### Added

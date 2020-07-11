@@ -79,6 +79,7 @@ try
                             RouterDiscovery                 = 'ControlledByDHCP'
                             WeakHostReceive                 = 'Enabled'
                             WeakHostSend                    = 'Enabled'
+                            NlMtu                           = 1600
                         }
                     )
                 }
@@ -146,6 +147,7 @@ try
                             RouterDiscovery             = 'Disabled'
                             WeakHostReceive             = 'Disabled'
                             WeakHostSend                = 'Disabled'
+                            NlMtu                       = 1500
                         }
                     )
                 }
@@ -188,6 +190,7 @@ try
                     $current.RouterDiscovery                 | Should -Be $script:configData.AllNodes[0].RouterDiscovery
                     $current.WeakHostReceive                 | Should -Be $script:configData.AllNodes[0].WeakHostReceive
                     $current.WeakHostSend                    | Should -Be $script:configData.AllNodes[0].WeakHostSend
+                    $current.NlMtu                           | Should -Be $script:configData.AllNodes[0].NlMtu
                 }
             }
         }

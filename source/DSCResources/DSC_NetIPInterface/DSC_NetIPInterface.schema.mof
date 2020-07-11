@@ -1,8 +1,8 @@
 [ClassVersion("1.0.0"), FriendlyName("NetIPInterface")]
 class DSC_NetIPInterface : OMI_BaseResource
 {
-    [Key, Description("Alias of the network interface to configure.")] string InterfaceAlias;
-    [Key, Description("IP address family on the interface to configure."), ValueMap{"IPv4", "IPv6"}, Values{"IPv4", "IPv6"}] string AddressFamily;
+    [Key, Description("Alias of the network interface to configure.")] String InterfaceAlias;
+    [Key, Description("IP address family on the interface to configure."), ValueMap{"IPv4", "IPv6"}, Values{"IPv4", "IPv6"}] String AddressFamily;
     [Write, Description("Specifies the default router advertisement for an interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String AdvertiseDefaultRoute;
     [Write, Description("Specifies the router advertisement value for the IP interface."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String Advertising;
     [Write, Description("Specifies the value for automatic metric calculation."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String AutomaticMetric;
@@ -18,4 +18,5 @@ class DSC_NetIPInterface : OMI_BaseResource
     [Write, Description("Specifies the value for router discovery for an IP interface."), ValueMap{"Enabled", "Disabled", "ControlledByDHCP"},Values{"Enabled", "Disabled", "ControlledByDHCP"}] String RouterDiscovery;
     [Write, Description("Specifies the receive value for a weak host model."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String WeakHostReceive;
     [Write, Description("Specifies the send value for a weak host model."), ValueMap{"Enabled", "Disabled"},Values{"Enabled", "Disabled"}] String WeakHostSend;
+    [Write, Description("Specifies the network layer Maximum Transmission Unit (MTU) value, in bytes, for an IP interface.")] UInt32 NlMtu;
 };
