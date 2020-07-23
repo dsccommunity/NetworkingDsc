@@ -12,13 +12,13 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current state of an IP address option.
+        Returns the current state of an IP address option.
 
     .PARAMETER IPAddress
-    The desired IP address.
+        The desired IP address.
 
     .PARAMETER SkipAsSource
-    The skip as source option.
+        The skip as source option.
 #>
 function Get-TargetResource
 {
@@ -52,13 +52,13 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Set the IP address options.
+        Set the IP address options.
 
     .PARAMETER IPAddress
-    The desired IP address.
+        The desired IP address.
 
     .PARAMETER SkipAsSource
-    The skip as source option.
+        The skip as source option.
 #>
 function Set-TargetResource
 {
@@ -89,13 +89,13 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the IP address options.
+        Tests the IP address options.
 
     .PARAMETER IPAddress
-    The desired IP address.
+        The desired IP address.
 
     .PARAMETER SkipAsSource
-    The skip as source option.
+        The skip as source option.
 #>
 function Test-TargetResource
 {
@@ -114,7 +114,7 @@ function Test-TargetResource
     )
 
     # Flag to signal whether settings are correct
-    [System.Boolean] $desiredConfigurationMatch = $true
+    $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             $($script:localizedData.CheckingIPAddressOptionMessage -f $IPAddress)

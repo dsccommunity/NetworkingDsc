@@ -12,19 +12,19 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current state of an IP address assigned to an interface.
+        Returns the current state of an IP address assigned to an interface.
 
     .PARAMETER IPAddress
-    The desired IP address.
+        The desired IP address.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the IP address should be set.
+        Alias of the network interface for which the IP address should be set.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 
     .PARAMETER KeepExistingAddress
-    Indicates whether or not existing IP addresses on an interface will be retained.
+        Indicates whether or not existing IP addresses on an interface will be retained.
 #>
 function Get-TargetResource
 {
@@ -80,19 +80,19 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets an IP address on an interface.
+        Sets an IP address on an interface.
 
     .PARAMETER IPAddress
-    The desired IP address.
+        The desired IP address.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the IP address should be set.
+        Alias of the network interface for which the IP address should be set.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 
     .PARAMETER KeepExistingAddress
-    Indicates whether or not existing IP addresses on an interface will be retained.
+        Indicates whether or not existing IP addresses on an interface will be retained.
 #>
 function Set-TargetResource
 {
@@ -267,19 +267,19 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the IP address on the interface.
+        Tests the IP address on the interface.
 
     .PARAMETER IPAddress
-    The desired IP address.
+        The desired IP address.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the IP address should be set.
+        Alias of the network interface for which the IP address should be set.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 
     .PARAMETER KeepExistingAddress
-    Indicates whether or not existing IP addresses on an interface will be retained.
+        Indicates whether or not existing IP addresses on an interface will be retained.
 #>
 function Test-TargetResource
 {
@@ -395,21 +395,21 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-    Check the IP Address details are valid and do not conflict with Address family.
-    Also checks the prefix length and ensures the interface exists.
-    If any problems are detected an exception will be thrown.
+        Check the IP Address details are valid and do not conflict with Address family.
+        Also checks the prefix length and ensures the interface exists.
+        If any problems are detected an exception will be thrown.
 
     .PARAMETER IPAddress
-    The desired IP address.
+        The desired IP address.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the IP address should be set.
+        Alias of the network interface for which the IP address should be set.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 
     .PARAMETER KeepExistingAddress
-    Indicates whether or not existing IP addresses on an interface will be retained.
+        Indicates whether or not existing IP addresses on an interface will be retained.
 #>
 function Assert-ResourceProperty
 {

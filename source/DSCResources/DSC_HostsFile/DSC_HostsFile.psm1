@@ -12,16 +12,16 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current state of a hosts file entry.
+        Returns the current state of a hosts file entry.
 
     .PARAMETER HostName
-    Specifies the name of the computer that will be mapped to an IP address.
+        Specifies the name of the computer that will be mapped to an IP address.
 
     .PARAMETER IPAddress
-    Specifies the IP Address that should be mapped to the host name.
+        Specifies the IP Address that should be mapped to the host name.
 
     .PARAMETER Ensure
-    Specifies if the hosts file entry should be created or deleted.
+        Specifies if the hosts file entry should be created or deleted.
 #>
 function Get-TargetResource
 {
@@ -67,16 +67,16 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Adds, updates or removes a hosts file entry.
+        Adds, updates or removes a hosts file entry.
 
     .PARAMETER HostName
-    Specifies the name of the computer that will be mapped to an IP address.
+        Specifies the name of the computer that will be mapped to an IP address.
 
     .PARAMETER IPAddress
-    Specifies the IP Address that should be mapped to the host name.
+        Specifies the IP Address that should be mapped to the host name.
 
     .PARAMETER Ensure
-    Specifies if the hosts file entry should be created or deleted.
+        Specifies if the hosts file entry should be created or deleted.
 #>
 function Set-TargetResource
 {
@@ -165,16 +165,16 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the current state of a hosts file entry.
+        Tests the current state of a hosts file entry.
 
     .PARAMETER HostName
-    Specifies the name of the computer that will be mapped to an IP address.
+        Specifies the name of the computer that will be mapped to an IP address.
 
     .PARAMETER IPAddress
-    Specifies the IP Address that should be mapped to the host name.
+        Specifies the IP Address that should be mapped to the host name.
 
     .PARAMETER Ensure
-    Specifies if the hosts file entry should be created or deleted.
+        Specifies if the hosts file entry should be created or deleted.
 #>
 function Test-TargetResource
 {

@@ -12,10 +12,10 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current WINS settings.
+        Returns the current WINS settings.
 
     .PARAMETER IsSingleInstance
-    Specifies the resource is a single instance, the value must be 'Yes'.
+        Specifies the resource is a single instance, the value must be 'Yes'.
 #>
 function Get-TargetResource
 {
@@ -67,18 +67,18 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the current configuration for the LMHOSTS Lookup setting.
+        Sets the current configuration for the LMHOSTS Lookup setting.
 
     .PARAMETER IsSingleInstance
-    Specifies the resource is a single instance, the value must be 'Yes'.
+        Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER EnableLmHosts
-    Specifies if LMHOSTS lookup should be enabled for all network
-    adapters with TCP/IP enabled.
+        Specifies if LMHOSTS lookup should be enabled for all network
+        adapters with TCP/IP enabled.
 
     .PARAMETER EnableDns
-    Specifies if DNS is enabled for name resolution over WINS for
-    all network adapters with TCP/IP enabled.
+        Specifies if DNS is enabled for name resolution over WINS for
+        all network adapters with TCP/IP enabled.
 #>
 function Set-TargetResource
 {
@@ -139,18 +139,18 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the current configuration for the LMHOSTS Lookup setting.
+        Tests the current configuration for the LMHOSTS Lookup setting.
 
     .PARAMETER IsSingleInstance
-    Specifies the resource is a single instance, the value must be 'Yes'.
+        Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER EnableLmHosts
-    Specifies if LMHOSTS lookup should be enabled for all network
-    adapters with TCP/IP enabled.
+        Specifies if LMHOSTS lookup should be enabled for all network
+        adapters with TCP/IP enabled.
 
     .PARAMETER EnableDns
-    Specifies if DNS is enabled for name resolution over WINS for
-    all network adapters with TCP/IP enabled.
+        Specifies if DNS is enabled for name resolution over WINS for
+        all network adapters with TCP/IP enabled.
 #>
 function Test-TargetResource
 {

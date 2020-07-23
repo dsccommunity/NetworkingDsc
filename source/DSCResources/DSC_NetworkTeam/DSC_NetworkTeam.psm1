@@ -12,14 +12,14 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current state of a Network Team.
+        Returns the current state of a Network Team.
 
     .PARAMETER Name
-    Specifies the name of the network team to create.
+        Specifies the name of the network team to create.
 
     .PARAMETER TeamMembers
-    Specifies the network interfaces that should be a part of the network team.
-    This is a comma-separated list.
+        Specifies the network interfaces that should be a part of the network team.
+        This is a comma-separated list.
 #>
 function Get-TargetResource
 {
@@ -72,23 +72,23 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Adds, updates or removes a Network Team.
+        Adds, updates or removes a Network Team.
 
     .PARAMETER Name
-    Specifies the name of the network team to create.
+        Specifies the name of the network team to create.
 
     .PARAMETER TeamMembers
-    Specifies the network interfaces that should be a part of the network team.
-    This is a comma-separated list.
+        Specifies the network interfaces that should be a part of the network team.
+        This is a comma-separated list.
 
     .PARAMETER TeamingMode
-    Specifies the teaming mode configuration.
+        Specifies the teaming mode configuration.
 
     .PARAMETER LoadBalancingAlgorithm
-    Specifies the load balancing algorithm for the network team.
+        Specifies the load balancing algorithm for the network team.
 
     .PARAMETER Ensure
-    Specifies if the network team should be created or deleted.
+        Specifies if the network team should be created or deleted.
 #>
 function Set-TargetResource
 {
@@ -227,23 +227,23 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests is a specified Network Team is in the correct state.
+        Tests is a specified Network Team is in the correct state.
 
     .PARAMETER Name
-    Specifies the name of the network team to create.
+        Specifies the name of the network team to create.
 
     .PARAMETER TeamMembers
-    Specifies the network interfaces that should be a part of the network team.
-    This is a comma-separated list.
+        Specifies the network interfaces that should be a part of the network team.
+        This is a comma-separated list.
 
     .PARAMETER TeamingMode
-    Specifies the teaming mode configuration.
+        Specifies the teaming mode configuration.
 
     .PARAMETER LoadBalancingAlgorithm
-    Specifies the load balancing algorithm for the network team.
+        Specifies the load balancing algorithm for the network team.
 
     .PARAMETER Ensure
-    Specifies if the network team should be created or deleted.
+        Specifies if the network team should be created or deleted.
 #>
 function Test-TargetResource
 {

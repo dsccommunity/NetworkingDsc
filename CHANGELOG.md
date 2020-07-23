@@ -15,6 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - NetIPInterface
   - Added `NlMtu` parameter - Fixes [Issue #460](https://github.com/dsccommunity/NetworkingDsc/issues/460).
 
+## Fixed
+
+- NetworkingDsc
+  - Update to force redeployment with latest version of `DSCResource.Common`
+    with fix `Get-LocalizationData` - Fixes [Issue #464](https://github.com/dsccommunity/NetworkingDsc/issues/464).
+  - Correct help block comment indentation - Fixes [Issue #466](https://github.com/dsccommunity/NetworkingDsc/issues/466).
+
 ## [8.0.0] - 2020-06-21
 
 ### Added

@@ -29,17 +29,17 @@ catch
 #endregion
 
 <#
-.SYNOPSIS
-    Returns the current state of the Net Bios on an interface.
+    .SYNOPSIS
+        Returns the current state of the Net Bios on an interface.
 
-.PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*' and '%'.
+    .PARAMETER InterfaceAlias
+        Specifies the alias of a network interface. Supports the use of '*' and '%'.
 
-.PARAMETER Setting
-    Specifies if NetBIOS should be enabled or disabled or obtained from
-    the DHCP server (Default). If static IP, Enable NetBIOS.
+    .PARAMETER Setting
+        Specifies if NetBIOS should be enabled or disabled or obtained from
+        the DHCP server (Default). If static IP, Enable NetBIOS.
 
-    Parameter value is ignored.
+        Parameter value is ignored.
 #>
 function Get-TargetResource
 {
@@ -117,15 +117,15 @@ function Get-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Sets the state of the Net Bios on an interface.
+    .SYNOPSIS
+        Sets the state of the Net Bios on an interface.
 
-.PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*' and '%'.
+    .PARAMETER InterfaceAlias
+        Specifies the alias of a network interface. Supports the use of '*' and '%'.
 
-.PARAMETER Setting
-    Specifies if NetBIOS should be enabled or disabled or obtained from
-    the DHCP server (Default). If static IP, Enable NetBIOS.
+    .PARAMETER Setting
+        Specifies if NetBIOS should be enabled or disabled or obtained from
+        the DHCP server (Default). If static IP, Enable NetBIOS.
 #>
 function Set-TargetResource
 {
@@ -200,15 +200,15 @@ function Set-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Tests the current state the Net Bios on an interface.
+    .SYNOPSIS
+        Tests the current state the Net Bios on an interface.
 
-.PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*' and '%'.
+    .PARAMETER InterfaceAlias
+        Specifies the alias of a network interface. Supports the use of '*' and '%'.
 
-.PARAMETER Setting
-    Specifies if NetBIOS should be enabled or disabled or obtained from
-    the DHCP server (Default). If static IP, Enable NetBIOS.
+    .PARAMETER Setting
+        Specifies if NetBIOS should be enabled or disabled or obtained from
+        the DHCP server (Default). If static IP, Enable NetBIOS.
 #>
 function Test-TargetResource
 {

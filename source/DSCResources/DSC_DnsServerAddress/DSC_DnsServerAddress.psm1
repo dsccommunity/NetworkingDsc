@@ -12,16 +12,16 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current DNS Server Addresses for an interface.
+        Returns the current DNS Server Addresses for an interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the DNS server address is set.
+        Alias of the network interface for which the DNS server address is set.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 
     .PARAMETER Address
-    The desired DNS Server address(es). Exclude to enable DHCP.
+        The desired DNS Server address(es). Exclude to enable DHCP.
 #>
 function Get-TargetResource
 {
@@ -68,21 +68,21 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the DNS Server Address for an interface.
+        Sets the DNS Server Address for an interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the DNS server address is set.
+        Alias of the network interface for which the DNS server address is set.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 
     .PARAMETER Address
-    The desired DNS Server address(es). Exclude to enable DHCP.
+        The desired DNS Server address(es). Exclude to enable DHCP.
 
     .PARAMETER Validate
-    Requires that the DNS Server addresses be validated if they are updated.
-    It will cause the resource to throw a 'A general error occurred that is not covered by a more
-    specific error code.' error if set to True and specified DNS Servers are not accessible.
+        Requires that the DNS Server addresses be validated if they are updated.
+        It will cause the resource to throw a 'A general error occurred that is not covered by a more
+        specific error code.' error if set to True and specified DNS Servers are not accessible.
 #>
 function Set-TargetResource
 {
@@ -181,21 +181,21 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the current state of a DNS Server Address for an interface.
+        Tests the current state of a DNS Server Address for an interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the DNS server address is set.
+        Alias of the network interface for which the DNS server address is set.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 
     .PARAMETER Address
-    The desired DNS Server address(es). Exclude to enable DHCP.
+        The desired DNS Server address(es). Exclude to enable DHCP.
 
     .PARAMETER Validate
-    Requires that the DNS Server addresses be validated if they are updated.
-    It will cause the resource to throw a 'A general error occurred that is not covered by a more
-    specific error code.' error if set to True and specified DNS Servers are not accessible.
+        Requires that the DNS Server addresses be validated if they are updated.
+        It will cause the resource to throw a 'A general error occurred that is not covered by a more
+        specific error code.' error if set to True and specified DNS Servers are not accessible.
 #>
 function Test-TargetResource
 {
@@ -223,7 +223,7 @@ function Test-TargetResource
         $Validate = $false
     )
     # Flag to signal whether settings are correct
-    [Boolean] $desiredConfigurationMatch = $true
+    $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
         $($script:localizedData.CheckingDnsServerAddressesMessage)
@@ -281,17 +281,17 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-    Checks the Address details are valid and do not conflict with Address family.
-    Ensures interface exists. If any problems are detected an exception will be thrown.
+        Checks the Address details are valid and do not conflict with Address family.
+        Ensures interface exists. If any problems are detected an exception will be thrown.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the DNS server address is set.
+        Alias of the network interface for which the DNS server address is set.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 
     .PARAMETER Address
-    The desired DNS Server address. Set to empty to enable DHCP.
+        The desired DNS Server address. Set to empty to enable DHCP.
 #>
 function Assert-ResourceProperty
 {

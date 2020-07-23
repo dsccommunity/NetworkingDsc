@@ -11,17 +11,17 @@ Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common'
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
-.SYNOPSIS
-    Gets the current state of NetAdapterRSC for a adapter.
+    .SYNOPSIS
+        Gets the current state of NetAdapterRSC for a adapter.
 
-.PARAMETER Name
-    Specifies the Name of the network adapter to check.
+    .PARAMETER Name
+        Specifies the Name of the network adapter to check.
 
-.PARAMETER Protocol
-    Specifies which protocol to target.
+    .PARAMETER Protocol
+        Specifies which protocol to target.
 
-.PARAMETER State
-    Specifies the RSC state for the protocol.
+    .PARAMETER State
+        Specifies the RSC state for the protocol.
 #>
 function Get-TargetResource
 {
@@ -94,17 +94,17 @@ function Get-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Sets the NetAdapterRSC resource state.
+    .SYNOPSIS
+        Sets the NetAdapterRSC resource state.
 
-.PARAMETER Name
-    Specifies the Name of the network adapter to check.
+    .PARAMETER Name
+        Specifies the Name of the network adapter to check.
 
-.PARAMETER Protocol
-    Specifies which protocol to target.
+    .PARAMETER Protocol
+        Specifies which protocol to target.
 
-.PARAMETER State
-    Specifies the RSC state for the protocol.
+    .PARAMETER State
+        Specifies the RSC state for the protocol.
 #>
 function Set-TargetResource
 {
@@ -171,17 +171,17 @@ function Set-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Tests if the NetAdapterRsc resource state is desired state.
+    .SYNOPSIS
+        Tests if the NetAdapterRsc resource state is desired state.
 
-.PARAMETER Name
-    Specifies the Name of the network adapter to check.
+    .PARAMETER Name
+        Specifies the Name of the network adapter to check.
 
-.PARAMETER Protocol
-    Specifies which protocol to target.
+    .PARAMETER Protocol
+        Specifies which protocol to target.
 
-.PARAMETER State
-    Specifies the RSC state for the protocol.
+    .PARAMETER State
+        Specifies the RSC state for the protocol.
 #>
 function Test-TargetResource
 {

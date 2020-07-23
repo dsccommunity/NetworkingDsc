@@ -22,10 +22,10 @@ $script:parameterList = $resourceData.ParameterList
 
 <#
     .SYNOPSIS
-    Returns the current DNS Client Global Settings.
+        Returns the current DNS Client Global Settings.
 
     .PARAMETER IsSingleInstance
-    Specifies the resource is a single instance, the value must be 'Yes'.
+        Specifies the resource is a single instance, the value must be 'Yes'.
 #>
 function Get-TargetResource
 {
@@ -65,20 +65,20 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the DNS Client Global Settings.
+        Sets the DNS Client Global Settings.
 
     .PARAMETER IsSingleInstance
-    Specifies the resource is a single instance, the value must be 'Yes'.
+        Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER SuffixSearchList
-    Specifies a list of global suffixes that can be used in the specified order by the DNS client
-    for resolving the IP address of the computer name.
+        Specifies a list of global suffixes that can be used in the specified order by the DNS client
+        for resolving the IP address of the computer name.
 
     .PARAMETER UseDevolution.
-    Specifies that devolution is activated.
+        Specifies that devolution is activated.
 
     .PARAMETER DevolutionLevel
-    Specifies the number of labels up to which devolution should occur.
+        Specifies the number of labels up to which devolution should occur.
 #>
 function Set-TargetResource
 {
@@ -151,20 +151,20 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the state of DNS Client Global Settings.
+        Tests the state of DNS Client Global Settings.
 
     .PARAMETER IsSingleInstance
-    Specifies the resource is a single instance, the value must be 'Yes'.
+        Specifies the resource is a single instance, the value must be 'Yes'.
 
     .PARAMETER SuffixSearchList
-    Specifies a list of global suffixes that can be used in the specified order by the DNS client
-    for resolving the IP address of the computer name.
+        Specifies a list of global suffixes that can be used in the specified order by the DNS client
+        for resolving the IP address of the computer name.
 
     .PARAMETER UseDevolution.
-    Specifies that devolution is activated.
+        Specifies that devolution is activated.
 
     .PARAMETER DevolutionLevel
-    Specifies the number of labels up to which devolution should occur.
+        Specifies the number of labels up to which devolution should occur.
 #>
 function Test-TargetResource
 {
@@ -196,7 +196,7 @@ function Test-TargetResource
         ) -join '' )
 
     # Flag to signal whether settings are correct
-    [Boolean] $desiredConfigurationMatch = $true
+    $desiredConfigurationMatch = $true
 
     # Get the current Dns Client Global Settings
     $dnsClientGlobalSetting = Get-DnsClientGlobalSetting `

@@ -17,10 +17,10 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current state of the wait for network team resource.
+        Returns the current state of the wait for network team resource.
 
     .PARAMETER Name
-    Specifies the name of the network team to wait for.
+        Specifies the name of the network team to wait for.
 #>
 function Get-TargetResource
 {
@@ -52,16 +52,16 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the current state of the wait for network team resource.
+        Sets the current state of the wait for network team resource.
 
     .PARAMETER Name
-    Specifies the name of the network team to wait for.
+        Specifies the name of the network team to wait for.
 
     .PARAMETER RetryIntervalSec
-    Specifies the number of seconds to wait for the network team to become available.
+        Specifies the number of seconds to wait for the network team to become available.
 
     .PARAMETER RetryCount
-    The number of times to loop the retry interval while waiting for the network team.
+        The number of times to loop the retry interval while waiting for the network team.
 #>
 function Set-TargetResource
 {
@@ -122,16 +122,16 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the current state of the wait for network team resource.
+        Tests the current state of the wait for network team resource.
 
     .PARAMETER Name
-    Specifies the name of the network team to wait for.
+        Specifies the name of the network team to wait for.
 
     .PARAMETER RetryIntervalSec
-    Specifies the number of seconds to wait for the network team to become available.
+        Specifies the number of seconds to wait for the network team to become available.
 
     .PARAMETER RetryCount
-    The number of times to loop the retry interval while waiting for the network team.
+        The number of times to loop the retry interval while waiting for the network team.
 #>
 function Test-TargetResource
 {
@@ -179,15 +179,15 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-    Returns the current status of a network team.
-    'Up' indicates that the network team is acive.
-    'Degraded' indicates that the network team is not yet
-    available.
-    If the network team does not exist an exception will be
-    thrown.
+        Returns the current status of a network team.
+        'Up' indicates that the network team is acive.
+        'Degraded' indicates that the network team is not yet
+        available.
+        If the network team does not exist an exception will be
+        thrown.
 
     .PARAMETER Name
-    Specifies the name of the network team to get the status of.
+        Specifies the name of the network team to get the status of.
 #>
 
 function Get-NetLbfoTeamStatus

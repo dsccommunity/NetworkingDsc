@@ -24,13 +24,13 @@ $script:parameterList = $script:resourceData.ParameterList
 
 <#
     .SYNOPSIS
-    Returns the current state of the Network Interface.
+        Returns the current state of the Network Interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface to configure.
+        Alias of the network interface to configure.
 
     .PARAMETER AddressFamily
-    IP address family on the interface to configure.
+        IP address family on the interface to configure.
 #>
 function Get-TargetResource
 {
@@ -63,61 +63,61 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the current state of the Network Interface.
+        Sets the current state of the Network Interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface to configure.
+        Alias of the network interface to configure.
 
     .PARAMETER AddressFamily
-    IP address family on the interface to configure.
+        IP address family on the interface to configure.
 
     .PARAMETER AdvertiseDefaultRoute
-    Specifies the default router advertisement for an interface.
+        Specifies the default router advertisement for an interface.
 
     .PARAMETER Advertising
-    Specifies the router advertisement value for the IP interface.
+        Specifies the router advertisement value for the IP interface.
 
     .PARAMETER AutomaticMetric
-    Specifies the value for automatic metric calculation.
+        Specifies the value for automatic metric calculation.
 
     .PARAMETER Dhcp
-    Specifies the Dynamic Host Configuration Protocol (DHCP) value for an IP interface.
+        Specifies the Dynamic Host Configuration Protocol (DHCP) value for an IP interface.
 
     .PARAMETER DirectedMacWolPattern
-    Specifies the wake-up packet value for an IP interface.
+        Specifies the wake-up packet value for an IP interface.
 
     .PARAMETER EcnMarking
-    Specifies the value for Explicit Congestion Notification (ECN) marking.
+        Specifies the value for Explicit Congestion Notification (ECN) marking.
 
     .PARAMETER ForceArpNdWolPattern
-    Specifies the Wake On LAN (WOL) value for the IP interface.
+        Specifies the Wake On LAN (WOL) value for the IP interface.
 
     .PARAMETER Forwarding
-    Specifies the packet forwarding value for the IP interface.
+        Specifies the packet forwarding value for the IP interface.
 
     .PARAMETER IgnoreDefaultRoutes
-    Specifies a value for Default Route advertisements.
+        Specifies a value for Default Route advertisements.
 
     .PARAMETER ManagedAddressConfiguration
-    Specifies the value for managed address configuration.
+        Specifies the value for managed address configuration.
 
     .PARAMETER NeighborUnreachabilityDetection
-    Specifies the value for Neighbor Unreachability Detection (NUD).
+        Specifies the value for Neighbor Unreachability Detection (NUD).
 
     .PARAMETER OtherStatefulConfiguration
-    Specifies the value for configuration other than addresses.
+        Specifies the value for configuration other than addresses.
 
     .PARAMETER RouterDiscovery
-    Specifies the value for router discovery for an IP interface.
+        Specifies the value for router discovery for an IP interface.
 
     .PARAMETER WeakHostReceive
-    Specifies the receive value for a weak host model.
+        Specifies the receive value for a weak host model.
 
     .PARAMETER WeakHostSend
-    Specifies the send value for a weak host model.
+        Specifies the send value for a weak host model.
 
     .PARAMETER NlMtu
-    Specifies the network layer Maximum Transmission Unit (MTU) value, in bytes, for an IP interface.
+        Specifies the network layer Maximum Transmission Unit (MTU) value, in bytes, for an IP interface.
 #>
 function Set-TargetResource
 {
@@ -267,61 +267,61 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the current state of the Network Interface.
+        Sets the current state of the Network Interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface to configure.
+        Alias of the network interface to configure.
 
     .PARAMETER AddressFamily
-    IP address family on the interface to configure.
+        IP address family on the interface to configure.
 
     .PARAMETER AdvertiseDefaultRoute
-    Specifies the default router advertisement for an interface.
+        Specifies the default router advertisement for an interface.
 
     .PARAMETER Advertising
-    Specifies the router advertisement value for the IP interface.
+        Specifies the router advertisement value for the IP interface.
 
     .PARAMETER AutomaticMetric
-    Specifies the value for automatic metric calculation.
+        Specifies the value for automatic metric calculation.
 
     .PARAMETER Dhcp
-    Specifies the Dynamic Host Configuration Protocol (DHCP) value for an IP interface.
+        Specifies the Dynamic Host Configuration Protocol (DHCP) value for an IP interface.
 
     .PARAMETER DirectedMacWolPattern
-    Specifies the wake-up packet value for an IP interface.
+        Specifies the wake-up packet value for an IP interface.
 
     .PARAMETER EcnMarking
-    Specifies the value for Explicit Congestion Notification (ECN) marking.
+        Specifies the value for Explicit Congestion Notification (ECN) marking.
 
     .PARAMETER ForceArpNdWolPattern
-    Specifies the Wake On LAN (WOL) value for the IP interface.
+        Specifies the Wake On LAN (WOL) value for the IP interface.
 
     .PARAMETER Forwarding
-    Specifies the packet forwarding value for the IP interface.
+        Specifies the packet forwarding value for the IP interface.
 
     .PARAMETER IgnoreDefaultRoutes
-    Specifies a value for Default Route advertisements.
+        Specifies a value for Default Route advertisements.
 
     .PARAMETER ManagedAddressConfiguration
-    Specifies the value for managed address configuration.
+        Specifies the value for managed address configuration.
 
     .PARAMETER NeighborUnreachabilityDetection
-    Specifies the value for Neighbor Unreachability Detection (NUD).
+        Specifies the value for Neighbor Unreachability Detection (NUD).
 
     .PARAMETER OtherStatefulConfiguration
-    Specifies the value for configuration other than addresses.
+        Specifies the value for configuration other than addresses.
 
     .PARAMETER RouterDiscovery
-    Specifies the value for router discovery for an IP interface.
+        Specifies the value for router discovery for an IP interface.
 
     .PARAMETER WeakHostReceive
-    Specifies the receive value for a weak host model.
+        Specifies the receive value for a weak host model.
 
     .PARAMETER WeakHostSend
-    Specifies the send value for a weak host model.
+        Specifies the send value for a weak host model.
 
     .PARAMETER NlMtu
-    Specifies the network layer Maximum Transmission Unit (MTU) value, in bytes, for an IP interface.
+        Specifies the network layer Maximum Transmission Unit (MTU) value, in bytes, for an IP interface.
 #>
 function Test-TargetResource
 {
@@ -435,19 +435,19 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-    Get the network IP interface for the address family.
-    If the network interface is not found or the address family
-    is not bound to the inerface then an exception will be thrown.
+        Get the network IP interface for the address family.
+        If the network interface is not found or the address family
+        is not bound to the inerface then an exception will be thrown.
 
-    It will return an hash table with only the parameters in found
-    in the $script:parameterList array and the InterfaceAlias and
-    AddressFamily parameters.
+        It will return an hash table with only the parameters in found
+        in the $script:parameterList array and the InterfaceAlias and
+        AddressFamily parameters.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface to configure.
+        Alias of the network interface to configure.
 
     .PARAMETER AddressFamily
-    IP address family on the interface to configure.
+        IP address family on the interface to configure.
 #>
 function Get-NetworkIPInterface
 {

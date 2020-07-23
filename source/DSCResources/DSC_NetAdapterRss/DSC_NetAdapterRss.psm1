@@ -11,14 +11,14 @@ Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common'
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
-.SYNOPSIS
-    Gets the current state of NetAdapterRss for a adapter.
+    .SYNOPSIS
+        Gets the current state of NetAdapterRss for a adapter.
 
-.PARAMETER Name
-    Specifies the Name of the network adapter to check.
+    .PARAMETER Name
+        Specifies the Name of the network adapter to check.
 
-.PARAMETER State
-    Specifies the Rss state for the protocol.
+    .PARAMETER State
+        Specifies the Rss state for the protocol.
 #>
 function Get-TargetResource
 {
@@ -67,14 +67,14 @@ function Get-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Sets the NetAdapterRss resource state.
+    .SYNOPSIS
+        Sets the NetAdapterRss resource state.
 
-.PARAMETER Name
-    Specifies the Name of the network adapter to check.
+    .PARAMETER Name
+        Specifies the Name of the network adapter to check.
 
-.PARAMETER State
-    Specifies the Rss state for the protocol.
+    .PARAMETER State
+        Specifies the Rss state for the protocol.
 #>
 function Set-TargetResource
 {
@@ -126,14 +126,14 @@ function Set-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Tests if the NetAdapterRss resource state is desired state.
+    .SYNOPSIS
+        Tests if the NetAdapterRss resource state is desired state.
 
-.PARAMETER Name
-    Specifies the Name of the network adapter to check.
+    .PARAMETER Name
+        Specifies the Name of the network adapter to check.
 
-.PARAMETER State
-    Specifies the Rss state for the protocol.
+    .PARAMETER State
+        Specifies the Rss state for the protocol.
 #>
 function Test-TargetResource
 {

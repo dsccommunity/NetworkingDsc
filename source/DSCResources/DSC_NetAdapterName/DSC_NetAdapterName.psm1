@@ -12,43 +12,43 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    This function will get the network adapter based on the provided
-    parameters.
+        This function will get the network adapter based on the provided
+        parameters.
 
     .PARAMETER NewName
-    Specifies the new name of the network adapter.
+        Specifies the new name of the network adapter.
 
     .PARAMETER Name
-    This is the name of the network adapter to find.
+        This is the name of the network adapter to find.
 
     .PARAMETER PhysicalMediaType
-    This is the media type of the network adapter to find.
+        This is the media type of the network adapter to find.
 
     .PARAMETER Status
-    This is the status of the network adapter to find.
+        This is the status of the network adapter to find.
 
     .PARAMETER MacAddress
-    This is the MAC address of the network adapter to find.
+        This is the MAC address of the network adapter to find.
 
     .PARAMETER InterfaceDescription
-    This is the interface description of the network adapter to find.
+        This is the interface description of the network adapter to find.
 
     .PARAMETER InterfaceIndex
-    This is the interface index of the network adapter to find.
+        This is the interface index of the network adapter to find.
 
     .PARAMETER InterfaceGuid
-    This is the interface GUID of the network adapter to find.
+        This is the interface GUID of the network adapter to find.
 
     .PARAMETER DriverDescription
-    This is the driver description of the network adapter.
+        This is the driver description of the network adapter.
 
     .PARAMETER InterfaceNumber
-    This is the interface number of the network adapter if more than one
-    are returned by the parameters.
+        This is the interface number of the network adapter if more than one
+        are returned by the parameters.
 
     .PARAMETER IgnoreMultipleMatchingAdapters
-    This switch will suppress an error occurring if more than one matching
-    adapter matches the parameters passed.
+        This switch will suppress an error occurring if more than one matching
+        adapter matches the parameters passed.
 #>
 function Get-TargetResource
 {
@@ -148,42 +148,42 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    This function will rename a network adapter that matches the parameters.
+        This function will rename a network adapter that matches the parameters.
 
     .PARAMETER NewName
-    Specifies the new name of the network adapter.
+        Specifies the new name of the network adapter.
 
     .PARAMETER Name
-    This is the name of the network adapter to find.
+        This is the name of the network adapter to find.
 
     .PARAMETER PhysicalMediaType
-    This is the media type of the network adapter to find.
+        This is the media type of the network adapter to find.
 
     .PARAMETER Status
-    This is the status of the network adapter to find.
+        This is the status of the network adapter to find.
 
     .PARAMETER MacAddress
-    This is the MAC address of the network adapter to find.
+        This is the MAC address of the network adapter to find.
 
     .PARAMETER InterfaceDescription
-    This is the interface description of the network adapter to find.
+        This is the interface description of the network adapter to find.
 
     .PARAMETER InterfaceIndex
-    This is the interface index of the network adapter to find.
+        This is the interface index of the network adapter to find.
 
     .PARAMETER InterfaceGuid
-    This is the interface GUID of the network adapter to find.
+        This is the interface GUID of the network adapter to find.
 
     .PARAMETER DriverDescription
-    This is the driver description of the network adapter.
+        This is the driver description of the network adapter.
 
     .PARAMETER InterfaceNumber
-    This is the interface number of the network adapter if more than one
-    are returned by the parameters.
+        This is the interface number of the network adapter if more than one
+        are returned by the parameters.
 
     .PARAMETER IgnoreMultipleMatchingAdapters
-    This switch will suppress an error occurring if more than one matching
-    adapter matches the parameters passed.
+        This switch will suppress an error occurring if more than one matching
+        adapter matches the parameters passed.
 #>
 function Set-TargetResource
 {
@@ -262,43 +262,43 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    This will check if the network adapter that matches the parameters needs
-    to be returned.
+        This will check if the network adapter that matches the parameters needs
+        to be returned.
 
     .PARAMETER NewName
-    Specifies the new name of the network adapter.
+        Specifies the new name of the network adapter.
 
     .PARAMETER Name
-    This is the name of the network adapter to find.
+        This is the name of the network adapter to find.
 
     .PARAMETER PhysicalMediaType
-    This is the media type of the network adapter to find.
+        This is the media type of the network adapter to find.
 
     .PARAMETER Status
-    This is the status of the network adapter to find.
+        This is the status of the network adapter to find.
 
     .PARAMETER MacAddress
-    This is the MAC address of the network adapter to find.
+        This is the MAC address of the network adapter to find.
 
     .PARAMETER InterfaceDescription
-    This is the interface description of the network adapter to find.
+        This is the interface description of the network adapter to find.
 
     .PARAMETER InterfaceIndex
-    This is the interface index of the network adapter to find.
+        This is the interface index of the network adapter to find.
 
     .PARAMETER InterfaceGuid
-    This is the interface GUID of the network adapter to find.
+        This is the interface GUID of the network adapter to find.
 
     .PARAMETER DriverDescription
-    This is the driver description of the network adapter.
+        This is the driver description of the network adapter.
 
     .PARAMETER InterfaceNumber
-    This is the interface number of the network adapter if more than one
-    are returned by the parameters.
+        This is the interface number of the network adapter if more than one
+        are returned by the parameters.
 
     .PARAMETER IgnoreMultipleMatchingAdapters
-    This switch will suppress an error occurring if more than one matching
-    adapter matches the parameters passed.
+        This switch will suppress an error occurring if more than one matching
+        adapter matches the parameters passed.
 #>
 function Test-TargetResource
 {

@@ -30,10 +30,10 @@ $script:parameterList = $script:resourceData.ParameterList
 
 <#
     .SYNOPSIS
-    Returns the current state of the Firewall Rule.
+        Returns the current state of the Firewall Rule.
 
     .PARAMETER Name
-    Name of the firewall rule.
+        Name of the firewall rule.
 #>
 function Get-TargetResource
 {
@@ -124,120 +124,120 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Create, update or delete the Firewall Rule.
+        Create, update or delete the Firewall Rule.
 
     .PARAMETER Name
-    Name of the firewall rule.
+        Name of the firewall rule.
 
     .PARAMETER DisplayName
-    Localized, user-facing name of the firewall rule being created.
+        Localized, user-facing name of the firewall rule being created.
 
     .PARAMETER Group
-    Name of the firewall group where we want to put the firewall rule.
+        Name of the firewall group where we want to put the firewall rule.
 
     .PARAMETER Ensure
-    Ensure that the firewall rule exists.
+        Ensure that the firewall rule exists.
 
     .PARAMETER Enabled
-    Enable or Disable the supplied configuration.
+        Enable or Disable the supplied configuration.
 
     .PARAMETER Action
-    Allow or Block the supplied configuration.
+        Allow or Block the supplied configuration.
 
     .PARAMETER Profile
-    Specifies one or more profiles to which the rule is assigned.
+        Specifies one or more profiles to which the rule is assigned.
 
     .PARAMETER Direction
-    Direction of the connection.
+        Direction of the connection.
 
     .PARAMETER RemotePort
-    Specific port used for filter. Specified by port number, range, or keyword.
+        Specific port used for filter. Specified by port number, range, or keyword.
 
     .PARAMETER LocalPort
-    Local port used for the filter.
+        Local port used for the filter.
 
     .PARAMETER Protocol
-    Specific protocol for filter. Specified by name, number, or range.
+        Specific protocol for filter. Specified by name, number, or range.
 
     .PARAMETER Description
-    Documentation for the rule.
+        Documentation for the rule.
 
     .PARAMETER Program
-    Path and filename of the program for which the rule is applied.
+        Path and filename of the program for which the rule is applied.
 
     .PARAMETER Service
-    Specifies the short name of a Windows service to which the firewall rule applies.
+        Specifies the short name of a Windows service to which the firewall rule applies.
 
     .PARAMETER Authentication
-    Specifies that authentication is required on firewall rules.
+        Specifies that authentication is required on firewall rules.
 
     .PARAMETER Encryption
-    Specifies that encryption in authentication is required on firewall rules.
+        Specifies that encryption in authentication is required on firewall rules.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias of the interface that applies to the traffic.
+        Specifies the alias of the interface that applies to the traffic.
 
     .PARAMETER InterfaceType
-    Specifies that only network connections made through the indicated interface types are subject
-    to the requirements of this rule.
+        Specifies that only network connections made through the indicated interface types are subject
+        to the requirements of this rule.
 
     .PARAMETER LocalAddress
-    Specifies that network packets with matching IP addresses match this rule. This parameter value
-    is the first end point of an IPsec rule and specifies the computers that are subject to the
-    requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet,
-    range, or the following keyword: Any.
+        Specifies that network packets with matching IP addresses match this rule. This parameter value
+        is the first end point of an IPsec rule and specifies the computers that are subject to the
+        requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet,
+        range, or the following keyword: Any.
 
     .PARAMETER LocalUser
-    Specifies the principals to which network traffic this firewall rule applies. The principals,
-    represented by security identifiers (SIDs) in the security descriptor definition language (SDDL)
-    string, are services, users, application containers, or any SID to which network traffic is
-    associated.
+        Specifies the principals to which network traffic this firewall rule applies. The principals,
+        represented by security identifiers (SIDs) in the security descriptor definition language (SDDL)
+        string, are services, users, application containers, or any SID to which network traffic is
+        associated.
 
     .PARAMETER Package
-    Specifies the Windows Store application to which the firewall rule applies. This parameter is
-    specified as a security identifier (SID).
+        Specifies the Windows Store application to which the firewall rule applies. This parameter is
+        specified as a security identifier (SID).
 
     .PARAMETER Platform
-    Specifies which version of Windows the associated rule applies.
+        Specifies which version of Windows the associated rule applies.
 
     .PARAMETER RemoteAddress
-    Specifies that network packets with matching IP addresses match this rule. This parameter value
-    is the second end point of an IPsec rule and specifies the computers that are subject to the
-    requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet,
-    range, or the following keyword: Any
+        Specifies that network packets with matching IP addresses match this rule. This parameter value
+        is the second end point of an IPsec rule and specifies the computers that are subject to the
+        requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet,
+        range, or the following keyword: Any
 
     .PARAMETER RemoteMachine
-    Specifies that matching IPsec rules of the indicated computer accounts are created. This
-    parameter specifies that only network packets that are authenticated as incoming from or
-    outgoing to a computer identified in the list of computer accounts (SID) match this rule.
-    This parameter value is specified as an SDDL string.
+        Specifies that matching IPsec rules of the indicated computer accounts are created. This
+        parameter specifies that only network packets that are authenticated as incoming from or
+        outgoing to a computer identified in the list of computer accounts (SID) match this rule.
+        This parameter value is specified as an SDDL string.
 
     .PARAMETER RemoteUser
-    Specifies that matching IPsec rules of the indicated user accounts are created. This parameter
-    specifies that only network packets that are authenticated as incoming from or outgoing to a
-    user identified in the list of user accounts match this rule. This parameter value is specified
-    as an SDDL string.
+        Specifies that matching IPsec rules of the indicated user accounts are created. This parameter
+        specifies that only network packets that are authenticated as incoming from or outgoing to a
+        user identified in the list of user accounts match this rule. This parameter value is specified
+        as an SDDL string.
 
     .PARAMETER DynamicTransport
-    Specifies a dynamic transport.
+        Specifies a dynamic transport.
 
     .PARAMETER EdgeTraversalPolicy
-    Specifies that matching firewall rules of the indicated edge traversal policy are created.
+        Specifies that matching firewall rules of the indicated edge traversal policy are created.
 
     .PARAMETER IcmpType
-    Specifies the ICMP type codes.
+        Specifies the ICMP type codes.
 
     .PARAMETER LocalOnlyMapping
-    Indicates that matching firewall rules of the indicated value are created.
+        Indicates that matching firewall rules of the indicated value are created.
 
     .PARAMETER LooseSourceMapping
-    Indicates that matching firewall rules of the indicated value are created.
+        Indicates that matching firewall rules of the indicated value are created.
 
     .PARAMETER OverrideBlockRules
-    Indicates that matching network traffic that would otherwise be blocked are allowed.
+        Indicates that matching network traffic that would otherwise be blocked are allowed.
 
     .PARAMETER Owner
-    Specifies that matching firewall rules of the indicated owner are created.
+        Specifies that matching firewall rules of the indicated owner are created.
 #>
 function Set-TargetResource
 {
@@ -549,117 +549,117 @@ function Set-TargetResource
     Test if Firewall Rule is in the required state.
 
     .PARAMETER Name
-    Name of the firewall rule.
+        Name of the firewall rule.
 
     .PARAMETER DisplayName
-    Localized, user-facing name of the firewall rule being created.
+        Localized, user-facing name of the firewall rule being created.
 
     .PARAMETER Group
-    Name of the firewall group where we want to put the firewall rule.
+        Name of the firewall group where we want to put the firewall rule.
 
     .PARAMETER Ensure
-    Ensure that the firewall rule exists.
+        Ensure that the firewall rule exists.
 
     .PARAMETER Enabled
-    Enable or Disable the supplied configuration.
+        Enable or Disable the supplied configuration.
 
     .PARAMETER Action
-    Allow or Block the supplied configuration.
+        Allow or Block the supplied configuration.
 
     .PARAMETER Profile
-    Specifies one or more profiles to which the rule is assigned.
+        Specifies one or more profiles to which the rule is assigned.
 
     .PARAMETER Direction
-    Direction of the connection.
+        Direction of the connection.
 
     .PARAMETER RemotePort
-    Specific port used for filter. Specified by port number, range, or keyword.
+        Specific port used for filter. Specified by port number, range, or keyword.
 
     .PARAMETER LocalPort
-    Local port used for the filter.
+        Local port used for the filter.
 
     .PARAMETER Protocol
-    Specific protocol for filter. Specified by name, number, or range.
+        Specific protocol for filter. Specified by name, number, or range.
 
     .PARAMETER Description
-    Documentation for the rule.
+        Documentation for the rule.
 
     .PARAMETER Program
-    Path and filename of the program for which the rule is applied.
+        Path and filename of the program for which the rule is applied.
 
     .PARAMETER Service
-    Specifies the short name of a Windows service to which the firewall rule applies.
+        Specifies the short name of a Windows service to which the firewall rule applies.
 
     .PARAMETER Authentication
-    Specifies that authentication is required on firewall rules.
+        Specifies that authentication is required on firewall rules.
 
     .PARAMETER Encryption
-    Specifies that encryption in authentication is required on firewall rules.
+        Specifies that encryption in authentication is required on firewall rules.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias of the interface that applies to the traffic.
+        Specifies the alias of the interface that applies to the traffic.
 
     .PARAMETER InterfaceType
-    Specifies that only network connections made through the indicated interface types are subject
-    to the requirements of this rule.
+        Specifies that only network connections made through the indicated interface types are subject
+        to the requirements of this rule.
 
     .PARAMETER LocalAddress
-    Specifies that network packets with matching IP addresses match this rule. This parameter value
-    is the first end point of an IPsec rule and specifies the computers that are subject to the
-    requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet,
-    range, or the following keyword: Any.
+        Specifies that network packets with matching IP addresses match this rule. This parameter value
+        is the first end point of an IPsec rule and specifies the computers that are subject to the
+        requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet,
+        range, or the following keyword: Any.
 
     .PARAMETER LocalUser
-    Specifies the principals to which network traffic this firewall rule applies. The principals,
-    represented by security identifiers (SIDs) in the security descriptor definition language (SDDL)
-    string, are services, users, application containers, or any SID to which network traffic is
-    associated.
+        Specifies the principals to which network traffic this firewall rule applies. The principals,
+        represented by security identifiers (SIDs) in the security descriptor definition language (SDDL)
+        string, are services, users, application containers, or any SID to which network traffic is
+        associated.
 
     .PARAMETER Package
-    Specifies the Windows Store application to which the firewall rule applies. This parameter is
-    specified as a security identifier (SID).
+        Specifies the Windows Store application to which the firewall rule applies. This parameter is
+        specified as a security identifier (SID).
 
     .PARAMETER Platform
-    Specifies which version of Windows the associated rule applies.
+        Specifies which version of Windows the associated rule applies.
 
     .PARAMETER RemoteAddress
-    Specifies that network packets with matching IP addresses match this rule. This parameter value
-    is the second end point of an IPsec rule and specifies the computers that are subject to the
-    requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet,
-    range, or the following keyword: Any
+        Specifies that network packets with matching IP addresses match this rule. This parameter value
+        is the second end point of an IPsec rule and specifies the computers that are subject to the
+        requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet,
+        range, or the following keyword: Any
 
     .PARAMETER RemoteMachine
-    Specifies that matching IPsec rules of the indicated computer accounts are created. This
-    parameter specifies that only network packets that are authenticated as incoming from or
-    outgoing to a computer identified in the list of computer accounts (SID) match this rule.
-    This parameter value is specified as an SDDL string.
+        Specifies that matching IPsec rules of the indicated computer accounts are created. This
+        parameter specifies that only network packets that are authenticated as incoming from or
+        outgoing to a computer identified in the list of computer accounts (SID) match this rule.
+        This parameter value is specified as an SDDL string.
 
     .PARAMETER RemoteUser
-    Specifies that matching IPsec rules of the indicated user accounts are created. This parameter
-    specifies that only network packets that are authenticated as incoming from or outgoing to a
-    user identified in the list of user accounts match this rule. This parameter value is specified
-    as an SDDL string.
+        Specifies that matching IPsec rules of the indicated user accounts are created. This parameter
+        specifies that only network packets that are authenticated as incoming from or outgoing to a
+        user identified in the list of user accounts match this rule. This parameter value is specified
+        as an SDDL string.
 
     .PARAMETER DynamicTransport
-    Specifies a dynamic transport.
+        Specifies a dynamic transport.
 
     .PARAMETER EdgeTraversalPolicy
-    Specifies that matching firewall rules of the indicated edge traversal policy are created.
+        Specifies that matching firewall rules of the indicated edge traversal policy are created.
 
     .PARAMETER IcmpType
-    Specifies the ICMP type codes.
+        Specifies the ICMP type codes.
 
     .PARAMETER LocalOnlyMapping
-    Indicates that matching firewall rules of the indicated value are created.
+        Indicates that matching firewall rules of the indicated value are created.
 
     .PARAMETER LooseSourceMapping
-    Indicates that matching firewall rules of the indicated value are created.
+        Indicates that matching firewall rules of the indicated value are created.
 
     .PARAMETER OverrideBlockRules
-    Indicates that matching network traffic that would otherwise be blocked are allowed.
+        Indicates that matching network traffic that would otherwise be blocked are allowed.
 
     .PARAMETER Owner
-    Specifies that matching firewall rules of the indicated owner are created.
+        Specifies that matching firewall rules of the indicated owner are created.
 #>
 function Test-TargetResource
 {
@@ -870,126 +870,125 @@ function Test-TargetResource
     return $returnValue
 }
 
-#region HelperFunctions
 <#
     .SYNOPSIS
-    Tests if the properties in the supplied Firewall Rule match the expected parameters passed.
+        Tests if the properties in the supplied Firewall Rule match the expected parameters passed.
 
     .PARAMETER FirewallRule
-    The firewall rule object to compare the properties of.
+        The firewall rule object to compare the properties of.
 
     .PARAMETER Name
-    Name of the firewall rule.
+        Name of the firewall rule.
 
     .PARAMETER DisplayName
-    Localized, user-facing name of the firewall rule being created.
+        Localized, user-facing name of the firewall rule being created.
 
     .PARAMETER Group
-    Name of the firewall group where we want to put the firewall rule.
+        Name of the firewall group where we want to put the firewall rule.
 
     .PARAMETER Ensure
-    Ensure that the firewall rule exists.
+        Ensure that the firewall rule exists.
 
     .PARAMETER Enabled
-    Enable or Disable the supplied configuration.
+        Enable or Disable the supplied configuration.
 
     .PARAMETER Action
-    Allow or Block the supplied configuration.
+        Allow or Block the supplied configuration.
 
     .PARAMETER Profile
-    Specifies one or more profiles to which the rule is assigned.
+        Specifies one or more profiles to which the rule is assigned.
 
     .PARAMETER Direction
-    Direction of the connection.
+        Direction of the connection.
 
     .PARAMETER RemotePort
-    Specific port used for filter. Specified by port number, range, or keyword.
+        Specific port used for filter. Specified by port number, range, or keyword.
 
     .PARAMETER LocalPort
-    Local port used for the filter.
+        Local port used for the filter.
 
     .PARAMETER Protocol
-    Specific protocol for filter. Specified by name, number, or range.
+        Specific protocol for filter. Specified by name, number, or range.
 
     .PARAMETER Description
-    Documentation for the rule.
+        Documentation for the rule.
 
     .PARAMETER Program
-    Path and filename of the program for which the rule is applied.
+        Path and filename of the program for which the rule is applied.
 
     .PARAMETER Service
-    Specifies the short name of a Windows service to which the firewall rule applies.
+        Specifies the short name of a Windows service to which the firewall rule applies.
 
     .PARAMETER Authentication
-    Specifies that authentication is required on firewall rules.
+        Specifies that authentication is required on firewall rules.
 
     .PARAMETER Encryption
-    Specifies that encryption in authentication is required on firewall rules.
+        Specifies that encryption in authentication is required on firewall rules.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias of the interface that applies to the traffic.
+        Specifies the alias of the interface that applies to the traffic.
 
     .PARAMETER InterfaceType
-    Specifies that only network connections made through the indicated interface types are subject
-    to the requirements of this rule.
+        Specifies that only network connections made through the indicated interface types are subject
+        to the requirements of this rule.
 
     .PARAMETER LocalAddress
-    Specifies that network packets with matching IP addresses match this rule. This parameter value
-    is the first end point of an IPsec rule and specifies the computers that are subject to the
-    requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet,
-    range, or the following keyword: Any.
+        Specifies that network packets with matching IP addresses match this rule. This parameter value
+        is the first end point of an IPsec rule and specifies the computers that are subject to the
+        requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet,
+        range, or the following keyword: Any.
 
     .PARAMETER LocalUser
-    Specifies the principals to which network traffic this firewall rule applies. The principals,
-    represented by security identifiers (SIDs) in the security descriptor definition language (SDDL)
-    string, are services, users, application containers, or any SID to which network traffic is
-    associated.
+        Specifies the principals to which network traffic this firewall rule applies. The principals,
+        represented by security identifiers (SIDs) in the security descriptor definition language (SDDL)
+        string, are services, users, application containers, or any SID to which network traffic is
+        associated.
 
     .PARAMETER Package
-    Specifies the Windows Store application to which the firewall rule applies. This parameter is
-    specified as a security identifier (SID).
+        Specifies the Windows Store application to which the firewall rule applies. This parameter is
+        specified as a security identifier (SID).
 
     .PARAMETER Platform
-    Specifies which version of Windows the associated rule applies.
+        Specifies which version of Windows the associated rule applies.
 
     .PARAMETER RemoteAddress
-    Specifies that network packets with matching IP addresses match this rule. This parameter value
-    is the second end point of an IPsec rule and specifies the computers that are subject to the
-    requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet,
-    range, or the following keyword: Any
+        Specifies that network packets with matching IP addresses match this rule. This parameter value
+        is the second end point of an IPsec rule and specifies the computers that are subject to the
+        requirements of this rule. This parameter value is an IPv4 or IPv6 address, hostname, subnet,
+        range, or the following keyword: Any
 
     .PARAMETER RemoteMachine
-    Specifies that matching IPsec rules of the indicated computer accounts are created. This
-    parameter specifies that only network packets that are authenticated as incoming from or
-    outgoing to a computer identified in the list of computer accounts (SID) match this rule.
-    This parameter value is specified as an SDDL string.
+        Specifies that matching IPsec rules of the indicated computer accounts are created. This
+        parameter specifies that only network packets that are authenticated as incoming from or
+        outgoing to a computer identified in the list of computer accounts (SID) match this rule.
+        This parameter value is specified as an SDDL string.
 
     .PARAMETER RemoteUser
-    Specifies that matching IPsec rules of the indicated user accounts are created. This parameter
-    specifies that only network packets that are authenticated as incoming from or outgoing to a
-    user identified in the list of user accounts match this rule. This parameter value is specified
-    as an SDDL string.
+        Specifies that matching IPsec rules of the indicated user accounts are created. This parameter
+        specifies that only network packets that are authenticated as incoming from or outgoing to a
+        user identified in the list of user accounts match this rule. This parameter value is specified
+        as an SDDL string.
 
     .PARAMETER DynamicTransport
-    Specifies a dynamic transport.
+        Specifies a dynamic transport.
 
     .PARAMETER EdgeTraversalPolicy
-    Specifies that matching firewall rules of the indicated edge traversal policy are created.
+        Specifies that matching firewall rules of the indicated edge traversal policy are created.
 
     .PARAMETER IcmpType
-    Specifies the ICMP type codes.
+        Specifies the ICMP type codes.
 
     .PARAMETER LocalOnlyMapping
-    Indicates that matching firewall rules of the indicated value are created.
+        Indicates that matching firewall rules of the indicated value are created.
 
     .PARAMETER LooseSourceMapping
-    Indicates that matching firewall rules of the indicated value are created.
+        Indicates that matching firewall rules of the indicated value are created.
 
     .PARAMETER OverrideBlockRules
-    Indicates that matching network traffic that would otherwise be blocked are allowed.
+        Indicates that matching network traffic that would otherwise be blocked are allowed.
 
     .PARAMETER Owner
-    Specifies that matching firewall rules of the indicated owner are created.
+        Specifies that matching firewall rules of the indicated owner are created.
 #>
 function Test-RuleProperties
 {
@@ -1239,10 +1238,10 @@ function Test-RuleProperties
 
 <#
     .SYNOPSIS
-    Returns a Firewall object matching the specified name.
+        Returns a Firewall object matching the specified name.
 
     .PARAMETER Name
-    The name of the Firewall Rule to Retrieve.
+        The name of the Firewall Rule to Retrieve.
 #>
 function Get-FirewallRule
 {
@@ -1282,10 +1281,10 @@ function Get-FirewallRule
 
 <#
     .SYNOPSIS
-    Returns a Hashtable containing the component Firewall objects for the specified Firewall Rule.
+        Returns a Hashtable containing the component Firewall objects for the specified Firewall Rule.
 
     .PARAMETER FirewallRule
-    The firewall rule object to pull the additional firewall objects for.
+        The firewall rule object to pull the additional firewall objects for.
 #>
 function Get-FirewallRuleProperty
 {
@@ -1315,16 +1314,16 @@ function Get-FirewallRuleProperty
 
 <#
     .SYNOPSIS
-    Looks up a Firewall Property value using the specified parameterList entry.
+        Looks up a Firewall Property value using the specified parameterList entry.
 
     .PARAMETER FirewallRule
-    The firewall rule object to pull the property from.
+        The firewall rule object to pull the property from.
 
     .PARAMETER Properties
-    The additional firewall objects to pull the property from.
+        The additional firewall objects to pull the property from.
 
     .PARAMETER Parameter
-    The entry from the ParameterList table used to retireve the parameter for.
+        The entry from the ParameterList table used to retireve the parameter for.
 #>
 function Get-FirewallPropertyValue
 {
@@ -1355,12 +1354,12 @@ function Get-FirewallPropertyValue
 
 <#
     .SYNOPSIS
-    Convert Firewall Rule name to Escape Wildcard Characters.
+        Convert Firewall Rule name to Escape Wildcard Characters.
 
-    It will append '[', ']' and '*' with a backtick.
+        It will append '[', ']' and '*' with a backtick.
 
     .PARAMETER Name
-    The firewall rule name to escape.
+        The firewall rule name to escape.
 #>
 function ConvertTo-FirewallRuleNameEscapedString
 {
@@ -1374,6 +1373,5 @@ function ConvertTo-FirewallRuleNameEscapedString
 
     return $Name.Replace('[','`[').Replace(']','`]').Replace('*','`*')
 }
-#endregion
 
 Export-ModuleMember -Function *-TargetResource
