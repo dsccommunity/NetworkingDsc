@@ -115,7 +115,7 @@ function Test-TargetResource
     $currentState = Get-TargetResource -InterfaceAlias $InterfaceAlias
     $desiredState = $PSBoundParameters
 
-    $result = Test-DscParameterState -CurrentValues $currentState -DesiredValues $desiredState -Verbose
+    $result = Test-DscParameterState -CurrentValues $currentState -DesiredValues $desiredState
 
     if ($result)
     {
