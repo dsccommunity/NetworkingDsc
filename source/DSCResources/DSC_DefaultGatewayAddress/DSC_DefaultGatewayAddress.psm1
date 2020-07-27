@@ -12,16 +12,16 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current state of the Default Gateway for an interface.
+        Returns the current state of the Default Gateway for an interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the default gateway address is set.
+        Alias of the network interface for which the default gateway address is set.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 
     .PARAMETER Address
-    The desired default gateway address - if not provided default gateway will be removed.
+        The desired default gateway address - if not provided default gateway will be removed.
 #>
 function Get-TargetResource
 {
@@ -82,16 +82,16 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the Default Gateway for an interface.
+        Sets the Default Gateway for an interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the default gateway address is set.
+        Alias of the network interface for which the default gateway address is set.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 
     .PARAMETER Address
-    The desired default gateway address - if not provided default gateway will be removed.
+        The desired default gateway address - if not provided default gateway will be removed.
 #>
 function Set-TargetResource
 {
@@ -161,16 +161,16 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the state of the Default Gateway for an interface.
+        Tests the state of the Default Gateway for an interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the default gateway address is set.
+        Alias of the network interface for which the default gateway address is set.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 
     .PARAMETER Address
-    The desired default gateway address - if not provided default gateway will be removed.
+        The desired default gateway address - if not provided default gateway will be removed.
 #>
 function Test-TargetResource
 {
@@ -260,17 +260,17 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-    Check the Address details are valid and do not conflict with Address family.
-    Ensures interface exists. If any problems are detected an exception will be thrown.
+        Check the Address details are valid and do not conflict with Address family.
+        Ensures interface exists. If any problems are detected an exception will be thrown.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the default gateway address is set.
+        Alias of the network interface for which the default gateway address is set.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 
     .PARAMETER Address
-    The desired default gateway address - if not provided default gateway will be removed.
+        The desired default gateway address - if not provided default gateway will be removed.
 #>
 function Assert-ResourceProperty
 {
@@ -337,13 +337,13 @@ function Get-NetDefaultGatewayDestinationPrefix
 
 <#
     .SYNOPSIS
-    Get the default network routes assigned to the interface.
+        Get the default network routes assigned to the interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the default gateway address is set.
+        Alias of the network interface for which the default gateway address is set.
 
     .PARAMETER AddressFamily
-    IP address family.
+        IP address family.
 #>
 function Get-NetDefaultRoute
 {

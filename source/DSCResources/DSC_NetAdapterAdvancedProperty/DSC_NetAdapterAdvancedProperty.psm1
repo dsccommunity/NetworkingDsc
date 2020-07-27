@@ -11,17 +11,17 @@ Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common'
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
-.SYNOPSIS
-    Gets the current value of an advanced property.
+    .SYNOPSIS
+        Gets the current value of an advanced property.
 
-.PARAMETER NetworkAdapterName
-    Specifies the name of the network adapter to set the advanced property for.
+    .PARAMETER NetworkAdapterName
+        Specifies the name of the network adapter to set the advanced property for.
 
-.PARAMETER RegistryKeyword
-    Specifies the registry keyword that should be in desired state.
+    .PARAMETER RegistryKeyword
+        Specifies the registry keyword that should be in desired state.
 
-.PARAMETER RegistryValue
-    Specifies the value of the registry keyword.
+    .PARAMETER RegistryValue
+        Specifies the value of the registry keyword.
 #>
 function Get-TargetResource
 {
@@ -79,17 +79,17 @@ function Get-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Sets the current value of an advanced property.
+    .SYNOPSIS
+        Sets the current value of an advanced property.
 
-.PARAMETER NetworkAdapterName
-    Specifies the name of the network adapter to set the advanced property for.
+    .PARAMETER NetworkAdapterName
+        Specifies the name of the network adapter to set the advanced property for.
 
-.PARAMETER RegistryKeyword
-    Specifies the registry keyword that should be in desired state.
+    .PARAMETER RegistryKeyword
+        Specifies the registry keyword that should be in desired state.
 
-.PARAMETER RegistryValue
-    Specifies the value of the registry keyword.
+    .PARAMETER RegistryValue
+        Specifies the value of the registry keyword.
 #>
 function Set-TargetResource
 {
@@ -152,17 +152,17 @@ function Set-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Tests the current value of an advanced property.
+    .SYNOPSIS
+        Tests the current value of an advanced property.
 
-.PARAMETER NetworkAdapterName
-    Specifies the name of the network adapter to set the advanced property for.
+    .PARAMETER NetworkAdapterName
+        Specifies the name of the network adapter to set the advanced property for.
 
-.PARAMETER RegistryKeyword
-    Specifies the registry keyword that should be in desired state.
+    .PARAMETER RegistryKeyword
+        Specifies the registry keyword that should be in desired state.
 
-.PARAMETER RegistryValue
-    Specifies the value of the registry keyword.
+    .PARAMETER RegistryValue
+        Specifies the value of the registry keyword.
 #>
 function Test-TargetResource
 {

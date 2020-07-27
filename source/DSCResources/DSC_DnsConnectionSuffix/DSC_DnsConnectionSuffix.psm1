@@ -12,23 +12,23 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current DNS Connection Suffix for an interface.
+        Returns the current DNS Connection Suffix for an interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the DNS server address is set.
+        Alias of the network interface for which the DNS server address is set.
 
     .PARAMETER ConnectionSpecificSuffix
-    DNS connection-specific suffix to assign to the network interface.
+        DNS connection-specific suffix to assign to the network interface.
 
     .PARAMETER RegisterThisConnectionsAddress
-    Specifies that the IP address for this connection is to be registered.
+        Specifies that the IP address for this connection is to be registered.
 
     .PARAMETER UseSuffixWhenRegistering
-    Specifies that this host name and the connection specific suffix for this connection are to
-    be registered.
+        Specifies that this host name and the connection specific suffix for this connection are to
+        be registered.
 
     .PARAMETER Ensure
-    Ensure that the network interface connection-specific suffix is present or not.
+        Ensure that the network interface connection-specific suffix is present or not.
 #>
 function Get-TargetResource
 {
@@ -105,23 +105,23 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the DNS Connection Suffix for an interface.
+        Sets the DNS Connection Suffix for an interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the DNS server address is set.
+        Alias of the network interface for which the DNS server address is set.
 
     .PARAMETER ConnectionSpecificSuffix
-    DNS connection-specific suffix to assign to the network interface.
+        DNS connection-specific suffix to assign to the network interface.
 
     .PARAMETER RegisterThisConnectionsAddress
-    Specifies that the IP address for this connection is to be registered.
+        Specifies that the IP address for this connection is to be registered.
 
     .PARAMETER UseSuffixWhenRegistering
-    Specifies that this host name and the connection specific suffix for this connection are to
-    be registered.
+        Specifies that this host name and the connection specific suffix for this connection are to
+        be registered.
 
     .PARAMETER Ensure
-    Ensure that the network interface connection-specific suffix is present or not.
+        Ensure that the network interface connection-specific suffix is present or not.
 #>
 function Set-TargetResource
 {
@@ -178,23 +178,23 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the current state of a DNS Connection Suffix for an interface.
+        Tests the current state of a DNS Connection Suffix for an interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the DNS server address is set.
+        Alias of the network interface for which the DNS server address is set.
 
     .PARAMETER ConnectionSpecificSuffix
-    DNS connection-specific suffix to assign to the network interface.
+        DNS connection-specific suffix to assign to the network interface.
 
     .PARAMETER RegisterThisConnectionsAddress
-    Specifies that the IP address for this connection is to be registered.
+        Specifies that the IP address for this connection is to be registered.
 
     .PARAMETER UseSuffixWhenRegistering
-    Specifies that this host name and the connection specific suffix for this connection are to
-    be registered.
+        Specifies that this host name and the connection specific suffix for this connection are to
+        be registered.
 
     .PARAMETER Ensure
-    Ensure that the network interface connection-specific suffix is present or not.
+        Ensure that the network interface connection-specific suffix is present or not.
 #>
 function Test-TargetResource
 {

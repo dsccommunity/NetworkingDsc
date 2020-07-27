@@ -12,10 +12,10 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current Networking Connection Profile for the specified interface.
+        Returns the current Networking Connection Profile for the specified interface.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias for the Interface that is being changed.
+        Specifies the alias for the Interface that is being changed.
 #>
 function Get-TargetResource
 {
@@ -44,19 +44,19 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the Network Connection Profile for a specified interface.
+        Sets the Network Connection Profile for a specified interface.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias for the Interface that is being changed.
+        Specifies the alias for the Interface that is being changed.
 
     .PARAMETER IPv4Connectivity
-    Specifies the IPv4 Connection Value.
+        Specifies the IPv4 Connection Value.
 
     .PARAMETER IPv6Connectivity
-    Specifies the IPv6 Connection Value.
+        Specifies the IPv6 Connection Value.
 
     .PARAMETER NetworkCategory
-    Sets the Network Category for the interface
+        Sets the Network Category for the interface
 #>
 function Set-TargetResource
 {
@@ -94,19 +94,19 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests is the Network Connection Profile for the specified interface is in the correct state.
+        Tests is the Network Connection Profile for the specified interface is in the correct state.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias for the Interface that is being changed.
+        Specifies the alias for the Interface that is being changed.
 
     .PARAMETER IPv4Connectivity
-    Specifies the IPv4 Connection Value.
+        Specifies the IPv4 Connection Value.
 
     .PARAMETER IPv6Connectivity
-    Specifies the IPv6 Connection Value.
+        Specifies the IPv6 Connection Value.
 
     .PARAMETER NetworkCategory
-    Sets the NetworkCategory for the interface
+        Sets the NetworkCategory for the interface
 #>
 function Test-TargetResource
 {
@@ -173,21 +173,21 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-    Check the parameter combination that was passed was valid.
-    Ensures interface exists. If any problems are detected an
-    exception will be thrown.
+        Check the parameter combination that was passed was valid.
+        Ensures interface exists. If any problems are detected an
+        exception will be thrown.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias for the Interface that is being changed.
+        Specifies the alias for the Interface that is being changed.
 
     .PARAMETER IPv4Connectivity
-    Specifies the IPv4 Connection Value.
+        Specifies the IPv4 Connection Value.
 
     .PARAMETER IPv6Connectivity
-    Specifies the IPv6 Connection Value.
+        Specifies the IPv6 Connection Value.
 
     .PARAMETER NetworkCategory
-    Sets the NetworkCategory for the interface
+        Sets the NetworkCategory for the interface
 #>
 function Assert-ResourceProperty
 {

@@ -374,12 +374,12 @@ function Get-DnsClientServerStaticAddress
 
 <#
     .SYNOPSIS
-    Returns the WINS Client Server static address that are assigned to a network
-    adapter. The CIM class Win32_NetworkAdapterConfiguration unfortunately only supports
-    the primary and secondary WINS server. The registry gives more flexibility.
+        Returns the WINS Client Server static address that are assigned to a network
+        adapter. The CIM class Win32_NetworkAdapterConfiguration unfortunately only supports
+        the primary and secondary WINS server. The registry gives more flexibility.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface to get the static WINS Server addresses from.
+        Alias of the network interface to get the static WINS Server addresses from.
 #>
 function Get-WinsClientServerStaticAddress
 {
@@ -432,12 +432,12 @@ function Get-WinsClientServerStaticAddress
 
 <#
     .SYNOPSIS
-    Sets the WINS Client Server static address on a network adapter. The CIM class
-    Win32_NetworkAdapterConfiguration unfortunately only supports the primary and
-    secondary WINS server. The registry gives more flexibility.
+        Sets the WINS Client Server static address on a network adapter. The CIM class
+        Win32_NetworkAdapterConfiguration unfortunately only supports the primary and
+        secondary WINS server. The registry gives more flexibility.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface to set the static WINS Server addresses on.
+        Alias of the network interface to set the static WINS Server addresses on.
 #>
 function Set-WinsClientServerStaticAddress
 {

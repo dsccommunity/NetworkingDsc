@@ -54,7 +54,9 @@ try
             }
 
             It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured" }
+                $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured"
+                }
                 $current.InterfaceAlias | Should -Be 'NetworkingDscLBA'
                 $current.Address.Count | Should -Be 1
                 $current.Address | Should -Be '10.139.17.99'
@@ -88,7 +90,9 @@ try
             }
 
             It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured" }
+                $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured"
+                }
                 $current.InterfaceAlias | Should -Be 'NetworkingDscLBA'
                 $current.Address.Count | Should -Be 2
                 $current.Address[0] | Should -Be '10.139.17.99'
@@ -123,7 +127,9 @@ try
             }
 
             It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured" }
+                $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured"
+                }
                 $current.InterfaceAlias | Should -Be 'NetworkingDscLBA'
                 $current.Address | Should -BeNullOrEmpty
             }

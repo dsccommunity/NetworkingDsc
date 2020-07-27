@@ -12,17 +12,17 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current state of an Adapter Binding on an interface.
+        Returns the current state of an Adapter Binding on an interface.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*'.
+        Specifies the alias of a network interface. Supports the use of '*'.
 
     .PARAMETER ComponentId
-    Specifies the underlying name of the transport or filter in the following
-    form - ms_xxxx, such as ms_tcpip.
+        Specifies the underlying name of the transport or filter in the following
+        form - ms_xxxx, such as ms_tcpip.
 
     .PARAMETER State
-    Specifies if the component ID for the Interface should be Enabled or Disabled.
+        Specifies if the component ID for the Interface should be Enabled or Disabled.
 #>
 function Get-TargetResource
 {
@@ -81,17 +81,17 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the Adapter Binding on a specific interface.
+        Sets the Adapter Binding on a specific interface.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*'.
+        Specifies the alias of a network interface. Supports the use of '*'.
 
     .PARAMETER ComponentId
-    Specifies the underlying name of the transport or filter in the following
-    form - ms_xxxx, such as ms_tcpip.
+        Specifies the underlying name of the transport or filter in the following
+        form - ms_xxxx, such as ms_tcpip.
 
     .PARAMETER State
-    Specifies if the component ID for the Interface should be Enabled or Disabled.
+        Specifies if the component ID for the Interface should be Enabled or Disabled.
 #>
 function Set-TargetResource
 {
@@ -119,7 +119,7 @@ function Set-TargetResource
                     $InterfaceAlias, $ComponentId)
         ) -join '')
 
-    $currentNetAdapterBinding = Get-Binding @PSBoundParameters
+    $null = Get-Binding @PSBoundParameters
 
     # Remove the State so we can splat
     $null = $PSBoundParameters.Remove('State')
@@ -146,17 +146,17 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the current state of an Adapter Binding on an interface.
+        Tests the current state of an Adapter Binding on an interface.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*'.
+        Specifies the alias of a network interface. Supports the use of '*'.
 
     .PARAMETER ComponentId
-    Specifies the underlying name of the transport or filter in the following
-    form - ms_xxxx, such as ms_tcpip.
+        Specifies the underlying name of the transport or filter in the following
+        form - ms_xxxx, such as ms_tcpip.
 
     .PARAMETER State
-    Specifies if the component ID for the Interface should be Enabled or Disabled.
+        Specifies if the component ID for the Interface should be Enabled or Disabled.
 #>
 function Test-TargetResource
 {
@@ -226,17 +226,17 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-    Ensures the interface and component Id exists and returns the Net Adapter binding object.
+        Ensures the interface and component Id exists and returns the Net Adapter binding object.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface. Supports the use of '*'.
+        Specifies the alias of a network interface. Supports the use of '*'.
 
     .PARAMETER ComponentId
-    Specifies the underlying name of the transport or filter in the following
-    form - ms_xxxx, such as ms_tcpip.
+        Specifies the underlying name of the transport or filter in the following
+        form - ms_xxxx, such as ms_tcpip.
 
     .PARAMETER State
-    Specifies if the component ID for the Interface should be Enabled or Disabled.
+        Specifies if the component ID for the Interface should be Enabled or Disabled.
 #>
 function Get-Binding
 {

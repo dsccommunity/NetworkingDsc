@@ -9,18 +9,19 @@ Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common'
 
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
+
 <#
-.SYNOPSIS
-    Gets the current state of NetAdapterLso for a adapter.
+    .SYNOPSIS
+        Gets the current state of NetAdapterLso for a adapter.
 
-.PARAMETER Name
-    Specifies the name of the network adapter to check.
+    .PARAMETER Name
+        Specifies the name of the network adapter to check.
 
-.PARAMETER Protocol
-    Specifies which protocol to target.
+    .PARAMETER Protocol
+        Specifies which protocol to target.
 
-.PARAMETER State
-    Specifies the LSO state for the protocol.
+    .PARAMETER State
+        Specifies the LSO state for the protocol.
 #>
 function Get-TargetResource
 {
@@ -92,17 +93,17 @@ function Get-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Sets the NetAdapterLso resource state.
+    .SYNOPSIS
+        Sets the NetAdapterLso resource state.
 
-.PARAMETER Name
-    Specifies the name of the network adapter to check.
+    .PARAMETER Name
+        Specifies the name of the network adapter to check.
 
-.PARAMETER Protocol
-    Specifies which protocol to target.
+    .PARAMETER Protocol
+        Specifies which protocol to target.
 
-.PARAMETER State
-    Specifies the LSO state for the protocol.
+    .PARAMETER State
+        Specifies the LSO state for the protocol.
 #>
 function Set-TargetResource
 {
@@ -179,17 +180,17 @@ function Set-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Tests if the NetAdapterLso resource state is desired state.
+    .SYNOPSIS
+        Tests if the NetAdapterLso resource state is desired state.
 
-.PARAMETER Name
-    Specifies the name of the network adapter to check.
+    .PARAMETER Name
+        Specifies the name of the network adapter to check.
 
-.PARAMETER Protocol
-    Specifies which protocol to target.
+    .PARAMETER Protocol
+        Specifies which protocol to target.
 
-.PARAMETER State
-    Specifies the LSO state for the protocol.
+    .PARAMETER State
+        Specifies the LSO state for the protocol.
 #>
 function Test-TargetResource
 {

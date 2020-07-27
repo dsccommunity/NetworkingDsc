@@ -12,21 +12,21 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current state of a Route for an interface.
+        Returns the current state of a Route for an interface.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface.
+        Specifies the alias of a network interface.
 
     .PARAMETER AddressFamily
-    Specify the IP address family.
+        Specify the IP address family.
 
     .PARAMETER DestinationPrefix
-    Specifies a destination prefix of an IP route.
-    A destination prefix consists of an IP address prefix
-    and a prefix length, separated by a slash (/).
+        Specifies a destination prefix of an IP route.
+        A destination prefix consists of an IP address prefix
+        and a prefix length, separated by a slash (/).
 
     .PARAMETER NextHop
-    Specifies the next hop for the IP route.
+        Specifies the next hop for the IP route.
 #>
 function Get-TargetResource
 {
@@ -104,36 +104,36 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets a Route for an interface.
+        Sets a Route for an interface.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface.
+        Specifies the alias of a network interface.
 
     .PARAMETER AddressFamily
-    Specify the IP address family.
+        Specify the IP address family.
 
     .PARAMETER DestinationPrefix
-    Specifies a destination prefix of an IP route.
-    A destination prefix consists of an IP address prefix
-    and a prefix length, separated by a slash (/).
+        Specifies a destination prefix of an IP route.
+        A destination prefix consists of an IP address prefix
+        and a prefix length, separated by a slash (/).
 
     .PARAMETER NextHop
-    Specifies the next hop for the IP route.
+        Specifies the next hop for the IP route.
 
     .PARAMETER Ensure
-    Specifies whether the route should exist.
-    Defaults to 'Present'.
+        Specifies whether the route should exist.
+        Defaults to 'Present'.
 
     .PARAMETER RouteMetric
-    Specifies an integer route metric for an IP route.
-    Defaults to 256.
+        Specifies an integer route metric for an IP route.
+        Defaults to 256.
 
     .PARAMETER Publish
-    Specifies the publish setting of an IP route.
-    Defaults to 'No'.
+        Specifies the publish setting of an IP route.
+        Defaults to 'No'.
 
     .PARAMETER PreferredLifetime
-    Specifies a preferred lifetime in seconds of an IP route.
+        Specifies a preferred lifetime in seconds of an IP route.
 #>
 function Set-TargetResource
 {
@@ -260,36 +260,36 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the state of a Route on an interface.
+        Tests the state of a Route on an interface.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface.
+        Specifies the alias of a network interface.
 
     .PARAMETER AddressFamily
-    Specify the IP address family.
+        Specify the IP address family.
 
     .PARAMETER DestinationPrefix
-    Specifies a destination prefix of an IP route.
-    A destination prefix consists of an IP address prefix
-    and a prefix length, separated by a slash (/).
+        Specifies a destination prefix of an IP route.
+        A destination prefix consists of an IP address prefix
+        and a prefix length, separated by a slash (/).
 
     .PARAMETER NextHop
-    Specifies the next hop for the IP route.
+        Specifies the next hop for the IP route.
 
     .PARAMETER Ensure
-    Specifies whether the route should exist.
-    Defaults to 'Present'.
+        Specifies whether the route should exist.
+        Defaults to 'Present'.
 
     .PARAMETER RouteMetric
-    Specifies an integer route metric for an IP route.
-    Defaults to 256.
+        Specifies an integer route metric for an IP route.
+        Defaults to 256.
 
     .PARAMETER Publish
-    Specifies the publish setting of an IP route.
-    Defaults to 'No'.
+        Specifies the publish setting of an IP route.
+        Defaults to 'No'.
 
     .PARAMETER PreferredLifetime
-    Specifies a preferred lifetime in seconds of an IP route.
+        Specifies a preferred lifetime in seconds of an IP route.
 #>
 function Test-TargetResource
 {
@@ -438,37 +438,37 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-    This function looks up the route using the parameters and returns
-    it. If the route is not found $null is returned.
+        This function looks up the route using the parameters and returns
+        it. If the route is not found $null is returned.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface.
+        Specifies the alias of a network interface.
 
     .PARAMETER AddressFamily
-    Specify the IP address family.
+        Specify the IP address family.
 
     .PARAMETER DestinationPrefix
-    Specifies a destination prefix of an IP route.
-    A destination prefix consists of an IP address prefix
-    and a prefix length, separated by a slash (/).
+        Specifies a destination prefix of an IP route.
+        A destination prefix consists of an IP address prefix
+        and a prefix length, separated by a slash (/).
 
     .PARAMETER NextHop
-    Specifies the next hop for the IP route.
+        Specifies the next hop for the IP route.
 
     .PARAMETER Ensure
-    Specifies whether the route should exist.
-    Defaults to 'Present'.
+        Specifies whether the route should exist.
+        Defaults to 'Present'.
 
     .PARAMETER RouteMetric
-    Specifies an integer route metric for an IP route.
-    Defaults to 256.
+        Specifies an integer route metric for an IP route.
+        Defaults to 256.
 
     .PARAMETER Publish
-    Specifies the publish setting of an IP route.
-    Defaults to 'No'.
+        Specifies the publish setting of an IP route.
+        Defaults to 'No'.
 
     .PARAMETER PreferredLifetime
-    Specifies a preferred lifetime in seconds of an IP route.
+        Specifies a preferred lifetime in seconds of an IP route.
 #>
 function Get-Route
 {
@@ -536,37 +536,37 @@ function Get-Route
 
 <#
     .SYNOPSIS
-    This function validates the parameters passed. Called by Test-Resource.
-    Will throw an error if any parameters are invalid.
+        This function validates the parameters passed. Called by Test-Resource.
+        Will throw an error if any parameters are invalid.
 
     .PARAMETER InterfaceAlias
-    Specifies the alias of a network interface.
+        Specifies the alias of a network interface.
 
     .PARAMETER AddressFamily
-    Specify the IP address family.
+        Specify the IP address family.
 
     .PARAMETER DestinationPrefix
-    Specifies a destination prefix of an IP route.
-    A destination prefix consists of an IP address prefix
-    and a prefix length, separated by a slash (/).
+        Specifies a destination prefix of an IP route.
+        A destination prefix consists of an IP address prefix
+        and a prefix length, separated by a slash (/).
 
     .PARAMETER NextHop
-    Specifies the next hop for the IP route.
+        Specifies the next hop for the IP route.
 
     .PARAMETER Ensure
-    Specifies whether the route should exist.
-    Defaults to 'Present'.
+        Specifies whether the route should exist.
+        Defaults to 'Present'.
 
     .PARAMETER RouteMetric
-    Specifies an integer route metric for an IP route.
-    Defaults to 256.
+        Specifies an integer route metric for an IP route.
+        Defaults to 256.
 
     .PARAMETER Publish
-    Specifies the publish setting of an IP route.
-    Defaults to 'No'.
+        Specifies the publish setting of an IP route.
+        Defaults to 'No'.
 
     .PARAMETER PreferredLifetime
-    Specifies a preferred lifetime in seconds of an IP route.
+        Specifies a preferred lifetime in seconds of an IP route.
 #>
 function Assert-ResourceProperty
 {

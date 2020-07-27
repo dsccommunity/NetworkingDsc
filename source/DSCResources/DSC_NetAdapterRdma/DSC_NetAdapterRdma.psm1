@@ -11,12 +11,12 @@ Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common'
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
-.SYNOPSIS
-    Gets the state of the network adapter RDMA.
+    .SYNOPSIS
+        Gets the state of the network adapter RDMA.
 
-.PARAMETER Name
-    Specifies the name of network adapter for which RDMA needs
-    to be configured.
+    .PARAMETER Name
+        Specifies the name of network adapter for which RDMA needs
+        to be configured.
 #>
 function Get-TargetResource
 {
@@ -56,16 +56,16 @@ function Get-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Sets the state of the network adapter RDMA.
+    .SYNOPSIS
+        Sets the state of the network adapter RDMA.
 
-.PARAMETER Name
-    Specifies the name of network adapter for which RDMA needs
-    to be configured.
+    .PARAMETER Name
+        Specifies the name of network adapter for which RDMA needs
+        to be configured.
 
-.PARAMETER Enabled
-    Specifies if the RDMA configuration should be enabled or disabled.
-    Defaults to $true.
+    .PARAMETER Enabled
+        Specifies if the RDMA configuration should be enabled or disabled.
+        Defaults to $true.
 #>
 function Set-TargetResource
 {
@@ -80,10 +80,6 @@ function Set-TargetResource
         [System.Boolean]
         $Enabled = $true
     )
-
-    $configuration = @{
-        Name = $Name
-    }
 
     try
     {
@@ -111,16 +107,16 @@ function Set-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Tests the state of the network adapter RDMA.
+    .SYNOPSIS
+        Tests the state of the network adapter RDMA.
 
-.PARAMETER Name
-    Specifies the name of network adapter for which RDMA needs
-    to be configured.
+    .PARAMETER Name
+        Specifies the name of network adapter for which RDMA needs
+        to be configured.
 
-.PARAMETER Enabled
-    Specifies if the RDMA configuration should be enabled or disabled.
-    Defaults to $true.
+    .PARAMETER Enabled
+        Specifies if the RDMA configuration should be enabled or disabled.
+        Defaults to $true.
 #>
 function Test-TargetResource
 {

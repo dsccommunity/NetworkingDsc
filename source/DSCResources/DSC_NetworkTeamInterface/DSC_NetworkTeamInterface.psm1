@@ -12,13 +12,13 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current state of a network team interface in a Network Team.
+        Returns the current state of a network team interface in a Network Team.
 
     .PARAMETER Name
-    Specifies the name of the network team interface to create.
+        Specifies the name of the network team interface to create.
 
     .PARAMETER TeamName
-    Specifies the name of the network team on which this particular interface should exist.
+        Specifies the name of the network team on which this particular interface should exist.
 #>
 function Get-TargetResource
 {
@@ -68,19 +68,19 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Adds, updates or removes a network team interface from a Network Team.
+        Adds, updates or removes a network team interface from a Network Team.
 
     .PARAMETER Name
-    Specifies the name of the network team interface to create.
+        Specifies the name of the network team interface to create.
 
     .PARAMETER TeamName
-    Specifies the name of the network team on which this particular interface should exist.
+        Specifies the name of the network team on which this particular interface should exist.
 
     .PARAMETER VlanId
-    Specifies VlanId to be set on network team interface.
+        Specifies VlanId to be set on network team interface.
 
     .PARAMETER Ensure
-    Specifies if the network team interface should be created or deleted.
+        Specifies if the network team interface should be created or deleted.
 #>
 function Set-TargetResource
 {
@@ -205,19 +205,19 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests is a specified Network Team Interface is in the correct state.
+        Tests is a specified Network Team Interface is in the correct state.
 
     .PARAMETER Name
-    Specifies the name of the network team interface to create.
+        Specifies the name of the network team interface to create.
 
     .PARAMETER TeamName
-    Specifies the name of the network team on which this particular interface should exist.
+        Specifies the name of the network team on which this particular interface should exist.
 
     .PARAMETER VlanId
-    Specifies VlanId to be set on network team interface.
+        Specifies VlanId to be set on network team interface.
 
     .PARAMETER Ensure
-    Specifies if the network team interface should be created or deleted.
+        Specifies if the network team interface should be created or deleted.
 #>
 function Test-TargetResource
 {

@@ -12,13 +12,13 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-    Returns the current WINS Server Addresses for an interface.
+        Returns the current WINS Server Addresses for an interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the WINS server address is set.
+        Alias of the network interface for which the WINS server address is set.
 
     .PARAMETER Address
-    The desired WINS Server address(es). Exclude to remove existing servers.
+        The desired WINS Server address(es). Exclude to remove existing servers.
 #>
 function Get-TargetResource
 {
@@ -49,13 +49,13 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the WINS Server Address(es) for an interface.
+        Sets the WINS Server Address(es) for an interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the WINS server address is set.
+        Alias of the network interface for which the WINS server address is set.
 
     .PARAMETER Address
-    The desired WINS Server address(es). Exclude to remove existing servers.
+        The desired WINS Server address(es). Exclude to remove existing servers.
 #>
 function Set-TargetResource
 {
@@ -83,13 +83,13 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the current state of a WINS Server Address for an interface.
+        Tests the current state of a WINS Server Address for an interface.
 
     .PARAMETER InterfaceAlias
-    Alias of the network interface for which the WINS server address is set.
+        Alias of the network interface for which the WINS server address is set.
 
     .PARAMETER Address
-    The desired WINS Server address(es). Exclude to remove existing servers.
+        The desired WINS Server address(es). Exclude to remove existing servers.
 #>
 function Test-TargetResource
 {

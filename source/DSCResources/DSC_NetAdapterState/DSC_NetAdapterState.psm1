@@ -11,15 +11,15 @@ Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common'
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
-.SYNOPSIS
-    Gets the current state of a network adapter.
+    .SYNOPSIS
+        Gets the current state of a network adapter.
 
-.PARAMETER Name
-    Specifies the name of the network adapter.
+    .PARAMETER Name
+        Specifies the name of the network adapter.
 
-.PARAMETER State
-    Specifies the desired state for the network adapter.
-    Not used in Get-TargetResource.
+    .PARAMETER State
+        Specifies the desired state for the network adapter.
+        Not used in Get-TargetResource.
 #>
 function Get-TargetResource
 {
@@ -84,14 +84,14 @@ function Get-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Sets the NetAdapterState resource state.
+    .SYNOPSIS
+        Sets the NetAdapterState resource state.
 
-.PARAMETER Name
-    Specifies the name of the network adapter.
+    .PARAMETER Name
+        Specifies the name of the network adapter.
 
-.PARAMETER State
-    Specifies the desired state for the network adapter.
+    .PARAMETER State
+        Specifies the desired state for the network adapter.
 #>
 function Set-TargetResource
 {
@@ -149,14 +149,14 @@ function Set-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Tests if the NetAdapterState resource state is desired state.
+    .SYNOPSIS
+        Tests if the NetAdapterState resource state is desired state.
 
-.PARAMETER Name
-    Specifies the name of the network adapter.
+    .PARAMETER Name
+        Specifies the name of the network adapter.
 
-.PARAMETER State
-    Specifies the state of the network adapter.
+    .PARAMETER State
+        Specifies the state of the network adapter.
 #>
 function Test-TargetResource
 {
