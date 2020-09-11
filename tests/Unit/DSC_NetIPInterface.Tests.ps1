@@ -46,7 +46,7 @@ try
         $testParameterList = @(
             @{
                 Name            = 'AdvertiseDefaultRoute'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.AdvertiseDefaultRoute]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $AdvertiseDefaultRoute -eq 'Disabled'
@@ -54,7 +54,7 @@ try
             },
             @{
                 Name            = 'Advertising'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.Advertising]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $Advertising -eq 'Disabled'
@@ -62,7 +62,7 @@ try
             },
             @{
                 Name            = 'AutomaticMetric'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.AutomaticMetric]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $AutomaticMetric -eq 'Disabled'
@@ -70,7 +70,7 @@ try
             },
             @{
                 Name            = 'Dhcp'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.Dhcp]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $Dhcp -eq 'Disabled'
@@ -78,7 +78,7 @@ try
             },
             @{
                 Name            = 'DirectedMacWolPattern'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.DirectedMacWolPattern]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $DirectedMacWolPattern -eq 'Disabled'
@@ -86,7 +86,7 @@ try
             },
             @{
                 Name            = 'EcnMarking'
-                MockedValue     = 'AppDecide'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.EcnMarking]::AppDecide
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $EcnMarking -eq 'Disabled'
@@ -94,7 +94,7 @@ try
             },
             @{
                 Name            = 'ForceArpNdWolPattern'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.ForceArpNdWolPattern]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $ForceArpNdWolPattern -eq 'Disabled'
@@ -102,7 +102,7 @@ try
             },
             @{
                 Name            = 'Forwarding'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.Forwarding]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $Forwarding -eq 'Disabled'
@@ -110,7 +110,7 @@ try
             },
             @{
                 Name            = 'IgnoreDefaultRoutes'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.IgnoreDefaultRoutes]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $IgnoreDefaultRoutes -eq 'Disabled'
@@ -118,7 +118,7 @@ try
             },
             @{
                 Name            = 'ManagedAddressConfiguration'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.ManagedAddressConfiguration]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $ManagedAddressConfiguration -eq 'Disabled'
@@ -126,7 +126,7 @@ try
             },
             @{
                 Name            = 'NeighborUnreachabilityDetection'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.NeighborUnreachabilityDetection]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $NeighborUnreachabilityDetection -eq 'Disabled'
@@ -134,7 +134,7 @@ try
             },
             @{
                 Name            = 'OtherStatefulConfiguration'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.OtherStatefulConfiguration]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $OtherStatefulConfiguration -eq 'Disabled'
@@ -142,7 +142,7 @@ try
             },
             @{
                 Name            = 'RouterDiscovery'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.RouterDiscovery]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $RouterDiscovery -eq 'Disabled'
@@ -150,7 +150,7 @@ try
             },
             @{
                 Name            = 'WeakHostReceive'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.WeakHostReceive]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $WeakHostReceive -eq 'Disabled'
@@ -158,7 +158,7 @@ try
             },
             @{
                 Name            = 'WeakHostSend'
-                MockedValue     = 'Enabled'
+                MockedValue     = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetIPInterface.WeakHostSend]::Enabled
                 TestValue       = 'Disabled'
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $WeakHostSend -eq 'Disabled'
@@ -370,7 +370,7 @@ try
                 }
             }
         }
-    } #end InModuleScope $DSCResourceName
+    }
 }
 finally
 {
