@@ -3,9 +3,9 @@ configuration DSC_IPAddress_Config {
 
     node localhost {
         IPAddress Integration_Test {
-            InterfaceAlias          = $TestIPAddress.InterfaceAlias
-            AddressFamily           = $TestIPAddress.AddressFamily
-            IPAddress               = $TestIPAddress.IPAddress
+            InterfaceAlias          = $Node.InterfaceAlias
+            AddressFamily           = $Node.AddressFamily
+            IPAddress               = $Node.IPAddress
         }
     }
 }
