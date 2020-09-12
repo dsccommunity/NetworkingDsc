@@ -22,27 +22,27 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 try
 {
     Describe 'IPAddress Integration Tests' {
-        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
-
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile -Verbose -ErrorAction Stop
 
+        BeforeAll {
+            New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
+            New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
+        }
+
+        AfterAll {
+            Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
+            Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
+        }
+
         Describe "$($script:dscResourceName)_Integration" {
-            BeforeEach {
-                New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
-            }
-
-            AfterEach {
-                Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
-            }
-
             Context 'When a single IP address is specified' {
                 # This is to pass to the Config
                 $configData = @{
                     AllNodes = @(
                         @{
                             NodeName       = 'localhost'
-                            InterfaceAlias = 'NetworkingDscLBA'
+                            InterfaceAlias = 'NetworkingDscLBA1'
                             AddressFamily  = 'IPv4'
                             IPAddress      = '10.11.12.13/16'
                         }
@@ -73,9 +73,9 @@ try
                     $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                     }
-                    $current.InterfaceAlias | Should -Be $configData.AllNodes[0].InterfaceAlias
-                    $current.AddressFamily | Should -Be $configData.AllNodes[0].AddressFamily
-                    $current.IPAddress | Should -Be $configData.AllNodes[0].IPAddress
+                    $current[0].InterfaceAlias | Should -Be $configData.AllNodes[0].InterfaceAlias
+                    $current[0].AddressFamily | Should -Be $configData.AllNodes[0].AddressFamily
+                    $current[0].IPAddress | Should -Be $configData.AllNodes[0].IPAddress
                 }
             }
         }
@@ -86,7 +86,7 @@ try
                 AllNodes = @(
                     @{
                         NodeName       = 'localhost'
-                        InterfaceAlias = 'NetworkingDscLBA'
+                        InterfaceAlias = 'NetworkingDscLBA2'
                         AddressFamily  = 'IPv4'
                         IPAddress      = @('10.12.13.14/16', '10.13.14.16/32')
                     }
@@ -117,10 +117,10 @@ try
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
-                $current.InterfaceAlias | Should -Be $configData.AllNodes[0].InterfaceAlias
-                $current.AddressFamily | Should -Be $configData.AllNodes[0].AddressFamily
-                $current.IPAddress | Should -Contain $configData.AllNodes[0].IPAddress[0]
-                $current.IPAddress | Should -Contain $configData.AllNodes[0].IPAddress[1]
+                $current[0].InterfaceAlias | Should -Be $configData.AllNodes[0].InterfaceAlias
+                $current[0].AddressFamily | Should -Be $configData.AllNodes[0].AddressFamily
+                $current[0].IPAddress | Should -Contain $configData.AllNodes[0].IPAddress[0]
+                $current[0].IPAddress | Should -Contain $configData.AllNodes[0].IPAddress[1]
             }
         }
     }
