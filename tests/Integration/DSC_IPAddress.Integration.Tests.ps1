@@ -22,29 +22,35 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 try
 {
     Describe 'IPAddress Integration Tests' {
-        # Configure loopback adapters
-        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
         New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
 
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile -Verbose -ErrorAction Stop
 
         Describe "$($script:dscResourceName)_Integration" {
+            BeforeEach {
+                New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
+            }
+
+            AfterEach {
+                Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
+            }
+
             Context 'When a single IP address is specified' {
+                # This is to pass to the Config
+                $configData = @{
+                    AllNodes = @(
+                        @{
+                            NodeName       = 'localhost'
+                            InterfaceAlias = 'NetworkingDscLBA'
+                            AddressFamily  = 'IPv4'
+                            IPAddress      = '10.11.12.13/16'
+                        }
+                    )
+                }
+
                 It 'Should compile and apply the MOF without throwing' {
                     {
-                        # This is to pass to the Config
-                        $configData = @{
-                            AllNodes = @(
-                                @{
-                                    NodeName       = 'localhost'
-                                    InterfaceAlias = 'NetworkingDscLBA'
-                                    AddressFamily  = 'IPv4'
-                                    IPAddress      = '10.11.12.13/16'
-                                }
-                            )
-                        }
-
                         & "$($script:dscResourceName)_Config" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
@@ -75,20 +81,20 @@ try
         }
 
         Context 'When a two IP addresses are specified' {
+            # This is to pass to the Config
+            $configData = @{
+                AllNodes = @(
+                    @{
+                        NodeName       = 'localhost'
+                        InterfaceAlias = 'NetworkingDscLBA'
+                        AddressFamily  = 'IPv4'
+                        IPAddress      = @('10.12.13.14/16', '10.13.14.16/32')
+                    }
+                )
+            }
+
             It 'Should compile and apply the MOF without throwing' {
                 {
-                    # This is to pass to the Config
-                    $configData = @{
-                        AllNodes = @(
-                            @{
-                                NodeName       = 'localhost'
-                                InterfaceAlias = 'NetworkingDscLBA2'
-                                AddressFamily  = 'IPv4'
-                                IPAddress      = @('10.12.13.14/16', '10.13.14.16/32')
-                            }
-                        )
-                    }
-
                     & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
@@ -121,9 +127,5 @@ try
 }
 finally
 {
-    # Remove Loopback Adapter
-    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
-    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
-
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
