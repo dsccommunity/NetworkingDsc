@@ -5,6 +5,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- IPAddress
+  - Improved integration test structure.
+
+### Fixed
+
+- NetIPInterface
+  - Fix 'type mismatch for property' issue when setting 'AdvertiseDefaultRoute',
+    'Advertising', 'AutomaticMetric', 'Dhcp', 'DirectedMacWolPattern', 'EcnMarking',
+    'ForceArpNdWolPattern', 'Forwarding', 'IgnoreDefaultRoutes', 'ManagedAddressConfiguration',
+    'NeighborUnreachabilityDetection', 'OtherStatefulConfiguration', 'RouterDiscovery',
+    'WeakHostReceive' or 'WeakHostSend' - Fixes [Issue #470](https://github.com/dsccommunity/NetworkingDsc/issues/470).
+
 ## [8.1.0] - 2020-08-04
 
 ### Changed
