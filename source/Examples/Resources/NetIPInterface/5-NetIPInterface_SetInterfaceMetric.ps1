@@ -21,7 +21,7 @@
     .DESCRIPTION
     Set a specified interface metrics for the network adapters with alias 'Ethernet' and 'Ethernet 2'.
 #>
-Configuration NetIPInterface_InterfaceMetric_Config
+Configuration NetIPInterface_SetInterfaceMetric
 {
     Import-DscResource -Module NetworkingDsc
 
