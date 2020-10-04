@@ -63,6 +63,11 @@
         @{
             ParameterName = 'NlMtuBytes'
             PropertyName = 'NlMtu'
+        },
+        @{
+            ParameterName = 'InterfaceMetric'
+            PropertyName = 'InterfaceMetric'
+        }
         }
     )
 }

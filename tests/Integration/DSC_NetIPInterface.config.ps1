@@ -21,6 +21,7 @@ configuration DSC_NetIPInterface_Config_Enabled {
             WeakHostReceive                 = $Node.WeakHostReceive
             WeakHostSend                    = $Node.WeakHostSend
             NlMtu                           = $Node.NlMtu
+            InterfaceMetric                 = $Node.InterfaceMetric
         }
     }
 }
@@ -46,6 +47,7 @@ configuration DSC_NetIPInterface_Config_Disabled {
             WeakHostReceive                 = $Node.WeakHostReceive
             WeakHostSend                    = $Node.WeakHostSend
             NlMtu                           = $Node.NlMtu
+            InterfaceMetric                 = $Node.InterfaceMetric
         }
     }
 }
