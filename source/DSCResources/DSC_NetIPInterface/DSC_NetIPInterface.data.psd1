@@ -68,6 +68,5 @@
             ParameterName = 'InterfaceMetric'
             PropertyName = 'InterfaceMetric'
         }
-        }
     )
 }
