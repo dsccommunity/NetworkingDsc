@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - NetIPInterface
-  - Added `InterfaceMetric` parameter.
+  - Added `InterfaceMetric` parameter- fixes [Issue #473](https://github.com/PowerShell/xNetworking/issues/473).
 
 ### Fixed
 
