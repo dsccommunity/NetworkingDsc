@@ -6,4 +6,4 @@ This resource is used to configure the IP interface settings for a network inter
 
 - If you define a value for `InterfaceMetric`, the `AutomaticMetric`
  setting is ignored. PowerShell ignores `AutomaticMetric` when you
- use both arguments with the   `Set-NetIPInterface` cmdlet.
+ use both arguments with the `Set-NetIPInterface` cmdlet.
