@@ -136,6 +136,7 @@ try
                             InterfaceAlias              = 'NetworkingDscLBA'
                             AddressFamily               = 'IPv4'
                             AdvertiseDefaultRoute       = 'Disabled'
+                            AutomaticMetric             = 'Disabled'
                             Dhcp                        = 'Disabled'
                             DirectedMacWolPattern       = 'Disabled'
                             EcnMarking                  = 'Disabled'
@@ -148,6 +149,7 @@ try
                             WeakHostReceive             = 'Disabled'
                             WeakHostSend                = 'Disabled'
                             NlMtu                       = 1500
+                            InterfaceMetric             = 20
                         }
                     )
                 }
@@ -179,6 +181,7 @@ try
                     $current.InterfaceAlias                  | Should -Be $script:configData.AllNodes[0].InterfaceAlias
                     $current.AddressFamily                   | Should -Be $script:configData.AllNodes[0].AddressFamily
                     $current.AdvertiseDefaultRoute           | Should -Be $script:configData.AllNodes[0].AdvertiseDefaultRoute
+                    $current.AutomaticMetric                 | Should -Be $script:configData.AllNodes[0].AutomaticMetric
                     $current.Dhcp                            | Should -Be $script:configData.AllNodes[0].Dhcp
                     $current.DirectedMacWolPattern           | Should -Be $script:configData.AllNodes[0].DirectedMacWolPattern
                     $current.EcnMarking                      | Should -Be $script:configData.AllNodes[0].EcnMarking
@@ -191,6 +194,7 @@ try
                     $current.WeakHostReceive                 | Should -Be $script:configData.AllNodes[0].WeakHostReceive
                     $current.WeakHostSend                    | Should -Be $script:configData.AllNodes[0].WeakHostSend
                     $current.NlMtu                           | Should -Be $script:configData.AllNodes[0].NlMtu
+                    $current.InterfaceMetric                 | Should -Be $script:configData.AllNodes[0].InterfaceMetric
                 }
             }
         }

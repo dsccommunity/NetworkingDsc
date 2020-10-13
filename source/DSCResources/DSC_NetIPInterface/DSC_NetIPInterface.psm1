@@ -118,6 +118,9 @@ function Get-TargetResource
 
     .PARAMETER NlMtu
         Specifies the network layer Maximum Transmission Unit (MTU) value, in bytes, for an IP interface.
+
+    .PARAMETER InterfaceMetric
+        Specifies the metric for an IP interface.
 #>
 function Set-TargetResource
 {
@@ -211,7 +214,11 @@ function Set-TargetResource
 
         [Parameter()]
         [System.UInt32]
-        $NlMtu
+        $NlMtu,
+
+        [Parameter()]
+        [System.UInt32]
+        $InterfaceMetric
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -322,6 +329,9 @@ function Set-TargetResource
 
     .PARAMETER NlMtu
         Specifies the network layer Maximum Transmission Unit (MTU) value, in bytes, for an IP interface.
+
+    .PARAMETER InterfaceMetric
+        Specifies the metric for an IP interface.
 #>
 function Test-TargetResource
 {
@@ -416,7 +426,11 @@ function Test-TargetResource
 
         [Parameter()]
         [System.UInt32]
-        $NlMtu
+        $NlMtu,
+
+        [Parameter()]
+        [System.UInt32]
+        $InterfaceMetric
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "

@@ -171,6 +171,14 @@ try
                 ParameterFilter = {
                     $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $NlMtuBytes -eq 1500
                 }
+            },
+            @{
+                Name            = 'InterfaceMetric'
+                MockedValue     = [System.Uint32] 20
+                TestValue       = [System.Uint32] 15
+                ParameterFilter = {
+                    $InterfaceAlias -eq 'Ethernet' -and $AddressFamily -eq 'IPv4' -and $InterfaceMetric -eq 15
+                }
             }
         )
 
