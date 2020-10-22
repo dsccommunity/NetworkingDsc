@@ -234,7 +234,7 @@ function Test-TargetResource
     if ($PSBoundParameters.ContainsKey('Address'))
     {
         # check for empty array
-        if([System.String]::IsNullOrEmpty($Address) -eq $false)
+        if( [System.String]::IsNullOrEmpty( $Address ) -eq $false )
         {
             foreach ($ServerAddress in $Address)
             {
@@ -256,15 +256,15 @@ function Test-TargetResource
         -ErrorAction Stop)
 
     # explicitly set empty array if $null or empty
-    if([System.String]::IsNullOrEmpty($Address) -eq $true)
+    if( [System.String]::IsNullOrEmpty( $Address ) -eq $true )
     {
-        [string[]]$Address = @()
+        [string[]] $Address = @()
     }
     
     # explicitly set empty array if $null or empty
-    if([System.String]::IsNullOrEmpty($currentAddress) -eq $true)
+    if( [System.String]::IsNullOrEmpty( $currentAddress ) -eq $true )
     {
-        [string[]]$currentAddress = @()
+        [string[]] $currentAddress = @()
     }
     
     # Check if the Server addresses are the same as the desired addresses.
