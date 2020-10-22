@@ -214,7 +214,8 @@ function Test-TargetResource
         $AddressFamily,
 
         [Parameter()]
-        [ValidateNotNullOrEmpty()]
+        [AllowNull()]
+        [AllowEmptyString()]
         [String[]]
         $Address,
 
@@ -232,17 +233,17 @@ function Test-TargetResource
     # Validate the Address passed or set to empty array if not passed
     if ($PSBoundParameters.ContainsKey('Address'))
     {
-        foreach ($ServerAddress in $Address)
+        # check for empty array
+        if([System.String]::IsNullOrEmpty($Address) -eq $false)
         {
-            Assert-ResourceProperty `
-                -Address $ServerAddress `
-                -AddressFamily $AddressFamily `
-                -InterfaceAlias $InterfaceAlias
-        } # foreach
-    }
-    else
-    {
-        [String[]] $Address = @()
+            foreach ($ServerAddress in $Address)
+            {
+                Assert-ResourceProperty `
+                    -Address $ServerAddress `
+                    -AddressFamily $AddressFamily `
+                    -InterfaceAlias $InterfaceAlias
+            } # foreach
+        } # if
     } # if
 
     # Remove the parameters we don't want to splat
@@ -254,6 +255,18 @@ function Test-TargetResource
         @PSBoundParameters `
         -ErrorAction Stop)
 
+    # explicitly set empty array if $null or empty
+    if([System.String]::IsNullOrEmpty($Address) -eq $true)
+    {
+        [string[]]$Address = @()
+    }
+    
+    # explicitly set empty array if $null or empty
+    if([System.String]::IsNullOrEmpty($currentAddress) -eq $true)
+    {
+        [string[]]$currentAddress = @()
+    }
+    
     # Check if the Server addresses are the same as the desired addresses.
     [Boolean] $addressDifferent = (@(Compare-Object `
             -ReferenceObject $currentAddress `
