@@ -5,6 +5,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [8.2.1] - 2020-10-22
+
+### Fixed
+
+- DnsServerAddress
+  - Fixes [Issue #446](https://github.com/dsccommunity/NetworkingDsc/issues/446).
+
 ## [8.2.0] - 2020-10-16
 
 ### Changed
