@@ -571,6 +571,120 @@ function Format-Win32NetworkAdapterFilterByNetConnectionId
     return $returnNetAdapaterFilter
 }
 
+<#
+.SYNOPSIS
+    Returns the NetbiosOptions value for a network adapter.
+.DESCRIPTION
+    Most reliable method of getting this value since network adapters
+    can be in any number of states (e.g. disabled, disconnected)
+    which can cause Win32 classes to not report the value.
+#>
+function Get-NetAdapterNetbiosOptionsFromRegistry
+{
+    [OutputType([System.String])]
+    [CmdletBinding()]
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [ValidatePattern("^\{[a-zA-Z0-9]{8}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{12}\}$")]
+        [System.String]
+        # Network Adapter GUID
+        $NetworkAdapterGUID
+        ,
+        [Parameter(Mandatory=$true)]
+        [ValidateSet('Default','Enable','Disable')]
+        [System.String]
+        $Setting
+    )
+
+    # Changing ErrorActionPreference variable since the switch -ErrorAction isn't supported.
+    $CurrentErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference        = 'SilentlyContinue'
+
+    $RegistryNetbiosOptions = Get-ItemPropertyValue -Name 'NetbiosOptions' `
+                    -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetworkAdapterGUID)"
+
+    $ErrorActionPreference = $CurrentErrorActionPreference
+
+    if ( $null -eq $RegistryNetbiosOptions )
+    {
+        $RegistryNetbiosOptions = 0
+    }
+
+    switch( $RegistryNetbiosOptions )
+    {
+        0 {       return 'Default' }
+        1 {       return 'Enable'  }
+        2 {       return 'Disable' }
+        default {
+
+            # Unknown value. Returning invalid setting to trigger Set-TargetResource
+            [string[]] $InvalidSetting = 'Default','Enable','Disable' | Where-Object{ $_ -ne $Setting }
+
+            return $InvalidSetting[0]
+        }
+    }
+} # end function Get-NetAdapterNetbiosOptionsFromRegistry
+
+<#
+.SYNOPSIS
+    Configures Netbios on a Network Adapter.
+#>
+function Set-NetAdapterNetbiosOptions
+{
+    [CmdletBinding()]
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [System.Object]
+        # Network Adapter Win32_NetworkAdapterConfiguration Object
+        $NetworkAdapterObj
+        ,
+        [Parameter(Mandatory=$true)]
+        [System.String]
+        $InterfaceAlias
+        ,
+        [Parameter(Mandatory=$true)]
+        [ValidateSet('Default','Enable','Disable')]
+        [System.String]
+        $Setting
+    )
+
+    Write-Verbose -Message ($script:localizedData.SetNetBiosMessage -f $InterfaceAlias,$Setting)
+
+    # Only IPEnabled interfaces can be configured via SetTcpipNetbios method.
+    if( $NetworkAdapterObj.IPEnabled )
+    {
+        $result = $NetworkAdapterObj |
+            Invoke-CimMethod `
+                -MethodName SetTcpipNetbios `
+                -ErrorAction Stop `
+                -Arguments @{
+                    TcpipNetbiosOptions = [uint32][NetBiosSetting]::$Setting.value__
+                }
+
+        if ( $result.ReturnValue -ne 0 )
+        {
+            New-InvalidOperationException `
+                -Message ($script:localizedData.FailedUpdatingNetBiosError -f $InterfaceAlias,$result.ReturnValue,$Setting)
+        }
+    }
+    else
+    {
+        # IPEnabled=$false can only be configured via registry
+        # this satisfies disabled and disconnected states
+        $setItemPropertyParameters = @{
+            Path  = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetworkAdapterObj.SettingID)"
+            Name  = 'NetbiosOptions'
+            Value = [NetBiosSetting]::$Setting.value__
+        }
+        $null = Set-ItemProperty @setItemPropertyParameters
+    }
+
+} # end function Set-NetAdapterNetbiosOptions
+
 Export-ModuleMember -Function @(
     'Convert-CIDRToSubhetMask'
     'Find-NetworkAdapter'
@@ -579,4 +693,6 @@ Export-ModuleMember -Function @(
     'Set-WinsClientServerStaticAddress'
     'Get-IPAddressPrefix'
     'Format-Win32NetworkAdapterFilterByNetConnectionId'
+    'Get-NetAdapterNetbiosOptionsFromRegistry'
+    'Set-NetAdapterNetbiosOptions'
 )

@@ -78,37 +78,35 @@ function Get-TargetResource
     <#
         If a wildcard was specified for the InterfaceAlias then
         more than one adapter may be returned. If more than one
-        adapter is returned then the NetBiosSetting value should
-        be returned for the first adapter that does not match
-        the desired value. This is to ensure that when testing
-        the resource state it will return a mismatch if any adapters
-        don't have the correct setting.
+        adapter is returned then the NetBios setting value will
+        be evaluated for all matching adapters. If there is a
+        mismatch, a wrong value is returned to signify the
+        resource is not in the desired state.
     #>
-    foreach ($netAdapterItem in $netAdapter)
+    if( $netAdapter -is [Array] )
     {
-        $netAdapterConfig = $netAdapterItem | Get-CimAssociatedInstance `
-            -ResultClassName Win32_NetworkAdapterConfiguration `
-            -ErrorAction Stop
+        [string[]] $SettingResults = @()
 
-        $tcpipNetbiosOptions = $netAdapterConfig.TcpipNetbiosOptions
+        foreach ( $netAdapterItem in $netAdapter )
+        {
+            $SettingResults += Get-NetAdapterNetbiosOptionsFromRegistry -NetworkAdapterGUID $netAdapterItem.GUID -Setting $Setting
 
-        if ($tcpipNetbiosOptions)
-        {
-            $interfaceSetting = $([NetBiosSetting].GetEnumValues()[$tcpipNetbiosOptions])
-        }
-        else
-        {
-            $interfaceSetting = 'Default'
+            Write-Verbose -Message ($script:localizedData.CurrentNetBiosSettingMessage -f $netAdapterItem.NetConnectionID,$SettingResults[-1])
         }
 
-        Write-Verbose -Message ($script:localizedData.CurrentNetBiosSettingMessage -f $netAdapterItem.Name, $interfaceSetting)
+        [string[]] $WrongSettings = $SettingResults | Where-Object{ $_ -ne $Setting }
 
-        if ($interfaceSetting -ne $Setting)
+        if([System.String]::IsNullOrEmpty($WrongSettings) -eq $false)
         {
-            $Setting = $interfaceSetting
-            break
+            [string] $Setting = $WrongSettings[0]
         }
     }
+    else
+    {
+        $Setting = Get-NetAdapterNetbiosOptionsFromRegistry -NetworkAdapterGUID $netAdapter.GUID -Setting $Setting
+    }
+
+    Write-Verbose -Message ($script:localizedData.CurrentNetBiosSettingMessage -f $InterfaceAlias, $Setting)
 
     return @{
         InterfaceAlias = $InterfaceAlias
@@ -160,42 +158,38 @@ function Set-TargetResource
             -Message ($script:localizedData.InterfaceNotFoundError -f $InterfaceAlias)
     }
 
-    foreach ($netAdapterItem in $netAdapter)
+    if( $netAdapter -is [Array] )
     {
-        $netAdapterConfig = $netAdapterItem | Get-CimAssociatedInstance `
-            -ResultClassName Win32_NetworkAdapterConfiguration `
-            -ErrorAction Stop
-
-        if ($Setting -eq [NetBiosSetting]::Default)
+        foreach( $netAdapterItem in $netAdapter )
         {
-            Write-Verbose -Message ($script:localizedData.ResetToDefaultMessage -f $netAdapterItem.Name)
+            $CurrentValue = Get-NetAdapterNetbiosOptionsFromRegistry -NetworkAdapterGUID $netAdapterItem.GUID -Setting $Setting
 
-            # If DHCP is not enabled, SetTcpipNetbios CIM Method won't take 0 so overwrite registry entry instead.
-            $setItemPropertyParameters = @{
-                Path  = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetAdapterConfig.SettingID)"
-                Name  = 'NetbiosOptions'
-                Value = 0
-            }
-            $null = Set-ItemProperty @setItemPropertyParameters
-        }
-        else
-        {
-            Write-Verbose -Message ($script:localizedData.SetNetBiosMessage -f $netAdapterItem.Name, $Setting)
-
-            $result = $netAdapterConfig |
-                Invoke-CimMethod `
-                    -MethodName SetTcpipNetbios `
-                    -ErrorAction Stop `
-                    -Arguments @{
-                        TcpipNetbiosOptions = [uint32][NetBiosSetting]::$Setting.value__
-                    }
-
-            if ($result.ReturnValue -ne 0)
+            # Only make changes if necessary
+            if( $CurrentValue -ne $Setting )
             {
-                New-InvalidOperationException `
-                    -Message ($script:localizedData.FailedUpdatingNetBiosError -f $netAdapterItem.Name, $result.ReturnValue, $Setting)
+                Write-Verbose -Message ($script:localizedData.SetNetBiosMessage -f $netAdapterItem.NetConnectionID, $Setting)
+
+                $netAdapterConfig = $netAdapterItem | Get-CimAssociatedInstance `
+                    -ResultClassName Win32_NetworkAdapterConfiguration `
+                    -ErrorAction Stop
+
+                Set-NetAdapterNetbiosOptions -NetworkAdapterObj $netAdapterConfig `
+                                             -InterfaceAlias $netAdapterItem.NetConnectionID `
+                                             -Setting $Setting
             }
         }
+    }
+    else
+    {
+        Write-Verbose -Message ($script:localizedData.SetNetBiosMessage -f $netAdapter.NetConnectionID, $Setting)
+
+        $netAdapterConfig = $netAdapter | Get-CimAssociatedInstance `
+                    -ResultClassName Win32_NetworkAdapterConfiguration `
+                    -ErrorAction Stop
+
+        Set-NetAdapterNetbiosOptions -NetworkAdapterObj $netAdapterConfig `
+                                     -InterfaceAlias $netAdapter.NetConnectionID `
+                                     -Setting $Setting
     }
 }
 
