@@ -10,4 +10,5 @@ ConvertFrom-StringData @'
     DNSServersHaveBeenSetCorrectlyMessage = DNS server addresses were set to the desired state.
     DNSServersHaveBeenSetToDHCPMessage    = DNS server addresses were set to the desired state of DHCP.
     InterfaceNotAvailableError            = Interface "{0}" is not available. Please select a valid interface and try again.
+    DNSServerValidationError              = DNS server addresses "{0}" failed validation.
 '@

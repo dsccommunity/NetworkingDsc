@@ -359,7 +359,7 @@ function Get-DnsClientServerStaticAddress
                 $($script:localizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily, $InterfaceAlias
             ) -join '')
 
-        return $null
+        return @()
     }
     else
     {
