@@ -110,7 +110,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.ApplyingDnsServerAddressesMessage)
+        $($script:localizedData.ApplyingDnsServerAddressesMessage -f ($AddressFamily),($Address -join ','),$InterfaceAlias)
         ) -join '')
 
     $dnsServerAddressSplat = @{
@@ -146,15 +146,15 @@ function Set-TargetResource
             ) -join '' )
     }
     catch [Microsoft.Management.Infrastructure.CimException]
-    {
+    {0
         # catching validation error to provide more descriptive message
-        Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($script:localizedData.DNSServerValidationError) -f ($Address -join ',')
-            ) -join '' )
+        New-InvalidOperationException `
+            -Message ($script:localizedData.DNSServerValidationError -f ($Address -join ','))
     }
     catch
     {
-        Write-Error -Exception $_.Exception
+        New-InvalidOperationException `
+            -Message ($script:localizedData.SetDNSServerAddressesError -f ($Address -join ','),$_.Exception)
     }
 }
 
