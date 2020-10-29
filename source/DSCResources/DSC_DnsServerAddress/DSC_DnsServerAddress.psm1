@@ -146,7 +146,7 @@ function Set-TargetResource
             ) -join '' )
     }
     catch [Microsoft.Management.Infrastructure.CimException]
-    {0
+    {
         # catching validation error to provide more descriptive message
         New-InvalidOperationException `
             -Message ($script:localizedData.DNSServerValidationError -f ($Address -join ','))
