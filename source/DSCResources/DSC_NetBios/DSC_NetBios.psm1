@@ -227,4 +227,134 @@ function Test-TargetResource
     return Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
 }
 
+<#
+.SYNOPSIS
+    Returns the NetbiosOptions value for a network adapter.
+.DESCRIPTION
+    Most reliable method of getting this value since network adapters
+    can be in any number of states (e.g. disabled, disconnected)
+    which can cause Win32 classes to not report the value.
+.PARAMETER NetworkAdapterGUID
+    Network Adapter GUID
+.PARAMETER Setting
+    Setting value for this resource which should be one of
+    the following: Default, Enable, Disable
+#>
+function Get-NetAdapterNetbiosOptionsFromRegistry
+{
+    [OutputType([System.String])]
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [ValidatePattern("^\{[a-zA-Z0-9]{8}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{12}\}$")]
+        [System.String]
+        # Network Adapter GUID
+        $NetworkAdapterGUID
+        ,
+        [Parameter(Mandatory=$true)]
+        [ValidateSet('Default','Enable','Disable')]
+        [System.String]
+        $Setting
+    )
+
+    # Changing ErrorActionPreference variable since the switch -ErrorAction isn't supported.
+    $CurrentErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference        = 'SilentlyContinue'
+
+    $RegistryNetbiosOptions = Get-ItemPropertyValue -Name 'NetbiosOptions' `
+                    -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetworkAdapterGUID)"
+
+    $ErrorActionPreference = $CurrentErrorActionPreference
+
+    if ( $null -eq $RegistryNetbiosOptions )
+    {
+        $RegistryNetbiosOptions = 0
+    }
+
+    switch( $RegistryNetbiosOptions )
+    {
+        0 {       return 'Default' }
+        1 {       return 'Enable'  }
+        2 {       return 'Disable' }
+        default {
+
+            # Unknown value. Returning invalid setting to trigger Set-TargetResource
+            [string[]] $InvalidSetting = 'Default','Enable','Disable' | Where-Object{ $_ -ne $Setting }
+
+            return $InvalidSetting[0]
+        }
+    }
+} # end function Get-NetAdapterNetbiosOptionsFromRegistry
+
+<#
+.SYNOPSIS
+    Configures Netbios on a Network Adapter.
+.DESCRIPTION
+    Uses two methods for configuring Netbios on a Network Adapter.
+    If an interface is IPEnabled, the CIMMethod will be invoked.
+    Otherwise the registry key is configured as this will satisfy
+    network adapters being in alternative states such as disabled
+    or disconnected.
+.PARAMETER NetworkAdapterObj
+    Network Adapter Win32_NetworkAdapterConfiguration Object
+.PARAMETER InterfaceAlias
+    Name of the network adapter being configured. Example: Ethernet
+.PARAMETER Setting
+    Setting value for this resource which should be one of
+    the following: Default, Enable, Disable
+#>
+function Set-NetAdapterNetbiosOptions
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [System.Object]
+        # Network Adapter Win32_NetworkAdapterConfiguration Object
+        $NetworkAdapterObj
+        ,
+        [Parameter(Mandatory=$true)]
+        [System.String]
+        $InterfaceAlias
+        ,
+        [Parameter(Mandatory=$true)]
+        [ValidateSet('Default','Enable','Disable')]
+        [System.String]
+        $Setting
+    )
+
+    Write-Verbose -Message ($script:localizedData.SetNetBiosMessage -f $InterfaceAlias,$Setting)
+
+    # Only IPEnabled interfaces can be configured via SetTcpipNetbios method.
+    if( $NetworkAdapterObj.IPEnabled )
+    {
+        $result = $NetworkAdapterObj |
+            Invoke-CimMethod `
+                -MethodName SetTcpipNetbios `
+                -ErrorAction Stop `
+                -Arguments @{
+                    TcpipNetbiosOptions = [uint32][NetBiosSetting]::$Setting.value__
+                }
+
+        if ( $result.ReturnValue -ne 0 )
+        {
+            New-InvalidOperationException `
+                -Message ($script:localizedData.FailedUpdatingNetBiosError -f $InterfaceAlias,$result.ReturnValue,$Setting)
+        }
+    }
+    else
+    {
+        # IPEnabled=$false can only be configured via registry
+        # this satisfies disabled and disconnected states
+        $setItemPropertyParameters = @{
+            Path  = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetworkAdapterObj.SettingID)"
+            Name  = 'NetbiosOptions'
+            Value = [NetBiosSetting]::$Setting.value__
+        }
+        $null = Set-ItemProperty @setItemPropertyParameters
+    }
+
+} # end function Set-NetAdapterNetbiosOptions
+
 Export-ModuleMember -Function *-TargetResource
