@@ -83,7 +83,7 @@ function Get-TargetResource
         mismatch, a wrong value is returned to signify the
         resource is not in the desired state.
     #>
-    if( $netAdapter -is [Array] )
+    if ( $netAdapter -is [Array] )
     {
         [string[]] $SettingResults = @()
 
@@ -96,7 +96,7 @@ function Get-TargetResource
 
         [string[]] $WrongSettings = $SettingResults | Where-Object{ $_ -ne $Setting }
 
-        if([System.String]::IsNullOrEmpty($WrongSettings) -eq $false)
+        if ([System.String]::IsNullOrEmpty($WrongSettings) -eq $false)
         {
             [string] $Setting = $WrongSettings[0]
         }
@@ -158,14 +158,14 @@ function Set-TargetResource
             -Message ($script:localizedData.InterfaceNotFoundError -f $InterfaceAlias)
     }
 
-    if( $netAdapter -is [Array] )
+    if ( $netAdapter -is [Array] )
     {
         foreach( $netAdapterItem in $netAdapter )
         {
             $CurrentValue = Get-NetAdapterNetbiosOptionsFromRegistry -NetworkAdapterGUID $netAdapterItem.GUID -Setting $Setting
 
             # Only make changes if necessary
-            if( $CurrentValue -ne $Setting )
+            if ( $CurrentValue -ne $Setting )
             {
                 Write-Verbose -Message ($script:localizedData.SetNetBiosMessage -f $netAdapterItem.NetConnectionID, $Setting)
 
@@ -272,7 +272,7 @@ function Get-NetAdapterNetbiosOptionsFromRegistry
         $RegistryNetbiosOptions = 0
     }
 
-    switch( $RegistryNetbiosOptions )
+    switch ( $RegistryNetbiosOptions )
     {
         0 {       return 'Default' }
         1 {       return 'Enable'  }
@@ -327,7 +327,7 @@ function Set-NetAdapterNetbiosOptions
     Write-Verbose -Message ($script:localizedData.SetNetBiosMessage -f $InterfaceAlias,$Setting)
 
     # Only IPEnabled interfaces can be configured via SetTcpipNetbios method.
-    if( $NetworkAdapterObj.IPEnabled )
+    if ( $NetworkAdapterObj.IPEnabled )
     {
         $result = $NetworkAdapterObj |
             Invoke-CimMethod `
@@ -345,8 +345,10 @@ function Set-NetAdapterNetbiosOptions
     }
     else
     {
-        # IPEnabled=$false can only be configured via registry
-        # this satisfies disabled and disconnected states
+        <#
+        IPEnabled=$false can only be configured via registry
+        this satisfies disabled and disconnected states
+        #>
         $setItemPropertyParameters = @{
             Path  = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetworkAdapterObj.SettingID)"
             Name  = 'NetbiosOptions'
