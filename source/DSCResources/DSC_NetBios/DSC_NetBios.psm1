@@ -160,7 +160,7 @@ function Set-TargetResource
 
     if ( $netAdapter -is [Array] )
     {
-        foreach( $netAdapterItem in $netAdapter )
+        foreach ( $netAdapterItem in $netAdapter )
         {
             $CurrentValue = Get-NetAdapterNetbiosOptionsFromRegistry -NetworkAdapterGUID $netAdapterItem.GUID -Setting $Setting
 
@@ -278,7 +278,6 @@ function Get-NetAdapterNetbiosOptionsFromRegistry
         1 {       return 'Enable'  }
         2 {       return 'Disable' }
         default {
-
             # Unknown value. Returning invalid setting to trigger Set-TargetResource
             [string[]] $InvalidSetting = 'Default','Enable','Disable' | Where-Object{ $_ -ne $Setting }
 
