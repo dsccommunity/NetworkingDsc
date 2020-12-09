@@ -5,12 +5,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [8.2.1] - 2020-12-4
+## [8.2.1] - 2020-12-9
 
-### Changed
+### Fixed
 
 - NetBios
-  - Fixes [Issue #434](https://github.com/dsccommunity/NetworkingDsc/issues/434).
+  - Fixes configuring network adapters in a disconnected or disabled state. Fixes [Issue #434](https://github.com/dsccommunity/NetworkingDsc/issues/434).
 
 ## [8.2.0] - 2020-10-16
 

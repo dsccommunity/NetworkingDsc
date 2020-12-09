@@ -83,22 +83,24 @@ function Get-TargetResource
         mismatch, a wrong value is returned to signify the
         resource is not in the desired state.
     #>
-    if ( $netAdapter -is [Array] )
+    if ($netAdapter -is [Array])
     {
-        [string[]] $SettingResults = @()
+        [System.String[]] $settingResults = @()
 
-        foreach ( $netAdapterItem in $netAdapter )
+        foreach ($netAdapterItem in $netAdapter)
         {
-            $SettingResults += Get-NetAdapterNetbiosOptionsFromRegistry -NetworkAdapterGUID $netAdapterItem.GUID -Setting $Setting
+            $settingResults += Get-NetAdapterNetbiosOptionsFromRegistry -NetworkAdapterGUID $netAdapterItem.GUID -Setting $Setting
 
-            Write-Verbose -Message ($script:localizedData.CurrentNetBiosSettingMessage -f $netAdapterItem.NetConnectionID,$SettingResults[-1])
+            Write-Verbose -Message ($script:localizedData.CurrentNetBiosSettingMessage -f $netAdapterItem.NetConnectionID, $settingResults[-1])
         }
 
-        [string[]] $WrongSettings = $SettingResults | Where-Object{ $_ -ne $Setting }
+        [System.String[]] $wrongSettings = $settingResults | Where-Object -FilterScript {
+            $_ -ne $Setting
+        }
 
-        if ([System.String]::IsNullOrEmpty($WrongSettings) -eq $false)
+        if (-not [System.String]::IsNullOrEmpty($wrongSettings))
         {
-            [string] $Setting = $WrongSettings[0]
+            $Setting = $wrongSettings[0]
         }
     }
     else
@@ -158,14 +160,14 @@ function Set-TargetResource
             -Message ($script:localizedData.InterfaceNotFoundError -f $InterfaceAlias)
     }
 
-    if ( $netAdapter -is [Array] )
+    if ($netAdapter -is [Array])
     {
-        foreach ( $netAdapterItem in $netAdapter )
+        foreach ($netAdapterItem in $netAdapter)
         {
-            $CurrentValue = Get-NetAdapterNetbiosOptionsFromRegistry -NetworkAdapterGUID $netAdapterItem.GUID -Setting $Setting
+            $currentValue = Get-NetAdapterNetbiosOptionsFromRegistry -NetworkAdapterGUID $netAdapterItem.GUID -Setting $Setting
 
             # Only make changes if necessary
-            if ( $CurrentValue -ne $Setting )
+            if ($currentValue -ne $Setting)
             {
                 Write-Verbose -Message ($script:localizedData.SetNetBiosMessage -f $netAdapterItem.NetConnectionID, $Setting)
 
@@ -230,12 +232,15 @@ function Test-TargetResource
 <#
 .SYNOPSIS
     Returns the NetbiosOptions value for a network adapter.
+
 .DESCRIPTION
     Most reliable method of getting this value since network adapters
     can be in any number of states (e.g. disabled, disconnected)
     which can cause Win32 classes to not report the value.
+
 .PARAMETER NetworkAdapterGUID
     Network Adapter GUID
+
 .PARAMETER Setting
     Setting value for this resource which should be one of
     the following: Default, Enable, Disable
@@ -246,42 +251,53 @@ function Get-NetAdapterNetbiosOptionsFromRegistry
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidatePattern("^\{[a-zA-Z0-9]{8}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{12}\}$")]
         [System.String]
-        # Network Adapter GUID
-        $NetworkAdapterGUID
-        ,
-        [Parameter(Mandatory=$true)]
+        $NetworkAdapterGUID,
+
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Default','Enable','Disable')]
         [System.String]
         $Setting
     )
 
     # Changing ErrorActionPreference variable since the switch -ErrorAction isn't supported.
-    $CurrentErrorActionPreference = $ErrorActionPreference
-    $ErrorActionPreference        = 'SilentlyContinue'
+    $currentErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'SilentlyContinue'
 
-    $RegistryNetbiosOptions = Get-ItemPropertyValue -Name 'NetbiosOptions' `
+    $registryNetbiosOptions = Get-ItemPropertyValue -Name 'NetbiosOptions' `
                     -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetworkAdapterGUID)"
 
-    $ErrorActionPreference = $CurrentErrorActionPreference
+    $ErrorActionPreference = $currentErrorActionPreference
 
-    if ( $null -eq $RegistryNetbiosOptions )
+    if ($null -eq $registryNetbiosOptions)
     {
-        $RegistryNetbiosOptions = 0
+        $registryNetbiosOptions = 0
     }
 
-    switch ( $RegistryNetbiosOptions )
+    switch ($registryNetbiosOptions)
     {
-        0 {       return 'Default' }
-        1 {       return 'Enable'  }
-        2 {       return 'Disable' }
-        default {
+        0
+        {
+            return 'Default'
+        }
+        1
+        {
+            return 'Enable'
+        }
+        2
+        {
+            return 'Disable'
+        }
+        default
+        {
             # Unknown value. Returning invalid setting to trigger Set-TargetResource
-            [string[]] $InvalidSetting = 'Default','Enable','Disable' | Where-Object{ $_ -ne $Setting }
+            [string[]] $invalidSetting = 'Default','Enable','Disable' | Where-Object -FilterScript {
+                $_ -ne $Setting
+            }
 
-            return $InvalidSetting[0]
+            return $invalidSetting[0]
         }
     }
 } # end function Get-NetAdapterNetbiosOptionsFromRegistry
@@ -289,16 +305,20 @@ function Get-NetAdapterNetbiosOptionsFromRegistry
 <#
 .SYNOPSIS
     Configures Netbios on a Network Adapter.
+
 .DESCRIPTION
     Uses two methods for configuring Netbios on a Network Adapter.
     If an interface is IPEnabled, the CIMMethod will be invoked.
     Otherwise the registry key is configured as this will satisfy
     network adapters being in alternative states such as disabled
     or disconnected.
+
 .PARAMETER NetworkAdapterObj
     Network Adapter Win32_NetworkAdapterConfiguration Object
+
 .PARAMETER InterfaceAlias
     Name of the network adapter being configured. Example: Ethernet
+
 .PARAMETER Setting
     Setting value for this resource which should be one of
     the following: Default, Enable, Disable
@@ -308,16 +328,15 @@ function Set-NetAdapterNetbiosOptions
     [CmdletBinding()]
     param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [System.Object]
-        # Network Adapter Win32_NetworkAdapterConfiguration Object
-        $NetworkAdapterObj
-        ,
-        [Parameter(Mandatory=$true)]
+        $NetworkAdapterObj,
+
+        [Parameter(Mandatory = $true)]
         [System.String]
-        $InterfaceAlias
-        ,
-        [Parameter(Mandatory=$true)]
+        $InterfaceAlias,
+
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Default','Enable','Disable')]
         [System.String]
         $Setting
@@ -326,7 +345,7 @@ function Set-NetAdapterNetbiosOptions
     Write-Verbose -Message ($script:localizedData.SetNetBiosMessage -f $InterfaceAlias,$Setting)
 
     # Only IPEnabled interfaces can be configured via SetTcpipNetbios method.
-    if ( $NetworkAdapterObj.IPEnabled )
+    if ($NetworkAdapterObj.IPEnabled)
     {
         $result = $NetworkAdapterObj |
             Invoke-CimMethod `
@@ -336,10 +355,10 @@ function Set-NetAdapterNetbiosOptions
                     TcpipNetbiosOptions = [uint32][NetBiosSetting]::$Setting.value__
                 }
 
-        if ( $result.ReturnValue -ne 0 )
+        if ($result.ReturnValue -ne 0)
         {
             New-InvalidOperationException `
-                -Message ($script:localizedData.FailedUpdatingNetBiosError -f $InterfaceAlias,$result.ReturnValue,$Setting)
+                -Message ($script:localizedData.FailedUpdatingNetBiosError -f $InterfaceAlias, $result.ReturnValue, $Setting)
         }
     }
     else
