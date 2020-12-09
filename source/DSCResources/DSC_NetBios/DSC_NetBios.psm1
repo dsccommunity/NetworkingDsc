@@ -83,7 +83,7 @@ function Get-TargetResource
         mismatch, a wrong value is returned to signify the
         resource is not in the desired state.
     #>
-    if ($netAdapter -is [Array])
+    if ($netAdapter -is [System.Array])
     {
         [System.String[]] $settingResults = @()
 
@@ -160,7 +160,7 @@ function Set-TargetResource
             -Message ($script:localizedData.InterfaceNotFoundError -f $InterfaceAlias)
     }
 
-    if ($netAdapter -is [Array])
+    if ($netAdapter -is [System.Array])
     {
         foreach ($netAdapterItem in $netAdapter)
         {
