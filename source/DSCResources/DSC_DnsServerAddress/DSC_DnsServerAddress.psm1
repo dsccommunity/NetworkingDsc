@@ -110,7 +110,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.ApplyingDnsServerAddressesMessage -f ($AddressFamily),($Address -join ','),$InterfaceAlias)
+        $($script:localizedData.ApplyingDnsServerAddressesMessage -f ($AddressFamily), ($Address -join ','), $InterfaceAlias)
         ) -join '')
 
     $dnsServerAddressSplat = @{
@@ -154,7 +154,7 @@ function Set-TargetResource
     catch
     {
         New-InvalidOperationException `
-            -Message ($script:localizedData.SetDNSServerAddressesError -f ($Address -join ','),$_.Exception)
+            -Message ($script:localizedData.SetDNSServerAddressesError -f ($Address -join ','), $_.Exception)
     }
 }
 
@@ -221,7 +221,7 @@ function Test-TargetResource
     }
     else
     {
-        [String[]] $Address = @()
+        [System.String[]] $Address = @()
     } # if
 
     # Remove the parameters we don't want to splat
