@@ -79,7 +79,7 @@ try
 
             Context 'Test DHCP' {
                 Context 'Invoking with an IPv4 address and DHCP is currently set' {
-                    Mock Get-DnsClientServerStaticAddress -MockWith { $null }
+                    Mock Get-DnsClientServerStaticAddress -MockWith { @() }
 
                     It 'Should return true' {
                         $getTargetResourceSplat = @{
@@ -122,9 +122,9 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 0
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
-                        Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
+                        Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
                     }
                 }
@@ -142,7 +142,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 0
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
@@ -163,7 +163,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 0
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $true }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
@@ -183,7 +183,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 0
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
@@ -202,7 +202,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 0
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $ResetServerAddresses -eq $true }
@@ -224,7 +224,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 0
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
@@ -232,7 +232,7 @@ try
                 }
 
                 Context 'Invoking with multiple IPv4 server addresses when DHCP is currently set' {
-                    Mock -commandName Get-DnsClientServerStaticAddress -MockWith { $null }
+                    Mock -commandName Get-DnsClientServerStaticAddress -MockWith { @() }
 
                     It 'Should not throw an exception' {
                         $setTargetResourceSplat = @{
@@ -246,7 +246,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 0
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
@@ -275,9 +275,9 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 0
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
-                        Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
+                        Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
                     }
                 }
@@ -295,7 +295,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 0
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
@@ -316,7 +316,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 0
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $true }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
@@ -336,7 +336,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 0
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }
@@ -355,7 +355,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 0
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $false }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $ResetServerAddresses -eq $true }
@@ -363,7 +363,7 @@ try
                 }
 
                 Context 'Invoking with multiple IPv6 server addresses when DHCP is currently set' {
-                    Mock Get-DnsClientServerStaticAddress -MockWith { $null }
+                    Mock Get-DnsClientServerStaticAddress -MockWith { @() }
 
                     It 'Should not throw an exception' {
                         $setTargetResourceSplat = @{
@@ -377,7 +377,7 @@ try
                     }
 
                     It 'Should call all the mocks' {
-                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 1
+                        Assert-MockCalled -commandName Get-DnsClientServerStaticAddress -Exactly 0
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $Validate -eq $true }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 1 -ParameterFilter { $Validate -eq $false }
                         Assert-MockCalled -commandName Set-DnsClientServerAddress -Exactly 0 -ParameterFilter { $ResetServerAddresses -eq $true }

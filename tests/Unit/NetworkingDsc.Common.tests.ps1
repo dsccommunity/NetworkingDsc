@@ -1,1025 +1,582 @@
-#region HEADER
-$script:projectPath = "$PSScriptRoot\..\.." | Convert-Path
-$script:projectName = (Get-ChildItem -Path "$script:projectPath\*\*.psd1" | Where-Object -FilterScript {
-        ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
-        $(try
-            { Test-ModuleManifest -Path $_.FullName -ErrorAction Stop
-            }
-            catch
-            { $false
-            })
-    }).BaseName
+$modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
-$script:parentModule = Get-Module -Name $script:projectName -ListAvailable | Select-Object -First 1
-$script:subModulesFolder = Join-Path -Path $script:parentModule.ModuleBase -ChildPath 'Modules'
-Remove-Module -Name $script:parentModule -Force -ErrorAction 'SilentlyContinue'
+Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
-$script:subModuleName = (Split-Path -Path $PSCommandPath -Leaf) -replace '\.Tests.ps1'
-$script:subModuleFile = Join-Path -Path $script:subModulesFolder -ChildPath "$($script:subModuleName)/$($script:subModuleName).psm1"
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
-Import-Module $script:subModuleFile -Force -ErrorAction Stop
-#endregion HEADER
+<#
+    .SYNOPSIS
+        Converts any IP Addresses containing CIDR notation filters in an array to use Subnet Mask
+        notation.
 
-InModuleScope $script:subModuleName {
-    Describe 'NetworkingDsc.Common\Convert-CIDRToSubhetMask' {
-        Context 'Subnet Mask Notation Used "192.168.0.0/255.255.0.0"' {
-            It 'Should Return "192.168.0.0/255.255.0.0"' {
-                Convert-CIDRToSubhetMask -Address @('192.168.0.0/255.255.0.0') | Should -Be '192.168.0.0/255.255.0.0'
+    .PARAMETER Address
+        The array of addresses to that need to be converted.
+#>
+function Convert-CIDRToSubhetMask
+{
+    [CmdletBinding()]
+    [OutputType([ Microsoft.Management.Infrastructure.CimInstance])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String[]]
+        $Address
+    )
+
+    $results = @()
+
+    foreach ($entry in $Address)
+    {
+        if (-not $entry.Contains(':') -and -not $entry.Contains('-'))
+        {
+            $entrySplit = $entry -split '/'
+
+            if (-not [String]::IsNullOrEmpty($entrySplit[1]))
+            {
+                # There was a / so this contains a Subnet Mask or CIDR
+                $prefix = $entrySplit[0]
+                $postfix = $entrySplit[1]
+
+                if ($postfix -match '^[0-9]*$')
+                {
+                    # The postfix contains CIDR notation so convert this to Subnet Mask
+                    $cidr = [System.Int32] $postfix
+                    $subnetMaskInt64 = ([convert]::ToInt64(('1' * $cidr + '0' * (32 - $cidr)), 2))
+                    $subnetMask = @(
+                        ([math]::Truncate($subnetMaskInt64 / 16777216))
+                        ([math]::Truncate(($subnetMaskInt64 % 16777216) / 65536))
+                        ([math]::Truncate(($subnetMaskInt64 % 65536) / 256))
+                        ([math]::Truncate($subnetMaskInt64 % 256))
+                    )
+                }
+                else
+                {
+                    $subnetMask = $postfix -split '\.'
+                }
+
+                <#
+                        Apply the Subnet Mast to the IP Address so that we end up with a correctly
+                        masked IP Address that will match what the Firewall rule returns.
+                #>
+                $maskedIp = $prefix -split '\.'
+
+                for ([System.Int32] $Octet = 0; $octet -lt 4; $octet++)
+                {
+                    $maskedIp[$Octet] = $maskedIp[$octet] -band $SubnetMask[$octet]
+                }
+
+                $entry = '{0}/{1}' -f ($maskedIp -join '.'), ($subnetMask -join '.')
             }
         }
-        Context 'Subnet Mask Notation Used "192.168.0.10/255.255.0.0" resulting in source bits masked' {
-            It 'Should Return "192.168.0.0/255.255.0.0" with source bits masked' {
-                Convert-CIDRToSubhetMask -Address @('192.168.0.10/255.255.0.0') | Should -Be '192.168.0.0/255.255.0.0'
-            }
-        }
-        Context 'CIDR Notation Used "192.168.0.0/16"' {
-            It 'Should Return "192.168.0.0/255.255.0.0"' {
-                Convert-CIDRToSubhetMask -Address @('192.168.0.0/16') | Should -Be '192.168.0.0/255.255.0.0'
-            }
-        }
-        Context 'CIDR Notation Used "192.168.0.10/16" resulting in source bits masked' {
-            It 'Should Return "192.168.0.0/255.255.0.0" with source bits masked' {
-                Convert-CIDRToSubhetMask -Address @('192.168.0.10/16') | Should -Be '192.168.0.0/255.255.0.0'
-            }
-        }
-        Context 'Multiple Notations Used "192.168.0.0/16,10.0.0.24/255.255.255.0"' {
-            $Result = Convert-CIDRToSubhetMask -Address @('192.168.0.0/16', '10.0.0.24/255.255.255.0')
-            It 'Should Return "192.168.0.0/255.255.0.0,10.0.0.0/255.255.255.0"' {
-                $Result[0] | Should -Be '192.168.0.0/255.255.0.0'
-                $Result[1] | Should -Be '10.0.0.0/255.255.255.0'
-            }
-        }
-        Context 'Range Used "192.168.1.0-192.168.1.128"' {
-            It 'Should Return "192.168.1.0-192.168.1.128"' {
-                Convert-CIDRToSubhetMask -Address @('192.168.1.0-192.168.1.128') | Should -Be '192.168.1.0-192.168.1.128'
-            }
-        }
-        Context 'IPv6 Used "fe80::/112"' {
-            It 'Should Return "fe80::/112"' {
-                Convert-CIDRToSubhetMask -Address @('fe80::/112') | Should -Be 'fe80::/112'
-            }
-        }
+
+        $results += $entry
     }
 
-    <#
-        InModuleScope has to be used to enable the Get-NetAdapter Mock
-        This is because forcing the ModuleName in the Mock command throws
-        an exception because the GetAdapter module has no manifest
-    #>
-    Describe 'NetworkingDsc.Common\Find-NetworkAdapter' {
-
-        # Generate the adapter data to be used for Mocking
-        $adapterName = 'Adapter'
-        $adapterPhysicalMediaType = '802.3'
-        $adapterStatus = 'Up'
-        $adapterMacAddress = '11-22-33-44-55-66'
-        $adapterInterfaceDescription = 'Hyper-V Virtual Ethernet Adapter #2'
-        $adapterInterfaceIndex = 2
-        $adapterInterfaceGuid = '75670D9B-5879-4DBA-BC99-86CDD33EB66A'
-        $adapterDriverDescription = 'Hyper-V Virtual Ethernet Adapter'
-        $nomatchAdapter = [PSObject]@{
-            Name                 = 'No Match Adapter'
-            PhysicalMediaType    = '802.11'
-            Status               = 'Disconnected'
-            MacAddress           = '66-55-44-33-22-11'
-            InterfaceDescription = 'Some Other Interface #2'
-            InterfaceIndex       = 3
-            InterfaceGuid        = 'FFFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'
-            DriverDescription    = 'Some Other Interface'
-        }
-        $matchAdapter = [PSObject]@{
-            Name                 = $adapterName
-            PhysicalMediaType    = $adapterPhysicalMediaType
-            Status               = $adapterStatus
-            MacAddress           = $adapterMacAddress
-            InterfaceDescription = $adapterInterfaceDescription
-            InterfaceIndex       = $adapterInterfaceIndex
-            InterfaceGuid        = $adapterInterfaceGuid
-            DriverDescription    = $adapterDriverDescription
-        }
-        $adapterArray = @( $nomatchAdapter, $matchAdapter )
-        $multipleMatchingAdapterArray = @( $matchAdapter, $matchAdapter )
-
-        Context 'Name is passed and one adapter matches' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            It 'Should not throw exception' {
-                { $script:result = Find-NetworkAdapter -Name $adapterName -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return expected adapter' {
-                $script:result.Name | Should -Be $adapterName
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'Name is passed and no adapters match' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            $errorRecord = Get-InvalidOperationRecord `
-                -Message ($script:localizedData.NetAdapterNotFoundError)
-
-            It 'Should throw the correct exception' {
-                { $script:result = Find-NetworkAdapter -Name 'NOMATCH' -Verbose } | Should -Throw $errorRecord
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'PhysicalMediaType is passed and one adapter matches' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            It 'Should not throw exception' {
-                { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return expected adapter' {
-                $script:result.Name | Should -Be $adapterName
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'PhysicalMediaType is passed and no adapters match' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            $errorRecord = Get-InvalidOperationRecord `
-                -Message ($script:localizedData.NetAdapterNotFoundError)
-
-            It 'Should throw the correct exception' {
-                { $script:result = Find-NetworkAdapter -PhysicalMediaType 'NOMATCH' -Verbose } | Should -Throw $errorRecord
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'Status is passed and one adapter matches' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            It 'Should not throw exception' {
-                { $script:result = Find-NetworkAdapter -Status $adapterStatus -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return expected adapter' {
-                $script:result.Name | Should -Be $adapterName
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'Status is passed and no adapters match' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            $errorRecord = Get-InvalidOperationRecord `
-                -Message ($script:localizedData.NetAdapterNotFoundError)
-
-            It 'Should throw the correct exception' {
-                { $script:result = Find-NetworkAdapter -Status 'Disabled' -Verbose } | Should -Throw $errorRecord
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'MacAddress is passed and one adapter matches' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            It 'Should not throw exception' {
-                { $script:result = Find-NetworkAdapter -MacAddress $adapterMacAddress -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return expected adapter' {
-                $script:result.Name | Should -Be $adapterName
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'MacAddress is passed and no adapters match' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            $errorRecord = Get-InvalidOperationRecord `
-                -Message ($script:localizedData.NetAdapterNotFoundError)
-
-            It 'Should throw the correct exception' {
-                { $script:result = Find-NetworkAdapter -MacAddress '00-00-00-00-00-00' -Verbose } | Should -Throw $errorRecord
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'InterfaceDescription is passed and one adapter matches' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            It 'Should not throw exception' {
-                { $script:result = Find-NetworkAdapter -InterfaceDescription $adapterInterfaceDescription -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return expected adapter' {
-                $script:result.Name | Should -Be $adapterName
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'InterfaceDescription is passed and no adapters match' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            $errorRecord = Get-InvalidOperationRecord `
-                -Message ($script:localizedData.NetAdapterNotFoundError)
-
-            It 'Should throw the correct exception' {
-                { $script:result = Find-NetworkAdapter -InterfaceDescription 'NOMATCH' -Verbose } | Should -Throw $errorRecord
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'InterfaceIndex is passed and one adapter matches' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            It 'Should not throw exception' {
-                { $script:result = Find-NetworkAdapter -InterfaceIndex $adapterInterfaceIndex -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return expected adapter' {
-                $script:result.Name | Should -Be $adapterName
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'InterfaceIndex is passed and no adapters match' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            $errorRecord = Get-InvalidOperationRecord `
-                -Message ($script:localizedData.NetAdapterNotFoundError)
-
-            It 'Should throw the correct exception' {
-                { $script:result = Find-NetworkAdapter -InterfaceIndex 99 -Verbose } | Should -Throw $errorRecord
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'InterfaceGuid is passed and one adapter matches' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            It 'Should not throw exception' {
-                { $script:result = Find-NetworkAdapter -InterfaceGuid $adapterInterfaceGuid -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return expected adapter' {
-                $script:result.Name | Should -Be $adapterName
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'InterfaceGuid is passed and no adapters match' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            $errorRecord = Get-InvalidOperationRecord `
-                -Message ($script:localizedData.NetAdapterNotFoundError)
-
-            It 'Should throw the correct exception' {
-                { $script:result = Find-NetworkAdapter -InterfaceGuid 'NOMATCH' -Verbose } | Should -Throw $errorRecord
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'DriverDescription is passed and one adapter matches' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            It 'Should not throw exception' {
-                { $script:result = Find-NetworkAdapter -DriverDescription $adapterDriverDescription -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return expected adapter' {
-                $script:result.Name | Should -Be $adapterName
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'DriverDescription is passed and no adapters match' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            $errorRecord = Get-InvalidOperationRecord `
-                -Message ($script:localizedData.NetAdapterNotFoundError)
-
-            It 'Should throw the correct exception' {
-                { $script:result = Find-NetworkAdapter -DriverDescription 'NOMATCH' -Verbose } | Should -Throw $errorRecord
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'No parameters are passed and multiple Adapters adapters match but IgnoreMultipleMatchingAdapters is not set' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            $errorRecord = Get-InvalidOperationRecord `
-                -Message ($script:localizedData.MultipleMatchingNetAdapterFound -f 2)
-
-            It 'Should throw the correct exception' {
-                { $script:result = Find-NetworkAdapter -Verbose } | Should -Throw $errorRecord
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'No parameters are passed and multiple Adapters adapters match and IgnoreMultipleMatchingAdapters is set and interface number is 2' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $adapterArray }
-
-            It 'Should not throw exception' {
-                { $script:result = Find-NetworkAdapter -IgnoreMultipleMatchingAdapters:$true -InterfaceNumber 2 -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return expected adapter' {
-                $script:result.Name | Should -Be $adapterName
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'Multiple Adapters adapters match but IgnoreMultipleMatchingAdapters is not set' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $multipleMatchingAdapterArray }
-
-            $errorRecord = Get-InvalidOperationRecord `
-                -Message ($script:localizedData.MultipleMatchingNetAdapterFound -f 2)
-
-            It 'Should throw the correct exception' {
-                { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -Verbose } | Should -Throw $errorRecord
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'Multiple Adapters adapters match and IgnoreMultipleMatchingAdapters is set' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $multipleMatchingAdapterArray }
-
-            It 'Should not throw exception' {
-                { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -IgnoreMultipleMatchingAdapters:$true -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return expected adapter' {
-                $script:result.Name | Should -Be $adapterName
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'Multiple Adapters adapters match and IgnoreMultipleMatchingAdapters is set and InterfaceNumber is greater than matching adapters' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $multipleMatchingAdapterArray }
-
-            $errorRecord = Get-InvalidOperationRecord `
-                -Message ($script:localizedData.InvalidNetAdapterNumberError -f 2, 3)
-
-            It 'Should throw the correct exception' {
-                { $script:result = Find-NetworkAdapter -PhysicalMediaType $adapterPhysicalMediaType -IgnoreMultipleMatchingAdapters:$true -InterfaceNumber 3 -Verbose } | Should -Throw $errorRecord
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
+    return $results
+} # Convert-CIDRToSubhetMask
+
+<#
+    .SYNOPSIS
+        This function will find a network adapter based on the provided
+        search parameters.
+
+    .PARAMETER Name
+        This is the name of network adapter to find.
+
+    .PARAMETER PhysicalMediaType
+        This is the media type of the network adapter to find.
+
+    .PARAMETER Status
+        This is the status of the network adapter to find.
+
+    .PARAMETER MacAddress
+        This is the MAC address of the network adapter to find.
+
+    .PARAMETER InterfaceDescription
+        This is the interface description of the network adapter to find.
+
+    .PARAMETER InterfaceIndex
+        This is the interface index of the network adapter to find.
+
+    .PARAMETER InterfaceGuid
+        This is the interface GUID of the network adapter to find.
+
+    .PARAMETER DriverDescription
+        This is the driver description of the network adapter.
+
+    .PARAMETER InterfaceNumber
+        This is the interface number of the network adapter if more than one
+        are returned by the parameters.
+
+    .PARAMETER IgnoreMultipleMatchingAdapters
+        This switch will suppress an error occurring if more than one matching
+        adapter matches the parameters passed.
+#>
+function Find-NetworkAdapter
+{
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param
+    (
+        [Parameter()]
+        [System.String]
+        $Name,
+
+        [Parameter()]
+        [System.String]
+        $PhysicalMediaType,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet('Up', 'Disconnected', 'Disabled')]
+        [System.String]
+        $Status = 'Up',
+
+        [Parameter()]
+        [System.String]
+        $MacAddress,
+
+        [Parameter()]
+        [System.String]
+        $InterfaceDescription,
+
+        [Parameter()]
+        [System.UInt32]
+        $InterfaceIndex,
+
+        [Parameter()]
+        [System.String]
+        $InterfaceGuid,
+
+        [Parameter()]
+        [System.String]
+        $DriverDescription,
+
+        [Parameter()]
+        [System.UInt32]
+        $InterfaceNumber = 1,
+
+        [Parameter()]
+        [System.Boolean]
+        $IgnoreMultipleMatchingAdapters = $false
+    )
+
+    Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+            $($script:localizedData.FindingNetAdapterMessage)
+        ) -join '')
+
+    $adapterFilters = @()
+
+    if ($PSBoundParameters.ContainsKey('Name'))
+    {
+        $adapterFilters += @('($_.Name -eq $Name)')
+    } # if
+
+    if ($PSBoundParameters.ContainsKey('PhysicalMediaType'))
+    {
+        $adapterFilters += @('($_.PhysicalMediaType -eq $PhysicalMediaType)')
+    } # if
+
+    if ($PSBoundParameters.ContainsKey('Status'))
+    {
+        $adapterFilters += @('($_.Status -eq $Status)')
+    } # if
+
+    if ($PSBoundParameters.ContainsKey('MacAddress'))
+    {
+        $adapterFilters += @('($_.MacAddress -eq $MacAddress)')
+    } # if
+
+    if ($PSBoundParameters.ContainsKey('InterfaceDescription'))
+    {
+        $adapterFilters += @('($_.InterfaceDescription -eq $InterfaceDescription)')
+    } # if
+
+    if ($PSBoundParameters.ContainsKey('InterfaceIndex'))
+    {
+        $adapterFilters += @('($_.InterfaceIndex -eq $InterfaceIndex)')
+    } # if
+
+    if ($PSBoundParameters.ContainsKey('InterfaceGuid'))
+    {
+        $adapterFilters += @('($_.InterfaceGuid -eq $InterfaceGuid)')
+    } # if
+
+    if ($PSBoundParameters.ContainsKey('DriverDescription'))
+    {
+        $adapterFilters += @('($_.DriverDescription -eq $DriverDescription)')
+    } # if
+
+    if ($adapterFilters.Count -eq 0)
+    {
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                $($script:localizedData.AllNetAdaptersFoundMessage)
+            ) -join '')
+
+        $matchingAdapters = @(Get-NetAdapter)
+    }
+    else
+    {
+        # Join all the filters together
+        $adapterFilterScript = '(' + ($adapterFilters -join ' -and ') + ')'
+        $matchingAdapters = @(Get-NetAdapter |
+            Where-Object -FilterScript ([ScriptBlock]::Create($adapterFilterScript)))
     }
 
-    <#
-        InModuleScope has to be used to enable the Get-NetAdapter Mock
-        This is because forcing the ModuleName in the Mock command throws
-        an exception because the GetAdapter module has no manifest
-    #>
-    Describe 'NetworkingDsc.Common\Get-DnsClientServerStaticAddress' {
+    # Were any adapters found matching the criteria?
+    if ($matchingAdapters.Count -eq 0)
+    {
+        New-InvalidOperationException `
+            -Message ($script:localizedData.NetAdapterNotFoundError)
 
-        # Generate the adapter data to be used for Mocking
-        $interfaceAlias = 'Adapter'
-        $interfaceGuid = [Guid]::NewGuid().ToString()
-        $nomatchAdapter = $null
-        $matchAdapter = [PSObject]@{
-            InterfaceGuid = $interfaceGuid
-        }
-        $ipv4Parameters = @{
-            InterfaceAlias = $interfaceAlias
-            AddressFamily  = 'IPv4'
-        }
-        $ipv6Parameters = @{
-            InterfaceAlias = $interfaceAlias
-            AddressFamily  = 'IPv6'
-        }
-        $noIpv4StaticAddressString = ''
-        $oneIpv4StaticAddressString = '8.8.8.8'
-        $secondIpv4StaticAddressString = '4.4.4.4'
-        $twoIpv4StaticAddressString = "$oneIpv4StaticAddressString,$secondIpv4StaticAddressString"
-        $noIpv6StaticAddressString = ''
-        $oneIpv6StaticAddressString = '::1'
-        $secondIpv6StaticAddressString = '::2'
-        $twoIpv6StaticAddressString = "$oneIpv6StaticAddressString,$secondIpv6StaticAddressString"
+        # Return a null so that ErrorAction SilentlyContinue works correctly
+        return $null
+    }
+    else
+    {
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                $($script:localizedData.NetAdapterFoundMessage -f $matchingAdapters.Count)
+            ) -join '')
 
-        Context 'Interface Alias does not match adapter in system' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $nomatchAdapter }
+        if ($matchingAdapters.Count -gt 1)
+        {
+            if ($IgnoreMultipleMatchingAdapters)
+            {
+                # Was the number of matching adapters found matching the adapter number?
+                if (($InterfaceNumber -gt 1) -and ($InterfaceNumber -gt $matchingAdapters.Count))
+                {
+                    New-InvalidOperationException `
+                        -Message ($script:localizedData.InvalidNetAdapterNumberError `
+                            -f $matchingAdapters.Count, $InterfaceNumber)
 
-            $errorRecord = Get-InvalidOperationRecord `
-                -Message ($script:localizedData.InterfaceAliasNotFoundError -f $interfaceAlias)
-
-            It 'Should throw exception' {
-                { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should -Throw $errorRecord
+                    # Return a null so that ErrorAction SilentlyContinue works correctly
+                    return $null
+                } # if
             }
+            else
+            {
+                New-InvalidOperationException `
+                    -Message ($script:localizedData.MultipleMatchingNetAdapterFound `
+                        -f $matchingAdapters.Count)
 
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
+                # Return a null so that ErrorAction SilentlyContinue works correctly
+                return $null
+            } # if
+        } # if
+    } # if
 
-        Context 'Interface Alias was found in system but IPv4 NameServer is empty' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $matchAdapter }
+    # Identify the exact adapter from the adapters that match
+    $exactAdapter = $matchingAdapters[$InterfaceNumber - 1]
 
-            Mock `
-                -CommandName Get-ItemProperty `
-                -MockWith {
-                [psobject] @{
-                    NameServer = $noIpv4StaticAddressString
-                }
-            }
-
-            It 'Should not throw exception' {
-                { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return null' {
-                $script:result | Should -BeNullOrEmpty
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
-            }
-        }
-
-        Context 'Interface Alias was found in system but IPv4 NameServer property does not exist' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $matchAdapter }
-
-            Mock `
-                -CommandName Get-ItemProperty `
-                -MockWith {
-                [psobject] @{
-                    Dummy = ''
-                }
-            }
-
-            It 'Should not throw exception' {
-                { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return null' {
-                $script:result | Should -BeNullOrEmpty
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
-            }
-        }
-
-        Context 'Interface Alias was found in system but IPv4 NameServer contains one DNS entry' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $matchAdapter }
-
-            Mock `
-                -CommandName Get-ItemProperty `
-                -MockWith {
-                [psobject] @{
-                    NameServer = $oneIpv4StaticAddressString
-                }
-            }
-
-            It 'Should not throw exception' {
-                { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return expected address' {
-                $script:result | Should -Be $oneIpv4StaticAddressString
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
-            }
-        }
-
-        Context 'Interface Alias was found in system but IPv4 NameServer contains two DNS entries' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $matchAdapter }
-
-            Mock `
-                -CommandName Get-ItemProperty `
-                -MockWith {
-                [psobject] @{
-                    NameServer = $twoIpv4StaticAddressString
-                }
-            }
-
-            It 'Should not throw exception' {
-                { $script:result = Get-DnsClientServerStaticAddress @ipv4Parameters -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return two expected addresses' {
-                $script:result[0] | Should -Be $oneIpv4StaticAddressString
-                $script:result[1] | Should -Be $secondIpv4StaticAddressString
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
-            }
-        }
-
-        Context 'Interface Alias was found in system but IPv6 NameServer is empty' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $matchAdapter }
-
-            Mock `
-                -CommandName Get-ItemProperty `
-                -MockWith {
-                [psobject] @{
-                    NameServer = $noIpv6StaticAddressString
-                }
-            }
-
-            It 'Should not throw exception' {
-                { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return null' {
-                $script:result | Should -BeNullOrEmpty
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
-            }
-        }
-
-        Context 'Interface Alias was found in system but IPv6 NameServer property does not exist' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $matchAdapter }
-
-            Mock `
-                -CommandName Get-ItemProperty `
-                -MockWith {
-                [psobject] @{
-                    Dummy = ''
-                }
-            }
-
-            It 'Should not throw exception' {
-                { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return null' {
-                $script:result | Should -BeNullOrEmpty
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
-            }
-        }
-
-        Context 'Interface Alias was found in system but IPv6 NameServer contains one DNS entry' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $matchAdapter }
-
-            Mock `
-                -CommandName Get-ItemProperty `
-                -MockWith {
-                [psobject] @{
-                    NameServer = $oneIpv6StaticAddressString
-                }
-            }
-
-            It 'Should not throw exception' {
-                { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return expected address' {
-                $script:result | Should -Be $oneIpv6StaticAddressString
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
-            }
-        }
-
-        Context 'Interface Alias was found in system but IPv6 NameServer contains two DNS entries' {
-            Mock `
-                -CommandName Get-NetAdapter `
-                -MockWith { $matchAdapter }
-
-            Mock `
-                -CommandName Get-ItemProperty `
-                -MockWith {
-                [psobject] @{
-                    NameServer = $twoIpv6StaticAddressString
-                }
-            }
-
-            It 'Should not throw exception' {
-                { $script:result = Get-DnsClientServerStaticAddress @ipv6Parameters -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return two expected addresses' {
-                $script:result[0] | Should -Be $oneIpv6StaticAddressString
-                $script:result[1] | Should -Be $secondIpv6StaticAddressString
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
-            }
-        }
+    $returnValue = [PSCustomObject] @{
+        Name                 = $exactAdapter.Name
+        PhysicalMediaType    = $exactAdapter.PhysicalMediaType
+        Status               = $exactAdapter.Status
+        MacAddress           = $exactAdapter.MacAddress
+        InterfaceDescription = $exactAdapter.InterfaceDescription
+        InterfaceIndex       = $exactAdapter.InterfaceIndex
+        InterfaceGuid        = $exactAdapter.InterfaceGuid
+        MatchingAdapterCount = $matchingAdapters.Count
     }
 
-    Describe 'NetworkingDsc.Common\Get-IPAddressPrefix' {
-        Context 'IPv4 CIDR notation provided' {
-            it 'Should return the provided IP and prefix as separate properties' {
-                $IPaddress = Get-IPAddressPrefix -IPAddress '192.168.10.0/24'
+    return $returnValue
+} # Find-NetworkAdapter
 
-                $IPaddress.IPaddress | Should -Be '192.168.10.0'
-                $IPaddress.PrefixLength | Should -Be 24
-            }
-        }
+<#
+    .SYNOPSIS
+        Returns the DNS Client Server static address that are assigned to a network
+        adapter. This is required because Get-DnsClientServerAddress always returns
+        the currently assigned server addresses whether regardless if they were
+        assigned as static or by DHCP.
 
-        Context 'IPv4 Class A address with no CIDR notation' {
-            it 'Should return correct prefix when Class A address provided' {
-                $IPaddress = Get-IPAddressPrefix -IPAddress '10.1.2.3'
+        The only way that could be found to do this is to query the registry.
 
-                $IPaddress.IPaddress | Should -Be '10.1.2.3'
-                $IPaddress.PrefixLength | Should -Be 8
-            }
-        }
+    .PARAMETER InterfaceAlias
+        Alias of the network interface to get the static DNS Server addresses from.
 
-        Context 'IPv4 Class B address with no CIDR notation' {
-            it 'Should return correct prefix when Class B address provided' {
-                $IPaddress = Get-IPAddressPrefix -IPAddress '172.16.2.3'
+    .PARAMETER AddressFamily
+        IP address family.
+#>
+function Get-DnsClientServerStaticAddress
+{
+    [CmdletBinding()]
+    [OutputType([System.String[]])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $InterfaceAlias,
 
-                $IPaddress.IPaddress | Should -Be '172.16.2.3'
-                $IPaddress.PrefixLength | Should -Be 16
-            }
-        }
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('IPv4', 'IPv6')]
+        [System.String]
+        $AddressFamily
+    )
 
-        Context 'IPv4 Class C address with no CIDR notation' {
-            it 'Should return correct prefix when Class C address provided' {
-                $IPaddress = Get-IPAddressPrefix -IPAddress '192.168.20.3'
+    Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+            $($script:localizedData.GettingDNSServerStaticAddressMessage) -f $AddressFamily, $InterfaceAlias
+        ) -join '')
 
-                $IPaddress.IPaddress | Should -Be '192.168.20.3'
-                $IPaddress.PrefixLength | Should -Be 24
-            }
-        }
+    # Look up the interface Guid
+    $adapter = Get-NetAdapter `
+        -InterfaceAlias $InterfaceAlias `
+        -ErrorAction SilentlyContinue
 
-        Context 'IPv6 CIDR notation provided' {
-            it 'Should return provided IP and prefix as separate properties' {
-                $IPaddress = Get-IPAddressPrefix -IPAddress 'FF12::12::123/64' -AddressFamily IPv6
+    if (-not $adapter)
+    {
+        New-InvalidOperationException `
+            -Message ($script:localizedData.InterfaceAliasNotFoundError `
+                -f $InterfaceAlias)
 
-                $IPaddress.IPaddress | Should -Be 'FF12::12::123'
-                $IPaddress.PrefixLength | Should -Be 64
-            }
-        }
+        # Return null to support ErrorAction Silently Continue
+        return $null
+    } # if
 
-        Context 'IPv6 with no CIDR notation provided' {
-            it 'Should return provided IP and correct IPv6 prefix' {
-                $IPaddress = Get-IPAddressPrefix -IPAddress 'FF12::12::123' -AddressFamily IPv6
+    $interfaceGuid = $adapter.InterfaceGuid.ToLower()
 
-                $IPaddress.IPaddress | Should -Be 'FF12::12::123'
-                $IPaddress.PrefixLength | Should -Be 64
-            }
-        }
+    if ($AddressFamily -eq 'IPv4')
+    {
+        $interfaceRegKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\$interfaceGuid\"
+    }
+    else
+    {
+        $interfaceRegKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters\Interfaces\$interfaceGuid\"
+    } # if
+
+    $interfaceInformation = Get-ItemProperty `
+        -Path $interfaceRegKeyPath `
+        -ErrorAction SilentlyContinue
+    $nameServerAddressString = $interfaceInformation.NameServer
+
+    # Are any statically assigned addresses for this adapter?
+    if ([System.String]::IsNullOrWhiteSpace($nameServerAddressString))
+    {
+        # Static DNS Server addresses not found so return empty array
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                $($script:localizedData.DNSServerStaticAddressNotSetMessage) -f $AddressFamily, $InterfaceAlias
+            ) -join '')
+
+        return @()
+    }
+    else
+    {
+        # Static DNS Server addresses found so split them into an array using comma
+        Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
+                $($script:localizedData.DNSServerStaticAddressFoundMessage) -f $AddressFamily, $InterfaceAlias, $nameServerAddressString
+            ) -join '')
+
+        return @($nameServerAddressString -split ',')
+    } # if
+} # Get-DnsClientServerStaticAddress
+
+<#
+    .SYNOPSIS
+        Returns the WINS Client Server static address that are assigned to a network
+        adapter. The CIM class Win32_NetworkAdapterConfiguration unfortunately only supports
+        the primary and secondary WINS server. The registry gives more flexibility.
+
+    .PARAMETER InterfaceAlias
+        Alias of the network interface to get the static WINS Server addresses from.
+#>
+function Get-WinsClientServerStaticAddress
+{
+    [CmdletBinding()]
+    [OutputType([System.String[]])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $InterfaceAlias
+    )
+
+    Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.GettingWinsServerStaticAddressMessage -f $InterfaceAlias)")
+
+    # Look up the interface Guid
+    $adapter = Get-NetAdapter -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
+
+    if (-not $adapter)
+    {
+        New-InvalidOperationException -Message ($script:localizedData.InterfaceAliasNotFoundError -f $InterfaceAlias)
+
+        # Return null to support ErrorAction Silently Continue
+        return $null
     }
 
-    Describe 'NetworkingDsc.Common\Get-WinsClientServerStaticAddress' {
+    $interfaceGuid = $adapter.InterfaceGuid.ToLower()
 
-        # Generate the adapter data to be used for Mocking
-        $interfaceAlias = 'Adapter'
-        $interfaceGuid = [Guid]::NewGuid().ToString()
-        $nomatchAdapter = $null
-        $matchAdapter = @{
-            InterfaceGuid = $interfaceGuid
-        }
-        $parameters = @{
-            InterfaceAlias = $interfaceAlias
-        }
-        $noIpStaticAddressString = ''
-        $oneIpStaticAddressString = '8.8.8.8'
-        $secondIpStaticAddressString = '4.4.4.4'
-        $twoIpStaticAddressString = $oneIpStaticAddressString, $secondIpStaticAddressString
+    $interfaceRegKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$interfaceGuid\"
 
-        Context 'When interface alias does not match adapter in system' {
-            Mock Get-NetAdapter -MockWith { $nomatchAdapter }
+    $interfaceInformation = Get-ItemProperty -Path $interfaceRegKeyPath -ErrorAction SilentlyContinue
+    $nameServerAddressString = $interfaceInformation.NameServerList
 
-            $errorRecord = Get-InvalidOperationRecord -Message ($script:localizedData.InterfaceAliasNotFoundError -f $interfaceAlias)
+    # Are any statically assigned addresses for this adapter?
+    if (-not $nameServerAddressString)
+    {
+        # Static DNS Server addresses not found so return empty array
+        Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.WinsServerStaticAddressNotSetMessage -f $InterfaceAlias)")
+        return $null
+    }
+    else
+    {
+        # Static DNS Server addresses found so split them into an array using comma
+        Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.WinsServerStaticAddressFoundMessage -f
+        $InterfaceAlias, ($nameServerAddressString -join ','))")
 
-            It 'Should throw exception' {
-                { $script:result = Get-WinsClientServerStaticAddress @parameters -Verbose } | Should -Throw $errorRecord
-            }
+        return $nameServerAddressString
+    }
+} # Get-WinsClientServerStaticAddress
 
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
+<#
+    .SYNOPSIS
+        Sets the WINS Client Server static address on a network adapter. The CIM class
+        Win32_NetworkAdapterConfiguration unfortunately only supports the primary and
+        secondary WINS server. The registry gives more flexibility.
 
-        Context 'When interface alias was found in system and WINS server is empty' {
-            Mock Get-NetAdapter -MockWith { $matchAdapter }
-            Mock Get-ItemProperty -MockWith {
-                @{
-                    NameServer = $noIpStaticAddressString
-                }
-            }
+    .PARAMETER InterfaceAlias
+        Alias of the network interface to set the static WINS Server addresses on.
+#>
+function Set-WinsClientServerStaticAddress
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $InterfaceAlias,
 
-            It 'Should not throw exception' {
-                { $script:result = Get-WinsClientServerStaticAddress @parameters -Verbose } | Should -Not -Throw
-            }
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [System.String[]]
+        $Address
+    )
 
-            It 'Should return null' {
-                $script:result | Should -BeNullOrEmpty
-            }
+    Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.SettingWinsServerStaticAddressMessage -f $InterfaceAlias, ($Address -join ', '))")
 
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
-            }
-        }
+    # Look up the interface Guid
+    $adapter = Get-NetAdapter -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
 
-        Context 'When interface alias was found in system and WINS server list contains one entry' {
-            Mock Get-NetAdapter -MockWith { $matchAdapter }
-            Mock Get-ItemProperty -MockWith {
-                @{
-                    NameServerList = $oneIpStaticAddressString
-                }
-            }
-
-            It 'Should not throw exception' {
-                { $script:result = Get-WinsClientServerStaticAddress @parameters -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return expected address' {
-                $script:result | Should -Be $oneIpStaticAddressString
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
-            }
-        }
-
-        Context 'When interface alias was found in system and WINS server list contains two entries' {
-            Mock Get-NetAdapter -MockWith { $matchAdapter }
-            Mock Get-ItemProperty -MockWith {
-                @{
-                    NameServerList = $twoIpStaticAddressString
-                }
-            }
-
-            It 'Should not throw exception' {
-                { $script:result = Get-WinsClientServerStaticAddress @parameters -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return two expected addresses' {
-                $script:result[0] | Should -Be $oneIpStaticAddressString
-                $script:result[1] | Should -Be $secondIpStaticAddressString
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-ItemProperty -Exactly -Times 1
-            }
-        }
+    if (-not $adapter)
+    {
+        New-InvalidOperationException -Message ($script:localizedData.InterfaceAliasNotFoundError -f $InterfaceAlias)
     }
 
-    Describe 'NetworkingDsc.Common\Set-WinsClientServerStaticAddress' {
+    $interfaceGuid = $adapter.InterfaceGuid.ToLower()
 
-        # Generate the adapter data to be used for Mocking
-        $interfaceAlias = 'Adapter'
-        $interfaceGuid = [Guid]::NewGuid().ToString()
-        $nomatchAdapter = $null
-        $matchAdapter = @{
-            InterfaceGuid = $interfaceGuid
-        }
-        $parameters = @{
-            InterfaceAlias = $interfaceAlias
-        }
-        $noIpStaticAddressString = ''
-        $oneIpStaticAddressString = '8.8.8.8'
-        $secondIpStaticAddressString = '4.4.4.4'
-        $twoIpStaticAddressString = $oneIpStaticAddressString, $secondIpStaticAddressString
+    $interfaceRegKeyPath = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$interfaceGuid\"
 
-        Context 'When interface alias does not match adapter in system' {
-            Mock Get-NetAdapter -MockWith { $nomatchAdapter }
+    Set-ItemProperty -Path $interfaceRegKeyPath -Name NameServerList -Value $Address
 
-            $parameters.Address = @()
+} # Set-WinsClientServerStaticAddress
 
-            $errorRecord = Get-InvalidOperationRecord -Message ($script:localizedData.InterfaceAliasNotFoundError -f $interfaceAlias)
+<#
+    .SYNOPSIS
+        Gets the IP Address prefix from a provided IP Address in CIDR notation.
 
-            It 'Should throw exception' {
-                { $script:result = Set-WinsClientServerStaticAddress @parameters -Verbose } | Should -Throw $errorRecord
+    .PARAMETER IPAddress
+        IP Address to get prefix for, can be in CIDR notation.
+
+    .PARAMETER AddressFamily
+        Address family for provided IP Address, defaults to IPv4.
+
+#>
+function Get-IPAddressPrefix
+{
+    [cmdletbinding()]
+    param
+    (
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline)]
+        [System.String[]]
+        $IPAddress,
+
+        [Parameter()]
+        [ValidateSet('IPv4', 'IPv6')]
+        [System.String]
+        $AddressFamily = 'IPv4'
+    )
+
+    process
+    {
+        foreach ($singleIP in $IPAddress)
+        {
+            $prefixLength = ($singleIP -split '/')[1]
+
+            if (-not ($prefixLength) -and $AddressFamily -eq 'IPv4')
+            {
+                if ($singleIP.split('.')[0] -in (0..127))
+                {
+                    $prefixLength = 8
+                }
+                elseif ($singleIP.split('.')[0] -in (128..191))
+                {
+                    $prefixLength = 16
+                }
+                elseif ($singleIP.split('.')[0] -in (192..223))
+                {
+                    $prefixLength = 24
+                }
+            }
+            elseif (-not ($prefixLength) -and $AddressFamily -eq 'IPv6')
+            {
+                $prefixLength = 64
             }
 
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-            }
-        }
-
-        Context 'When interface alias was found in system and WINS server address is set to $null' {
-            Mock Get-NetAdapter -MockWith { $matchAdapter }
-            Mock Set-ItemProperty -MockWith { }
-
-            $parameters.Address = @()
-
-            It 'Should not throw exception' {
-                { $script:result = Set-WinsClientServerStaticAddress @parameters -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return null' {
-                $script:result | Should -BeNullOrEmpty
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 1
-            }
-        }
-
-        Context 'When interface alias was found in system and WINS server address is set to a single entry' {
-            Mock Get-NetAdapter -MockWith { $matchAdapter }
-            Mock Set-ItemProperty -MockWith { }
-
-            $parameters.Address = $oneIpStaticAddressString
-
-            It 'Should not throw exception' {
-                { $script:result = Set-WinsClientServerStaticAddress @parameters -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return null' {
-                $script:result | Should -BeNullOrEmpty
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 1
-            }
-        }
-
-        Context 'When interface alias was found in system and WINS server address is set to two enties' {
-            Mock Get-NetAdapter -MockWith { $matchAdapter }
-            Mock Set-ItemProperty -MockWith { }
-
-            $parameters.Address = $twoIpStaticAddressString
-
-            It 'Should not throw exception' {
-                { $script:result = Set-WinsClientServerStaticAddress @parameters -Verbose } | Should -Not -Throw
-            }
-
-            It 'Should return null' {
-                $script:result | Should -BeNullOrEmpty
-            }
-
-            It 'Should call expected mocks' {
-                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                Assert-MockCalled -CommandName Set-ItemProperty -Exactly -Times 1
-            }
-        }
-    }
-
-    Describe 'NetworkingDsc.Common\Format-Win32NetworkADapterFilterByNetConnectionID' {
-        Context 'When interface alias has an ''*''' {
-            $interfaceAlias = 'Ether*'
-
-            It 'Should convert the ''*'' to a ''%''' {
-                (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).Contains('%') -eq $True -and
-                (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).Contains('*') -eq $False | Should -Be $True
-            }
-
-            It 'Should change the operator to ''LIKE''' {
-                (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
-            }
-
-            It 'Should look like a usable filter' {
-                Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
-            }
-        }
-
-        Context 'When interface alias has a ''%''' {
-            $interfaceAlias = 'Ether%'
-
-            It 'Should change the operator to ''LIKE''' {
-                (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
-            }
-
-            It 'Should look like a usable filter' {
-                Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
-            }
-        }
-
-        Context 'When interface alias has no wildcards' {
-            $interfaceAlias = 'Ethernet'
-
-            It 'Should look like a usable filter' {
-                Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID="Ethernet"'
+            [PSCustomObject]@{
+                IPAddress    = $singleIP.split('/')[0]
+                prefixLength = $prefixLength
             }
         }
     }
 }
+
+<#
+.SYNOPSIS
+    Returns a filter string for the net adapter CIM instances. Wildcards supported.
+
+.PARAMETER InterfaceAlias
+    Specifies the alias of a network interface. Supports the use of '*' or '%'.
+#>
+function Format-Win32NetworkAdapterFilterByNetConnectionId
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $InterfaceAlias
+    )
+
+    if ($InterfaceAlias.Contains('*'))
+    {
+        $InterfaceAlias = $InterfaceAlias.Replace('*','%')
+    }
+
+    if ($InterfaceAlias.Contains('%'))
+    {
+        $operator = ' LIKE '
+    }
+    else
+    {
+        $operator = '='
+    }
+
+    $returnNetAdapaterFilter = 'NetConnectionID{0}"{1}"' -f $operator, $InterfaceAlias
+
+    return $returnNetAdapaterFilter
+}
+
+Export-ModuleMember -Function @(
+    'Convert-CIDRToSubhetMask'
+    'Find-NetworkAdapter'
+    'Get-DnsClientServerStaticAddress'
+    'Get-WinsClientServerStaticAddress'
+    'Set-WinsClientServerStaticAddress'
+    'Get-IPAddressPrefix'
+    'Format-Win32NetworkAdapterFilterByNetConnectionId'
+)
