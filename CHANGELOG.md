@@ -10,11 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - NetAdapterLso
-  - Protocol now a key field allowing multiple protocol configurations for a single network adapter.
-  - Updated wiki documentation showing configuration overlap with NetAdapterAdvancedProperty.
-  - Fixes [Issue #475](https://github.com/dsccommunity/NetworkingDsc/issues/475)
+  - Protocol now a key field allowing multiple protocol configurations for a single network adapter - fixes [Issue #475](https://github.com/dsccommunity/NetworkingDsc/issues/475).
+  - Updated wiki documentation showing configuration overlap with NetAdapterAdvancedProperty - fixes [Issue #475](https://github.com/dsccommunity/NetworkingDsc/issues/475).
 - NetAdapterAdvancedProperty
-  - Updated wiki documentation showing configuration overlap with NetAdapterLso.
+  - Updated wiki documentation showing configuration overlap with NetAdapterLso - fixes [Issue #475](https://github.com/dsccommunity/NetworkingDsc/issues/475)
 
 ## [8.2.0] - 2020-10-16
 
