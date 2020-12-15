@@ -110,7 +110,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.ApplyingDnsServerAddressesMessage -f ($AddressFamily), ($Address -join ','), $InterfaceAlias)
+        $($script:localizedData.ApplyingDnsServerAddressesMessage -f $AddressFamily, ($Address -join ','), $InterfaceAlias)
         ) -join '')
 
     $dnsServerAddressSplat = @{
@@ -134,8 +134,6 @@ function Set-TargetResource
         }
     }
 
-    # added try/catch block to provide more feedback when
-    # Validate=$true and the validation process fails
     try
     {
         Set-DnsClientServerAddress @dnsServerAddressSplat `
