@@ -10,6 +10,9 @@ Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common'
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
+# Base registry key path for NetBios settings
+$script:hklmInterfacesPath = 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces'
+
 #region check NetBiosSetting enum loaded, if not load
 try
 {
@@ -175,7 +178,7 @@ function Set-TargetResource
                     -ResultClassName Win32_NetworkAdapterConfiguration `
                     -ErrorAction Stop
 
-                Set-NetAdapterNetbiosOptions -NetworkAdapterObj $netAdapterConfig `
+                Set-NetAdapterNetbiosOptions -NetworkAdapterObject $netAdapterConfig `
                                              -InterfaceAlias $netAdapterItem.NetConnectionID `
                                              -Setting $Setting
             }
@@ -189,7 +192,7 @@ function Set-TargetResource
                     -ResultClassName Win32_NetworkAdapterConfiguration `
                     -ErrorAction Stop
 
-        Set-NetAdapterNetbiosOptions -NetworkAdapterObj $netAdapterConfig `
+        Set-NetAdapterNetbiosOptions -NetworkAdapterObject $netAdapterConfig `
                                      -InterfaceAlias $netAdapter.NetConnectionID `
                                      -Setting $Setting
     }
@@ -230,20 +233,20 @@ function Test-TargetResource
 }
 
 <#
-.SYNOPSIS
-    Returns the NetbiosOptions value for a network adapter.
+    .SYNOPSIS
+        Returns the NetbiosOptions value for a network adapter.
 
-.DESCRIPTION
-    Most reliable method of getting this value since network adapters
-    can be in any number of states (e.g. disabled, disconnected)
-    which can cause Win32 classes to not report the value.
+    .DESCRIPTION
+        Most reliable method of getting this value since network adapters
+        can be in any number of states (e.g. disabled, disconnected)
+        which can cause Win32 classes to not report the value.
 
-.PARAMETER NetworkAdapterGUID
-    Network Adapter GUID
+    .PARAMETER NetworkAdapterGUID
+        Network Adapter GUID
 
-.PARAMETER Setting
-    Setting value for this resource which should be one of
-    the following: Default, Enable, Disable
+    .PARAMETER Setting
+        Setting value for this resource which should be one of
+        the following: Default, Enable, Disable
 #>
 function Get-NetAdapterNetbiosOptionsFromRegistry
 {
@@ -267,7 +270,7 @@ function Get-NetAdapterNetbiosOptionsFromRegistry
     $ErrorActionPreference = 'SilentlyContinue'
 
     $registryNetbiosOptions = Get-ItemPropertyValue -Name 'NetbiosOptions' `
-                    -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetworkAdapterGUID)"
+                    -Path "$($script:hklmInterfacesPath)\Tcpip_$($NetworkAdapterGUID)"
 
     $ErrorActionPreference = $currentErrorActionPreference
 
@@ -282,18 +285,21 @@ function Get-NetAdapterNetbiosOptionsFromRegistry
         {
             return 'Default'
         }
+
         1
         {
             return 'Enable'
         }
+
         2
         {
             return 'Disable'
         }
+
         default
         {
             # Unknown value. Returning invalid setting to trigger Set-TargetResource
-            [string[]] $invalidSetting = 'Default','Enable','Disable' | Where-Object -FilterScript {
+            [System.String[]] $invalidSetting = 'Default','Enable','Disable' | Where-Object -FilterScript {
                 $_ -ne $Setting
             }
 
@@ -303,25 +309,25 @@ function Get-NetAdapterNetbiosOptionsFromRegistry
 } # end function Get-NetAdapterNetbiosOptionsFromRegistry
 
 <#
-.SYNOPSIS
-    Configures Netbios on a Network Adapter.
+    .SYNOPSIS
+        Configures Netbios on a Network Adapter.
 
-.DESCRIPTION
-    Uses two methods for configuring Netbios on a Network Adapter.
-    If an interface is IPEnabled, the CIMMethod will be invoked.
-    Otherwise the registry key is configured as this will satisfy
-    network adapters being in alternative states such as disabled
-    or disconnected.
+    .DESCRIPTION
+        Uses two methods for configuring Netbios on a Network Adapter.
+        If an interface is IPEnabled, the CIMMethod will be invoked.
+        Otherwise the registry key is configured as this will satisfy
+        network adapters being in alternative states such as disabled
+        or disconnected.
 
-.PARAMETER NetworkAdapterObj
-    Network Adapter Win32_NetworkAdapterConfiguration Object
+    .PARAMETER NetworkAdapterObject
+        Network Adapter Win32_NetworkAdapterConfiguration Object
 
-.PARAMETER InterfaceAlias
-    Name of the network adapter being configured. Example: Ethernet
+    .PARAMETER InterfaceAlias
+        Name of the network adapter being configured. Example: Ethernet
 
-.PARAMETER Setting
-    Setting value for this resource which should be one of
-    the following: Default, Enable, Disable
+    .PARAMETER Setting
+        Setting value for this resource which should be one of
+        the following: Default, Enable, Disable
 #>
 function Set-NetAdapterNetbiosOptions
 {
@@ -330,7 +336,7 @@ function Set-NetAdapterNetbiosOptions
     (
         [Parameter(Mandatory = $true)]
         [System.Object]
-        $NetworkAdapterObj,
+        $NetworkAdapterObject,
 
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -342,12 +348,12 @@ function Set-NetAdapterNetbiosOptions
         $Setting
     )
 
-    Write-Verbose -Message ($script:localizedData.SetNetBiosMessage -f $InterfaceAlias,$Setting)
+    Write-Verbose -Message ($script:localizedData.SetNetBiosMessage -f $InterfaceAlias, $Setting)
 
     # Only IPEnabled interfaces can be configured via SetTcpipNetbios method.
-    if ($NetworkAdapterObj.IPEnabled)
+    if ($NetworkAdapterObject.IPEnabled)
     {
-        $result = $NetworkAdapterObj |
+        $result = $NetworkAdapterObject |
             Invoke-CimMethod `
                 -MethodName SetTcpipNetbios `
                 -ErrorAction Stop `
@@ -364,17 +370,16 @@ function Set-NetAdapterNetbiosOptions
     else
     {
         <#
-        IPEnabled=$false can only be configured via registry
-        this satisfies disabled and disconnected states
+            IPEnabled=$false can only be configured via registry
+            this satisfies disabled and disconnected states
         #>
         $setItemPropertyParameters = @{
-            Path  = "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces\Tcpip_$($NetworkAdapterObj.SettingID)"
+            Path  = "$($script:hklmInterfacesPath)\Tcpip_$($NetworkAdapterObject.SettingID)"
             Name  = 'NetbiosOptions'
             Value = [NetBiosSetting]::$Setting.value__
         }
         $null = Set-ItemProperty @setItemPropertyParameters
     }
-
 } # end function Set-NetAdapterNetbiosOptions
 
 Export-ModuleMember -Function *-TargetResource
