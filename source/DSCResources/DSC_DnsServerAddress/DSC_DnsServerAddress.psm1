@@ -242,7 +242,7 @@ function Test-TargetResource
     }
     else
     {
-        [String[]] $Address = @()
+        [String[]] $Address = @($null)
     } # if
 
     # Remove the parameters we don't want to splat
