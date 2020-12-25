@@ -57,3 +57,11 @@ your network adapter:
 - *UDPChecksumOffloadIPv6
 - *VMQ
 - *VMQVlanFiltering
+
+The following table shows configuration overlap with [NetAdapterLso](https://github.com/dsccommunity/NetworkingDsc/wiki/NetAdapterLso).
+
+| NetAdapterLso | | NetAdapterAdvancedProperty |
+| -------------------- | ---- | ------------------------------------ |
+| V1IPv4 | = | Not Available |
+| IPv4 | = | *LsoV2IPv4 |
+| IPv6 | = | *LsoV2IPv6 |
