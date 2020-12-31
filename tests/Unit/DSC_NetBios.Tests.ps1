@@ -207,7 +207,9 @@ try
         )
 
         Describe 'DSC_NetBios\Get-TargetResource' -Tag 'Get' {
+        
             Context 'When specifying a single network adapter' {
+            
                 foreach ($testCase in $script:testCases)
                 {
                     Context "When NetBios over TCP/IP is set to '$($testCase.Setting)'" {
@@ -242,6 +244,7 @@ try
                 }
 
                 Context 'When specifying a wildcard network adapter' {
+                
                     Context "When both NetBios over TCP/IP is set to 'Default' on both and Setting is 'Default'" {
                         Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterMulti
                         Mock -CommandName Get-ItemPropertyValue -MockWith { return 0 } `
@@ -406,7 +409,9 @@ try
         }
 
         Describe 'DSC_NetBios\Test-TargetResource' -Tag 'Test' {
+        
             Context 'When specifying a single network adapter' {
+            
                 foreach ($testCase in $script:testCases)
                 {
                     Context "When NetBios over TCP/IP is set to '$($testCase.Setting)'" {
@@ -436,6 +441,7 @@ try
                 }
 
                 Context 'When specifying a wildcard network adapter' {
+                
                     Context "When NetBios set to 'Default' on both and Setting is 'Default'" {
                         Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterMulti
                         Mock -CommandName Get-ItemPropertyValue -MockWith { return 0 } `
@@ -531,7 +537,9 @@ try
         }
 
         Describe 'DSC_NetBios\Set-TargetResource' -Tag 'Set' {
+        
             Context 'When specifying a single network adapter' {
+            
                 foreach ($testCase in $script:testCases)
                 {
                     Context "When NetBios over TCP/IP should be set to '$($testCase.Setting)' and IPEnabled=True" {
@@ -604,6 +612,7 @@ try
                 }
 
                 Context 'When specifying a wildcard network adapter' {
+                
                     Context "When all Interfaces are IPEnabled and NetBios set to 'Default' on both and Setting is 'Disable'" {
                         Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterMulti
                         Mock -CommandName Get-CimAssociatedInstance `
@@ -855,7 +864,9 @@ try
                 }
             }
         }
+        
         Describe 'DSC_NetBios\Get-NetAdapterNetbiosOptionsFromRegistry' {
+        
             foreach ($testCase in $script:testCases)
             {
                 Context "When interface NetBios is '$($testCase.Setting)'" {
@@ -876,6 +887,7 @@ try
                     }
                 }
             }
+            
             Context 'When interface Netbios setting missing from registry' {
                 Mock -CommandName Get-ItemPropertyValue -MockWith { return $null } `
                             -ParameterFilter $script:getItemPropertyValue_NetbiosOptions_One_ParameterFilter
@@ -893,6 +905,7 @@ try
                             -Exactly -Times 1
                 }
             }
+            
             Context 'When Netbios registry setting invalid number' {
                 Mock -CommandName Get-ItemPropertyValue -MockWith { return 5 } `
                             -ParameterFilter $script:getItemPropertyValue_NetbiosOptions_One_ParameterFilter
@@ -910,6 +923,7 @@ try
                             -Exactly -Times 1
                 }
             }
+            
             Context 'When Netbios registry setting invalid letters' {
                 Mock -CommandName Get-ItemPropertyValue -MockWith { return 'invalid' } `
                             -ParameterFilter $script:getItemPropertyValue_NetbiosOptions_One_ParameterFilter
@@ -928,7 +942,9 @@ try
                 }
             }
         }
+        
         Describe 'DSC_NetBios\Set-NetAdapterNetbiosOptions' {
+        
             Context "When NetBios over TCP/IP should be set to 'Default' and IPEnabled=True" {
                 Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterA
                 Mock -CommandName Get-CimAssociatedInstance `
@@ -963,6 +979,7 @@ try
                     Assert-MockCalled -CommandName Get-CimAssociatedInstance -Exactly -Times 1
                 }
             }
+            
             Context "When NetBios over TCP/IP should be set to 'Default' and IPEnabled=False" {
                 Mock -CommandName Get-CimInstance -MockWith $script:mockNetadapterA
                 Mock -CommandName Get-CimAssociatedInstance `
