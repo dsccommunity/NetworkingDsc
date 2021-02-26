@@ -110,72 +110,49 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.ApplyingDnsServerAddressesMessage)
+        $($script:localizedData.ApplyingDnsServerAddressesMessage -f $AddressFamily, ($Address -join ','), $InterfaceAlias)
         ) -join '')
 
-    # If address not passed, set to an empty array
-    if (-not $PSBoundParameters.ContainsKey('Address'))
-    {
-        [String[]] $Address = @()
+    $dnsServerAddressSplat = @{
+        InterfaceAlias = $InterfaceAlias
     }
 
-    # Remove the parameters we don't want to splat
-    $null = $PSBoundParameters.Remove('Address')
-    $null = $PSBoundParameters.Remove('Validate')
-
-    # Get the current DNS Server Addresses based on the parameters given.
-    [String[]] $currentAddress = @(Get-DnsClientServerStaticAddress `
-        @PSBoundParameters `
-        -ErrorAction Stop)
-
-    # Check if the Server addresses are the same as the desired addresses.
-    [Boolean] $addressDifferent = (@(Compare-Object `
-            -ReferenceObject $currentAddress `
-            -DifferenceObject $Address `
-            -SyncWindow 0).Length -gt 0)
-
-    if ($addressDifferent)
+    # Check if Address parameter was used.
+    if (-not $PSBoundParameters.ContainsKey('Address'))
     {
-        $dnsServerAddressSplat = @{
-            InterfaceAlias = $InterfaceAlias
-        }
-
-        if ($Address.Count -eq 0)
-        {
-            # Reset the DNS server address to DHCP
-            $dnsServerAddressSplat += @{
-                ResetServerAddresses = $true
-            }
-
-            Set-DnsClientServerAddress @dnsServerAddressSplat `
-                -ErrorAction Stop
-
-            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($script:localizedData.DNSServersHaveBeenSetToDHCPMessage)
-                ) -join '' )
-        }
-        else
-        {
-            # Set the DNS server address to static
-            $dnsServerAddressSplat += @{
-                Address  = $Address
-                Validate = $Validate
-            }
-
-            Set-DnsClientServerAddress @dnsServerAddressSplat `
-                -ErrorAction Stop
-
-            Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-                $($script:localizedData.DNSServersHaveBeenSetCorrectlyMessage)
-                ) -join '' )
+        # Reset the DNS server address to DHCP
+        $dnsServerAddressSplat += @{
+            ResetServerAddresses = $true
         }
     }
     else
     {
-        # Test will return true in this case
+        # Set the DNS server address to static
+        $dnsServerAddressSplat += @{
+            Address  = $Address
+            Validate = $Validate
+        }
+    }
+
+    try
+    {
+        Set-DnsClientServerAddress @dnsServerAddressSplat `
+            -ErrorAction Stop
+
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($script:localizedData.DNSServersAlreadySetMessage)
+            $($script:localizedData.DNSServersHaveBeenSetCorrectlyMessage)
             ) -join '' )
+    }
+    catch [Microsoft.Management.Infrastructure.CimException]
+    {
+        # catching validation error to provide more descriptive message
+        New-InvalidOperationException `
+            -Message ($script:localizedData.DNSServerValidationError -f ($Address -join ','))
+    }
+    catch
+    {
+        New-InvalidOperationException `
+            -Message ($script:localizedData.SetDNSServerAddressesError -f ($Address -join ','), $_.Exception)
     }
 }
 
@@ -242,7 +219,7 @@ function Test-TargetResource
     }
     else
     {
-        [String[]] $Address = @()
+        [System.String[]] $Address = @()
     } # if
 
     # Remove the parameters we don't want to splat
