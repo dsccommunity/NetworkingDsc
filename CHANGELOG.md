@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - NetAdapterAdvancedProperty
   - Updated wiki documentation showing configuration overlap with
     NetAdapterLso - fixes [Issue #475](https://github.com/dsccommunity/NetworkingDsc/issues/475).
+- DnsServerAddress
+  - Test-TargetResource returns an incorrect value when Address parameter is not set
+    fixes [Issue #211](https://github.com/dsccommunity/NetworkingDsc/issues/211)
 
 ## [8.2.0] - 2020-10-16
 
