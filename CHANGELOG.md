@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - NetAdapterAdvancedProperty
   - Updated wiki documentation showing configuration overlap with
     NetAdapterLso - fixes [Issue #475](https://github.com/dsccommunity/NetworkingDsc/issues/475).
+- Renamed `master` branch to `main` - Fixes [Issue #469](https://github.com/dsccommunity/NetworkingDsc/issues/469).
 
 ## [8.2.0] - 2020-10-16
 

@@ -1,8 +1,8 @@
 # NetworkingDsc
 
-[![Build Status](https://dev.azure.com/dsccommunity/NetworkingDsc/_apis/build/status/dsccommunity.NetworkingDsc?branchName=master)](https://dev.azure.com/dsccommunity/NetworkingDsc/_build/latest?definitionId=16&branchName=master)
-![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/NetworkingDsc/16/master)
-[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/NetworkingDsc/16/master)](https://dsccommunity.visualstudio.com/NetworkingDsc/_test/analytics?definitionId=16&contextType=build)
+[![Build Status](https://dev.azure.com/dsccommunity/NetworkingDsc/_apis/build/status/dsccommunity.NetworkingDsc?branchName=main)](https://dev.azure.com/dsccommunity/NetworkingDsc/_build/latest?definitionId=16&branchName=main)
+![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/NetworkingDsc/16/main)
+[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/NetworkingDsc/16/main)](https://dsccommunity.visualstudio.com/NetworkingDsc/_test/analytics?definitionId=16&contextType=build)
 [![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/NetworkingDsc?label=NetworkingDsc%20Preview)](https://www.powershellgallery.com/packages/NetworkingDsc/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/NetworkingDsc?label=NetworkingDsc)](https://www.powershellgallery.com/packages/NetworkingDsc/)
 
@@ -12,7 +12,7 @@ This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 
 ## Releases
 
-For each merge to the branch `master` a preview release will be
+For each merge to the branch `main` a preview release will be
 deployed to [PowerShell Gallery](https://www.powershellgallery.com/).
 Periodically a release version tag will be pushed which will deploy a
 full release to [PowerShell Gallery](https://www.powershellgallery.com/).
