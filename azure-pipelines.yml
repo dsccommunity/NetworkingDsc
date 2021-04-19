@@ -238,14 +238,6 @@ stages:
               testRunTitle: 'Unit (Windows Server 2019)'
             condition: succeededOrFailed()
 
-          - task: PublishCodeCoverageResults@1
-            displayName: 'Publish Code Coverage'
-            condition: succeededOrFailed()
-            inputs:
-              codeCoverageTool: 'JaCoCo'
-              summaryFileLocation: '$(buildFolderName)/$(testResultFolderName)/CodeCov*.xml'
-              pathToSources: '$(Build.SourcesDirectory)/output/$(dscBuildVariable.RepositoryName)'
-
       - job: Test_Integration_2019
         displayName: 'Integration (Windows Server 2019)'
         pool:
