@@ -6,7 +6,6 @@
 [![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/NetworkingDsc?label=NetworkingDsc%20Preview)](https://www.powershellgallery.com/packages/NetworkingDsc/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/NetworkingDsc?label=NetworkingDsc)](https://www.powershellgallery.com/packages/NetworkingDsc/)
 [![codecov](https://codecov.io/gh/dsccommunity/NetworkingDsc/branch/main/graph/badge.svg)](https://codecov.io/gh/dsccommunity/NetworkingDsc)
-![Azure DevOps coverage (main)](https://img.shields.io/azure-devops/coverage/dsccommunity/NetworkingDsc/14/main)
 
 ## Code of Conduct
 
