@@ -929,6 +929,34 @@ try
                 }
             }
         }
+
+        Describe 'DSC_ProxySettings\Get-ProxySettingsRegistryKeyPath' {
+            Context 'When scope is default (LocalMachine)' {
+                It 'Should return "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections"' {
+                    Get-ProxySettingsRegistryKeyPath | Should -BeExactly 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections'
+                }
+            }
+
+            Context 'When scope is CurrentUser' {
+                It 'Should return "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections"' {
+                    Get-ProxySettingsRegistryKeyPath | Should -BeExactly 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections'
+                }
+            }
+        }
+
+        Describe 'DSC_ProxySettings\ConvertTo-Win32RegistryPath' {
+            Context 'When path contains "HKLM:\SOFTWARE"' {
+                It 'Should return "HKEY_LOCAL_MACHINE\SOFTWARE"' {
+                    ConvertTo-Win32RegistryPath -Path 'HKLM:\SOFTWARE' | Should -Be 'HKEY_LOCAL_MACHINE\SOFTWARE'
+                }
+            }
+
+            Context 'When path contains "HKCU:\SOFTWARE"' {
+                It 'Should return "HKEY_CURRENT_USER\SOFTWARE"' {
+                    ConvertTo-Win32RegistryPath -Path 'HKCU:\SOFTWARE' | Should -Be 'HKEY_CURRENT_USER\SOFTWARE'
+                }
+            }
+        }
     }
 }
 finally
