@@ -939,7 +939,7 @@ try
 
             Context 'When scope is CurrentUser' {
                 It 'Should return "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections"' {
-                    Get-ProxySettingsRegistryKeyPath | Should -BeExactly 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections'
+                    Get-ProxySettingsRegistryKeyPath -Scope 'CurrentUser' | Should -BeExactly 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections'
                 }
             }
         }
@@ -953,7 +953,7 @@ try
 
             Context 'When path contains "HKCU:\SOFTWARE"' {
                 It 'Should return "HKEY_CURRENT_USER\SOFTWARE"' {
-                    ConvertTo-Win32RegistryPath -Path 'HKCU:\SOFTWARE' | Should -Be 'HKEY_CURRENT_USER\SOFTWARE'
+                    ConvertTo-Win32RegistryPath -Path 'HKCU:\Software' | Should -Be 'HKEY_CURRENT_USER\Software'
                 }
             }
         }
