@@ -11,5 +11,6 @@ class DSC_NetAdapterName : OMI_BaseResource
     [Write, Description("This is the interface GUID of the network adapter to find.")] String InterfaceGuid;
     [Write, Description("This is the driver description of the network adapter.")] String DriverDescription;
     [Write, Description("This is the interface number of the network adapter if more than one are returned by the parameters.")] UInt32 InterfaceNumber;
+    [Write, Description("This switch will causes hidden network adapters to be included in the search.")] Boolean IncludeHidden;
     [Write, Description("This switch will suppress an error occurring if more than one matching adapter matches the parameters passed.")] Boolean IgnoreMultipleMatchingAdapters;
 };

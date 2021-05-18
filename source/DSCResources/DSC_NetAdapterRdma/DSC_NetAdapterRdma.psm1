@@ -17,6 +17,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .PARAMETER Name
         Specifies the name of network adapter for which RDMA needs
         to be configured.
+
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
 #>
 function Get-TargetResource
 {
@@ -26,7 +29,11 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $Name
+        $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false
     )
 
     $configuration = @{
@@ -37,7 +44,9 @@ function Get-TargetResource
     {
         Write-Verbose -Message ($script:localizedData.GetNetAdapterRdmaMessage -f $Name)
 
-        $netAdapterRdma = Get-NetAdapterRdma -Name $Name -ErrorAction Stop
+        $netAdapterRdma = Get-NetAdapterRdma -Name $Name `
+                                             -IncludeHidden:$IncludeHidden `
+                                             -ErrorAction Stop
     }
     catch
     {
@@ -63,6 +72,9 @@ function Get-TargetResource
         Specifies the name of network adapter for which RDMA needs
         to be configured.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER Enabled
         Specifies if the RDMA configuration should be enabled or disabled.
         Defaults to $true.
@@ -78,6 +90,10 @@ function Set-TargetResource
 
         [Parameter()]
         [System.Boolean]
+        $IncludeHidden = $false,
+
+        [Parameter()]
+        [System.Boolean]
         $Enabled = $true
     )
 
@@ -85,7 +101,9 @@ function Set-TargetResource
     {
         Write-Verbose -Message ($script:localizedData.GetNetAdapterRdmaMessage -f $Name)
 
-        $netAdapterRdma = Get-NetAdapterRdma -Name $Name -ErrorAction Stop
+        $netAdapterRdma = Get-NetAdapterRdma -Name $Name `
+                                             -IncludeHidden:$IncludeHidden `
+                                             -ErrorAction Stop
     }
     catch
     {
@@ -101,7 +119,9 @@ function Set-TargetResource
         {
             Write-Verbose -Message ($script:localizedData.SetNetAdapterRdmaMessage -f $Name, $Enabled)
 
-            Set-NetAdapterRdma -Name $Name -Enabled $Enabled
+            Set-NetAdapterRdma -Name $Name `
+                               -IncludeHidden:$IncludeHidden `
+                               -Enabled $Enabled
         }
     }
 }
@@ -113,6 +133,9 @@ function Set-TargetResource
     .PARAMETER Name
         Specifies the name of network adapter for which RDMA needs
         to be configured.
+
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
 
     .PARAMETER Enabled
         Specifies if the RDMA configuration should be enabled or disabled.
@@ -130,6 +153,10 @@ function Test-TargetResource
 
         [Parameter()]
         [System.Boolean]
+        $IncludeHidden = $false,
+
+        [Parameter()]
+        [System.Boolean]
         $Enabled = $true
     )
 
@@ -137,7 +164,9 @@ function Test-TargetResource
     {
         Write-Verbose -Message ($script:localizedData.GetNetAdapterRdmaMessage -f $Name)
 
-        $netAdapterRdma = Get-NetAdapterRdma -Name $Name -ErrorAction Stop
+        $netAdapterRdma = Get-NetAdapterRdma -Name $Name `
+                                             -IncludeHidden:$IncludeHidden `
+                                             -ErrorAction Stop
     }
     catch
     {

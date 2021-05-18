@@ -17,6 +17,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .PARAMETER Name
         Specifies the Name of the network adapter to check.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER Protocol
         Specifies which protocol to target.
 
@@ -32,6 +35,10 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [String]
         $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("IPv4", "IPv6", "All")]
@@ -100,6 +107,9 @@ function Get-TargetResource
     .PARAMETER Name
         Specifies the Name of the network adapter to check.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER Protocol
         Specifies which protocol to target.
 
@@ -114,6 +124,10 @@ function Set-TargetResource
         [Parameter(Mandatory = $true)]
         [String]
         $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("IPv4", "IPv6", "All")]
@@ -177,6 +191,9 @@ function Set-TargetResource
     .PARAMETER Name
         Specifies the Name of the network adapter to check.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER Protocol
         Specifies which protocol to target.
 
@@ -192,6 +209,10 @@ function Test-TargetResource
         [Parameter(Mandatory = $true)]
         [String]
         $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("IPv4", "IPv6", "All")]

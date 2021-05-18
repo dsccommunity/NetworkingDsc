@@ -17,6 +17,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .PARAMETER InterfaceAlias
         Alias of the network interface for which the WINS server address is set.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER Address
         The desired WINS Server address(es). Exclude to remove existing servers.
 #>
@@ -29,7 +32,11 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $InterfaceAlias
+        $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false
     )
 
     Assert-ResourceProperty @PSBoundParameters
@@ -37,7 +44,9 @@ function Get-TargetResource
     Write-Verbose -Message "$($MyInvocation.MyCommand): $($script:localizedData.GettingWinsServerAddressesMessage)"
 
     # Get the current WINS Server Addresses based on the parameters given.
-    $currentAddress = [string[]]@(Get-WinsClientServerStaticAddress -InterfaceAlias $InterfaceAlias -ErrorAction Stop)
+    $currentAddress = [string[]]@(Get-WinsClientServerStaticAddress -InterfaceAlias $InterfaceAlias `
+                                                                    -IncludeHidden:$IncludeHidden `
+                                                                    -ErrorAction Stop)
 
     $returnValue = @{
         InterfaceAlias = $InterfaceAlias
@@ -54,6 +63,9 @@ function Get-TargetResource
     .PARAMETER InterfaceAlias
         Alias of the network interface for which the WINS server address is set.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER Address
         The desired WINS Server address(es). Exclude to remove existing servers.
 #>
@@ -68,6 +80,10 @@ function Set-TargetResource
         $InterfaceAlias,
 
         [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
+        [Parameter()]
         [AllowEmptyCollection()]
         [System.String[]]
         $Address
@@ -77,8 +93,10 @@ function Set-TargetResource
 
     Write-Verbose -Message "$($MyInvocation.MyCommand): $($script:localizedData.ApplyingWinsServerAddressesMessage)"
 
-    Set-WinsClientServerStaticAddress -InterfaceAlias $InterfaceAlias -Address $Address -ErrorAction Stop
-
+    Set-WinsClientServerStaticAddress -InterfaceAlias $InterfaceAlias `
+                                      -IncludeHidden:$IncludeHidden `
+                                      -Address $Address `
+                                      -ErrorAction Stop
 }
 
 <#
@@ -87,6 +105,9 @@ function Set-TargetResource
 
     .PARAMETER InterfaceAlias
         Alias of the network interface for which the WINS server address is set.
+
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
 
     .PARAMETER Address
         The desired WINS Server address(es). Exclude to remove existing servers.
@@ -103,6 +124,10 @@ function Test-TargetResource
         $InterfaceAlias,
 
         [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
+        [Parameter()]
         [AllowEmptyCollection()]
         [System.String[]]
         $Address
@@ -112,7 +137,8 @@ function Test-TargetResource
 
     Assert-ResourceProperty @PSBoundParameters
 
-    $currentState = Get-TargetResource -InterfaceAlias $InterfaceAlias
+    $currentState = Get-TargetResource -InterfaceAlias $InterfaceAlias `
+                                       -IncludeHidden:$IncludeHidden
     $desiredState = $PSBoundParameters
 
     $result = Test-DscParameterState -CurrentValues $currentState -DesiredValues $desiredState
@@ -142,12 +168,16 @@ function Assert-ResourceProperty
         $InterfaceAlias,
 
         [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
+        [Parameter()]
         [AllowEmptyCollection()]
         [System.String[]]
         $Address
     )
 
-    if (-not (Get-NetAdapter | Where-Object Name -EQ $InterfaceAlias))
+    if (-not (Get-NetAdapter -IncludeHidden:$IncludeHidden | Where-Object Name -EQ $InterfaceAlias))
     {
         New-InvalidArgumentException `
             -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias) `

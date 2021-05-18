@@ -17,6 +17,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .PARAMETER NetworkAdapterName
         Specifies the name of the network adapter to set the advanced property for.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER RegistryKeyword
         Specifies the registry keyword that should be in desired state.
 
@@ -32,6 +35,10 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $NetworkAdapterName,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -51,6 +58,7 @@ function Get-TargetResource
     {
         $netAdapterAdvancedProperty = Get-NetAdapterAdvancedProperty `
             -Name $networkAdapterName `
+            -IncludeHidden:$IncludeHidden `
             -RegistryKeyword $RegistryKeyword `
             -ErrorAction Stop
     }
@@ -85,6 +93,9 @@ function Get-TargetResource
     .PARAMETER NetworkAdapterName
         Specifies the name of the network adapter to set the advanced property for.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER RegistryKeyword
         Specifies the registry keyword that should be in desired state.
 
@@ -99,6 +110,10 @@ function Set-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $NetworkAdapterName,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -118,6 +133,7 @@ function Set-TargetResource
     {
         $netAdapterAdvancedProperty = Get-NetAdapterAdvancedProperty `
             -Name $networkAdapterName `
+            -IncludeHidden:$IncludeHidden `
             -RegistryKeyword $RegistryKeyword `
             -ErrorAction Stop
     }
@@ -146,6 +162,7 @@ function Set-TargetResource
             Set-NetAdapterAdvancedProperty `
                 -RegistryValue $RegistryValue `
                 -Name $networkAdapterName `
+                -IncludeHidden:$IncludeHidden `
                 -RegistryKeyword $RegistryKeyword
         }
     }
@@ -157,6 +174,9 @@ function Set-TargetResource
 
     .PARAMETER NetworkAdapterName
         Specifies the name of the network adapter to set the advanced property for.
+
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
 
     .PARAMETER RegistryKeyword
         Specifies the registry keyword that should be in desired state.
@@ -173,6 +193,10 @@ function Test-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $NetworkAdapterName,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -192,6 +216,7 @@ function Test-TargetResource
     {
         $netAdapterAdvancedProperty = Get-NetAdapterAdvancedProperty `
             -Name $networkAdapterName `
+            -IncludeHidden:$IncludeHidden `
             -RegistryKeyword $RegistryKeyword `
             -ErrorAction Stop
     }

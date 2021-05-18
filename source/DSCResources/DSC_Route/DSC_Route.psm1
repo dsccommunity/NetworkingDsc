@@ -17,6 +17,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .PARAMETER InterfaceAlias
         Specifies the alias of a network interface.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER AddressFamily
         Specify the IP address family.
 
@@ -38,6 +41,10 @@ function Get-TargetResource
         [ValidateNotNullOrEmpty()]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
@@ -109,6 +116,9 @@ function Get-TargetResource
     .PARAMETER InterfaceAlias
         Specifies the alias of a network interface.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER AddressFamily
         Specify the IP address family.
 
@@ -144,6 +154,10 @@ function Set-TargetResource
         [ValidateNotNullOrEmpty()]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
@@ -265,6 +279,9 @@ function Set-TargetResource
     .PARAMETER InterfaceAlias
         Specifies the alias of a network interface.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER AddressFamily
         Specify the IP address family.
 
@@ -301,6 +318,10 @@ function Test-TargetResource
         [ValidateNotNullOrEmpty()]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
@@ -444,6 +465,9 @@ function Test-TargetResource
     .PARAMETER InterfaceAlias
         Specifies the alias of a network interface.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER AddressFamily
         Specify the IP address family.
 
@@ -478,6 +502,10 @@ function Get-Route
         [ValidateNotNullOrEmpty()]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
@@ -542,6 +570,9 @@ function Get-Route
     .PARAMETER InterfaceAlias
         Specifies the alias of a network interface.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER AddressFamily
         Specify the IP address family.
 
@@ -578,6 +609,10 @@ function Assert-ResourceProperty
         [System.String]
         $InterfaceAlias,
 
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
         [System.String]
@@ -613,7 +648,7 @@ function Assert-ResourceProperty
     )
 
     # Validate the Adapter exists
-    if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
+    if (-not (Get-NetAdapter -IncludeHidden:$IncludeHidden | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
         New-InvalidArgumentException `
             -Message $($($script:localizedData.InterfaceNotAvailableError) -f $InterfaceAlias) `

@@ -16,6 +16,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
     .PARAMETER InterfaceAlias
         Specifies the alias for the Interface that is being changed.
+
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
 #>
 function Get-TargetResource
 {
@@ -25,7 +28,11 @@ function Get-TargetResource
     (
         [Parameter(Position = 0, Mandatory = $true)]
         [System.String]
-        $InterfaceAlias
+        $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -49,6 +56,9 @@ function Get-TargetResource
     .PARAMETER InterfaceAlias
         Specifies the alias for the Interface that is being changed.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER IPv4Connectivity
         Specifies the IPv4 Connection Value.
 
@@ -66,6 +76,10 @@ function Set-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter()]
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
@@ -99,6 +113,9 @@ function Set-TargetResource
     .PARAMETER InterfaceAlias
         Specifies the alias for the Interface that is being changed.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER IPv4Connectivity
         Specifies the IPv4 Connection Value.
 
@@ -117,6 +134,10 @@ function Test-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter()]
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
@@ -180,6 +201,9 @@ function Test-TargetResource
     .PARAMETER InterfaceAlias
         Specifies the alias for the Interface that is being changed.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER IPv4Connectivity
         Specifies the IPv4 Connection Value.
 
@@ -199,6 +223,10 @@ function Assert-ResourceProperty
         $InterfaceAlias,
 
         [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
+        [Parameter()]
         [ValidateSet('Disconnected', 'NoTraffic', 'Subnet', 'LocalNetwork', 'Internet')]
         [System.String]
         $IPv4Connectivity,
@@ -214,7 +242,7 @@ function Assert-ResourceProperty
         $NetworkCategory
     )
 
-    if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
+    if (-not (Get-NetAdapter -IncludeHidden:$IncludeHidden | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
         New-InvalidOperationException `
             -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias)
