@@ -99,6 +99,10 @@ try
                     [System.String]
                     $Name,
 
+                    [Parameter()]
+                    [System.Boolean]
+                    $IncludeHidden = $false,
+
                     [Parameter(Mandatory = $true)]
                     [System.Boolean]
                     $Enabled = $true
