@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated build to use `Sampler.GitHubTasks` - Fixes [Issue #489](https://github.com/dsccommunity/NetworkingDsc/issues/489).
 - Added support for publishing code coverage to `CodeCov.io` and
   Azure Pipelines - Fixes [Issue #491](https://github.com/dsccommunity/NetworkingDsc/issues/491).
+- Minor change to environment variable lookup.
 
 ## [8.2.0] - 2020-10-16
 
