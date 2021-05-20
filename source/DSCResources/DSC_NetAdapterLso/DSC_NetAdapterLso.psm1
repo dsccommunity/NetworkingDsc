@@ -50,7 +50,9 @@ function Get-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterLso `
+            -Name $Name `
+            -ErrorAction Stop
     }
     catch
     {
@@ -131,7 +133,9 @@ function Set-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterLso `
+            -Name $Name `
+            -ErrorAction Stop
     }
     catch
     {
@@ -154,7 +158,9 @@ function Set-TargetResource
                             $Name, $Protocol, $($netAdapter.V1IPv4Enabled.ToString()), $($State.ToString()) )
                 ) -join '')
 
-            Set-NetAdapterLso -Name $Name -V1IPv4Enabled $State
+            Set-NetAdapterLso `
+                -Name $Name `
+                -V1IPv4Enabled $State
         }
         elseif ($Protocol -eq 'IPv4' -and $State -ne $netAdapter.IPv4Enabled)
         {
@@ -164,7 +170,9 @@ function Set-TargetResource
                             $Name, $Protocol, $($netAdapter.IPv4Enabled.ToString()), $($State.ToString()) )
                 ) -join '')
 
-            Set-NetAdapterLso -Name $Name -IPv4Enabled $State
+            Set-NetAdapterLso `
+                -Name $Name `
+                -IPv4Enabled $State
         }
         elseif ($Protocol -eq 'IPv6' -and $State -ne $netAdapter.IPv6Enabled)
         {
@@ -174,7 +182,9 @@ function Set-TargetResource
                             $Name, $Protocol, $($netAdapter.IPv6Enabled.ToString()), $($State.ToString()) )
                 ) -join '')
 
-            Set-NetAdapterLso -Name $Name -IPv6Enabled $State
+            Set-NetAdapterLso `
+                -Name $Name `
+                -IPv6Enabled $State
         }
     }
 }
@@ -219,7 +229,9 @@ function Test-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterLso `
+            -Name $Name `
+            -ErrorAction Stop
     }
     catch
     {

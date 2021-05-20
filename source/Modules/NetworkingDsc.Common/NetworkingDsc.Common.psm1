@@ -396,7 +396,9 @@ function Get-WinsClientServerStaticAddress
     Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.GettingWinsServerStaticAddressMessage -f $InterfaceAlias)")
 
     # Look up the interface Guid
-    $adapter = Get-NetAdapter -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
+    $adapter = Get-NetAdapter `
+        -InterfaceAlias $InterfaceAlias `
+        -ErrorAction SilentlyContinue
 
     if (-not $adapter)
     {
@@ -458,7 +460,9 @@ function Set-WinsClientServerStaticAddress
     Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.SettingWinsServerStaticAddressMessage -f $InterfaceAlias, ($Address -join ', '))")
 
     # Look up the interface Guid
-    $adapter = Get-NetAdapter -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
+    $adapter = Get-NetAdapter `
+        -InterfaceAlias $InterfaceAlias `
+        -ErrorAction SilentlyContinue
 
     if (-not $adapter)
     {

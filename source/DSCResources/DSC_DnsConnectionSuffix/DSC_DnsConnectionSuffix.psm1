@@ -60,7 +60,9 @@ function Get-TargetResource
         $Ensure = 'Present'
     )
 
-    $dnsClient = Get-DnsClient -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
+    $dnsClient = Get-DnsClient `
+        -InterfaceAlias $InterfaceAlias `
+        -ErrorAction SilentlyContinue
 
     $targetResource = @{
         InterfaceAlias                 = $dnsClient.InterfaceAlias

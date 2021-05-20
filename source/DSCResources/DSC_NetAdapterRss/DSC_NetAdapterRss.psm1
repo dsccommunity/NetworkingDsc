@@ -42,7 +42,9 @@ function Get-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterRss `
+            -Name $Name `
+            -ErrorAction Stop
     }
     catch
     {
@@ -97,7 +99,9 @@ function Set-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterRss `
+            -Name $Name `
+            -ErrorAction Stop
     }
     catch
     {
@@ -120,7 +124,9 @@ function Set-TargetResource
                             $Name, $Enabled, $($netAdapter.Enabled.ToString()), $($Enabled.ToString()) )
                 ) -join '')
 
-            Set-NetAdapterRss -Name $Name -Enabled:$Enabled
+            Set-NetAdapterRss `
+                -Name $Name `
+                -Enabled:$Enabled
         }
     }
 }
@@ -157,7 +163,9 @@ function Test-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterRss `
+            -Name $Name `
+            -ErrorAction Stop
     }
     catch
     {
