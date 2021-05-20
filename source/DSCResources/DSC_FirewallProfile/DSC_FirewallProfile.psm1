@@ -245,7 +245,10 @@ function Set-TargetResource
         $parameterNewValue = (Get-Variable -Name ($parameter.name)).Value
 
         if ($PSBoundParameters.ContainsKey($parameter.Name) `
-            -and (Compare-Object -ReferenceObject $parameterSourceValue -DifferenceObject $parameterNewValue -SyncWindow 0))
+            -and (Compare-Object `
+                -ReferenceObject $parameterSourceValue `
+                -DifferenceObject $parameterNewValue `
+                -SyncWindow 0))
         {
             $changeParameters += @{
                 $($parameter.name) = $parameterNewValue
