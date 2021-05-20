@@ -85,6 +85,10 @@ try
                 $InputObject,
 
                 [Parameter()]
+                [System.Boolean]
+                $IncludeHidden = $false,
+
+                [Parameter()]
                 [System.String]
                 $NewName
             )
