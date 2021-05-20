@@ -222,7 +222,7 @@ function Get-HostEntry
         $HostName
     )
 
-    $hostPath = "$env:windir\System32\drivers\etc\hosts"
+    $hostPath = "$env:SystemRoot\System32\drivers\etc\hosts"
 
     $allHosts = Get-Content -Path $hostPath | Where-Object -FilterScript {
         [System.String]::IsNullOrEmpty($_) -eq $false -and $_.StartsWith('#') -eq $false
