@@ -17,6 +17,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .PARAMETER Name
         Specifies the name of the network adapter.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER State
         Specifies the desired state for the network adapter.
         Not used in Get-TargetResource.
@@ -31,6 +34,10 @@ function Get-TargetResource
         [System.String]
         $Name,
 
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
         [System.String]
@@ -44,7 +51,9 @@ function Get-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapter -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapter -Name $Name `
+                                     -IncludeHidden:$IncludeHidden `
+                                     -ErrorAction Stop
     }
     catch
     {
@@ -90,6 +99,9 @@ function Get-TargetResource
     .PARAMETER Name
         Specifies the name of the network adapter.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER State
         Specifies the desired state for the network adapter.
 #>
@@ -101,6 +113,10 @@ function Set-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]
@@ -115,7 +131,9 @@ function Set-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapter -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapter -Name $Name `
+                                     -IncludeHidden:$IncludeHidden `
+                                     -ErrorAction Stop
     }
     catch
     {
@@ -131,11 +149,16 @@ function Set-TargetResource
         {
             if ($State -eq 'Disabled')
             {
-                Disable-NetAdapter -Name $Name -Confirm:$false -ErrorAction Stop
+                Disable-NetAdapter -Name $Name `
+                                   -IncludeHidden:$IncludeHidden `
+                                   -Confirm:$false `
+                                   -ErrorAction Stop
             }
             else
             {
-                Enable-NetAdapter -Name $Name -ErrorAction Stop
+                Enable-NetAdapter -Name $Name `
+                                  -IncludeHidden:$IncludeHidden `
+                                  -ErrorAction Stop
             }
         }
         catch
@@ -155,6 +178,9 @@ function Set-TargetResource
     .PARAMETER Name
         Specifies the name of the network adapter.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER State
         Specifies the state of the network adapter.
 #>
@@ -167,6 +193,10 @@ function Test-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Enabled', 'Disabled')]

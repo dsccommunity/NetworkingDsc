@@ -17,6 +17,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .PARAMETER InterfaceAlias
         Specifies the alias of a network interface. Supports the use of '*'.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER ComponentId
         Specifies the underlying name of the transport or filter in the following
         form - ms_xxxx, such as ms_tcpip.
@@ -34,6 +37,10 @@ function Get-TargetResource
         [ValidateNotNullOrEmpty()]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -86,6 +93,9 @@ function Get-TargetResource
     .PARAMETER InterfaceAlias
         Specifies the alias of a network interface. Supports the use of '*'.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER ComponentId
         Specifies the underlying name of the transport or filter in the following
         form - ms_xxxx, such as ms_tcpip.
@@ -102,6 +112,10 @@ function Set-TargetResource
         [ValidateNotNullOrEmpty()]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -151,6 +165,9 @@ function Set-TargetResource
     .PARAMETER InterfaceAlias
         Specifies the alias of a network interface. Supports the use of '*'.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER ComponentId
         Specifies the underlying name of the transport or filter in the following
         form - ms_xxxx, such as ms_tcpip.
@@ -168,6 +185,10 @@ function Test-TargetResource
         [ValidateNotNullOrEmpty()]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -231,6 +252,9 @@ function Test-TargetResource
     .PARAMETER InterfaceAlias
         Specifies the alias of a network interface. Supports the use of '*'.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER ComponentId
         Specifies the underlying name of the transport or filter in the following
         form - ms_xxxx, such as ms_tcpip.
@@ -249,6 +273,10 @@ function Get-Binding
         [System.String]
         $InterfaceAlias,
 
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
@@ -260,7 +288,7 @@ function Get-Binding
         $State = 'Enabled'
     )
 
-    if (-not (Get-NetAdapter -Name $InterfaceAlias -ErrorAction SilentlyContinue))
+    if (-not (Get-NetAdapter -Name $InterfaceAlias -IncludeHidden:$IncludeHidden -ErrorAction SilentlyContinue))
     {
         New-InvalidArgumentException `
             -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias) `

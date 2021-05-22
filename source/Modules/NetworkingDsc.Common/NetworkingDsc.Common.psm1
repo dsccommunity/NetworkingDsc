@@ -85,6 +85,9 @@ function Convert-CIDRToSubhetMask
     .PARAMETER Name
         This is the name of network adapter to find.
 
+    .PARAMETER IncludeHidden
+        This switch will include hidden adapters.
+
     .PARAMETER PhysicalMediaType
         This is the media type of the network adapter to find.
 
@@ -123,6 +126,10 @@ function Find-NetworkAdapter
         [Parameter()]
         [System.String]
         $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter()]
         [System.String]
@@ -215,13 +222,13 @@ function Find-NetworkAdapter
                 $($script:localizedData.AllNetAdaptersFoundMessage)
             ) -join '')
 
-        $matchingAdapters = @(Get-NetAdapter)
+        $matchingAdapters = @(Get-NetAdapter -IncludeHidden:$IncludeHidden)
     }
     else
     {
         # Join all the filters together
         $adapterFilterScript = '(' + ($adapterFilters -join ' -and ') + ')'
-        $matchingAdapters = @(Get-NetAdapter |
+        $matchingAdapters = @(Get-NetAdapter -IncludeHidden:$IncludeHidden |
             Where-Object -FilterScript ([ScriptBlock]::Create($adapterFilterScript)))
     }
 
@@ -296,6 +303,9 @@ function Find-NetworkAdapter
     .PARAMETER InterfaceAlias
         Alias of the network interface to get the static DNS Server addresses from.
 
+    .PARAMETER IncludeHidden
+        This switch will include hidden adapters.
+
     .PARAMETER AddressFamily
         IP address family.
 #>
@@ -310,6 +320,10 @@ function Get-DnsClientServerStaticAddress
         [System.String]
         $InterfaceAlias,
 
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
         [Parameter(Mandatory = $true)]
         [ValidateSet('IPv4', 'IPv6')]
         [System.String]
@@ -323,6 +337,7 @@ function Get-DnsClientServerStaticAddress
     # Look up the interface Guid
     $adapter = Get-NetAdapter `
         -InterfaceAlias $InterfaceAlias `
+        -IncludeHidden:$IncludeHidden `
         -ErrorAction SilentlyContinue
 
     if (-not $adapter)
@@ -380,6 +395,9 @@ function Get-DnsClientServerStaticAddress
 
     .PARAMETER InterfaceAlias
         Alias of the network interface to get the static WINS Server addresses from.
+
+    .PARAMETER IncludeHidden
+        This switch will include hidden adapters.
 #>
 function Get-WinsClientServerStaticAddress
 {
@@ -390,13 +408,20 @@ function Get-WinsClientServerStaticAddress
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
-        $InterfaceAlias
+        $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false
     )
 
     Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.GettingWinsServerStaticAddressMessage -f $InterfaceAlias)")
 
     # Look up the interface Guid
-    $adapter = Get-NetAdapter -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
+    $adapter = Get-NetAdapter `
+        -InterfaceAlias $InterfaceAlias `
+        -IncludeHidden:$IncludeHidden `
+        -ErrorAction SilentlyContinue
 
     if (-not $adapter)
     {
@@ -438,6 +463,12 @@ function Get-WinsClientServerStaticAddress
 
     .PARAMETER InterfaceAlias
         Alias of the network interface to set the static WINS Server addresses on.
+
+    .PARAMETER IncludeHidden
+        This switch will include hidden adapters.
+
+    .PARAMETER Address
+        The WINS server IP addresses to configure.
 #>
 function Set-WinsClientServerStaticAddress
 {
@@ -449,6 +480,10 @@ function Set-WinsClientServerStaticAddress
         [System.String]
         $InterfaceAlias,
 
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
         [Parameter(Mandatory = $true)]
         [AllowEmptyCollection()]
         [System.String[]]
@@ -458,7 +493,10 @@ function Set-WinsClientServerStaticAddress
     Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.SettingWinsServerStaticAddressMessage -f $InterfaceAlias, ($Address -join ', '))")
 
     # Look up the interface Guid
-    $adapter = Get-NetAdapter -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
+    $adapter = Get-NetAdapter `
+        -InterfaceAlias $InterfaceAlias `
+        -IncludeHidden:$IncludeHidden `
+        -ErrorAction SilentlyContinue
 
     if (-not $adapter)
     {

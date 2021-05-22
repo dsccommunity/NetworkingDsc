@@ -2,5 +2,6 @@
 class DSC_NetAdapterRss : OMI_BaseResource
 {
     [Key, Description("Specifies the Name of network adapter.")] String Name;
+    [Write, Description("This switch will causes hidden network adapters to be included in the search.")] Boolean IncludeHidden;
     [Required, Description("Specifies whether RSS should be enabled or disabled.")] Boolean Enabled;
 };

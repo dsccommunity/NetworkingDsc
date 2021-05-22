@@ -21,6 +21,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .PARAMETER Name
         This is the name of the network adapter to find.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER PhysicalMediaType
         This is the media type of the network adapter to find.
 
@@ -67,6 +70,10 @@ function Get-TargetResource
         $Name,
 
         [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
+        [Parameter()]
         [System.String]
         $PhysicalMediaType,
 
@@ -111,6 +118,7 @@ function Get-TargetResource
 
     $adapter = Find-NetworkAdapter `
         -Name $NewName `
+        -IncludeHidden:$IncludeHidden `
         -ErrorAction SilentlyContinue
 
     if (-not $adapter)
@@ -132,6 +140,7 @@ function Get-TargetResource
 
     $returnValue = @{
         Name                           = $adapter.Name
+        IncludeHidden                  = $IncludeHidden
         PhysicalMediaType              = $adapter.PhysicalMediaType
         Status                         = $adapter.Status
         MacAddress                     = $adapter.MacAddress
@@ -155,6 +164,9 @@ function Get-TargetResource
 
     .PARAMETER Name
         This is the name of the network adapter to find.
+
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
 
     .PARAMETER PhysicalMediaType
         This is the media type of the network adapter to find.
@@ -199,6 +211,10 @@ function Set-TargetResource
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter()]
         [System.String]
@@ -253,7 +269,8 @@ function Set-TargetResource
             $($script:localizedData.RenamingNetAdapterNameMessage -f $adapter.Name, $NewName)
         ) -join '')
 
-    $adapter | Rename-NetAdapter -NewName $NewName
+    $adapter | Rename-NetAdapter -NewName $NewName `
+                                 -IncludeHidden:$IncludeHidden
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($script:localizedData.NetAdapterNameRenamedMessage -f $NewName)
@@ -270,6 +287,9 @@ function Set-TargetResource
 
     .PARAMETER Name
         This is the name of the network adapter to find.
+
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
 
     .PARAMETER PhysicalMediaType
         This is the media type of the network adapter to find.
@@ -315,6 +335,10 @@ function Test-TargetResource
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter()]
         [System.String]
@@ -365,6 +389,7 @@ function Test-TargetResource
     $adapterWithNewName = Find-NetworkAdapter `
         -Name $NewName `
         -Verbose:$Verbose `
+        -IncludeHidden:$IncludeHidden `
         -ErrorAction SilentlyContinue
 
     if ($adapterWithNewName)

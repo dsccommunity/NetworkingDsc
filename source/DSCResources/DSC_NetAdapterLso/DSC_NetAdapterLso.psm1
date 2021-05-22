@@ -17,6 +17,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .PARAMETER Name
         Specifies the name of the network adapter to check.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER Protocol
         Specifies which protocol to target.
 
@@ -32,6 +35,10 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('V1IPv4', 'IPv4', 'IPv6')]
@@ -50,7 +57,9 @@ function Get-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterLso -Name $Name `
+                                        -IncludeHidden:$IncludeHidden `
+                                        -ErrorAction Stop
     }
     catch
     {
@@ -99,6 +108,9 @@ function Get-TargetResource
     .PARAMETER Name
         Specifies the name of the network adapter to check.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER Protocol
         Specifies which protocol to target.
 
@@ -113,6 +125,10 @@ function Set-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('V1IPv4', 'IPv4', 'IPv6')]
@@ -131,7 +147,9 @@ function Set-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterLso -Name $Name `
+                                        -IncludeHidden:$IncludeHidden `
+                                        -ErrorAction Stop
     }
     catch
     {
@@ -154,7 +172,9 @@ function Set-TargetResource
                             $Name, $Protocol, $($netAdapter.V1IPv4Enabled.ToString()), $($State.ToString()) )
                 ) -join '')
 
-            Set-NetAdapterLso -Name $Name -V1IPv4Enabled $State
+            Set-NetAdapterLso -Name $Name `
+                              -IncludeHidden:$IncludeHidden `
+                              -ErrorAction Stop
         }
         elseif ($Protocol -eq 'IPv4' -and $State -ne $netAdapter.IPv4Enabled)
         {
@@ -164,7 +184,9 @@ function Set-TargetResource
                             $Name, $Protocol, $($netAdapter.IPv4Enabled.ToString()), $($State.ToString()) )
                 ) -join '')
 
-            Set-NetAdapterLso -Name $Name -IPv4Enabled $State
+            Set-NetAdapterLso -Name $Name `
+                              -IncludeHidden:$IncludeHidden `
+                              -ErrorAction Stop
         }
         elseif ($Protocol -eq 'IPv6' -and $State -ne $netAdapter.IPv6Enabled)
         {
@@ -174,7 +196,9 @@ function Set-TargetResource
                             $Name, $Protocol, $($netAdapter.IPv6Enabled.ToString()), $($State.ToString()) )
                 ) -join '')
 
-            Set-NetAdapterLso -Name $Name -IPv6Enabled $State
+            Set-NetAdapterLso -Name $Name `
+                              -IncludeHidden:$IncludeHidden `
+                              -ErrorAction Stop
         }
     }
 }
@@ -185,6 +209,9 @@ function Set-TargetResource
 
     .PARAMETER Name
         Specifies the name of the network adapter to check.
+
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
 
     .PARAMETER Protocol
         Specifies which protocol to target.
@@ -201,6 +228,10 @@ function Test-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('V1IPv4', 'IPv4', 'IPv6')]
@@ -219,7 +250,9 @@ function Test-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapterLso -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterLso -Name $Name `
+                                        -IncludeHidden:$IncludeHidden `
+                                        -ErrorAction Stop
     }
     catch
     {

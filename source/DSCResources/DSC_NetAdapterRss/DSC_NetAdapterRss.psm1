@@ -17,6 +17,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .PARAMETER Name
         Specifies the Name of the network adapter to check.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER State
         Specifies the Rss state for the protocol.
 #>
@@ -30,6 +33,10 @@ function Get-TargetResource
         [String]
         $Name,
 
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
         [Parameter(Mandatory = $true)]
         [Boolean]
         $Enabled
@@ -42,7 +49,9 @@ function Get-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterRss -Name $Name `
+                                        -IncludeHidden:$IncludeHidden `
+                                        -ErrorAction Stop
     }
     catch
     {
@@ -73,6 +82,9 @@ function Get-TargetResource
     .PARAMETER Name
         Specifies the Name of the network adapter to check.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER State
         Specifies the Rss state for the protocol.
 #>
@@ -84,6 +96,10 @@ function Set-TargetResource
         [Parameter(Mandatory = $true)]
         [String]
         $Name,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [Boolean]
@@ -97,7 +113,9 @@ function Set-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterRss -Name $Name `
+                                        -IncludeHidden:$IncludeHidden `
+                                        -ErrorAction Stop
     }
     catch
     {
@@ -120,7 +138,9 @@ function Set-TargetResource
                             $Name, $Enabled, $($netAdapter.Enabled.ToString()), $($Enabled.ToString()) )
                 ) -join '')
 
-            Set-NetAdapterRss -Name $Name -Enabled:$Enabled
+            Set-NetAdapterRss -Name $Name `
+                              -IncludeHidden:$IncludeHidden `
+                              -Enabled:$Enabled
         }
     }
 }
@@ -131,6 +151,9 @@ function Set-TargetResource
 
     .PARAMETER Name
         Specifies the Name of the network adapter to check.
+
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
 
     .PARAMETER State
         Specifies the Rss state for the protocol.
@@ -145,6 +168,10 @@ function Test-TargetResource
         [String]
         $Name,
 
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
         [Parameter(Mandatory = $true)]
         [Boolean]
         $Enabled
@@ -157,7 +184,9 @@ function Test-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapterRss -Name $Name -ErrorAction Stop
+        $netAdapter = Get-NetAdapterRss -Name $Name `
+                                        -IncludeHidden:$IncludeHidden `
+                                        -ErrorAction Stop
     }
     catch
     {

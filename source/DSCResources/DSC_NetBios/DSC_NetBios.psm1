@@ -38,6 +38,9 @@ catch
     .PARAMETER InterfaceAlias
         Specifies the alias of a network interface. Supports the use of '*' and '%'.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER Setting
         Specifies if NetBIOS should be enabled or disabled or obtained from
         the DHCP server (Default). If static IP, Enable NetBIOS.
@@ -53,6 +56,10 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Default', 'Enable', 'Disable')]
@@ -126,6 +133,9 @@ function Get-TargetResource
     .PARAMETER InterfaceAlias
         Specifies the alias of a network interface. Supports the use of '*' and '%'.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER Setting
         Specifies if NetBIOS should be enabled or disabled or obtained from
         the DHCP server (Default). If static IP, Enable NetBIOS.
@@ -138,6 +148,10 @@ function Set-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Default', 'Enable', 'Disable')]
@@ -180,6 +194,7 @@ function Set-TargetResource
 
                 Set-NetAdapterNetbiosOptions -NetworkAdapterObject $netAdapterConfig `
                                              -InterfaceAlias $netAdapterItem.NetConnectionID `
+                                             -IncludeHidden $IncludeHidden `
                                              -Setting $Setting
             }
         }
@@ -205,6 +220,9 @@ function Set-TargetResource
     .PARAMETER InterfaceAlias
         Specifies the alias of a network interface. Supports the use of '*' and '%'.
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER Setting
         Specifies if NetBIOS should be enabled or disabled or obtained from
         the DHCP server (Default). If static IP, Enable NetBIOS.
@@ -218,6 +236,10 @@ function Test-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Default', 'Enable', 'Disable')]
@@ -325,6 +347,9 @@ function Get-NetAdapterNetbiosOptionsFromRegistry
     .PARAMETER InterfaceAlias
         Name of the network adapter being configured. Example: Ethernet
 
+    .PARAMETER IncludeHidden
+        This switch will causes hidden network adapters to be included in the search.
+
     .PARAMETER Setting
         Setting value for this resource which should be one of
         the following: Default, Enable, Disable
@@ -341,6 +366,10 @@ function Set-NetAdapterNetbiosOptions
         [Parameter(Mandatory = $true)]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet('Default','Enable','Disable')]

@@ -2,6 +2,7 @@
 class DSC_Route : OMI_BaseResource
 {
     [Key, Description("Specifies the alias of a network interface.")] string InterfaceAlias;
+    [Write, Description("This switch will causes hidden network adapters to be included in the search.")] Boolean IncludeHidden;
     [Key, Description("Specifies the IP address family."), ValueMap{"IPv4", "IPv6"},Values{"IPv4", "IPv6"}] string AddressFamily;
     [Key, Description("Specifies a destination prefix of an IP route. A destination prefix consists of an IP address prefix and a prefix length, separated by a slash (/).")] String DestinationPrefix;
     [Key, Description("Specifies the next hop for the IP route.")] String NextHop;

@@ -266,6 +266,9 @@ function Test-TargetResource
     .PARAMETER InterfaceAlias
         Alias of the network interface for which the default gateway address is set.
 
+    .PARAMETER IncludeHidden
+        Whether to include hidden network adapters.
+
     .PARAMETER AddressFamily
         IP address family.
 
@@ -283,6 +286,10 @@ function Assert-ResourceProperty
         $InterfaceAlias,
 
         [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
+        [Parameter()]
         [ValidateSet('IPv4', 'IPv6')]
         [System.String]
         $AddressFamily = 'IPv4',
@@ -292,7 +299,7 @@ function Assert-ResourceProperty
         $Address
     )
 
-    if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
+    if (-not (Get-NetAdapter -IncludeHidden:$IncludeHidden | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
         New-InvalidOperationException `
             -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias)
