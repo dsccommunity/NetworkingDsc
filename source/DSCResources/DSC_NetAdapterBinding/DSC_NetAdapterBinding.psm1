@@ -126,7 +126,8 @@ function Set-TargetResource
 
     if ($State -eq 'Enabled')
     {
-        Enable-NetAdapterBinding @PSBoundParameters
+        Enable-NetAdapterBinding @PSBoundParameters `
+            -IncludeHidden:$true
 
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                 $($script:localizedData.NetAdapterBindingEnabledMessage -f `
@@ -135,7 +136,8 @@ function Set-TargetResource
     }
     else
     {
-        Disable-NetAdapterBinding @PSBoundParameters
+        Disable-NetAdapterBinding @PSBoundParameters `
+            -IncludeHidden:$true
 
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
                 $($script:localizedData.NetAdapterBindingDisabledMessage -f `
@@ -269,6 +271,7 @@ function Get-Binding
 
     $binding = Get-NetAdapterBinding `
         -InterfaceAlias $InterfaceAlias `
+        -IncludeHidden:$true `
         -ComponentId $ComponentId `
         -ErrorAction Stop
 
