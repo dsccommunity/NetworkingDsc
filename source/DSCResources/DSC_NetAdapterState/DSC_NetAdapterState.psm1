@@ -137,6 +137,7 @@ function Set-TargetResource
             {
                 Disable-NetAdapter `
                     -Name $Name `
+                    -IncludeHidden:$true `
                     -Confirm:$false `
                     -ErrorAction Stop
             }
@@ -144,6 +145,7 @@ function Set-TargetResource
             {
                 Enable-NetAdapter `
                     -Name $Name `
+                    -IncludeHidden:$true `
                     -ErrorAction Stop
             }
         }
