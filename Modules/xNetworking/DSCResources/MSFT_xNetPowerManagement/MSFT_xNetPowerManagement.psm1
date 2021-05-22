@@ -18,11 +18,11 @@ function Get-TargetResource
           $AdapterType
      )
 
-    #Write-Verbose "Use this cmdlet to deliver information about command processing."
+    Write-Verbose "Getting the power setting on the network adpater."
 
     #Write-Debug "Use this cmdlet to write debug information while troubleshooting."
-    $nic = Get-WmiObject Win32_NetworkAdapter | where {$_.AdapterType -eq 'Ethernet 802.3'}
-    $powerMgmt = Get-WmiObject MSPower_DeviceEnable -Namespace root\wmi | where {$_.InstanceName.ToUpper().Contains($nic.PNPDeviceID)}
+    $nic = Get-CimClass Win32_NetworkAdapter | where-object {$_.AdapterType -eq 'Ethernet 802.3'}
+    $powerMgmt = Get-CimClass MSPower_DeviceEnable -Namespace root\wmi | where-object {$_.InstanceName.ToUpper().Contains($nic.PNPDeviceID)}
 
     If ($powerMgmt.Enable -eq $true){
         $State = $False
@@ -65,10 +65,10 @@ function Set-TargetResource
      )
 
 
-    $nics = Get-WmiObject Win32_NetworkAdapter | where {$_.AdapterType -eq $AdapterType}
+    $nics = Get-CimClass Win32_NetworkAdapter | where-object {$_.AdapterType -eq $AdapterType}
     foreach ($nic in $nics)
     {
-        $powerMgmt = Get-WmiObject MSPower_DeviceEnable -Namespace root\wmi | where {$_.InstanceName.ToUpper().Contains($nic.PNPDeviceID)}
+        $powerMgmt = Get-CimClass MSPower_DeviceEnable -Namespace root\wmi | where-object {$_.InstanceName.ToUpper().Contains($nic.PNPDeviceID)}
             
         If ($State -eq 'Disabled'){
             Write-Verbose "Disabling the NIC power management setting."
@@ -113,8 +113,8 @@ function Test-TargetResource
 
     #Write-Debug "Use this cmdlet to write debug information while troubleshooting."
 
-    $nic = Get-WmiObject Win32_NetworkAdapter | where {$_.AdapterType -eq 'Ethernet 802.3'}
-    $powerMgmt = Get-WmiObject MSPower_DeviceEnable -Namespace root\wmi | where {$_.InstanceName.ToUpper().Contains($nic.PNPDeviceID)}
+    $nic = Get-CimClass Win32_NetworkAdapter | where-object {$_.AdapterType -eq 'Ethernet 802.3'}
+    $powerMgmt = Get-CimClass MSPower_DeviceEnable -Namespace root\wmi | where-object {$_.InstanceName.ToUpper().Contains($nic.PNPDeviceID)}
 
     If ($State -eq 'Disabled'){
         If ($powerMgmt.Enable -eq $false){
