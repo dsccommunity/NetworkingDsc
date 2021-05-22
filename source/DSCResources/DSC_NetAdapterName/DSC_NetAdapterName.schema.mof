@@ -7,6 +7,7 @@ class DSC_NetAdapterName : OMI_BaseResource
     [Write, Description("This is the status of the network adapter to find."), ValueMap{"Up", "Disconnected", "Disabled"}, Values{"Up", "Disconnected", "Disabled"}] String Status;
     [Write, Description("This is the MAC address of the network adapter to find.")] String MacAddress;
     [Write, Description("This is the interface description of the network adapter to find.")] String InterfaceDescription;
+    [Write, Description("This switch indicates the adapter to find may be hidden.")] Boolean IncludeHidden;
     [Write, Description("This is the interface index of the network adapter to find.")] UInt32 InterfaceIndex;
     [Write, Description("This is the interface GUID of the network adapter to find.")] String InterfaceGuid;
     [Write, Description("This is the driver description of the network adapter.")] String DriverDescription;

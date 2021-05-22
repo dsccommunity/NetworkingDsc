@@ -33,6 +33,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .PARAMETER InterfaceDescription
         This is the interface description of the network adapter to find.
 
+    .PARAMETER IncludeHidden
+        This switch indicates the adapter to find may be hidden.
+
     .PARAMETER InterfaceIndex
         This is the interface index of the network adapter to find.
 
@@ -85,6 +88,10 @@ function Get-TargetResource
         $InterfaceDescription,
 
         [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
+        [Parameter()]
         [System.UInt32]
         $InterfaceIndex,
 
@@ -111,6 +118,7 @@ function Get-TargetResource
 
     $adapter = Find-NetworkAdapter `
         -Name $NewName `
+        -IncludeHidden:$IncludeHidden `
         -ErrorAction SilentlyContinue
 
     if (-not $adapter)
@@ -136,6 +144,7 @@ function Get-TargetResource
         Status                         = $adapter.Status
         MacAddress                     = $adapter.MacAddress
         InterfaceDescription           = $adapter.InterfaceDescription
+        IncludeHidden                  = $IncludeHidden
         InterfaceIndex                 = $adapter.InterfaceIndex
         InterfaceGuid                  = $adapter.InterfaceGuid
         DriverDescription              = $adapter.DriverDescription
@@ -167,6 +176,9 @@ function Get-TargetResource
 
     .PARAMETER InterfaceDescription
         This is the interface description of the network adapter to find.
+
+    .PARAMETER IncludeHidden
+        This switch indicates the adapter to find may be hidden.
 
     .PARAMETER InterfaceIndex
         This is the interface index of the network adapter to find.
@@ -219,6 +231,10 @@ function Set-TargetResource
         $InterfaceDescription,
 
         [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
+        [Parameter()]
         [System.UInt32]
         $InterfaceIndex,
 
@@ -254,6 +270,7 @@ function Set-TargetResource
         ) -join '')
 
     $adapter | Rename-NetAdapter `
+        -IncludeHidden:$IncludeHidden `
         -NewName $NewName
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -283,6 +300,9 @@ function Set-TargetResource
 
     .PARAMETER InterfaceDescription
         This is the interface description of the network adapter to find.
+
+    .PARAMETER IncludeHidden
+        This switch indicates the adapter to find may be hidden.
 
     .PARAMETER InterfaceIndex
         This is the interface index of the network adapter to find.
@@ -336,6 +356,10 @@ function Test-TargetResource
         $InterfaceDescription,
 
         [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
+
+        [Parameter()]
         [System.UInt32]
         $InterfaceIndex,
 
@@ -365,6 +389,7 @@ function Test-TargetResource
     # Can an adapter be found with the new name?
     $adapterWithNewName = Find-NetworkAdapter `
         -Name $NewName `
+        -IncludeHidden:$IncludeHidden `
         -Verbose:$Verbose `
         -ErrorAction SilentlyContinue
 
