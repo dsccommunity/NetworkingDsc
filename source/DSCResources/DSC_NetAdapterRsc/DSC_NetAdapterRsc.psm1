@@ -52,6 +52,7 @@ function Get-TargetResource
     {
         $netAdapter = Get-NetAdapterRsc `
             -Name $Name `
+            -IncludeHidden:$true `
             -ErrorAction Stop
     }
     catch
@@ -136,6 +137,7 @@ function Set-TargetResource
     {
         $netAdapter = Get-NetAdapterRsc `
             -Name $Name `
+            -IncludeHidden:$true `
             -ErrorAction Stop
     }
     catch
@@ -161,6 +163,7 @@ function Set-TargetResource
 
             Set-NetAdapterRsc `
                 -Name $Name `
+                -IncludeHidden:$true `
                 -IPv4Enabled $State
         }
         if ($Protocol -in ('IPv6', 'All') -and $State -ne $netAdapter.IPv6Enabled)
@@ -173,6 +176,7 @@ function Set-TargetResource
 
             Set-NetAdapterRsc `
                 -Name $Name `
+                -IncludeHidden:$true `
                 -IPv6Enabled $State
         }
     }
@@ -220,6 +224,7 @@ function Test-TargetResource
     {
         $netAdapter = Get-NetAdapterRsc `
             -Name $Name `
+            -IncludeHidden:$true `
             -ErrorAction Stop
     }
     catch
