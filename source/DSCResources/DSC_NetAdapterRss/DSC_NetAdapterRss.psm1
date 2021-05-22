@@ -44,6 +44,7 @@ function Get-TargetResource
     {
         $netAdapter = Get-NetAdapterRss `
             -Name $Name `
+            -IncludeHidden:$true `
             -ErrorAction Stop
     }
     catch
@@ -101,6 +102,7 @@ function Set-TargetResource
     {
         $netAdapter = Get-NetAdapterRss `
             -Name $Name `
+            -IncludeHidden:$true `
             -ErrorAction Stop
     }
     catch
@@ -126,6 +128,7 @@ function Set-TargetResource
 
             Set-NetAdapterRss `
                 -Name $Name `
+                -IncludeHidden:$true `
                 -Enabled:$Enabled
         }
     }
@@ -165,6 +168,7 @@ function Test-TargetResource
     {
         $netAdapter = Get-NetAdapterRss `
             -Name $Name `
+            -IncludeHidden:$true `
             -ErrorAction Stop
     }
     catch
