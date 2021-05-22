@@ -44,7 +44,7 @@ function Get-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapter `
+        $netAdapter = Find-NetworkAdapter `
             -Name $Name `
             -ErrorAction Stop
     }
@@ -117,7 +117,7 @@ function Set-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapter `
+        $netAdapter = Find-NetworkAdapter `
             -Name $Name `
             -ErrorAction Stop
     }
