@@ -39,6 +39,7 @@ function Get-TargetResource
 
         $netAdapterRdma = Get-NetAdapterRdma `
             -Name $Name `
+            -IncludeHidden:$true `
             -ErrorAction Stop
     }
     catch
@@ -89,6 +90,7 @@ function Set-TargetResource
 
         $netAdapterRdma = Get-NetAdapterRdma `
             -Name $Name `
+            -IncludeHidden:$true `
             -ErrorAction Stop
     }
     catch
@@ -107,6 +109,7 @@ function Set-TargetResource
 
             Set-NetAdapterRdma `
                 -Name $Name `
+                -IncludeHidden:$true `
                 -Enabled $Enabled
         }
     }
