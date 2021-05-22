@@ -262,7 +262,7 @@ function Get-Binding
         $State = 'Enabled'
     )
 
-    if (-not (Get-NetAdapter -Name $InterfaceAlias -ErrorAction SilentlyContinue))
+    if (-not (Find-NetworkAdapter -Name $InterfaceAlias -ErrorAction SilentlyContinue))
     {
         New-InvalidArgumentException `
             -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias) `
