@@ -266,6 +266,9 @@ function Test-TargetResource
     .PARAMETER InterfaceAlias
         Alias of the network interface for which the default gateway address is set.
 
+    .PARAMETER IncludeHidden
+        Whether to include hidden network adapters.
+
     .PARAMETER AddressFamily
         IP address family.
 
@@ -281,6 +284,10 @@ function Assert-ResourceProperty
         [ValidateNotNullOrEmpty()]
         [System.String]
         $InterfaceAlias,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $false,
 
         [Parameter()]
         [ValidateSet('IPv4', 'IPv6')]
