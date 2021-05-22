@@ -43,7 +43,9 @@ function Get-TargetResource
     }
 
     Write-Verbose -Message ($script:localizedData.GetTeamInfo -f $Name)
-    $networkTeam = Get-NetLBFOTeam -Name $Name -ErrorAction SilentlyContinue
+    $networkTeam = Get-NetLBFOTeam `
+        -Name $Name `
+        -ErrorAction SilentlyContinue
 
     if ($networkTeam)
     {
@@ -121,7 +123,9 @@ function Set-TargetResource
 
     Write-Verbose -Message ($script:localizedData.GetTeamInfo -f $Name)
 
-    $networkTeam = Get-NetLBFOTeam -Name $Name -ErrorAction SilentlyContinue
+    $networkTeam = Get-NetLBFOTeam `
+        -Name $Name `
+        -ErrorAction SilentlyContinue
 
     if ($Ensure -eq 'Present')
     {
@@ -153,7 +157,9 @@ function Set-TargetResource
             {
                 Write-Verbose -Message ($script:localizedData.ModifyTeam -f $Name)
 
-                Set-NetLbfoTeam @setArguments -ErrorAction Stop -Confirm:$false
+                Set-NetLbfoTeam @setArguments `
+                    -ErrorAction Stop `
+                    -Confirm:$false
             }
 
             $netTeamMembers = Compare-Object `
@@ -172,7 +178,8 @@ function Set-TargetResource
                 {
                     Write-Verbose -Message ($script:localizedData.RemovingMembers -f ($membersToRemove -join ','))
 
-                    $null = Remove-NetLbfoTeamMember -Name $membersToRemove `
+                    $null = Remove-NetLbfoTeamMember `
+                        -Name $membersToRemove `
                         -Team $Name `
                         -ErrorAction Stop `
                         -Confirm:$false
@@ -186,7 +193,8 @@ function Set-TargetResource
                 {
                     Write-Verbose -Message ($script:localizedData.AddingMembers -f ($membersToAdd -join ','))
 
-                    $null = Add-NetLbfoTeamMember -Name $membersToAdd `
+                    $null = Add-NetLbfoTeamMember `
+                        -Name $membersToAdd `
                         -Team $Name `
                         -ErrorAction Stop `
                         -Confirm:$false
@@ -221,7 +229,10 @@ function Set-TargetResource
     {
         Write-Verbose -Message ($script:localizedData.RemoveTeam -f $Name)
 
-        $null = Remove-NetLbfoTeam -Name $name -ErrorAction Stop -Confirm:$false
+        $null = Remove-NetLbfoTeam `
+            -Name $name `
+            -ErrorAction Stop `
+            -Confirm:$false
     }
 }
 
@@ -277,7 +288,9 @@ function Test-TargetResource
 
     Write-Verbose -Message ($script:localizedData.GetTeamInfo -f $Name)
 
-    $networkTeam = Get-NetLbfoTeam -Name $Name -ErrorAction SilentlyContinue
+    $networkTeam = Get-NetLbfoTeam `
+        -Name $Name `
+        -ErrorAction SilentlyContinue
 
     if ($ensure -eq 'Present')
     {

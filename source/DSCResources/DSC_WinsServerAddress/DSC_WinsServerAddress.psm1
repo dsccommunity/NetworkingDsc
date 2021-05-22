@@ -77,7 +77,10 @@ function Set-TargetResource
 
     Write-Verbose -Message "$($MyInvocation.MyCommand): $($script:localizedData.ApplyingWinsServerAddressesMessage)"
 
-    Set-WinsClientServerStaticAddress -InterfaceAlias $InterfaceAlias -Address $Address -ErrorAction Stop
+    Set-WinsClientServerStaticAddress `
+        -InterfaceAlias $InterfaceAlias `
+        -Address $Address `
+        -ErrorAction Stop
 
 }
 
@@ -147,7 +150,7 @@ function Assert-ResourceProperty
         $Address
     )
 
-    if (-not (Get-NetAdapter | Where-Object Name -EQ $InterfaceAlias))
+    if (-not (Find-NetworkAdapter -Name $InterfaceAlias))
     {
         New-InvalidArgumentException `
             -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias) `

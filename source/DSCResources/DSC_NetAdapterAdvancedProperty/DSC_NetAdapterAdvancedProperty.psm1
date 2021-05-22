@@ -51,6 +51,7 @@ function Get-TargetResource
     {
         $netAdapterAdvancedProperty = Get-NetAdapterAdvancedProperty `
             -Name $networkAdapterName `
+            -IncludeHidden:$true `
             -RegistryKeyword $RegistryKeyword `
             -ErrorAction Stop
     }
@@ -118,6 +119,7 @@ function Set-TargetResource
     {
         $netAdapterAdvancedProperty = Get-NetAdapterAdvancedProperty `
             -Name $networkAdapterName `
+            -IncludeHidden:$true `
             -RegistryKeyword $RegistryKeyword `
             -ErrorAction Stop
     }
@@ -146,6 +148,7 @@ function Set-TargetResource
             Set-NetAdapterAdvancedProperty `
                 -RegistryValue $RegistryValue `
                 -Name $networkAdapterName `
+                -IncludeHidden:$true `
                 -RegistryKeyword $RegistryKeyword
         }
     }
@@ -192,6 +195,7 @@ function Test-TargetResource
     {
         $netAdapterAdvancedProperty = Get-NetAdapterAdvancedProperty `
             -Name $networkAdapterName `
+            -IncludeHidden:$true `
             -RegistryKeyword $RegistryKeyword `
             -ErrorAction Stop
     }

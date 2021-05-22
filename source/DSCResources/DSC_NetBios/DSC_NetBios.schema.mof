@@ -1,4 +1,3 @@
-
 [ClassVersion("1.0.0.0"), FriendlyName("NetBios")]
 class DSC_NetBios : OMI_BaseResource
 {

@@ -97,6 +97,9 @@ function Convert-CIDRToSubhetMask
     .PARAMETER InterfaceDescription
         This is the interface description of the network adapter to find.
 
+    .PARAMETER IncludeHidden
+        This switch indicates the adapter to find may be hidden.
+
     .PARAMETER InterfaceIndex
         This is the interface index of the network adapter to find.
 
@@ -141,6 +144,10 @@ function Find-NetworkAdapter
         [Parameter()]
         [System.String]
         $InterfaceDescription,
+
+        [Parameter()]
+        [System.Boolean]
+        $IncludeHidden = $true,
 
         [Parameter()]
         [System.UInt32]
@@ -215,13 +222,13 @@ function Find-NetworkAdapter
                 $($script:localizedData.AllNetAdaptersFoundMessage)
             ) -join '')
 
-        $matchingAdapters = @(Get-NetAdapter)
+        $matchingAdapters = @(Get-NetAdapter -IncludeHidden:$IncludeHidden)
     }
     else
     {
         # Join all the filters together
         $adapterFilterScript = '(' + ($adapterFilters -join ' -and ') + ')'
-        $matchingAdapters = @(Get-NetAdapter |
+        $matchingAdapters = @(Get-NetAdapter -IncludeHidden:$IncludeHidden |
             Where-Object -FilterScript ([ScriptBlock]::Create($adapterFilterScript)))
     }
 
@@ -276,6 +283,7 @@ function Find-NetworkAdapter
         Status               = $exactAdapter.Status
         MacAddress           = $exactAdapter.MacAddress
         InterfaceDescription = $exactAdapter.InterfaceDescription
+        IncludeHidden        = $IncludeHidden
         InterfaceIndex       = $exactAdapter.InterfaceIndex
         InterfaceGuid        = $exactAdapter.InterfaceGuid
         MatchingAdapterCount = $matchingAdapters.Count
@@ -323,6 +331,7 @@ function Get-DnsClientServerStaticAddress
     # Look up the interface Guid
     $adapter = Get-NetAdapter `
         -InterfaceAlias $InterfaceAlias `
+        -IncludeHidden:$true `
         -ErrorAction SilentlyContinue
 
     if (-not $adapter)
@@ -396,7 +405,10 @@ function Get-WinsClientServerStaticAddress
     Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.GettingWinsServerStaticAddressMessage -f $InterfaceAlias)")
 
     # Look up the interface Guid
-    $adapter = Get-NetAdapter -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
+    $adapter = Get-NetAdapter `
+        -InterfaceAlias $InterfaceAlias `
+        -IncludeHidden:$true `
+        -ErrorAction SilentlyContinue
 
     if (-not $adapter)
     {
@@ -458,7 +470,10 @@ function Set-WinsClientServerStaticAddress
     Write-Verbose -Message ("$($MyInvocation.MyCommand): $($script:localizedData.SettingWinsServerStaticAddressMessage -f $InterfaceAlias, ($Address -join ', '))")
 
     # Look up the interface Guid
-    $adapter = Get-NetAdapter -InterfaceAlias $InterfaceAlias -ErrorAction SilentlyContinue
+    $adapter = Get-NetAdapter `
+        -InterfaceAlias $InterfaceAlias `
+        -IncludeHidden:$true `
+        -ErrorAction SilentlyContinue
 
     if (-not $adapter)
     {

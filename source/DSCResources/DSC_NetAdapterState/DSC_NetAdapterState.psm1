@@ -44,7 +44,9 @@ function Get-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapter -Name $Name -ErrorAction Stop
+        $netAdapter = Find-NetworkAdapter `
+            -Name $Name `
+            -ErrorAction Stop
     }
     catch
     {
@@ -115,7 +117,9 @@ function Set-TargetResource
 
     try
     {
-        $netAdapter = Get-NetAdapter -Name $Name -ErrorAction Stop
+        $netAdapter = Find-NetworkAdapter `
+            -Name $Name `
+            -ErrorAction Stop
     }
     catch
     {
@@ -131,11 +135,18 @@ function Set-TargetResource
         {
             if ($State -eq 'Disabled')
             {
-                Disable-NetAdapter -Name $Name -Confirm:$false -ErrorAction Stop
+                Disable-NetAdapter `
+                    -Name $Name `
+                    -IncludeHidden:$true `
+                    -Confirm:$false `
+                    -ErrorAction Stop
             }
             else
             {
-                Enable-NetAdapter -Name $Name -ErrorAction Stop
+                Enable-NetAdapter `
+                    -Name $Name `
+                    -IncludeHidden:$true `
+                    -ErrorAction Stop
             }
         }
         catch

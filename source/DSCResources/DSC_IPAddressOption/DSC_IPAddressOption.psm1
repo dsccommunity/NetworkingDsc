@@ -83,7 +83,9 @@ function Set-TargetResource
 
     if ($currentConfig.SkipAsSource -ne $SkipAsSource)
     {
-        Set-NetIPAddress -IPAddress $IPAddress -SkipAsSource $SkipAsSource
+        Set-NetIPAddress `
+            -IPAddress $IPAddress `
+            -SkipAsSource $SkipAsSource
     }
 }
 

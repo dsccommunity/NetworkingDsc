@@ -292,7 +292,7 @@ function Assert-ResourceProperty
         $Address
     )
 
-    if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
+    if (-not (Find-NetworkAdapter -Name $InterfaceAlias ))
     {
         New-InvalidOperationException `
             -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias)
