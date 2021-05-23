@@ -60,7 +60,8 @@ function Get-TargetResource
     {
         $returnValue.Add('Ensure','Present')
 
-        $proxySettings = ConvertFrom-ProxySettingsBinary -ProxySettings $proxySettingsRegistryBinary
+        $proxySettings = ConvertFrom-ProxySettingsBinary `
+            -ProxySettings $proxySettingsRegistryBinary
 
         $returnValue.Add('EnableManualProxy',$proxySettings.EnableManualProxy)
         $returnValue.Add('EnableAutoConfiguration',$proxySettings.EnableAutoConfiguration)
@@ -392,14 +393,17 @@ function Test-TargetResource
 
             if ($connectionsRegistryValues.DefaultConnectionSettings)
             {
-                $defaultConnectionSettings = ConvertFrom-ProxySettingsBinary -ProxySettings $connectionsRegistryValues.DefaultConnectionSettings
+                $defaultConnectionSettings = ConvertFrom-ProxySettingsBinary `
+                    -ProxySettings $connectionsRegistryValues.DefaultConnectionSettings
             }
             else
             {
                 $defaultConnectionSettings = @{}
             }
 
-            $inDesiredState = Test-ProxySettings -CurrentValues $defaultConnectionSettings -DesiredValues $desiredValues
+            $inDesiredState = Test-ProxySettings `
+                -CurrentValues $defaultConnectionSettings `
+                -DesiredValues $desiredValues
 
             if (-not $inDesiredState)
             {
@@ -420,14 +424,17 @@ function Test-TargetResource
 
             if ($connectionsRegistryValues.SavedLegacySettings)
             {
-                $savedLegacySettings = ConvertFrom-ProxySettingsBinary -ProxySettings $connectionsRegistryValues.SavedLegacySettings
+                $savedLegacySettings = ConvertFrom-ProxySettingsBinary `
+                    -ProxySettings $connectionsRegistryValues.SavedLegacySettings
             }
             else
             {
                 $savedLegacySettings = @{}
             }
 
-            $inDesiredState = Test-ProxySettings -CurrentValues $savedLegacySettings -DesiredValues $desiredValues
+            $inDesiredState = Test-ProxySettings `
+                -CurrentValues $savedLegacySettings `
+                -DesiredValues $desiredValues
 
             if (-not $inDesiredState)
             {
@@ -792,7 +799,9 @@ function ConvertFrom-ProxySettingsBinary
 
         # Extract the Proxy Server string
         $proxyServer = ''
-        $stringLength = Get-Int32FromByteArray -Byte $ProxySettings -StartByte $stringPointer
+        $stringLength = Get-Int32FromByteArray `
+            -Byte $ProxySettings `
+            -StartByte $stringPointer
         $stringPointer += 4
 
         if ($stringLength -gt 0)
@@ -807,7 +816,9 @@ function ConvertFrom-ProxySettingsBinary
 
         # Extract the Proxy Server Exceptions string
         $proxyServerExceptions = @()
-        $stringLength = Get-Int32FromByteArray -Byte $ProxySettings -StartByte $stringPointer
+        $stringLength = Get-Int32FromByteArray `
+            -Byte $ProxySettings `
+            -StartByte $stringPointer
         $stringPointer += 4
 
         if ($stringLength -gt 0)

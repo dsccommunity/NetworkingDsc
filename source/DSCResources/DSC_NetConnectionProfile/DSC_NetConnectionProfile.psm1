@@ -32,7 +32,8 @@ function Get-TargetResource
         $($script:localizedData.GettingNetConnectionProfile) -f $InterfaceAlias
     ) -join '')
 
-    $result = Get-NetConnectionProfile -InterfaceAlias $InterfaceAlias
+    $result = Get-NetConnectionProfile `
+        -InterfaceAlias $InterfaceAlias
 
     return @{
         InterfaceAlias   = $result.InterfaceAlias
@@ -136,7 +137,8 @@ function Test-TargetResource
 
     Assert-ResourceProperty @PSBoundParameters
 
-    $current = Get-TargetResource -InterfaceAlias $InterfaceAlias
+    $current = Get-TargetResource `
+        -InterfaceAlias $InterfaceAlias
 
     if (-not [System.String]::IsNullOrEmpty($IPv4Connectivity) -and `
         ($IPv4Connectivity -ne $current.IPv4Connectivity))
