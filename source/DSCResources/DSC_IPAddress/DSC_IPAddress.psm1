@@ -228,7 +228,8 @@ function Set-TargetResource
         try
         {
             # Apply the specified IP configuration
-            New-NetIPAddress @newNetIPAddressParameters -ErrorAction Stop
+            New-NetIPAddress @newNetIPAddressParameters `
+                -ErrorAction Stop
         }
         catch [Microsoft.Management.Infrastructure.CimException]
         {
@@ -240,7 +241,8 @@ function Set-TargetResource
                 Setting New-NetIPaddress will throw [Microsoft.Management.Infrastructure.CimException] if
                 the IP address is already set. Need to check to make sure the IP is set on correct interface
             #>
-            $verifyNetIPAddressAdapter = Get-NetIPAddress @verifyNetIPAddressAdapterParam -ErrorAction SilentlyContinue
+            $verifyNetIPAddressAdapter = Get-NetIPAddress @verifyNetIPAddressAdapterParam `
+                -ErrorAction SilentlyContinue
 
             if ($verifyNetIPAddressAdapter.InterfaceAlias -eq $InterfaceAlias)
             {
@@ -343,7 +345,9 @@ function Test-TargetResource
         }
     } # while
 
-    $ipAddressObject = Get-IPAddressPrefix -IPAddress $IPAddress -AddressFamily $AddressFamily
+    $ipAddressObject = Get-IPAddressPrefix `
+        -IPAddress $IPAddress `
+        -AddressFamily $AddressFamily
 
     # Test if the IP Address passed is present
     foreach ($singleIP in $ipAddressObject)
@@ -480,7 +484,9 @@ function Assert-ResourceProperty
     {
         $singleIP = ($singleIPAddress -split '/')[0]
 
-        Assert-IPAddress -Address $singleIP -AddressFamily $AddressFamily
+        Assert-IPAddress `
+            -Address $singleIP `
+            -AddressFamily $AddressFamily
     }
 
     foreach ($prefixLength in $prefixLengthArray)

@@ -1,4 +1,3 @@
-
 [ClassVersion("1.0"), FriendlyName("NetworkTeamInterface")]
 class DSC_NetworkTeamInterface : OMI_BaseResource
 {
