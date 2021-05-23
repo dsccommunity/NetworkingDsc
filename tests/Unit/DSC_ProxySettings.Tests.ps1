@@ -106,17 +106,27 @@ try
             AutoConfigURL           = $testAutoConfigURL
         }
 
+        $localMachineParameters = @{
+            Scope = 'LocalMachine'
+            Verbose = $true
+        }
+
+        $currentUserParameters = @{
+            Scope = 'CurrentUser'
+            Verbose = $true
+        }
+
         [System.Byte[]] $testBinary = @(0x46, 0x0, 0x0, 0x0, 0x8, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0)
 
         Describe 'DSC_ProxySettings\Get-TargetResource' -Tag 'Get' {
-            Context 'No Proxy Settings are Defined in the Registry' {
+            Context 'When no proxy settings are defined in the registry' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -Verifiable
 
                 It 'Should not throw an exception' {
                     {
-                        $script:getTargetResourceResult = Get-TargetResource -Verbose
+                        $script:getTargetResourceResult = Get-TargetResource @localMachineParameters
                     } | Should -Not -Throw
                 }
 
@@ -129,7 +139,7 @@ try
                 }
             }
 
-            Context 'The DefaultConnectionSettings Proxy Settings are Defined in the Registry' {
+            Context 'When the DefaultConnectionSettings proxy settings are defined in the registry' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -148,7 +158,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:getTargetResourceResult = Get-TargetResource -Verbose
+                        $script:getTargetResourceResult = Get-TargetResource @localMachineParameters
                     } | Should -Not -Throw
                 }
 
@@ -168,7 +178,7 @@ try
                 }
             }
 
-            Context 'The SavedLegacySettings Proxy Settings are Defined in the Registry' {
+            Context 'When the SavedLegacySettings proxy settings are defined in the registry' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -187,7 +197,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:getTargetResourceResult = Get-TargetResource -Verbose
+                        $script:getTargetResourceResult = Get-TargetResource @localMachineParameters
                     } | Should -Not -Throw
                 }
 
@@ -209,7 +219,7 @@ try
         }
 
         Describe 'DSC_ProxySettings\Set-TargetResource' -Tag 'Set' {
-            Context 'Ensure Proxy Settings not Defined for All Connection Types' {
+            Context 'When ensuring proxy settings not defined for All Connection types' {
                 Mock `
                     -CommandName Remove-ItemProperty `
                     -ParameterFilter { $Name -eq 'DefaultConnectionSettings' }
@@ -220,7 +230,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        Set-TargetResource -Ensure 'Absent' -ConnectionType 'All' -Verbose
+                        Set-TargetResource @localMachineParameters -Ensure 'Absent' -ConnectionType 'All'
                     } | Should -Not -Throw
                 }
 
@@ -237,7 +247,7 @@ try
                 }
             }
 
-            Context 'Ensure Proxy Settings not Defined for Default Connection Type' {
+            Context 'When ensuring proxy settings not defined for Default Connection type' {
                 Mock `
                     -CommandName Remove-ItemProperty `
                     -ParameterFilter { $Name -eq 'DefaultConnectionSettings' }
@@ -248,7 +258,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        Set-TargetResource -Ensure 'Absent' -ConnectionType 'Default' -Verbose
+                        Set-TargetResource @localMachineParameters -Ensure 'Absent' -ConnectionType 'Default'
                     } | Should -Not -Throw
                 }
 
@@ -265,7 +275,7 @@ try
                 }
             }
 
-            Context 'Ensure Proxy Settings not Defined for Legacy Connection Type' {
+            Context 'When ensuring proxy settings not defined for Legacy Connection type' {
                 Mock `
                     -CommandName Remove-ItemProperty `
                     -ParameterFilter { $Name -eq 'DefaultConnectionSettings' }
@@ -276,7 +286,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        Set-TargetResource -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose
+                        Set-TargetResource @localMachineParameters -Ensure 'Absent' -ConnectionType 'Legacy'
                     } | Should -Not -Throw
                 }
 
@@ -293,7 +303,7 @@ try
                 }
             }
 
-            Context 'Ensure Proxy Settings are Defined for All Connection Types' {
+            Context 'When ensuring proxy settings are defined for All Connection types' {
                 Mock `
                     -CommandName Set-BinaryRegistryValue `
                     -ParameterFilter { $Name -eq 'DefaultConnectionSettings' }
@@ -304,7 +314,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        Set-TargetResource -Ensure 'Present' -ConnectionType 'All' -Verbose
+                        Set-TargetResource @localMachineParameters -Ensure 'Present' -ConnectionType 'All'
                     } | Should -Not -Throw
                 }
 
@@ -321,7 +331,7 @@ try
                 }
             }
 
-            Context 'Ensure Proxy Settings are Defined for Default Connection Type' {
+            Context 'When ensuring proxy settings are defined for Default Connection type' {
                 Mock `
                     -CommandName Set-BinaryRegistryValue `
                     -ParameterFilter { $Name -eq 'DefaultConnectionSettings' }
@@ -332,7 +342,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        Set-TargetResource -Ensure 'Present' -ConnectionType 'Default' -Verbose
+                        Set-TargetResource @localMachineParameters -Ensure 'Present' -ConnectionType 'Default'
                     } | Should -Not -Throw
                 }
 
@@ -349,7 +359,7 @@ try
                 }
             }
 
-            Context 'Ensure Proxy Settings are Defined for Legacy Connection Type' {
+            Context 'When ensuring proxy settings are defined for Legacy Connection type' {
                 Mock `
                     -CommandName Set-BinaryRegistryValue `
                     -ParameterFilter { $Name -eq 'DefaultConnectionSettings' }
@@ -360,7 +370,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        Set-TargetResource -Ensure 'Present' -ConnectionType 'Legacy' -Verbose
+                        Set-TargetResource @localMachineParameters -Ensure 'Present' -ConnectionType 'Legacy'
                     } | Should -Not -Throw
                 }
 
@@ -379,14 +389,14 @@ try
         }
 
         Describe 'DSC_ProxySettings\Test-TargetResource' -Tag 'Test' {
-            Context 'No Proxy Settings are Defined in the Registry and None Required for All Connection Types' {
+            Context 'When no proxy settings are defined in the registry and None Required for All Connection types' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -Verifiable
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Absent' -ConnectionType 'All' -Verbose
+                        $script:testTargetResourceResult = Test-TargetResource @localMachineParameters -Ensure 'Absent' -ConnectionType 'All'
                     } | Should -Not -Throw
                 }
 
@@ -401,7 +411,7 @@ try
                 }
             }
 
-            Context 'DefaultConnectionSettings are Defined in the Registry and None Required for All Connection Types' {
+            Context 'When DefaultConnectionSettings are defined in the registry and None Required for All Connection types' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -413,7 +423,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Absent' -ConnectionType 'All' -Verbose
+                        $script:testTargetResourceResult = Test-TargetResource @localMachineParameters -Ensure 'Absent' -ConnectionType 'All'
                     } | Should -Not -Throw
                 }
 
@@ -428,7 +438,7 @@ try
                 }
             }
 
-            Context 'DefaultConnectionSettings are Defined in the Registry and None Required for Legacy Connection Types' {
+            Context 'When DefaultConnectionSettings are defined in the registry and None Required for Legacy Connection types' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -440,7 +450,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose
+                        $script:testTargetResourceResult = Test-TargetResource @localMachineParameters -Ensure 'Absent' -ConnectionType 'Legacy'
                     } | Should -Not -Throw
                 }
 
@@ -455,7 +465,7 @@ try
                 }
             }
 
-            Context 'SavedLegacySettings are Defined in the Registry and None Required for All Connection Types' {
+            Context 'When SavedLegacySettings are defined in the registry and None Required for All Connection types' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -467,7 +477,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Absent' -ConnectionType 'All' -Verbose
+                        $script:testTargetResourceResult = Test-TargetResource @localMachineParameters -Ensure 'Absent' -ConnectionType 'All'
                     } | Should -Not -Throw
                 }
 
@@ -482,7 +492,7 @@ try
                 }
             }
 
-            Context 'SavedLegacySettings are Defined in the Registry and None Required for Default Connection Types' {
+            Context 'When SavedLegacySettings are defined in the registry and None Required for Default Connection types' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -494,7 +504,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Absent' -ConnectionType 'Default' -Verbose
+                        $script:testTargetResourceResult = Test-TargetResource @localMachineParameters -Ensure 'Absent' -ConnectionType 'Default'
                     } | Should -Not -Throw
                 }
 
@@ -509,7 +519,7 @@ try
                 }
             }
 
-            Context 'DefaultConnectionSettings are Defined in the Registry but are Different for Default Connection Type' {
+            Context 'When DefaultConnectionSettings are defined in the registry but are Different for Default Connection type' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -526,7 +536,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Present' -ConnectionType 'Default' -Verbose
+                        $script:testTargetResourceResult = Test-TargetResource @localMachineParameters -Ensure 'Present' -ConnectionType 'Default'
                     } | Should -Not -Throw
                 }
 
@@ -545,7 +555,7 @@ try
                 }
             }
 
-            Context 'SavedLegacySettings are Defined in the Registry but are Different for Legacy Connection Type' {
+            Context 'When SavedLegacySettings are defined in the registry but are Different for Legacy Connection type' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -562,7 +572,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Present' -ConnectionType 'Legacy' -Verbose
+                        $script:testTargetResourceResult = Test-TargetResource @localMachineParameters -Ensure 'Present' -ConnectionType 'Legacy'
                     } | Should -Not -Throw
                 }
 
@@ -581,7 +591,7 @@ try
                 }
             }
 
-            Context 'DefaultConnectionSettings are Defined in the Registry and matches for Default Connection Type' {
+            Context 'When DefaultConnectionSettings are defined in the registry and matches for Default Connection type' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -598,7 +608,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Present' -ConnectionType 'Default' -Verbose
+                        $script:testTargetResourceResult = Test-TargetResource @localMachineParameters -Ensure 'Present' -ConnectionType 'Default'
                     } | Should -Not -Throw
                 }
 
@@ -617,7 +627,7 @@ try
                 }
             }
 
-            Context 'SavedLegacySettings are Defined in the Registry and matches for Legacy Connection Type' {
+            Context 'When SavedLegacySettings are defined in the registry and matches for Legacy Connection type' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -634,7 +644,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Present' -ConnectionType 'Legacy' -Verbose
+                        $script:testTargetResourceResult = Test-TargetResource @localMachineParameters -Ensure 'Present' -ConnectionType 'Legacy'
                     } | Should -Not -Throw
                 }
 
@@ -653,7 +663,7 @@ try
                 }
             }
 
-            Context 'DefaultConnectionSettings are Defined in the Registry but Legacy Connection Type settings required' {
+            Context 'When DefaultConnectionSettings are defined in the registry but Legacy Connection Type settings required' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -670,7 +680,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Present' -ConnectionType 'Legacy' -Verbose
+                        $script:testTargetResourceResult = Test-TargetResource @localMachineParameters -Ensure 'Present' -ConnectionType 'Legacy'
                     } | Should -Not -Throw
                 }
 
@@ -689,7 +699,7 @@ try
                 }
             }
 
-            Context 'DefaultConnectionSettings are Defined in the Registry but Default Connection Type settings required' {
+            Context 'When DefaultConnectionSettings are defined in the registry but Default Connection Type settings required' {
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
@@ -706,7 +716,7 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Present' -ConnectionType 'Default' -Verbose
+                        $script:testTargetResourceResult = Test-TargetResource @localMachineParameters -Ensure 'Present' -ConnectionType 'Default'
                     } | Should -Not -Throw
                 }
 
@@ -727,7 +737,7 @@ try
         }
 
         Describe 'DSC_ProxySettings\Test-ProxySettings' {
-            Context 'All Proxy Types Disabled' {
+            Context 'When all proxy types are Disabled' {
                 It 'Should not throw an exception' {
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllDisabledSettings `
@@ -740,7 +750,7 @@ try
                 }
             }
 
-            Context 'All Proxy Types Enabled and Proxy Bypass Local Disabled with all Values Matching' {
+            Context 'When all proxy types are Enabled and Proxy Bypass Local is Disabled with all Values matching' {
                 It 'Should not throw an exception' {
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllEnabledWithoutBypassLocalSettings `
@@ -753,7 +763,7 @@ try
                 }
             }
 
-            Context 'All Proxy Types Enabled and Proxy Bypass Local Enabled with all Values Matching' {
+            Context 'When all proxy types Enabled and Proxy Bypass Local Enabled with all Values matching' {
                 It 'Should not throw an exception' {
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllEnabledWithBypassLocalSettings `
@@ -766,7 +776,7 @@ try
                 }
             }
 
-            Context 'All Proxy Types Enabled and Proxy Bypass Local Enabled with Bypass Local Not Matching' {
+            Context 'When all proxy types Enabled and Proxy Bypass Local Enabled with Bypass Local not matching' {
                 It 'Should not throw an exception' {
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyAllEnabledWithBypassLocalSettings `
@@ -779,7 +789,7 @@ try
                 }
             }
 
-            Context 'Only Manual Proxy Server type Enabled with Exceptions Only that Match' {
+            Context 'When only Manual Proxy Server type Enabled with Exceptions Only that match' {
                 It 'Should not throw an exception' {
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyManualProxyWithExceptionsSettings `
@@ -792,7 +802,7 @@ try
                 }
             }
 
-            Context 'Only Manual Proxy Server type Enabled with Exceptions Only that do not Match' {
+            Context 'When only Manual Proxy Server type Enabled with Exceptions Only that do not match' {
                 It 'Should not throw an exception' {
                     { $script:testProxySettingsResult = Test-ProxySettings `
                             -CurrentValues $testProxyManualProxyWithExceptionsSettings `
@@ -853,12 +863,12 @@ try
         }
 
         Describe 'DSC_ProxySettings\Convert*-ProxySettingsBinary' {
-            Context 'All Proxy Types Disabled' {
-                It 'Should not throw an exception when converting to Proxy Settings Binary' {
+            Context 'When all proxy types are Disabled' {
+                It 'Should not throw an exception when converting to proxy settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllDisabledSettings -Verbose } | Should -Not -Throw
                 }
 
-                It 'Should not throw an exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from proxy settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 
@@ -873,12 +883,12 @@ try
                 }
             }
 
-            Context 'Only Manual Proxy Server type Enabled' {
-                It 'Should not throw an exception when converting to Proxy Settings Binary' {
+            Context 'When only Manual Proxy Server type Enabled' {
+                It 'Should not throw an exception when converting to proxy settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxySettings -Verbose } | Should -Not -Throw
                 }
 
-                It 'Should not throw an exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from proxy settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 
@@ -893,12 +903,12 @@ try
                 }
             }
 
-            Context 'Only Manual Proxy Server type Enabled with Exceptions Only' {
-                It 'Should not throw an exception when converting to Proxy Settings Binary' {
+            Context 'When only Manual Proxy Server type Enabled with Exceptions Only' {
+                It 'Should not throw an exception when converting to proxy settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxyWithExceptionsSettings -Verbose } | Should -Not -Throw
                 }
 
-                It 'Should not throw an exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from proxy settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 
@@ -913,12 +923,12 @@ try
                 }
             }
 
-            Context 'Only Manual Proxy Server type Enabled with Bypass Local Only' {
-                It 'Should not throw an exception when converting to Proxy Settings Binary' {
+            Context 'When only Manual Proxy Server type Enabled with Bypass Local Only' {
+                It 'Should not throw an exception when converting to proxy settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyManualProxyWithBypassLocalOnlySettings -Verbose } | Should -Not -Throw
                 }
 
-                It 'Should not throw an exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from proxy settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 
@@ -933,12 +943,12 @@ try
                 }
             }
 
-            Context 'Only Auto Config Proxy type Enabled' {
-                It 'Should not throw an exception when converting to Proxy Settings Binary' {
+            Context 'When only Auto Config Proxy type Enabled' {
+                It 'Should not throw an exception when converting to proxy settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAutoConfigOnlySettings -Verbose } | Should -Not -Throw
                 }
 
-                It 'Should not throw an exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from proxy settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 
@@ -953,12 +963,12 @@ try
                 }
             }
 
-            Context 'All Proxy Types Enabled and Proxy Bypass Local Disabled' {
-                It 'Should not throw an exception when converting to Proxy Settings Binary' {
+            Context 'When all Proxy Types Enabled and Proxy Bypass Local Disabled' {
+                It 'Should not throw an exception when converting to proxy settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllEnabledWithoutBypassLocalSettings -Verbose } | Should -Not -Throw
                 }
 
-                It 'Should not throw an exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from proxy settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 
@@ -973,12 +983,12 @@ try
                 }
             }
 
-            Context 'All Proxy Types Enabled and Proxy Bypass Local Enabled' {
-                It 'Should not throw an exception when converting to Proxy Settings Binary' {
+            Context 'When all Proxy Types Enabled and Proxy Bypass Local Enabled' {
+                It 'Should not throw an exception when converting to proxy settings Binary' {
                     { $script:proxyBinary = ConvertTo-ProxySettingsBinary @testProxyAllEnabledWithBypassLocalSettings -Verbose } | Should -Not -Throw
                 }
 
-                It 'Should not throw an exception when converting from Proxy Settings Binary' {
+                It 'Should not throw an exception when converting from proxy settings Binary' {
                     { $script:proxySettingsResult = ConvertFrom-ProxySettingsBinary -ProxySettings $script:proxyBinary -Verbose } | Should -Not -Throw
                 }
 

@@ -1,7 +1,7 @@
 [ClassVersion("1.0.0"), FriendlyName("ProxySettings")]
 class DSC_ProxySettings : OMI_BaseResource
 {
-    [Key, Description("Specifies if the proxy settings should be set for the LocalMachine or for the CurrentUser. Defaults to 'LocalMachine'."), ValueMap{"LocalMachine","CurrentUser"}, Values{"LocalMachine","CurrentUser"}] String Target;
+    [Key, Description("Specifies if the proxy settings should be set for the LocalMachine or for the CurrentUser. Defaults to 'LocalMachine'."), ValueMap{"LocalMachine","CurrentUser"}, Values{"LocalMachine","CurrentUser"}] String Scope;
     [Write, Description("Specifies if proxy settings should be set. Defaults to 'Present'."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
     [Write, Description("Defines if the proxy settings should be configured for default connections, legacy connections or all connections. Defaults to 'All'."), ValueMap{"All","Default","Legacy"}, Values{"All","Default","Legacy"}] String ConnectionType;
     [Write, Description("Enable automatic detection of the proxy settings. Defaults to 'False'.")] Boolean EnableAutoDetection;

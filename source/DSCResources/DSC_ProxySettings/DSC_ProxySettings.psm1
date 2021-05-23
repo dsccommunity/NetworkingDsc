@@ -30,7 +30,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.GettingProxySettingsMessage)
+        $($script:localizedData.GettingProxySettingsMessage -f $Scope)
         ) -join '')
 
     $proxySettingsPath = Get-ProxySettingsRegistryKeyPath `
@@ -170,7 +170,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.ApplyingProxySettingsMessage -f $Ensure)
+        $($script:localizedData.ApplyingProxySettingsMessage -f $Scope, $Ensure)
         ) -join '')
 
     $proxySettingsPath = Get-ProxySettingsRegistryKeyPath `
@@ -180,7 +180,7 @@ function Set-TargetResource
     {
         # Remove all the Proxy Settings
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($script:localizedData.DisablingProxyMessage)
+            $($script:localizedData.DisablingProxyMessage -f $Scope)
             ) -join '')
 
         if ($ConnectionType -in ('All','Default'))
@@ -202,7 +202,7 @@ function Set-TargetResource
     else
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($script:localizedData.EnablingProxyMessage)
+            $($script:localizedData.EnablingProxyMessage -f $Scope)
             ) -join '')
 
         # Generate the Proxy Settings binary value
@@ -217,7 +217,7 @@ function Set-TargetResource
         if ($ConnectionType -in ('All','Default'))
         {
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($script:localizedData.WritingProxyBinarySettingsMessage -f 'DefaultConnectionSettings',($proxySettings -join ','))
+                $($script:localizedData.WritingProxyBinarySettingsMessage -f $Scope, 'DefaultConnectionSettings',($proxySettings -join ','))
                 ) -join '')
 
             Set-BinaryRegistryValue `
@@ -229,7 +229,7 @@ function Set-TargetResource
         if ($ConnectionType -in ('All','Legacy'))
         {
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($script:localizedData.WritingProxyBinarySettingsMessage -f 'SavedLegacySettings',($proxySettings -join ','))
+                $($script:localizedData.WritingProxyBinarySettingsMessage -f $Scope, 'SavedLegacySettings',($proxySettings -join ','))
                 ) -join '')
 
             Set-BinaryRegistryValue `
@@ -335,7 +335,7 @@ function Test-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.CheckingProxySettingsMessage -f $Ensure)
+        $($script:localizedData.CheckingProxySettingsMessage -f $Scope, $Ensure)
         ) -join '')
 
     $desiredConfigurationMatch = $true
@@ -356,7 +356,7 @@ function Test-TargetResource
             if ($connectionsRegistryValues.DefaultConnectionSettings)
             {
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                    $($script:localizedData.ProxyBinarySettingsRequiresRemovalMessage -f 'DefaultConnectionSettings')
+                    $($script:localizedData.ProxyBinarySettingsRequiresRemovalMessage -f $Scope, 'DefaultConnectionSettings')
                     ) -join '')
 
                 $desiredConfigurationMatch = $false
@@ -369,7 +369,7 @@ function Test-TargetResource
             if ($connectionsRegistryValues.SavedLegacySettings)
             {
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                    $($script:localizedData.ProxyBinarySettingsRequiresRemovalMessage -f 'SavedLegacySettings')
+                    $($script:localizedData.ProxyBinarySettingsRequiresRemovalMessage -f $Scope, 'SavedLegacySettings')
                     ) -join '')
 
                 $desiredConfigurationMatch = $false
@@ -388,7 +388,7 @@ function Test-TargetResource
         {
             # Check if the Default Connection proxy settings are in the desired state
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($script:localizedData.CheckingProxyBinarySettingsMessage -f 'DefaultConnectionSettings')
+                $($script:localizedData.CheckingProxyBinarySettingsMessage -f $Scope, 'DefaultConnectionSettings')
                 ) -join '')
 
             if ($connectionsRegistryValues.DefaultConnectionSettings)
@@ -408,7 +408,7 @@ function Test-TargetResource
             if (-not $inDesiredState)
             {
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                    $($script:localizedData.ProxyBinarySettingsNoMatchMessage -f 'DefaultConnectionSettings')
+                    $($script:localizedData.ProxyBinarySettingsNoMatchMessage -f $Scope, 'DefaultConnectionSettings')
                     ) -join '')
 
                 $desiredConfigurationMatch = $false
@@ -419,7 +419,7 @@ function Test-TargetResource
         {
             # Check if the Saved Legacy proxy settings are in the desired state
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($script:localizedData.CheckingProxyBinarySettingsMessage -f 'SavedLegacySettings')
+                $($script:localizedData.CheckingProxyBinarySettingsMessage -f $Scope, 'SavedLegacySettings')
                 ) -join '')
 
             if ($connectionsRegistryValues.SavedLegacySettings)
@@ -439,7 +439,7 @@ function Test-TargetResource
             if (-not $inDesiredState)
             {
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                    $($script:localizedData.ProxyBinarySettingsNoMatchMessage -f 'SavedLegacySettings')
+                    $($script:localizedData.ProxyBinarySettingsNoMatchMessage -f $Scope, 'SavedLegacySettings')
                     ) -join '')
 
                 $desiredConfigurationMatch = $false
