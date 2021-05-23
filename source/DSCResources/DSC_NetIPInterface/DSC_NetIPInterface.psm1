@@ -484,7 +484,8 @@ function Get-NetworkIPInterface
             $($script:localizedData.GettingNetIPInterfaceMessage) -f $InterfaceAlias, $AddressFamily
         ) -join '')
 
-    $netIPInterface = Get-NetIPInterface @PSBoundParameters -ErrorAction SilentlyContinue
+    $netIPInterface = Get-NetIPInterface @PSBoundParameters `
+        -ErrorAction SilentlyContinue
 
     if (-not $netIPInterface)
     {

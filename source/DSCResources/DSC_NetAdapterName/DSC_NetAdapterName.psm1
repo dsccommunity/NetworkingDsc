@@ -253,7 +253,8 @@ function Set-TargetResource
             $($script:localizedData.RenamingNetAdapterNameMessage -f $adapter.Name, $NewName)
         ) -join '')
 
-    $adapter | Rename-NetAdapter -NewName $NewName
+    $adapter | Rename-NetAdapter `
+        -NewName $NewName
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($script:localizedData.NetAdapterNameRenamedMessage -f $NewName)

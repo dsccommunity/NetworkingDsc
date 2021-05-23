@@ -46,7 +46,8 @@ function Get-TargetResource
         ) -join '' )
 
     # Get the current Dns Client Global Settings
-    $netFirewallProfile = Get-NetFirewallProfile -Name $Name `
+    $netFirewallProfile = Get-NetFirewallProfile `
+        -Name $Name `
         -ErrorAction Stop
 
     # Generate the return object.
@@ -231,7 +232,8 @@ function Set-TargetResource
         ) -join '' )
 
     # Get the current Firewall Profile Settings
-    $netFirewallProfile = Get-NetFirewallProfile -Name $Name `
+    $netFirewallProfile = Get-NetFirewallProfile `
+        -Name $Name `
         -ErrorAction Stop
 
     # Generate a list of parameters that will need to be changed.
@@ -442,7 +444,8 @@ function Test-TargetResource
     $desiredConfigurationMatch = $true
 
     # Get the current Dns Client Global Settings
-    $netFirewallProfile = Get-NetFirewallProfile -Name $Name `
+    $netFirewallProfile = Get-NetFirewallProfile `
+        -Name $Name `
         -ErrorAction Stop
 
     # Check each parameter

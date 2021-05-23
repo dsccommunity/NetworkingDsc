@@ -92,7 +92,9 @@ function Get-TargetResource
 
         foreach ($netAdapterItem in $netAdapter)
         {
-            $settingResults += Get-NetAdapterNetbiosOptionsFromRegistry -NetworkAdapterGUID $netAdapterItem.GUID -Setting $Setting
+            $settingResults += Get-NetAdapterNetbiosOptionsFromRegistry `
+                -NetworkAdapterGUID $netAdapterItem.GUID `
+                -Setting $Setting
 
             Write-Verbose -Message ($script:localizedData.CurrentNetBiosSettingMessage -f $netAdapterItem.NetConnectionID, $settingResults[-1])
         }
@@ -108,7 +110,9 @@ function Get-TargetResource
     }
     else
     {
-        $Setting = Get-NetAdapterNetbiosOptionsFromRegistry -NetworkAdapterGUID $netAdapter.GUID -Setting $Setting
+        $Setting = Get-NetAdapterNetbiosOptionsFromRegistry `
+            -NetworkAdapterGUID $netAdapter.GUID `
+            -Setting $Setting
     }
 
     Write-Verbose -Message ($script:localizedData.CurrentNetBiosSettingMessage -f $InterfaceAlias, $Setting)
@@ -167,7 +171,9 @@ function Set-TargetResource
     {
         foreach ($netAdapterItem in $netAdapter)
         {
-            $currentValue = Get-NetAdapterNetbiosOptionsFromRegistry -NetworkAdapterGUID $netAdapterItem.GUID -Setting $Setting
+            $currentValue = Get-NetAdapterNetbiosOptionsFromRegistry `
+                -NetworkAdapterGUID $netAdapterItem.GUID `
+                -Setting $Setting
 
             # Only make changes if necessary
             if ($currentValue -ne $Setting)
@@ -178,9 +184,10 @@ function Set-TargetResource
                     -ResultClassName Win32_NetworkAdapterConfiguration `
                     -ErrorAction Stop
 
-                Set-NetAdapterNetbiosOptions -NetworkAdapterObject $netAdapterConfig `
-                                             -InterfaceAlias $netAdapterItem.NetConnectionID `
-                                             -Setting $Setting
+                Set-NetAdapterNetbiosOptions `
+                    -NetworkAdapterObject $netAdapterConfig `
+                    -InterfaceAlias $netAdapterItem.NetConnectionID `
+                    -Setting $Setting
             }
         }
     }
@@ -192,9 +199,10 @@ function Set-TargetResource
                     -ResultClassName Win32_NetworkAdapterConfiguration `
                     -ErrorAction Stop
 
-        Set-NetAdapterNetbiosOptions -NetworkAdapterObject $netAdapterConfig `
-                                     -InterfaceAlias $netAdapter.NetConnectionID `
-                                     -Setting $Setting
+        Set-NetAdapterNetbiosOptions `
+            -NetworkAdapterObject $netAdapterConfig `
+            -InterfaceAlias $netAdapter.NetConnectionID `
+            -Setting $Setting
     }
 }
 
@@ -269,8 +277,9 @@ function Get-NetAdapterNetbiosOptionsFromRegistry
     $currentErrorActionPreference = $ErrorActionPreference
     $ErrorActionPreference = 'SilentlyContinue'
 
-    $registryNetbiosOptions = Get-ItemPropertyValue -Name 'NetbiosOptions' `
-                    -Path "$($script:hklmInterfacesPath)\Tcpip_$($NetworkAdapterGUID)"
+    $registryNetbiosOptions = Get-ItemPropertyValue `
+        -Name 'NetbiosOptions' `
+        -Path "$($script:hklmInterfacesPath)\Tcpip_$($NetworkAdapterGUID)"
 
     $ErrorActionPreference = $currentErrorActionPreference
 
