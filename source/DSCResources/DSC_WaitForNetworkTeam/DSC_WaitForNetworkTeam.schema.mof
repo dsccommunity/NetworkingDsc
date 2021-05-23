@@ -1,4 +1,3 @@
-
 [ClassVersion("1.0.0.0"), FriendlyName("WaitForNetworkTeam")]
 class DSC_WaitForNetworkTeam : OMI_BaseResource
 {

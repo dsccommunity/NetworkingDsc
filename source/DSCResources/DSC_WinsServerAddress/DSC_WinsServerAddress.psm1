@@ -77,7 +77,10 @@ function Set-TargetResource
 
     Write-Verbose -Message "$($MyInvocation.MyCommand): $($script:localizedData.ApplyingWinsServerAddressesMessage)"
 
-    Set-WinsClientServerStaticAddress -InterfaceAlias $InterfaceAlias -Address $Address -ErrorAction Stop
+    Set-WinsClientServerStaticAddress `
+        -InterfaceAlias $InterfaceAlias `
+        -Address $Address `
+        -ErrorAction Stop
 
 }
 

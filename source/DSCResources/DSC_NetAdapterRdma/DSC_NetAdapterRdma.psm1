@@ -37,7 +37,9 @@ function Get-TargetResource
     {
         Write-Verbose -Message ($script:localizedData.GetNetAdapterRdmaMessage -f $Name)
 
-        $netAdapterRdma = Get-NetAdapterRdma -Name $Name -ErrorAction Stop
+        $netAdapterRdma = Get-NetAdapterRdma `
+            -Name $Name `
+            -ErrorAction Stop
     }
     catch
     {
@@ -85,7 +87,9 @@ function Set-TargetResource
     {
         Write-Verbose -Message ($script:localizedData.GetNetAdapterRdmaMessage -f $Name)
 
-        $netAdapterRdma = Get-NetAdapterRdma -Name $Name -ErrorAction Stop
+        $netAdapterRdma = Get-NetAdapterRdma `
+            -Name $Name `
+            -ErrorAction Stop
     }
     catch
     {
@@ -101,7 +105,9 @@ function Set-TargetResource
         {
             Write-Verbose -Message ($script:localizedData.SetNetAdapterRdmaMessage -f $Name, $Enabled)
 
-            Set-NetAdapterRdma -Name $Name -Enabled $Enabled
+            Set-NetAdapterRdma `
+                -Name $Name `
+                -Enabled $Enabled
         }
     }
 }
@@ -137,7 +143,9 @@ function Test-TargetResource
     {
         Write-Verbose -Message ($script:localizedData.GetNetAdapterRdmaMessage -f $Name)
 
-        $netAdapterRdma = Get-NetAdapterRdma -Name $Name -ErrorAction Stop
+        $netAdapterRdma = Get-NetAdapterRdma `
+            -Name $Name `
+            -ErrorAction Stop
     }
     catch
     {

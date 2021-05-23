@@ -1,0 +1,6 @@
+[ClassVersion("1.0.0.0"), FriendlyName("MSFT_xNetPowerManagement")]
+class MSFT_xNetPowerManagement : OMI_BaseResource
+{
+    [Key, Description("Specifies the adapter Type you want to effect. Example 'Ethernet 802.3' for Ethernet adapters")] String AdapterType;
+    [Write, Description("Specifies to Enable or Disable the power management feature of the NIC."), ValueMap{"Enabled","Disabled"}, Values{"Enabled","Disabled"}] String State;
+};
