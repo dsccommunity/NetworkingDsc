@@ -1,6 +1,6 @@
 <#PSScriptInfo
-.VERSION 2.0.0
-.GUID b16d59df-5a59-4592-8033-46e1daee24c3
+.VERSION 1.0.0
+.GUID f066cc99-4b79-4e43-8244-ca0396cd9e01
 .AUTHOR DSC Community
 .COMPANYNAME DSC Community
 .COPYRIGHT Copyright the DSC Community contributors. All rights reserved.
@@ -19,12 +19,13 @@
 
 <#
     .DESCRIPTION
-    Sets the computer to use a manually configured proxy server
+    Sets a user account to use a manually configured proxy server
     with the address 'proxy.contoso.com' on port 8888. Traffic to addresses
     starting with 'web1' or 'web2' or any local addresses will not be sent
-    to the proxy.
+    to the proxy. The user account that is configured will be the account
+    that the resource is run under (e.g. LocalSystem for the LCM).
 #>
-Configuration ProxySettings_ManualProxy_Config
+Configuration ProxySettings_ManualProxyForCurrentUser_Config
 {
     Import-DSCResource -ModuleName NetworkingDsc
 
@@ -32,7 +33,7 @@ Configuration ProxySettings_ManualProxy_Config
     {
         ProxySettings ManualProxy
         {
-            Scope                   = 'LocalMachine'
+            Scope                   = 'CurrentUser'
             Ensure                  = 'Present'
             EnableAutoDetection     = $false
             EnableAutoConfiguration = $false

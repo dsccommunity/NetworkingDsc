@@ -3,7 +3,7 @@ configuration DSC_ProxySettings_Present_Config {
 
     node localhost {
         ProxySettings Integration_Test {
-            IsSingleInstance        = 'Yes'
+            Scope                   = $Node.Scope
             Ensure                  = 'Present'
             EnableAutoDetection     = $Node.EnableAutoDetection
             EnableAutoConfiguration = $Node.EnableAutoConfiguration

@@ -3,8 +3,8 @@ configuration DSC_ProxySettings_Absent_Config {
 
     node localhost {
         ProxySettings Integration_Test {
-            IsSingleInstance        = 'Yes'
-            Ensure                  = 'Absent'
+            Scope  = $Node.Scope
+            Ensure = 'Absent'
         }
     }
 }

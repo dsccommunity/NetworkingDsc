@@ -29,22 +29,23 @@ try
         }
         $testAutoConfigURL = 'http://wpad.contoso.com/test.wpad'
 
-        $configData = @{
-            AllNodes = @(
-                @{
-                    NodeName                = 'localhost'
-                    EnableAutoDetection     = $True
-                    EnableAutoConfiguration = $True
-                    EnableManualProxy       = $True
-                    ProxyServer             = $testProxyServer
-                    ProxyServerExceptions   = $testProxyExceptions
-                    ProxyServerBypassLocal  = $True
-                    AutoConfigURL           = $testAutoConfigURL
-                }
-            )
-        }
-
         Describe "$($script:dscResourceName)_Present_Integration" {
+            $configData = @{
+                AllNodes = @(
+                    @{
+                        NodeName                = 'localhost'
+                        Scope                   = 'LocalMachine'
+                        EnableAutoDetection     = $True
+                        EnableAutoConfiguration = $True
+                        EnableManualProxy       = $True
+                        ProxyServer             = $testProxyServer
+                        ProxyServerExceptions   = $testProxyExceptions
+                        ProxyServerBypassLocal  = $True
+                        AutoConfigURL           = $testAutoConfigURL
+                    }
+                )
+            }
+
             $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_Present.config.ps1"
             . $configFile -Verbose -ErrorAction Stop
 
@@ -73,19 +74,22 @@ try
             }
 
             It 'Should report that DSC is in state' {
-                $script:currentState | Should -Be $true
+                $script:currentState | Should -BeTrue
             }
 
             It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Present_Config" }
-                $current.Ensure                  | Should -Be 'Present'
-                $current.EnableAutoDetection     | Should -Be $True
-                $current.EnableAutoConfiguration | Should -Be $True
-                $current.EnableManualProxy       | Should -Be $True
-                $current.ProxyServer             | Should -Be $testProxyServer
-                $current.ProxyServerExceptions   | Should -Be $testProxyExceptions
-                $current.ProxyServerBypassLocal  | Should -Be $True
-                $current.AutoConfigURL           | Should -Be $testAutoConfigURL
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Present_Config"
+                }
+                $current.Scope                   | Should -Be $configData.AllNodes[0].Scope
+                $current.Ensure                  | Should -Be $configData.AllNodes[0].Ensure
+                $current.EnableAutoDetection     | Should -Be $configData.AllNodes[0].EnableAutoDetection
+                $current.EnableAutoConfiguration | Should -Be $configData.AllNodes[0].EnableAutoConfiguration
+                $current.EnableManualProxy       | Should -Be $configData.AllNodes[0].EnableManualProxy
+                $current.ProxyServer             | Should -Be $configData.AllNodes[0].ProxyServer
+                $current.ProxyServerExceptions   | Should -Be $configData.AllNodes[0].ProxyServerExceptions
+                $current.ProxyServerBypassLocal  | Should -Be $configData.AllNodes[0].ProxyServerBypassLocal
+                $current.AutoConfigURL           | Should -Be $configData.AllNodes[0].AutoConfigURL
             }
         }
 
@@ -117,12 +121,14 @@ try
             }
 
             It 'Should report that DSC is in state' {
-                $script:currentState | Should -Be $true
+                $script:currentState | Should -BeTrue
             }
 
             It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Absent_Config" }
-                $current.Ensure            | Should -Be 'Absent'
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Absent_Config"
+                }
+                $current.Ensure | Should -Be 'Absent'
             }
         }
     }

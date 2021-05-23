@@ -115,7 +115,9 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should -Not -Throw
+                    {
+                        $script:getTargetResourceResult = Get-TargetResource -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return the expected values' {
@@ -131,8 +133,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                    @{ DefaultConnectionSettings = $testBinary }
-                } `
+                        @{
+                            DefaultConnectionSettings = $testBinary
+                        }
+                    } `
                     -Verifiable
 
                 Mock `
@@ -143,7 +147,9 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should -Not -Throw
+                    {
+                        $script:getTargetResourceResult = Get-TargetResource -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return the expected values' {
@@ -166,8 +172,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                    @{ SavedLegacySettings = $testBinary }
-                } `
+                        @{
+                            SavedLegacySettings = $testBinary
+                        }
+                    } `
                     -Verifiable
 
                 Mock `
@@ -178,7 +186,9 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:getTargetResourceResult = Get-TargetResource -IsSingleInstance 'Yes' -Verbose } | Should -Not -Throw
+                    {
+                        $script:getTargetResourceResult = Get-TargetResource -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return the expected values' {
@@ -209,7 +219,9 @@ try
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should -Not -Throw
+                    {
+                        Set-TargetResource -Ensure 'Absent' -ConnectionType 'All' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -235,7 +247,9 @@ try
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Default' -Verbose } | Should -Not -Throw
+                    {
+                        Set-TargetResource -Ensure 'Absent' -ConnectionType 'Default' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -261,7 +275,9 @@ try
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose } | Should -Not -Throw
+                    {
+                        Set-TargetResource -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -287,7 +303,9 @@ try
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'All' -Verbose } | Should -Not -Throw
+                    {
+                        Set-TargetResource -Ensure 'Present' -ConnectionType 'All' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -313,7 +331,9 @@ try
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should -Not -Throw
+                    {
+                        Set-TargetResource -Ensure 'Present' -ConnectionType 'Default' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -339,7 +359,9 @@ try
                     -ParameterFilter { $Name -eq 'SavedLegacySettings' }
 
                 It 'Should not throw an exception' {
-                    { Set-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should -Not -Throw
+                    {
+                        Set-TargetResource -Ensure 'Present' -ConnectionType 'Legacy' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call expected mocks' {
@@ -363,7 +385,9 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should -Not -Throw
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Absent' -ConnectionType 'All' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
@@ -381,12 +405,16 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                    @{ DefaultConnectionSettings = $testBinary }
-                } `
+                        @{
+                            DefaultConnectionSettings = $testBinary
+                        }
+                    } `
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should -Not -Throw
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Absent' -ConnectionType 'All' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
@@ -404,12 +432,16 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                    @{ DefaultConnectionSettings = $testBinary }
-                } `
+                        @{
+                            DefaultConnectionSettings = $testBinary
+                        }
+                    } `
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose } | Should -Not -Throw
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Absent' -ConnectionType 'Legacy' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
@@ -427,12 +459,16 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                    @{ SavedLegacySettings = $testBinary }
-                } `
+                        @{
+                            SavedLegacySettings = $testBinary
+                        }
+                    } `
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'All' -Verbose } | Should -Not -Throw
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Absent' -ConnectionType 'All' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
@@ -450,12 +486,16 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                    @{ SavedLegacySettings = $testBinary }
-                } `
+                        @{
+                            SavedLegacySettings = $testBinary
+                        }
+                    } `
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Absent' -ConnectionType 'Default' -Verbose } | Should -Not -Throw
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Absent' -ConnectionType 'Default' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
@@ -473,8 +513,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                    @{ DefaultConnectionSettings = $testBinary }
-                } `
+                        @{
+                            DefaultConnectionSettings = $testBinary
+                        }
+                    } `
                     -Verifiable
 
                 Mock `
@@ -483,7 +525,9 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should -Not -Throw
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Present' -ConnectionType 'Default' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
@@ -505,8 +549,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                    @{ SavedLegacySettings = $testBinary }
-                } `
+                        @{
+                            SavedLegacySettings = $testBinary
+                        }
+                    } `
                     -Verifiable
 
                 Mock `
@@ -515,7 +561,9 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should -Not -Throw
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Present' -ConnectionType 'Legacy' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
@@ -537,8 +585,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                    @{ DefaultConnectionSettings = $testBinary }
-                } `
+                        @{
+                            DefaultConnectionSettings = $testBinary
+                        }
+                    } `
                     -Verifiable
 
                 Mock `
@@ -547,7 +597,9 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should -Not -Throw
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Present' -ConnectionType 'Default' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
@@ -569,8 +621,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                    @{ SavedLegacySettings = $testBinary }
-                } `
+                        @{
+                            SavedLegacySettings = $testBinary
+                        }
+                    } `
                     -Verifiable
 
                 Mock `
@@ -579,7 +633,9 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should -Not -Throw
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Present' -ConnectionType 'Legacy' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
@@ -601,8 +657,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                    @{ DefaultConnectionSettings = $testBinary }
-                } `
+                        @{
+                            DefaultConnectionSettings = $testBinary
+                        }
+                    } `
                     -Verifiable
 
                 Mock `
@@ -611,7 +669,9 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Legacy' -Verbose } | Should -Not -Throw
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Present' -ConnectionType 'Legacy' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
@@ -633,8 +693,10 @@ try
                 Mock `
                     -CommandName Get-ItemProperty `
                     -MockWith {
-                    @{ SavedLegacySettings = $testBinary }
-                } `
+                        @{
+                            SavedLegacySettings = $testBinary
+                        }
+                    } `
                     -Verifiable
 
                 Mock `
@@ -643,7 +705,9 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { $script:testTargetResourceResult = Test-TargetResource -IsSingleInstance 'Yes' -Ensure 'Present' -ConnectionType 'Default' -Verbose } | Should -Not -Throw
+                    {
+                        $script:testTargetResourceResult = Test-TargetResource -Ensure 'Present' -ConnectionType 'Default' -Verbose
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
