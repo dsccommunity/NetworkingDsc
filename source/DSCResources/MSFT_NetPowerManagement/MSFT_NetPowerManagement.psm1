@@ -1,32 +1,47 @@
-﻿<#
+﻿$modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
+
+# Import the Networking Common Modules
+Import-Module -Name (Join-Path -Path $modulePath `
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
+
+Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
+
+# Import Localization Strings
+$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
+
+<#
     .SYNOPSIS
-    Returns the current state of a Network Power Management.
+        Gets the power management features of the network adapter.
 
     .PARAMETER AdapterType
-    Specifies the name of the network adapter type you want to change. example 'Ethernet 802.3'
-
+        Specifies the network adapter type you want to change. example 'Ethernet 802.3'
 #>
-
 function Get-TargetResource {
     [CmdletBinding()]
-    [OutputType([System.Collections.Hashtable])]
+    [OutputType([Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
-        $AdapterType
+        $AdapterType,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Enabled', 'Disabled')]
+        [System.String]
+        $State
     )
 
     Write-Verbose "Getting the power setting on the network adpater."
 
     #Write-Debug "Use this cmdlet to write debug information while troubleshooting."
-    $nic = Get-CimClass Win32_NetworkAdapter | where-object {$_.AdapterType -eq 'Ethernet 802.3'}
+    $nic = Get-CimClass Win32_NetworkAdapter | where-object {$_.AdapterType -eq $AdapterType}
     $powerMgmt = Get-CimClass MSPower_DeviceEnable -Namespace root\wmi | where-object {$_.InstanceName.ToUpper().Contains($nic.PNPDeviceID)}
 
-    If ($powerMgmt.Enable -eq $true) {
+    if ($powerMgmt.Enable -eq $true) {
         $State = $False
     }
-    ELSE {
+    else {
         $State = $true
     }
 
@@ -42,103 +57,98 @@ function Get-TargetResource {
 
 <#
     .SYNOPSIS
-    Sets the current state of a Network Power Management.
+        Sets the power management properties on the network adapter.
 
     .PARAMETER AdapterType
-    Specifies the name of the network adapter type you want to change. example 'Ethernet 802.3'
+        Specifies the name of the network adapter type you want to change. example 'Ethernet 802.3'
 
     .PARAMETER State
-    Allows to set the state of the Network Adapter power management settings to disable to enable. 
+        Allows to set the state of the Network Adapter power management settings to disable to enable.
 #>
 function Set-TargetResource {
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $AdapterType,
 
-        [ValidateSet("Enabled", "Disabled")]
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Enabled', 'Disabled')]
         [System.String]
         $State
     )
 
+    Write-Verbose -Message ( @(
+        "$($MyInvocation.MyCommand): "
+        $script:localizedData.CheckingNetAdapterMessage
+    ) -join '')
+
+    $currentState = Get-TargetResource @PSBoundParameters
 
     $nics = Get-CimClass Win32_NetworkAdapter | where-object {$_.AdapterType -eq $AdapterType}
     foreach ($nic in $nics) {
         $powerMgmt = Get-CimClass MSPower_DeviceEnable -Namespace root\wmi | where-object {$_.InstanceName.ToUpper().Contains($nic.PNPDeviceID)}
-            
-        If ($State -eq 'Disabled') {
+
+        if ($State -eq 'Disabled') {
             Write-Verbose "Disabling the NIC power management setting."
             $powerMgmt.Enable = $False #Turn off PowerManagement feature
         }
-        ELSE {
+        else {
             Write-Verbose "Enabling the NIC power management setting."
             $powerMgmt.Enable = $true #Turn on PowerManagement feature
         }
-            
+
         $powerMgmt.psbase.Put() | Out-Null
     }
-
-
 }
 
 <#
     .SYNOPSIS
-    Test the current state of a Network Power Management.
+        Tests if the NetPowerManagement resource state is desired state.
 
     .PARAMETER AdapterType
-    Specifies the name of the network adapter type you want to change. example 'Ethernet 802.3'
+        Specifies the name of the network adapter type you want to change. example 'Ethernet 802.3'
 
     .PARAMETER State
-    Allows to Check the state of the Network Adapter power management settings to disable to enable to see if it needs to be changed. 
+        Allows to Check the state of the Network Adapter power management settings to disable to enable to see if it needs to be changed.
 #>
 function Test-TargetResource {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $AdapterType,
 
-        [ValidateSet("Enabled", "Disabled")]
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('Enabled', 'Disabled')]
         [System.String]
         $State
     )
 
     Write-Verbose "Checking to see if the power setting on the NIC for Adapter Type $AdapterType."
 
-    #Write-Debug "Use this cmdlet to write debug information while troubleshooting."
+    Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($script:localizedData.NetPowerManagementMessage -f $AdapterType)
+        ) -join '')
 
-    $nic = Get-CimClass Win32_NetworkAdapter | where-object {$_.AdapterType -eq 'Ethernet 802.3'}
-    $powerMgmt = Get-CimClass MSPower_DeviceEnable -Namespace root\wmi | where-object {$_.InstanceName.ToUpper().Contains($nic.PNPDeviceID)}
+    $currentState = Get-TargetResource @PSBoundParameters
 
-    If ($State -eq 'Disabled') {
-        If ($powerMgmt.Enable -eq $false) {
-            Write-Verbose "NIC Power Management setting is disabled."
-            $result = $true
-        }
-        ELSE {
-            Write-Verbose "NIC Power Management setting is not disabled. - Disabling"
-            $result = $false
-        }
+    if ($currentState)
+    {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.NetPowerManagementMessage -f $AdapterType, $currentState.State)
+            ) -join '')
+
+        return $currentState.State -eq $State
     }
 
-    If ($State -eq 'Enabled') {
-        If ($powerMgmt.Enable -eq $false) {
-            Write-Verbose "NIC Power Management setting is disabled. - Enabling."
-            $result = $false
-        }
-        ELSE {
-            Write-Verbose "NIC Power Management setting is not disabled."
-            $result = $true
-        }
-    }
-
-    $result
+    return $false
 }
 
 
 Export-ModuleMember -Function *-TargetResource
-
