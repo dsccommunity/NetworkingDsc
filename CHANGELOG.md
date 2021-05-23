@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Azure Pipelines - Fixes [Issue #491](https://github.com/dsccommunity/NetworkingDsc/issues/491).
 - Minor reformatting of code style for diffability.
 
+### Added
+- NetPowerManagement
+  - Allow configuration of power saving settings on network adapters.
+
 ## [8.2.0] - 2020-10-16
 
 ### Changed
