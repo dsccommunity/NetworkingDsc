@@ -32,7 +32,7 @@ try
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile -Verbose -ErrorAction Stop
 
-        foreach ($target in @('LocalMachinee','CurrentUser'))
+        foreach ($target in @('LocalMachine','CurrentUser'))
         {
             Context "When Target is '$Target'" {
                 Context "When Ensure is 'Present'" {
