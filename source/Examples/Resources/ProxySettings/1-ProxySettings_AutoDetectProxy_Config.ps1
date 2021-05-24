@@ -29,7 +29,7 @@ Configuration ProxySettings_AutoDetectProxy_Config
     {
         ProxySettings AutoDetectProxy
         {
-            Scope                   = 'LocalMachine'
+            Target                  = 'LocalMachine'
             Ensure                  = 'Present'
             EnableAutoDetection     = $true
             EnableAutoConfiguration = $false

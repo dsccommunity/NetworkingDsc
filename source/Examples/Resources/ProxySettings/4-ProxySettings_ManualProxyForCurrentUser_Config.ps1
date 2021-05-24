@@ -22,8 +22,10 @@
     Sets a user account to use a manually configured proxy server
     with the address 'proxy.contoso.com' on port 8888. Traffic to addresses
     starting with 'web1' or 'web2' or any local addresses will not be sent
-    to the proxy. The user account that is configured will be the account
-    that the resource is run under (e.g. LocalSystem for the LCM).
+    to the proxy.
+
+    The user account that the proxy settings are configured for will be the account
+    that applies the resource.
 #>
 Configuration ProxySettings_ManualProxyForCurrentUser_Config
 {
@@ -33,7 +35,7 @@ Configuration ProxySettings_ManualProxyForCurrentUser_Config
     {
         ProxySettings ManualProxy
         {
-            Scope                   = 'CurrentUser'
+            Target                  = 'CurrentUser'
             Ensure                  = 'Present'
             EnableAutoDetection     = $false
             EnableAutoConfiguration = $false

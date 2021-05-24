@@ -32,7 +32,7 @@ Configuration ProxySettings_ManualProxy_Config
     {
         ProxySettings ManualProxy
         {
-            Scope                   = 'LocalMachine'
+            Target                  = 'LocalMachine'
             Ensure                  = 'Present'
             EnableAutoDetection     = $false
             EnableAutoConfiguration = $false

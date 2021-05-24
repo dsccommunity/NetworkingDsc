@@ -81,8 +81,8 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Present_Config"
                 }
+                $current.Ensure                  | Should -Be 'Present'
                 $current.Target                  | Should -Be $configData.AllNodes[0].Target
-                $current.Ensure                  | Should -Be $configData.AllNodes[0].Ensure
                 $current.EnableAutoDetection     | Should -Be $configData.AllNodes[0].EnableAutoDetection
                 $current.EnableAutoConfiguration | Should -Be $configData.AllNodes[0].EnableAutoConfiguration
                 $current.EnableManualProxy       | Should -Be $configData.AllNodes[0].EnableManualProxy
@@ -94,13 +94,23 @@ try
         }
 
         Describe "$($script:dscResourceName)_Absent_Integration" {
+            $configData = @{
+                AllNodes = @(
+                    @{
+                        NodeName = 'localhost'
+                        Target   = 'LocalMachine'
+                    }
+                )
+            }
+
             $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_Absent.config.ps1"
             . $configFile -Verbose -ErrorAction Stop
 
             It 'Should compile without throwing' {
                 {
                     & "$($script:dscResourceName)_Absent_Config" `
-                        -OutputPath $TestDrive
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
 
                     Start-DscConfiguration `
                         -Path $TestDrive `
@@ -129,6 +139,7 @@ try
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Absent_Config"
                 }
                 $current.Ensure | Should -Be 'Absent'
+                $current.Target | Should -Be $configData.AllNodes[0].Target
             }
         }
     }
