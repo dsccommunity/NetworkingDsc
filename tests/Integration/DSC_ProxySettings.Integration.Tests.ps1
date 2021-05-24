@@ -29,6 +29,9 @@ try
         }
         $testAutoConfigURL = 'http://wpad.contoso.com/test.wpad'
 
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+        . $configFile -Verbose -ErrorAction Stop
+
         Describe "$($script:dscResourceName)_Present_Integration" {
             $configData = @{
                 AllNodes = @(
@@ -45,9 +48,6 @@ try
                     }
                 )
             }
-
-            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_Present.config.ps1"
-            . $configFile -Verbose -ErrorAction Stop
 
             It 'Should compile without throwing' {
                 {
@@ -102,9 +102,6 @@ try
                     }
                 )
             }
-
-            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_Absent.config.ps1"
-            . $configFile -Verbose -ErrorAction Stop
 
             It 'Should compile without throwing' {
                 {

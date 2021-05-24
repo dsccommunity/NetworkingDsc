@@ -35,7 +35,9 @@ function Get-TargetResource
 
     $proxySettingsPath = Get-ProxySettingsRegistryKeyPath `
         -Target $Target
-    $returnValue = @{}
+    $returnValue = @{
+        Target = $Target
+    }
 
     # Get the registry values in the Connections registry key
     $connectionsRegistryValues = Get-ItemProperty `
