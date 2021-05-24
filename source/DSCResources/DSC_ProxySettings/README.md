@@ -3,12 +3,12 @@
 The resource is used to configure internet proxy settings for a computer
 (`LocalMachine`) or a user account (`CurrentUser`).
 
-## Scope
+## Target
 
-The `Scope` parameter is used to specify whether to configure the proxy
+The `Target` parameter is used to specify whether to configure the proxy
 settings for the machine or for a specific user account.
 
-If the `Scope` is set to `CurrentUser` then the proxy settings will be
+If the `Target` is set to `CurrentUser` then the proxy settings will be
 configured for the user account that the resource runs under. This is
 usually the account the DSC Local Configuration Manager runs under,
 which is `LocalSystem`.

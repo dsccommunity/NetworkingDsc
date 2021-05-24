@@ -107,12 +107,12 @@ try
         }
 
         $localMachineParameters = @{
-            Scope = 'LocalMachine'
+            Target = 'LocalMachine'
             Verbose = $true
         }
 
         $currentUserParameters = @{
-            Scope = 'CurrentUser'
+            Target = 'CurrentUser'
             Verbose = $true
         }
 
@@ -1005,15 +1005,15 @@ try
         }
 
         Describe 'DSC_ProxySettings\Get-ProxySettingsRegistryKeyPath' {
-            Context 'When scope is default (LocalMachine)' {
+            Context 'When target is default (LocalMachine)' {
                 It 'Should return "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections"' {
                     Get-ProxySettingsRegistryKeyPath | Should -BeExactly 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections'
                 }
             }
 
-            Context 'When scope is CurrentUser' {
+            Context 'When target is CurrentUser' {
                 It 'Should return "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections"' {
-                    Get-ProxySettingsRegistryKeyPath -Scope 'CurrentUser' | Should -BeExactly 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections'
+                    Get-ProxySettingsRegistryKeyPath -Target 'CurrentUser' | Should -BeExactly 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections'
                 }
             }
         }

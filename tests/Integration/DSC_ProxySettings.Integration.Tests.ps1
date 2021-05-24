@@ -34,7 +34,7 @@ try
                 AllNodes = @(
                     @{
                         NodeName                = 'localhost'
-                        Scope                   = 'LocalMachine'
+                        Target                  = 'LocalMachine'
                         EnableAutoDetection     = $True
                         EnableAutoConfiguration = $True
                         EnableManualProxy       = $True
@@ -81,7 +81,7 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Present_Config"
                 }
-                $current.Scope                   | Should -Be $configData.AllNodes[0].Scope
+                $current.Target                  | Should -Be $configData.AllNodes[0].Target
                 $current.Ensure                  | Should -Be $configData.AllNodes[0].Ensure
                 $current.EnableAutoDetection     | Should -Be $configData.AllNodes[0].EnableAutoDetection
                 $current.EnableAutoConfiguration | Should -Be $configData.AllNodes[0].EnableAutoConfiguration
