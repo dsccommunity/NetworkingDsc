@@ -23,7 +23,7 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [Parameter()]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('LocalMachine','CurrentUser')]
         [System.String]
         $Target
@@ -125,7 +125,7 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [Parameter()]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('LocalMachine','CurrentUser')]
         [System.String]
         $Target,
@@ -290,7 +290,7 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [Parameter()]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('LocalMachine','CurrentUser')]
         [System.String]
         $Target,
