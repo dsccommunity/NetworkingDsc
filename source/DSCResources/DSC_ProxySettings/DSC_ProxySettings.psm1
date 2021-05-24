@@ -210,7 +210,7 @@ function Set-TargetResource
         # Generate the Proxy Settings binary value
         $convertToProxySettingsBinaryParameters = @{} + $PSBoundParameters
 
-        $convertToProxySettingsBinaryParameters.Remove('IsSingleInstance')
+        $convertToProxySettingsBinaryParameters.Remove('Target')
         $convertToProxySettingsBinaryParameters.Remove('Ensure')
         $convertToProxySettingsBinaryParameters.Remove('ConnectionType')
 
@@ -382,7 +382,7 @@ function Test-TargetResource
     {
         $desiredValues = @{} + $PSBoundParameters
 
-        $desiredValues.Remove('IsSingleInstance')
+        $desiredValues.Remove('Target')
         $desiredValues.Remove('Ensure')
         $desiredValues.Remove('ConnectionType')
 
