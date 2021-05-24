@@ -40,7 +40,7 @@ try
                         AllNodes = @(
                             @{
                                 NodeName                = 'localhost'
-                                Target                  = 'LocalMachine'
+                                Target                  = $Target
                                 EnableAutoDetection     = $True
                                 EnableAutoConfiguration = $True
                                 EnableManualProxy       = $True
@@ -101,7 +101,7 @@ try
                         AllNodes = @(
                             @{
                                 NodeName = 'localhost'
-                                Target   = 'LocalMachine'
+                                Target   = $Target
                             }
                         )
                     }
