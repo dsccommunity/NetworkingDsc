@@ -10,18 +10,13 @@ Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common'
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
-
-# Registry key paths for proxy settings
-$script:connectionsRegistryKeyPath = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections'
-
 <#
     .SYNOPSIS
-        Returns the current state of the proxy settings for
-        the computer.
+        Returns the current state of the proxy settings.
 
-    .PARAMETER IsSingleInstance
-        Specifies the resource is a single instance, the
-        value must be 'Yes'. Not used in Get-TargetResource.
+    .PARAMETER Target
+        Specifies if the proxy settings should be set for the LocalMachine
+        or for the CurrentUser. Defaults to 'LocalMachine'.
 #>
 function Get-TargetResource
 {
@@ -29,20 +24,24 @@ function Get-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet('Yes')]
+        [ValidateSet('LocalMachine','CurrentUser')]
         [System.String]
-        $IsSingleInstance
+        $Target
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.GettingProxySettingsMessage)
+        $($script:localizedData.GettingProxySettingsMessage -f $Target)
         ) -join '')
 
-    $returnValue = @{}
+    $proxySettingsPath = Get-ProxySettingsRegistryKeyPath `
+        -Target $Target
+    $returnValue = @{
+        Target = $Target
+    }
 
     # Get the registry values in the Connections registry key
     $connectionsRegistryValues = Get-ItemProperty `
-        -Path "HKLM:\$($script:connectionsRegistryKeyPath)" `
+        -Path $proxySettingsPath `
         -ErrorAction SilentlyContinue
 
     $proxySettingsRegistryBinary = $null
@@ -81,15 +80,14 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-        Sets the current state of the proxy settings for
-        the computer.
+        Sets the current state of the proxy settings.
 
-    .PARAMETER IsSingleInstance
-        Specifies the resource is a single instance, the
-        value must be 'Yes'.
+    .PARAMETER Target
+        Specifies if the proxy settings should be set for the LocalMachine
+        or for the CurrentUser. Defaults to 'LocalMachine'.
 
     .PARAMETER Ensure
-        Specifies if computer proxy settings should be set.
+        Specifies if proxy settings should be set.
         Defaults to 'Present'.
 
     .PARAMETER ConnectionType
@@ -130,9 +128,9 @@ function Set-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet('Yes')]
+        [ValidateSet('LocalMachine','CurrentUser')]
         [System.String]
-        $IsSingleInstance,
+        $Target,
 
         [Parameter()]
         [ValidateSet('Present','Absent')]
@@ -174,20 +172,23 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.ApplyingProxySettingsMessage -f $Ensure)
+        $($script:localizedData.ApplyingProxySettingsMessage -f $Target, $Ensure)
         ) -join '')
+
+    $proxySettingsPath = Get-ProxySettingsRegistryKeyPath `
+        -Target $Target
 
     if ($Ensure -eq 'Absent')
     {
         # Remove all the Proxy Settings
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($script:localizedData.DisablingComputerProxyMessage)
+            $($script:localizedData.DisablingProxyMessage -f $Target)
             ) -join '')
 
         if ($ConnectionType -in ('All','Default'))
         {
             Remove-ItemProperty `
-                -Path "HKLM:\$($script:connectionsRegistryKeyPath)" `
+                -Path $proxySettingsPath `
                 -Name 'DefaultConnectionSettings' `
                 -ErrorAction SilentlyContinue
         }
@@ -195,7 +196,7 @@ function Set-TargetResource
         if ($ConnectionType -in ('All','Legacy'))
         {
             Remove-ItemProperty `
-                -Path "HKLM:\$($script:connectionsRegistryKeyPath)" `
+                -Path $proxySettingsPath `
                 -Name 'SavedLegacySettings' `
                 -ErrorAction SilentlyContinue
         }
@@ -203,13 +204,13 @@ function Set-TargetResource
     else
     {
         Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-            $($script:localizedData.EnablingComputerProxyMessage)
+            $($script:localizedData.EnablingProxyMessage -f $Target)
             ) -join '')
 
         # Generate the Proxy Settings binary value
         $convertToProxySettingsBinaryParameters = @{} + $PSBoundParameters
 
-        $convertToProxySettingsBinaryParameters.Remove('IsSingleInstance')
+        $convertToProxySettingsBinaryParameters.Remove('Target')
         $convertToProxySettingsBinaryParameters.Remove('Ensure')
         $convertToProxySettingsBinaryParameters.Remove('ConnectionType')
 
@@ -218,11 +219,11 @@ function Set-TargetResource
         if ($ConnectionType -in ('All','Default'))
         {
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($script:localizedData.WritingComputerProxyBinarySettingsMessage -f 'DefaultConnectionSettings',($proxySettings -join ','))
+                $($script:localizedData.WritingProxyBinarySettingsMessage -f $Target, 'DefaultConnectionSettings',($proxySettings -join ','))
                 ) -join '')
 
             Set-BinaryRegistryValue `
-                -Path "HKEY_LOCAL_MACHINE\$($script:connectionsRegistryKeyPath)" `
+                -Path $proxySettingsPath `
                 -Name 'DefaultConnectionSettings' `
                 -Value $proxySettings
         }
@@ -230,11 +231,11 @@ function Set-TargetResource
         if ($ConnectionType -in ('All','Legacy'))
         {
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($script:localizedData.WritingComputerProxyBinarySettingsMessage -f 'SavedLegacySettings',($proxySettings -join ','))
+                $($script:localizedData.WritingProxyBinarySettingsMessage -f $Target, 'SavedLegacySettings',($proxySettings -join ','))
                 ) -join '')
 
             Set-BinaryRegistryValue `
-                -Path "HKEY_LOCAL_MACHINE\$($script:connectionsRegistryKeyPath)" `
+                -Path $proxySettingsPath `
                 -Name 'SavedLegacySettings' `
                 -Value $proxySettings
         }
@@ -243,15 +244,14 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-        Tests the current state of the proxy settings for
-        the computer.
+        Tests the current state of the proxy settings.
 
-    .PARAMETER IsSingleInstance
-        Specifies the resource is a single instance, the
-        value must be 'Yes'.
+    .PARAMETER Target
+        Specifies if the proxy settings should be set for the LocalMachine
+        or for the CurrentUser. Defaults to 'LocalMachine'.
 
     .PARAMETER Ensure
-        Specifies if computer proxy settings should be set.
+        Specifies if proxy settings should be set.
         Defaults to 'Present'.
 
     .PARAMETER ConnectionType
@@ -293,9 +293,9 @@ function Test-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet('Yes')]
+        [ValidateSet('LocalMachine','CurrentUser')]
         [System.String]
-        $IsSingleInstance,
+        $Target,
 
         [Parameter()]
         [ValidateSet('Present','Absent')]
@@ -337,14 +337,16 @@ function Test-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.CheckingProxySettingsMessage -f $Ensure)
+        $($script:localizedData.CheckingProxySettingsMessage -f $Target, $Ensure)
         ) -join '')
 
-    [System.Boolean] $desiredConfigurationMatch = $true
+    $desiredConfigurationMatch = $true
+    $proxySettingsPath = Get-ProxySettingsRegistryKeyPath `
+        -Target $Target
 
     # Get the registry values in the Connections registry key
     $connectionsRegistryValues = Get-ItemProperty `
-        -Path "HKLM:\$($script:connectionsRegistryKeyPath)" `
+        -Path $proxySettingsPath `
         -ErrorAction SilentlyContinue
 
     if ($Ensure -eq 'Absent')
@@ -356,7 +358,7 @@ function Test-TargetResource
             if ($connectionsRegistryValues.DefaultConnectionSettings)
             {
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                    $($script:localizedData.ComputerProxyBinarySettingsRequiresRemovalMessage -f 'DefaultConnectionSettings')
+                    $($script:localizedData.ProxyBinarySettingsRequiresRemovalMessage -f $Target, 'DefaultConnectionSettings')
                     ) -join '')
 
                 $desiredConfigurationMatch = $false
@@ -369,7 +371,7 @@ function Test-TargetResource
             if ($connectionsRegistryValues.SavedLegacySettings)
             {
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                    $($script:localizedData.ComputerProxyBinarySettingsRequiresRemovalMessage -f 'SavedLegacySettings')
+                    $($script:localizedData.ProxyBinarySettingsRequiresRemovalMessage -f $Target, 'SavedLegacySettings')
                     ) -join '')
 
                 $desiredConfigurationMatch = $false
@@ -380,7 +382,7 @@ function Test-TargetResource
     {
         $desiredValues = @{} + $PSBoundParameters
 
-        $desiredValues.Remove('IsSingleInstance')
+        $desiredValues.Remove('Target')
         $desiredValues.Remove('Ensure')
         $desiredValues.Remove('ConnectionType')
 
@@ -388,7 +390,7 @@ function Test-TargetResource
         {
             # Check if the Default Connection proxy settings are in the desired state
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($script:localizedData.CheckingComputerProxyBinarySettingsMessage -f 'DefaultConnectionSettings')
+                $($script:localizedData.CheckingProxyBinarySettingsMessage -f $Target, 'DefaultConnectionSettings')
                 ) -join '')
 
             if ($connectionsRegistryValues.DefaultConnectionSettings)
@@ -408,7 +410,7 @@ function Test-TargetResource
             if (-not $inDesiredState)
             {
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                    $($script:localizedData.ComputerProxyBinarySettingsNoMatchMessage -f 'DefaultConnectionSettings')
+                    $($script:localizedData.ProxyBinarySettingsNoMatchMessage -f $Target, 'DefaultConnectionSettings')
                     ) -join '')
 
                 $desiredConfigurationMatch = $false
@@ -419,7 +421,7 @@ function Test-TargetResource
         {
             # Check if the Saved Legacy proxy settings are in the desired state
             Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                $($script:localizedData.CheckingComputerProxyBinarySettingsMessage -f 'SavedLegacySettings')
+                $($script:localizedData.CheckingProxyBinarySettingsMessage -f $Target, 'SavedLegacySettings')
                 ) -join '')
 
             if ($connectionsRegistryValues.SavedLegacySettings)
@@ -439,7 +441,7 @@ function Test-TargetResource
             if (-not $inDesiredState)
             {
                 Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-                    $($script:localizedData.ComputerProxyBinarySettingsNoMatchMessage -f 'SavedLegacySettings')
+                    $($script:localizedData.ProxyBinarySettingsNoMatchMessage -f $Target, 'SavedLegacySettings')
                     ) -join '')
 
                 $desiredConfigurationMatch = $false
@@ -481,6 +483,7 @@ function Set-BinaryRegistryValue
         $Value
     )
 
+    $Path = ConvertTo-Win32RegistryPath -Path $Path
     $null = [Microsoft.Win32.Registry]::SetValue($Path, $Name, $Value, 'Binary')
 }
 
@@ -510,7 +513,7 @@ function Test-ProxySettings
         $DesiredValues
     )
 
-    [System.Boolean] $inState = $true
+    $inState = $true
 
     $proxySettingsToCompare = @(
         'EnableManualProxy'
@@ -745,7 +748,6 @@ function ConvertTo-ProxySettingsBinary
     .PARAMETER ProxySettings
         The binary extracted from the registry key
         DefaultConnectionSettings or SavedLegacySettings.
-
 #>
 function ConvertFrom-ProxySettingsBinary
 {
@@ -859,6 +861,71 @@ function ConvertFrom-ProxySettingsBinary
     }
 
     return [PSObject] $proxyParameters
+}
+
+<#
+    .SYNOPSIS
+        Get the proxy settings registry key path.
+
+    .PARAMETER Target
+        Specify the target of the regisry key path to return.
+
+        It will return HKLM:\ if LocalMachine is specified and HKCU:\
+        if CurrentUser is specified.
+#>
+function Get-ProxySettingsRegistryKeyPath
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param
+    (
+        [Parameter()]
+        [ValidateSet('LocalMachine','CurrentUser')]
+        [System.String]
+        $Target = 'LocalMachine'
+    )
+
+    if ($Target -eq 'LocalMachine')
+    {
+        $path = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections'
+    }
+    else
+    {
+        <#
+            This path is almost identical to the LocalMachine one, but the
+            case of 'Software' is different. This mostly shouldn't matter, but
+            it is possible some future functions will be case sensitive.
+        #>
+        $path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections'
+    }
+
+    return $path
+}
+
+<#
+    .SYNOPSIS
+        Convert a registry path to be compatible with Win32.
+
+    .PARAMETER Path
+        The registry path to convert from a PowerShell path to
+        a path compatible with Win32.
+#>
+function ConvertTo-Win32RegistryPath
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param
+    (
+        [Parameter()]
+        [System.String]
+        $Path
+    )
+
+    # Translate the registry key from PS
+    $Path = $Path -replace '^HKLM:\\','HKEY_LOCAL_MACHINE\'
+    $Path = $Path -replace '^HKCU:\\','HKEY_CURRENT_USER\'
+
+    return $Path
 }
 
 Export-ModuleMember -function *-TargetResource
