@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 1.0.0
+.VERSION 2.0.0
 .GUID 49497e7c-1788-4d3e-a857-f676f88ec70d
 .AUTHOR DSC Community
 .COMPANYNAME DSC Community
@@ -29,7 +29,7 @@ Configuration ProxySettings_AutoDetectProxy_Config
     {
         ProxySettings AutoDetectProxy
         {
-            IsSingleInstance        = 'Yes'
+            Target                  = 'LocalMachine'
             Ensure                  = 'Present'
             EnableAutoDetection     = $true
             EnableAutoConfiguration = $false

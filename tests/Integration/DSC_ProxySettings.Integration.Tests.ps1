@@ -29,100 +29,119 @@ try
         }
         $testAutoConfigURL = 'http://wpad.contoso.com/test.wpad'
 
-        $configData = @{
-            AllNodes = @(
-                @{
-                    NodeName                = 'localhost'
-                    EnableAutoDetection     = $True
-                    EnableAutoConfiguration = $True
-                    EnableManualProxy       = $True
-                    ProxyServer             = $testProxyServer
-                    ProxyServerExceptions   = $testProxyExceptions
-                    ProxyServerBypassLocal  = $True
-                    AutoConfigURL           = $testAutoConfigURL
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+        . $configFile -Verbose -ErrorAction Stop
+
+        foreach ($target in @('LocalMachine','CurrentUser'))
+        {
+            Context "When Target is '$Target'" {
+                Context "When Ensure is 'Present'" {
+                    $configData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName                = 'localhost'
+                                Target                  = $Target
+                                EnableAutoDetection     = $True
+                                EnableAutoConfiguration = $True
+                                EnableManualProxy       = $True
+                                ProxyServer             = $testProxyServer
+                                ProxyServerExceptions   = $testProxyExceptions
+                                ProxyServerBypassLocal  = $True
+                                AutoConfigURL           = $testAutoConfigURL
+                            }
+                        )
+                    }
+
+                    It 'Should compile without throwing' {
+                        {
+                            & "$($script:dscResourceName)_Present_Config" `
+                                -OutputPath $TestDrive `
+                                -ConfigurationData $configData
+
+                            Start-DscConfiguration `
+                                -Path $TestDrive `
+                                -ComputerName localhost `
+                                -Wait `
+                                -Verbose `
+                                -Force `
+                                -ErrorAction Stop
+                        } | Should -Not -Throw
+                    }
+
+                    It 'Should be able to call Get-DscConfiguration without throwing' {
+                        { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    }
+
+                    It 'Should be able to call Test-DscConfiguration without throwing' {
+                        { $script:currentState = Test-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    }
+
+                    It 'Should report that DSC is in state' {
+                        $script:currentState | Should -BeTrue
+                    }
+
+                    It 'Should have set the resource and all the parameters should match' {
+                        $current = Get-DscConfiguration | Where-Object {
+                            $_.ConfigurationName -eq "$($script:dscResourceName)_Present_Config"
+                        }
+                        $current.Ensure                  | Should -Be 'Present'
+                        $current.Target                  | Should -Be $configData.AllNodes[0].Target
+                        $current.EnableAutoDetection     | Should -Be $configData.AllNodes[0].EnableAutoDetection
+                        $current.EnableAutoConfiguration | Should -Be $configData.AllNodes[0].EnableAutoConfiguration
+                        $current.EnableManualProxy       | Should -Be $configData.AllNodes[0].EnableManualProxy
+                        $current.ProxyServer             | Should -Be $configData.AllNodes[0].ProxyServer
+                        $current.ProxyServerExceptions   | Should -Be $configData.AllNodes[0].ProxyServerExceptions
+                        $current.ProxyServerBypassLocal  | Should -Be $configData.AllNodes[0].ProxyServerBypassLocal
+                        $current.AutoConfigURL           | Should -Be $configData.AllNodes[0].AutoConfigURL
+                    }
                 }
-            )
-        }
 
-        Describe "$($script:dscResourceName)_Present_Integration" {
-            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_Present.config.ps1"
-            . $configFile -Verbose -ErrorAction Stop
+                Context "When Ensure is 'Absent'" {
+                    $configData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName = 'localhost'
+                                Target   = $Target
+                            }
+                        )
+                    }
 
-            It 'Should compile without throwing' {
-                {
-                    & "$($script:dscResourceName)_Present_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
+                    It 'Should compile without throwing' {
+                        {
+                            & "$($script:dscResourceName)_Absent_Config" `
+                                -OutputPath $TestDrive `
+                                -ConfigurationData $configData
 
-                    Start-DscConfiguration `
-                        -Path $TestDrive `
-                        -ComputerName localhost `
-                        -Wait `
-                        -Verbose `
-                        -Force `
-                        -ErrorAction Stop
-                } | Should -Not -Throw
-            }
+                            Start-DscConfiguration `
+                                -Path $TestDrive `
+                                -ComputerName localhost `
+                                -Wait `
+                                -Verbose `
+                                -Force `
+                                -ErrorAction Stop
+                        } | Should -Not -Throw
+                    }
 
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
+                    It 'Should be able to call Get-DscConfiguration without throwing' {
+                        { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    }
 
-            It 'Should be able to call Test-DscConfiguration without throwing' {
-                { $script:currentState = Test-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
+                    It 'Should be able to call Test-DscConfiguration without throwing' {
+                        { $script:currentState = Test-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    }
 
-            It 'Should report that DSC is in state' {
-                $script:currentState | Should -Be $true
-            }
+                    It 'Should report that DSC is in state' {
+                        $script:currentState | Should -BeTrue
+                    }
 
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Present_Config" }
-                $current.Ensure                  | Should -Be 'Present'
-                $current.EnableAutoDetection     | Should -Be $True
-                $current.EnableAutoConfiguration | Should -Be $True
-                $current.EnableManualProxy       | Should -Be $True
-                $current.ProxyServer             | Should -Be $testProxyServer
-                $current.ProxyServerExceptions   | Should -Be $testProxyExceptions
-                $current.ProxyServerBypassLocal  | Should -Be $True
-                $current.AutoConfigURL           | Should -Be $testAutoConfigURL
-            }
-        }
-
-        Describe "$($script:dscResourceName)_Absent_Integration" {
-            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_Absent.config.ps1"
-            . $configFile -Verbose -ErrorAction Stop
-
-            It 'Should compile without throwing' {
-                {
-                    & "$($script:dscResourceName)_Absent_Config" `
-                        -OutputPath $TestDrive
-
-                    Start-DscConfiguration `
-                        -Path $TestDrive `
-                        -ComputerName localhost `
-                        -Wait `
-                        -Verbose `
-                        -Force `
-                        -ErrorAction Stop
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Test-DscConfiguration without throwing' {
-                { $script:currentState = Test-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should report that DSC is in state' {
-                $script:currentState | Should -Be $true
-            }
-
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object { $_.ConfigurationName -eq "$($script:dscResourceName)_Absent_Config" }
-                $current.Ensure            | Should -Be 'Absent'
+                    It 'Should have set the resource and all the parameters should match' {
+                        $current = Get-DscConfiguration | Where-Object {
+                            $_.ConfigurationName -eq "$($script:dscResourceName)_Absent_Config"
+                        }
+                        $current.Ensure | Should -Be 'Absent'
+                        $current.Target | Should -Be $configData.AllNodes[0].Target
+                    }
+                }
             }
         }
     }

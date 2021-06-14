@@ -3,7 +3,7 @@ configuration DSC_ProxySettings_Present_Config {
 
     node localhost {
         ProxySettings Integration_Test {
-            IsSingleInstance        = 'Yes'
+            Target                  = $Node.Target
             Ensure                  = 'Present'
             EnableAutoDetection     = $Node.EnableAutoDetection
             EnableAutoConfiguration = $Node.EnableAutoConfiguration
@@ -12,6 +12,17 @@ configuration DSC_ProxySettings_Present_Config {
             ProxyServerExceptions   = $Node.ProxyServerExceptions
             ProxyServerBypassLocal  = $Node.ProxyServerBypassLocal
             AutoConfigURL           = $Node.AutoConfigURL
+        }
+    }
+}
+
+configuration DSC_ProxySettings_Absent_Config {
+    Import-DscResource -ModuleName NetworkingDsc
+
+    node localhost {
+        ProxySettings Integration_Test {
+            Target = $Node.Target
+            Ensure = 'Absent'
         }
     }
 }

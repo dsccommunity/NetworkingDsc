@@ -27,6 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for publishing code coverage to `CodeCov.io` and
   Azure Pipelines - Fixes [Issue #491](https://github.com/dsccommunity/NetworkingDsc/issues/491).
 - Minor reformatting of code style for diffability.
+- ProxySettings
+  - Added function `Get-ProxySettingsRegistryKeyPath` to provide initial
+    support for changing proxy settings for current user.
+    BREAKING CHANGE: Added support for configuring proxy settings for a user
+    account by adding `Target` parameter - Fixes [Issue #423](https://github.com/dsccommunity/NetworkingDsc/issues/423).
 
 ## [8.2.0] - 2020-10-16
 
