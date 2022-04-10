@@ -83,9 +83,9 @@ try
                 $current = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
-                $current.Name | Should -Be $TestEnableLsoIPv6.Name
-                $current.Protocol | Should -Be $TestEnableLsoIPv6.Protocol
-                $current.State | Should -Be $TestEnableLsoIPv6.State
+                $current.Name     | Should -Be $configData.AllNodes[0].Name
+                $current.Protocol | Should -Be $configData.AllNodes[0].Protocol
+                $current.State    | Should -Be $configData.AllNodes[0].State
             }
         }
     }
