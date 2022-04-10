@@ -132,6 +132,7 @@ try
                     $netAdapterEnabled
                 }
                 Mock -CommandName Disable-NetAdapter
+                Mock -CommandName Enable-NetAdapter
 
                 It 'Should not throw an exception' {
                     { Set-TargetResource @setTargetResourceEnabled } | Should -Not -Throw
@@ -140,6 +141,7 @@ try
                 It 'Should not call Disable-NetAdapter' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
                     Assert-MockCalled -CommandName Disable-NetAdapter -Exactly -Times 0
+                    Assert-MockCalled -CommandName Enable-NetAdapter -Exactly -Times 0
                 }
             }
 
@@ -165,8 +167,8 @@ try
                 Mock -CommandName Get-NetAdapter -MockWith {
                     $netAdapterDisabled
                 }
-                Mock -CommandName Enable-NetAdapter
                 Mock -CommandName Disable-NetAdapter
+                Mock -CommandName Enable-NetAdapter
 
                 It 'Should not throw an exception' {
                     { Set-TargetResource @setTargetResourceDisabled } | Should -Not -Throw
@@ -174,6 +176,7 @@ try
 
                 It 'Should not call Enable-NetAdapter' {
                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                    Assert-MockCalled -CommandName Disable-NetAdapter -Exactly -Times 0
                     Assert-MockCalled -CommandName Enable-NetAdapter -Exactly -Times 0
                 }
             }

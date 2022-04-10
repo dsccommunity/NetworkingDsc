@@ -129,7 +129,7 @@ function Set-TargetResource
         ) -join '')
     }
 
-    if ($netAdapter)
+    if ($netAdapter -and $State -ne $netAdapter.State)
     {
         try
         {

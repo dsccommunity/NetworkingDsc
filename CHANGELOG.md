@@ -44,6 +44,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed pipeline by replacing the GitVersion task in the `azure-pipelines.yml`
   with a script.
+- NetAdapterState
+  - Fixed so that the resource is idempotent so that `Enable-NetAdapter` and
+    `Disable-NetAdapter` are only called when change is required. This fixes
+    unit tests on Windows Server 2022.
 
 ## [8.2.0] - 2020-10-16
 
