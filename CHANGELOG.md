@@ -32,6 +32,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     support for changing proxy settings for current user.
     BREAKING CHANGE: Added support for configuring proxy settings for a user
     account by adding `Target` parameter - Fixes [Issue #423](https://github.com/dsccommunity/NetworkingDsc/issues/423).
+- Updated .github issue templates to standard - Fixes [Issue #508](https://github.com/dsccommunity/NetworkingDsc/issues/508).
+- Added Create_ChangeLog_GitHub_PR task to publish stage of build pipeline.
+- Added SECURITY.md.
+- Updated pipeline Deploy_Module anb Code_Coverage jobs to use ubuntu-latest
+  images - Fixes [Issue #508](https://github.com/dsccommunity/NetworkingDsc/issues/508).
+- Updated pipeline unit tests and integration tests to use Windows Server 2019 and
+  Windows Server 2022 images - Fixes [Issue #507](https://github.com/dsccommunity/NetworkingDsc/issues/507).
+
+### Fixed
+
+- Fixed pipeline by replacing the GitVersion task in the `azure-pipelines.yml`
+  with a script.
 
 ## [8.2.0] - 2020-10-16
 
