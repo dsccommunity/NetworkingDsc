@@ -53,7 +53,7 @@ try
         Describe "$($script:dscResourceName)_Integration" {
             It 'Should compile without throwing' {
                 {
-                    & "$($script:dscResourceName)_Present_Config" `
+                    & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
 
