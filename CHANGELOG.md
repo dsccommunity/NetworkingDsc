@@ -49,6 +49,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - NetAdapterState
   - Fixed so that the resource is idempotent so that `Enable-NetAdapter` and
     `Disable-NetAdapter` are only called when change is required.
+- NetAdapterLso
+  - Fixed integration tests so that they will be skipped if a network adapter
+    with NDIS version 6 or greater is not available.
 
 ## [8.2.0] - 2020-10-16
 
