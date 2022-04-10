@@ -39,6 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   images - Fixes [Issue #508](https://github.com/dsccommunity/NetworkingDsc/issues/508).
 - Updated pipeline unit tests and integration tests to use Windows Server 2019 and
   Windows Server 2022 images - Fixes [Issue #507](https://github.com/dsccommunity/NetworkingDsc/issues/507).
+- NetAdapterState
+  - Added a new message when setting the state of an adapter.
 
 ### Fixed
 
@@ -46,8 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with a script.
 - NetAdapterState
   - Fixed so that the resource is idempotent so that `Enable-NetAdapter` and
-    `Disable-NetAdapter` are only called when change is required. This fixes
-    unit tests on Windows Server 2022.
+    `Disable-NetAdapter` are only called when change is required.
 
 ## [8.2.0] - 2020-10-16
 

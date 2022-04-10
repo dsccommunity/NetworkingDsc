@@ -38,11 +38,13 @@ try
         $netAdapterEnabled = [PSCustomObject]@{
             Name        = 'Ethernet'
             AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Up
+            State       = 'Enabled'
         }
 
         $netAdapterDisabled = [PSCustomObject]@{
             Name        = 'Ethernet'
             AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Down
+            State       = 'Disabled'
         }
 
         $netAdapterUnsupported = [PSCustomObject]@{
