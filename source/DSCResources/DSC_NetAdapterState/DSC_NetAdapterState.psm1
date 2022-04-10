@@ -129,8 +129,13 @@ function Set-TargetResource
         ) -join '')
     }
 
-    if ($netAdapter)
+    if ($netAdapter -and $State -ne $netAdapter.State)
     {
+        Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($script:localizedData.SettingNetAdapterStateMessage -f $Name, $State)
+        ) -join '')
+
         try
         {
             if ($State -eq 'Disabled')
