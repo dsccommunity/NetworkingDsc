@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated CHANGELOG.md
+  - Renamed NetworkingDSc to NetworkingDsc in CHANGELOG.md - fixes [Issue #513](https://github.com/dsccommunity/NetworkingDsc/issues/513).
 - NetAdapterLso
   - Protocol now a key field allowing multiple protocol configurations for a
     single network adapter - fixes [Issue #475](https://github.com/dsccommunity/NetworkingDsc/issues/475).
