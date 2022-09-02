@@ -45,7 +45,11 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $Name
+        $Name,
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore'
     )
 
     $ErrorActionPreference = 'Stop'
@@ -57,7 +61,7 @@ function Get-TargetResource
             $($script:localizedData.FindFirewallRuleMessage) -f $Name
         ) -join '')
 
-    $firewallRule = Get-FirewallRule -Name $Name
+    $firewallRule = Get-FirewallRule -Name $Name -PolicyStore $PolicyStore
 
     if (-not $firewallRule)
     {
@@ -70,7 +74,7 @@ function Get-TargetResource
         }
     }
 
-    $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
+    $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule -PolicyStore $PolicyStore
 
     $result = @{
         Ensure = 'Present'
@@ -397,7 +401,17 @@ function Set-TargetResource
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
-        $Owner
+        $Owner,
+
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore',
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $PolicyStoreSourceType
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -410,7 +424,7 @@ function Set-TargetResource
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($script:localizedData.FindFirewallRuleMessage) -f $Name
         ) -join '')
-    $firewallRule = Get-FirewallRule -Name $Name
+    $firewallRule = Get-FirewallRule -Name $Name -PolicyStore $PolicyStore
 
     $exists = ($null -ne $firewallRule)
 
@@ -446,7 +460,7 @@ function Set-TargetResource
                         Merge the existing rule values into the PSBoundParameters
                         so that it can be splatted.
                     #>
-                    $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
+                    $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule -PolicyStore $PolicyStore
 
                     <#
                         Loop through each possible property and if it is not passed as a parameter
@@ -820,7 +834,17 @@ function Test-TargetResource
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
-        $Owner
+        $Owner,
+
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore',
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $PolicyStoreSourceType
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -834,7 +858,7 @@ function Test-TargetResource
             $($script:localizedData.FindFirewallRuleMessage) -f $Name
         ) -join '')
 
-    $firewallRule = Get-FirewallRule -Name $Name
+    $firewallRule = Get-FirewallRule -Name $Name -PolicyStore $PolicyStore
 
     $exists = ($null -ne $firewallRule)
 
@@ -1139,10 +1163,14 @@ function Test-RuleProperties
 
         [Parameter()]
         [String]
-        $Owner
+        $Owner,
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore'
     )
 
-    $properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
+    $properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule -PolicyStore $PolicyStore
     $desiredConfigurationMatch = $true
 
     <#
@@ -1243,7 +1271,7 @@ function Test-RuleProperties
     .PARAMETER Name
         The name of the Firewall Rule to Retrieve.
 #>
-function Get-FirewallRule
+function Get-FirewallRule # DONE
 {
     [CmdletBinding()]
     [OutputType([Microsoft.Management.Infrastructure.CimInstance])]
@@ -1252,10 +1280,14 @@ function Get-FirewallRule
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $Name
+        $Name,
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore'
     )
 
-    $firewallRule = @(Get-NetFirewallRule -Name (ConvertTo-FirewallRuleNameEscapedString -Name $Name) -ErrorAction SilentlyContinue)
+    $firewallRule = @(Get-NetFirewallRule -Name (ConvertTo-FirewallRuleNameEscapedString -Name $Name) -PolicyStore $PolicyStore -ErrorAction SilentlyContinue)
 
     if (-not $firewallRule)
     {
@@ -1293,7 +1325,12 @@ function Get-FirewallRuleProperty
     param
     (
         [Parameter(Mandatory = $true)]
-        $FirewallRule
+        $FirewallRule,
+
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
