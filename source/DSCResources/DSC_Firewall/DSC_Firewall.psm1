@@ -455,7 +455,7 @@ function Set-TargetResource
                 if ($PSBoundParameters.ContainsKey('Group') `
                         -and ($Group -ne $FirewallRule.Group))
                 {
-                    Remove-NetFirewallRule -Name  (ConvertTo-FirewallRuleNameEscapedString -Name $Name)
+                    Remove-NetFirewallRule -Name  (ConvertTo-FirewallRuleNameEscapedString -Name $Name) -PolicyStore $PolicyStore
 
                     <#
                         Merge the existing rule values into the PSBoundParameters
@@ -547,7 +547,7 @@ function Set-TargetResource
                 ) -join '')
 
             # Remove the existing Firewall rule
-            Remove-NetFirewallRule -Name (ConvertTo-FirewallRuleNameEscapedString -Name $Name)
+            Remove-NetFirewallRule -Name (ConvertTo-FirewallRuleNameEscapedString -Name $Name) -PolicyStore $PolicyStore
         }
         else
         {
