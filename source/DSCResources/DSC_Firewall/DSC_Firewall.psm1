@@ -46,6 +46,7 @@ function Get-TargetResource
         [ValidateNotNullOrEmpty()]
         [String]
         $Name,
+
         [Parameter()]
         [ValidateSet('PersistentStore', 'localhost')]
         [String]
@@ -1164,6 +1165,7 @@ function Test-RuleProperties
         [Parameter()]
         [String]
         $Owner,
+
         [Parameter()]
         [ValidateSet('PersistentStore', 'localhost')]
         [String]
@@ -1271,7 +1273,7 @@ function Test-RuleProperties
     .PARAMETER Name
         The name of the Firewall Rule to Retrieve.
 #>
-function Get-FirewallRule # DONE
+function Get-FirewallRule
 {
     [CmdletBinding()]
     [OutputType([Microsoft.Management.Infrastructure.CimInstance])]
@@ -1281,6 +1283,7 @@ function Get-FirewallRule # DONE
         [ValidateNotNullOrEmpty()]
         [String]
         $Name,
+
         [Parameter()]
         [ValidateSet('PersistentStore', 'localhost')]
         [String]
