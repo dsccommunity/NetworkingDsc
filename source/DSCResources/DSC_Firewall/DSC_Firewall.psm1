@@ -34,6 +34,9 @@ $script:parameterList = $script:resourceData.ParameterList
 
     .PARAMETER Name
         Name of the firewall rule.
+
+    .PARAMETER PolicyStore
+        Targets the policy store from which to retrieve the rules.
 #>
 function Get-TargetResource
 {
@@ -243,6 +246,12 @@ function Get-TargetResource
 
     .PARAMETER Owner
         Specifies that matching firewall rules of the indicated owner are created.
+
+    .PARAMETER PolicyStore
+        Specifies the policy store from which to retrieve the rules to be created.
+
+    .PARAMETER PolicyStoreSourceType
+        Specifies that firewall rules that match the indicated policy store source type are retrieved.
 #>
 function Set-TargetResource
 {
@@ -675,6 +684,12 @@ function Set-TargetResource
 
     .PARAMETER Owner
         Specifies that matching firewall rules of the indicated owner are created.
+
+    .PARAMETER PolicyStore
+        Specifies the policy store from which to retrieve the rules to be created.
+
+    .PARAMETER PolicyStoreSourceType
+        Specifies that firewall rules that match the indicated policy store source type are retrieved.
 #>
 function Test-TargetResource
 {
@@ -1014,6 +1029,10 @@ function Test-TargetResource
 
     .PARAMETER Owner
         Specifies that matching firewall rules of the indicated owner are created.
+
+    .PARAMETER PolicyStore
+        Specifies the policy store from which to retrieve the rules to be created.
+
 #>
 function Test-RuleProperties
 {
@@ -1272,6 +1291,9 @@ function Test-RuleProperties
 
     .PARAMETER Name
         The name of the Firewall Rule to Retrieve.
+
+    .PARAMETER PolicyStore
+        Specifies the policy store from which to retrieve the rules to be created.
 #>
 function Get-FirewallRule
 {
@@ -1320,6 +1342,9 @@ function Get-FirewallRule
 
     .PARAMETER FirewallRule
         The firewall rule object to pull the additional firewall objects for.
+
+    .PARAMETER PolicyStore
+        Specifies the policy store from which to retrieve the rules to be created.
 #>
 function Get-FirewallRuleProperty
 {
