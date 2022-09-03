@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Firewall
+  - Added `PolicyStore` parameter and read only property `PolicyStoreSourceType` - fixes [Issue #428](https://github.com/dsccommunity/NetworkingDsc/issues/428).
+
 ### Changed
 
 - Updated CHANGELOG.md
