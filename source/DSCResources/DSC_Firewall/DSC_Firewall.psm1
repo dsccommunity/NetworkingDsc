@@ -1033,6 +1033,8 @@ function Test-TargetResource
     .PARAMETER PolicyStore
         Specifies the policy store from which to retrieve the rules to be created.
 
+    .PARAMETER PolicyStoreSourceType
+        Specifies that firewall rules that match the indicated policy store source type are retrieved.
 #>
 function Test-RuleProperties
 {
