@@ -419,7 +419,7 @@ function Set-TargetResource
         $PolicyStore = 'PersistentStore',
 
         [Parameter()]
-        [ValidateNotNullOrEmpty()]
+        [ValidateSet('None', 'Local', 'GroupPolicy', 'Dynamic', 'Generated', 'Hardcoded')]
         [String]
         $PolicyStoreSourceType
     )
@@ -858,7 +858,7 @@ function Test-TargetResource
         $PolicyStore = 'PersistentStore',
 
         [Parameter()]
-        [ValidateNotNullOrEmpty()]
+        [ValidateSet('None', 'Local', 'GroupPolicy', 'Dynamic', 'Generated', 'Hardcoded')]
         [String]
         $PolicyStoreSourceType
     )
@@ -1441,7 +1441,7 @@ function ConvertTo-FirewallRuleNameEscapedString
         $Name
     )
 
-    return $Name.Replace('[','`[').Replace(']','`]').Replace('*','`*')
+    return $Name.Replace('[', '`[').Replace(']', '`]').Replace('*', '`*')
 }
 
 Export-ModuleMember -Function *-TargetResource
