@@ -249,9 +249,6 @@ function Get-TargetResource
 
     .PARAMETER PolicyStore
         Specifies the policy store from which to retrieve the rules to be created.
-
-    .PARAMETER PolicyStoreSourceType
-        Specifies that firewall rules that match the indicated policy store source type are retrieved.
 #>
 function Set-TargetResource
 {
@@ -416,12 +413,7 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('PersistentStore', 'localhost')]
         [String]
-        $PolicyStore = 'PersistentStore',
-
-        [Parameter()]
-        [ValidateSet('None', 'Local', 'GroupPolicy', 'Dynamic', 'Generated', 'Hardcoded')]
-        [String]
-        $PolicyStoreSourceType
+        $PolicyStore = 'PersistentStore'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -687,9 +679,6 @@ function Set-TargetResource
 
     .PARAMETER PolicyStore
         Specifies the policy store from which to retrieve the rules to be created.
-
-    .PARAMETER PolicyStoreSourceType
-        Specifies that firewall rules that match the indicated policy store source type are retrieved.
 #>
 function Test-TargetResource
 {
@@ -855,12 +844,7 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('PersistentStore', 'localhost')]
         [String]
-        $PolicyStore = 'PersistentStore',
-
-        [Parameter()]
-        [ValidateSet('None', 'Local', 'GroupPolicy', 'Dynamic', 'Generated', 'Hardcoded')]
-        [String]
-        $PolicyStoreSourceType
+        $PolicyStore = 'PersistentStore'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
