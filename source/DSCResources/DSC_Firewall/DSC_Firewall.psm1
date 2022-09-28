@@ -1188,7 +1188,12 @@ function Test-RuleProperties
         [Parameter()]
         [ValidateSet('PersistentStore', 'localhost')]
         [String]
-        $PolicyStore = 'PersistentStore'
+        $PolicyStore = 'PersistentStore',
+
+        [Parameter()]
+        [ValidateSet('None', 'Local', 'GroupPolicy', 'Dynamic', 'Generated', 'Hardcoded')]
+        [String]
+        $PolicyStoreSourceType
     )
 
     $properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule -PolicyStore $PolicyStore
