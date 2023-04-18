@@ -77,6 +77,8 @@ InModuleScope $script:subModuleName {
         $adapterInterfaceIndex = 2
         $adapterInterfaceGuid = '75670D9B-5879-4DBA-BC99-86CDD33EB66A'
         $adapterDriverDescription = 'Hyper-V Virtual Ethernet Adapter'
+        $adapterHyperVNetworkAdapterName = 'hv-res-001'
+
         $nomatchAdapter = [PSObject]@{
             Name                 = 'No Match Adapter'
             PhysicalMediaType    = '802.11'
@@ -377,6 +379,54 @@ InModuleScope $script:subModuleName {
 
             It 'Should call expected mocks' {
                 Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+            }
+        }
+
+        Context 'HyperVNetworkAdapterName is passed and one adapter matches' {
+            Mock `
+                -CommandName Get-NetAdapter `
+                -MockWith { $adapterArray }
+
+            Mock -CommandName Get-NetAdapterAdvancedProperty -MockWith {
+                @{
+                    DisplayValue = $adapterHyperVNetworkAdapterName
+                }
+            } -ParameterFilter { $Name -eq $adapterName }
+
+            Mock -CommandName Get-NetAdapterAdvancedProperty -ParameterFilter { $Name -eq 'No Match Adapter' }
+
+            It 'Should not throw exception' {
+                {
+                    $script:result = Find-NetworkAdapter -HyperVNetworkAdapterName $adapterHyperVNetworkAdapterName -Verbose
+                } | Should -Not -Throw
+            }
+
+            It 'Should return expected adapter' {
+                $script:result.Name | Should -Be $adapterName
+            }
+
+            It 'Should call expected mocks' {
+                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly -Times 2
+            }
+        }
+
+        Context 'HyperVNetworkAdapterName is passed and no adapters match' {
+            Mock `
+                -CommandName Get-NetAdapter `
+                -MockWith { $adapterArray }
+            Mock -CommandName Get-NetAdapterAdvancedProperty
+
+            $errorRecord = Get-InvalidOperationRecord `
+                -Message ($script:localizedData.NetAdapterNotFoundError)
+
+            It 'Should throw the correct exception' {
+                { $script:result = Find-NetworkAdapter -HyperVNetworkAdapterName 'NOMATCH' -Verbose } | Should -Throw $errorRecord
+            }
+
+            It 'Should call expected mocks' {
+                Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
+                Assert-MockCalled -CommandName Get-NetAdapterAdvancedProperty -Exactly -Times 2
             }
         }
 
