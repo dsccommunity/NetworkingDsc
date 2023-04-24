@@ -42,28 +42,31 @@ try
         $script:adapterInterfaceIndex = 2
         $script:adapterInterfaceGuid = '75670D9B-5879-4DBA-BC99-86CDD33EB66A'
         $script:adapterDriverDescription = 'Hyper-V Virtual Ethernet Adapter'
+        $script:adapterHyperVNetworkAdapterName = 'hv-res-001'
 
         $script:adapterParameters = [PSObject]@{
-            Name                 = $script:adapterName
-            NewName              = $script:newAdapterName
-            PhysicalMediaType    = $script:adapterPhysicalMediaType
-            Status               = $script:adapterStatus
-            MacAddress           = $script:adapterMacAddress
-            InterfaceDescription = $script:adapterInterfaceDescription
-            InterfaceIndex       = $script:adapterInterfaceIndex
-            InterfaceGuid        = $script:adapterInterfaceGuid
-            DriverDescription    = $script:adapterDriverDescription
+            Name                     = $script:adapterName
+            NewName                  = $script:newAdapterName
+            PhysicalMediaType        = $script:adapterPhysicalMediaType
+            Status                   = $script:adapterStatus
+            MacAddress               = $script:adapterMacAddress
+            InterfaceDescription     = $script:adapterInterfaceDescription
+            InterfaceIndex           = $script:adapterInterfaceIndex
+            InterfaceGuid            = $script:adapterInterfaceGuid
+            DriverDescription        = $script:adapterDriverDescription
+            HyperVNetworkAdapterName = $script:adapterHyperVNetworkAdapterName
         }
 
         $script:mockAdapter = [PSObject]@{
-            Name                 = $script:adapterName
-            PhysicalMediaType    = $script:adapterPhysicalMediaType
-            Status               = $script:adapterStatus
-            MacAddress           = $script:adapterMacAddress
-            InterfaceDescription = $script:adapterInterfaceDescription
-            InterfaceIndex       = $script:adapterInterfaceIndex
-            InterfaceGuid        = $script:adapterInterfaceGuid
-            DriverDescription    = $script:adapterDriverDescription
+            Name                      = $script:adapterName
+            PhysicalMediaType         = $script:adapterPhysicalMediaType
+            Status                    = $script:adapterStatus
+            MacAddress                = $script:adapterMacAddress
+            InterfaceDescription      = $script:adapterInterfaceDescription
+            InterfaceIndex            = $script:adapterInterfaceIndex
+            InterfaceGuid             = $script:adapterInterfaceGuid
+            DriverDescription         = $script:adapterDriverDescription
+            HyperVNetworkAdapterName  = $script:adapterHyperVNetworkAdapterName
         }
 
         $script:mockRenamedAdapter = [PSObject]@{
@@ -141,6 +144,7 @@ try
                     $script:result.InterfaceIndex | Should -Be $script:mockAdapter.InterfaceIndex
                     $script:result.InterfaceGuid | Should -Be $script:mockAdapter.InterfaceGuid
                     $script:result.DriverDescription | Should -Be $script:mockAdapter.DriverDescription
+                    $script:result.HyperVNetworkAdapterName | Should -Be $script:mockAdapter.HyperVNetworkAdapterName
                 }
 
                 It 'Should call all the mocks' {
