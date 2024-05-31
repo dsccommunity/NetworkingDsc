@@ -298,6 +298,30 @@ try
                 }
             }
         }
+
+        Context 'When a host entry has leading spaces' {
+
+            $testParams = @{
+                HostName  = 'www.anotherexample.com'
+                IPAddress = '127.0.0.1'
+                Verbose   = $true
+            }
+
+            Mock -CommandName Get-Content -MockWith {
+                return @(
+                    '# A mocked example of a host file - this line is a comment',
+                    '',
+                    '127.0.0.1       localhost',
+                    '# comment',
+                    '  127.0.0.1  www.anotherexample.com',
+                    ''
+                )
+            }
+
+            It 'Should return absent from the get method' {
+                (Get-TargetResource @testParams).Ensure | Should -Be 'Present'
+            }
+        }
     } #end InModuleScope $DSCResourceName
 }
 finally
