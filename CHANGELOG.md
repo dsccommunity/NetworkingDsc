@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated CHANGELOG.md
   - Renamed NetworkingDSc to NetworkingDsc in CHANGELOG.md - fixes [Issue #513](https://github.com/dsccommunity/NetworkingDsc/issues/513).
+- HostsFile
+  - Fix bad return data when line contains leading spaces - fixes [Issue #526](https://github.com/dsccommunity/NetworkingDsc/issues/526)
 
 ## [9.0.0] - 2022-05-30
 
