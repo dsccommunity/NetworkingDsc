@@ -9,7 +9,6 @@ resource module.
 These are the links to the examples for each individual resource.
 
 - [DefaultGatewayAddress](Resources/DefaultGatewayAddress)
-- [DhcpClient](Resources/DhcpClient)
 - [DnsClientGlobalSetting](Resources/DnsClientGlobalSetting)
 - [DnsConnectionSuffix](Resources/DnsConnectionSuffix)
 - [DnsServerAddress](Resources/DnsServerAddress)
@@ -32,8 +31,7 @@ These are the links to the examples for each individual resource.
 - [NetworkTeam](Resources/NetworkTeam)
 - [NetworkTeamInterface](Resources/NetworkTeamInterface)
 - [ProxySettings](Resources/ProxySettings)
-- [Route](RResources/oute)
-- [Running-Gulp-based-tests](Resources/Running-Gulp-based-tests)
+- [Route](Resources/Route)
 - [WaitForNetworkTeam](Resources/WaitForNetworkTeam)
 - [WinsServerAddress](Resources/WinsServerAddress)
 - [WinsSetting](Resources/WinsSetting)
