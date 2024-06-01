@@ -140,19 +140,9 @@ Pester:
 #      Pester Configuration (DscResource.Test)     #
 ####################################################
 DscTest:
-  Configuration:
-    Filter:
-      ExcludeTag:
-        - "Common Tests - New Error-Level Script Analyzer Rules"
-    Output:
-      Verbosity: Detailed
-      CIFormat: Auto
-    TestResult:
-      Enabled: true
-      OutputFormat: NUnitXML
-      OutputEncoding: ascii
-      OutputPath: ./output/testResults/NUnitXml_HQRM_Tests.xml
-Script:
+  OutputFormat: NUnitXML
+  ExcludeTag:
+    - 'Common Tests - New Error-Level Script Analyzer Rules'
   ExcludeSourceFile:
     - output
   ExcludeModuleFile:
