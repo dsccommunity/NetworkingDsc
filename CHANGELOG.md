@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Renamed NetworkingDSc to NetworkingDsc in CHANGELOG.md - fixes [Issue #513](https://github.com/dsccommunity/NetworkingDsc/issues/513).
 - HostsFile
   - Fix bad return data when line contains leading spaces - fixes [Issue #526](https://github.com/dsccommunity/NetworkingDsc/issues/526)
+- CI Pipeline
+  - Updated pipeline files to match current DSC Community patterns - fixes [Issue #528](https://github.com/dsccommunity/NetworkingDsc/issues/528).
+  - Updated HQRM and build steps to use windows-latest image.
 
 ## [9.0.0] - 2022-05-30
 
