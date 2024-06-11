@@ -180,11 +180,11 @@ try
             }
 
             It 'Should include the extra whitespace' {
-                "${env:SystemRoot}\System32\Drivers\Etc\Hosts" | Should -FileContentMatch " $($configData.AllNodes[0].IPAddress) $($configData.AllNodes[0].HostName)"
+                "${env:SystemRoot}\System32\Drivers\Etc\Hosts" | Should -FileContentMatch " $($configData.AllNodes[0].IPAddress)`t$($configData.AllNodes[0].HostName)"
             }
 
             It 'Should not fail subsiquent Test invocations' {
-                $result = Test-DscConfiguration -Path $TestDrive -Wait -Verbose
+                $result = Test-DscConfiguration -Path $TestDrive
                 $result | Should -BeTrue
             }
         }
