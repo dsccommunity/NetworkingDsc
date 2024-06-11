@@ -178,6 +178,15 @@ try
                 $result.HostName               | Should -Be $configData.AllNodes[0].HostName
                 $result.IPAddress              | Should -Be $configData.AllNodes[0].IPAddress.Trim()
             }
+
+            It 'Should include the extra whitespace' {
+                "${env:SystemRoot}\System32\Drivers\Etc\Hosts" | Should -FileContentMatch " $($configData.AllNodes[0].IPAddress) $($configData.AllNodes[0].HostName)"
+            }
+
+            It 'Should not fail subsiquent Test invocations' {
+                $result = Test-DscConfiguration -Path $TestDrive -Wait -Verbose
+                $result | Should -BeTrue
+            }
         }
     }
 }
