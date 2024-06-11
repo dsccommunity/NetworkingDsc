@@ -141,7 +141,7 @@ try
             }
         }
 
-        Describe "$($script:dscResourceName)_Integration - Remove Single Line" {
+        Describe "$($script:dscResourceName)_Integration - Update single line with leading space" {
             $configData = @{
                 AllNodes = @(
                     @{
