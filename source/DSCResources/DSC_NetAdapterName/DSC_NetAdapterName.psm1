@@ -42,6 +42,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .PARAMETER DriverDescription
         This is the driver description of the network adapter.
 
+    .PARAMETER HyperVNetworkAdapterName
+        This is the name of the network adapter to find if device naming is enabled.
+
     .PARAMETER InterfaceNumber
         This is the interface number of the network adapter if more than one
         are returned by the parameters.
@@ -97,6 +100,10 @@ function Get-TargetResource
         $DriverDescription,
 
         [Parameter()]
+        [System.String]
+        $HyperVNetworkAdapterName,
+
+        [Parameter()]
         [System.UInt32]
         $InterfaceNumber = 1,
 
@@ -139,6 +146,7 @@ function Get-TargetResource
         InterfaceIndex                 = $adapter.InterfaceIndex
         InterfaceGuid                  = $adapter.InterfaceGuid
         DriverDescription              = $adapter.DriverDescription
+        HyperVNetworkAdapterName       = $adapter.HyperVNetworkAdapterName
         InterfaceNumber                = $InterfaceNumber
         IgnoreMultipleMatchingAdapters = $IgnoreMultipleMatchingAdapters
     }
@@ -176,6 +184,9 @@ function Get-TargetResource
 
     .PARAMETER DriverDescription
         This is the driver description of the network adapter.
+
+    .PARAMETER HyperVNetworkAdapterName
+        This is the name of the network adapter to find if device naming is enabled.
 
     .PARAMETER InterfaceNumber
         This is the interface number of the network adapter if more than one
@@ -229,6 +240,10 @@ function Set-TargetResource
         [Parameter()]
         [System.String]
         $DriverDescription,
+
+        [Parameter()]
+        [System.String]
+        $HyperVNetworkAdapterName,
 
         [Parameter()]
         [System.UInt32]
@@ -293,6 +308,9 @@ function Set-TargetResource
     .PARAMETER DriverDescription
         This is the driver description of the network adapter.
 
+    .PARAMETER HyperVNetworkAdapterName
+        This is the name of the network adapter to find if device naming is enabled.
+
     .PARAMETER InterfaceNumber
         This is the interface number of the network adapter if more than one
         are returned by the parameters.
@@ -346,6 +364,10 @@ function Test-TargetResource
         [Parameter()]
         [System.String]
         $DriverDescription,
+
+        [Parameter()]
+        [System.String]
+        $HyperVNetworkAdapterName,
 
         [Parameter()]
         [System.UInt32]

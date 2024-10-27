@@ -159,6 +159,10 @@ function Find-NetworkAdapter
         $InterfaceNumber = 1,
 
         [Parameter()]
+        [System.String]
+        $HyperVNetworkAdapterName,
+
+        [Parameter()]
         [System.Boolean]
         $IgnoreMultipleMatchingAdapters = $false
     )
@@ -207,6 +211,11 @@ function Find-NetworkAdapter
     if ($PSBoundParameters.ContainsKey('DriverDescription'))
     {
         $adapterFilters += @('($_.DriverDescription -eq $DriverDescription)')
+    } # if
+
+    if ($PSBoundParameters.ContainsKey('HyperVNetworkAdapterName'))
+    {
+        $adapterFilters += @('((Get-NetAdapterAdvancedProperty -Name $_.Name -RegistryKeyword HyperVNetworkAdapterName -ErrorAction SilentlyContinue).DisplayValue -eq $HyperVNetworkAdapterName)')
     } # if
 
     if ($adapterFilters.Count -eq 0)
