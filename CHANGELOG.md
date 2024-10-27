@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- FirewallProfile
+  - Added `PolicyStore` parameter (defaults to PersistentStore to prevent a breaking change) - fixes [Issue #428](https://github.com/dsccommunity/NetworkingDsc/issues/428).
+
 ### Changed
 
 - Updated CHANGELOG.md
