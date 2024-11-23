@@ -1,10 +1,5 @@
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
-# Import the Networking Common Modules
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-            -ChildPath 'NetworkingDsc.Common.psm1'))
-
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
 # Import Localization Strings
@@ -47,9 +42,6 @@ function Get-TargetResource
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             $($script:localizedData.GettingDefaultGatewayAddressMessage)
         ) -join '' )
-
-    $destinationPrefix = Get-NetDefaultGatewayDestinationPrefix `
-        -AddressFamily $AddressFamily
 
     $defaultRoutes = Get-NetDefaultRoute `
         -InterfaceAlias $InterfaceAlias `
@@ -302,75 +294,4 @@ function Assert-ResourceProperty
     {
         Assert-IPAddress -Address $Address -AddressFamily $AddressFamily
     }
-} # Assert-ResourceProperty
-
-<#
-    .SYNOPSIS
-    Get the default gateway destination prefix for the IP address family.
-
-    .PARAMETER AddressFamily
-    IP address family.
-#>
-function Get-NetDefaultGatewayDestinationPrefix
-{
-    [CmdletBinding()]
-    [OutputType([System.String])]
-    param
-    (
-        [Parameter()]
-        [ValidateSet('IPv4', 'IPv6')]
-        [System.String]
-        $AddressFamily = 'IPv4'
-    )
-
-    if ($AddressFamily -eq 'IPv4')
-    {
-        $destinationPrefix = '0.0.0.0/0'
-    }
-    else
-    {
-        $destinationPrefix = '::/0'
-    }
-
-    return $destinationPrefix
-} # Get-NetDefaultGatewayDestinationPrefix
-
-<#
-    .SYNOPSIS
-        Get the default network routes assigned to the interface.
-
-    .PARAMETER InterfaceAlias
-        Alias of the network interface for which the default gateway address is set.
-
-    .PARAMETER AddressFamily
-        IP address family.
-#>
-function Get-NetDefaultRoute
-{
-    [CmdletBinding()]
-    [OutputType([System.String[]])]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [System.String]
-        $InterfaceAlias,
-
-        [Parameter()]
-        [ValidateSet('IPv4', 'IPv6')]
-        [System.String]
-        $AddressFamily = 'IPv4'
-    )
-
-    $destinationPrefix = Get-NetDefaultGatewayDestinationPrefix `
-        -AddressFamily $AddressFamily
-
-    return @(Get-NetRoute `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily `
-        -ErrorAction Stop).Where({
-            $_.DestinationPrefix -eq $destinationPrefix
-        })
-} # Get-NetDefaultRoute
-
-Export-ModuleMember -function *-TargetResource
+}
