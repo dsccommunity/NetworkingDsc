@@ -1,4 +1,7 @@
 @{
+        # Script module or binary module file associated with this manifest.
+    RootModule            = 'NetworkingDsc.psm1'
+
     # Version number of this module.
     moduleVersion        = '0.0.1'
 
@@ -36,33 +39,7 @@
     AliasesToExport      = @()
 
     # DSC resources to export from this module
-    DscResourcesToExport = @(
-        'DefaultGatewayAddress',
-        'DnsClientGlobalSetting',
-        'DnsConnectionSuffix',
-        'DNSServerAddress',
-        'Firewall',
-        'FirewallProfile',
-        'HostsFile',
-        'IPAddress',
-        'IPAddressOption',
-        'NetAdapterAdvancedProperty',
-        'NetAdapterBinding',
-        'NetAdapterLso',
-        'NetAdapterName',
-        'NetAdapterRDMA',
-        'NetAdapterRsc',
-        'NetAdapterRss',
-        'NetAdapterState',
-        'NetBIOS',
-        'NetConnectionProfile',
-        'NetIPInterface',
-        'NetworkTeam',
-        'NetworkTeamInterface',
-        'ProxySettings',
-        'Route',
-        'WINSSetting'
-    )
+    DscResourcesToExport = @()
 
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
     PrivateData          = @{
