@@ -42,7 +42,7 @@ AfterAll {
     Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
 }
 
-Describe 'Find-NetworkAdapter' {
+Describe 'Public\Find-NetworkAdapter' {
     BeforeAll {
         # Generate the adapter data to be used for Mocking
         $adapterName = 'Adapter'

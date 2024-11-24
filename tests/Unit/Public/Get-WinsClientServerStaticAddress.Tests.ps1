@@ -42,7 +42,7 @@ AfterAll {
     Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
 }
 
-Describe 'Set-WinsClientServerStaticAddress' {
+Describe 'Public\Get-WinsClientServerStaticAddress' {
     BeforeAll {
         # Generate the adapter data to be used for Mocking
         $interfaceAlias = 'Adapter'
@@ -60,16 +60,17 @@ Describe 'Set-WinsClientServerStaticAddress' {
         $twoIpStaticAddressString = $oneIpStaticAddressString, $secondIpStaticAddressString
 
         InModuleScope -Parameters @{
-            interfaceAlias           = $interfaceAlias
-            parameters               = $parameters
-            oneIpStaticAddressString = $oneIpStaticAddressString
-            twoIpStaticAddressString = $twoIpStaticAddressString
+            interfaceAlias              = $interfaceAlias
+            parameters                  = $parameters
+            oneIpStaticAddressString    = $oneIpStaticAddressString
+            secondIpStaticAddressString = $secondIpStaticAddressString
         } -ScriptBlock {
             Set-StrictMode -Version 1.0
+
             $script:interfaceAlias = $interfaceAlias
             $script:parameters = $parameters
             $script:oneIpStaticAddressString = $oneIpStaticAddressString
-            $script:twoIpStaticAddressString = $twoIpStaticAddressString
+            $script:secondIpStaticAddressString = $secondIpStaticAddressString
         }
     }
 
@@ -82,11 +83,9 @@ Describe 'Set-WinsClientServerStaticAddress' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $parameters.Address = @()
-
                 $errorRecord = Get-InvalidOperationRecord -Message ($script:localizedData.InterfaceAliasNotFoundError -f $interfaceAlias)
 
-                { $script:result = Set-WinsClientServerStaticAddress @parameters } | Should -Throw $errorRecord
+                { $script:result = Get-WinsClientServerStaticAddress @parameters } | Should -Throw -ExpectedMessage $errorRecord
             }
         }
 
@@ -95,19 +94,21 @@ Describe 'Set-WinsClientServerStaticAddress' {
         }
     }
 
-    Context 'When interface alias was found in system and WINS server address is set to $null' {
+    Context 'When interface alias was found in system and WINS server is empty' {
         BeforeAll {
             Mock Get-NetAdapter -MockWith { $matchAdapter }
-            Mock Set-ItemProperty
+            Mock Get-ItemProperty -MockWith {
+                @{
+                    NameServer = $noIpStaticAddressString
+                }
+            }
         }
 
         It 'Should not throw exception' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $parameters.Address = @()
-
-                { $script:result = Set-WinsClientServerStaticAddress @parameters } | Should -Not -Throw
+                { $script:result = Get-WinsClientServerStaticAddress @parameters } | Should -Not -Throw
             }
         }
 
@@ -121,66 +122,72 @@ Describe 'Set-WinsClientServerStaticAddress' {
 
         It 'Should call expected mocks' {
             Should -Invoke -CommandName Get-NetAdapter -Exactly -Times 1 -Scope Context
-            Should -Invoke -CommandName Set-ItemProperty -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Get-ItemProperty -Exactly -Times 1 -Scope Context
         }
     }
 
-    Context 'When interface alias was found in system and WINS server address is set to a single entry' {
+    Context 'When interface alias was found in system and WINS server list contains one entry' {
         BeforeAll {
             Mock Get-NetAdapter -MockWith { $matchAdapter }
-            Mock Set-ItemProperty
+            Mock Get-ItemProperty -MockWith {
+                @{
+                    NameServerList = $oneIpStaticAddressString
+                }
+            }
         }
 
         It 'Should not throw exception' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $parameters.Address = $oneIpStaticAddressString
-                { $script:result = Set-WinsClientServerStaticAddress @parameters } | Should -Not -Throw
+                { $script:result = Get-WinsClientServerStaticAddress @parameters } | Should -Not -Throw
             }
         }
 
-        It 'Should return null' {
+        It 'Should return expected address' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $script:result | Should -BeNullOrEmpty
+                $script:result | Should -Be $oneIpStaticAddressString
             }
         }
 
         It 'Should call expected mocks' {
             Should -Invoke -CommandName Get-NetAdapter -Exactly -Times 1 -Scope Context
-            Should -Invoke -CommandName Set-ItemProperty -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Get-ItemProperty -Exactly -Times 1 -Scope Context
         }
     }
 
-    Context 'When interface alias was found in system and WINS server address is set to two entries' {
+    Context 'When interface alias was found in system and WINS server list contains two entries' {
         BeforeAll {
             Mock Get-NetAdapter -MockWith { $matchAdapter }
-            Mock Set-ItemProperty
+            Mock Get-ItemProperty -MockWith {
+                @{
+                    NameServerList = $twoIpStaticAddressString
+                }
+            }
         }
 
         It 'Should not throw exception' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $parameters.Address = $twoIpStaticAddressString
-
-                { $script:result = Set-WinsClientServerStaticAddress @parameters } | Should -Not -Throw
+                { $script:result = Get-WinsClientServerStaticAddress @parameters } | Should -Not -Throw
             }
         }
 
-        It 'Should return null' {
+        It 'Should return two expected addresses' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $script:result | Should -BeNullOrEmpty
+                $script:result[0] | Should -Be $oneIpStaticAddressString
+                $script:result[1] | Should -Be $secondIpStaticAddressString
             }
         }
 
         It 'Should call expected mocks' {
             Should -Invoke -CommandName Get-NetAdapter -Exactly -Times 1 -Scope Context
-            Should -Invoke -CommandName Set-ItemProperty -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Get-ItemProperty -Exactly -Times 1 -Scope Context
         }
     }
 }

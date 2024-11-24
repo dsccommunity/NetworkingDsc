@@ -42,7 +42,7 @@ AfterAll {
     Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
 }
 
-Describe 'Get-DnsClientServerStaticAddress' {
+Describe 'Public\Get-DnsClientServerStaticAddress' {
     BeforeAll {
         # Generate the adapter data to be used for Mocking
         $interfaceAlias = 'Adapter'

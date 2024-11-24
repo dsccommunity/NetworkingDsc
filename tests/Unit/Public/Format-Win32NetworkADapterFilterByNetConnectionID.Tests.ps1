@@ -42,81 +42,76 @@ AfterAll {
     Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
 }
 
-Describe 'Get-IPAddressPrefix' {
-    Context 'IPv4 CIDR notation provided' {
-        It 'Should return the provided IP and prefix as separate properties' {
+Describe 'Public\Format-Win32NetworkADapterFilterByNetConnectionID' {
+    Context 'When interface alias has an ''*''' {
+        BeforeAll {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $IPaddress = Get-IPAddressPrefix -IPAddress '192.168.10.0/24'
+                $script:interfaceAlias = 'Ether*'
+            }
+        }
 
-                $IPaddress.IPaddress | Should -Be '192.168.10.0'
-                $IPaddress.PrefixLength | Should -Be 24
+        It 'Should convert the ''*'' to a ''%''' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).Contains('%') -eq $true -and
+                (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).Contains('*') -eq $false | Should -BeTrue
+            }
+        }
+
+        It 'Should change the operator to ''LIKE''' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
+            }
+        }
+
+        It 'Should look like a usable filter' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
             }
         }
     }
 
-    Context 'IPv4 Class A address with no CIDR notation' {
-        It 'Should return correct prefix when Class A address provided' {
+    Context 'When interface alias has a ''%''' {
+        BeforeAll {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $IPaddress = Get-IPAddressPrefix -IPAddress '10.1.2.3'
+                $interfaceAlias = 'Ether%'
+            }
+        }
 
-                $IPaddress.IPaddress | Should -Be '10.1.2.3'
-                $IPaddress.PrefixLength | Should -Be 8
+        It 'Should change the operator to ''LIKE''' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
+            }
+        }
+
+        It 'Should look like a usable filter' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
             }
         }
     }
 
-    Context 'IPv4 Class B address with no CIDR notation' {
-        It 'Should return correct prefix when Class B address provided' {
+    Context 'When interface alias has no wildcards' {
+        It 'Should look like a usable filter' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $IPaddress = Get-IPAddressPrefix -IPAddress '172.16.2.3'
+                $interfaceAlias = 'Ethernet'
 
-                $IPaddress.IPaddress | Should -Be '172.16.2.3'
-                $IPaddress.PrefixLength | Should -Be 16
-            }
-        }
-    }
-
-    Context 'IPv4 Class C address with no CIDR notation' {
-        It 'Should return correct prefix when Class C address provided' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                $IPaddress = Get-IPAddressPrefix -IPAddress '192.168.20.3'
-
-                $IPaddress.IPaddress | Should -Be '192.168.20.3'
-                $IPaddress.PrefixLength | Should -Be 24
-            }
-        }
-    }
-
-    Context 'IPv6 CIDR notation provided' {
-        It 'Should return provided IP and prefix as separate properties' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                $IPaddress = Get-IPAddressPrefix -IPAddress 'FF12::12::123/64' -AddressFamily IPv6
-
-                $IPaddress.IPaddress | Should -Be 'FF12::12::123'
-                $IPaddress.PrefixLength | Should -Be 64
-            }
-        }
-    }
-
-    Context 'IPv6 with no CIDR notation provided' {
-        It 'Should return provided IP and correct IPv6 prefix' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                $IPaddress = Get-IPAddressPrefix -IPAddress 'FF12::12::123' -AddressFamily IPv6
-
-                $IPaddress.IPaddress | Should -Be 'FF12::12::123'
-                $IPaddress.PrefixLength | Should -Be 64
+                Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID="Ethernet"'
             }
         }
     }
