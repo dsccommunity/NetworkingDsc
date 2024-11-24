@@ -26,14 +26,14 @@ BeforeDiscovery {
         Need to define that variables here to be used in the Pester Discover to
         build the ForEach-blocks.
     #>
-    $script:dscResourceFriendlyName = 'DSC_IPAddress'
+    $script:dscResourceFriendlyName = 'IPAddress'
     $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
 }
 
 BeforeAll {
     # Need to define the variables here which will be used in Pester Run.
     $script:dscModuleName = 'NetworkingDsc'
-    $script:dscResourceFriendlyName = 'DSC_IPAddress'
+    $script:dscResourceFriendlyName = 'IPAddress'
     $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
 
     $script:testEnvironment = Initialize-TestEnvironment `
