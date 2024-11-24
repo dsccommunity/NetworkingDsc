@@ -46,7 +46,7 @@ function Get-TargetResource
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($script:localizedData.GettingDnsServerAddressesMessage)
+            $($script:localizedData.GettingDnsServerAddressesMessage)
         ) -join '')
 
     # Remove the parameters we don't want to splat
@@ -110,7 +110,7 @@ function Set-TargetResource
     )
 
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
-        $($script:localizedData.ApplyingDnsServerAddressesMessage -f $AddressFamily, ($Address -join ','), $InterfaceAlias)
+            $($script:localizedData.ApplyingDnsServerAddressesMessage -f $AddressFamily, ($Address -join ','), $InterfaceAlias)
         ) -join '')
 
     $dnsServerAddressSplat = @{
@@ -140,7 +140,7 @@ function Set-TargetResource
             -ErrorAction Stop
 
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($script:localizedData.DNSServersHaveBeenSetCorrectlyMessage)
+                $($script:localizedData.DNSServersHaveBeenSetCorrectlyMessage)
             ) -join '' )
     }
     catch [Microsoft.Management.Infrastructure.CimException]
@@ -203,7 +203,7 @@ function Test-TargetResource
     $desiredConfigurationMatch = $true
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-        $($script:localizedData.CheckingDnsServerAddressesMessage)
+            $($script:localizedData.CheckingDnsServerAddressesMessage)
         ) -join '' )
 
     # Validate the Address passed or set to empty array if not passed
@@ -228,29 +228,29 @@ function Test-TargetResource
 
     # Get the current DNS Server Addresses based on the parameters given.
     [String[]] $currentAddress = @(Get-DnsClientServerStaticAddress `
-        @PSBoundParameters `
-        -ErrorAction Stop)
+            @PSBoundParameters `
+            -ErrorAction Stop)
 
     # Check if the Server addresses are the same as the desired addresses.
     [Boolean] $addressDifferent = (@(Compare-Object `
-            -ReferenceObject $currentAddress `
-            -DifferenceObject $Address `
-            -SyncWindow 0).Length -gt 0)
+                -ReferenceObject $currentAddress `
+                -DifferenceObject $Address `
+                -SyncWindow 0).Length -gt 0)
 
     if ($addressDifferent)
     {
         $desiredConfigurationMatch = $false
 
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($script:localizedData.DNSServersNotCorrectMessage) `
-                -f ($Address -join ','),($currentAddress -join ',')
+                $($script:localizedData.DNSServersNotCorrectMessage) `
+                    -f ($Address -join ','), ($currentAddress -join ',')
             ) -join '' )
     }
     else
     {
         # Test will return true in this case
         Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
-            $($script:localizedData.DNSServersSetCorrectlyMessage)
+                $($script:localizedData.DNSServersSetCorrectlyMessage)
             ) -join '' )
     }
     return $desiredConfigurationMatch
@@ -300,5 +300,3 @@ function Assert-ResourceProperty
 
     Assert-IPAddress -Address $Address -AddressFamily $AddressFamily
 } # Assert-ResourceProperty
-
-Export-ModuleMember -function *-TargetResource

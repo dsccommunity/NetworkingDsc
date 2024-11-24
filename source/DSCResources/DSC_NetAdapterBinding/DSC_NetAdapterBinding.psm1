@@ -274,5 +274,3 @@ function Get-Binding
 
     return $binding
 } # Get-Binding
-
-Export-ModuleMember -function *-TargetResource
