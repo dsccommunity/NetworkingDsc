@@ -110,8 +110,8 @@ function Set-TargetResource
         ) -join '' )
 
     $defaultRoutes = @(Get-NetDefaultRoute `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily)
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily)
 
     # Remove any existing default routes
     foreach ($defaultRoute in $defaultRoutes)
@@ -195,8 +195,8 @@ function Test-TargetResource
     Assert-ResourceProperty @PSBoundParameters
 
     $defaultRoutes = @(Get-NetDefaultRoute `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily)
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily)
 
     # Test if the Default Gateway passed is equal to the current default gateway
     if ($Address)
@@ -204,8 +204,8 @@ function Test-TargetResource
         if ($defaultRoutes)
         {
             $nextHopRoute = $defaultRoutes.Where( {
-                $_.NextHop -eq $Address
-            } )
+                    $_.NextHop -eq $Address
+                } )
 
             if ($nextHopRoute)
             {
@@ -294,4 +294,73 @@ function Assert-ResourceProperty
     {
         Assert-IPAddress -Address $Address -AddressFamily $AddressFamily
     }
+}
+
+<#
+    .SYNOPSIS
+    Get the default gateway destination prefix for the IP address family.
+
+    .PARAMETER AddressFamily
+    IP address family.
+#>
+function Get-NetDefaultGatewayDestinationPrefix
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param
+    (
+        [Parameter()]
+        [ValidateSet('IPv4', 'IPv6')]
+        [System.String]
+        $AddressFamily = 'IPv4'
+    )
+
+    if ($AddressFamily -eq 'IPv4')
+    {
+        $destinationPrefix = '0.0.0.0/0'
+    }
+    else
+    {
+        $destinationPrefix = '::/0'
+    }
+
+    return $destinationPrefix
+}
+
+<#
+    .SYNOPSIS
+        Get the default network routes assigned to the interface.
+
+    .PARAMETER InterfaceAlias
+        Alias of the network interface for which the default gateway address is set.
+
+    .PARAMETER AddressFamily
+        IP address family.
+#>
+function Get-NetDefaultRoute
+{
+    [CmdletBinding()]
+    [OutputType([System.String[]])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $InterfaceAlias,
+
+        [Parameter()]
+        [ValidateSet('IPv4', 'IPv6')]
+        [System.String]
+        $AddressFamily = 'IPv4'
+    )
+
+    $destinationPrefix = Get-NetDefaultGatewayDestinationPrefix `
+        -AddressFamily $AddressFamily
+
+    return @(Get-NetRoute `
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily `
+            -ErrorAction Stop).Where({
+            $_.DestinationPrefix -eq $destinationPrefix
+        })
 }

@@ -402,3 +402,77 @@ Describe 'DSC_DefaultGatewayAddress\Assert-ResourceProperty' -Tag 'Private' {
         }
     }
 }
+
+Describe 'DSC_DefaultGatewayAddress\Get-NetDefaultGatewayDestinationPrefix' -Tag 'Private' {
+    Context 'When the AddressFamily is IPv4' {
+        It 'Should return current default gateway' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Get-NetDefaultGatewayDestinationPrefix -AddressFamily 'IPv4' | Should -Be '0.0.0.0/0'
+            }
+        }
+    }
+
+    Context 'When the AddressFamily is IPv6' {
+        It 'Should return current default gateway' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                Get-NetDefaultGatewayDestinationPrefix -AddressFamily 'IPv6' | Should -Be '::/0'
+            }
+        }
+    }
+}
+
+Describe 'DSC_DefaultGatewayAddress\Get-NetDefaultRoute' -Tag 'Private' {
+    Context 'When interface has a default gateway set' {
+        BeforeAll {
+            Mock -CommandName Get-NetRoute -MockWith {
+                @{
+                    NextHop           = '192.168.0.1'
+                    DestinationPrefix = '0.0.0.0/0'
+                    InterfaceAlias    = 'Ethernet'
+                    InterfaceIndex    = 1
+                    AddressFamily     = 'IPv4'
+                }
+            }
+        }
+
+        It 'Should return current default gateway' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $GetNetDefaultRouteParameters = @{
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily  = 'IPv4'
+                }
+
+                $result = Get-NetDefaultRoute @GetNetDefaultRouteParameters
+
+                $result.NextHop | Should -Be '192.168.0.1'
+            }
+        }
+    }
+
+    Context 'When interface has no default gateway set' {
+        BeforeAll {
+            Mock -CommandName Get-NetRoute
+        }
+
+        It 'Should return no default gateway' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $GetNetDefaultRouteParameters = @{
+                    InterfaceAlias = 'Ethernet'
+                    AddressFamily  = 'IPv4'
+                }
+
+                $result = Get-NetDefaultRoute @GetNetDefaultRouteParameters
+
+                $result | Should -BeNullOrEmpty
+            }
+        }
+    }
+}
