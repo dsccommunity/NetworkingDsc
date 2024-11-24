@@ -28,6 +28,33 @@ BeforeDiscovery {
     #>
     $script:dscResourceFriendlyName = 'WinsSetting'
     $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
+
+    # Find an adapter we can test with. It needs to be enabled and have IP enabled.
+    $netAdapter = $null
+    $netAdapterConfig = $null
+    $netAdapterEnabled = Get-CimInstance -ClassName Win32_NetworkAdapter -Filter 'NetEnabled="True"'
+
+    if (-not $netAdapterEnabled)
+    {
+        $script:skip = $true
+    }
+
+    foreach ($netAdapter in $netAdapterEnabled)
+    {
+        $netAdapterConfig = $netAdapter |
+            Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration |
+            Where-Object -FilterScript { $_.IPEnabled -eq $True }
+
+        if ($netAdapterConfig)
+        {
+            break
+        }
+    }
+
+    if (-not $netAdapterConfig)
+    {
+        $script:skip = $true
+    }
 }
 
 BeforeAll {
@@ -55,84 +82,53 @@ AfterAll {
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
 
-Describe 'WinsSetting Integration Tests' {
+Describe 'WinsSetting Integration Tests' -Skip:$script:skip {
+    BeforeAll {
+        # Store the current WINS settings
+        $enableDnsRegistryKey = Get-ItemProperty `
+            -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' `
+            -Name EnableDNS `
+            -ErrorAction SilentlyContinue
+
+        if ($enableDnsRegistryKey)
+        {
+            $currentEnableDNS = ($enableDnsRegistryKey.EnableDNS -eq 1)
+        }
+        else
+        {
+            # if the key does not exist, then set the default which is enabled.
+            $currentEnableDNS = $true
+        }
+
+        $enableLMHostsRegistryKey = Get-ItemProperty `
+            -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' `
+            -Name EnableLMHOSTS `
+            -ErrorAction SilentlyContinue
+
+        $currentEnableLmHosts = ($enableLMHOSTSRegistryKey.EnableLMHOSTS -eq 1)
+
+        # Set the WINS settings to known values
+        $null = Invoke-CimMethod `
+            -ClassName Win32_NetworkAdapterConfiguration `
+            -MethodName EnableWins `
+            -Arguments @{
+            DNSEnabledForWINSResolution = $true
+            WINSEnableLMHostsLookup     = $true
+        }
+    }
+
+    AfterAll {
+        # Restore the WINS settings
+        $null = Invoke-CimMethod `
+            -ClassName Win32_NetworkAdapterConfiguration `
+            -MethodName EnableWins `
+            -Arguments @{
+            DNSEnabledForWINSResolution = $currentEnableDns
+            WINSEnableLMHostsLookup     = $currentEnableLmHosts
+        }
+    }
+
     Describe "$($script:dscResourceName)_Integration" {
-        BeforeAll {
-            # Find an adapter we can test with. It needs to be enabled and have IP enabled.
-            $netAdapter = $null
-            $netAdapterConfig = $null
-            $netAdapterEnabled = Get-CimInstance -ClassName Win32_NetworkAdapter -Filter 'NetEnabled="True"'
-
-            if (-not $netAdapterEnabled)
-            {
-                Write-Verbose -Message ('There are no enabled network adapters in this system. Integration tests will be skipped.') -Verbose
-                return
-            }
-
-            foreach ($netAdapter in $netAdapterEnabled)
-            {
-                $netAdapterConfig = $netAdapter |
-                    Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration |
-                    Where-Object -FilterScript { $_.IPEnabled -eq $True }
-
-                if ($netAdapterConfig)
-                {
-                    break
-                }
-            }
-
-            if (-not $netAdapterConfig)
-            {
-                Write-Verbose -Message ('There are no enabled network adapters with IP enabled in this system. Integration tests will be skipped.') -Verbose
-                return
-            }
-
-            Write-Verbose -Message ('A network adapter ({0}) was found in this system that meets requirements for integration testing.' -f $netAdapter.Name) -Verbose
-
-            # Store the current WINS settings
-            $enableDnsRegistryKey = Get-ItemProperty `
-                -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' `
-                -Name EnableDNS `
-                -ErrorAction SilentlyContinue
-
-            if ($enableDnsRegistryKey)
-            {
-                $currentEnableDNS = ($enableDnsRegistryKey.EnableDNS -eq 1)
-            }
-            else
-            {
-                # if the key does not exist, then set the default which is enabled.
-                $currentEnableDNS = $true
-            }
-
-            $enableLMHostsRegistryKey = Get-ItemProperty `
-                -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' `
-                -Name EnableLMHOSTS `
-                -ErrorAction SilentlyContinue
-
-            $currentEnableLmHosts = ($enableLMHOSTSRegistryKey.EnableLMHOSTS -eq 1)
-
-            # Set the WINS settings to known values
-            $null = Invoke-CimMethod `
-                -ClassName Win32_NetworkAdapterConfiguration `
-                -MethodName EnableWins `
-                -Arguments @{
-                DNSEnabledForWINSResolution = $true
-                WINSEnableLMHostsLookup     = $true
-            }
-        }
-
-        AfterAll {
-            # Restore the WINS settings
-            $null = Invoke-CimMethod `
-                -ClassName Win32_NetworkAdapterConfiguration `
-                -MethodName EnableWins `
-                -Arguments @{
-                DNSEnabledForWINSResolution = $currentEnableDns
-                WINSEnableLMHostsLookup     = $currentEnableLmHosts
-            }
-        }
-
         Context 'Disable all settings' {
             BeforeAll {
                 $configurationData = @{
@@ -170,6 +166,7 @@ Describe 'WinsSetting Integration Tests' {
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
+
                 $result.EnableLmHosts | Should -Be $false
                 $result.EnableDns | Should -Be $false
             }

@@ -44,6 +44,16 @@ BeforeDiscovery {
     #>
     $script:dscResourceFriendlyName = 'WaitForNetworkTeam'
     $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+
+    $script:NetworkTeamMembers = @()
+
+    # Check if integration tests can be run
+    if (-not (Test-NetworkTeamIntegrationEnvironment -NetworkAdapters $script:NetworkTeamMembers))
+    {
+        $script:skip = $true
+    }
 }
 
 BeforeAll {
@@ -62,15 +72,6 @@ BeforeAll {
     . $configFile
 
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
-
-    $script:NetworkTeamMembers = @()
-
-    # Check if integration tests can be run
-    if (-not (Test-NetworkTeamIntegrationEnvironment -NetworkAdapters $script:NetworkTeamMembers))
-    {
-        Write-Warning -Message 'Integration tests will be skipped.'
-        return
-    }
 }
 
 AfterAll {
@@ -80,7 +81,7 @@ AfterAll {
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
 
-Describe 'WaitForNetworkTeam Integration Tests' {
+Describe 'WaitForNetworkTeam Integration Tests' -Skip:$script:skip {
     BeforeAll {
         $null = New-NetLbfoTeam `
             -Name 'TestTeam' `
