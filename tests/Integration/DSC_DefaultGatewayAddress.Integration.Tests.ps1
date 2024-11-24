@@ -46,44 +46,50 @@ BeforeAll {
     . $configFile
 
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
-
-    # Configure Loopback Adapter
-    New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
 }
 
 AfterAll {
-    # Remove Loopback Adapter
-    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
-
     # Remove module common test helper.
     Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
 
-Describe "$($script:dscResourceName)_Integration" {
-    It 'Should compile and apply the MOF without throwing' {
-        {
-            & "$($script:dscResourceName)_Config" -OutputPath $TestDrive
-            Start-DscConfiguration `
-                -Path $TestDrive `
-                -ComputerName localhost `
-                -Wait `
-                -Verbose `
-                -Force
-        } | Should -Not -Throw
+Describe 'DefaultGatewayAddress Integration Tests' {
+    BeforeAll {
+        # Configure Loopback Adapter
+        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
     }
 
-    It 'Should be able to call Get-DscConfiguration without throwing' {
-        { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+    AfterAll {
+        # Remove Loopback Adapter
+        Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
     }
 
-    It 'Should have set the resource and all the parameters should match' {
-        $current = Get-DscConfiguration   | Where-Object -FilterScript {
-            $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+    Describe "$($script:dscResourceName)_Integration" {
+        It 'Should compile and apply the MOF without throwing' {
+            {
+                & "$($script:dscResourceName)_Config" -OutputPath $TestDrive
+                Start-DscConfiguration `
+                    -Path $TestDrive `
+                    -ComputerName localhost `
+                    -Wait `
+                    -Verbose `
+                    -Force
+            } | Should -Not -Throw
         }
-        $current.InterfaceAlias           | Should -Be $TestDefaultGatewayAddress.InterfaceAlias
-        $current.AddressFamily            | Should -Be $TestDefaultGatewayAddress.AddressFamily
-        $current.Address                  | Should -Be $TestDefaultGatewayAddress.Address
+
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+
+        It 'Should have set the resource and all the parameters should match' {
+            $current = Get-DscConfiguration   | Where-Object -FilterScript {
+                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+            }
+            $current.InterfaceAlias           | Should -Be $TestDefaultGatewayAddress.InterfaceAlias
+            $current.AddressFamily            | Should -Be $TestDefaultGatewayAddress.AddressFamily
+            $current.Address                  | Should -Be $TestDefaultGatewayAddress.Address
+        }
     }
 }
