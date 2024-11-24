@@ -42,7 +42,7 @@ BeforeAll {
         -ResourceType 'Mof' `
         -TestType 'Integration'
 
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_Configured.config.ps1"
     . $configFile
 
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
