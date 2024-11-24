@@ -55,164 +55,166 @@ AfterAll {
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
 
-Describe "$($script:dscResourceName)_Integration" {
-    BeforeAll {
-        # Find an adapter we can test with. It needs to be enabled and have IP enabled.
-        $netAdapter = $null
-        $netAdapterConfig = $null
-        $netAdapterEnabled = Get-CimInstance -ClassName Win32_NetworkAdapter -Filter 'NetEnabled="True"'
-
-        if (-not $netAdapterEnabled)
-        {
-            Write-Verbose -Message ('There are no enabled network adapters in this system. Integration tests will be skipped.') -Verbose
-            return
-        }
-
-        foreach ($netAdapter in $netAdapterEnabled)
-        {
-            $netAdapterConfig = $netAdapter |
-                Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration |
-                Where-Object -FilterScript { $_.IPEnabled -eq $True }
-
-            if ($netAdapterConfig)
-            {
-                break
-            }
-        }
-
-        if (-not $netAdapterConfig)
-        {
-            Write-Verbose -Message ('There are no enabled network adapters with IP enabled in this system. Integration tests will be skipped.') -Verbose
-            return
-        }
-
-        Write-Verbose -Message ('A network adapter ({0}) was found in this system that meets requirements for integration testing.' -f $netAdapter.Name) -Verbose
-
-        # Store the current WINS settings
-        $enableDnsRegistryKey = Get-ItemProperty `
-            -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' `
-            -Name EnableDNS `
-            -ErrorAction SilentlyContinue
-
-        if ($enableDnsRegistryKey)
-        {
-            $currentEnableDNS = ($enableDnsRegistryKey.EnableDNS -eq 1)
-        }
-        else
-        {
-            # if the key does not exist, then set the default which is enabled.
-            $currentEnableDNS = $true
-        }
-
-        $enableLMHostsRegistryKey = Get-ItemProperty `
-            -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' `
-            -Name EnableLMHOSTS `
-            -ErrorAction SilentlyContinue
-
-        $currentEnableLmHosts = ($enableLMHOSTSRegistryKey.EnableLMHOSTS -eq 1)
-
-        # Set the WINS settings to known values
-        $null = Invoke-CimMethod `
-            -ClassName Win32_NetworkAdapterConfiguration `
-            -MethodName EnableWins `
-            -Arguments @{
-            DNSEnabledForWINSResolution = $true
-            WINSEnableLMHostsLookup     = $true
-        }
-    }
-
-    AfterAll {
-        # Restore the WINS settings
-        $null = Invoke-CimMethod `
-            -ClassName Win32_NetworkAdapterConfiguration `
-            -MethodName EnableWins `
-            -Arguments @{
-            DNSEnabledForWINSResolution = $currentEnableDns
-            WINSEnableLMHostsLookup     = $currentEnableLmHosts
-        }
-    }
-
-    Context 'Disable all settings' {
+Describe 'WinsSetting Integration Tests' {
+    Describe "$($script:dscResourceName)_Integration" {
         BeforeAll {
-            $configurationData = @{
-                AllNodes = @(
-                    @{
-                        NodeName      = 'localhost'
-                        EnableLmHosts = $false
-                        EnableDns     = $false
-                    }
-                )
-            }
-        }
+            # Find an adapter we can test with. It needs to be enabled and have IP enabled.
+            $netAdapter = $null
+            $netAdapterConfig = $null
+            $netAdapterEnabled = Get-CimInstance -ClassName Win32_NetworkAdapter -Filter 'NetEnabled="True"'
 
-        It 'Should compile and apply the MOF without throwing' {
+            if (-not $netAdapterEnabled)
             {
-                & "$($script:dscResourceName)_Config" `
-                    -OutputPath $TestDrive `
-                    -ConfigurationData $configurationData
-
-                Start-DscConfiguration `
-                    -Path $TestDrive `
-                    -ComputerName localhost `
-                    -Wait `
-                    -Verbose `
-                    -Force `
-                    -ErrorAction Stop
-            } | Should -Not -Throw
-        }
-
-        It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-        }
-
-        It 'Should have set the resource and all setting should match current state' {
-            $result = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                Write-Verbose -Message ('There are no enabled network adapters in this system. Integration tests will be skipped.') -Verbose
+                return
             }
-            $result.EnableLmHosts | Should -Be $false
-            $result.EnableDns | Should -Be $false
-        }
-    }
 
-    Context 'Enable all settings' {
-        BeforeAll {
-            $configurationData = @{
-                AllNodes = @(
-                    @{
-                        NodeName      = 'localhost'
-                        EnableLmHosts = $true
-                        EnableDns     = $true
-                    }
-                )
-            }
-        }
-
-        It 'Should compile and apply the MOF without throwing' {
+            foreach ($netAdapter in $netAdapterEnabled)
             {
-                & "$($script:dscResourceName)_Config" `
-                    -OutputPath $TestDrive `
-                    -ConfigurationData $configurationData
+                $netAdapterConfig = $netAdapter |
+                    Get-CimAssociatedInstance -ResultClassName Win32_NetworkAdapterConfiguration |
+                    Where-Object -FilterScript { $_.IPEnabled -eq $True }
 
-                Start-DscConfiguration `
-                    -Path $TestDrive `
-                    -ComputerName localhost `
-                    -Wait `
-                    -Verbose `
-                    -Force `
-                    -ErrorAction Stop
-            } | Should -Not -Throw
-        }
-
-        It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-        }
-
-        It 'Should have set the resource and all setting should match current state' {
-            $result = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                if ($netAdapterConfig)
+                {
+                    break
+                }
             }
-            $result.EnableLmHosts | Should -Be $true
-            $result.EnableDns | Should -Be $true
+
+            if (-not $netAdapterConfig)
+            {
+                Write-Verbose -Message ('There are no enabled network adapters with IP enabled in this system. Integration tests will be skipped.') -Verbose
+                return
+            }
+
+            Write-Verbose -Message ('A network adapter ({0}) was found in this system that meets requirements for integration testing.' -f $netAdapter.Name) -Verbose
+
+            # Store the current WINS settings
+            $enableDnsRegistryKey = Get-ItemProperty `
+                -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' `
+                -Name EnableDNS `
+                -ErrorAction SilentlyContinue
+
+            if ($enableDnsRegistryKey)
+            {
+                $currentEnableDNS = ($enableDnsRegistryKey.EnableDNS -eq 1)
+            }
+            else
+            {
+                # if the key does not exist, then set the default which is enabled.
+                $currentEnableDNS = $true
+            }
+
+            $enableLMHostsRegistryKey = Get-ItemProperty `
+                -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters' `
+                -Name EnableLMHOSTS `
+                -ErrorAction SilentlyContinue
+
+            $currentEnableLmHosts = ($enableLMHOSTSRegistryKey.EnableLMHOSTS -eq 1)
+
+            # Set the WINS settings to known values
+            $null = Invoke-CimMethod `
+                -ClassName Win32_NetworkAdapterConfiguration `
+                -MethodName EnableWins `
+                -Arguments @{
+                DNSEnabledForWINSResolution = $true
+                WINSEnableLMHostsLookup     = $true
+            }
+        }
+
+        AfterAll {
+            # Restore the WINS settings
+            $null = Invoke-CimMethod `
+                -ClassName Win32_NetworkAdapterConfiguration `
+                -MethodName EnableWins `
+                -Arguments @{
+                DNSEnabledForWINSResolution = $currentEnableDns
+                WINSEnableLMHostsLookup     = $currentEnableLmHosts
+            }
+        }
+
+        Context 'Disable all settings' {
+            BeforeAll {
+                $configurationData = @{
+                    AllNodes = @(
+                        @{
+                            NodeName      = 'localhost'
+                            EnableLmHosts = $false
+                            EnableDns     = $false
+                        }
+                    )
+                }
+            }
+
+            It 'Should compile and apply the MOF without throwing' {
+                {
+                    & "$($script:dscResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configurationData
+
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should have set the resource and all setting should match current state' {
+                $result = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                }
+                $result.EnableLmHosts | Should -Be $false
+                $result.EnableDns | Should -Be $false
+            }
+        }
+
+        Context 'Enable all settings' {
+            BeforeAll {
+                $configurationData = @{
+                    AllNodes = @(
+                        @{
+                            NodeName      = 'localhost'
+                            EnableLmHosts = $true
+                            EnableDns     = $true
+                        }
+                    )
+                }
+            }
+
+            It 'Should compile and apply the MOF without throwing' {
+                {
+                    & "$($script:dscResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configurationData
+
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should have set the resource and all setting should match current state' {
+                $result = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                }
+                $result.EnableLmHosts | Should -Be $true
+                $result.EnableDns | Should -Be $true
+            }
         }
     }
 }
