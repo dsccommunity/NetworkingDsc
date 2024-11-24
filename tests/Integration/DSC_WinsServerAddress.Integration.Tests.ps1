@@ -46,14 +46,9 @@ BeforeAll {
     . $configFile
 
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
-
-    New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
 }
 
 AfterAll {
-    # Remove Loopback Adapter
-    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
-
     # Remove module common test helper.
     Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 
@@ -61,6 +56,15 @@ AfterAll {
 }
 
 Describe 'WinsServerAddress Integration Tests' {
+    BeforeAll {
+        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
+    }
+
+    AfterAll {
+        # Remove Loopback Adapter
+        Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
+    }
+    
     Describe "$($script:dscResourceName)_Integration using single address" {
         It 'Should compile and apply the MOF without throwing' {
             {
