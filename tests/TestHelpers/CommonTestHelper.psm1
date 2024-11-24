@@ -151,3 +151,9 @@ function Remove-IntegrationLoopbackAdapter
         -Force
 
 } # function Remove-IntegrationLoopbackAdapter
+
+Export-ModuleMember -Function `
+    Get-InvalidArgumentRecord, `
+    Test-NetworkTeamIntegrationEnvironment, `
+    New-IntegrationLoopbackAdapter, `
+    Remove-IntegrationLoopbackAdapter
