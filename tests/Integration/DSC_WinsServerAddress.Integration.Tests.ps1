@@ -91,6 +91,7 @@ Describe 'WinsServerAddress Integration Tests' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured"
             }
+
             $current.InterfaceAlias | Should -Be 'NetworkingDscLBA'
             $current.Address.Count | Should -Be 1
             $current.Address | Should -Be '10.139.17.99'
@@ -127,6 +128,7 @@ Describe 'WinsServerAddress Integration Tests' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured"
             }
+
             $current.InterfaceAlias | Should -Be 'NetworkingDscLBA'
             $current.Address.Count | Should -Be 2
             $current.Address[0] | Should -Be '10.139.17.99'
@@ -164,6 +166,7 @@ Describe 'WinsServerAddress Integration Tests' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Configured"
             }
+
             $current.InterfaceAlias | Should -Be 'NetworkingDscLBA'
             $current.Address | Should -BeNullOrEmpty
         }
