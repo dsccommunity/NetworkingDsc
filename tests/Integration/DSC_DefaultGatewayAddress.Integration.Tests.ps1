@@ -60,6 +60,7 @@ AfterAll {
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
+
 Describe "$($script:dscResourceName)_Integration" {
     It 'Should compile and apply the MOF without throwing' {
         {
