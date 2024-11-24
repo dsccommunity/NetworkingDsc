@@ -50,6 +50,29 @@ BeforeAll {
     # Configure Loopback Adapters
     New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
     New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
+
+    function Invoke-NetBiosIntegrationTest
+    {
+        param (
+            [Parameter()]
+            [System.String]
+            $InterfaceAlias,
+
+            [Parameter()]
+            [System.String]
+            $Setting = 'Disable'
+        )
+
+        $configData = @{
+            AllNodes = @(
+                @{
+                    NodeName       = 'localhost'
+                    InterfaceAlias = $InterfaceAlias
+                    Setting        = $Setting
+                }
+            )
+        }
+    }
 }
 
 AfterAll {
@@ -80,29 +103,6 @@ public enum NetBiosSetting
     Disable
 }
 '@
-        }
-
-        function Invoke-NetBiosIntegrationTest
-        {
-            param (
-                [Parameter()]
-                [System.String]
-                $InterfaceAlias,
-
-                [Parameter()]
-                [System.String]
-                $Setting = 'Disable'
-            )
-
-            $configData = @{
-                AllNodes = @(
-                    @{
-                        NodeName       = 'localhost'
-                        InterfaceAlias = $InterfaceAlias
-                        Setting        = $Setting
-                    }
-                )
-            }
         }
 
         It 'Should compile and apply the MOF without throwing' {
