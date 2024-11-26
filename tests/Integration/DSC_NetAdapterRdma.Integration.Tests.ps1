@@ -43,14 +43,14 @@ BeforeDiscovery {
     $script:dscResourceFriendlyName = 'NetAdapterRdma'
     $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
 
-    $script:AdapterName = 'vEthernet (Default Switch)'
+    $AdapterName = 'vEthernet (Default Switch)'
 
     # Check the adapter selected for use in testing is RDMA compatible and preserve state
-    $script:adapterRDMAStatus = Get-NetAdapterRdma -Name $script:AdapterName -ErrorAction SilentlyContinue
+    $adapterRDMAStatus = Get-NetAdapterRdma -Name $AdapterName -ErrorAction SilentlyContinue
 
-    if (-not $script:adapterRDMAStatus)
+    if (-not $adapterRDMAStatus)
     {
-        $script:skip = $true
+        $script:Skip = $true
     }
 }
 
@@ -76,7 +76,7 @@ AfterAll {
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
 
-Describe 'NetAdapterName Integration Tests' -Skip:$script:skip {
+Describe 'NetAdapterName Integration Tests' -Skip:$script:Skip {
     BeforeAll {
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile
@@ -84,14 +84,14 @@ Describe 'NetAdapterName Integration Tests' -Skip:$script:skip {
         $AdapterName = 'vEthernet (Default Switch)'
 
         # Check the adapter selected for use in testing is RDMA compatible and preserve state
-        $script:adapterRDMAStatus = Get-NetAdapterRdma -Name $AdapterName -ErrorAction SilentlyContinue
+        $adapterRDMAStatus = Get-NetAdapterRdma -Name $AdapterName -ErrorAction SilentlyContinue
 
         # Make sure RDMA is disabled on the selected adapter before running tests
         Set-NetAdapterRdma -Name $AdapterName -Enabled $false
     }
 
     AfterAll {
-        Set-NetAdapterRdma -Name $AdapterName -Enabled $script:adapterRDMAStatus.Enabled
+        Set-NetAdapterRdma -Name $AdapterName -Enabled $adapterRDMAStatus.Enabled
     }
 
     Describe "$($script:dscResourceName)_Integration" {
