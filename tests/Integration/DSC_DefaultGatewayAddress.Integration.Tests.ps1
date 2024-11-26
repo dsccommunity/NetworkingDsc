@@ -42,9 +42,6 @@ BeforeAll {
         -ResourceType 'Mof' `
         -TestType 'Integration'
 
-    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
-    . $configFile
-
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
@@ -59,6 +56,9 @@ Describe 'DefaultGatewayAddress Integration Tests' {
     BeforeAll {
         # Configure Loopback Adapter
         New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
+
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+        . $configFile
     }
 
     AfterAll {
