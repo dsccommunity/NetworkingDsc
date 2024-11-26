@@ -1,201 +1,214 @@
-# <#
-#     These tests can not be run in AppVeyor as this will cause the network
-#     adapter to disconnect and terminate the build.
+<#
+    These tests can not be run in AppVeyor as this will cause the network
+    adapter to disconnect and terminate the build.
 
-#     They can only be run if two teaming compatible network adapters are
-#     present on the test machine and the adapters can be safely used in
-#     a team during the test process.
+    They can only be run if two teaming compatible network adapters are
+    present on the test machine and the adapters can be safely used in
+    a team during the test process.
 
-#     Loopback adapters can not be used for NIC teaming and only server OS
-#     SKU machines will support it.
+    Loopback adapters can not be used for NIC teaming and only server OS
+    SKU machines will support it.
 
-#     To enable this test to be run, add the names of the adapters to use
-#     for testing into the $script:NetworkTeamMembers array below. E.g.
-#     $script:NetworkTeamMembers = @('Ethernet','Ethernet 2')
-# #>
+    To enable this test to be run, add the names of the adapters to use
+    for testing into the $script:NetworkTeamMembers array below. E.g.
+    $script:NetworkTeamMembers = @('Ethernet','Ethernet 2')
+#>
 
-# [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Suppressing this rule because Script Analyzer does not understand Pester syntax.')]
-# param ()
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Suppressing this rule because Script Analyzer does not understand Pester syntax.')]
+param ()
 
-# BeforeDiscovery {
-#     try
-#     {
-#         if (-not (Get-Module -Name 'DscResource.Test'))
-#         {
-#             # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
-#             if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
-#             {
-#                 # Redirect all streams to $null, except the error stream (stream 2)
-#                 & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
-#             }
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-#             # If the dependencies has not been resolved, this will throw an error.
-#             Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
-#         }
-#     }
-#     catch [System.IO.FileNotFoundException]
-#     {
-#         throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
-#     }
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
 
-#     <#
-#         Need to define that variables here to be used in the Pester Discover to
-#         build the ForEach-blocks.
-#     #>
-#     $script:dscResourceFriendlyName = 'NetworkTeam'
-#     $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
+    <#
+        Need to define that variables here to be used in the Pester Discover to
+        build the ForEach-blocks.
+    #>
+    $script:dscResourceFriendlyName = 'NetworkTeam'
+    $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
 
-#     $script:NetworkTeamMembers = @()
+    $script:NetworkTeamMembers = @()
 
-#     # Check if integration tests can be run
-#     if (-not (Test-NetworkTeamIntegrationEnvironment -NetworkAdapters $script:NetworkTeamMembers))
-#     {
-#         $script:skip = $true
-#     }
-# }
+    # Check if integration tests can be run
+    if (-not (Test-NetworkTeamIntegrationEnvironment -NetworkAdapters $script:NetworkTeamMembers))
+    {
+        $script:Skip = $true
+    }
+}
 
-# BeforeAll {
-#     # Need to define the variables here which will be used in Pester Run.
-#     $script:dscModuleName = 'NetworkingDsc'
-#     $script:dscResourceFriendlyName = 'NetworkTeam'
-#     $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
+BeforeAll {
+    # Need to define the variables here which will be used in Pester Run.
+    $script:dscModuleName = 'NetworkingDsc'
+    $script:dscResourceFriendlyName = 'NetworkTeam'
+    $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
 
-#     $script:testEnvironment = Initialize-TestEnvironment `
-#         -DSCModuleName $script:dscModuleName `
-#         -DSCResourceName $script:dscResourceName `
-#         -ResourceType 'Mof' `
-#         -TestType 'Integration'
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Integration'
 
-#     $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
-#     . $configFile
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
-#     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+    $script:NetworkTeamMembers = @()
+}
 
-#     $script:NetworkTeamMembers = @()
-# }
+AfterAll {
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 
-# AfterAll {
-#     # Remove the team just in case it wasn't removed correctly
-#     Remove-NetLbfoTeam `
-#         -Name 'TestTeam' `
-#         -Confirm:$false `
-#         -ErrorAction SilentlyContinue
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
 
-#     # Remove module common test helper.
-#     Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
+Describe 'NetworkTeam Integration Tests' -Skip:$script:Skip {
+    BeforeAll {
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+        . $configFile
+    }
 
-#     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
-# }
+    AfterAll {
+    # Remove the team just in case it wasn't removed correctly
+    Remove-NetLbfoTeam `
+        -Name 'TestTeam' `
+        -Confirm:$false `
+        -ErrorAction SilentlyContinue
+    }
 
-# Describe 'NetworkTeam Integration Tests' -Skip:$script:skip {
-#     Describe "$($script:dscResourceName)_Integration" {
-#         BeforeAll {
-#             $configurationData = @{
-#                 AllNodes = @(
-#                     @{
-#                         NodeName               = 'localhost'
-#                         Name                   = 'TestTeam'
-#                         Members                = $script:NetworkTeamMembers
-#                         LoadBalancingAlgorithm = 'MacAddresses'
-#                         TeamingMode            = 'SwitchIndependent'
-#                         Ensure                 = 'Present'
-#                     }
-#                 )
-#             }
-#         }
+    Describe "$($script:dscResourceName)_Integration" {
+        BeforeAll {
+            $configurationData = @{
+                AllNodes = @(
+                    @{
+                        NodeName               = 'localhost'
+                        Name                   = 'TestTeam'
+                        Members                = $script:NetworkTeamMembers
+                        LoadBalancingAlgorithm = 'MacAddresses'
+                        TeamingMode            = 'SwitchIndependent'
+                        Ensure                 = 'Present'
+                    }
+                )
+            }
+        }
 
-#         Context 'When the network team is created' {
-#             It 'Should compile and apply the MOF without throwing' {
-#                 {
-#                     & "$($script:dscResourceName)_Config" `
-#                         -OutputPath $TestDrive `
-#                         -ConfigurationData $configurationData
+        Context 'When the network team is created' {
+            AfterEach {
+                Wait-ForIdleLcm
+            }
 
-#                     Start-DscConfiguration `
-#                         -Path $TestDrive `
-#                         -ComputerName localhost `
-#                         -Wait `
-#                         -Verbose `
-#                         -Force `
-#                         -ErrorAction Stop
+            It 'Should compile and apply the MOF without throwing' {
+                {
+                    & "$($script:dscResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configurationData
 
-#                     # Wait for up to 60 seconds for the team to be created
-#                     $count = 0
-#                     While (-not (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue))
-#                     {
-#                         Start-Sleep -Seconds 1
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
 
-#                         if ($count -ge 60)
-#                         {
-#                             break
-#                         }
+                    # Wait for up to 60 seconds for the team to be created
+                    $count = 0
+                    While (-not (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue))
+                    {
+                        Start-Sleep -Seconds 1
 
-#                         $count++
-#                     }
-#                 } | Should -Not -Throw
-#             }
+                        if ($count -ge 60)
+                        {
+                            break
+                        }
 
-#             It 'Should be able to call Get-DscConfiguration without throwing' {
-#                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-#             }
+                        $count++
+                    }
+                } | Should -Not -Throw
+            }
 
-#             It 'Should have set the resource and all the parameters should match' {
-#                 $result = Get-DscConfiguration | Where-Object -FilterScript {
-#                     $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
-#                 }
-#                 $result.Ensure | Should -Be $configurationData.AllNodes[0].Ensure
-#                 $result.Name | Should -Be $configurationData.AllNodes[0].Name
-#                 $result.TeamMembers | Should -Be $configurationData.AllNodes[0].Members
-#                 $result.LoadBalancingAlgorithm | Should -Be $configurationData.AllNodes[0].LoadBalancingAlgorithm
-#                 $result.TeamingMode | Should -Be $configurationData.AllNodes[0].TeamingMode
-#             }
-#         }
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
 
-#         Context 'When the network team is deleted' {
-#             It 'Should compile and apply the MOF without throwing' {
-#                 $configurationData.AllNodes[0].Ensure = 'Absent'
+            It 'Should have set the resource and all the parameters should match' {
+                $result = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                }
 
-#                 {
-#                     & "$($script:dscResourceName)_Config" `
-#                         -OutputPath $TestDrive `
-#                         -ConfigurationData $configurationData
+                $result.Ensure | Should -Be $configurationData.AllNodes[0].Ensure
+                $result.Name | Should -Be $configurationData.AllNodes[0].Name
+                $result.TeamMembers | Should -Be $configurationData.AllNodes[0].Members
+                $result.LoadBalancingAlgorithm | Should -Be $configurationData.AllNodes[0].LoadBalancingAlgorithm
+                $result.TeamingMode | Should -Be $configurationData.AllNodes[0].TeamingMode
+            }
+        }
 
-#                     Start-DscConfiguration `
-#                         -Path $TestDrive `
-#                         -ComputerName localhost `
-#                         -Wait `
-#                         -Verbose `
-#                         -Force `
-#                         -ErrorAction Stop
+        Context 'When the network team is deleted' {
+            AfterEach {
+                Wait-ForIdleLcm
+            }
 
-#                     # Wait for up to 60 seconds for the team to be removed
-#                     $count = 0
-#                     While (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue)
-#                     {
-#                         Start-Sleep -Seconds 1
+            It 'Should compile and apply the MOF without throwing' {
+                $configurationData.AllNodes[0].Ensure = 'Absent'
 
-#                         if ($count -ge 60)
-#                         {
-#                             break
-#                         }
+                {
+                    & "$($script:dscResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configurationData
 
-#                         $count++
-#                     }
-#                 } | Should -Not -Throw
-#             }
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
 
-#             It 'Should be able to call Get-DscConfiguration without throwing' {
-#                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-#             }
+                    # Wait for up to 60 seconds for the team to be removed
+                    $count = 0
+                    While (Get-NetLbfoTeam -Name 'TestTeam' -ErrorAction SilentlyContinue)
+                    {
+                        Start-Sleep -Seconds 1
 
-#             It 'Should have set the resource and all the parameters should match' {
-#                 $result = Get-DscConfiguration | Where-Object -FilterScript {
-#                     $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
-#                 }
-#                 $result.Ensure | Should -Be $configurationData.AllNodes[0].Ensure
-#                 $result.Name | Should -Be $configurationData.AllNodes[0].Name
-#                 $result.TeamMembers | Should -Be $configurationData.AllNodes[0].Members
-#             }
-#         }
-#     }
-# }
+                        if ($count -ge 60)
+                        {
+                            break
+                        }
+
+                        $count++
+                    }
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $result = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                }
+                $result.Ensure | Should -Be $configurationData.AllNodes[0].Ensure
+                $result.Name | Should -Be $configurationData.AllNodes[0].Name
+                $result.TeamMembers | Should -Be $configurationData.AllNodes[0].Members
+            }
+        }
+    }
+}
