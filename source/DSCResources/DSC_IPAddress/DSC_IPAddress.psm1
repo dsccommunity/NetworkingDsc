@@ -124,7 +124,6 @@ function Set-TargetResource
     if ($AddressFamily -eq 'IPv6')
     {
         $destinationPrefix = '::/0'
-        $prefixLength = 64
     }
 
     # Get all the default routes - this has to be done in case the IP Address is being Removed

@@ -362,7 +362,7 @@ function Set-NetAdapterNetbiosOptions
                 -MethodName SetTcpipNetbios `
                 -ErrorAction Stop `
                 -Arguments @{
-                TcpipNetbiosOptions = [uint32][NetBiosSetting]::$Setting.value__
+                    TcpipNetbiosOptions = [uint32][NetBiosSetting]::$Setting.value__
             }
 
         if ($result.ReturnValue -ne 0)

@@ -16,7 +16,7 @@
 function Get-DnsClientServerStaticAddress
 {
     [CmdletBinding()]
-    [OutputType([System.String[]])]
+    [OutputType([System.Object[]])]
     param
     (
         [Parameter(Mandatory = $true)]

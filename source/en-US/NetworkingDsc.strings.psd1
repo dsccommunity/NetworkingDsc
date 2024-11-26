@@ -1,9 +1,6 @@
 # Localized resources for NetworkingDsc
 
 ConvertFrom-StringData @'
-    # Assert-ResourceProperty
-    InterfaceNotAvailableError = Interface "{0}" is not available. Please select a valid interface and try again.
-
     # Find-NetworkAdapter
     AllNetAdaptersFoundMessage           = Found all network adapters because no filter parameters provided. (NET0002)
     FindingNetAdapterMessage             = Finding network adapters matching the parameters. (NET0001)
