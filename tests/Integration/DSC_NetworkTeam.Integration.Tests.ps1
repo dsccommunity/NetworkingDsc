@@ -45,6 +45,9 @@ BeforeDiscovery {
     $script:dscResourceFriendlyName = 'NetworkTeam'
     $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
 
+    # Import to allow check to run in Discovery
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+
     $script:NetworkTeamMembers = @()
 
     # Check if integration tests can be run

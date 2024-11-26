@@ -45,6 +45,9 @@ BeforeDiscovery {
     $script:dscResourceFriendlyName = 'NetworkTeam'
     $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
 
+    # Import to allow check to run in discovery
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+
     $script:NetworkTeamMembers = @()
 
     # Check if integration tests can be run
@@ -118,7 +121,7 @@ Describe 'NetworkTeamInterface Integration Tests' -Skip:$script:Skip {
             AfterEach {
                 Wait-ForIdleLcm
             }
-            
+
             It 'Should compile and apply the MOF without throwing' {
                 {
                     & "$($script:dscResourceName)_Config" `
