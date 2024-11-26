@@ -67,6 +67,10 @@ Describe 'DnsConnectionSuffix Integration Tests' {
     }
 
     Describe "$($script:dscResourceName)_Integration" {
+        AfterEach {
+            Wait-ForIdleLcm
+        }
+
         It 'Should compile without throwing' {
             {
                 & "$($script:dscResourceName)_Config" -OutputPath $TestDrive

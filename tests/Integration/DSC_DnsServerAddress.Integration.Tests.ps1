@@ -67,6 +67,10 @@ Describe 'DnsServerAddress Integration Tests' {
     }
 
     Describe "$($script:dscResourceName)_Integration using single address" {
+        AfterEach {
+            Wait-ForIdleLcm
+        }
+
         It 'Should compile and apply the MOF without throwing' {
             {
                 # This is to pass to the Config
@@ -98,7 +102,7 @@ Describe 'DnsServerAddress Integration Tests' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:dscResourceName)_Config_Static"
             }
-            
+
             $current.InterfaceAlias             | Should -Be 'NetworkingDscLBA'
             $current.AddressFamily              | Should -Be 'IPv4'
             $current.Address.Count              | Should -Be 1
@@ -107,6 +111,10 @@ Describe 'DnsServerAddress Integration Tests' {
     }
 
     Describe "$($script:dscResourceName)_Integration using two addresses" {
+        AfterEach {
+            Wait-ForIdleLcm
+        }
+
         It 'Should compile and apply the MOF without throwing' {
             {
                 # This is to pass to the Config
@@ -155,6 +163,10 @@ Describe 'DnsServerAddress Integration Tests' {
         BeforeAll {
             $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_DHCP.config.ps1"
             . $configFile -Verbose -ErrorAction Stop
+        }
+
+        AfterEach {
+            Wait-ForIdleLcm
         }
 
         It 'Should compile and apply the MOF without throwing' {
