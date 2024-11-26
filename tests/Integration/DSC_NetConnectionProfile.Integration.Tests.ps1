@@ -59,6 +59,10 @@ Describe 'NetConnectionProfile Integration Tests' {
     }
 
     Describe "$($script:dscResourceName)_Integration" {
+        AfterEach {
+            Wait-ForIdleLcm
+        }
+        
         It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:dscResourceName)_Config" -OutputPath $TestDrive
