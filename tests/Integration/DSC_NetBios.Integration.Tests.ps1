@@ -86,40 +86,6 @@ public enum NetBiosSetting
     }
 
     Describe "$($script:dscResourceName)_Integration" {
-        AfterEach {
-            Wait-ForIdleLcm
-        }
-
-        It 'Should compile and apply the MOF without throwing' {
-            {
-                & "$($script:dscResourceName)_Config" `
-                    -OutputPath $TestDrive `
-                    -ConfigurationData $configData
-
-                Start-DscConfiguration `
-                    -Path $TestDrive `
-                    -ComputerName localhost `
-                    -Wait `
-                    -Verbose `
-                    -Force `
-                    -ErrorAction Stop
-            } | Should -Not -Throw
-        }
-
-        It 'Should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-        }
-
-        It 'Should have set the resource and all setting should match current state' {
-            $result = Get-DscConfiguration | Where-Object -FilterScript {
-                $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
-            }
-
-            $result.Setting | Should -Be $Setting
-        }
-    }
-
-    Describe "$($script:dscResourceName)_Integration" {
         Context 'When applying to a single network adapter' {
             BeforeDiscovery {
                 $testCases = @(
@@ -151,7 +117,37 @@ public enum NetBiosSetting
                     }
                 }
 
-                #TODO: Missing from Pester 4
+                AfterEach {
+                    Wait-ForIdleLcm
+                }
+
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        & "$($script:dscResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all setting should match current state' {
+                    $result = Get-DscConfiguration | Where-Object -FilterScript {
+                        $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                    }
+
+                    $result.Setting | Should -Be $Setting
+                }
             }
         }
 
@@ -186,7 +182,37 @@ public enum NetBiosSetting
                     }
                 }
 
-                #TODO: Missing from Pester 4
+                AfterEach {
+                    Wait-ForIdleLcm
+                }
+
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        & "$($script:dscResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all setting should match current state' {
+                    $result = Get-DscConfiguration | Where-Object -FilterScript {
+                        $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                    }
+
+                    $result.Setting | Should -Be $Setting
+                }
             }
         }
     }
