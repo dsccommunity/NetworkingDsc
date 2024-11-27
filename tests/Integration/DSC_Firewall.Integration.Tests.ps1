@@ -142,42 +142,79 @@ Describe 'Firewall Integration Tests' {
             { $script:current = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
         }
 
-        # Context 'DSC resource state' {
-        #     # Use the Parameters List to perform these tests
-        #     foreach ($parameter in $parameterList)
-        #     {
-        #         $parameterName = $parameter.Name
+        Context 'DSC resource state' {
+            BeforeDiscovery {
+                $arrayTestCases = @(
+                    @{ Name = 'Profile'; Variable = 'FirewallRule'; Type = 'Array'; Delimiter = ', ' }
+                    @{ Name = 'RemotePort'; Variable = 'properties'; Property = 'PortFilters'; Type = 'Array' }
+                    @{ Name = 'LocalPort'; Variable = 'properties'; Property = 'PortFilters'; Type = 'Array' }
+                    @{ Name = 'InterfaceAlias'; Variable = 'properties'; Property = 'InterfaceFilters'; Type = 'Array' }
+                    @{ Name = 'Platform'; Variable = 'FirewallRule'; Type = 'Array' }
+                    @{ Name = 'IcmpType'; Variable = 'properties'; Property = 'PortFilters'; Type = 'Array' }
+                )
 
-        #         if ($parameterName -ne 'Name')
-        #         {
-        #             $parameterValue = $Current.$($parameter.Name)
+                $arrayIpTestCases = @(
+                    @{ Name = 'LocalAddress'; Variable = 'properties'; Property = 'AddressFilters'; Type = 'ArrayIP' }
+                    @{ Name = 'RemoteAddress'; Variable = 'properties'; Property = 'AddressFilters'; Type = 'ArrayIP' }
+                )
 
-        #             $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$($parameter.Name)
+                $remainingTestCases = @(
+                    @{ Name = 'DisplayName'; Variable = 'FirewallRule'; Type = 'String' }
+                    @{ Name = 'Group'; Variable = 'FirewallRule'; Type = 'String' }
+                    @{ Name = 'DisplayGroup'; Variable = 'FirewallRule'; Type = '' }
+                    @{ Name = 'Enabled'; Variable = 'FirewallRule'; Type = 'String' }
+                    @{ Name = 'Action'; Variable = 'FirewallRule'; Type = 'String' }
+                    @{ Name = 'Direction'; Variable = 'FirewallRule'; Type = 'String' }
+                    @{ Name = 'Description'; Variable = 'FirewallRule'; Type = 'String' }
+                    @{ Name = 'Protocol'; Variable = 'properties'; Property = 'PortFilters'; Type = 'String' }
+                    @{ Name = 'Program'; Variable = 'properties'; Property = 'ApplicationFilters'; Type = 'String' }
+                    @{ Name = 'Service'; Variable = 'properties'; Property = 'ServiceFilters'; Type = 'String' }
+                    @{ Name = 'Authentication'; Variable = 'properties'; Property = 'SecurityFilters'; Type = 'String' }
+                    @{ Name = 'Encryption'; Variable = 'properties'; Property = 'SecurityFilters'; Type = 'String' }
+                    @{ Name = 'InterfaceType'; Variable = 'properties'; Property = 'InterfaceTypeFilters'; Type = 'String' }
+                    @{ Name = 'LocalUser'; Variable = 'properties'; Property = 'SecurityFilters'; Type = 'String' }
+                    @{ Name = 'Package'; Variable = 'properties'; Property = 'ApplicationFilters'; Type = 'String' }
+                    @{ Name = 'RemoteMachine'; Variable = 'properties'; Property = 'SecurityFilters'; Type = 'String' }
+                    @{ Name = 'RemoteUser'; Variable = 'properties'; Property = 'SecurityFilters'; Type = 'String' }
+                    @{ Name = 'DynamicTransport'; Variable = 'properties'; Property = 'PortFilters'; Type = 'String' }
+                    @{ Name = 'EdgeTraversalPolicy'; Variable = 'FirewallRule'; Type = 'String' }
+                    @{ Name = 'LocalOnlyMapping'; Variable = 'FirewallRule'; Type = 'Boolean' }
+                    @{ Name = 'LooseSourceMapping'; Variable = 'FirewallRule'; Type = 'Boolean' }
+                    @{ Name = 'OverrideBlockRules'; Variable = 'properties'; Property = 'SecurityFilters'; Type = 'Boolean' }
+                    @{ Name = 'Owner'; Variable = 'FirewallRule'; Type = 'String' }
+                )
+            }
 
-        #             if ($parameter.Type -eq 'Array' -and $parameter.Delimiter)
-        #             {
-        #                 It "Should have set the '$parameterName' to '$parameterNew'" {
-        #                     $parameterValue | Should -Be $parameterNew
-        #                 }
-        #             }
-        #             elseif ($parameter.Type -eq 'ArrayIP')
-        #             {
-        #                 for ([int] $entry = 0; $entry -lt $parameterNew.Count; $entry++)
-        #                 {
-        #                     It "Should have set the '$parameterName' arry item $entry to '$($parameterNew[$entry])'" {
-        #                         $parameterValue[$entry] | Should -Be (Convert-CIDRToSubnetMask -Address $parameterNew[$entry])
-        #                     }
-        #                 }
-        #             }
-        #             else
-        #             {
-        #                 It "Should have set the '$parameterName' to '$parameterNew'" {
-        #                     $parameterValue | Should -Be $parameterNew
-        #                 }
-        #             }
-        #         }
-        #     }
-        # }
+            # Array
+            It 'Should have set the parameter ''<Name>''' -ForEach $arrayTestCases {
+                $parameterValue = $Current.$Name
+
+                $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$Name
+
+                $parameterValue | Should -Be $parameterNew
+            }
+
+            # ArrayIP
+            It "Should have set the '<Name>' array item correctly" -ForEach $arrayIpTestCases {
+                $parameterValue = $Current.$Name
+
+                $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$Name
+
+                for ([int] $entry = 0; $entry -lt $parameterNew.Count; $entry++)
+                {
+                    $parameterValue[$entry] | Should -Be (Convert-CIDRToSubnetMask -Address $parameterNew[$entry])
+                }
+            }
+
+            # Other
+            It 'Should have set the parameter ''<Name>''' -ForEach $remainingTestCases {
+                $parameterValue = $Current.$Name
+
+                $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$Name
+
+                $parameterValue | Should -Be $parameterNew
+            }
+        }
 
         Context 'The current firewall rule state' {
             BeforeDiscovery {
@@ -251,7 +288,7 @@ Describe 'Firewall Integration Tests' {
 
                 if ($Delimiter)
                 {
-                    $parameterNew = $parameterNew -join $Delimiter
+                    $parameterNew = [System.String[]] $parameterNew -join $Delimiter
                 }
 
                 $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$Name
@@ -270,9 +307,12 @@ Describe 'Firewall Integration Tests' {
                     $parameterValue = (Get-Variable -Name $Variable).value.$Name
                 }
 
-                $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$($parameter.Name)
+                $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$Name
 
-
+                for ([int] $entry = 0; $entry -lt $parameterNew.Count; $entry++)
+                {
+                    $parameterValue[$entry] | Should -Be (Convert-CIDRToSubnetMask -Address $parameterNew[$entry])
+                }
             }
 
             # Other
@@ -289,11 +329,6 @@ Describe 'Firewall Integration Tests' {
                 $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$Name
 
                 $parameterValue | Should -Be $parameterNew
-
-                for ([int] $entry = 0; $entry -lt $parameterNew.Count; $entry++)
-                {
-                        $parameterValue[$entry] | Should -Be (Convert-CIDRToSubnetMask -Address $parameterNew[$entry])
-                }
             }
         }
     }
