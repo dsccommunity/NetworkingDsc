@@ -52,14 +52,6 @@ AfterAll {
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
 
-# Load the parameter List from the data file
-# $moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-# $resourceData = Import-LocalizedData `
-#     -BaseDirectory (Join-Path -Path $moduleRoot -ChildPath 'Source\DscResources\DSC_DnsClientGlobalSetting') `
-#     -FileName 'DSC_DnsClientGlobalSetting.data.psd1'
-
-# $parameterList = $resourceData.ParameterList | Where-Object -Property IntTest -eq $True
-
 Describe 'Firewall Integration Tests' {
     BeforeAll {
         # Create a config data object to pass to the Add Rule Config
@@ -286,12 +278,12 @@ Describe 'Firewall Integration Tests' {
                     $parameterValue = (Get-Variable -Name $Variable).value.$Name
                 }
 
+                $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$Name
+
                 if ($Delimiter)
                 {
-                    $parameterNew = [System.String[]] $parameterNew -join $Delimiter
+                    $parameterNew = $parameterNew -join $Delimiter
                 }
-
-                $parameterNew = (Get-Variable -Name configData).Value.AllNodes[0].$Name
 
                 $parameterValue | Should -Be $parameterNew
             }
