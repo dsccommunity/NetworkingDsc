@@ -153,7 +153,7 @@ Describe 'DSC_DnsConnectionSuffix\Get-TargetResource' -Tag 'Get' {
                         Ensure                   = 'Absent'
                     }
 
-                    $targetResource = Get-TargetResource @testDnsSuffixParams -Ensure Absent
+                    $targetResource = Get-TargetResource @testDnsSuffixParams
 
                     $targetResource.Ensure | Should -Be 'Absent'
                 }
