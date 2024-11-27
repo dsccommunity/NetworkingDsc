@@ -55,28 +55,6 @@ AfterAll {
     Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
 }
 
-
-# $testDnsSuffix = 'example.local'
-# $testInterfaceAlias = 'Ethernet'
-# $testDnsSuffixParams = @{
-#     InterfaceAlias           = 'Ethernet'
-#     ConnectionSpecificSuffix = 'example.local'
-# }
-
-# $fakeDnsSuffixPresent = @{
-#     InterfaceAlias                 = 'Ethernet'
-#     ConnectionSpecificSuffix       = 'example.local'
-#     RegisterThisConnectionsAddress = $true
-#     UseSuffixWhenRegistering       = $false
-# }
-
-# $fakeDnsSuffixMismatch = $fakeDnsSuffixPresent.Clone()
-# $fakeDnsSuffixMismatch['ConnectionSpecificSuffix'] = 'mismatch.local'
-
-# $fakeDnsSuffixAbsent = $fakeDnsSuffixPresent.Clone()
-# $fakeDnsSuffixAbsent['ConnectionSpecificSuffix'] = ''
-
-
 Describe 'DSC_DnsConnectionSuffix\Get-TargetResource' -Tag 'Get' {
     Context 'Validates "Get-TargetResource" method' {
         Context 'When the Dns Suffix does match' {
