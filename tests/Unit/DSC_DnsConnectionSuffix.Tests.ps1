@@ -1,210 +1,435 @@
-# $script:dscModuleName = 'NetworkingDsc'
-# $script:dscResourceName = 'DSC_DnsConnectionSuffix'
+# Suppressing this rule because Script Analyzer does not understand Pester's syntax.
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
-# function Invoke-TestSetup
-# {
-#     try
-#     {
-#         Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
-#     }
-#     catch [System.IO.FileNotFoundException]
-#     {
-#         throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
-#     }
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-#     $script:testEnvironment = Initialize-TestEnvironment `
-#         -DSCModuleName $script:dscModuleName `
-#         -DSCResourceName $script:dscResourceName `
-#         -ResourceType 'Mof' `
-#         -TestType 'Unit'
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+}
 
-#     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+BeforeAll {
+    $script:dscModuleName = 'NetworkingDsc'
+    $script:dscResourceName = 'DSC_DnsConnectionSuffix'
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscResourceName
+}
+
+AfterAll {
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
+
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
+
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
+}
+
+
+# $testDnsSuffix = 'example.local'
+# $testInterfaceAlias = 'Ethernet'
+# $testDnsSuffixParams = @{
+#     InterfaceAlias           = 'Ethernet'
+#     ConnectionSpecificSuffix = 'example.local'
 # }
 
-# function Invoke-TestCleanup
-# {
-#     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+# $fakeDnsSuffixPresent = @{
+#     InterfaceAlias                 = 'Ethernet'
+#     ConnectionSpecificSuffix       = 'example.local'
+#     RegisterThisConnectionsAddress = $true
+#     UseSuffixWhenRegistering       = $false
 # }
 
-# Invoke-TestSetup
+# $fakeDnsSuffixMismatch = $fakeDnsSuffixPresent.Clone()
+# $fakeDnsSuffixMismatch['ConnectionSpecificSuffix'] = 'mismatch.local'
 
-# # Begin Testing
-# try
-# {
-#     InModuleScope $script:dscResourceName {
-#         $testDnsSuffix = 'example.local'
-#         $testInterfaceAlias = 'Ethernet'
-#         $testDnsSuffixParams = @{
-#             InterfaceAlias           = $testInterfaceAlias
-#             ConnectionSpecificSuffix = $testDnsSuffix
-#         }
-
-#         $fakeDnsSuffixPresent = @{
-#             InterfaceAlias                 = $testInterfaceAlias
-#             ConnectionSpecificSuffix       = $testDnsSuffix
-#             RegisterThisConnectionsAddress = $true
-#             UseSuffixWhenRegistering       = $false
-#         }
-
-#         $fakeDnsSuffixMismatch = $fakeDnsSuffixPresent.Clone()
-#         $fakeDnsSuffixMismatch['ConnectionSpecificSuffix'] = 'mismatch.local'
-
-#         $fakeDnsSuffixAbsent = $fakeDnsSuffixPresent.Clone()
-#         $fakeDnsSuffixAbsent['ConnectionSpecificSuffix'] = ''
+# $fakeDnsSuffixAbsent = $fakeDnsSuffixPresent.Clone()
+# $fakeDnsSuffixAbsent['ConnectionSpecificSuffix'] = ''
 
 
-#         Describe 'DSC_DnsConnectionSuffix\Get-TargetResource' -Tag 'Get' {
-#             Context 'Validates "Get-TargetResource" method' {
-#                 It 'Should return a "System.Collections.Hashtable" object type' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
+Describe 'DSC_DnsConnectionSuffix\Get-TargetResource' -Tag 'Get' {
+    Context 'Validates "Get-TargetResource" method' {
+        Context 'When the Dns Suffix does match' {
+            BeforeAll {
+                Mock -CommandName Get-DnsClient -MockWith {
+                    @{
+                        InterfaceAlias                 = 'Ethernet'
+                        ConnectionSpecificSuffix       = 'example.local'
+                        RegisterThisConnectionsAddress = $true
+                        UseSuffixWhenRegistering       = $false
+                    }
+                }
+            }
 
-#                     $targetResource = Get-TargetResource @testDnsSuffixParams
+            It 'Should return a "System.Collections.Hashtable" object type' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#                     $targetResource -is [System.Collections.Hashtable] | Should -Be $true
-#                 }
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                    }
 
-#                 It 'Should return "Present" when DNS suffix matches and "Ensure" = "Present"' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
+                    $targetResource = Get-TargetResource @testDnsSuffixParams
 
-#                     $targetResource = Get-TargetResource @testDnsSuffixParams
+                    $targetResource -is [System.Collections.Hashtable] | Should -BeTrue
+                }
+            }
 
-#                     $targetResource.Ensure | Should -Be 'Present'
-#                 }
+            It 'Should return "Present" when DNS suffix matches and "Ensure" = "Present"' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#                 It 'Should return "Absent" when DNS suffix does not match and "Ensure" = "Present"' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixMismatch }
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                    }
 
-#                     $targetResource = Get-TargetResource @testDnsSuffixParams
+                    $targetResource = Get-TargetResource @testDnsSuffixParams
 
-#                     $targetResource.Ensure | Should -Be 'Absent'
-#                 }
+                    $targetResource.Ensure | Should -Be 'Present'
+                }
+            }
 
-#                 It 'Should return "Absent" when no DNS suffix is defined and "Ensure" = "Present"' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixAbsent }
+            It 'Should return "Present" when DNS suffix is defined and "Ensure" = "Absent"' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#                     $targetResource = Get-TargetResource @testDnsSuffixParams
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                        Ensure                   = 'Absent'
+                    }
 
-#                     $targetResource.Ensure | Should -Be 'Absent'
-#                 }
+                    $targetResource = Get-TargetResource @testDnsSuffixParams
 
-#                 It 'Should return "Absent" when no DNS suffix is defined and "Ensure" = "Absent"' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixAbsent }
+                    $targetResource.Ensure | Should -Be 'Present'
+                }
+            }
+        }
 
-#                     $targetResource = Get-TargetResource @testDnsSuffixParams -Ensure Absent
+        Context 'When the Dns Suffix is blank' {
+            BeforeAll {
+                Mock -CommandName Get-DnsClient -MockWith {
+                    @{
+                        InterfaceAlias                 = 'Ethernet'
+                        ConnectionSpecificSuffix       = ''
+                        RegisterThisConnectionsAddress = $true
+                        UseSuffixWhenRegistering       = $false
+                    }
+                }
+            }
 
-#                     $targetResource.Ensure | Should -Be 'Absent'
-#                 }
+            It 'Should return "Absent" when no DNS suffix is defined and "Ensure" = "Present"' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#                 It 'Should return "Present" when DNS suffix is defined and "Ensure" = "Absent"' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                    }
 
-#                     $targetResource = Get-TargetResource @testDnsSuffixParams -Ensure Absent
+                    $targetResource = Get-TargetResource @testDnsSuffixParams
 
-#                     $targetResource.Ensure | Should -Be 'Present'
-#                 }
+                    $targetResource.Ensure | Should -Be 'Absent'
+                }
+            }
 
-#             } #end Context 'Validates "Get-TargetResource" method'
-#         }
+            It 'Should return "Absent" when no DNS suffix is defined and "Ensure" = "Absent"' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#         Describe 'DSC_DnsConnectionSuffix\Test-TargetResource' -Tag 'Test' {
-#             Context 'Validates "Test-TargetResource" method' {
-#                 It 'Should pass when all properties match and "Ensure" = "Present"' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                        Ensure                   = 'Absent'
+                    }
 
-#                     $targetResource = Test-TargetResource @testDnsSuffixParams
+                    $targetResource = Get-TargetResource @testDnsSuffixParams -Ensure Absent
 
-#                     $targetResource | Should -Be $true
-#                 }
+                    $targetResource.Ensure | Should -Be 'Absent'
+                }
+            }
+        }
 
-#                 It 'Should pass when no DNS suffix is registered and "Ensure" = "Absent"' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixAbsent }
+        Context 'When the Dns Suffix does not match' {
+            It 'Should return "Absent" when DNS suffix does not match and "Ensure" = "Present"' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#                     $targetResource = Test-TargetResource @testDnsSuffixParams -Ensure Absent
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                    }
 
-#                     $targetResource | Should -Be $true
-#                 }
+                    $targetResource = Get-TargetResource @testDnsSuffixParams
 
-#                 It 'Should pass when "RegisterThisConnectionsAddress" setting is correct' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
+                    $targetResource.Ensure | Should -Be 'Absent'
+                }
+            }
+        }
+    }
+}
 
-#                     $targetResource = Test-TargetResource @testDnsSuffixParams -RegisterThisConnectionsAddress $true
+Describe 'DSC_DnsConnectionSuffix\Test-TargetResource' -Tag 'Test' {
+    Context 'Validates "Test-TargetResource" method' {
+        Context 'When the Dns Suffix is present' {
+            BeforeAll {
+                Mock -CommandName Get-DnsClient -MockWith { @{
+                        InterfaceAlias                 = 'Ethernet'
+                        ConnectionSpecificSuffix       = 'example.local'
+                        RegisterThisConnectionsAddress = $true
+                        UseSuffixWhenRegistering       = $false
+                    }
+                }
+            }
 
-#                     $targetResource | Should -Be $true
-#                 }
+            It 'Should pass when all properties match and "Ensure" = "Present"' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#                 It 'Should pass when "UseSuffixWhenRegistering" setting is correct' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                    }
 
-#                     $targetResource = Test-TargetResource @testDnsSuffixParams -UseSuffixWhenRegistering $false
+                    $targetResource = Test-TargetResource @testDnsSuffixParams
 
-#                     $targetResource | Should -Be $true
-#                 }
+                    $targetResource | Should -BeTrue
+                }
+            }
 
+            It 'Should pass when "RegisterThisConnectionsAddress" setting is correct' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#                 It 'Should fail when no DNS suffix is registered and "Ensure" = "Present"' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixAbsent }
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias                 = 'Ethernet'
+                        ConnectionSpecificSuffix       = 'example.local'
+                        RegisterThisConnectionsAddress = $true
+                    }
 
-#                     $targetResource = Test-TargetResource @testDnsSuffixParams
+                    $targetResource = Test-TargetResource @testDnsSuffixParams
 
-#                     $targetResource | Should -Be $false
-#                 }
+                    $targetResource | Should -BeTrue
+                }
+            }
 
-#                 It 'Should fail when the registered DNS suffix is incorrect and "Ensure" = "Present"' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixMismatch }
+            It 'Should pass when "UseSuffixWhenRegistering" setting is correct' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#                     $targetResource = Test-TargetResource @testDnsSuffixParams
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                        UseSuffixWhenRegistering = $false
+                    }
 
-#                     $targetResource | Should -Be $false
-#                 }
+                    $targetResource = Test-TargetResource @testDnsSuffixParams
 
-#                 It 'Should fail when a DNS suffix is registered and "Ensure" = "Absent"' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
+                    $targetResource | Should -BeTrue
+                }
+            }
 
-#                     $targetResource = Test-TargetResource @testDnsSuffixParams -Ensure Absent
+            It 'Should fail when a DNS suffix is registered and "Ensure" = "Absent"' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#                     $targetResource | Should -Be $false
-#                 }
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                        Ensure                   = 'Absent'
+                    }
 
-#                 It 'Should fail when "RegisterThisConnectionsAddress" setting is incorrect' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
+                    $targetResource = Test-TargetResource @testDnsSuffixParams
 
-#                     $targetResource = Test-TargetResource @testDnsSuffixParams -RegisterThisConnectionsAddress $false
+                    $targetResource | Should -BeFalse
+                }
+            }
 
-#                     $targetResource | Should -Be $false
-#                 }
+            It 'Should fail when "RegisterThisConnectionsAddress" setting is incorrect' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#                 It 'Should fail when "UseSuffixWhenRegistering" setting is incorrect' {
-#                     Mock Get-DnsClient { return [PSCustomObject] $fakeDnsSuffixPresent }
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias                 = 'Ethernet'
+                        ConnectionSpecificSuffix       = 'example.local'
+                        RegisterThisConnectionsAddress = $false
+                    }
 
-#                     $targetResource = Test-TargetResource @testDnsSuffixParams -UseSuffixWhenRegistering $true
+                    $targetResource = Test-TargetResource @testDnsSuffixParams
 
-#                     $targetResource | Should -Be $false
-#                 }
-#             } #end Context 'Validates "Test-TargetResource" method'
-#         }
+                    $targetResource | Should -BeFalse
+                }
+            }
 
-#         Describe 'DSC_DnsConnectionSuffix\Set-TargetResource' -Tag 'Set' {
-#             Context 'Validates "Set-TargetResource" method' {
-#                 It 'Should call "Set-DnsClient" with specified DNS suffix when "Ensure" = "Present"' {
-#                     Mock Set-DnsClient -ParameterFilter { $InterfaceAlias -eq $testInterfaceAlias -and $ConnectionSpecificSuffix -eq $testDnsSuffix } { }
+            It 'Should fail when "UseSuffixWhenRegistering" setting is incorrect' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#                     Set-TargetResource @testDnsSuffixParams
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                        UseSuffixWhenRegistering = $true
+                    }
 
-#                     Assert-MockCalled Set-DnsClient -ParameterFilter { $InterfaceAlias -eq $testInterfaceAlias -and $ConnectionSpecificSuffix -eq $testDnsSuffix } -Scope It
-#                 }
+                    $targetResource = Test-TargetResource @testDnsSuffixParams
 
-#                 It 'Should call "Set-DnsClient" with no DNS suffix when "Ensure" = "Absent"' {
-#                     Mock Set-DnsClient -ParameterFilter { $InterfaceAlias -eq $testInterfaceAlias -and $ConnectionSpecificSuffix -eq '' } { }
+                    $targetResource | Should -BeFalse
+                }
+            }
+        }
 
-#                     Set-TargetResource @testDnsSuffixParams -Ensure Absent
+        Context 'When the Dns Suffix is Absent' {
+            BeforeAll {
+                Mock -CommandName Get-DnsClient -MockWith {
+                    @{
+                        InterfaceAlias                 = 'Ethernet'
+                        ConnectionSpecificSuffix       = ''
+                        RegisterThisConnectionsAddress = $true
+                        UseSuffixWhenRegistering       = $false
+                    }
+                }
+            }
 
-#                     Assert-MockCalled Set-DnsClient -ParameterFilter { $InterfaceAlias -eq $testInterfaceAlias -and $ConnectionSpecificSuffix -eq '' } -Scope It
-#                 }
-#             } #end Context 'Validates "Set-TargetResource" method'
-#         }
-#     } #end InModuleScope $DSCResourceName
-# }
-# finally
-# {
-#     Invoke-TestCleanup
-# }
+            It 'Should pass when no DNS suffix is registered and "Ensure" = "Absent"' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                        Ensure                   = 'Absent'
+                    }
+
+                    $targetResource = Test-TargetResource @testDnsSuffixParams
+
+                    $targetResource | Should -BeTrue
+                }
+            }
+
+            It 'Should fail when no DNS suffix is registered and "Ensure" = "Present"' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                    }
+
+                    $targetResource = Test-TargetResource @testDnsSuffixParams
+
+                    $targetResource | Should -BeFalse
+                }
+            }
+
+        }
+
+        Context 'When the Dns Suffix is blank' {
+            BeforeAll {
+                Mock -CommandName Get-DnsClient -MockWith {
+                    @{
+                        InterfaceAlias                 = 'Ethernet'
+                        ConnectionSpecificSuffix       = 'mismatch.local'
+                        RegisterThisConnectionsAddress = $true
+                        UseSuffixWhenRegistering       = $false
+                    }
+                }
+            }
+
+            It 'Should fail when the registered DNS suffix is incorrect and "Ensure" = "Present"' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                    }
+
+                    $targetResource = Test-TargetResource @testDnsSuffixParams
+
+                    $targetResource | Should -BeFalse
+                }
+            }
+        }
+    }
+}
+
+Describe 'DSC_DnsConnectionSuffix\Set-TargetResource' -Tag 'Set' {
+    Context 'Validates "Set-TargetResource" method' {
+        Context 'When Dns Suffix should be added' {
+            BeforeAll {
+                Mock -CommandName Set-DnsClient
+            }
+
+            It 'Should call "Set-DnsClient" with specified DNS suffix when "Ensure" = "Present"' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                    }
+
+                    Set-TargetResource @testDnsSuffixParams
+                }
+
+                Should -Invoke -CommandName Set-DnsClient -ParameterFilter { $ConnectionSpecificSuffix -eq 'example.local' } `
+                    -Exactly -Times 1 -Scope It
+            }
+        }
+
+        Context 'When Dns suffix should be removed' {
+            BeforeAll {
+                Mock -CommandName Set-DnsClient
+            }
+
+            It 'Should call "Set-DnsClient" with no DNS suffix when "Ensure" = "Absent"' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testDnsSuffixParams = @{
+                        InterfaceAlias           = 'Ethernet'
+                        ConnectionSpecificSuffix = 'example.local'
+                        Ensure                   = 'Absent'
+                    }
+
+                    Set-TargetResource @testDnsSuffixParams
+                }
+
+                Should -Invoke -CommandName Set-DnsClient -ParameterFilter { $ConnectionSpecificSuffix -eq '' } `
+                    -Exactly -Times 1 -Scope It
+            }
+        }
+    } #end Context 'Validates "Set-TargetResource" method'
+}
