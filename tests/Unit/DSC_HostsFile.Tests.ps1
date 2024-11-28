@@ -81,7 +81,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
-                    Verbose   = $true
                 }
 
                 $result = Get-TargetResource @testParams
@@ -97,7 +96,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
-                    Verbose   = $true
                 }
 
                 Test-TargetResource @testParams | Should -BeFalse
@@ -111,7 +109,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
-                    Verbose   = $true
                 }
 
                 Set-TargetResource @testParams
@@ -142,7 +139,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
-                    Verbose   = $true
                 }
 
                 $result = Get-TargetResource @testParams
@@ -158,7 +154,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
-                    Verbose   = $true
                 }
 
                 Test-TargetResource @testParams | Should -BeFalse
@@ -172,7 +167,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
-                    Verbose   = $true
                 }
 
                 Set-TargetResource @testParams
@@ -203,7 +197,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
-                    Verbose   = $true
                 }
 
                 $result = Get-TargetResource @testParams
@@ -219,7 +212,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
-                    Verbose   = $true
                 }
 
                 Test-TargetResource @testParams | Should -BeTrue
@@ -248,7 +240,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName = 'www.contoso.com'
                     Ensure   = 'Absent'
-                    Verbose  = $true
                 }
 
                 $result = Get-TargetResource @testParams
@@ -264,7 +255,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName = 'www.contoso.com'
                     Ensure   = 'Absent'
-                    Verbose  = $true
                 }
 
                 Test-TargetResource @testParams | Should -BeFalse
@@ -278,7 +268,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName = 'www.contoso.com'
                     Ensure   = 'Absent'
-                    Verbose  = $true
                 }
 
                 Set-TargetResource @testParams
@@ -309,7 +298,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '127.0.0.1'
-                    Verbose   = $true
                 }
 
                 $result = Get-TargetResource @testParams
@@ -325,7 +313,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '127.0.0.1'
-                    Verbose   = $true
                 }
 
                 Test-TargetResource @testParams | Should -BeFalse
@@ -339,7 +326,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '127.0.0.1'
-                    Verbose   = $true
                 }
 
                 Set-TargetResource @testParams
@@ -369,7 +355,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName = 'www.contoso.com'
                     Ensure   = 'Absent'
-                    Verbose  = $true
                 }
 
                 $result = Get-TargetResource @testParams
@@ -385,7 +370,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName = 'www.contoso.com'
                     Ensure   = 'Absent'
-                    Verbose  = $true
                 }
 
                 Test-TargetResource @testParams | Should -BeTrue
@@ -414,7 +398,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
-                    Verbose   = $true
                 }
 
                 $result = Get-TargetResource @testParams
@@ -430,7 +413,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
-                    Verbose   = $true
                 }
 
                 Test-TargetResource @testParams | Should -BeTrue
@@ -459,7 +441,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
-                    Verbose   = $true
                 }
 
                 $result = Get-TargetResource @testParams
@@ -475,7 +456,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
-                    Verbose   = $true
                 }
 
                 Test-TargetResource @testParams | Should -BeFalse
@@ -489,7 +469,6 @@ Describe 'DSC_HostsFile' {
                 $testParams = @{
                     HostName  = 'www.contoso.com'
                     IPAddress = '192.168.0.156'
-                    Verbose   = $true
                 }
 
                 Set-TargetResource @testParams
@@ -518,7 +497,6 @@ Describe 'DSC_HostsFile' {
 
                 $testParams = @{
                     HostName = 'www.contoso.com'
-                    Verbose  = $true
                 }
 
                 $errorMessage = Get-InvalidArgumentRecord -Message $script:localizedData.UnableToEnsureWithoutIP -ArgumentName 'IPAddress'
