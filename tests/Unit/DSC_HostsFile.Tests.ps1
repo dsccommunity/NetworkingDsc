@@ -1,306 +1,530 @@
-# $script:dscModuleName = 'NetworkingDsc'
-# $script:dscResourceName = 'DSC_HostsFile'
+# Suppressing this rule because Script Analyzer does not understand Pester's syntax.
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
-# function Invoke-TestSetup
-# {
-#     try
-#     {
-#         Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
-#     }
-#     catch [System.IO.FileNotFoundException]
-#     {
-#         throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
-#     }
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-#     $script:testEnvironment = Initialize-TestEnvironment `
-#         -DSCModuleName $script:dscModuleName `
-#         -DSCResourceName $script:dscResourceName `
-#         -ResourceType 'Mof' `
-#         -TestType 'Unit'
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+}
 
-#     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
-# }
+BeforeAll {
+    $script:dscModuleName = 'NetworkingDsc'
+    $script:dscResourceName = 'DSC_HostsFile'
 
-# function Invoke-TestCleanup
-# {
-#     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
-# }
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
 
-# Invoke-TestSetup
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
-# # Begin Testing
-# try
-# {
-#     InModuleScope $script:dscResourceName {
-#         Describe 'DSC_HostsFile' {
-#             BeforeEach {
-#                 Mock -CommandName Add-Content
-#                 Mock -CommandName Set-Content
-#             }
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscResourceName
+}
 
-#             Context 'When a host entry does not exist, and should' {
-#                 $testParams = @{
-#                     HostName  = 'www.contoso.com'
-#                     IPAddress = '192.168.0.156'
-#                     Verbose   = $true
-#                 }
+AfterAll {
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
 
-#                 Mock -CommandName Get-Content -MockWith {
-#                     return @(
-#                         '# A mocked example of a host file - this line is a comment',
-#                         '',
-#                         '127.0.0.1       localhost',
-#                         '127.0.0.1  www.anotherexample.com',
-#                         ''
-#                     )
-#                 }
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 
-#                 It 'Should return absent from the get method' {
-#                     (Get-TargetResource @testParams).Ensure | Should -Be 'Absent'
-#                 }
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 
-#                 It 'Should return false from the test method' {
-#                     Test-TargetResource @testParams | Should -Be $false
-#                 }
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
+}
 
-#                 It 'Should create the entry in the set method' {
-#                     Set-TargetResource @testParams
-#                     Assert-MockCalled -CommandName Add-Content
-#                 }
-#             }
+Describe 'DSC_HostsFile' {
+    BeforeAll {
+        Mock -CommandName Add-Content
+        Mock -CommandName Set-Content
+    }
 
-#             Context 'When a host entry exists but has the wrong IP address' {
-#                 $testParams = @{
-#                     HostName  = 'www.contoso.com'
-#                     IPAddress = '192.168.0.156'
-#                     Verbose   = $true
-#                 }
+    Context 'When a host entry does not exist, and should' {
+        BeforeAll {
+            Mock -CommandName Get-Content -MockWith {
+                return @(
+                    '# A mocked example of a host file - this line is a comment',
+                    '',
+                    '127.0.0.1       localhost',
+                    '127.0.0.1  www.anotherexample.com',
+                    ''
+                )
+            }
+        }
 
-#                 Mock -CommandName Get-Content -MockWith {
-#                     return @(
-#                         '# A mocked example of a host file - this line is a comment',
-#                         '',
-#                         '127.0.0.1       localhost',
-#                         '127.0.0.1  www.anotherexample.com',
-#                         "127.0.0.1         $($testParams.HostName)",
-#                         ''
-#                     )
-#                 }
+        It 'Should return absent from the get method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should return present from the get method' {
-#                     (Get-TargetResource @testParams).Ensure | Should -Be 'Present'
-#                 }
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
 
-#                 It 'Should return false from the test method' {
-#                     Test-TargetResource @testParams | Should -Be $false
-#                 }
+                $result = Get-TargetResource @testParams
 
-#                 It 'Should update the entry in the set method' {
-#                     Set-TargetResource @testParams
-#                     Assert-MockCalled -CommandName Set-Content
-#                 }
-#             }
+                $result.Ensure | Should -Be 'Absent'
+            }
+        }
 
-#             Context 'When a host entry exists with the correct IP address' {
-#                 $testParams = @{
-#                     HostName  = 'www.contoso.com'
-#                     IPAddress = '192.168.0.156'
-#                     Verbose   = $true
-#                 }
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 Mock -CommandName Get-Content -MockWith {
-#                     return @(
-#                         '# A mocked example of a host file - this line is a comment',
-#                         '',
-#                         '127.0.0.1       localhost',
-#                         '127.0.0.1  www.anotherexample.com',
-#                         "$($testParams.IPAddress)         $($testParams.HostName)",
-#                         ''
-#                     )
-#                 }
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
 
-#                 It 'Should return present from the get method' {
-#                     (Get-TargetResource @testParams).Ensure | Should -Be 'Present'
-#                 }
+                Test-TargetResource @testParams | Should -BeFalse
+            }
+        }
 
-#                 It 'Should return true from the test method' {
-#                     Test-TargetResource @testParams | Should -Be $true
-#                 }
-#             }
+        It 'Should create the entry in the set method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#             Context 'When a host entry exists but it should not' {
-#                 $testParams = @{
-#                     HostName = 'www.contoso.com'
-#                     Ensure   = 'Absent'
-#                     Verbose  = $true
-#                 }
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
 
-#                 Mock -CommandName Get-Content -MockWith {
-#                     return @(
-#                         '# A mocked example of a host file - this line is a comment',
-#                         '',
-#                         '127.0.0.1       localhost',
-#                         '127.0.0.1  www.anotherexample.com',
-#                         "127.0.0.1         $($testParams.HostName)",
-#                         ''
-#                     )
-#                 }
+                Set-TargetResource @testParams
+            }
 
-#                 It 'Should return present from the get method' {
-#                     (Get-TargetResource @testParams).Ensure | Should -Be 'Present'
-#                 }
+            Should -Invoke -CommandName Add-Content -Exactly -Times 1 -Scope It
+        }
+    }
 
-#                 It 'Should return false from the test method' {
-#                     Test-TargetResource @testParams | Should -Be $false
-#                 }
+    Context 'When a host entry exists but has the wrong IP address' {
+        BeforeAll {
+            Mock -CommandName Get-Content -MockWith {
+                return @(
+                    '# A mocked example of a host file - this line is a comment',
+                    '',
+                    '127.0.0.1       localhost',
+                    '127.0.0.1  www.anotherexample.com',
+                    '127.0.0.1         www.contoso.com',
+                    ''
+                )
+            }
+        }
 
-#                 It 'Should remove the entry in the set method' {
-#                     Set-TargetResource @testParams
-#                     Assert-MockCalled -CommandName Set-Content
-#                 }
-#             }
+        It 'Should return present from the get method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#             Context 'When a commented out host entry exists' {
-#                 $testParams = @{
-#                     HostName  = 'www.contoso.com'
-#                     IPAddress = '127.0.0.1'
-#                     Verbose   = $true
-#                 }
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
 
-#                 Mock -CommandName Get-Content -MockWith {
-#                     return @(
-#                         '# A mocked example of a host file - this line is a comment',
-#                         '',
-#                         '127.0.0.1       localhost',
-#                         '127.0.0.1  www.anotherexample.com',
-#                         "# 127.0.0.1         $($testParams.HostName)",
-#                         ''
-#                     )
-#                 }
+                $result = Get-TargetResource @testParams
 
-#                 It 'Should return present from the get method' {
-#                     (Get-TargetResource @testParams).Ensure | Should -Be 'Absent'
-#                 }
+                $result.Ensure | Should -Be 'Present'
+            }
+        }
 
-#                 It 'Should return false from the test method' {
-#                     Test-TargetResource @testParams | Should -Be $false
-#                 }
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should add the entry in the set method' {
-#                     Set-TargetResource @testParams
-#                     Assert-MockCalled -CommandName Add-Content
-#                 }
-#             }
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
 
-#             Context 'When a host entry does not it exist and should not' {
-#                 $testParams = @{
-#                     HostName = 'www.contoso.com'
-#                     Ensure   = 'Absent'
-#                     Verbose  = $true
-#                 }
+                Test-TargetResource @testParams | Should -BeFalse
+            }
+        }
 
-#                 Mock -CommandName Get-Content -MockWith {
-#                     return @(
-#                         '# A mocked example of a host file - this line is a comment',
-#                         '',
-#                         '127.0.0.1       localhost',
-#                         '127.0.0.1  www.anotherexample.com',
-#                         ''
-#                     )
-#                 }
+        It 'Should update the entry in the set method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should return absent from the get method' {
-#                     (Get-TargetResource @testParams).Ensure | Should -Be 'Absent'
-#                 }
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
 
-#                 It 'Should return true from the test method' {
-#                     Test-TargetResource @testParams | Should -Be $true
-#                 }
-#             }
+                Set-TargetResource @testParams
+            }
 
-#             Context 'When a host entry exists and is correct, but it listed with multiple entries on one line' {
-#                 $testParams = @{
-#                     HostName  = 'www.contoso.com'
-#                     IPAddress = '192.168.0.156'
-#                     Verbose   = $true
-#                 }
+            Should -Invoke -CommandName Set-Content -Exactly -Times 1 -Scope It
+        }
+    }
 
-#                 Mock -CommandName Get-Content -MockWith {
-#                     return @(
-#                         '# A mocked example of a host file - this line is a comment',
-#                         '',
-#                         '127.0.0.1       localhost',
-#                         '127.0.0.1  www.anotherexample.com',
-#                         "$($testParams.IPAddress)         demo.contoso.com   $($testParams.HostName) more.examples.com",
-#                         ''
-#                     )
-#                 }
+    Context 'When a host entry exists with the correct IP address' {
+        BeforeAll {
+            Mock -CommandName Get-Content -MockWith {
+                return @(
+                    '# A mocked example of a host file - this line is a comment',
+                    '',
+                    '127.0.0.1       localhost',
+                    '127.0.0.1  www.anotherexample.com',
+                    '192.168.0.156         www.contoso.com',
+                    ''
+                )
+            }
+        }
 
-#                 It 'Should return present from the get method' {
-#                     (Get-TargetResource @testParams).Ensure | Should -Be 'Present'
-#                 }
+        It 'Should return present from the get method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should return true from the test method' {
-#                     Test-TargetResource @testParams | Should -Be $true
-#                 }
-#             }
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
 
-#             Context 'When a host entry exists and is not correct, but it listed with multiple entries on one line' {
-#                 $testParams = @{
-#                     HostName  = 'www.contoso.com'
-#                     IPAddress = '192.168.0.156'
-#                     Verbose   = $true
-#                 }
+                $result = Get-TargetResource @testParams
 
-#                 Mock -CommandName Get-Content -MockWith {
-#                     return @(
-#                         '# A mocked example of a host file - this line is a comment',
-#                         '',
-#                         '127.0.0.1       localhost',
-#                         '127.0.0.1  www.anotherexample.com',
-#                         "127.0.0.1         demo.contoso.com   $($testParams.HostName) more.examples.com",
-#                         ''
-#                     )
-#                 }
+                $result.Ensure | Should -Be 'Present'
+            }
+        }
 
-#                 It 'Should return present from the get method' {
-#                     (Get-TargetResource @testParams).Ensure | Should -Be 'Present'
-#                 }
+        It 'Should return true from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should return false from the test method' {
-#                     Test-TargetResource @testParams | Should -Be $false
-#                 }
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
 
-#                 It 'Should update the entry in the set method' {
-#                     Set-TargetResource @testParams
-#                     Assert-MockCalled -CommandName Set-Content
-#                 }
-#             }
+                Test-TargetResource @testParams | Should -BeTrue
+            }
+        }
+    }
 
-#             Context 'When called with invalid parameters' {
-#                 $testParams = @{
-#                     HostName = 'www.contoso.com'
-#                     Verbose  = $true
-#                 }
+    Context 'When a host entry exists but it should not' {
+        BeforeAll {
+            Mock -CommandName Get-Content -MockWith {
+                return @(
+                    '# A mocked example of a host file - this line is a comment',
+                    '',
+                    '127.0.0.1       localhost',
+                    '127.0.0.1  www.anotherexample.com',
+                    '127.0.0.1         www.contoso.com',
+                    ''
+                )
+            }
+        }
 
-#                 Mock -CommandName Get-Content -MockWith {
-#                     return @(
-#                         '# A mocked example of a host file - this line is a comment',
-#                         '',
-#                         '127.0.0.1       localhost',
-#                         '127.0.0.1  www.anotherexample.com',
-#                         ''
-#                     )
-#                 }
+        It 'Should return present from the get method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should throw an error when IP Address is not provide and ensure is present' {
-#                     { Set-TargetResource @testParams } | Should -Throw $script:localizedData.UnableToEnsureWithoutIP
-#                 }
-#             }
-#         }
-#     } #end InModuleScope $DSCResourceName
-# }
-# finally
-# {
-#     Invoke-TestCleanup
-# }
+                $testParams = @{
+                    HostName = 'www.contoso.com'
+                    Ensure   = 'Absent'
+                    Verbose  = $true
+                }
+
+                $result = Get-TargetResource @testParams
+
+                $result.Ensure | Should -Be 'Present'
+            }
+        }
+
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    HostName = 'www.contoso.com'
+                    Ensure   = 'Absent'
+                    Verbose  = $true
+                }
+
+                Test-TargetResource @testParams | Should -BeFalse
+            }
+        }
+
+        It 'Should remove the entry in the set method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    HostName = 'www.contoso.com'
+                    Ensure   = 'Absent'
+                    Verbose  = $true
+                }
+
+                Set-TargetResource @testParams
+            }
+
+            Should -Invoke -CommandName Set-Content -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When a commented out host entry exists' {
+        BeforeAll {
+            Mock -CommandName Get-Content -MockWith {
+                return @(
+                    '# A mocked example of a host file - this line is a comment',
+                    '',
+                    '127.0.0.1       localhost',
+                    '127.0.0.1  www.anotherexample.com',
+                    '# 127.0.0.1         www.contoso.com',
+                    ''
+                )
+            }
+        }
+
+        It 'Should return present from the get method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '127.0.0.1'
+                    Verbose   = $true
+                }
+
+                $result = Get-TargetResource @testParams
+
+                $result.Ensure | Should -Be 'Absent'
+            }
+        }
+
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '127.0.0.1'
+                    Verbose   = $true
+                }
+
+                Test-TargetResource @testParams | Should -BeFalse
+            }
+        }
+
+        It 'Should add the entry in the set method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '127.0.0.1'
+                    Verbose   = $true
+                }
+
+                Set-TargetResource @testParams
+            }
+
+            Should -Invoke -CommandName Add-Content -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When a host entry does not it exist and should not' {
+        BeforeAll {
+            Mock -CommandName Get-Content -MockWith {
+                return @(
+                    '# A mocked example of a host file - this line is a comment',
+                    '',
+                    '127.0.0.1       localhost',
+                    '127.0.0.1  www.anotherexample.com',
+                    ''
+                )
+            }
+        }
+
+        It 'Should return absent from the get method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    HostName = 'www.contoso.com'
+                    Ensure   = 'Absent'
+                    Verbose  = $true
+                }
+
+                $result = Get-TargetResource @testParams
+
+                $result.Ensure | Should -Be 'Absent'
+            }
+        }
+
+        It 'Should return true from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    HostName = 'www.contoso.com'
+                    Ensure   = 'Absent'
+                    Verbose  = $true
+                }
+
+                Test-TargetResource @testParams | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When a host entry exists and is correct, but it listed with multiple entries on one line' {
+        BeforeAll {
+            Mock -CommandName Get-Content -MockWith {
+                return @(
+                    '# A mocked example of a host file - this line is a comment',
+                    '',
+                    '127.0.0.1       localhost',
+                    '127.0.0.1  www.anotherexample.com',
+                    '192.168.0.156        demo.contoso.com   www.contoso.com more.examples.com',
+                    ''
+                )
+            }
+        }
+
+        It 'Should return present from the get method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
+
+                $result = Get-TargetResource @testParams
+
+                $result.Ensure | Should -Be 'Present'
+            }
+        }
+
+        It 'Should return true from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
+
+                Test-TargetResource @testParams | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When a host entry exists and is not correct, but it listed with multiple entries on one line' {
+        BeforeAll {
+            Mock -CommandName Get-Content -MockWith {
+                return @(
+                    '# A mocked example of a host file - this line is a comment',
+                    '',
+                    '127.0.0.1       localhost',
+                    '127.0.0.1  www.anotherexample.com',
+                    '127.0.0.1         demo.contoso.com   www.contoso.com more.examples.com',
+                    ''
+                )
+            }
+        }
+
+        It 'Should return present from the get method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
+
+                $result = Get-TargetResource @testParams
+
+                $result.Ensure | Should -Be 'Present'
+            }
+        }
+
+        It 'Should return false from the test method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
+
+                Test-TargetResource @testParams | Should -BeFalse
+            }
+        }
+
+        It 'Should update the entry in the set method' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
+
+                Set-TargetResource @testParams
+            }
+
+            Should -Invoke -CommandName Set-Content -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When called with invalid parameters' {
+        BeforeAll {
+            Mock -CommandName Get-Content -MockWith {
+                return @(
+                    '# A mocked example of a host file - this line is a comment',
+                    '',
+                    '127.0.0.1       localhost',
+                    '127.0.0.1  www.anotherexample.com',
+                    ''
+                )
+            }
+        }
+
+        It 'Should throw an error when IP Address is not provide and ensure is present' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    HostName = 'www.contoso.com'
+                    Verbose  = $true
+                }
+
+                $errorMessage = Get-InvalidArgumentRecord -Message $script:localizedData.UnableToEnsureWithoutIP -ArgumentName 'IPAddress'
+
+                { Set-TargetResource @testParams } | Should -Throw -ExpectedMessage $errorMessage
+            }
+        }
+    }
+}
