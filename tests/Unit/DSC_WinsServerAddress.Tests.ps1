@@ -1,238 +1,287 @@
-# $script:dscModuleName = 'NetworkingDsc'
-# $script:dscResourceName = 'DSC_WinsServerAddress'
+# Suppressing this rule because Script Analyzer does not understand Pester's syntax.
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
-# function Invoke-TestSetup
-# {
-#     try
-#     {
-#         Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
-#     }
-#     catch [System.IO.FileNotFoundException]
-#     {
-#         throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
-#     }
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-#     $script:testEnvironment = Initialize-TestEnvironment `
-#         -DSCModuleName $script:dscModuleName `
-#         -DSCResourceName $script:dscResourceName `
-#         -ResourceType 'Mof' `
-#         -TestType 'Unit'
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+}
 
-#     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
-# }
+BeforeAll {
+    $script:dscModuleName = 'NetworkingDsc'
+    $script:dscResourceName = 'DSC_WinsServerAddress'
 
-# function Invoke-TestCleanup
-# {
-#     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
-# }
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
 
-# Invoke-TestSetup
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
-# # Begin Testing
-# try
-# {
-#     InModuleScope $script:dscResourceName {
-#         Describe 'DSC_WinsServerAddress\Get-TargetResource' {
-#             Context 'When invoking with an address and one address is currently set' {
-#                 Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
-#                 Mock Assert-ResourceProperty -MockWith { }
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscResourceName
+}
 
-#                 It 'Should return current WINS address' {
-#                     $getTargetResourceSplat = @{
-#                         InterfaceAlias = 'Ethernet'
-#                         Verbose        = $true
-#                     }
+AfterAll {
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
 
-#                     $result = Get-TargetResource @getTargetResourceSplat
-#                     $result.Address | Should -Be '192.168.0.1'
-#                 }
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1 #-ParameterFilter { Write-Host "--$($InterfaceName)--"; $InterfaceName -eq 'Ethernet' }
-#                     Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 1 #-ParameterFilter { $InterfaceName -eq 'Ethernet' }
-#                 }
-#             }
-#         }
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 
-#         Describe 'DSC_WinsServerAddress\Set-TargetResource' {
-#             BeforeEach {
-#                 Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
-#                 Mock Set-WinsClientServerStaticAddress -MockWith { }
-#                 Mock Assert-ResourceProperty -MockWith { }
-#             }
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
+}
 
-#             Context 'When invoking with single server address' {
-#                 It 'Should not throw an exception' {
-#                     $setTargetResourceSplat = @{
-#                         Address        = '192.168.0.1'
-#                         InterfaceAlias = 'Ethernet'
-#                         Verbose        = $true
-#                     }
+Describe 'DSC_WinsServerAddress\Get-TargetResource' {
+    Context 'When invoking with an address and one address is currently set' {
+        BeforeAll {
+            Mock -CommandName Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
+            Mock -CommandName Assert-ResourceProperty
+        }
 
-#                     { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
-#                 }
+        It 'Should return current WINS address' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Set-WinsClientServerStaticAddress -Exactly 1
-#                     Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 1
-#                 }
-#             }
+                $getTargetResourceSplat = @{
+                    InterfaceAlias = 'Ethernet'
+                }
 
-#             Context 'When invoking with multiple server addresses' {
-#                 It 'Should not throw an exception' {
-#                     $setTargetResourceSplat = @{
-#                         Address        = @( '192.168.0.99', '192.168.0.100' )
-#                         InterfaceAlias = 'Ethernet'
-#                         Verbose        = $true
-#                     }
+                $result = Get-TargetResource @getTargetResourceSplat
+                $result.Address | Should -Be '192.168.0.1'
+            }
+        }
 
-#                     { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
-#                 }
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Get-WinsClientServerStaticAddress -Exactly -Times 1 -Scope Context #-ParameterFilter { Write-Host "--$($InterfaceName)--"; $InterfaceName -eq 'Ethernet' }
+            Should -Invoke -CommandName Assert-ResourceProperty -Exactly -Times 1 -Scope Context #-ParameterFilter { $InterfaceName -eq 'Ethernet' }
+        }
+    }
+}
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -commandName Set-WinsClientServerStaticAddress -Exactly 1
-#                     Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 1
-#                 }
-#             }
-#         }
+Describe 'DSC_WinsServerAddress\Set-TargetResource' {
+    BeforeAll {
+        Mock -CommandName Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
+        Mock -CommandName Set-WinsClientServerStaticAddress
+        Mock -CommandName Assert-ResourceProperty
+    }
 
-#         Describe 'DSC_WinsServerAddress\Test-TargetResource' {
-#             Context 'When a single WINS server is currently configured' {
-#                 BeforeEach {
-#                     Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
-#                     Mock Assert-ResourceProperty -MockWith { }
-#                 }
+    Context 'When invoking with single server address' {
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 Context 'When invoking with single server address that is the same as current' {
-#                     It 'Should return true' {
-#                         $testTargetResourceSplat = @{
-#                             Address        = '192.168.0.1'
-#                             InterfaceAlias = 'Ethernet'
-#                             Verbose        = $true
-#                         }
+                $setTargetResourceSplat = @{
+                    Address        = '192.168.0.1'
+                    InterfaceAlias = 'Ethernet'
+                }
 
-#                         Test-TargetResource @testTargetResourceSplat | Should -Be $true
-#                     }
+                { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
+            }
+        }
 
-#                     It 'Should call all the mocks' {
-#                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
-#                         Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
-#                     }
-#                 }
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Set-WinsClientServerStaticAddress -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Assert-ResourceProperty -Exactly -Times 1 -Scope Context
+        }
+    }
 
-#                 Context 'When invoking with single server address that is different to current' {
-#                     It 'Should return false' {
-#                         $testTargetResourceSplat = @{
-#                             Address        = '192.168.0.2'
-#                             InterfaceAlias = 'Ethernet'
-#                             Verbose        = $true
-#                         }
+    Context 'When invoking with multiple server addresses' {
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                         Test-TargetResource @testTargetResourceSplat | Should -Be $False
-#                     }
+                $setTargetResourceSplat = @{
+                    Address        = @( '192.168.0.99', '192.168.0.100' )
+                    InterfaceAlias = 'Ethernet'
+                }
 
-#                     It 'Should call all the mocks' {
-#                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
-#                         Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
-#                     }
-#                 }
+                { Set-TargetResource @setTargetResourceSplat } | Should -Not -Throw
+            }
+        }
 
-#                 Context 'Invoking with multiple server addresses that are different to current' {
-#                     It 'Should return false' {
-#                         $testTargetResourceSplat = @{
-#                             Address        = '192.168.0.2', '192.168.0.3'
-#                             InterfaceAlias = 'Ethernet'
-#                             Verbose        = $true
-#                         }
+        It 'Should call all the mocks' {
+            Should -Invoke -commandName Set-WinsClientServerStaticAddress -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Assert-ResourceProperty -Exactly -Times 1 -Scope Context
+        }
+    }
+}
 
-#                         Test-TargetResource @testTargetResourceSplat | Should -Be $False
-#                     }
+Describe 'DSC_WinsServerAddress\Test-TargetResource' {
+    Context 'When a single WINS server is currently configured' {
+        BeforeAll {
+            Mock -CommandName Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1' }
+            Mock -CommandName Assert-ResourceProperty
+        }
 
-#                     It 'Should call all the mocks' {
-#                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
-#                         Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
-#                     }
-#                 }
-#             }
+        Context 'When invoking with single server address that is the same as current' {
+            It 'Should return true' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#             Context 'When two WINS servers are currently configured' {
-#                 BeforeEach {
-#                     Mock Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1', '192.168.0.2' }
-#                     Mock Assert-ResourceProperty -MockWith { }
-#                 }
+                    $testTargetResourceSplat = @{
+                        Address        = '192.168.0.1'
+                        InterfaceAlias = 'Ethernet'
+                    }
 
-#                 Context 'When invoking with multiple server addresses that are the same as current' {
-#                     It 'Should return true' {
-#                         $testTargetResourceSplat = @{
-#                             Address        = '192.168.0.1', '192.168.0.2'
-#                             InterfaceAlias = 'Ethernet'
-#                             Verbose        = $true
-#                         }
+                    Test-TargetResource @testTargetResourceSplat | Should -BeTrue
+                }
+            }
 
-#                         Test-TargetResource @testTargetResourceSplat | Should -Be $true
-#                     }
+            It 'Should call all the mocks' {
+                Should -Invoke -CommandName Get-WinsClientServerStaticAddress -Exactly -Times 1 -Scope Context
+                Should -Invoke -CommandName Assert-ResourceProperty -Exactly -Times 2 -Scope Context
+            }
+        }
 
-#                     It 'Should call all the mocks' {
-#                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
-#                         Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
-#                     }
-#                 }
+        Context 'When invoking with single server address that is different to current' {
+            It 'Should return false' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#                 Context 'When invoking with multiple server addresses that are different to current 1' {
-#                     It 'Should return false' {
-#                         $testTargetResourceSplat = @{
-#                             Address        = '192.168.0.2', '192.168.0.99'
-#                             InterfaceAlias = 'Ethernet'
-#                             Verbose        = $true
-#                         }
+                    $testTargetResourceSplat = @{
+                        Address        = '192.168.0.2'
+                        InterfaceAlias = 'Ethernet'
+                    }
 
-#                         Test-TargetResource @testTargetResourceSplat | Should -Be $false
-#                     }
+                    Test-TargetResource @testTargetResourceSplat | Should -BeFalse
+                }
+            }
 
-#                     It 'Should call all the mocks' {
-#                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
-#                         Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
-#                     }
-#                 }
+            It 'Should call all the mocks' {
+                Should -Invoke -CommandName Get-WinsClientServerStaticAddress -Exactly -Times 1 -Scope Context
+                Should -Invoke -CommandName Assert-ResourceProperty -Exactly -Times 2 -Scope Context
+            }
+        }
 
-#                 Context 'When invoking with multiple server addresses that are different to current 2' {
-#                     It 'Should return false' {
-#                         $testTargetResourceSplat = @{
-#                             Address        = '192.168.0.1', '192.168.0.2', '192.168.0.3'
-#                             InterfaceAlias = 'Ethernet'
-#                             Verbose        = $true
-#                         }
+        Context 'Invoking with multiple server addresses that are different to current' {
+            It 'Should return false' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-#                         Test-TargetResource @testTargetResourceSplat | Should -Be $false
-#                     }
+                    $testTargetResourceSplat = @{
+                        Address        = '192.168.0.2', '192.168.0.3'
+                        InterfaceAlias = 'Ethernet'
+                    }
 
-#                     It 'Should call all the mocks' {
-#                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
-#                         Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
-#                     }
-#                 }
+                    Test-TargetResource @testTargetResourceSplat | Should -BeFalse
+                }
+            }
 
-#                 Context 'When invoking with multiple server addresses that are in a different order to current' {
-#                     It 'Should return false' {
-#                         $testTargetResourceSplat = @{
-#                             Address        = '192.168.0.2', '192.168.0.1'
-#                             InterfaceAlias = 'Ethernet'
-#                             Verbose        = $true
-#                         }
+            It 'Should call all the mocks' {
+                Should -Invoke -CommandName Get-WinsClientServerStaticAddress -Exactly -Times 1 -Scope Context
+                Should -Invoke -CommandName Assert-ResourceProperty -Exactly -Times 2 -Scope Context
+            }
+        }
+    }
 
-#                         Test-TargetResource @testTargetResourceSplat | Should -Be $false
-#                     }
+    Context 'When two WINS servers are currently configured' {
+        BeforeAll {
+            Mock -CommandName Get-WinsClientServerStaticAddress -MockWith { '192.168.0.1', '192.168.0.2' }
+            Mock -CommandName Assert-ResourceProperty
+        }
 
-#                     It 'Should call all the mocks' {
-#                         Assert-MockCalled -CommandName Get-WinsClientServerStaticAddress -Exactly 1
-#                         Assert-MockCalled -CommandName Assert-ResourceProperty -Exactly 2
-#                     }
-#                 }
-#             }
-#         }
-#     } #end InModuleScope $DSCResourceName
-# }
-# finally
-# {
-#     Invoke-TestCleanup
-# }
+        Context 'When invoking with multiple server addresses that are the same as current' {
+            It 'Should return true' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testTargetResourceSplat = @{
+                        Address        = '192.168.0.1', '192.168.0.2'
+                        InterfaceAlias = 'Ethernet'
+                    }
+
+                    Test-TargetResource @testTargetResourceSplat | Should -BeTrue
+                }
+            }
+
+            It 'Should call all the mocks' {
+                Should -Invoke -CommandName Get-WinsClientServerStaticAddress -Exactly -Times 1 -Scope Context
+                Should -Invoke -CommandName Assert-ResourceProperty -Exactly -Times 2 -Scope Context
+            }
+        }
+
+        Context 'When invoking with multiple server addresses that are different to current 1' {
+            It 'Should return false' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testTargetResourceSplat = @{
+                        Address        = '192.168.0.2', '192.168.0.99'
+                        InterfaceAlias = 'Ethernet'
+                    }
+
+                    Test-TargetResource @testTargetResourceSplat | Should -BeFalse
+                }
+            }
+
+            It 'Should call all the mocks' {
+                Should -Invoke -CommandName Get-WinsClientServerStaticAddress -Exactly -Times 1 -Scope Context
+                Should -Invoke -CommandName Assert-ResourceProperty -Exactly -Times 2 -Scope Context
+            }
+        }
+
+        Context 'When invoking with multiple server addresses that are different to current 2' {
+            It 'Should return false' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testTargetResourceSplat = @{
+                        Address        = '192.168.0.1', '192.168.0.2', '192.168.0.3'
+                        InterfaceAlias = 'Ethernet'
+                    }
+
+                    Test-TargetResource @testTargetResourceSplat | Should -BeFalse
+                }
+            }
+
+            It 'Should call all the mocks' {
+                Should -Invoke -CommandName Get-WinsClientServerStaticAddress -Exactly -Times 1 -Scope Context
+                Should -Invoke -CommandName Assert-ResourceProperty -Exactly -Times 2 -Scope Context
+            }
+        }
+
+        Context 'When invoking with multiple server addresses that are in a different order to current' {
+            It 'Should return false' {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $testTargetResourceSplat = @{
+                        Address        = '192.168.0.2', '192.168.0.1'
+                        InterfaceAlias = 'Ethernet'
+                    }
+
+                    Test-TargetResource @testTargetResourceSplat | Should -BeFalse
+                }
+            }
+
+            It 'Should call all the mocks' {
+                Should -Invoke -CommandName Get-WinsClientServerStaticAddress -Exactly -Times 1 -Scope Context
+                Should -Invoke -CommandName Assert-ResourceProperty -Exactly -Times 2 -Scope Context
+            }
+        }
+    }
+}
