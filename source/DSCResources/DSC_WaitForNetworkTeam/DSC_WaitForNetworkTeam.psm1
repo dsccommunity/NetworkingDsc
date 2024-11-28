@@ -175,7 +175,7 @@ function Test-TargetResource
 <#
     .SYNOPSIS
         Returns the current status of a network team.
-        'Up' indicates that the network team is acive.
+        'Up' indicates that the network team is active.
         'Degraded' indicates that the network team is not yet
         available.
         If the network team does not exist an exception will be

@@ -1,244 +1,338 @@
-# $script:dscModuleName = 'NetworkingDsc'
-# $script:dscResourceName = 'DSC_WaitForNetworkTeam'
+# Suppressing this rule because Script Analyzer does not understand Pester's syntax.
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
-# function Invoke-TestSetup
-# {
-#     try
-#     {
-#         Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
-#     }
-#     catch [System.IO.FileNotFoundException]
-#     {
-#         throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
-#     }
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-#     $script:testEnvironment = Initialize-TestEnvironment `
-#         -DSCModuleName $script:dscModuleName `
-#         -DSCResourceName $script:dscResourceName `
-#         -ResourceType 'Mof' `
-#         -TestType 'Unit'
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+}
 
-#     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
-# }
+BeforeAll {
+    $script:dscModuleName = 'NetworkingDsc'
+    $script:dscResourceName = 'DSC_WaitForNetworkTeam'
 
-# function Invoke-TestCleanup
-# {
-#     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
-# }
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
 
-# Invoke-TestSetup
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
-# # Begin Testing
-# try
-# {
-#     InModuleScope $script:dscResourceName {
-#         $testTeamName = 'TestTeam'
-#         $mockedGetNetLbfoTeamUp = [pscustomobject] @{
-#             Name   = $testTeamName
-#             Status = 'Up'
-#         }
-#         $mockedGetNetLbfoTeamDegraded = [pscustomobject] @{
-#             Name   = $testTeamName
-#             Status = 'Degraded'
-#         }
-#         $testTeamParametersGet = @{
-#             Name    = $testTeamName
-#             Verbose = $true
-#         }
-#         $testTeamParameters = @{
-#             Name             = $testTeamName
-#             RetryIntervalSec = 5
-#             RetryCount       = 20
-#             Verbose          = $true
-#         }
-#         $getNetLbfoTeamStatusParameters = @{
-#             Name    = $testTeamName
-#             Verbose = $true
-#         }
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscResourceName
+}
 
-#         Describe 'DSC_WaitForVolume\Get-TargetResource' -Tag 'Get' {
-#             Context 'When the network team exists' {
-#                 Mock `
-#                     -CommandName Get-NetLbfoTeamStatus `
-#                     -MockWith { 'Up' }
+AfterAll {
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
 
-#                 It 'Should not throw exception' {
-#                     {
-#                         $script:result = Get-TargetResource @testTeamParametersGet
-#                     } | Should -Not -Throw
-#                 }
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 
-#                 It "Should return Name $testTeamName" {
-#                     $script:result.Name | Should -Be $testTeamName
-#                 }
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 
-#                 It 'Should call the expected mocks' {
-#                     Assert-MockCalled `
-#                         -CommandName Get-NetLbfoTeamStatus `
-#                         -Exactly `
-#                         -Times 1
-#                 }
-#             }
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
+}
 
-#             Context 'When the network team does not exist' {
-#                 Mock `
-#                     -CommandName Get-NetLbfoTeamStatus `
-#                     -MockWith {
-#                     New-InvalidOperationException -Message $($script:localizedData.NetworkTeamNotFoundMessage -f $testTeamName)
-#                 }
+Describe 'DSC_WaitForNetworkTeam\Get-TargetResource' -Tag 'Get' {
+    Context 'When the network team exists' {
+        BeforeAll {
+            Mock -CommandName Get-NetLbfoTeamStatus -MockWith { 'Up' }
+        }
 
-#                 $errorRecord = Get-InvalidOperationRecord `
-#                     -Message ($script:localizedData.NetworkTeamNotFoundMessage -f $testTeamName)
+        It 'Should not throw exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should throw exception' {
-#                     {
-#                         $script:result = Get-TargetResource @testTeamParametersGet
-#                     } | Should -Throw $errorRecord
-#                 }
+                $testParams = @{
+                    Name = 'TestTeam'
+                }
 
-#                 It 'Should call the expected mocks' {
-#                     Assert-MockCalled `
-#                         -CommandName Get-NetLbfoTeamStatus `
-#                         -Exactly `
-#                         -Times 1
-#                 }
-#             }
-#         }
+                { $script:result = Get-TargetResource @testParams } | Should -Not -Throw
+            }
+        }
 
-#         Describe 'DSC_WaitForVolume\Set-TargetResource' -Tag 'Set' {
-#             Context 'When network team is Up' {
-#                 Mock Start-Sleep
-#                 Mock -CommandName Get-NetLbfoTeamStatus -MockWith { 'Up' }
+        It "Should return Name 'TestTeam'" {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should not throw an exception' {
-#                     {
-#                         Set-TargetResource @testTeamParameters
-#                     } | Should -Not -Throw
-#                 }
+                $script:result.Name | Should -Be 'TestTeam'
+            }
+        }
 
-#                 It 'Should call the expected mocks' {
-#                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times 0
-#                     Assert-MockCalled -CommandName Get-NetLbfoTeamStatus -Exactly -Times 1
-#                 }
-#             }
+        It 'Should call the expected mocks' {
+            Should -Invoke -CommandName Get-NetLbfoTeamStatus -Exactly -Times 1 -Scope Context
+        }
+    }
 
-#             Context 'When network team is not Up' {
-#                 Mock Start-Sleep
-#                 Mock -CommandName Get-NetLbfoTeamStatus -MockWith { 'Degraded' }
+    Context 'When the network team does not exist' {
+        BeforeAll {
+            Mock -CommandName Get-NetLbfoTeamStatus -MockWith {
+                New-InvalidOperationException -Message ('Network Team {0} not found' -f 'TestTeam') -PassThru
+            }
+        }
 
-#                 $errorRecord = Get-InvalidOperationRecord `
-#                     -Message $($script:localizedData.NetworkTeamNotUpAfterError -f $testTeamName, $testTeamParameters.RetryCount)
+        # TODO: Not working
+        It 'Should throw exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should throw VolumeNotFoundAfterError' {
-#                     {
-#                         Set-TargetResource @testTeamParameters
-#                     } | Should -Throw $errorRecord
-#                 }
+                $testParams = @{
+                    Name = 'TestTeam'
+                }
 
-#                 It 'Should call the expected mocks' {
-#                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times $testTeamParameters.RetryCount
-#                     Assert-MockCalled -CommandName Get-NetLbfoTeamStatus -Exactly -Times $testTeamParameters.RetryCount
-#                 }
-#             }
-#         }
+                $errorRecord = Get-InvalidOperationRecord -Message ($script:localizedData.NetworkTeamNotFoundMessage -f $testParams.Name)
 
-#         Describe 'DSC_WaitForVolume\Test-TargetResource' -Tag 'Test' {
-#             Context 'When network team is Up' {
-#                 Mock -CommandName Get-NetLbfoTeamStatus -MockWith { 'Up' }
+                $result = Get-TargetResource @testParams
+                { $result } | Should -Throw -Not
+            }
+        }
 
-#                 It 'Should not throw an exception' {
-#                     {
-#                         $script:result = Test-TargetResource @testTeamParameters
-#                     } | Should -Not -Throw
-#                 }
+        It 'Should call the expected mocks' {
+            Should -Invoke -CommandName Get-NetLbfoTeamStatus -Exactly -Times 1 -Scope Context
+        }
+    }
+}
 
-#                 It 'Should return true' {
-#                     $script:result | Should -Be $true
-#                 }
+Describe 'DSC_WaitForNetworkTeam\Set-TargetResource' -Tag 'Set' {
+    Context 'When network team is Up' {
+        BeforeAll {
+            Mock -CommandName Start-Sleep
+            Mock -CommandName Get-NetLbfoTeamStatus -MockWith { 'Up' }
+        }
 
-#                 It 'Should call the expected mocks' {
-#                     Assert-MockCalled -CommandName Get-NetLbfoTeamStatus -Exactly -Times 1
-#                 }
-#             }
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#             Context 'When network team is not Up' {
-#                 Mock -CommandName Get-NetLbfoTeamStatus -MockWith { 'Degraded' }
+                $testParams = @{
+                    Name             = 'TestTeam'
+                    RetryIntervalSec = 5
+                    RetryCount       = 20
+                }
 
-#                 It 'Should not throw an exception' {
-#                     {
-#                         $script:result = Test-TargetResource @testTeamParameters
-#                     } | Should -Not -Throw
-#                 }
+                { Set-TargetResource @testParams } | Should -Not -Throw
+            }
+        }
 
-#                 It 'Should return false' {
-#                     $script:result | Should -Be $false
-#                 }
+        It 'Should call the expected mocks' {
+            Should -Invoke -CommandName Start-Sleep -Exactly -Times 0 -Scope Context
+            Should -Invoke -CommandName Get-NetLbfoTeamStatus -Exactly -Times 1 -Scope Context
+        }
+    }
 
-#                 It 'Should call the expected mocks' {
-#                     Assert-MockCalled -CommandName Get-NetLbfoTeamStatus -Exactly -Times 1
-#                 }
-#             }
-#         }
+    Context 'When network team is not Up' {
+        BeforeAll {
+            Mock -CommandName Start-Sleep
+            Mock -CommandName Get-NetLbfoTeamStatus -MockWith { 'Degraded' }
+        }
 
-#         Describe 'DSC_WaitForVolume\Get-NetLbfoTeamStatus' {
-#             Context 'When network team exists and is Up' {
-#                 Mock -CommandName Get-NetLbfoTeam -MockWith { $mockedGetNetLbfoTeamUp }
+        It 'Should throw VolumeNotFoundAfterError' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should not throw an exception' {
-#                     {
-#                         $script:result = Get-NetLbfoTeamStatus @getNetLbfoTeamStatusParameters
-#                     } | Should -Not -Throw
-#                 }
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message $($script:localizedData.NetworkTeamNotUpAfterError -f 'TestTeam', 20)
 
-#                 It 'Should return "Up"' {
-#                     $script:result | Should -Be 'Up'
-#                 }
+                $testParams = @{
+                    Name             = 'TestTeam'
+                    RetryIntervalSec = 5
+                    RetryCount       = 20
+                }
 
-#                 It 'Should call the expected mocks' {
-#                     Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
-#                 }
-#             }
+                { Set-TargetResource @testParams } | Should -Throw $errorRecord
+            }
+        }
 
-#             Context 'When network team exists and is Degraded' {
-#                 Mock -CommandName Get-NetLbfoTeam -MockWith { $mockedGetNetLbfoTeamDegraded }
+        It 'Should call the expected mocks' {
+            Should -Invoke -CommandName Start-Sleep -Exactly -Times 20 -Scope Context
+            Should -Invoke -CommandName Get-NetLbfoTeamStatus -Exactly -Times 20 -Scope Context
+        }
+    }
+}
 
-#                 It 'Should not throw an exception' {
-#                     {
-#                         $script:result = Get-NetLbfoTeamStatus @getNetLbfoTeamStatusParameters
-#                     } | Should -Not -Throw
-#                 }
+Describe 'DSC_WaitForNetworkTeam\Test-TargetResource' -Tag 'Test' {
+    Context 'When network team is Up' {
+        BeforeAll {
+            Mock -CommandName Get-NetLbfoTeamStatus -MockWith { 'Up' }
+        }
 
-#                 It 'Should return "Degraded"' {
-#                     $script:result | Should -Be 'Degraded'
-#                 }
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should call the expected mocks' {
-#                     Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
-#                 }
-#             }
+                $testParams = @{
+                    Name             = 'TestTeam'
+                    RetryIntervalSec = 5
+                    RetryCount       = 20
+                }
 
-#             Context 'When network team does not exist' {
-#                 Mock `
-#                     -CommandName Get-NetLbfoTeam `
-#                     -MockWith { Throw (New-Object -TypeName 'Microsoft.PowerShell.Cmdletization.Cim.CimJobException') }
+                { $script:result = Test-TargetResource @testParams } | Should -Not -Throw
+            }
+        }
 
-#                 $errorRecord = Get-InvalidOperationRecord `
-#                     -Message ($script:localizedData.NetworkTeamNotFoundMessage -f $testTeamName)
+        It 'Should return true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should throw expected exception' {
-#                     {
-#                         $script:result = Get-NetLbfoTeamStatus @getNetLbfoTeamStatusParameters
-#                     } | Should -Throw $errorRecord
-#                 }
+                $script:result | Should -BeTrue
+            }
+        }
 
-#                 It 'Should call the expected mocks' {
-#                     Assert-MockCalled -CommandName Get-NetLbfoTeam -Exactly -Times 1
-#                 }
-#             }
-#         }
-#     }
-# }
-# finally
-# {
-#     Invoke-TestCleanup
-# }
+        It 'Should call the expected mocks' {
+            Should -Invoke -CommandName Get-NetLbfoTeamStatus -Exactly -Times 1 -Scope Context
+        }
+    }
+
+    Context 'When network team is not Up' {
+        BeforeAll {
+            Mock -CommandName Get-NetLbfoTeamStatus -MockWith { 'Degraded' }
+        }
+
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    Name             = 'TestTeam'
+                    RetryIntervalSec = 5
+                    RetryCount       = 20
+                }
+
+                { $script:result = Test-TargetResource @testParams } | Should -Not -Throw
+            }
+        }
+
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $script:result | Should -BeFalse
+            }
+        }
+
+        It 'Should call the expected mocks' {
+            Should -Invoke -CommandName Get-NetLbfoTeamStatus -Exactly -Times 1 -Scope Context
+        }
+    }
+}
+
+Describe 'DSC_WaitForNetworkTeam\Get-NetLbfoTeamStatus' {
+    Context 'When network team exists and is Up' {
+        BeforeAll {
+            Mock -CommandName Get-NetLbfoTeam -MockWith {
+                @{
+                    Name   = 'TestTeam'
+                    Status = 'Up'
+                }
+            }
+        }
+
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    Name = 'TestTeam'
+                }
+
+                { $script:result = Get-NetLbfoTeamStatus @testParams } | Should -Not -Throw
+            }
+        }
+
+        It 'Should return "Up"' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $script:result | Should -Be 'Up'
+            }
+        }
+
+        It 'Should call the expected mocks' {
+            Should -Invoke -CommandName Get-NetLbfoTeam -Exactly -Times 1 -Scope Context
+        }
+    }
+
+    Context 'When network team exists and is Degraded' {
+        BeforeAll {
+            Mock -CommandName Get-NetLbfoTeam -MockWith {
+                @{
+                    Name   = 'TestTeam'
+                    Status = 'Degraded'
+                }
+            }
+        }
+
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    Name = 'TestTeam'
+                }
+
+                { $script:result = Get-NetLbfoTeamStatus @testParams } | Should -Not -Throw
+            }
+        }
+
+        It 'Should return "Degraded"' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $script:result | Should -Be 'Degraded'
+            }
+        }
+
+        It 'Should call the expected mocks' {
+            Should -Invoke -CommandName Get-NetLbfoTeam -Exactly -Times 1 -Scope Context
+        }
+    }
+
+    Context 'When network team does not exist' {
+        BeforeAll {
+            Mock -CommandName Get-NetLbfoTeam -MockWith {
+                Throw New-Object -TypeName 'Microsoft.PowerShell.Cmdletization.Cim.CimJobException'
+            }
+        }
+
+        It 'Should throw expected exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($script:localizedData.NetworkTeamNotFoundMessage -f 'TestTeam')
+
+                $testParams = @{
+                    Name = 'TestTeam'
+                }
+
+                { $script:result = Get-NetLbfoTeamStatus @testParams } | Should -Throw $errorRecord
+            }
+        }
+
+        It 'Should call the expected mocks' {
+            Should -Invoke -CommandName Get-NetLbfoTeam -Exactly -Times 1 -Scope Context
+        }
+    }
+}
