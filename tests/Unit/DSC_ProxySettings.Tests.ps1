@@ -504,7 +504,7 @@ Describe 'DSC_ProxySettings\Test-TargetResource' -Tag 'Test' {
                     ConnectionType = 'All'
                 }
 
-                { $script:testTargetResourceResult = Test-TargetResource @localMachineParameters} | Should -Not -Throw
+                { $script:testTargetResourceResult = Test-TargetResource @localMachineParameters } | Should -Not -Throw
             }
         }
 
@@ -579,7 +579,7 @@ Describe 'DSC_ProxySettings\Test-TargetResource' -Tag 'Test' {
                     ConnectionType = 'Default'
                 }
 
-                { $script:testTargetResourceResult = Test-TargetResource @localMachineParameters -Ensure 'Present' -ConnectionType 'Default' } | Should -Not -Throw
+                { $script:testTargetResourceResult = Test-TargetResource @localMachineParameters } | Should -Not -Throw
             }
         }
 
@@ -618,7 +618,7 @@ Describe 'DSC_ProxySettings\Test-TargetResource' -Tag 'Test' {
                     ConnectionType = 'Legacy'
                 }
 
-                { $script:testTargetResourceResult = Test-TargetResource @localMachineParameters -Ensure 'Present' -ConnectionType 'Legacy' } | Should -Not -Throw
+                { $script:testTargetResourceResult = Test-TargetResource @localMachineParameters } | Should -Not -Throw
             }
         }
 
