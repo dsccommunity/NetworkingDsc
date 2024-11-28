@@ -1,206 +1,333 @@
-# $script:dscModuleName = 'NetworkingDsc'
-# $script:dscResourceName = 'DSC_NetConnectionProfile'
+# Suppressing this rule because Script Analyzer does not understand Pester's syntax.
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
-# function Invoke-TestSetup
-# {
-#     try
-#     {
-#         Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
-#     }
-#     catch [System.IO.FileNotFoundException]
-#     {
-#         throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
-#     }
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-#     $script:testEnvironment = Initialize-TestEnvironment `
-#         -DSCModuleName $script:dscModuleName `
-#         -DSCResourceName $script:dscResourceName `
-#         -ResourceType 'Mof' `
-#         -TestType 'Unit'
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+}
 
-#     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
-# }
+BeforeAll {
+    $script:dscModuleName = 'NetworkingDsc'
+    $script:dscResourceName = 'DSC_NetConnectionProfile'
 
-# function Invoke-TestCleanup
-# {
-#     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
-# }
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
 
-# Invoke-TestSetup
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
-# # Begin Testing
-# try
-# {
-#     InModuleScope $script:dscResourceName {
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscResourceName
+}
 
-#         # Create the Mock Objects that will be used for running tests
-#         $mockNetAdapter = [PSCustomObject] @{
-#             Name = 'TestAdapter'
-#         }
+AfterAll {
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
 
-#         $mockNetConnnectionProfileAll = [PSObject] @{
-#             InterfaceAlias   = $mockNetAdapter.Name
-#             NetworkCategory  = 'Public'
-#             IPv4Connectivity = 'Internet'
-#             IPv6Connectivity = 'Internet'
-#         }
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 
-#         $testValidInterfaceAliasOnlyPassed = [PSObject] @{
-#             InterfaceAlias = $mockNetAdapter.Name
-#         }
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 
-#         $testNetworkCategoryMatches = [PSObject] @{
-#             InterfaceAlias  = $mockNetAdapter.Name
-#             NetworkCategory = 'Public'
-#         }
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
+}
 
-#         $testNetworkCategoryNoMatches = [PSObject] @{
-#             InterfaceAlias  = $mockNetAdapter.Name
-#             NetworkCategory = 'Private'
-#         }
+Describe 'DSC_NetConnectionProfile\Get-TargetResource' -Tag 'Get' {
+    BeforeAll {
+        Mock -CommandName Get-NetConnectionProfile {
+            @{
+                InterfaceAlias   = 'TestAdapter'
+                NetworkCategory  = 'Public'
+                IPv4Connectivity = 'Internet'
+                IPv6Connectivity = 'Internet'
+            }
+        }
+    }
 
-#         $testIPv4ConnectivityMatches = [PSObject] @{
-#             InterfaceAlias   = $mockNetAdapter.Name
-#             IPv4Connectivity = 'Internet'
-#         }
+    It 'Should return the correct values' {
+        InModuleScope -ScriptBlock {
+            Set-StrictMode -Version 1.0
 
-#         $testIPv4ConnectivityNoMatches = [PSObject] @{
-#             InterfaceAlias   = $mockNetAdapter.Name
-#             IPv4Connectivity = 'Disconnected'
-#         }
+            $mockNetConnectionProfileAll = @{
+                InterfaceAlias   = 'TestAdapter'
+                NetworkCategory  = 'Public'
+                IPv4Connectivity = 'Internet'
+                IPv6Connectivity = 'Internet'
+            }
 
-#         $testIPv6ConnectivityMatches = [PSObject] @{
-#             InterfaceAlias   = $mockNetAdapter.Name
-#             IPv6Connectivity = 'Internet'
-#         }
+            $result = Get-TargetResource -InterfaceAlias 'TestAdapter'
+            $result.InterfaceAlias | Should -Be $mockNetConnectionProfileAll.InterfaceAlias
+            $result.NetworkCategory | Should -Be $mockNetConnectionProfileAll.NetworkCategory
+            $result.IPv4Connectivity | Should -Be $mockNetConnectionProfileAll.IPv4Connectivity
+            $result.IPv6Connectivity | Should -Be $mockNetConnectionProfileAll.IPv6Connectivity
+        }
+    }
+}
 
-#         $testIPv6ConnectivityNoMatches = [PSObject] @{
-#             InterfaceAlias   = $mockNetAdapter.Name
-#             IPv6Connectivity = 'Disconnected'
-#         }
+Describe 'DSC_NetConnectionProfile\Test-TargetResource' -Tag 'Test' {
+    BeforeAll {
+        Mock -CommandName Get-TargetResource -MockWith {
+            @{
+                InterfaceAlias   = 'TestAdapter'
+                NetworkCategory  = 'Public'
+                IPv4Connectivity = 'Internet'
+                IPv6Connectivity = 'Internet'
+            }
+        }
 
-#         Describe 'DSC_NetConnectionProfile\Get-TargetResource' -Tag 'Get' {
-#             Mock -CommandName Get-NetConnectionProfile {
-#                 return $mockNetConnnectionProfileAll
-#             }
+        Mock -CommandName Assert-ResourceProperty
+    }
 
-#             $result = Get-TargetResource -InterfaceAlias $mockNetAdapter.Name
+    Context 'NetworkCategory matches' {
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#             It 'Should return the correct values' {
-#                 $result.InterfaceAlias | Should -Be $mockNetConnnectionProfileAll.InterfaceAlias
-#                 $result.NetworkCategory | Should -Be $mockNetConnnectionProfileAll.NetworkCategory
-#                 $result.IPv4Connectivity | Should -Be $mockNetConnnectionProfileAll.IPv4Connectivity
-#                 $result.IPv6Connectivity | Should -Be $mockNetConnnectionProfileAll.IPv6Connectivity
-#             }
-#         }
+                $testNetworkCategoryMatches = @{
+                    InterfaceAlias  = 'TestAdapter'
+                    NetworkCategory = 'Public'
+                }
 
-#         Describe 'DSC_NetConnectionProfile\Test-TargetResource' -Tag 'Test' {
-#             BeforeEach {
-#                 Mock -CommandName Get-TargetResource -MockWith {
-#                     return $mockNetConnnectionProfileAll
-#                 }
+                Test-TargetResource @testNetworkCategoryMatches | Should -BeTrue
+            }
+        }
+    }
 
-#                 Mock -CommandName Assert-ResourceProperty
-#             }
+    Context 'NetworkCategory does not match' {
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#             Context 'NetworkCategory matches' {
-#                 It 'Should return false' {
-#                     Test-TargetResource @testNetworkCategoryMatches | should -be $true
-#                 }
-#             }
+                $testNetworkCategoryNoMatches = @{
+                    InterfaceAlias  = 'TestAdapter'
+                    NetworkCategory = 'Private'
+                }
 
-#             Context 'NetworkCategory does not match' {
-#                 It 'Should return false' {
-#                     Test-TargetResource @testNetworkCategoryNoMatches | should -be $false
-#                 }
-#             }
+                Test-TargetResource @testNetworkCategoryNoMatches | Should -BeFalse
+            }
+        }
+    }
 
-#             Context 'IPv4Connectivity matches' {
-#                 It 'Should return false' {
-#                     Test-TargetResource @testIPv4ConnectivityMatches | should -be $true
-#                 }
-#             }
+    Context 'IPv4Connectivity matches' {
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#             Context 'IPv4Connectivity does not match' {
-#                 It 'Should return false' {
-#                     Test-TargetResource @testIPv4ConnectivityNoMatches | should -be $false
-#                 }
-#             }
+                $testIPv4ConnectivityMatches = @{
+                    InterfaceAlias   = 'TestAdapter'
+                    IPv4Connectivity = 'Internet'
+                }
 
-#             Context 'IPv6Connectivity matches' {
-#                 It 'Should return false' {
-#                     Test-TargetResource @testIPv6ConnectivityMatches | should -be $true
-#                 }
-#             }
+                Test-TargetResource @testIPv4ConnectivityMatches | Should -BeTrue
+            }
+        }
+    }
 
-#             Context 'IPv6Connectivity does not match' {
-#                 It 'Should return false' {
-#                     Test-TargetResource @testIPv6ConnectivityNoMatches | should -be $false
-#                 }
-#             }
-#         }
+    Context 'IPv4Connectivity does not match' {
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#         Describe 'DSC_NetConnectionProfile\Set-TargetResource' -Tag 'Set' {
-#             It 'Should call all the mocks' {
-#                 Mock -CommandName Set-NetConnectionProfile
-#                 Mock -CommandName Assert-ResourceProperty
+                $testIPv4ConnectivityNoMatches = @{
+                    InterfaceAlias   = 'TestAdapter'
+                    IPv4Connectivity = 'Disconnected'
+                }
 
-#                 Set-TargetResource @testNetworkCategoryMatches
+                Test-TargetResource @testIPv4ConnectivityNoMatches | Should -BeFalse
+            }
+        }
+    }
 
-#                 Assert-MockCalled -CommandName Set-NetConnectionProfile
-#             }
-#         }
+    Context 'IPv6Connectivity matches' {
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#         Describe 'DSC_NetConnectionProfile\Assert-ResourceProperty' {
-#             Context 'Invoking with bad interface alias' {
-#                 Mock -CommandName Get-NetAdapter
+                $testIPv6ConnectivityMatches = @{
+                    InterfaceAlias   = 'TestAdapter'
+                    IPv6Connectivity = 'Internet'
+                }
 
-#                 It 'Should throw testValidInterfaceAliasOnlyPassed exception' {
-#                     $errorRecord = Get-InvalidOperationRecord `
-#                         -Message ($script:localizedData.InterfaceNotAvailableError -f $testValidInterfaceAliasOnlyPassed.InterfaceAlias)
+                Test-TargetResource @testIPv6ConnectivityMatches | Should -BeTrue
+            }
+        }
+    }
 
-#                     { Assert-ResourceProperty @testValidInterfaceAliasOnlyPassed } | Should -Throw $errorRecord
-#                 }
-#             }
+    Context 'IPv6Connectivity does not match' {
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#             Context 'Invoking with valid interface alias but all empty parameters' {
-#                 Mock -CommandName Get-NetAdapter -MockWith { return $mockNetAdapter }
+                $testIPv6ConnectivityNoMatches = @{
+                    InterfaceAlias   = 'TestAdapter'
+                    IPv6Connectivity = 'Disconnected'
+                }
 
-#                 $errorRecord = Get-InvalidOperationRecord `
-#                     -Message ($script:localizedData.ParameterCombinationError)
+                Test-TargetResource @testIPv6ConnectivityNoMatches | Should -BeFalse
+            }
+        }
+    }
+}
 
-#                 It 'Should not ParameterCombinationError exception' {
-#                     { Assert-ResourceProperty @testValidInterfaceAliasOnlyPassed } | Should -Throw $errorRecord
-#                 }
-#             }
+Describe 'DSC_NetConnectionProfile\Set-TargetResource' -Tag 'Set' {
+    BeforeAll {
+        Mock -CommandName Set-NetConnectionProfile
+        Mock -CommandName Assert-ResourceProperty
+    }
 
-#             Context 'Invoking with valid interface alias and one NetworkCategory' {
-#                 Mock -CommandName Get-NetAdapter -MockWith { return $mockNetAdapter }
+    It 'Should call all the mocks' {
+        InModuleScope -ScriptBlock {
+            Set-StrictMode -Version 1.0
 
-#                 It 'Should not throw an exception' {
-#                     { Assert-ResourceProperty @testNetworkCategoryMatches } | Should -Not -Throw
-#                 }
-#             }
+            $testNetworkCategoryMatches = @{
+                InterfaceAlias  = 'TestAdapter'
+                NetworkCategory = 'Public'
+            }
 
-#             Context 'Invoking with valid interface alias and one IPv4Connectivity' {
-#                 Mock -CommandName Get-NetAdapter -MockWith { return $mockNetAdapter }
+            Set-TargetResource @testNetworkCategoryMatches
+        }
 
-#                 It 'Should not throw an exception' {
-#                     { Assert-ResourceProperty @testIPv4ConnectivityMatches } | Should -Not -Throw
-#                 }
-#             }
+        Should -Invoke -CommandName Set-NetConnectionProfile
+    }
+}
 
-#             Context 'Invoking with valid interface alias and one IPv6Connectivity' {
-#                 Mock -CommandName Get-NetAdapter -MockWith { return $mockNetAdapter }
+Describe 'DSC_NetConnectionProfile\Assert-ResourceProperty' {
+    Context 'Invoking with bad interface alias' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter
+        }
 
-#                 It 'Should not throw an exception' {
-#                     { Assert-ResourceProperty @testIPv6ConnectivityMatches } | Should -Not -Throw
-#                 }
-#             }
-#         }
-#     } #end InModuleScope $DSCResourceName
-# }
-# finally
-# {
-#     Invoke-TestCleanup
-# }
+        It 'Should throw testValidInterfaceAliasOnlyPassed exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testValidInterfaceAliasOnlyPassed = @{
+                    InterfaceAlias = 'TestAdapter'
+                }
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($script:localizedData.InterfaceNotAvailableError -f $testValidInterfaceAliasOnlyPassed.InterfaceAlias)
+
+
+                { Assert-ResourceProperty @testValidInterfaceAliasOnlyPassed } | Should -Throw $errorRecord
+            }
+        }
+    }
+
+    Context 'Invoking with valid interface alias but all empty parameters' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name = 'TestAdapter'
+                }
+            }
+        }
+
+        It 'Should not ParameterCombinationError exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($script:localizedData.ParameterCombinationError)
+
+                $testValidInterfaceAliasOnlyPassed = @{
+                    InterfaceAlias = 'TestAdapter'
+                }
+
+                { Assert-ResourceProperty @testValidInterfaceAliasOnlyPassed } | Should -Throw $errorRecord
+            }
+        }
+    }
+
+    Context 'Invoking with valid interface alias and one NetworkCategory' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name = 'TestAdapter'
+                }
+            }
+        }
+
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testNetworkCategoryMatches = @{
+                    InterfaceAlias  = 'TestAdapter'
+                    NetworkCategory = 'Public'
+                }
+
+                { Assert-ResourceProperty @testNetworkCategoryMatches } | Should -Not -Throw
+            }
+        }
+    }
+
+    Context 'Invoking with valid interface alias and one IPv4Connectivity' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name = 'TestAdapter'
+                }
+            }
+        }
+
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testIPv4ConnectivityMatches = @{
+                    InterfaceAlias   = 'TestAdapter'
+                    IPv4Connectivity = 'Internet'
+                }
+
+                { Assert-ResourceProperty @testIPv4ConnectivityMatches } | Should -Not -Throw
+            }
+        }
+    }
+
+    Context 'Invoking with valid interface alias and one IPv6Connectivity' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name = 'TestAdapter'
+                }
+            }
+        }
+
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testIPv6ConnectivityMatches = @{
+                    InterfaceAlias   = 'TestAdapter'
+                    IPv6Connectivity = 'Internet'
+                }
+
+                { Assert-ResourceProperty @testIPv6ConnectivityMatches } | Should -Not -Throw
+            }
+        }
+    }
+}
