@@ -39,7 +39,10 @@
         "steppable",
         "contoso",
         "fabrikam",
-        "fourthcoffee"
+        "fourthcoffee",
+        "Lbfo",
+        "HKLM",
+        "HKCU"
     ],
     "cSpell.ignorePaths": [
         ".git"
