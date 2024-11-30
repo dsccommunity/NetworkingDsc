@@ -1,273 +1,472 @@
-# $script:dscModuleName = 'NetworkingDsc'
-# $script:dscResourceName = 'DSC_NetAdapterBinding'
+# Suppressing this rule because Script Analyzer does not understand Pester's syntax.
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
-# function Invoke-TestSetup
-# {
-#     try
-#     {
-#         Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
-#     }
-#     catch [System.IO.FileNotFoundException]
-#     {
-#         throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
-#     }
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-#     $script:testEnvironment = Initialize-TestEnvironment `
-#         -DSCModuleName $script:dscModuleName `
-#         -DSCResourceName $script:dscResourceName `
-#         -ResourceType 'Mof' `
-#         -TestType 'Unit'
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+}
 
-#     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
-# }
+BeforeAll {
+    $script:dscModuleName = 'NetworkingDsc'
+    $script:dscResourceName = 'DSC_NetAdapterBinding'
 
-# function Invoke-TestCleanup
-# {
-#     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
-# }
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
 
-# Invoke-TestSetup
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
-# # Begin Testing
-# try
-# {
-#     InModuleScope $script:dscResourceName {
-#         $testBindingEnabled = @{
-#             InterfaceAlias = 'Ethernet'
-#             ComponentId    = 'ms_tcpip63'
-#             State          = 'Enabled'
-#         }
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscResourceName
+}
 
-#         $testBindingDisabled = @{
-#             InterfaceAlias = 'Ethernet'
-#             ComponentId    = 'ms_tcpip63'
-#             State          = 'Disabled'
-#         }
+AfterAll {
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
 
-#         $testBindingMixed = @{
-#             InterfaceAlias = '*'
-#             ComponentId    = 'ms_tcpip63'
-#             State          = 'Enabled'
-#         }
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 
-#         $mockAdapter = @{
-#             InterfaceAlias = 'Ethernet'
-#         }
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 
-#         $mockBindingEnabled = @{
-#             InterfaceAlias = 'Ethernet'
-#             ComponentId    = 'ms_tcpip63'
-#             Enabled        = $true
-#         }
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
+}
 
-#         $mockBindingDisabled = @{
-#             InterfaceAlias = 'Ethernet'
-#             ComponentId    = 'ms_tcpip63'
-#             Enabled        = $False
-#         }
+Describe 'DSC_NetAdapterBinding\Get-TargetResource' -Tag 'Get' {
+    Context 'Adapter exists and binding Enabled' {
+        BeforeAll {
+            Mock -CommandName Get-Binding -MockWith {
+                @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    Enabled        = $true
+                }
+            }
+        }
 
-#         $mockBindingMixed = @(
-#             @{
-#                 InterfaceAlias = 'Ethernet'
-#                 ComponentId    = 'ms_tcpip63'
-#                 Enabled        = $False
-#             },
-#             @{
-#                 InterfaceAlias = 'Ethernet2'
-#                 ComponentId    = 'ms_tcpip63'
-#                 Enabled        = $true
-#             }
-#         )
+        It 'Should return existing binding' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#         Describe 'DSC_NetAdapterBinding\Get-TargetResource' -Tag 'Get' {
-#             Context 'Adapter exists and binding Enabled' {
-#                 Mock -CommandName Get-Binding -MockWith { $mockBindingEnabled }
+                $testBindingEnabled = @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    State          = 'Enabled'
+                }
 
-#                 It 'Should return existing binding' {
-#                     $result = Get-TargetResource @testBindingEnabled
-#                     $result.InterfaceAlias | Should -Be $testBindingEnabled.InterfaceAlias
-#                     $result.ComponentId | Should -Be $testBindingEnabled.ComponentId
-#                     $result.State | Should -Be 'Enabled'
-#                     $result.CurrentState | Should -Be 'Enabled'
-#                 }
+                $result = Get-TargetResource @testBindingEnabled
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Get-Binding -Exactly -Times 1
-#                 }
-#             }
+                $result.InterfaceAlias | Should -Be $testBindingEnabled.InterfaceAlias
+                $result.ComponentId | Should -Be $testBindingEnabled.ComponentId
+                $result.State | Should -Be 'Enabled'
+                $result.CurrentState | Should -Be 'Enabled'
+            }
+        }
 
-#             Context 'Adapter exists and binding Disabled' {
-#                 Mock -CommandName Get-Binding -MockWith { $mockBindingDisabled }
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Get-Binding -Exactly -Times 1 -Scope Context
+        }
+    }
 
-#                 It 'Should return existing binding' {
-#                     $result = Get-TargetResource @testBindingDisabled
-#                     $result.InterfaceAlias | Should -Be $testBindingDisabled.InterfaceAlias
-#                     $result.ComponentId | Should -Be $testBindingDisabled.ComponentId
-#                     $result.State | Should -Be 'Disabled'
-#                     $result.CurrentState | Should -Be 'Disabled'
-#                 }
+    Context 'Adapter exists and binding Disabled' {
+        BeforeAll {
+            Mock -CommandName Get-Binding -MockWith {
+                @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    Enabled        = $False
+                }
+            }
+        }
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Get-Binding -Exactly -Times 1
-#                 }
-#             }
+        It 'Should return existing binding' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#             Context 'More than one Adapter exists and binding is Disabled on one and Enabled on another' {
-#                 Mock -CommandName Get-Binding -MockWith { $mockBindingMixed }
+                $testBindingDisabled = @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    State          = 'Disabled'
+                }
 
-#                 It 'Should return existing binding' {
-#                     $result = Get-TargetResource @testBindingMixed
-#                     $result.InterfaceAlias | Should -Be $testBindingMixed.InterfaceAlias
-#                     $result.ComponentId | Should -Be $testBindingMixed.ComponentId
-#                     $result.State | Should -Be 'Enabled'
-#                     $result.CurrentState | Should -Be 'Mixed'
-#                 }
+                $result = Get-TargetResource @testBindingDisabled
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Get-Binding -Exactly -Times 1
-#                 }
-#             }
+                $result.InterfaceAlias | Should -Be $testBindingDisabled.InterfaceAlias
+                $result.ComponentId | Should -Be $testBindingDisabled.ComponentId
+                $result.State | Should -Be 'Disabled'
+                $result.CurrentState | Should -Be 'Disabled'
+            }
+        }
 
-#         }
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Get-Binding -Exactly -Times 1 -Scope Context
+        }
+    }
 
-#         Describe 'DSC_NetAdapterBinding\Set-TargetResource' -Tag 'Set' {
-#             Context 'Adapter exists and set binding to Enabled' {
-#                 Mock -CommandName Get-Binding -MockWith { $mockBindingDisabled }
-#                 Mock -CommandName Enable-NetAdapterBinding
-#                 Mock -CommandName Disable-NetAdapterBinding
+    Context 'More than one Adapter exists and binding is Disabled on one and Enabled on another' {
+        BeforeAll {
+            Mock -CommandName Get-Binding -MockWith {
+                @(
+                    @{
+                        InterfaceAlias = 'Ethernet'
+                        ComponentId    = 'ms_tcpip63'
+                        Enabled        = $False
+                    },
+                    @{
+                        InterfaceAlias = 'Ethernet2'
+                        ComponentId    = 'ms_tcpip63'
+                        Enabled        = $true
+                    }
+                )
+            }
+        }
 
-#                 It 'Should not throw an exception' {
-#                     { Set-TargetResource @testBindingEnabled } | Should -Not -Throw
-#                 }
+        It 'Should return existing binding' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Get-Binding -Exactly -Times 1
-#                     Assert-MockCalled -CommandName Enable-NetAdapterBinding -Exactly -Times 1
-#                     Assert-MockCalled -CommandName Disable-NetAdapterBinding -Exactly -Times 0
-#                 }
-#             }
+                $testBindingMixed = @{
+                    InterfaceAlias = '*'
+                    ComponentId    = 'ms_tcpip63'
+                    State          = 'Enabled'
+                }
 
-#             Context 'Adapter exists and set binding to Disabled' {
-#                 Mock -CommandName Get-Binding -MockWith { $mockBindingEnabled }
-#                 Mock -CommandName Enable-NetAdapterBinding
-#                 Mock -CommandName Disable-NetAdapterBinding
+                $result = Get-TargetResource @testBindingMixed
 
-#                 It 'Should not throw an exception' {
-#                     { Set-TargetResource @testBindingDisabled } | Should -Not -Throw
-#                 }
+                $result.InterfaceAlias | Should -Be $testBindingMixed.InterfaceAlias
+                $result.ComponentId | Should -Be $testBindingMixed.ComponentId
+                $result.State | Should -Be 'Enabled'
+                $result.CurrentState | Should -Be 'Mixed'
+            }
+        }
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Get-Binding -Exactly -Times 1
-#                     Assert-MockCalled -CommandName Enable-NetAdapterBinding -Exactly -Times 0
-#                     Assert-MockCalled -CommandName Disable-NetAdapterBinding -Exactly -Times 1
-#                 }
-#             }
-#         }
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Get-Binding -Exactly -Times 1 -Scope Context
+        }
+    }
+}
 
-#         Describe 'DSC_NetAdapterBinding\Test-TargetResource' -Tag 'Test' {
-#             Context 'Adapter exists, current binding set to Enabled but want it Disabled' {
-#                 Mock -CommandName Get-Binding -MockWith { $mockBindingEnabled }
+Describe 'DSC_NetAdapterBinding\Set-TargetResource' -Tag 'Set' {
+    Context 'Adapter exists and set binding to Enabled' {
+        BeforeAll {
+            Mock -CommandName Get-Binding -MockWith {
+                @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    Enabled        = $False
+                }
+            }
+            Mock -CommandName Enable-NetAdapterBinding
+            Mock -CommandName Disable-NetAdapterBinding
+        }
 
-#                 It 'Should return false' {
-#                     Test-TargetResource @testBindingDisabled | Should -Be $False
-#                 }
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Get-Binding -Exactly -Times 1
-#                 }
-#             }
+                $testBindingEnabled = @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    State          = 'Enabled'
+                }
 
-#             Context 'Adapter exists, current binding set to Disabled but want it Enabled' {
-#                 Mock -CommandName Get-Binding -MockWith { $mockBindingDisabled }
+                { Set-TargetResource @testBindingEnabled } | Should -Not -Throw
+            }
+        }
 
-#                 It 'Should return false' {
-#                     Test-TargetResource @testBindingEnabled | Should -Be $False
-#                 }
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Get-Binding -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Enable-NetAdapterBinding -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Disable-NetAdapterBinding -Exactly -Times 0 -Scope Context
+        }
+    }
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Get-Binding -Exactly -Times 1
-#                 }
-#             }
+    Context 'Adapter exists and set binding to Disabled' {
+        BeforeAll {
+            Mock -CommandName Get-Binding -MockWith {
+                @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    Enabled        = $true
+                }
+            }
+            Mock -CommandName Enable-NetAdapterBinding
+            Mock -CommandName Disable-NetAdapterBinding
+        }
 
-#             Context 'Adapter exists, current binding set to Enabled and want it Enabled' {
-#                 Mock -CommandName Get-Binding -MockWith { $mockBindingEnabled }
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should return true' {
-#                     Test-TargetResource @testBindingEnabled | Should -Be $true
-#                 }
+                $testBindingDisabled = @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    State          = 'Disabled'
+                }
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Get-Binding -Exactly -Times 1
-#                 }
-#             }
+                { Set-TargetResource @testBindingDisabled } | Should -Not -Throw
+            }
+        }
 
-#             Context 'Adapter exists, current binding set to Disabled and want it Disabled' {
-#                 Mock -CommandName Get-Binding -MockWith { $mockBindingDisabled }
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Get-Binding -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Enable-NetAdapterBinding -Exactly -Times 0 -Scope Context
+            Should -Invoke -CommandName Disable-NetAdapterBinding -Exactly -Times 1 -Scope Context
+        }
+    }
+}
 
-#                 It 'Should return true' {
-#                     Test-TargetResource @testBindingDisabled | Should -Be $true
-#                 }
+Describe 'DSC_NetAdapterBinding\Test-TargetResource' -Tag 'Test' {
+    Context 'Adapter exists, current binding set to Enabled but want it Disabled' {
+        BeforeAll {
+            Mock -CommandName Get-Binding -MockWith {
+                @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    Enabled        = $true
+                }
+            }
+        }
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Get-Binding -Exactly -Times 1
-#                 }
-#             }
-#         }
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#         Describe 'DSC_NetAdapterBinding\Get-Binding' {
-#             Context 'Adapter does not exist' {
-#                 Mock -CommandName Get-NetAdapter
+                $testBindingDisabled = @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    State          = 'Disabled'
+                }
 
-#                 It 'Should throw an InterfaceNotAvailable error' {
-#                     $errorRecord = Get-InvalidArgumentRecord `
-#                         -Message ($script:localizedData.InterfaceNotAvailableError -f $testBindingEnabled.InterfaceAlias) `
-#                         -ArgumentName 'Interface'
+                Test-TargetResource @testBindingDisabled | Should -BeFalse
+            }
+        }
 
-#                     { Get-Binding @testBindingEnabled } | Should -Throw $errorRecord
-#                 }
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Get-Binding -Exactly -Times 1 -Scope Context
+        }
+    }
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-#                 }
-#             }
+    Context 'Adapter exists, current binding set to Disabled but want it Enabled' {
+        BeforeAll {
+            Mock -CommandName Get-Binding -MockWith {
+                @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    Enabled        = $False
+                }
+            }
+        }
 
-#             Context 'Adapter exists and binding enabled' {
-#                 Mock -CommandName Get-NetAdapter -MockWith { $mockAdapter }
-#                 Mock -CommandName Get-NetAdapterBinding -MockWith { $mockBindingEnabled }
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should return the adapter binding' {
-#                     $result = Get-Binding @testBindingEnabled
-#                     $result.InterfaceAlias | Should -Be $mockBindingEnabled.InterfaceAlias
-#                     $result.ComponentId | Should -Be $mockBindingEnabled.ComponentId
-#                     $result.Enabled | Should -Be $mockBindingEnabled.Enabled
-#                 }
+                $testBindingEnabled = @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    State          = 'Enabled'
+                }
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-#                     Assert-MockCalled -CommandName Get-NetAdapterBinding -Exactly -Times 1
-#                 }
-#             }
+                Test-TargetResource @testBindingEnabled | Should -BeFalse
+            }
+        }
 
-#             Context 'Adapter exists and binding disabled' {
-#                 Mock -CommandName Get-NetAdapter -MockWith { $mockAdapter }
-#                 Mock -CommandName Get-NetAdapterBinding -MockWith { $mockBindingDisabled }
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Get-Binding -Exactly -Times 1 -Scope Context
+        }
+    }
 
-#                 It 'Should return the adapter binding' {
-#                     $result = Get-Binding @testBindingDisabled
-#                     $result.InterfaceAlias | Should -Be $mockBindingDisabled.InterfaceAlias
-#                     $result.ComponentId | Should -Be $mockBindingDisabled.ComponentId
-#                     $result.Enabled | Should -Be $mockBindingDisabled.Enabled
-#                 }
+    Context 'Adapter exists, current binding set to Enabled and want it Enabled' {
+        BeforeAll {
+            Mock -CommandName Get-Binding -MockWith {
+                @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    Enabled        = $true
+                }
+            }
+        }
 
-#                 It 'Should call all the mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-#                     Assert-MockCalled -CommandName Get-NetAdapterBinding -Exactly -Times 1
-#                 }
-#             }
-#         }
-#     } #end InModuleScope $DSCResourceName
-# }
-# finally
-# {
-#     Invoke-TestCleanup
-# }
+        It 'Should return true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testBindingEnabled = @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    State          = 'Enabled'
+                }
+
+                Test-TargetResource @testBindingEnabled | Should -BeTrue
+            }
+        }
+
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Get-Binding -Exactly -Times 1 -Scope Context
+        }
+    }
+
+    Context 'Adapter exists, current binding set to Disabled and want it Disabled' {
+        BeforeAll {
+            Mock -CommandName Get-Binding -MockWith {
+                @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    Enabled        = $False
+                }
+            }
+        }
+
+        It 'Should return true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testBindingDisabled = @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    State          = 'Disabled'
+                }
+
+                Test-TargetResource @testBindingDisabled | Should -BeTrue
+            }
+        }
+
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Get-Binding -Exactly -Times 1 -Scope Context
+        }
+    }
+}
+
+Describe 'DSC_NetAdapterBinding\Get-Binding' {
+    Context 'Adapter does not exist' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter
+        }
+
+        It 'Should throw an InterfaceNotAvailable error' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testBindingEnabled = @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    State          = 'Enabled'
+                }
+
+                $errorRecord = Get-InvalidArgumentRecord `
+                    -Message ($script:localizedData.InterfaceNotAvailableError -f $testBindingEnabled.InterfaceAlias) `
+                    -ArgumentName 'InterfaceAlias'
+
+                { Get-Binding @testBindingEnabled } | Should -Throw $errorRecord
+            }
+        }
+
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Get-NetAdapter -Exactly -Times 1 -Scope Context
+        }
+    }
+
+    Context 'Adapter exists and binding enabled' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    InterfaceAlias = 'Ethernet'
+                }
+            }
+            Mock -CommandName Get-NetAdapterBinding -MockWith {
+                @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    Enabled        = $true
+                }
+            }
+        }
+
+        It 'Should return the adapter binding' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testBindingEnabled = @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    State          = 'Enabled'
+                }
+
+                $result = Get-Binding @testBindingEnabled
+
+                $result.InterfaceAlias | Should -Be 'Ethernet'
+                $result.ComponentId | Should -Be 'ms_tcpip63'
+                $result.Enabled | Should -BeTrue
+            }
+        }
+
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Get-NetAdapter -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Get-NetAdapterBinding -Exactly -Times 1 -Scope Context
+        }
+    }
+
+    Context 'Adapter exists and binding disabled' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    InterfaceAlias = 'Ethernet'
+                }
+            }
+            Mock -CommandName Get-NetAdapterBinding -MockWith {
+                @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    Enabled        = $False
+                }
+            }
+        }
+
+        It 'Should return the adapter binding' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testBindingDisabled = @{
+                    InterfaceAlias = 'Ethernet'
+                    ComponentId    = 'ms_tcpip63'
+                    State          = 'Disabled'
+                }
+
+                $result = Get-Binding @testBindingDisabled
+
+                $result.InterfaceAlias | Should -Be 'Ethernet'
+                $result.ComponentId | Should -Be 'ms_tcpip63'
+                $result.Enabled | Should -BeFalse
+            }
+        }
+
+        It 'Should call all the mocks' {
+            Should -Invoke -CommandName Get-NetAdapter -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Get-NetAdapterBinding -Exactly -Times 1 -Scope Context
+        }
+    }
+}
