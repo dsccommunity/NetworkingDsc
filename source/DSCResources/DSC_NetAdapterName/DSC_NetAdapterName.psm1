@@ -360,7 +360,7 @@ function Test-TargetResource
     # Can an adapter be found with the new name?
     $adapterWithNewName = Find-NetworkAdapter `
         -Name $NewName `
-        -Verbose:$Verbose `
+        -Verbose:$VerbosePreference `
         -ErrorAction SilentlyContinue
 
     if ($adapterWithNewName)
