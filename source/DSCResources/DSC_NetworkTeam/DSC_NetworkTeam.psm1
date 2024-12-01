@@ -132,6 +132,8 @@ function Set-TargetResource
                 Name = $Name
             }
 
+            $isNetModifyRequired = $false
+
             if ($networkTeam.loadBalancingAlgorithm -ne $LoadBalancingAlgorithm)
             {
                 Write-Verbose -Message ($script:localizedData.LoadBalancingAlgorithmDifferent -f $LoadBalancingAlgorithm)
