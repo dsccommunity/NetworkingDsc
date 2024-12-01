@@ -37,6 +37,8 @@ function Get-TargetResource
             $script:localizedData.CheckingNetAdapterMessage
         ) -join '')
 
+    $netAdapter = $null
+
     try
     {
         $netAdapter = Get-NetAdapter `
@@ -109,6 +111,8 @@ function Set-TargetResource
             "$($MyInvocation.MyCommand): "
             $script:localizedData.CheckingNetAdapterMessage
         ) -join '')
+
+    $netAdapter = $null
 
     try
     {
