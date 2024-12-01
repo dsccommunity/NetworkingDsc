@@ -1,293 +1,419 @@
-# $script:dscModuleName = 'NetworkingDsc'
-# $script:dscResourceName = 'DSC_NetAdapterRdma'
+# Suppressing this rule because Script Analyzer does not understand Pester's syntax.
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
-# function Invoke-TestSetup
-# {
-#     try
-#     {
-#         Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
-#     }
-#     catch [System.IO.FileNotFoundException]
-#     {
-#         throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
-#     }
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-#     $script:testEnvironment = Initialize-TestEnvironment `
-#         -DSCModuleName $script:dscModuleName `
-#         -DSCResourceName $script:dscResourceName `
-#         -ResourceType 'Mof' `
-#         -TestType 'Unit'
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+}
 
-#     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
-# }
+BeforeAll {
+    $script:dscModuleName = 'NetworkingDsc'
+    $script:dscResourceName = 'DSC_NetAdapterRdma'
 
-# function Invoke-TestCleanup
-# {
-#     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
-# }
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
 
-# Invoke-TestSetup
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
-# # Begin Testing
-# try
-# {
-#     InModuleScope $script:dscResourceName {
-#         # Create the Mock -CommandName Objects that will be used for running tests
-#         $testAdapterName = 'SMB1_1'
-#         $targetParameters = [PSObject] @{
-#             Name = $testAdapterName
-#         }
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscResourceName
+}
 
-#         $mockNetAdapterRdmaEnabled = [PSCustomObject] @{
-#             Name    = $testAdapterName
-#             Enabled = $true
-#         }
+AfterAll {
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
 
-#         $mockNetAdapterRdmaDisabled = [PSCustomObject] @{
-#             Name    = $testAdapterName
-#             Enabled = $false
-#         }
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 
-#         Describe 'DSC_NetAdapterRdma\Get-TargetResource' -Tag 'Get' {
-#             function Get-NetAdapterRdma
-#             {
-#             }
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 
-#             Context 'Network adapter does not exist' {
-#                 Mock -CommandName Get-NetAdapterRdma -MockWith {
-#                     throw 'Network adapter not found'
-#                 }
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
+}
 
-#                 It 'Should throw expected exception' {
-#                     $errorRecord = Get-InvalidOperationRecord `
-#                         -Message ($script:localizedData.NetAdapterNotFoundError -f $testAdapterName)
+Describe 'DSC_NetAdapterRdma\Get-TargetResource' -Tag 'Get' {
+    Context 'Network adapter does not exist' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRdma -MockWith {
+                throw 'Network adapter not found'
+            }
+        }
 
-#                     {
-#                         Get-TargetResource @targetParameters
-#                     } | Should -Throw $errorRecord
-#                 }
+        It 'Should throw expected exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should call the expected mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRdma -Exactly -Times 1
-#                 }
-#             }
+                $targetParameters = @{
+                    Name = 'SMB1_1'
+                }
 
-#             Context 'Network Team exists' {
-#                 Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaEnabled }
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($script:localizedData.NetAdapterNotFoundError -f $targetParameters.Name)
 
-#                 It 'Should return network adapter RDMA properties' {
-#                     $Result = Get-TargetResource @targetParameters
-#                     $Result.Name | Should -Be $targetParameters.Name
-#                     $Result.Enabled | Should -Be $true
-#                 }
+                { Get-TargetResource @targetParameters } | Should -Throw $errorRecord
+            }
+        }
 
-#                 It 'Should call the expected mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRdma -Exactly -Times 1
-#                 }
-#             }
-#         }
+        It 'Should call the expected mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRdma -Exactly -Times 1 -Scope Context
+        }
+    }
 
-#         Describe 'DSC_NetAdapterRdma\Set-TargetResource' -Tag 'Set' {
-#             function Get-NetAdapterRdma
-#             {
-#             }
-#             function Set-NetAdapterRdma
-#             {
-#                 param
-#                 (
-#                     [Parameter(Mandatory = $true)]
-#                     [System.String]
-#                     $Name,
+    Context 'Network Team exists' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRdma -MockWith {
+                @{
+                    Name    = 'SMB1_1'
+                    Enabled = $true
+                }
+            }
+        }
 
-#                     [Parameter(Mandatory = $true)]
-#                     [System.Boolean]
-#                     $Enabled = $true
-#                 )
-#             }
+        It 'Should return network adapter RDMA properties' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#             Context 'Net Adapter does not exist' {
-#                 Mock -CommandName Set-NetAdapterRdma
-#                 Mock -CommandName Get-NetAdapterRdma -MockWith {
-#                     throw 'Network adapter not found'
-#                 }
+                $targetParameters = @{
+                    Name = 'SMB1_1'
+                }
 
-#                 It 'Should throw expected exception' {
-#                     $setTargetResourceParameters = $targetParameters.Clone()
-#                     $setTargetResourceParameters['Enabled'] = $true
+                $Result = Get-TargetResource @targetParameters
 
-#                     $errorRecord = Get-InvalidOperationRecord `
-#                         -Message ($script:localizedData.NetAdapterNotFoundError -f $testAdapterName)
+                $Result.Name | Should -Be $targetParameters.Name
+                $Result.Enabled | Should -BeTrue
+            }
+        }
 
-#                     {
-#                         Set-TargetResource @setTargetResourceParameters
-#                     } | Should -Throw $errorRecord
-#                 }
+        It 'Should call the expected mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRdma -Exactly -Times 1 -Scope Context
+        }
+    }
+}
 
-#                 It 'Should call expected Mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRdma -Exactly -Times 1
-#                     Assert-MockCalled -CommandName Set-NetAdapterRdma -Exactly -Times 0
-#                 }
-#             }
+Describe 'DSC_NetAdapterRdma\Set-TargetResource' -Tag 'Set' {
+    Context 'Net Adapter does not exist' {
+        BeforeAll {
+            Mock -CommandName Set-NetAdapterRdma
+            Mock -CommandName Get-NetAdapterRdma -MockWith {
+                throw 'Network adapter not found'
+            }
+        }
 
-#             Context 'Net Adapter RDMA is already enabled and no action needed' {
-#                 Mock -CommandName Set-NetAdapterRdma
-#                 Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaEnabled }
+        It 'Should throw expected exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should not throw exception' {
-#                     $setTargetResourceParameters = $targetParameters.Clone()
-#                     $setTargetResourceParameters['Enabled'] = $true
-#                     {
-#                         Set-TargetResource @setTargetResourceParameters
-#                     } | Should -Not -Throw
-#                 }
+                $targetParameters = @{
+                    Name = 'SMB1_1'
+                }
 
-#                 It 'Should call expected Mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRdma -Exactly -Times 1
-#                     Assert-MockCalled -CommandName Set-NetAdapterRdma -Exactly -Times 0
-#                 }
-#             }
+                $targetParameters.Enabled = $true
 
-#             Context 'Net Adapter RDMA is disabled and should be enabled' {
-#                 Mock -CommandName Set-NetAdapterRdma
-#                 Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaDisabled }
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($script:localizedData.NetAdapterNotFoundError -f $targetParameters.Name)
 
-#                 It 'Should not throw exception' {
-#                     $setTargetResourceParameters = $targetParameters.Clone()
-#                     $setTargetResourceParameters['Enabled'] = $true
-#                     {
-#                         Set-TargetResource @setTargetResourceParameters
-#                     } | Should -Not -Throw
-#                 }
+                { Set-TargetResource @targetParameters } | Should -Throw $errorRecord
+            }
+        }
 
-#                 It 'Should call expected Mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRdma -Exactly -Times 1
-#                     Assert-MockCalled -CommandName Set-NetAdapterRdma -Exactly -Times 1
-#                 }
-#             }
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRdma -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Set-NetAdapterRdma -Exactly -Times 0 -Scope Context
+        }
+    }
 
-#             Context 'Net Adapter RDMA is enabled and should be disabled' {
-#                 Mock -CommandName Set-NetAdapterRdma
-#                 Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaEnabled }
+    Context 'Net Adapter RDMA is already enabled and no action needed' {
+        BeforeAll {
+            Mock -CommandName Set-NetAdapterRdma
+            Mock -CommandName Get-NetAdapterRdma -MockWith {
+                @{
+                    Name    = 'SMB1_1'
+                    Enabled = $true
+                }
+            }
+        }
 
-#                 It 'Should not throw exception' {
-#                     $setTargetResourceParameters = $targetParameters.Clone()
-#                     $setTargetResourceParameters['Enabled'] = $false
-#                     {
-#                         Set-TargetResource @setTargetResourceParameters
-#                     } | Should -Not -Throw
-#                 }
+        It 'Should not throw exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should call expected Mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRdma -Exactly -Times 1
-#                     Assert-MockCalled -CommandName Set-NetAdapterRdma -Exactly -Times 1
-#                 }
-#             }
+                $targetParameters = @{
+                    Name = 'SMB1_1'
+                }
 
-#             Context 'Net Adapter RDMA is already disabled and no action needed' {
-#                 Mock -CommandName Set-NetAdapterRdma
-#                 Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaDisabled }
+                $targetParameters.Enabled = $true
 
-#                 It 'Should not throw exception' {
-#                     $setTargetResourceParameters = $targetParameters.Clone()
-#                     $setTargetResourceParameters['Enabled'] = $false
-#                     {
-#                         Set-TargetResource @setTargetResourceParameters
-#                     } | Should -Not -Throw
-#                 }
+                { Set-TargetResource @targetParameters } | Should -Not -Throw
+            }
+        }
 
-#                 It 'Should call expected Mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRdma -Exactly -Times 1
-#                     Assert-MockCalled -CommandName Set-NetAdapterRdma -Exactly -Times 0
-#                 }
-#             }
-#         }
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRdma -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Set-NetAdapterRdma -Exactly -Times 0 -Scope Context
+        }
+    }
 
-#         Describe 'DSC_NetAdapterRdma\Test-TargetResource' -Tag 'Test' {
-#             function Get-NetAdapterRdma
-#             {
-#             }
+    Context 'Net Adapter RDMA is disabled and should be enabled' {
+        BeforeAll {
+            Mock -CommandName Set-NetAdapterRdma
+            Mock -CommandName Get-NetAdapterRdma -MockWith {
+                @{
+                    Name    = 'SMB1_1'
+                    Enabled = $false
+                }
+            }
+        }
 
-#             Context 'Net Adapter does not exist' {
-#                 Mock -CommandName Get-NetAdapterRdma -MockWith {
-#                     throw 'Network adapter not found'
-#                 }
+        It 'Should not throw exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should throw expected exception' {
-#                     $testTargetResourceParameters = $targetParameters.Clone()
-#                     $testTargetResourceParameters['Enabled'] = $true
+                $targetParameters = @{
+                    Name = 'SMB1_1'
+                }
 
-#                     $errorRecord = Get-InvalidOperationRecord `
-#                         -Message ($script:localizedData.NetAdapterNotFoundError -f $testAdapterName)
+                $targetParameters.Enabled = $true
 
-#                     {
-#                         Test-TargetResource @testTargetResourceParameters
-#                     } | Should -Throw $errorRecord
-#                 }
+                { Set-TargetResource @targetParameters } | Should -Not -Throw
+            }
+        }
 
-#                 It 'Should call expected Mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRdma -Exactly -Times 1
-#                 }
-#             }
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRdma -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Set-NetAdapterRdma -Exactly -Times 1 -Scope Context
+        }
+    }
 
-#             Context 'Net Adapter RDMA is already enabled and no action needed' {
-#                 Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaEnabled }
+    Context 'Net Adapter RDMA is enabled and should be disabled' {
+        BeforeAll {
+            Mock -CommandName Set-NetAdapterRdma
+            Mock -CommandName Get-NetAdapterRdma -MockWith {
+                @{
+                    Name    = 'SMB1_1'
+                    Enabled = $true
+                }
+            }
+        }
 
-#                 It 'Should return true' {
-#                     $testTargetResourceParameters = $targetParameters.Clone()
-#                     $testTargetResourceParameters['Enabled'] = $true
-#                     Test-TargetResource @testTargetResourceParameters | Should -Be $true
-#                 }
+        It 'Should not throw exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should call expected Mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRdma -Exactly -Times 1
-#                 }
-#             }
+                $targetParameters = @{
+                    Name = 'SMB1_1'
+                }
 
-#             Context 'Net Adapter RDMA is disabled and should be enabled' {
-#                 Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaDisabled }
+                $targetParameters.Enabled = $false
 
-#                 It 'Should return false' {
-#                     $testTargetResourceParameters = $targetParameters.Clone()
-#                     $testTargetResourceParameters['Enabled'] = $true
-#                     Test-TargetResource @testTargetResourceParameters | Should -Be $false
-#                 }
+                { Set-TargetResource @targetParameters } | Should -Not -Throw
+            }
+        }
 
-#                 It 'Should call expected Mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRdma -Exactly -Times 1
-#                 }
-#             }
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRdma -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Set-NetAdapterRdma -Exactly -Times 1 -Scope Context
+        }
+    }
 
-#             Context 'Net Adapter RDMA is enabled and should be disabled' {
-#                 Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaEnabled }
+    Context 'Net Adapter RDMA is already disabled and no action needed' {
+        BeforeAll {
+            Mock -CommandName Set-NetAdapterRdma
+            Mock -CommandName Get-NetAdapterRdma -MockWith {
+                @{
+                    Name    = 'SMB1_1'
+                    Enabled = $false
+                }
+            }
+        }
 
-#                 It 'Should return false' {
-#                     $testTargetResourceParameters = $targetParameters.Clone()
-#                     $testTargetResourceParameters['Enabled'] = $false
-#                     Test-TargetResource @testTargetResourceParameters | Should -Be $false
-#                 }
+        It 'Should not throw exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should call expected Mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRdma -Exactly -Times 1
-#                 }
-#             }
+                $targetParameters = @{
+                    Name = 'SMB1_1'
+                }
 
-#             Context 'Net Adapter RDMA is already disabled and no action needed' {
-#                 Mock -CommandName Get-NetAdapterRdma -MockWith { $mockNetAdapterRdmaDisabled }
+                $targetParameters.Enabled = $false
 
-#                 It 'Should return true' {
-#                     $testTargetResourceParameters = $targetParameters.Clone()
-#                     $testTargetResourceParameters['Enabled'] = $false
-#                     Test-TargetResource @testTargetResourceParameters | Should -Be $true
-#                 }
+                { Set-TargetResource @targetParameters } | Should -Not -Throw
+            }
+        }
 
-#                 It 'Should call expected Mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRdma -Exactly -Times 1
-#                 }
-#             }
-#         }
-#     }
-# }
-# finally
-# {
-#     Invoke-TestCleanup
-# }
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRdma -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Set-NetAdapterRdma -Exactly -Times 0 -Scope Context
+        }
+    }
+}
+
+Describe 'DSC_NetAdapterRdma\Test-TargetResource' -Tag 'Test' {
+    Context 'Net Adapter does not exist' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRdma -MockWith {
+                throw 'Network adapter not found'
+            }
+        }
+
+        It 'Should throw expected exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $targetParameters = @{
+                    Name = 'SMB1_1'
+                }
+
+                $targetParameters.Enabled = $true
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($script:localizedData.NetAdapterNotFoundError -f $targetParameters.Name)
+
+                { Test-TargetResource @targetParameters } | Should -Throw $errorRecord
+            }
+        }
+
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRdma -Exactly -Times 1 -Scope Context
+        }
+    }
+
+    Context 'Net Adapter RDMA is already enabled and no action needed' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRdma -MockWith {
+                @{
+                    Name    = 'SMB1_1'
+                    Enabled = $true
+                }
+            }
+        }
+
+        It 'Should return true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $targetParameters = @{
+                    Name = 'SMB1_1'
+                }
+
+                $targetParameters.Enabled = $true
+
+                Test-TargetResource @targetParameters | Should -BeTrue
+            }
+        }
+
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRdma -Exactly -Times 1 -Scope Context
+        }
+    }
+
+    Context 'Net Adapter RDMA is disabled and should be enabled' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRdma -MockWith {
+                @{
+                    Name    = 'SMB1_1'
+                    Enabled = $false
+                }
+            }
+        }
+
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $targetParameters = @{
+                    Name = 'SMB1_1'
+                }
+
+                $targetParameters.Enabled = $true
+
+                Test-TargetResource @targetParameters | Should -BeFalse
+            }
+        }
+
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRdma -Exactly -Times 1 -Scope Context
+        }
+    }
+
+    Context 'Net Adapter RDMA is enabled and should be disabled' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRdma -MockWith {
+                @{
+                    Name    = 'SMB1_1'
+                    Enabled = $true
+                }
+            }
+        }
+
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $targetParameters = @{
+                    Name = 'SMB1_1'
+                }
+
+                $targetParameters.Enabled = $false
+
+                Test-TargetResource @targetParameters | Should -BeFalse
+            }
+        }
+
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRdma -Exactly -Times 1 -Scope Context
+        }
+    }
+
+    Context 'Net Adapter RDMA is already disabled and no action needed' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRdma -MockWith {
+                @{
+                    Name    = 'SMB1_1'
+                    Enabled = $false
+                }
+            }
+        }
+
+        It 'Should return true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $targetParameters = @{
+                    Name = 'SMB1_1'
+                }
+
+                $targetParameters.Enabled = $false
+
+                Test-TargetResource @targetParameters | Should -BeTrue
+            }
+        }
+
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRdma -Exactly -Times 1 -Scope Context
+        }
+    }
+}
