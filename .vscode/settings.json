@@ -42,7 +42,8 @@
         "fourthcoffee",
         "Lbfo",
         "HKLM",
-        "HKCU"
+        "HKCU",
+        "RDMA"
     ],
     "cSpell.ignorePaths": [
         ".git"
