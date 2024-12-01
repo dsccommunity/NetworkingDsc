@@ -22,6 +22,9 @@ BeforeDiscovery {
     {
         throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
     }
+
+    # Import the NetTCPIP module
+    Import-Module -Name NetTCPIP
 }
 
 BeforeAll {
