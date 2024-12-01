@@ -1,258 +1,409 @@
-# $script:dscModuleName = 'NetworkingDsc'
-# $script:dscResourceName = 'DSC_NetAdapterRss'
+# Suppressing this rule because Script Analyzer does not understand Pester's syntax.
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
-# function Invoke-TestSetup
-# {
-#     try
-#     {
-#         Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
-#     }
-#     catch [System.IO.FileNotFoundException]
-#     {
-#         throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
-#     }
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-#     $script:testEnvironment = Initialize-TestEnvironment `
-#         -DSCModuleName $script:dscModuleName `
-#         -DSCResourceName $script:dscResourceName `
-#         -ResourceType 'Mof' `
-#         -TestType 'Unit'
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+}
 
-#     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
-# }
+BeforeAll {
+    $script:dscModuleName = 'NetworkingDsc'
+    $script:dscResourceName = 'DSC_NetAdapterRss'
 
-# function Invoke-TestCleanup
-# {
-#     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
-# }
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Unit'
 
-# Invoke-TestSetup
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
-# # Begin Testing
-# try
-# {
-#     InModuleScope $script:dscResourceName {
-#         $TestRssEnabled = @{
-#             Name    = 'Ethernet'
-#             Enabled = $true
-#         }
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscResourceName
+}
 
-#         $TestRssDisabled = @{
-#             Name    = 'Ethernet'
-#             Enabled = $false
-#         }
+AfterAll {
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
 
-#         $TestAdapterNotFound = @{
-#             Name    = 'Ethe'
-#             Enabled = $true
-#         }
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 
-#         Describe 'DSC_NetAdapterRss\Get-TargetResource' -Tag 'Get' {
-#             Context 'Adapter exist and RSS is enabled' {
-#                 Mock Get-NetAdapterRss -Verbose -MockWith { @{ Enabled = $true } }
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 
-#                 It 'Should return the RSS Enabled' {
-#                     $result = Get-TargetResource @TestRssEnabled
-#                     $result.Enabled | Should -Be $TestRSSEnabled.Enabled
-#                 }
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
+}
 
-#                 It 'Should call all mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
-#                 }
-#             }
+Describe 'DSC_NetAdapterRss\Get-TargetResource' -Tag 'Get' {
+    Context 'Adapter exist and RSS is enabled' {
+        BeforeAll {
+            Mock Get-NetAdapterRss -Verbose -MockWith {
+                @{ Enabled = $true }
+            }
+        }
 
-#             Context 'Adapter exist and RSS is disabled' {
-#                 Mock -CommandName Get-NetAdapterRSS -MockWith {
-#                     @{ Enabled = $TestRSSDisabled.Enabled }
-#                 }
+        It 'Should return the RSS Enabled' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 It 'Should return the RSS Enabled' {
-#                     $result = Get-TargetResource @TestRSSDisabled
-#                     $result.Enabled | Should -Be $TestRSSDisabled.Enabled
-#                 }
+                $TestRssEnabled = @{
+                    Name    = 'Ethernet'
+                    Enabled = $true
+                }
 
-#                 It 'Should call all mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
-#                 }
-#             }
-#             Context 'Adapter does not exist' {
+                $result = Get-TargetResource @TestRssEnabled
 
-#                 Mock -CommandName Get-NetAdapterRss -MockWith { throw 'Network adapter not found' }
+                $result.Enabled | Should -Be $TestRSSEnabled.Enabled
+            }
+        }
 
-#                 $errorRecord = Get-InvalidOperationRecord `
-#                     -Message ($script:localizedData.NetAdapterNotFoundMessage)
+        It 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRSS -Exactly -Time 1 -Scope Context
+        }
+    }
 
-#                 It 'Should throw an exception' {
-#                     { Get-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
-#                 }
+    Context 'Adapter exist and RSS is disabled' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRSS -MockWith {
+                @{ Enabled = $false }
+            }
+        }
 
-#                 It 'Should call all mocks' {
-#                     Assert-MockCalled -CommandName Get-NetAdapterRss -Exactly -Time 1
-#                 }
-#             }
+        It 'Should return the RSS Enabled' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#             Describe 'DSC_NetAdapterRss\Set-TargetResource' -Tag 'Set' {
+                $TestRssDisabled = @{
+                    Name    = 'Ethernet'
+                    Enabled = $false
+                }
 
-#                 Context 'Adapter exist, RSS is enabled, no action required' {
-#                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-#                         @{ Enabled = $TestRSSEnabled.Enabled }
-#                     }
-#                     Mock -CommandName Set-NetAdapterRSS
+                $result = Get-TargetResource @TestRSSDisabled
 
-#                     It 'Should not throw an exception' {
-#                         { Set-TargetResource @TestRSSEnabled } | Should -Not -Throw
-#                     }
+                $result.Enabled | Should -Be $TestRSSDisabled.Enabled
+            }
+        }
 
-#                     It 'Should call all mocks' {
-#                         Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
-#                         Assert-MockCalled -CommandName Set-NetAdapterRSS -Exactly -Time 0
-#                     }
-#                 }
+        It 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRSS -Exactly -Time 1 -Scope Context
+        }
+    }
+    Context 'Adapter does not exist' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRss -MockWith { throw 'Network adapter not found' }
+        }
 
-#                 Context 'Adapter exist, RSS is enabled, should be disabled' {
-#                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-#                         @{ Enabled = $TestRSSEnabled.Enabled }
-#                     }
-#                     Mock -CommandName Set-NetAdapterRSS
+        It 'Should throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                     It 'Should not throw an exception' {
-#                         { Set-TargetResource @TestRSSDisabled } | Should -Not -Throw
-#                     }
+                $TestAdapterNotFound = @{
+                    Name    = 'Ethe'
+                    Enabled = $true
+                }
 
-#                     It 'Should call all mocks' {
-#                         Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
-#                         Assert-MockCalled -CommandName Set-NetAdapterRSS -Exactly -Time 1
-#                     }
-#                 }
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($script:localizedData.NetAdapterNotFoundMessage)
 
-#                 Context 'Adapter exist, RSS is disabled, no action required' {
-#                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-#                         @{ Enabled = $TestRSSDisabled.Enabled }
-#                     }
-#                     Mock -CommandName Set-NetAdapterRSS
+                { Get-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
+            }
+        }
 
-#                     It 'Should not throw an exception' {
-#                         { Set-TargetResource @TestRSSDisabled } | Should -Not -Throw
-#                     }
+        It 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRss -Exactly -Time 1 -Scope Context
+        }
+    }
+}
 
-#                     It 'Should call all mocks' {
-#                         Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
-#                         Assert-MockCalled -CommandName Set-NetAdapterRSS -Exactly -Time 0
-#                     }
-#                 }
+Describe 'DSC_NetAdapterRss\Set-TargetResource' -Tag 'Set' {
+    Context 'Adapter exist, RSS is enabled, no action required' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRSS -MockWith {
+                @{ Enabled = $true }
+            }
 
-#                 Context 'Adapter exist, RSS is disabled, should be enabled.' {
-#                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-#                         @{ Enabled = $TestRSSDisabled.Enabled }
-#                     }
-#                     Mock -CommandName Set-NetAdapterRSS
+            Mock -CommandName Set-NetAdapterRSS
+        }
 
-#                     It 'Should not throw an exception' {
-#                         { Set-TargetResource @TestRSSEnabled } | Should -Not -Throw
-#                     }
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                     It 'Should call all mocks' {
-#                         Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
-#                         Assert-MockCalled -CommandName Set-NetAdapterRSS -Exactly -Time 1
-#                     }
-#                 }
+                $TestRssEnabled = @{
+                    Name    = 'Ethernet'
+                    Enabled = $true
+                }
 
-#                 # Adapter
-#                 Context 'Adapter does not exist' {
-#                     Mock -CommandName Get-NetAdapterRSS -MockWith { throw 'Network adapter not found' }
+                { Set-TargetResource @TestRSSEnabled } | Should -Not -Throw
+            }
+        }
 
-#                     $errorRecord = Get-InvalidOperationRecord `
-#                         -Message ($script:localizedData.NetAdapterNotFoundMessage)
+        It 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRSS -Exactly -Time 1 -Scope Context
+            Should -Invoke -CommandName Set-NetAdapterRSS -Exactly -Time 0 -Scope Context
+        }
+    }
 
-#                     It 'Should throw an exception' {
-#                         { Set-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
-#                     }
+    Context 'Adapter exist, RSS is enabled, should be disabled' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRSS -MockWith {
+                @{ Enabled = $true }
+            }
 
-#                     It 'Should call all mocks' {
-#                         Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
-#                     }
-#                 }
+            Mock -CommandName Set-NetAdapterRSS
+        }
 
-#             }
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#             Describe 'DSC_NetAdapterRss\Test-TargetResource' -Tag 'Test' {
-#                 # All
-#                 Context 'Adapter exist, RSS is enabled, no action required' {
-#                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-#                         @{ Enabled = $TestRSSEnabled.Enabled }
-#                     }
+                $TestRssDisabled = @{
+                    Name    = 'Ethernet'
+                    Enabled = $false
+                }
 
-#                     It 'Should return true' {
-#                         Test-TargetResource @TestRSSEnabled | Should -Be $true
-#                     }
+                { Set-TargetResource @TestRSSDisabled } | Should -Not -Throw
+            }
+        }
 
-#                     It 'Should call all mocks' {
-#                         Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
-#                     }
-#                 }
+        It 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRSS -Exactly -Time 1 -Scope Context
+            Should -Invoke -CommandName Set-NetAdapterRSS -Exactly -Time 1 -Scope Context
+        }
+    }
 
-#                 Context 'Adapter exist, RSS is enabled, should be disabled' {
-#                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-#                         @{ Enabled = $TestRSSEnabled.Enabled }
-#                     }
+    Context 'Adapter exist, RSS is disabled, no action required' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRSS -MockWith {
+                @{ Enabled = $false }
+            }
 
-#                     It 'Should return false' {
-#                         Test-TargetResource @TestRSSDisabled | Should -Be $false
-#                     }
+            Mock -CommandName Set-NetAdapterRSS
+        }
 
-#                     it 'Should call all mocks' {
-#                         Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
-#                     }
-#                 }
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 Context 'Adapter exist, RSS is disabled, no action required' {
-#                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-#                         @{ Enabled = $TestRSSDisabled.Enabled }
-#                     }
+                $TestRssDisabled = @{
+                    Name    = 'Ethernet'
+                    Enabled = $false
+                }
 
-#                     It 'Should return true' {
-#                         Test-TargetResource @TestRSSDisabled | Should -Be $true
-#                     }
+                { Set-TargetResource @TestRSSDisabled } | Should -Not -Throw
+            }
+        }
 
-#                     it 'Should call all mocks' {
-#                         Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
-#                     }
-#                 }
+        It 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRSS -Exactly -Time 1 -Scope Context
+            Should -Invoke -CommandName Set-NetAdapterRSS -Exactly -Time 0 -Scope Context
+        }
+    }
 
-#                 Context 'Adapter exist, RSS is disabled, should be enabled.' {
-#                     Mock -CommandName Get-NetAdapterRSS -MockWith {
-#                         @{ Enabled = $TestRSSDisabled.Enabled }
-#                     }
+    Context 'Adapter exist, RSS is disabled, should be enabled.' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRSS -MockWith {
+                @{ Enabled = $false }
+            }
 
-#                     It 'Should return false' {
-#                         Test-TargetResource @TestRSSEnabled | Should -Be $false
-#                     }
+            Mock -CommandName Set-NetAdapterRSS
+        }
 
-#                     it 'Should call all mocks' {
-#                         Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
-#                     }
-#                 }
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#                 # Adapter
-#                 Context 'Adapter does not exist' {
-#                     Mock -CommandName Get-NetAdapterRSS -MockWith { throw 'Network adapter not found' }
+                $TestRssEnabled = @{
+                    Name    = 'Ethernet'
+                    Enabled = $true
+                }
 
-#                     $errorRecord = Get-InvalidOperationRecord `
-#                         -Message ($script:localizedData.NetAdapterNotFoundMessage)
+                { Set-TargetResource @TestRSSEnabled } | Should -Not -Throw
+            }
+        }
 
-#                     It 'Should throw an exception' {
-#                         { Test-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
-#                     }
+        It 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRSS -Exactly -Time 1 -Scope Context
+            Should -Invoke -CommandName Set-NetAdapterRSS -Exactly -Time 1 -Scope Context
+        }
+    }
 
-#                     It 'Should call all mocks' {
-#                         Assert-MockCalled -CommandName Get-NetAdapterRSS -Exactly -Time 1
-#                     }
-#                 }
-#             }
-#         }
-#     }
-# }
-# finally
-# {
-#     Invoke-TestCleanup
-# }
+    # Adapter
+    Context 'Adapter does not exist' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRSS -MockWith { throw 'Network adapter not found' }
+        }
+
+        It 'Should throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $TestAdapterNotFound = @{
+                    Name    = 'Ethe'
+                    Enabled = $true
+                }
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($script:localizedData.NetAdapterNotFoundMessage)
+
+                { Set-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
+            }
+        }
+
+        It 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRSS -Exactly -Time 1 -Scope Context
+        }
+    }
+
+}
+
+Describe 'DSC_NetAdapterRss\Test-TargetResource' -Tag 'Test' {
+    # All
+    Context 'Adapter exist, RSS is enabled, no action required' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRSS -MockWith {
+                @{ Enabled = $true }
+            }
+        }
+
+        It 'Should return true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $TestRssEnabled = @{
+                    Name    = 'Ethernet'
+                    Enabled = $true
+                }
+
+                Test-TargetResource @TestRSSEnabled | Should -BeTrue
+            }
+        }
+
+        It 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRSS -Exactly -Time 1 -Scope Context
+        }
+    }
+
+    Context 'Adapter exist, RSS is enabled, should be disabled' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRSS -MockWith {
+                @{ Enabled = $true }
+            }
+        }
+
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $TestRssDisabled = @{
+                    Name    = 'Ethernet'
+                    Enabled = $false
+                }
+
+                Test-TargetResource @TestRSSDisabled | Should -BeFalse
+            }
+        }
+
+        It 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRSS -Exactly -Time 1 -Scope Context
+        }
+    }
+
+    Context 'Adapter exist, RSS is disabled, no action required' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRSS -MockWith {
+                @{ Enabled = $false }
+            }
+        }
+
+        It 'Should return true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $TestRssDisabled = @{
+                    Name    = 'Ethernet'
+                    Enabled = $false
+                }
+
+                Test-TargetResource @TestRSSDisabled | Should -BeTrue
+            }
+        }
+
+        it 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRSS -Exactly -Time 1 -Scope Context
+        }
+    }
+
+    Context 'Adapter exist, RSS is disabled, should be enabled.' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRSS -MockWith {
+                @{ Enabled = $false }
+            }
+        }
+
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $TestRssEnabled = @{
+                    Name    = 'Ethernet'
+                    Enabled = $true
+                }
+
+                Test-TargetResource @TestRSSEnabled | Should -BeFalse
+            }
+        }
+
+        it 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRSS -Exactly -Time 1 -Scope Context
+        }
+    }
+
+    # Adapter
+    Context 'Adapter does not exist' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapterRSS -MockWith { throw 'Network adapter not found' }
+        }
+
+        It 'Should throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $TestAdapterNotFound = @{
+                    Name    = 'Ethe'
+                    Enabled = $true
+                }
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($script:localizedData.NetAdapterNotFoundMessage)
+
+                { Test-TargetResource @TestAdapterNotFound } | Should -Throw $errorRecord
+            }
+        }
+
+        It 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapterRSS -Exactly -Time 1 -Scope Context
+        }
+    }
+}
