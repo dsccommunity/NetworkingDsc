@@ -171,6 +171,9 @@ public enum NetBiosSetting
 
             Context 'When setting NetBios over TCP/IP to <Setting>' -ForEach $testCases {
                 BeforeAll {
+                    # Fix intermittent test failures
+                    Wait-ForIdleLcm -Clear
+
                     $configData = @{
                         AllNodes = @(
                             @{
