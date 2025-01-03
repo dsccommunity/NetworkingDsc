@@ -11,7 +11,7 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     Each element contains 3 properties:
     Name: The parameter name
     Source: The source where the existing parameter can be pulled from
-    Type: This is the content type of the paramater (it is either array or string or blank)
+    Type: This is the content type of the parameter (it is either array or string or blank)
     A blank type means it will not be compared
     data ParameterList
     Delimiter: Only required for Profile parameter, because Get-NetFirewall rule doesn't
