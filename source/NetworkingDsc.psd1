@@ -1,6 +1,6 @@
 @{
-        # Script module or binary module file associated with this manifest.
-    RootModule            = 'NetworkingDsc.psm1'
+    # Script module or binary module file associated with this manifest.
+    RootModule           = 'NetworkingDsc.psm1'
 
     # Version number of this module.
     moduleVersion        = '0.0.1'
