@@ -125,7 +125,7 @@ DscTest:
       - output
     ExcludeModuleFile:
       - Modules/DscResource.Common
-      - NetworkingDsc.ps1
+      - NetworkingDsc.psm1
     MainGitBranch: main
 
 ####################################################
