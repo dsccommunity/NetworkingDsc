@@ -1206,7 +1206,7 @@ function Test-RuleProperties
                     #>
                     if ($null -ne $parameterNew)
                     {
-                        $parameterNew = Convert-CIDRToSubhetMask -Address $parameterNew
+                        $parameterNew = Convert-CIDRToSubnetMask -Address $parameterNew
                     }
                 }
 
@@ -1318,7 +1318,7 @@ function Get-FirewallRuleProperty
         The additional firewall objects to pull the property from.
 
     .PARAMETER Parameter
-        The entry from the ParameterList table used to retireve the parameter for.
+        The entry from the ParameterList table used to retrieve the parameter for.
 #>
 function Get-FirewallPropertyValue
 {
