@@ -55,23 +55,6 @@ AfterAll {
     Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
 }
 
-# # Get the rule that will be used for testing
-# $firewallRule = Get-NetFirewallRule |
-#     Sort-Object -Property Name |
-#     Where-Object {
-#         $_.DisplayGroup -ne $null
-#     } |
-#     Select-Object -First 1
-# $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
-
-# # Pull two rules to use testing that error is thrown when this occurs
-# $firewallRules = Get-NetFirewallRule |
-#     Sort-Object -Property Name |
-#     Where-Object -FilterScript {
-#         $_.DisplayGroup -ne $null
-#     } |
-#     Select-Object -First 2
-
 Describe 'DSC_Firewall\Get-TargetResource' -Tag 'Get' {
     BeforeDiscovery {
         $firewallRule = Get-NetFirewallRule |
