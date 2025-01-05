@@ -463,6 +463,10 @@ function Set-TargetResource
                         }
                     }
 
+                    # DisplayGroup cannot be specified with New-NetFirewallRule
+                    # https://learn.microsoft.com/en-us/powershell/module/netsecurity/new-netfirewallrule#-group
+                    $null = $PSBoundParameters.Remove('DisplayGroup')
+
                     New-NetFirewallRule @PSBoundParameters
                 }
                 else
