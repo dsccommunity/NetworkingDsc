@@ -447,7 +447,7 @@ function Set-TargetResource
                         Loop through each possible property and if it is not passed as a parameter
                         then set the PSBoundParameter property to the exiting rule value.
                     #>
-                    foreach ($parameter in $ParametersList)
+                    foreach ($parameter in $ParameterList)
                     {
                         if (-not $PSBoundParameters.ContainsKey($parameter.Name))
                         {
