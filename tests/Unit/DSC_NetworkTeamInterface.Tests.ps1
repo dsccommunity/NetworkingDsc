@@ -55,66 +55,6 @@ AfterAll {
     Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
 }
 
-# # Create the Mock -CommandName Objects that will be used for running tests
-# $script:testNicName = 'HostTeamNic'
-# $script:testTeamName = 'HostTeam'
-
-# $mockNetTeamNic = @{
-#     Name = 'HostTeamNic'
-#     Team = 'HostTeam'
-# }
-
-# $testTeamNic = @{
-#     Name     = 'HostTeamNic'
-#     TeamName = 'HostTeam'
-#     Verbose  = $true
-# }
-
-# $newTeamNic = @{
-#     Name     = 'HostTeamNic'
-#     TeamName = 'HostTeam'
-#     VlanId   = 100
-#     Verbose  = $true
-# }
-
-# $mockTeamNic = {
-#     @{
-#         Name   = 'HostTeamNic'
-#         Team   = 'HostTeam'
-#         VlanId = 100
-#     }
-# }
-
-# $mockTeamNicDefaultVLAN = {
-#     @{
-#         Name   = 'HostTeamNic'
-#         Team   = 'HostTeam'
-#         VlanId = $null
-#     }
-# }
-
-# $getNetLbfoTeamNic_ParameterFilter = {
-#     $Name -eq 'HostTeamNic' `
-#         -and $Team -eq 'HostTeam'
-# }
-
-# $addNetLbfoTeamNic_ParameterFilter = {
-#     $Name -eq 'HostTeamNic' `
-#         -and $Team -eq 'HostTeam' `
-#         -and $VlanId -eq 100
-# }
-
-# $setNetLbfoTeamNic_ParameterFilter = {
-#     $Name -eq 'HostTeamNic' `
-#         -and $Team -eq 'HostTeam' `
-#         -and $VlanId -eq 105
-# }
-
-# $removeNetLbfoTeamNic_ParameterFilter = {
-#     $Team -eq 'HostTeam' `
-#         -and $VlanId -eq 100
-# }
-
 Describe 'DSC_NetworkTeamInterface\Get-TargetResource' -Tag 'Get' {
     BeforeAll {
         $mockTeamNic = {
