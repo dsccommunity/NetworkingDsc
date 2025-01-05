@@ -891,6 +891,102 @@ Describe 'DSC_Firewall\Test-RuleProperties' {
     }
 
     Context 'When testing with a rule that has property differences' -ForEach $firewallRule {
+        BeforeDiscovery {
+            $testCases = @(
+                @{
+                    PropertyName  = 'Name'
+                    PropertyValue = 'Different'
+                },
+                @{
+                    PropertyName  = 'DisplayName'
+                    PropertyValue = 'Different'
+                },
+                @{
+                    PropertyName  = 'Group'
+                    PropertyValue = 'Different'
+                },
+                @{
+                    PropertyName  = 'RemotePort'
+                    PropertyValue = 1
+                },
+                @{
+                    PropertyName  = 'LocalPort'
+                    PropertyValue = 1
+                },
+                @{
+                    PropertyName  = 'Description'
+                    PropertyValue = 'Different'
+                },
+                @{
+                    PropertyName  = 'Program'
+                    PropertyValue = 'Different'
+                },
+                @{
+                    PropertyName  = 'Service'
+                    PropertyValue = 'Different'
+                },
+                @{
+                    PropertyName  = 'InterfaceAlias'
+                    PropertyValue = 'Different'
+                },
+                @{
+                    PropertyName  = 'LocalAddress'
+                    PropertyValue = @('10.0.0.1/255.0.0.0', '10.1.1.0-10.1.2.0')
+                },
+                @{
+                    PropertyName  = 'LocalUser'
+                    PropertyValue = 'Different'
+                },
+                @{
+                    PropertyName  = 'Package'
+                    PropertyValue = 'Different'
+                },
+                @{
+                    PropertyName  = 'Platform'
+                    PropertyValue = @('6.2')
+                },
+                @{
+                    PropertyName  = 'RemoteAddress'
+                    PropertyValue = @('10.0.0.1/255.0.0.0', '10.1.1.0-10.1.2.0')
+                },
+                @{
+                    PropertyName  = 'RemoteMachine'
+                    PropertyValue = 'Different'
+                },
+                @{
+                    PropertyName  = 'RemoteUser'
+                    PropertyValue = 'Different'
+                },
+                @{
+                    PropertyName  = 'DynamicTransport'
+                    PropertyValue = 'WifiDirectDevices'
+                },
+                @{
+                    PropertyName  = 'EdgeTraversalPolicy'
+                    PropertyValue = 'DeferToApp'
+                },
+                @{
+                    PropertyName  = 'IcmpType'
+                    PropertyValue = @('53', '54')
+                },
+                @{
+                    PropertyName  = 'LocalOnlyMapping'
+                    PropertyValue = ! $compareRule.LocalOnlyMapping
+                },
+                @{
+                    PropertyName  = 'LooseSourceMapping'
+                    PropertyValue = ! $compareRule.LooseSourceMapping
+                },
+                @{
+                    PropertyName  = 'OverrideBlockRules'
+                    PropertyValue = ! $compareRule.OverrideBlockRules
+                },
+                @{
+                    PropertyName  = 'Owner'
+                    PropertyValue = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
+                }
+            )
+        }
         BeforeAll {
             $properties = Get-FirewallRuleProperty -FirewallRule $_
 
@@ -939,39 +1035,13 @@ Describe 'DSC_Firewall\Test-RuleProperties' {
             }
         }
 
-        Context 'When testing with a rule with a different name' {
+        Context 'When testing with a rule with a different ''<PropertyName>''' -ForEach $testCases {
             It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
+                InModuleScope -Parameters $_ -ScriptBlock {
                     Set-StrictMode -Version 1.0
 
                     $compareRule = $testRuleProperties.Clone()
-                    $compareRule.Name = 'Different'
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different displayname' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.DisplayName = 'Different'
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different group' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.Group = 'Different'
+                    $compareRule.$PropertyName = $PropertyValue
 
                     Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
                 }
@@ -1062,32 +1132,6 @@ Describe 'DSC_Firewall\Test-RuleProperties' {
             }
         }
 
-        Context 'When testing with a rule with a different remote port' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.RemotePort = 1
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different local port' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.LocalPort = 1
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
         Context 'When testing with a rule with a different protocol' {
             It "Should return False on firewall rule $($firewallRule.Name)" {
                 InModuleScope -ScriptBlock {
@@ -1103,45 +1147,6 @@ Describe 'DSC_Firewall\Test-RuleProperties' {
                     {
                         $compareRule.Protocol = 'TCP'
                     }
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different description' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.Description = 'Different'
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different program' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.Program = 'Different'
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different service' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.Service = 'Different'
 
                     Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
                 }
@@ -1190,19 +1195,6 @@ Describe 'DSC_Firewall\Test-RuleProperties' {
             }
         }
 
-        Context 'When testing with a rule with a different InterfaceAlias' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.InterfaceAlias = 'Different'
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
         Context 'When testing with a rule with a different InterfaceType' {
             It "Should return False on firewall rule $($firewallRule.Name)" {
                 InModuleScope -ScriptBlock {
@@ -1218,188 +1210,6 @@ Describe 'DSC_Firewall\Test-RuleProperties' {
                     {
                         $compareRule.InterfaceType = 'Wired'
                     }
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different LocalAddress' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.LocalAddress = @('10.0.0.1/255.0.0.0', '10.1.1.0-10.1.2.0')
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different LocalUser' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.LocalUser = 'Different'
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different Package' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.Package = 'Different'
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different Platform' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.Platform = @('6.2')
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different RemoteAddress' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.RemoteAddress = @('10.0.0.1/255.0.0.0', '10.1.1.0-10.1.2.0')
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different RemoteMachine' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.RemoteMachine = 'Different'
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different RemoteUser' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.RemoteUser = 'Different'
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different DynamicTransport' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.DynamicTransport = 'WifiDirectDevices'
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different EdgeTraversalPolicy' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.EdgeTraversalPolicy = 'DeferToApp'
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different IcmpType' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.IcmpType = @('53', '54')
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different LocalOnlyMapping' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.LocalOnlyMapping = ! $compareRule.LocalOnlyMapping
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different LooseSourceMapping' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.LooseSourceMapping = ! $compareRule.LooseSourceMapping
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different OverrideBlockRules' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.OverrideBlockRules = ! $compareRule.OverrideBlockRules
-
-                    Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
-                }
-            }
-        }
-
-        Context 'When testing with a rule with a different Owner' {
-            It "Should return False on firewall rule $($firewallRule.Name)" {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $compareRule = $testRuleProperties.Clone()
-                    $compareRule.Owner = (Get-CimInstance win32_useraccount | Select-Object -First 1).Sid
 
                     Test-RuleProperties -FirewallRule $firewallRule @compareRule | Should -BeFalse
                 }
