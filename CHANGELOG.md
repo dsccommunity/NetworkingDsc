@@ -15,6 +15,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Update build pieline to pin GitVersion v5.
 - Tests
   - Update to use Pester 5.
+- `New-InvalidArgumentException` change to `New-ArgumentException` for HQRM.
+
+### Fixed
+
+- `DSC_Firewall`
+  - Fixed comment typo.
+  - Fixed `ParameterList` in `Set-TargetResource` typo.
+  - Remove `DisplayGroup` property when creating new firewall rule.
+  - `Test-RuleProperties`
+    - Fixed `Convert-CIDRToSubnetMask` function call typo.
+    -
+
+### Removed
+
+- `NetworkingDsc.Common`
+  - Functions moved to separate files in Public directory.
+  - Each resource removed import at top of file.
+- `Build.psd1`
+  - Removed as not required.
+- `DSC_IPAddress`
+  - Remove IPv6 prefix length as unused.
 
 ## [9.0.0] - 2022-05-30
 
