@@ -469,7 +469,7 @@ function Assert-ResourceProperty
 
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $($($script:localizedData.InterfaceNotAvailableError) -f $InterfaceAlias) `
             -ArgumentName 'InterfaceAlias'
     }
@@ -495,7 +495,7 @@ function Assert-ResourceProperty
                     -and (($prefixLength -lt [uint32]0) -or ($prefixLength -gt [uint32]128))
             ))
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message $($($script:localizedData.PrefixLengthError) -f $prefixLength, $AddressFamily) `
                 -ArgumentName 'IPAddress'
         }

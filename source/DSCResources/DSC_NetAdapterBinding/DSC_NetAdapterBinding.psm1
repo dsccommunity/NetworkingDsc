@@ -257,7 +257,7 @@ function Get-Binding
 
     if (-not (Get-NetAdapter -Name $InterfaceAlias -ErrorAction SilentlyContinue))
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias) `
             -ArgumentName 'InterfaceAlias'
     } # if

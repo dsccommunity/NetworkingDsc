@@ -147,7 +147,7 @@ function Assert-ResourceProperty
 
     if (-not (Get-NetAdapter | Where-Object Name -EQ $InterfaceAlias))
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias) `
             -ArgumentName 'InterfaceAlias'
     }
@@ -156,7 +156,7 @@ function Assert-ResourceProperty
     {
         if (-not ([System.Net.IPAddress]::TryParse($ip, [ref]0)))
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message ($script:localizedData.AddressFormatError -f $ip)
                 -ArgumentName 'Address'
         }

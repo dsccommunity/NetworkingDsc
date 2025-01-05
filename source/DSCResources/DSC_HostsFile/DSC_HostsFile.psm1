@@ -99,7 +99,7 @@ function Set-TargetResource
 
     if ($Ensure -eq 'Present' -and $PSBoundParameters.ContainsKey('IPAddress') -eq $false)
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $script:localizedData.UnableToEnsureWithoutIP `
             -ArgumentName 'IPAddress'
     }

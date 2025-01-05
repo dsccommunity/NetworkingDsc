@@ -610,7 +610,7 @@ function Assert-ResourceProperty
     # Validate the Adapter exists
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $($($script:localizedData.InterfaceNotAvailableError) -f $InterfaceAlias) `
             -ArgumentName 'InterfaceAlias'
     }
