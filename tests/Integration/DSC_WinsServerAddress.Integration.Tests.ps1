@@ -152,7 +152,7 @@ Describe 'WinsServerAddress Integration Tests' {
         AfterEach {
             Wait-ForIdleLcm
         }
-        
+
         It 'Should compile and apply the MOF without throwing' {
             {
                 # This is to pass to the Config

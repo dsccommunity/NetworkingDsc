@@ -87,8 +87,8 @@ Describe 'WaitForNetworkTeam Integration Tests' -Skip:$script:Skip {
             -TeamingMode 'SwitchIndependent' `
             -Confirm:$false
 
-            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
-            . $configFile
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+        . $configFile
     }
 
     AfterAll {
@@ -142,7 +142,7 @@ Describe 'WaitForNetworkTeam Integration Tests' -Skip:$script:Skip {
                 $result = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
-                
+
                 $result.Ensure                 | Should -Be $configurationData.AllNodes[0].Ensure
                 $result.Name                   | Should -Be $configurationData.AllNodes[0].Name
             }

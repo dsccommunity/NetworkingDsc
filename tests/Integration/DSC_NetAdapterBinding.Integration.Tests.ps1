@@ -91,7 +91,7 @@ Describe 'NetAdapterBinding Integration Tests' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
             }
-            
+
             $current.InterfaceAlias | Should -Be $TestDisableIPv4.InterfaceAlias
             $current.ComponentId    | Should -Be $TestDisableIPv4.ComponentId
             $current.State          | Should -Be $TestDisableIPv4.State

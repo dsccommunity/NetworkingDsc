@@ -90,7 +90,7 @@ Describe 'DnsClientGlobalSetting Integration Tests' {
         AfterEach {
             Wait-ForIdleLcm
         }
-        
+
         It 'Should compile and apply the MOF without throwing' {
             {
                 & "$($script:dscResourceName)_Config" `

@@ -91,7 +91,7 @@ Describe 'IPAddressOption Integration Tests' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
             }
-            
+
             $current[0].InterfaceAlias | Should -Be $TestIPAddress.InterfaceAlias
             $current[0].AddressFamily  | Should -Be $TestIPAddress.AddressFamily
             $current[0].IPAddress      | Should -Be $TestIPAddress.IPAddress

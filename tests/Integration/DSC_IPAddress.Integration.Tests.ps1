@@ -65,7 +65,7 @@ Describe 'HostsFile Integration Tests' {
         Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
         Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
     }
-    
+
     Describe "$($script:dscResourceName)_Integration" {
         Context 'When a single IP address is specified' {
             BeforeAll {

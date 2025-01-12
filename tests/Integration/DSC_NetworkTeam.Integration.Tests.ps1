@@ -88,11 +88,11 @@ Describe 'NetworkTeam Integration Tests' -Skip:$script:Skip {
     }
 
     AfterAll {
-    # Remove the team just in case it wasn't removed correctly
-    Remove-NetLbfoTeam `
-        -Name 'TestTeam' `
-        -Confirm:$false `
-        -ErrorAction SilentlyContinue
+        # Remove the team just in case it wasn't removed correctly
+        Remove-NetLbfoTeam `
+            -Name 'TestTeam' `
+            -Confirm:$false `
+            -ErrorAction SilentlyContinue
     }
 
     Describe "$($script:dscResourceName)_Integration" {

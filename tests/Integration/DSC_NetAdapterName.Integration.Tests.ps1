@@ -195,7 +195,7 @@ Describe 'NetAdapterName Integration Tests' {
             $current = Get-DscConfiguration | Where-Object -FilterScript {
                 $_.ConfigurationName -eq "$($script:dscResourceName)_Config_NameOnly"
             }
-            
+
             $current.Name | Should -Be 'NetworkingDscLBANew'
         }
     }
