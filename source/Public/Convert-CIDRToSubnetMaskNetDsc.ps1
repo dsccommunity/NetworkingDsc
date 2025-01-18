@@ -6,7 +6,7 @@
     .PARAMETER Address
         The array of addresses to that need to be converted.
 #>
-function Convert-CIDRToSubnetMask
+function Convert-CIDRToSubnetMaskNetDsc
 {
     [CmdletBinding()]
     [OutputType([ Microsoft.Management.Infrastructure.CimInstance])]

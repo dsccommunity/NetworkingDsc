@@ -194,7 +194,7 @@ Describe 'Firewall Integration Tests' {
 
                 for ([int] $entry = 0; $entry -lt $parameterNew.Count; $entry++)
                 {
-                    $parameterValue[$entry] | Should -Be (Convert-CIDRToSubnetMask -Address $parameterNew[$entry])
+                    $parameterValue[$entry] | Should -Be (Convert-CIDRToSubnetMaskNetDsc -Address $parameterNew[$entry])
                 }
             }
 
@@ -303,7 +303,7 @@ Describe 'Firewall Integration Tests' {
 
                 for ([int] $entry = 0; $entry -lt $parameterNew.Count; $entry++)
                 {
-                    $parameterValue[$entry] | Should -Be (Convert-CIDRToSubnetMask -Address $parameterNew[$entry])
+                    $parameterValue[$entry] | Should -Be (Convert-CIDRToSubnetMaskNetDsc -Address $parameterNew[$entry])
                 }
             }
 

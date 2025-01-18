@@ -1210,7 +1210,7 @@ function Test-RuleProperties
                     #>
                     if ($null -ne $parameterNew)
                     {
-                        $parameterNew = Convert-CIDRToSubnetMask -Address $parameterNew
+                        $parameterNew = Convert-CIDRToSubnetMaskNetDsc -Address $parameterNew
                     }
                 }
 

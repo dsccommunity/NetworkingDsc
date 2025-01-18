@@ -42,13 +42,13 @@ AfterAll {
     Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
 }
 
-Describe 'Convert-CIDRToSubnetMask' {
+Describe 'Convert-CIDRToSubnetMaskNetDsc' {
     Context 'Subnet Mask Notation Used "192.168.0.0/255.255.0.0"' {
         It 'Should Return "192.168.0.0/255.255.0.0"' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                Convert-CIDRToSubnetMask -Address @('192.168.0.0/255.255.0.0') | Should -Be '192.168.0.0/255.255.0.0'
+                Convert-CIDRToSubnetMaskNetDscc -Address @('192.168.0.0/255.255.0.0') | Should -Be '192.168.0.0/255.255.0.0'
             }
         }
     }
@@ -58,7 +58,7 @@ Describe 'Convert-CIDRToSubnetMask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                Convert-CIDRToSubnetMask -Address @('192.168.0.10/255.255.0.0') | Should -Be '192.168.0.0/255.255.0.0'
+                Convert-CIDRToSubnetMaskNetDsc -Address @('192.168.0.10/255.255.0.0') | Should -Be '192.168.0.0/255.255.0.0'
             }
         }
     }
@@ -68,7 +68,7 @@ Describe 'Convert-CIDRToSubnetMask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                Convert-CIDRToSubnetMask -Address @('192.168.0.0/16') | Should -Be '192.168.0.0/255.255.0.0'
+                Convert-CIDRToSubnetMaskNetDsc -Address @('192.168.0.0/16') | Should -Be '192.168.0.0/255.255.0.0'
             }
         }
     }
@@ -78,7 +78,7 @@ Describe 'Convert-CIDRToSubnetMask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                Convert-CIDRToSubnetMask -Address @('192.168.0.10/16') | Should -Be '192.168.0.0/255.255.0.0'
+                Convert-CIDRToSubnetMaskNetDsc -Address @('192.168.0.10/16') | Should -Be '192.168.0.0/255.255.0.0'
             }
         }
     }
@@ -88,7 +88,7 @@ Describe 'Convert-CIDRToSubnetMask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $Result = Convert-CIDRToSubnetMask -Address @('192.168.0.0/16', '10.0.0.24/255.255.255.0')
+                $Result = Convert-CIDRToSubnetMaskNetDsc -Address @('192.168.0.0/16', '10.0.0.24/255.255.255.0')
                 $Result[0] | Should -Be '192.168.0.0/255.255.0.0'
                 $Result[1] | Should -Be '10.0.0.0/255.255.255.0'
             }
@@ -100,7 +100,7 @@ Describe 'Convert-CIDRToSubnetMask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                Convert-CIDRToSubnetMask -Address @('192.168.1.0-192.168.1.128') | Should -Be '192.168.1.0-192.168.1.128'
+                Convert-CIDRToSubnetMaskNetDsc -Address @('192.168.1.0-192.168.1.128') | Should -Be '192.168.1.0-192.168.1.128'
             }
         }
     }
@@ -110,7 +110,7 @@ Describe 'Convert-CIDRToSubnetMask' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                Convert-CIDRToSubnetMask -Address @('fe80::/112') | Should -Be 'fe80::/112'
+                Convert-CIDRToSubnetMaskNetDsc -Address @('fe80::/112') | Should -Be 'fe80::/112'
             }
         }
     }
