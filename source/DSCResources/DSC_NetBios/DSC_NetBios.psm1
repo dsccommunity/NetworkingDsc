@@ -1,10 +1,5 @@
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
-# Import the Networking Common Modules
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-            -ChildPath 'NetworkingDsc.Common.psm1'))
-
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
 # Import Localization Strings
@@ -196,8 +191,8 @@ function Set-TargetResource
         Write-Verbose -Message ($script:localizedData.SetNetBiosMessage -f $netAdapter.NetConnectionID, $Setting)
 
         $netAdapterConfig = $netAdapter | Get-CimAssociatedInstance `
-                    -ResultClassName Win32_NetworkAdapterConfiguration `
-                    -ErrorAction Stop
+            -ResultClassName Win32_NetworkAdapterConfiguration `
+            -ErrorAction Stop
 
         Set-NetAdapterNetbiosOptions `
             -NetworkAdapterObject $netAdapterConfig `
@@ -263,12 +258,12 @@ function Get-NetAdapterNetbiosOptionsFromRegistry
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidatePattern("^\{[a-zA-Z0-9]{8}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{12}\}$")]
+        [ValidatePattern('^\{[a-zA-Z0-9]{8}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{4}\-[a-zA-Z0-9]{12}\}$')]
         [System.String]
         $NetworkAdapterGUID,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('Default','Enable','Disable')]
+        [ValidateSet('Default', 'Enable', 'Disable')]
         [System.String]
         $Setting
     )
@@ -308,7 +303,7 @@ function Get-NetAdapterNetbiosOptionsFromRegistry
         default
         {
             # Unknown value. Returning invalid setting to trigger Set-TargetResource
-            [System.String[]] $invalidSetting = 'Default','Enable','Disable' | Where-Object -FilterScript {
+            [System.String[]] $invalidSetting = 'Default', 'Enable', 'Disable' | Where-Object -FilterScript {
                 $_ -ne $Setting
             }
 
@@ -352,7 +347,7 @@ function Set-NetAdapterNetbiosOptions
         $InterfaceAlias,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('Default','Enable','Disable')]
+        [ValidateSet('Default', 'Enable', 'Disable')]
         [System.String]
         $Setting
     )
@@ -368,7 +363,7 @@ function Set-NetAdapterNetbiosOptions
                 -ErrorAction Stop `
                 -Arguments @{
                     TcpipNetbiosOptions = [uint32][NetBiosSetting]::$Setting.value__
-                }
+            }
 
         if ($result.ReturnValue -ne 0)
         {
@@ -390,5 +385,3 @@ function Set-NetAdapterNetbiosOptions
         $null = Set-ItemProperty @setItemPropertyParameters
     }
 } # end function Set-NetAdapterNetbiosOptions
-
-Export-ModuleMember -Function *-TargetResource

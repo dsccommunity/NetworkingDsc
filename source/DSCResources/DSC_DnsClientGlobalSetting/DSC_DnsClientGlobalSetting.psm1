@@ -1,10 +1,5 @@
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
-# Import the Networking Common Modules
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-            -ChildPath 'NetworkingDsc.Common.psm1'))
-
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
 # Import Localization Strings
@@ -130,7 +125,7 @@ function Set-TargetResource
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($script:localizedData.DnsClientGlobalSettingUpdateParameterMessage) `
-                        -f $parameter.Name,($parameterNewValue -join ',')
+                        -f $parameter.Name, ($parameterNewValue -join ',')
                 ) -join '' )
         } # if
     } # foreach
@@ -263,5 +258,3 @@ function Test-TargetResource
 
     return $desiredConfigurationMatch
 } # Test-TargetResource
-
-Export-ModuleMember -Function *-TargetResource

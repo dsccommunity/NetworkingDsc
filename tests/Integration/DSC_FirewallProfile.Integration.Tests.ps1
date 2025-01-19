@@ -1,35 +1,59 @@
-$script:dscModuleName = 'NetworkingDsc'
-$script:dscResourceName = 'DSC_FirewallProfile'
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Suppressing this rule because Script Analyzer does not understand Pester syntax.')]
+param ()
 
-try
-{
-    Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+            }
+
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+
+    <#
+        Need to define that variables here to be used in the Pester Discover to
+        build the ForEach-blocks.
+    #>
+    $script:dscResourceFriendlyName = 'FirewallProfile'
+    $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
 }
-catch [System.IO.FileNotFoundException]
-{
-    throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+
+BeforeAll {
+    # Need to define the variables here which will be used in Pester Run.
+    $script:dscModuleName = 'NetworkingDsc'
+    $script:dscResourceFriendlyName = 'FirewallProfile'
+    $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Integration'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-$script:testEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:dscModuleName `
-    -DSCResourceName $script:dscResourceName `
-    -ResourceType 'Mof' `
-    -TestType 'Integration'
+AfterAll {
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
 
-# Load the parameter List from the data file
-$moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-$resourceData = Import-LocalizedData `
-    -BaseDirectory (Join-Path -Path $moduleRoot -ChildPath 'Source\DscResources\DSC_FirewallProfile') `
-    -FileName 'DSC_FirewallProfile.data.psd1'
-
-$parameterList = $resourceData.ParameterList | Where-Object -Property IntTest -eq $True
-
-# Begin Testing
-try
-{
-    Describe 'FirewallProfile Integration Tests' {
+Describe 'FirewallProfile Integration Tests' {
+    BeforeAll {
         # Backup the existing settings
         $script:firewallProfileName = 'Public'
         $script:currentFirewallProfile = Get-NetFirewallProfile -Name $script:firewallProfileName
@@ -88,64 +112,87 @@ try
 
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
         . $configFile
+    }
 
-        Describe "$($script:dscResourceName)_Integration" {
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    & "$($script:dscResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
-                    Start-DscConfiguration `
-                        -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
+    AfterAll {
+        # Clean up
+        Set-NetFirewallProfile `
+            -Name $script:firewallProfileName `
+            -Enabled $script:currentFirewallProfile.Enabled `
+            -DefaultInboundAction $script:currentFirewallProfile.DefaultInboundAction `
+            -DefaultOutboundAction $script:currentFirewallProfile.DefaultOutboundAction `
+            -AllowInboundRules $script:currentFirewallProfile.AllowInboundRules `
+            -AllowLocalFirewallRules $script:currentFirewallProfile.AllowLocalFirewallRules `
+            -AllowLocalIPsecRules $script:currentFirewallProfile.AllowLocalIPsecRules `
+            -AllowUserApps $script:currentFirewallProfile.AllowUserApps `
+            -AllowUserPorts $script:currentFirewallProfile.AllowUserPorts `
+            -AllowUnicastResponseToMulticast $script:currentFirewallProfile.AllowUnicastResponseToMulticast `
+            -NotifyOnListen $script:currentFirewallProfile.NotifyOnListen `
+            -EnableStealthModeForIPsec $script:currentFirewallProfile.EnableStealthModeForIPsec `
+            -LogFileName $script:currentFirewallProfile.LogFileName `
+            -LogMaxSizeKilobytes $script:currentFirewallProfile.LogMaxSizeKilobytes `
+            -LogAllowed $script:currentFirewallProfile.LogAllowed `
+            -LogBlocked $script:currentFirewallProfile.LogBlocked `
+            -LogIgnored $script:currentFirewallProfile.LogIgnored `
+            -DisabledInterfaceAliases $script:currentFirewallProfile.DisabledInterfaceAliases
 
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
+        # Remove Loopback Adapter
+        Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
+    }
 
-            # Get the DNS Client Global Settings details
-            $firewallProfileNew = Get-NetFirewallProfile -Name $script:firewallProfileName
+    Describe "$($script:dscResourceName)_Integration" {
+        AfterEach {
+            Wait-ForIdleLcm
+        }
 
-            # Use the Parameters List to perform these tests
-            foreach ($parameter in $parameterList)
+        It 'Should compile and apply the MOF without throwing' {
             {
-                $parameterName = $parameter.name
-                $parameterCurrentValue = (Get-Variable -Name 'firewallProfileNew').value.$($parameter.name)
-                $parameterNewValue = (Get-Variable -Name configData).Value.AllNodes[0].$($parameter.Name)
+                & "$($script:dscResourceName)_Config" `
+                    -OutputPath $TestDrive `
+                    -ConfigurationData $configData
+                Start-DscConfiguration `
+                    -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+            } | Should -Not -Throw
+        }
 
-                It "Should have set the '$parameterName' to '$parameterNewValue'" {
-                    $parameterCurrentValue | Should -Be $parameterNewValue
-                }
+        It 'Should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+        }
+
+        Context 'When checking the parameters' {
+            BeforeDiscovery {
+                $testCases = @(
+                    'AllowInboundRules',
+                    'AllowLocalFirewallRules',
+                    'AllowLocalIPsecRules',
+                    'AllowUnicastResponseToMulticast',
+                    'AllowUserApps',
+                    'AllowUserPorts',
+                    'DefaultInboundAction',
+                    'DefaultOutboundAction',
+                    'DisabledInterfaceAliases',
+                    'Enabled',
+                    'EnableStealthModeForIPsec',
+                    'LogAllowed',
+                    'LogBlocked',
+                    'LogFileName',
+                    'LogIgnored',
+                    'LogMaxSizeKilobytes',
+                    'NotifyOnListen'
+                )
+            }
+
+            BeforeAll {
+                # Get the DNS Client Global Settings details
+                $firewallProfileNew = Get-NetFirewallProfile -Name $script:firewallProfileName
+            }
+
+            It 'Should have set parameter <_> correctly' -ForEach $testCases {
+                $parameterCurrentValue = (Get-Variable -Name 'firewallProfileNew').value.$_
+                $parameterNewValue = (Get-Variable -Name configData).Value.AllNodes[0].$_
+
+                $parameterCurrentValue | Should -Be $parameterNewValue
             }
         }
     }
-}
-finally
-{
-    # Clean up
-    Set-NetFirewallProfile `
-        -Name $script:firewallProfileName `
-        -Enabled $script:currentFirewallProfile.Enabled `
-        -DefaultInboundAction $script:currentFirewallProfile.DefaultInboundAction `
-        -DefaultOutboundAction $script:currentFirewallProfile.DefaultOutboundAction `
-        -AllowInboundRules $script:currentFirewallProfile.AllowInboundRules `
-        -AllowLocalFirewallRules $script:currentFirewallProfile.AllowLocalFirewallRules `
-        -AllowLocalIPsecRules $script:currentFirewallProfile.AllowLocalIPsecRules `
-        -AllowUserApps $script:currentFirewallProfile.AllowUserApps `
-        -AllowUserPorts $script:currentFirewallProfile.AllowUserPorts `
-        -AllowUnicastResponseToMulticast $script:currentFirewallProfile.AllowUnicastResponseToMulticast `
-        -NotifyOnListen $script:currentFirewallProfile.NotifyOnListen `
-        -EnableStealthModeForIPsec $script:currentFirewallProfile.EnableStealthModeForIPsec `
-        -LogFileName $script:currentFirewallProfile.LogFileName `
-        -LogMaxSizeKilobytes $script:currentFirewallProfile.LogMaxSizeKilobytes `
-        -LogAllowed $script:currentFirewallProfile.LogAllowed `
-        -LogBlocked $script:currentFirewallProfile.LogBlocked `
-        -LogIgnored $script:currentFirewallProfile.LogIgnored `
-        -DisabledInterfaceAliases $script:currentFirewallProfile.DisabledInterfaceAliases
-
-    # Remove Loopback Adapter
-    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA'
-
-    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

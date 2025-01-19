@@ -1,16 +1,32 @@
-$script:dscModuleName = 'NetworkingDsc'
-$script:dscResourceName = 'DSC_NetAdapterState'
+# Suppressing this rule because Script Analyzer does not understand Pester's syntax.
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
-function Invoke-TestSetup
-{
+BeforeDiscovery {
     try
     {
-        Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+            }
+
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
     }
     catch [System.IO.FileNotFoundException]
     {
-        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
     }
+}
+
+BeforeAll {
+    $script:dscModuleName = 'NetworkingDsc'
+    $script:dscResourceName = 'DSC_NetAdapterState'
 
     $script:testEnvironment = Initialize-TestEnvironment `
         -DSCModuleName $script:dscModuleName `
@@ -19,297 +35,486 @@ function Invoke-TestSetup
         -TestType 'Unit'
 
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+
+    # Import the NetAdapter module to load the required NET_IF_ADMIN_STATUS enums
+    Import-Module -Name NetAdapter
+
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscResourceName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscResourceName
 }
 
-function Invoke-TestCleanup
-{
+AfterAll {
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
+
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
+
+    # Remove module NetAdapter.
+    Get-Module -Name 'NetAdapter' -All | Remove-Module -Force
+
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
 }
 
-Invoke-TestSetup
-
-# Begin Testing
-try
-{
-    InModuleScope $script:dscResourceName {
-        # Import the NetAdapter module to load the required NET_IF_ADMIN_STATUS enums
-        Import-Module -Name NetAdapter
-
-        $netAdapterEnabled = [PSCustomObject]@{
-            Name        = 'Ethernet'
-            AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Up
-            State       = 'Enabled'
+Describe 'DSC_NetAdapterState\Get-TargetResource' -Tag 'Get' {
+    Context 'When adapter exists and is enabled' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name        = 'Ethernet'
+                    AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Up
+                    State       = 'Enabled'
+                }
+            }
         }
 
-        $netAdapterDisabled = [PSCustomObject]@{
-            Name        = 'Ethernet'
-            AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Down
-            State       = 'Disabled'
-        }
+        It 'Should return the state of the network adapter' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-        $netAdapterUnsupported = [PSCustomObject]@{
-            Name        = 'Ethernet'
-            AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Testing
-        }
-
-        Describe 'DSC_NetAdapterState\Get-TargetResource' -Tag 'Get' {
-            BeforeEach {
                 $getTargetResource = @{
-                    Name    = 'Ethernet'
-                    State   = 'Enabled'
-                    Verbose = $true
+                    Name  = 'Ethernet'
+                    State = 'Enabled'
                 }
+
+                $result = Get-TargetResource @getTargetResource
+
+                $result.State | Should -Be 'Enabled'
             }
+        }
 
-            Context 'When adapter exists and is enabled' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $netAdapterEnabled
-                }
+        It 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapter -Exactly -Times 1 -Scope Context
+        }
+    }
 
-                It 'Should return the state of the network adapter' {
-                    $result = Get-TargetResource @getTargetResource
-                    $result.State | Should -Be 'Enabled'
-                }
-
-                It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                }
-            }
-
-            Context 'When adapter exists and is in unsupported state' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $netAdapterUnsupported
-                }
-
-                It 'Should return the state of the network adapter' {
-                    $result = Get-TargetResource @getTargetResource
-                    $result.State | Should -Be 'Unsupported'
-                }
-            }
-
-            Context 'When adapter exists and is disabled' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $netAdapterDisabled
-                }
-
-                It 'Should return the state of the network adapter' {
-                    $result = Get-TargetResource @getTargetResource
-                    $result.State | Should -Be 'Disabled'
-                }
-
-                It 'Should call all mocks' {
-                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                }
-            }
-
-            Context 'When Get-NetAdapter returns error' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    Throw 'Throwing from Get-NetAdapter'
-                }
-
-                It 'Should display warning when network adapter cannot be found' {
-                    $warning = Get-TargetResource @getTargetResource 3>&1
-                    $warning.Message | Should -Be "Get-TargetResource: Network adapter 'Ethernet' not found."
+    Context 'When adapter exists and is in unsupported state' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name        = 'Ethernet'
+                    AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Testing
                 }
             }
         }
 
-        Describe 'DSC_NetAdapterState\Set-TargetResource' -Tag 'Set' {
-            BeforeEach {
-                $setTargetResourceEnabled = @{
-                    Name    = 'Ethernet'
-                    State   = 'Enabled'
-                    Verbose = $true
+        It 'Should return the state of the network adapter' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $getTargetResource = @{
+                    Name  = 'Ethernet'
+                    State = 'Enabled'
                 }
 
-                $setTargetResourceDisabled = @{
-                    Name    = 'Ethernet'
-                    State   = 'Disabled'
-                    Verbose = $true
-                }
+                $result = Get-TargetResource @getTargetResource
+
+                $result.State | Should -Be 'Unsupported'
             }
+        }
+    }
 
-            Context 'When adapter exists and is enabled, desired state is enabled, no action required' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $netAdapterEnabled
-                }
-                Mock -CommandName Disable-NetAdapter
-                Mock -CommandName Enable-NetAdapter
-
-                It 'Should not throw an exception' {
-                    { Set-TargetResource @setTargetResourceEnabled } | Should -Not -Throw
-                }
-
-                It 'Should not call Disable-NetAdapter' {
-                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                    Assert-MockCalled -CommandName Disable-NetAdapter -Exactly -Times 0
-                    Assert-MockCalled -CommandName Enable-NetAdapter -Exactly -Times 0
-                }
-            }
-
-            Context 'When adapter exists and is enabled, desired state is disabled, should be disabled' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $netAdapterEnabled
-                }
-                Mock -CommandName Disable-NetAdapter
-
-                It 'Should not throw an exception' {
-                    { Set-TargetResource @setTargetResourceDisabled } | Should -Not -Throw
-                }
-
-                It 'Should call Disable-NetAdapter' {
-                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                    Assert-MockCalled -CommandName Disable-NetAdapter -Exactly -Times 1 -ParameterFilter {
-                        $Name -eq $setTargetResourceEnabled.Name
-                    }
-                }
-            }
-
-            Context 'When adapter exists and is disabled, desired state is disabled, no action required' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $netAdapterDisabled
-                }
-                Mock -CommandName Disable-NetAdapter
-                Mock -CommandName Enable-NetAdapter
-
-                It 'Should not throw an exception' {
-                    { Set-TargetResource @setTargetResourceDisabled } | Should -Not -Throw
-                }
-
-                It 'Should not call Enable-NetAdapter' {
-                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                    Assert-MockCalled -CommandName Disable-NetAdapter -Exactly -Times 0
-                    Assert-MockCalled -CommandName Enable-NetAdapter -Exactly -Times 0
-                }
-            }
-
-            Context 'When adapter exists and is disabled, desired state is enabled, should be enabled' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $netAdapterDisabled
-                }
-                Mock -CommandName Enable-NetAdapter
-
-                It 'Should not throw an exception' {
-                    { Set-TargetResource @setTargetResourceEnabled } | Should -Not -Throw
-                }
-
-                It 'Should call Enable-NetAdapter' {
-                    Assert-MockCalled -CommandName Get-NetAdapter -Exactly -Times 1
-                    Assert-MockCalled -CommandName Enable-NetAdapter -Exactly -Times 1 -ParameterFilter {
-                        $Name -eq $setTargetResourceEnabled.Name
-                    }
-                }
-            }
-
-            Context 'When adapter exists and is disabled, desired state is enabled, set failed' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $netAdapterDisabled
-                }
-
-                Mock -CommandName Enable-NetAdapter -MockWith {
-                    Throw 'Throwing from Enable-NetAdapter'
-                }
-
-                $errorText = "Set-TargetResource: Failed to set network adapter 'Ethernet' to state 'Enabled'. Error: 'Throwing from Enable-NetAdapter'."
-
-                It 'Should raise a non terminating error' {
-                    $netAdapterError = Set-TargetResource @setTargetResourceEnabled -ErrorAction Continue 2>&1
-                    $netAdapterError.Exception.Message | Should -Be $errorText
-                }
-            }
-
-            Context 'When adapter does not exist and desired state is enabled' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    throw 'Throwing from Get-NetAdapter'
-                }
-
-                $errorText = "Set-TargetResource: Network adapter 'Ethernet' not found."
-
-                It 'Should raise a non terminating error' {
-                    $netAdapterError = Set-TargetResource @setTargetResourceEnabled -ErrorAction Continue 2>&1
-                    $netAdapterError.Exception.Message | Should -Be $errorText
+    Context 'When adapter exists and is disabled' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name        = 'Ethernet'
+                    AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Down
+                    State       = 'Disabled'
                 }
             }
         }
 
-        Describe 'DSC_NetAdapterState\Test-TargetResource' -Tag 'Test' {
-            BeforeEach {
-                $testTargetResourceEnabled = @{
-                    Name    = 'Ethernet'
-                    State   = 'Enabled'
-                    Verbose = $true
+        It 'Should return the state of the network adapter' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $getTargetResource = @{
+                    Name  = 'Ethernet'
+                    State = 'Enabled'
                 }
 
-                $testTargetResourceDisabled = @{
-                    Name    = 'Ethernet'
-                    State   = 'Disabled'
-                    Verbose = $true
-                }
+                $result = Get-TargetResource @getTargetResource
+
+                $result.State | Should -Be 'Disabled'
             }
+        }
 
-            Context 'When adapter exists and is enabled, desired state is enabled, test true' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $netAdapterEnabled
-                }
+        It 'Should call all mocks' {
+            Should -Invoke -CommandName Get-NetAdapter -Exactly -Times 1 -Scope Context
+        }
+    }
 
-                It 'Should return true' {
-                    Test-TargetResource @testTargetResourceEnabled | Should -Be $true
-                }
+    Context 'When Get-NetAdapter returns error' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                throw 'Throwing from Get-NetAdapter'
             }
+        }
 
-            Context 'When adapter exists and is enabled, desired state is disabled, test false' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $netAdapterEnabled
+        It 'Should display warning when network adapter cannot be found' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $getTargetResource = @{
+                    Name  = 'Ethernet'
+                    State = 'Enabled'
                 }
 
-                It 'Should return false' {
-                    Test-TargetResource @testTargetResourceDisabled | Should -Be $false
-                }
-            }
+                $warning = Get-TargetResource @getTargetResource 3>&1
 
-            Context 'When adapter exists and is disabled, desired state is disabled, test true' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $netAdapterDisabled
-                }
-
-                It 'Should return true' {
-                    Test-TargetResource @testTargetResourceDisabled | Should -Be $true
-                }
-            }
-
-            Context 'When adapter exists and is disabled, desired state is enabled, test false' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $netAdapterDisabled
-                }
-
-                It 'Should return false' {
-                    Test-TargetResource @testTargetResourceEnabled | Should -Be $false
-                }
-            }
-
-            Context 'When adapter exists and is in Unsupported state, desired state is enabled, test false' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $netAdapterUnsupported
-                }
-
-                It 'Should return false' {
-                    Test-TargetResource @testTargetResourceEnabled | Should -Be $false
-                }
-            }
-
-            Context 'When adapter does not exist, desired state is enabled, test false' {
-                Mock -CommandName Get-NetAdapter -MockWith {
-                    $null
-                }
-
-                It 'Should return false' {
-                    Test-TargetResource @testTargetResourceEnabled | Should -Be $false
-                }
+                $warning.Message | Should -Be "Get-TargetResource: Network adapter 'Ethernet' not found."
             }
         }
     }
 }
-finally
-{
-    Invoke-TestCleanup
+
+Describe 'DSC_NetAdapterState\Set-TargetResource' -Tag 'Set' {
+    Context 'When adapter exists and is enabled, desired state is enabled, no action required' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name        = 'Ethernet'
+                    AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Up
+                    State       = 'Enabled'
+                }
+            }
+
+            Mock -CommandName Disable-NetAdapter
+            Mock -CommandName Enable-NetAdapter
+        }
+
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $setTargetResourceEnabled = @{
+                    Name  = 'Ethernet'
+                    State = 'Enabled'
+                }
+
+                { Set-TargetResource @setTargetResourceEnabled } | Should -Not -Throw
+            }
+        }
+
+        It 'Should not call Disable-NetAdapter' {
+            Should -Invoke -CommandName Get-NetAdapter -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Disable-NetAdapter -Exactly -Times 0 -Scope Context
+            Should -Invoke -CommandName Enable-NetAdapter -Exactly -Times 0 -Scope Context
+        }
+    }
+
+    Context 'When adapter exists and is enabled, desired state is disabled, should be disabled' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name        = 'Ethernet'
+                    AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Up
+                    State       = 'Enabled'
+                }
+            }
+
+            Mock -CommandName Disable-NetAdapter
+        }
+
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $setTargetResourceDisabled = @{
+                    Name  = 'Ethernet'
+                    State = 'Disabled'
+                }
+
+                { Set-TargetResource @setTargetResourceDisabled } | Should -Not -Throw
+            }
+        }
+
+        It 'Should call Disable-NetAdapter' {
+            Should -Invoke -CommandName Get-NetAdapter -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Disable-NetAdapter -Exactly -Times 1 -Scope Context -ParameterFilter {
+                $Name -eq 'Ethernet'
+            }
+        }
+    }
+
+    Context 'When adapter exists and is disabled, desired state is disabled, no action required' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name        = 'Ethernet'
+                    AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Down
+                    State       = 'Disabled'
+                }
+            }
+
+            Mock -CommandName Disable-NetAdapter
+            Mock -CommandName Enable-NetAdapter
+        }
+
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $setTargetResourceDisabled = @{
+                    Name  = 'Ethernet'
+                    State = 'Disabled'
+                }
+
+                { Set-TargetResource @setTargetResourceDisabled } | Should -Not -Throw
+            }
+        }
+
+        It 'Should not call Enable-NetAdapter' {
+            Should -Invoke -CommandName Get-NetAdapter -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Disable-NetAdapter -Exactly -Times 0 -Scope Context
+            Should -Invoke -CommandName Enable-NetAdapter -Exactly -Times 0 -Scope Context
+        }
+    }
+
+    Context 'When adapter exists and is disabled, desired state is enabled, should be enabled' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name        = 'Ethernet'
+                    AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Down
+                    State       = 'Disabled'
+                }
+            }
+
+            Mock -CommandName Enable-NetAdapter
+        }
+
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $setTargetResourceEnabled = @{
+                    Name  = 'Ethernet'
+                    State = 'Enabled'
+                }
+
+                { Set-TargetResource @setTargetResourceEnabled } | Should -Not -Throw
+            }
+        }
+
+        It 'Should call Enable-NetAdapter' {
+            Should -Invoke -CommandName Get-NetAdapter -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Enable-NetAdapter -Exactly -Times 1 -Scope Context -ParameterFilter {
+                $Name -eq 'Ethernet'
+            }
+        }
+    }
+
+    Context 'When adapter exists and is disabled, desired state is enabled, set failed' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name        = 'Ethernet'
+                    AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Down
+                    State       = 'Disabled'
+                }
+            }
+
+            Mock -CommandName Enable-NetAdapter -MockWith {
+                throw 'Throwing from Enable-NetAdapter'
+            }
+        }
+
+
+        It 'Should raise a non terminating error' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $setTargetResourceEnabled = @{
+                    Name  = 'Ethernet'
+                    State = 'Enabled'
+                }
+
+                $errorText = "Set-TargetResource: Failed to set network adapter 'Ethernet' to state 'Enabled'. Error: 'Throwing from Enable-NetAdapter'."
+
+                $netAdapterError = Set-TargetResource @setTargetResourceEnabled -ErrorAction Continue 2>&1
+
+                $netAdapterError.Exception.Message | Should -Be $errorText
+            }
+        }
+    }
+
+    Context 'When adapter does not exist and desired state is enabled' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                throw 'Throwing from Get-NetAdapter'
+            }
+        }
+
+
+        It 'Should raise a non terminating error' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $setTargetResourceEnabled = @{
+                    Name  = 'Ethernet'
+                    State = 'Enabled'
+                }
+
+                $errorText = "Set-TargetResource: Network adapter 'Ethernet' not found."
+
+                $netAdapterError = Set-TargetResource @setTargetResourceEnabled -ErrorAction Continue 2>&1
+
+                $netAdapterError.Exception.Message | Should -Be $errorText
+            }
+        }
+    }
+}
+
+Describe 'DSC_NetAdapterState\Test-TargetResource' -Tag 'Test' {
+    Context 'When adapter exists and is enabled, desired state is enabled, test true' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name        = 'Ethernet'
+                    AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Up
+                    State       = 'Enabled'
+                }
+            }
+        }
+
+        It 'Should return true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testTargetResourceEnabled = @{
+                    Name  = 'Ethernet'
+                    State = 'Enabled'
+                }
+
+                Test-TargetResource @testTargetResourceEnabled | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When adapter exists and is enabled, desired state is disabled, test false' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name        = 'Ethernet'
+                    AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Up
+                    State       = 'Enabled'
+                }
+            }
+        }
+
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testTargetResourceDisabled = @{
+                    Name  = 'Ethernet'
+                    State = 'Disabled'
+                }
+
+                Test-TargetResource @testTargetResourceDisabled | Should -BeFalse
+            }
+        }
+    }
+
+    Context 'When adapter exists and is disabled, desired state is disabled, test true' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name        = 'Ethernet'
+                    AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Down
+                    State       = 'Disabled'
+                }
+            }
+        }
+
+        It 'Should return true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testTargetResourceDisabled = @{
+                    Name  = 'Ethernet'
+                    State = 'Disabled'
+                }
+
+                Test-TargetResource @testTargetResourceDisabled | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'When adapter exists and is disabled, desired state is enabled, test false' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name        = 'Ethernet'
+                    AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Down
+                    State       = 'Disabled'
+                }
+            }
+        }
+
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testTargetResourceEnabled = @{
+                    Name  = 'Ethernet'
+                    State = 'Enabled'
+                }
+
+                Test-TargetResource @testTargetResourceEnabled | Should -BeFalse
+            }
+        }
+    }
+
+    Context 'When adapter exists and is in Unsupported state, desired state is enabled, test false' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                @{
+                    Name        = 'Ethernet'
+                    AdminStatus = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Testing
+                }
+            }
+        }
+
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testTargetResourceEnabled = @{
+                    Name  = 'Ethernet'
+                    State = 'Enabled'
+                }
+
+                Test-TargetResource @testTargetResourceEnabled | Should -BeFalse
+            }
+        }
+    }
+
+    Context 'When adapter does not exist, desired state is enabled, test false' {
+        BeforeAll {
+            Mock -CommandName Get-NetAdapter -MockWith {
+                $null
+            }
+        }
+
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testTargetResourceEnabled = @{
+                    Name  = 'Ethernet'
+                    State = 'Enabled'
+                }
+
+                Test-TargetResource @testTargetResourceEnabled | Should -BeFalse
+            }
+        }
+    }
 }

@@ -36,7 +36,15 @@
         "keepachangelog",
         "notin",
         "pscmdlet",
-        "steppable"
+        "steppable",
+        "contoso",
+        "fabrikam",
+        "fourthcoffee",
+        "Lbfo",
+        "HKLM",
+        "HKCU",
+        "RDMA",
+        "Netbios"
     ],
     "cSpell.ignorePaths": [
         ".git"
