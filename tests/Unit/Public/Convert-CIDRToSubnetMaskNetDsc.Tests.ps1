@@ -48,7 +48,7 @@ Describe 'Convert-CIDRToSubnetMaskNetDsc' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                Convert-CIDRToSubnetMaskNetDscc -Address @('192.168.0.0/255.255.0.0') | Should -Be '192.168.0.0/255.255.0.0'
+                Convert-CIDRToSubnetMaskNetDsc -Address @('192.168.0.0/255.255.0.0') | Should -Be '192.168.0.0/255.255.0.0'
             }
         }
     }
