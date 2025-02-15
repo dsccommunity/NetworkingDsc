@@ -10,7 +10,7 @@ BeforeDiscovery {
             if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
             {
                 # Redirect all streams to $null, except the error stream (stream 2)
-                & "$PSScriptRoot/../../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+                & "$PSScriptRoot/../../../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
             }
 
             # If the dependencies has not been resolved, this will throw an error.
@@ -25,12 +25,18 @@ BeforeDiscovery {
 
 BeforeAll {
     $script:dscModuleName = 'NetworkingDsc'
+    $script:subModuleName = 'NetworkingDsc.Common'
 
-    Import-Module -Name $script:dscModuleName
+    $script:parentModule = Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1
+    $script:subModulesFolder = Join-Path -Path $script:parentModule.ModuleBase -ChildPath 'Modules'
 
-    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscModuleName
+    $script:subModulePath = Join-Path -Path $script:subModulesFolder -ChildPath $script:subModuleName
+
+    Import-Module -Name $script:subModulePath -Force -ErrorAction 'Stop'
+
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:subModuleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:subModuleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:subModuleName
 }
 
 AfterAll {
@@ -39,10 +45,10 @@ AfterAll {
     $PSDefaultParameterValues.Remove('Should:ModuleName')
 
     # Unload the module being tested so that it doesn't impact any other tests.
-    Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
+    Get-Module -Name $script:subModuleName -All | Remove-Module -Force
 }
 
-Describe 'Public\Format-Win32NetworkADapterFilterByNetConnectionID' {
+Describe 'NetworkingDsc.Common\Format-Win32NetworkAdapterFilterByNetConnectionID' {
     Context 'When interface alias has an ''*''' {
         BeforeAll {
             InModuleScope -ScriptBlock {
@@ -56,8 +62,8 @@ Describe 'Public\Format-Win32NetworkADapterFilterByNetConnectionID' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).Contains('%') -eq $true -and
-                (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).Contains('*') -eq $false | Should -BeTrue
+                (Format-Win32NetworkAdapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).Contains('%') -eq $true -and
+                (Format-Win32NetworkAdapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias).Contains('*') -eq $false | Should -BeTrue
             }
         }
 
@@ -65,7 +71,7 @@ Describe 'Public\Format-Win32NetworkADapterFilterByNetConnectionID' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
+                (Format-Win32NetworkAdapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
             }
         }
 
@@ -73,7 +79,7 @@ Describe 'Public\Format-Win32NetworkADapterFilterByNetConnectionID' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
+                Format-Win32NetworkAdapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
             }
         }
     }
@@ -91,7 +97,7 @@ Describe 'Public\Format-Win32NetworkADapterFilterByNetConnectionID' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                (Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
+                (Format-Win32NetworkAdapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias) | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
             }
         }
 
@@ -99,7 +105,7 @@ Describe 'Public\Format-Win32NetworkADapterFilterByNetConnectionID' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
+                Format-Win32NetworkAdapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID LIKE "Ether%"'
             }
         }
     }
@@ -111,7 +117,7 @@ Describe 'Public\Format-Win32NetworkADapterFilterByNetConnectionID' {
 
                 $interfaceAlias = 'Ethernet'
 
-                Format-Win32NetworkADapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID="Ethernet"'
+                Format-Win32NetworkAdapterFilterByNetConnectionID -InterfaceAlias $interfaceAlias | Should -BeExactly 'NetConnectionID="Ethernet"'
             }
         }
     }

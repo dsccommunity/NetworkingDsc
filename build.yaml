@@ -44,7 +44,6 @@ BuildWorkflow:
 CopyPaths:
   - en-US
   - DSCResources
-Prefix: prefix.ps1
 Encoding: UTF8
 BuiltModuleSubdirectory: builtModule
 
@@ -76,6 +75,14 @@ NestedModule:
   DscResource.Common:
     CopyOnly: true
     Path: ./output/RequiredModules/DscResource.Common
+    AddToManifest: false
+    Exclude: PSGetModuleInfo.xml
+  NetworkingDsc.Common:
+    Prefix: prefix.ps1
+    VersionedOutputDirectory: false
+    CopyPaths:
+      - en-US
+    Encoding: UTF8
     AddToManifest: false
     Exclude: PSGetModuleInfo.xml
 

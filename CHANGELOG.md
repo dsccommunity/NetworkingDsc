@@ -12,10 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI Pipeline
   - Updated pipeline files to match current DSC Community patterns - fixes [Issue #528](https://github.com/dsccommunity/NetworkingDsc/issues/528).
   - Updated HQRM and build steps to use windows-latest image.
-  - Update build pieline to pin GitVersion v5.
+  - Update build pipeline to pin GitVersion v5.
 - Tests
   - Update to use Pester 5.
 - `New-InvalidArgumentException` change to `New-ArgumentException` for HQRM.
+- `NetworkingDsc.Common`
+  - Changed to a buildable module.
 
 ### Fixed
 
@@ -29,9 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- `NetworkingDsc.Common`
-  - Functions moved to separate files in Public directory.
-  - Each resource removed import at top of file.
 - `Build.psd1`
   - Removed as not required.
 - `DSC_IPAddress`

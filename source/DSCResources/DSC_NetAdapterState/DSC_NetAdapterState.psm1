@@ -1,5 +1,10 @@
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
+# Import the Networking Common Modules
+Import-Module -Name (Join-Path -Path $modulePath `
+        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
+            -ChildPath 'NetworkingDsc.Common.psm1'))
+
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
 # Import Localization Strings
@@ -48,9 +53,9 @@ function Get-TargetResource
     catch
     {
         Write-Warning -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $script:localizedData.NetAdapterNotFoundMessage -f $Name
-        ) -join '')
+                "$($MyInvocation.MyCommand): "
+                $script:localizedData.NetAdapterNotFoundMessage -f $Name
+            ) -join '')
     }
 
     if ($netAdapter)
@@ -65,16 +70,25 @@ function Get-TargetResource
             https://docs.microsoft.com/en-us/windows/desktop/api/ifdef/ne-ifdef-net_if_admin_status
         #>
 
-        $enabled  = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Up
+        $enabled = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Up
         $disabled = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.NetAdapter.NET_IF_ADMIN_STATUS]::Down
 
         $result = @{
             Name  = $Name
             State = switch ($netAdapter.AdminStatus)
             {
-                $enabled  { 'Enabled' }
-                $disabled { 'Disabled' }
-                default   { 'Unsupported' }
+                $enabled
+                {
+                    'Enabled' 
+                }
+                $disabled
+                {
+                    'Disabled' 
+                }
+                default
+                {
+                    'Unsupported' 
+                }
             }
         }
 
@@ -123,17 +137,17 @@ function Set-TargetResource
     catch
     {
         Write-Error -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $script:localizedData.NetAdapterNotFoundMessage -f $Name
-        ) -join '')
+                "$($MyInvocation.MyCommand): "
+                $script:localizedData.NetAdapterNotFoundMessage -f $Name
+            ) -join '')
     }
 
     if ($netAdapter -and $State -ne $netAdapter.State)
     {
         Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($script:localizedData.SettingNetAdapterStateMessage -f $Name, $State)
-        ) -join '')
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.SettingNetAdapterStateMessage -f $Name, $State)
+            ) -join '')
 
         try
         {
@@ -154,9 +168,9 @@ function Set-TargetResource
         catch
         {
             Write-Error -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($script:localizedData.NetAdapterSetFailedMessage -f $Name, $State, $_)
-            ) -join '')
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.NetAdapterSetFailedMessage -f $Name, $State, $_)
+                ) -join '')
         }
     }
 }

@@ -44,7 +44,8 @@
         "HKLM",
         "HKCU",
         "RDMA",
-        "Netbios"
+        "Netbios",
+        "HQRM"
     ],
     "cSpell.ignorePaths": [
         ".git"

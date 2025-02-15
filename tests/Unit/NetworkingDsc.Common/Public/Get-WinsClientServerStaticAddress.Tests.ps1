@@ -10,7 +10,7 @@ BeforeDiscovery {
             if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
             {
                 # Redirect all streams to $null, except the error stream (stream 2)
-                & "$PSScriptRoot/../../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+                & "$PSScriptRoot/../../../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
             }
 
             # If the dependencies has not been resolved, this will throw an error.
@@ -25,12 +25,18 @@ BeforeDiscovery {
 
 BeforeAll {
     $script:dscModuleName = 'NetworkingDsc'
+    $script:subModuleName = 'NetworkingDsc.Common'
 
-    Import-Module -Name $script:dscModuleName
+    $script:parentModule = Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1
+    $script:subModulesFolder = Join-Path -Path $script:parentModule.ModuleBase -ChildPath 'Modules'
 
-    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Mock:ModuleName'] = $script:dscModuleName
-    $PSDefaultParameterValues['Should:ModuleName'] = $script:dscModuleName
+    $script:subModulePath = Join-Path -Path $script:subModulesFolder -ChildPath $script:subModuleName
+
+    Import-Module -Name $script:subModulePath -Force -ErrorAction 'Stop'
+
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:subModuleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:subModuleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:subModuleName
 }
 
 AfterAll {
@@ -39,10 +45,10 @@ AfterAll {
     $PSDefaultParameterValues.Remove('Should:ModuleName')
 
     # Unload the module being tested so that it doesn't impact any other tests.
-    Get-Module -Name $script:dscModuleName -All | Remove-Module -Force
+    Get-Module -Name $script:subModuleName -All | Remove-Module -Force
 }
 
-Describe 'Public\Get-WinsClientServerStaticAddress' {
+Describe 'NetworkingDsc.Common\Get-WinsClientServerStaticAddress' {
     BeforeAll {
         # Generate the adapter data to be used for Mocking
         $interfaceAlias = 'Adapter'
