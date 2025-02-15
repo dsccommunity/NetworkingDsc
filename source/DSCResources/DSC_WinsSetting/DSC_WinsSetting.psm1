@@ -121,8 +121,8 @@ function Set-TargetResource
         -ClassName Win32_NetworkAdapterConfiguration `
         -MethodName EnableWins `
         -Arguments @{
-        DNSEnabledForWINSResolution = $EnableDns
-        WINSEnableLMHostsLookup     = $EnableLmHosts
+            DNSEnabledForWINSResolution = $EnableDns
+            WINSEnableLMHostsLookup     = $EnableLmHosts
         }
 
     if ($result.ReturnValue -ne 0)
