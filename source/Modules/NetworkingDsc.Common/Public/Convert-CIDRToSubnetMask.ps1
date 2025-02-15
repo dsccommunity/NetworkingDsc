@@ -9,7 +9,7 @@
 function Convert-CIDRToSubnetMask
 {
     [CmdletBinding()]
-    [OutputType([ Microsoft.Management.Infrastructure.CimInstance])]
+    [OutputType([Microsoft.Management.Infrastructure.CimInstance])]
     param
     (
         [Parameter(Mandatory = $true)]

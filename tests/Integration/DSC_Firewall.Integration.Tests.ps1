@@ -43,11 +43,23 @@ BeforeAll {
         -TestType 'Integration'
 
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+
+    $script:subModuleName = 'NetworkingDsc.Common'
+
+    $script:parentModule = Get-Module -Name $script:dscModuleName -ListAvailable | Select-Object -First 1
+    $script:subModulesFolder = Join-Path -Path $script:parentModule.ModuleBase -ChildPath 'Modules'
+
+    $script:subModulePath = Join-Path -Path $script:subModulesFolder -ChildPath $script:subModuleName
+
+    Import-Module -Name $script:subModulePath -Force -ErrorAction 'Stop'
 }
 
 AfterAll {
     # Remove module common test helper.
     Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
+
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:subModuleName -All | Remove-Module -Force
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
