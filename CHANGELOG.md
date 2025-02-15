@@ -35,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed as not required.
 - `DSC_IPAddress`
   - Remove IPv6 prefix length as unused.
+- `CommonTestHelper`
+  - Use `Get-InvalidArgumentRecord` from `DscResource.Test`.
 
 ## [9.0.0] - 2022-05-30
 
