@@ -32,6 +32,8 @@ The **NetworkingDsc** module contains the following resources:
 
 - **DefaultGatewayAddress**: Sets a node's default gateway address.
 - **DnsClientGlobalSetting**: Configure DNS client global settings.
+- **DnsClientNrptGlobal**: Configure the global Name Resolution Policy Table (NRPT) settings.
+- **DnsClientNrptRule**: Sets a NRPT rule on a node.
 - **DnsConnectionSuffix**: Sets a node's network interface
     connection-specific DNS suffix.
 - **DnsServerAddress**: Sets a node's DNS server address(s).

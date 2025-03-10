@@ -39,6 +39,8 @@
     DscResourcesToExport = @(
         'DefaultGatewayAddress',
         'DnsClientGlobalSetting',
+        'DnsClientNrptGlobal',
+        'DnsClientNrptRule',
         'DnsConnectionSuffix',
         'DNSServerAddress',
         'Firewall',
