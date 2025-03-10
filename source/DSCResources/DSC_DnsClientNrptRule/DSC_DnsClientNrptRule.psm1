@@ -473,7 +473,7 @@ function Test-TargetResource
         # The NrptRule should exist
         if ($NrptRule)
         {
-            # The route exists and does - but check the parameters
+            # The NrptRule exists and does - but check the parameters
             $currentState = Get-TargetResource -Name $Name
 
             return Test-DscParameterState -CurrentValues $currentState -DesiredValues $PSBoundParameters
