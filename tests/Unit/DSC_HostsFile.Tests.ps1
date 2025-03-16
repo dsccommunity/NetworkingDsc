@@ -361,6 +361,62 @@ Describe 'DSC_HostsFile' {
 
                 $result.Ensure | Should -Be 'Absent'
             }
+
+            Context 'When a host entry has leading spaces' {
+                $testParams = @{
+                    HostName  = 'www.anotherexample.com'
+                    IPAddress = '127.0.0.1'
+                    Verbose   = $true
+                }
+
+                Mock -CommandName Get-Content -MockWith {
+                    return @(
+                        '# A mocked example of a host file - this line is a comment',
+                        '',
+                        '127.0.0.1       localhost',
+                        '# comment',
+                        '  127.0.0.1  www.anotherexample.com',
+                        ''
+                    )
+                }
+
+                It 'Should return absent from the get method' {
+                    (Get-TargetResource @testParams).Ensure | Should -Be 'Present'
+                }
+            }
+
+            Context 'When a host entry exists and is not correct, but has a leading space' {
+                $testParams = @{
+                    HostName  = 'www.contoso.com'
+                    IPAddress = '192.168.0.156'
+                    Verbose   = $true
+                }
+
+                Mock -CommandName Get-Content -MockWith {
+                    return @(
+                        '# A mocked example of a host file - this line is a comment',
+                        '',
+                        '127.0.0.1       localhost',
+                        '127.0.0.1  www.anotherexample.com',
+                        " 127.0.0.1  $($testParams.HostName)",
+                        '127.0.0.5  anotherexample.com',
+                        ''
+                    )
+                }
+
+                It 'Should return present from the get method' {
+                    (Get-TargetResource @testParams).Ensure | Should -Be 'Present'
+                }
+
+                It 'Should return false from the test method' {
+                    Test-TargetResource @testParams | Should -Be $false
+                }
+
+                It 'Should update the entry in the set method' {
+                    Set-TargetResource @testParams
+                    Assert-MockCalled -CommandName Set-Content
+                }
+            }
         }
 
         It 'Should return true from the test method' {
