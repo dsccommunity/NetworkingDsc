@@ -1,10 +1,7 @@
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
 # Import the Networking Common Modules
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-            -ChildPath 'NetworkingDsc.Common.psm1'))
-
+Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'NetworkingDsc.Common')
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
 # Import Localization Strings
@@ -215,7 +212,7 @@ function Set-TargetResource
         $LogIgnored,
 
         [Parameter()]
-        [ValidateRange(1,32767)]
+        [ValidateRange(1, 32767)]
         [System.Uint64]
         $LogMaxSizeKilobytes,
 
@@ -245,16 +242,16 @@ function Set-TargetResource
         $parameterNewValue = (Get-Variable -Name ($parameter.name)).Value
 
         if ($PSBoundParameters.ContainsKey($parameter.Name) `
-            -and (Compare-Object -ReferenceObject $parameterSourceValue -DifferenceObject $parameterNewValue -SyncWindow 0))
+                -and (Compare-Object -ReferenceObject $parameterSourceValue -DifferenceObject $parameterNewValue -SyncWindow 0))
         {
             $changeParameters += @{
                 $($parameter.name) = $parameterNewValue
             }
 
             Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($script:localizedData.FirewallProfileUpdateParameterMessage) `
-                    -f $Name,$parameter.Name,$parameterNewValue
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.FirewallProfileUpdateParameterMessage) `
+                        -f $Name, $parameter.Name, $parameterNewValue
                 ) -join '' )
         } # if
     } # foreach
@@ -267,9 +264,9 @@ function Set-TargetResource
             -ErrorAction Stop
 
         Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($script:localizedData.FirewallProfileUpdatedMessage) `
-                -f $Name
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.FirewallProfileUpdatedMessage) `
+                    -f $Name
             ) -join '' )
     } # if
 } # Set-TargetResource
@@ -424,7 +421,7 @@ function Test-TargetResource
         $LogIgnored,
 
         [Parameter()]
-        [ValidateRange(1,32767)]
+        [ValidateRange(1, 32767)]
         [System.Uint64]
         $LogMaxSizeKilobytes,
 
@@ -455,12 +452,12 @@ function Test-TargetResource
         $parameterNewValue = (Get-Variable -Name ($parameter.name)).Value
 
         if ($PSBoundParameters.ContainsKey($parameter.Name) `
-            -and (Compare-Object -ReferenceObject $parameterSourceValue -DifferenceObject $parameterNewValue -SyncWindow 0))
+                -and (Compare-Object -ReferenceObject $parameterSourceValue -DifferenceObject $parameterNewValue -SyncWindow 0))
         {
             Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($script:localizedData.FirewallProfileParameterNeedsUpdateMessage) `
-                    -f $Name,$parameter.Name,$parameterSourceValue,$parameterNewValue
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.FirewallProfileParameterNeedsUpdateMessage) `
+                        -f $Name, $parameter.Name, $parameterSourceValue, $parameterNewValue
                 ) -join '' )
 
             $desiredConfigurationMatch = $false
@@ -469,5 +466,3 @@ function Test-TargetResource
 
     return $desiredConfigurationMatch
 } # Test-TargetResource
-
-Export-ModuleMember -Function *-TargetResource

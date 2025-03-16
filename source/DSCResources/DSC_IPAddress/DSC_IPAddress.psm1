@@ -1,10 +1,7 @@
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
 # Import the Networking Common Modules
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-            -ChildPath 'NetworkingDsc.Common.psm1'))
-
+Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'NetworkingDsc.Common')
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
 # Import Localization Strings
@@ -129,7 +126,6 @@ function Set-TargetResource
     if ($AddressFamily -eq 'IPv6')
     {
         $destinationPrefix = '::/0'
-        $prefixLength = 64
     }
 
     # Get all the default routes - this has to be done in case the IP Address is being Removed
@@ -234,8 +230,8 @@ function Set-TargetResource
         catch [Microsoft.Management.Infrastructure.CimException]
         {
             $verifyNetIPAddressAdapterParam = @{
-                IPAddress      = $singleIP.IPAddress
-                prefixLength   = $singleIP.prefixLength
+                IPAddress    = $singleIP.IPAddress
+                prefixLength = $singleIP.prefixLength
             }
             <#
                 Setting New-NetIPaddress will throw [Microsoft.Management.Infrastructure.CimException] if
@@ -254,9 +250,9 @@ function Set-TargetResource
             else
             {
                 Write-Error -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.IPAddressDoesNotMatchInterfaceAliasMessage) -f $InterfaceAlias,$verifyNetIPAddressAdapter.InterfaceAlias
-                ) -join '' )
+                        "$($MyInvocation.MyCommand): "
+                        $($script:localizedData.IPAddressDoesNotMatchInterfaceAliasMessage) -f $InterfaceAlias, $verifyNetIPAddressAdapter.InterfaceAlias
+                    ) -join '' )
             }
             continue
         }
@@ -475,7 +471,7 @@ function Assert-ResourceProperty
 
     if (-not (Get-NetAdapter | Where-Object -Property Name -EQ $InterfaceAlias ))
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $($($script:localizedData.InterfaceNotAvailableError) -f $InterfaceAlias) `
             -ArgumentName 'InterfaceAlias'
     }
@@ -501,11 +497,9 @@ function Assert-ResourceProperty
                     -and (($prefixLength -lt [uint32]0) -or ($prefixLength -gt [uint32]128))
             ))
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message $($($script:localizedData.PrefixLengthError) -f $prefixLength, $AddressFamily) `
                 -ArgumentName 'IPAddress'
         }
     }
 } # Assert-ResourceProperty
-
-Export-ModuleMember -function *-TargetResource

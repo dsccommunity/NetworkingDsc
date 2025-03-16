@@ -12,7 +12,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI Pipeline
   - Updated pipeline files to match current DSC Community patterns - fixes [Issue #528](https://github.com/dsccommunity/NetworkingDsc/issues/528).
   - Updated HQRM and build steps to use windows-latest image.
-  - Update build pieline to pin GitVersion v5.
+  - Update build pipeline to pin GitVersion v5.
+- Tests
+  - Update to use Pester 5.
+- `New-InvalidArgumentException` change to `New-ArgumentException` for HQRM.
+- `NetworkingDsc.Common`
+  - Changed to a buildable module.
+
+### Fixed
+
+- `DSC_Firewall`
+  - Fixed comment typo.
+  - Fixed `ParameterList` in `Set-TargetResource` typo.
+  - Remove `DisplayGroup` property when creating new firewall rule.
+  - `Test-RuleProperties`
+    - Fixed `Convert-CIDRToSubnetMask` function call typo.
+    -
+
+### Removed
+
+- `Build.psd1`
+  - Removed as not required.
+- `DSC_IPAddress`
+  - Remove IPv6 prefix length as unused.
+- `CommonTestHelper`
+  - Use `Get-InvalidArgumentRecord` from `DscResource.Test`.
 
 ## [9.0.0] - 2022-05-30
 

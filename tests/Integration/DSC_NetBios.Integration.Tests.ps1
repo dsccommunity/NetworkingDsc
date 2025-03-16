@@ -1,34 +1,59 @@
-$script:dscModuleName = 'NetworkingDsc'
-$script:dscResourceName = 'DSC_NetBios'
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = 'Suppressing this rule because Script Analyzer does not understand Pester syntax.')]
+param ()
 
-try
-{
-    Import-Module -Name DscResource.Test -Force -ErrorAction 'Stop'
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+            }
+
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+
+    <#
+        Need to define that variables here to be used in the Pester Discover to
+        build the ForEach-blocks.
+    #>
+    $script:dscResourceFriendlyName = 'NetBios'
+    $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
 }
-catch [System.IO.FileNotFoundException]
-{
-    throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -Tasks build" first.'
+
+BeforeAll {
+    # Need to define the variables here which will be used in Pester Run.
+    $script:dscModuleName = 'NetworkingDsc'
+    $script:dscResourceFriendlyName = 'NetBios'
+    $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
+
+    $script:testEnvironment = Initialize-TestEnvironment `
+        -DSCModuleName $script:dscModuleName `
+        -DSCResourceName $script:dscResourceName `
+        -ResourceType 'Mof' `
+        -TestType 'Integration'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 }
 
-$script:testEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $script:dscModuleName `
-    -DSCResourceName $script:dscResourceName `
-    -ResourceType 'Mof' `
-    -TestType 'Integration'
+AfterAll {
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
+}
 
-# Begin Testing
-try
-{
-    Describe 'NetBios Integration Tests' {
-        # Configure Loopback Adapters
-        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
-        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
-
-        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
-        . $configFile -Verbose -ErrorAction Stop
-
+Describe 'NetBios Integration Tests' {
+    BeforeAll {
         # Check NetBiosSetting enum loaded, if not load
         try
         {
@@ -46,92 +71,152 @@ public enum NetBiosSetting
 '@
         }
 
-function Invoke-NetBiosIntegrationTest
-{
-    param (
-        [Parameter()]
-        [System.String]
-        $InterfaceAlias,
+        # Configure Loopback Adapters
+        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
+        New-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
 
-        [Parameter()]
-        [System.String]
-        $Setting = 'Disable'
-    )
+        $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+        . $configFile
+    }
 
-    $configData = @{
-        AllNodes = @(
-            @{
-                NodeName       = 'localhost'
-                InterfaceAlias = $InterfaceAlias
-                Setting        = $Setting
+    AfterAll {
+        # Remove Loopback Adapters
+        Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
+        Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
+    }
+
+    Describe "$($script:dscResourceName)_Integration" {
+        Context 'When applying to a single network adapter' {
+            BeforeDiscovery {
+                $testCases = @(
+                    @{
+                        InterfaceAlias = 'NetworkingDscLBA1'
+                        Setting        = 'Disable'
+                    }
+                    @{
+                        InterfaceAlias = 'NetworkingDscLBA1'
+                        Setting        = 'Enable'
+                    }
+                    @{
+                        InterfaceAlias = 'NetworkingDscLBA1'
+                        Setting        = 'Default'
+                    }
+                )
             }
-        )
-    }
 
-    It 'Should compile and apply the MOF without throwing' {
-        {
-            & "DSC_NetBios_Config" `
-                -OutputPath $TestDrive `
-                -ConfigurationData $configData
+            Context 'When setting NetBios over TCP/IP to <Setting>' -ForEach $testCases {
+                BeforeAll {
+                    $configData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName       = 'localhost'
+                                InterfaceAlias = $InterfaceAlias
+                                Setting        = $Setting
+                            }
+                        )
+                    }
+                }
 
-            Start-DscConfiguration `
-                -Path $TestDrive `
-                -ComputerName localhost `
-                -Wait `
-                -Verbose `
-                -Force `
-                -ErrorAction Stop
-        } | Should -Not -Throw
-    }
+                AfterEach {
+                    Wait-ForIdleLcm
+                }
 
-    It 'Should be able to call Get-DscConfiguration without throwing' {
-        { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-    }
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        & "$($script:dscResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
 
-    It 'Should have set the resource and all setting should match current state' {
-        $result = Get-DscConfiguration | Where-Object -FilterScript {
-            $_.ConfigurationName -eq "DSC_NetBios_Config"
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all setting should match current state' {
+                    $result = Get-DscConfiguration | Where-Object -FilterScript {
+                        $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                    }
+
+                    $result.Setting | Should -Be $Setting
+                }
+            }
         }
-        $result.Setting | Should -Be $Setting
-    }
-}
 
-        Describe "$($script:dscResourceName)_Integration" {
-            Context 'When applying to a single network adapter' {
-                Context 'When setting NetBios over TCP/IP to Disable' {
-                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA1' -Setting 'Disable'
-                }
-
-                Context 'When setting NetBios over TCP/IP to Enable' {
-                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA1' -Setting 'Enable'
-                }
-
-                Context 'When setting NetBios over TCP/IP to Default' {
-                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA1' -Setting 'Default'
-                }
+        Context 'When applying to a all network adapters' {
+            BeforeDiscovery {
+                $testCases = @(
+                    @{
+                        InterfaceAlias = 'NetworkingDscLBA*'
+                        Setting        = 'Disable'
+                    }
+                    @{
+                        InterfaceAlias = 'NetworkingDscLBA*'
+                        Setting        = 'Enable'
+                    }
+                    @{
+                        InterfaceAlias = 'NetworkingDscLBA*'
+                        Setting        = 'Default'
+                    }
+                )
             }
 
-            Context 'When applying to a all network adapters' {
-                Context 'When setting NetBios over TCP/IP to Disable' {
-                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA*' -Setting 'Disable'
+            Context 'When setting NetBios over TCP/IP to <Setting>' -ForEach $testCases {
+                BeforeAll {
+                    # Fix intermittent test failures
+                    Wait-ForIdleLcm -Clear
+
+                    $configData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName       = 'localhost'
+                                InterfaceAlias = $InterfaceAlias
+                                Setting        = $Setting
+                            }
+                        )
+                    }
                 }
 
-                Context 'When setting NetBios over TCP/IP to Enable' {
-                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA*' -Setting 'Enable'
+                AfterEach {
+                    Wait-ForIdleLcm
                 }
 
-                Context 'When setting NetBios over TCP/IP to Default' {
-                    Invoke-NetBiosIntegrationTest -InterfaceAlias 'NetworkingDscLBA*' -Setting 'Default'
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        & "$($script:dscResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all setting should match current state' {
+                    $result = Get-DscConfiguration | Where-Object -FilterScript {
+                        $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                    }
+
+                    $result.Setting | Should -Be $Setting
                 }
             }
         }
     }
-}
-finally
-{
-    # Remove Loopback Adapters
-    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA2'
-    Remove-IntegrationLoopbackAdapter -AdapterName 'NetworkingDscLBA1'
-
-    Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
