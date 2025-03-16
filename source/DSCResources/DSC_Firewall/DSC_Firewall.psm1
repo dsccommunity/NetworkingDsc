@@ -31,6 +31,9 @@ $script:parameterList = $script:resourceData.ParameterList
 
     .PARAMETER Name
         Name of the firewall rule.
+
+    .PARAMETER PolicyStore
+        Targets the policy store from which to retrieve the rules.
 #>
 function Get-TargetResource
 {
@@ -42,7 +45,12 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $Name
+        $Name,
+
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore'
     )
 
     $ErrorActionPreference = 'Stop'
@@ -54,7 +62,7 @@ function Get-TargetResource
             $($script:localizedData.FindFirewallRuleMessage) -f $Name
         ) -join '')
 
-    $firewallRule = Get-FirewallRule -Name $Name
+    $firewallRule = Get-FirewallRule -Name $Name -PolicyStore $PolicyStore
 
     if (-not $firewallRule)
     {
@@ -67,7 +75,7 @@ function Get-TargetResource
         }
     }
 
-    $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
+    $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule -PolicyStore $PolicyStore
 
     $result = @{
         Ensure = 'Present'
@@ -235,6 +243,9 @@ function Get-TargetResource
 
     .PARAMETER Owner
         Specifies that matching firewall rules of the indicated owner are created.
+
+    .PARAMETER PolicyStore
+        Specifies the policy store from which to retrieve the rules to be created.
 #>
 function Set-TargetResource
 {
@@ -394,7 +405,12 @@ function Set-TargetResource
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
-        $Owner
+        $Owner,
+
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -407,7 +423,7 @@ function Set-TargetResource
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
             $($script:localizedData.FindFirewallRuleMessage) -f $Name
         ) -join '')
-    $firewallRule = Get-FirewallRule -Name $Name
+    $firewallRule = Get-FirewallRule -Name $Name -PolicyStore $PolicyStore
 
     $exists = ($null -ne $firewallRule)
 
@@ -437,13 +453,13 @@ function Set-TargetResource
                 if ($PSBoundParameters.ContainsKey('Group') `
                         -and ($Group -ne $FirewallRule.Group))
                 {
-                    Remove-NetFirewallRule -Name  (ConvertTo-FirewallRuleNameEscapedString -Name $Name)
+                    Remove-NetFirewallRule -Name  (ConvertTo-FirewallRuleNameEscapedString -Name $Name) -PolicyStore $PolicyStore
 
                     <#
                         Merge the existing rule values into the PSBoundParameters
                         so that it can be splatted.
                     #>
-                    $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule
+                    $properties = Get-FirewallRuleProperty -FirewallRule $firewallRule -PolicyStore $PolicyStore
 
                     <#
                         Loop through each possible property and if it is not passed as a parameter
@@ -533,7 +549,7 @@ function Set-TargetResource
                 ) -join '')
 
             # Remove the existing Firewall rule
-            Remove-NetFirewallRule -Name (ConvertTo-FirewallRuleNameEscapedString -Name $Name)
+            Remove-NetFirewallRule -Name (ConvertTo-FirewallRuleNameEscapedString -Name $Name) -PolicyStore $PolicyStore
         }
         else
         {
@@ -661,6 +677,9 @@ function Set-TargetResource
 
     .PARAMETER Owner
         Specifies that matching firewall rules of the indicated owner are created.
+
+    .PARAMETER PolicyStore
+        Specifies the policy store from which to retrieve the rules to be created.
 #>
 function Test-TargetResource
 {
@@ -821,7 +840,12 @@ function Test-TargetResource
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [String]
-        $Owner
+        $Owner,
+
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
@@ -835,7 +859,7 @@ function Test-TargetResource
             $($script:localizedData.FindFirewallRuleMessage) -f $Name
         ) -join '')
 
-    $firewallRule = Get-FirewallRule -Name $Name
+    $firewallRule = Get-FirewallRule -Name $Name -PolicyStore $PolicyStore
 
     $exists = ($null -ne $firewallRule)
 
@@ -990,6 +1014,12 @@ function Test-TargetResource
 
     .PARAMETER Owner
         Specifies that matching firewall rules of the indicated owner are created.
+
+    .PARAMETER PolicyStore
+        Specifies the policy store from which to retrieve the rules to be created.
+
+    .PARAMETER PolicyStoreSourceType
+        Specifies that firewall rules that match the indicated policy store source type are retrieved.
 #>
 function Test-RuleProperties
 {
@@ -1140,10 +1170,20 @@ function Test-RuleProperties
 
         [Parameter()]
         [String]
-        $Owner
+        $Owner,
+
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore',
+
+        [Parameter()]
+        [ValidateSet('None', 'Local', 'GroupPolicy', 'Dynamic', 'Generated', 'Hardcoded')]
+        [String]
+        $PolicyStoreSourceType
     )
 
-    $properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule
+    $properties = Get-FirewallRuleProperty -FirewallRule $FirewallRule -PolicyStore $PolicyStore
     $desiredConfigurationMatch = $true
 
     <#
@@ -1243,6 +1283,9 @@ function Test-RuleProperties
 
     .PARAMETER Name
         The name of the Firewall Rule to Retrieve.
+
+    .PARAMETER PolicyStore
+        Specifies the policy store from which to retrieve the rules to be created.
 #>
 function Get-FirewallRule
 {
@@ -1253,10 +1296,15 @@ function Get-FirewallRule
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        $Name
+        $Name,
+
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore'
     )
 
-    $firewallRule = @(Get-NetFirewallRule -Name (ConvertTo-FirewallRuleNameEscapedString -Name $Name) -ErrorAction SilentlyContinue)
+    $firewallRule = @(Get-NetFirewallRule -Name (ConvertTo-FirewallRuleNameEscapedString -Name $Name) -PolicyStore $PolicyStore -ErrorAction SilentlyContinue)
 
     if (-not $firewallRule)
     {
@@ -1286,6 +1334,9 @@ function Get-FirewallRule
 
     .PARAMETER FirewallRule
         The firewall rule object to pull the additional firewall objects for.
+
+    .PARAMETER PolicyStore
+        Specifies the policy store from which to retrieve the rules to be created.
 #>
 function Get-FirewallRuleProperty
 {
@@ -1294,7 +1345,12 @@ function Get-FirewallRuleProperty
     param
     (
         [Parameter(Mandatory = $true)]
-        $FirewallRule
+        $FirewallRule,
+
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore'
     )
 
     Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
