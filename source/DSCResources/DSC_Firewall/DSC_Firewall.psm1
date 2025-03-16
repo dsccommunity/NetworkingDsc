@@ -1,10 +1,7 @@
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
 # Import the Networking Common Modules
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-            -ChildPath 'NetworkingDsc.Common.psm1'))
-
+Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'NetworkingDsc.Common')
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
 # Import Localization Strings
@@ -16,7 +13,7 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     Each element contains 3 properties:
     Name: The parameter name
     Source: The source where the existing parameter can be pulled from
-    Type: This is the content type of the paramater (it is either array or string or blank)
+    Type: This is the content type of the parameter (it is either array or string or blank)
     A blank type means it will not be compared
     data ParameterList
     Delimiter: Only required for Profile parameter, because Get-NetFirewall rule doesn't
@@ -452,7 +449,7 @@ function Set-TargetResource
                         Loop through each possible property and if it is not passed as a parameter
                         then set the PSBoundParameter property to the exiting rule value.
                     #>
-                    foreach ($parameter in $ParametersList)
+                    foreach ($parameter in $ParameterList)
                     {
                         if (-not $PSBoundParameters.ContainsKey($parameter.Name))
                         {
@@ -467,6 +464,10 @@ function Set-TargetResource
                             }
                         }
                     }
+
+                    # DisplayGroup cannot be specified with New-NetFirewallRule
+                    # https://learn.microsoft.com/en-us/powershell/module/netsecurity/new-netfirewallrule#-group
+                    $null = $PSBoundParameters.Remove('DisplayGroup')
 
                     New-NetFirewallRule @PSBoundParameters
                 }
@@ -1211,7 +1212,7 @@ function Test-RuleProperties
                     #>
                     if ($null -ne $parameterNew)
                     {
-                        $parameterNew = Convert-CIDRToSubhetMask -Address $parameterNew
+                        $parameterNew = Convert-CIDRToSubnetMask -Address $parameterNew
                     }
                 }
 
@@ -1323,7 +1324,7 @@ function Get-FirewallRuleProperty
         The additional firewall objects to pull the property from.
 
     .PARAMETER Parameter
-        The entry from the ParameterList table used to retireve the parameter for.
+        The entry from the ParameterList table used to retrieve the parameter for.
 #>
 function Get-FirewallPropertyValue
 {
@@ -1371,7 +1372,5 @@ function ConvertTo-FirewallRuleNameEscapedString
         $Name
     )
 
-    return $Name.Replace('[','`[').Replace(']','`]').Replace('*','`*')
+    return $Name.Replace('[', '`[').Replace(']', '`]').Replace('*', '`*')
 }
-
-Export-ModuleMember -Function *-TargetResource

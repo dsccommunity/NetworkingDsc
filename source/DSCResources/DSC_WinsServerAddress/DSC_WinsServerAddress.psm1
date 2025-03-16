@@ -1,10 +1,7 @@
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
 # Import the Networking Common Modules
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-            -ChildPath 'NetworkingDsc.Common.psm1'))
-
+Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'NetworkingDsc.Common')
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
 # Import Localization Strings
@@ -152,7 +149,7 @@ function Assert-ResourceProperty
 
     if (-not (Get-NetAdapter | Where-Object Name -EQ $InterfaceAlias))
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message ($script:localizedData.InterfaceNotAvailableError -f $InterfaceAlias) `
             -ArgumentName 'InterfaceAlias'
     }
@@ -161,11 +158,9 @@ function Assert-ResourceProperty
     {
         if (-not ([System.Net.IPAddress]::TryParse($ip, [ref]0)))
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message ($script:localizedData.AddressFormatError -f $ip)
                 -ArgumentName 'Address'
         }
     }
 }
-
-Export-ModuleMember -Function *-TargetResource

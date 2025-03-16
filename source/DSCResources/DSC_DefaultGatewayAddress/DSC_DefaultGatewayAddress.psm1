@@ -1,10 +1,7 @@
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
 # Import the Networking Common Modules
-Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'NetworkingDsc.Common' `
-            -ChildPath 'NetworkingDsc.Common.psm1'))
-
+Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'NetworkingDsc.Common')
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 
 # Import Localization Strings
@@ -47,9 +44,6 @@ function Get-TargetResource
     Write-Verbose -Message ( @("$($MyInvocation.MyCommand): "
             $($script:localizedData.GettingDefaultGatewayAddressMessage)
         ) -join '' )
-
-    $destinationPrefix = Get-NetDefaultGatewayDestinationPrefix `
-        -AddressFamily $AddressFamily
 
     $defaultRoutes = Get-NetDefaultRoute `
         -InterfaceAlias $InterfaceAlias `
@@ -118,8 +112,8 @@ function Set-TargetResource
         ) -join '' )
 
     $defaultRoutes = @(Get-NetDefaultRoute `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily)
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily)
 
     # Remove any existing default routes
     foreach ($defaultRoute in $defaultRoutes)
@@ -203,8 +197,8 @@ function Test-TargetResource
     Assert-ResourceProperty @PSBoundParameters
 
     $defaultRoutes = @(Get-NetDefaultRoute `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily)
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily)
 
     # Test if the Default Gateway passed is equal to the current default gateway
     if ($Address)
@@ -212,8 +206,8 @@ function Test-TargetResource
         if ($defaultRoutes)
         {
             $nextHopRoute = $defaultRoutes.Where( {
-                $_.NextHop -eq $Address
-            } )
+                    $_.NextHop -eq $Address
+                } )
 
             if ($nextHopRoute)
             {
@@ -302,7 +296,7 @@ function Assert-ResourceProperty
     {
         Assert-IPAddress -Address $Address -AddressFamily $AddressFamily
     }
-} # Assert-ResourceProperty
+}
 
 <#
     .SYNOPSIS
@@ -333,7 +327,7 @@ function Get-NetDefaultGatewayDestinationPrefix
     }
 
     return $destinationPrefix
-} # Get-NetDefaultGatewayDestinationPrefix
+}
 
 <#
     .SYNOPSIS
@@ -366,11 +360,9 @@ function Get-NetDefaultRoute
         -AddressFamily $AddressFamily
 
     return @(Get-NetRoute `
-        -InterfaceAlias $InterfaceAlias `
-        -AddressFamily $AddressFamily `
-        -ErrorAction Stop).Where({
+            -InterfaceAlias $InterfaceAlias `
+            -AddressFamily $AddressFamily `
+            -ErrorAction Stop).Where({
             $_.DestinationPrefix -eq $destinationPrefix
         })
-} # Get-NetDefaultRoute
-
-Export-ModuleMember -function *-TargetResource
+}
