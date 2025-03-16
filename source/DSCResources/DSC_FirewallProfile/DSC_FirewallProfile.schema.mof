@@ -19,4 +19,5 @@ class DSC_FirewallProfile : OMI_BaseResource
     [Write, Description("Specifies how to log the ignored packets in the location specified by the LogFileName parameter."), ValueMap{"True", "False", "NotConfigured"}, Values{"True", "False", "NotConfigured"}] String LogIgnored;
     [Write, Description("Specifies the maximum file size of the log, in kilobytes. The acceptable values for this parameter are: 1 through 32767.")] UInt64 LogMaxSizeKilobytes;
     [Write, Description("Allows the notification of listening for inbound connections by a service."), ValueMap{"True", "False", "NotConfigured"}, Values{"True", "False", "NotConfigured"}] String NotifyOnListen;
+    [Write, Description("Specifies the policy store from which to retrieve the rules to be created."), ValueMap{"localhost", "PersistentStore"}, Values{"localhost", "PersistentStore"}] String PolicyStore;
 };
