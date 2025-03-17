@@ -91,11 +91,11 @@ public enum NetBiosSetting
                 $testCases = @(
                     @{
                         InterfaceAlias = 'NetworkingDscLBA1'
-                        Setting        = 'Disable'
+                        Setting        = 'Enable'
                     }
                     @{
                         InterfaceAlias = 'NetworkingDscLBA1'
-                        Setting        = 'Enable'
+                        Setting        = 'Disable'
                     }
                     @{
                         InterfaceAlias = 'NetworkingDscLBA1'
@@ -141,7 +141,7 @@ public enum NetBiosSetting
                     { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
-                It 'Should have set the resource and all setting should match current state' {
+                It 'Should have set the resource and all settings should match current state' {
                     $result = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                     }
@@ -156,11 +156,11 @@ public enum NetBiosSetting
                 $testCases = @(
                     @{
                         InterfaceAlias = 'NetworkingDscLBA*'
-                        Setting        = 'Disable'
+                        Setting        = 'Enable'
                     }
                     @{
                         InterfaceAlias = 'NetworkingDscLBA*'
-                        Setting        = 'Enable'
+                        Setting        = 'Disable'
                     }
                     @{
                         InterfaceAlias = 'NetworkingDscLBA*'
