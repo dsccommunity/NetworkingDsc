@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Update build pipeline to pin GitVersion v5.
 - Tests
   - Update to use Pester 5.
+  - Fix integration tests on Server 2022. Fixes [Issue #510](https://github.com/dsccommunity/NetworkingDsc/issues/510).
 - `New-InvalidArgumentException` change to `New-ArgumentException` for HQRM.
 - `NetworkingDsc.Common`
   - Changed to a buildable module.
