@@ -175,7 +175,7 @@ Describe 'DnsClientNrptRule Integration Tests' {
         }
 
         It 'Should have deleted the NRPT rule' {
-            Get-DnsClientNrptRule -Name $script:dummyRule.Name | Should -BeNullOrEmpty
+            Get-DnsClientNrptRule -Name $script:dummyRule.Name -ErrorAction SilentlyContinue | Should -BeNullOrEmpty
         }
     }
 }
