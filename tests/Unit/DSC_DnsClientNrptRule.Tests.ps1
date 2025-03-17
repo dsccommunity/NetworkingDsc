@@ -57,15 +57,8 @@ AfterAll {
 
 Describe 'DSC_DnsClientNrptRule\Get-TargetResource' -Tag 'Get' {
     BeforeAll {
-        $mockNrptRule = @{
-            Name        = 'Server'
-            Namespace   = '.contoso.com'
-            NameServers = ('192.168.1.1')
-            Ensure      = 'Present'
-        }
-
         $testNrptRule = @{
-            Name        = 'Server'
+            Name        = 'Contoso Dns Policy'
             Namespace   = '.contoso.com'
             NameServers = ('192.168.1.1')
             Ensure      = 'Present'
@@ -73,7 +66,7 @@ Describe 'DSC_DnsClientNrptRule\Get-TargetResource' -Tag 'Get' {
 
         InModuleScope -ScriptBlock {
             $script:testNrptRule = @{
-                Name        = 'Server'
+                Name        = 'Contoso Dns Policy'
                 Namespace   = '.contoso.com'
                 NameServers = ('192.168.1.1')
                 Ensure      = 'Present'
@@ -89,7 +82,7 @@ Describe 'DSC_DnsClientNrptRule\Get-TargetResource' -Tag 'Get' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $result = Get-TargetResource -Name 'Server'
+                $result = Get-TargetResource -Name 'Contoso Dns Policy'
                 $result.Ensure | Should -Be 'Absent'
             }
         }
@@ -101,14 +94,14 @@ Describe 'DSC_DnsClientNrptRule\Get-TargetResource' -Tag 'Get' {
 
     Context 'NRPT Rule does exist' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -MockWith { $mockNrptRule }
+            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
         }
 
         It 'Should return correct NRPT Rule' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $result = Get-TargetResource -Name 'Server'
+                $result = Get-TargetResource -Name 'Contoso Dns Policy'
                 $result.Ensure | Should -Be 'Present'
                 $result.Namespace | Should -Be $testNrptRule.Namespace
                 $result.NameServers | Should -Be $testNrptRule.NameServers
@@ -123,15 +116,8 @@ Describe 'DSC_DnsClientNrptRule\Get-TargetResource' -Tag 'Get' {
 
 Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
     BeforeAll {
-        $mockNrptRule = @{
-            Name        = 'Server'
-            Namespace   = '.contoso.com'
-            NameServers = ('192.168.1.1')
-            Ensure      = 'Present'
-        }
-
         $testNrptRule = @{
-            Name        = 'Server'
+            Name        = 'Contoso Dns Policy'
             Namespace   = '.contoso.com'
             NameServers = ('192.168.1.1')
             Ensure      = 'Present'
@@ -139,7 +125,7 @@ Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
 
         InModuleScope -ScriptBlock {
             $script:testNrptRule = @{
-                Name        = 'Server'
+                Name        = 'Contoso Dns Policy'
                 Namespace   = '.contoso.com'
                 NameServers = ('192.168.1.1')
                 Ensure      = 'Present'
@@ -174,7 +160,7 @@ Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
 
     Context 'NRPT Rule exists and should but has a different Namespace' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -MockWith { $mockNrptRule }
+            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
             Mock -CommandName Add-DnsClientNrptRule
             Mock -CommandName Set-DnsClientNrptRule
             Mock -CommandName Remove-DnsClientNrptRule
@@ -203,7 +189,7 @@ Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
 
     Context 'NRPT Rule exists and should but has a different NameServers' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -MockWith { $mockNrptRule }
+            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
             Mock -CommandName Add-DnsClientNrptRule
             Mock -CommandName Set-DnsClientNrptRule
             Mock -CommandName Remove-DnsClientNrptRule
@@ -230,7 +216,7 @@ Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
 
     Context 'NRPT Rule exists and but should not' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -MockWith { $mockNrptRule }
+            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
             Mock -CommandName Add-DnsClientNrptRule
             Mock -CommandName Set-DnsClientNrptRule
             Mock -CommandName Remove-DnsClientNrptRule `
@@ -293,15 +279,8 @@ Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
 
 Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
     BeforeAll {
-        $mockNrptRule = @{
-            Name        = 'Server'
-            Namespace   = '.contoso.com'
-            NameServers = ('192.168.1.1')
-            Ensure      = 'Present'
-        }
-
         $testNrptRule = @{
-            Name        = 'Server'
+            Name        = 'Contoso Dns Policy'
             Namespace   = '.contoso.com'
             NameServers = ('192.168.1.1')
             Ensure      = 'Present'
@@ -309,7 +288,7 @@ Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
 
         InModuleScope -ScriptBlock {
             $script:testNrptRule = @{
-                Name        = 'Server'
+                Name        = 'Contoso Dns Policy'
                 Namespace   = '.contoso.com'
                 NameServers = ('192.168.1.1')
                 Ensure      = 'Present'
@@ -318,7 +297,6 @@ Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
     }
     Context 'NRPT Rule does not exist but should' {
         BeforeAll {
-            Mock -CommandName Get-NetAdapter -MockWith { $mockNetAdapter }
             Mock -CommandName Get-DnsClientNrptRule
         }
 
@@ -339,7 +317,7 @@ Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
 
     Context 'NRPT Rule exists and should but has a different Namespace' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -MockWith { $mockNrptRule }
+            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
         }
 
         It 'Should return false' {
@@ -363,7 +341,7 @@ Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
 
     Context 'NRPT Rule exists and should but has a different NameServers' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -MockWith { $mockNrptRule }
+            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
         }
 
         It 'Should return false' {
@@ -387,7 +365,7 @@ Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
 
     Context 'NRPT Rule exists and should and all parameters match' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -MockWith { $mockNrptRule }
+            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
         }
 
         It 'Should return true' {
@@ -410,7 +388,7 @@ Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
 
     Context 'NRPT Rule exists but should not' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -MockWith { $mockNrptRule }
+            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
         }
 
         It 'Should return false' {
