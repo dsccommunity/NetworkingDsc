@@ -206,7 +206,8 @@ function Test-TargetResource
         $parameterSourceValue = $DnsClientNrptGlobal.$($parameter.name)
         $parameterNewValue = (Get-Variable -Name ($parameter.name)).Value
 
-        if ($parameterNewValue -ne $parameterSourceValue) {
+        if ($parameterNewValue -ne $parameterSourceValue)
+        {
             Write-Verbose -Message ( @( "$($MyInvocation.MyCommand): "
                 $($script:localizedData.DnsClientNrptGlobalParameterNeedsUpdateMessage) `
                 -f $parameter.Name, ($parameterSourceValue -join ','), ($parameterNewValue -join ',')
