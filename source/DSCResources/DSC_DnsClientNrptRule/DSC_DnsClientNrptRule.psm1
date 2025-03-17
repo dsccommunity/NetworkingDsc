@@ -268,7 +268,8 @@ function Set-TargetResource
             -ErrorAction Stop).Name
             
             # If rule has been created, rename it by registry as Name cannot be provided in Add-DnsClientNrptRule cmdlet
-            if ($NrptRuleName -match "^\{[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}\}$") {
+            if ($NrptRuleName -match "^\{[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}\}$")
+            {
                 # Rename the registry key
                 Rename-Item -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters\DnsPolicyConfig\$($NrptRuleName)" -NewName $Name
             }
