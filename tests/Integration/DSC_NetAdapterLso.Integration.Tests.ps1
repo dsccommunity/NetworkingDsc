@@ -30,8 +30,8 @@ BeforeDiscovery {
     $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
 
     <#
-    To run these tests a network adapter that has NDIS version of 6 or greater.
-    If this is not available then the tests will be skipped.
+        To run these tests a network adapter that has NDIS version of 6 or greater.
+        If this is not available then the tests will be skipped.
     #>
     $script:netAdapter = Get-NetAdapter | Where-Object -FilterScript {
         $_.NdisVersion -ge 6
@@ -56,7 +56,6 @@ BeforeAll {
         -TestType 'Integration'
 
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
-
 }
 
 AfterAll {
@@ -66,7 +65,7 @@ AfterAll {
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
 
-Describe 'NetAdapterLso Integration Tests' {
+Describe 'NetAdapterLso Integration Tests' -Skip:$script:skip {
     BeforeAll {
         $script:netAdapter = Get-NetAdapter | Where-Object -FilterScript {
             $_.NdisVersion -ge 6
