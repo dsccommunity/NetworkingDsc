@@ -146,7 +146,7 @@ Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
 
         It 'Should call expected Mocks' {
             Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
-            Should -Invoke -CommandName Set-DnsClientNrptGlobal -Exactly -Times 0 -Scope Context
+            Should -Invoke -CommandName Set-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
         }
     }
 
@@ -175,7 +175,7 @@ Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
 
         It 'Should call expected Mocks' {
             Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
-            Should -Invoke -CommandName Set-DnsClientNrptGlobal -Exactly -Times 0 -Scope Context
+            Should -Invoke -CommandName Set-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
         }
     }
 
@@ -203,7 +203,7 @@ Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
 
         It 'Should call expected Mocks' {
             Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
-            Should -Invoke -CommandName Set-DnsClientNrptGlobal -Exactly -Times 0 -Scope Context
+            Should -Invoke -CommandName Set-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
         }
     }
 }
