@@ -235,8 +235,7 @@ Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
             Mock -CommandName Set-DnsClientNrptRule
             Mock -CommandName Remove-DnsClientNrptRule `
                 -ParameterFilter {
-                    ($Namespace -eq $testNrptRule.Namespace) -and `
-                    ($NameServers -eq $testNrptRule.NameServers)
+                    ($Name -eq $testNrptRule.Name)
             }
         }
 
@@ -257,8 +256,7 @@ Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
             Should -Invoke -CommandName Set-DnsClientNrptRule -Exactly -Times 0 -Scope Context
             Should -Invoke -CommandName Remove-DnsClientNrptRule `
                 -ParameterFilter {
-                    ($Namespace -eq $testNrptRule.Namespace) -and `
-                    ($NameServers -eq $testNrptRule.NameServers)
+                    ($Name -eq $testNrptRule.Name)
             } -Exactly -Times 1 -Scope Context
         }
     }
@@ -356,7 +354,7 @@ Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
         }
 
         It 'Should call expected Mocks' {
-            Should -Invoke -CommandName Get-DnsClientNrptRule -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Get-DnsClientNrptRule -Exactly -Times 2 -Scope Context
         }
     }
 
@@ -380,7 +378,7 @@ Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
         }
 
         It 'Should call expected Mocks' {
-            Should -Invoke -CommandName Get-DnsClientNrptRule -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Get-DnsClientNrptRule -Exactly -Times 2 -Scope Context
         }
     }
 
@@ -403,7 +401,7 @@ Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
         }
 
         It 'Should call expected Mocks' {
-            Should -Invoke -CommandName Get-DnsClientNrptRule -Exactly -Times 1 -Scope Context
+            Should -Invoke -CommandName Get-DnsClientNrptRule -Exactly -Times 2 -Scope Context
         }
     }
 
