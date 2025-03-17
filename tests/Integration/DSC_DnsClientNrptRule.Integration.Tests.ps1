@@ -135,7 +135,7 @@ Describe 'DnsClientNrptRule Integration Tests' {
                         Name        = $script:dummyRule.Name
                         Namespace   = $script:dummyRule.Namespace
                         NameServers = $script:dummyRule.NameServers
-                        Ensure      = 'Present'
+                        Ensure      = 'Absent'
                     }
                 )
             }
