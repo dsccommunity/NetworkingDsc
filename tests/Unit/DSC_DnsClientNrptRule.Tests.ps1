@@ -94,7 +94,11 @@ Describe 'DSC_DnsClientNrptRule\Get-TargetResource' -Tag 'Get' {
 
     Context 'NRPT Rule does exist' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
+            Mock -CommandName Get-DnsClientNrptRule -MockWith {
+                @{
+                    Name = 'Contoso Dns Policy'
+                }
+            }
         }
 
         It 'Should return correct NRPT Rule' {
@@ -160,7 +164,11 @@ Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
 
     Context 'NRPT Rule exists and should but has a different Namespace' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
+            Mock -CommandName Get-DnsClientNrptRule -MockWith {
+                @{
+                    Name = 'Contoso Dns Policy'
+                }
+            }
             Mock -CommandName Add-DnsClientNrptRule
             Mock -CommandName Set-DnsClientNrptRule
             Mock -CommandName Remove-DnsClientNrptRule
@@ -189,7 +197,11 @@ Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
 
     Context 'NRPT Rule exists and should but has a different NameServers' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
+            Mock -CommandName Get-DnsClientNrptRule -MockWith {
+                @{
+                    Name = 'Contoso Dns Policy'
+                }
+            }
             Mock -CommandName Add-DnsClientNrptRule
             Mock -CommandName Set-DnsClientNrptRule
             Mock -CommandName Remove-DnsClientNrptRule
@@ -216,7 +228,11 @@ Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
 
     Context 'NRPT Rule exists and but should not' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
+            Mock -CommandName Get-DnsClientNrptRule -MockWith {
+                @{
+                    Name = 'Contoso Dns Policy'
+                }
+            }
             Mock -CommandName Add-DnsClientNrptRule
             Mock -CommandName Set-DnsClientNrptRule
             Mock -CommandName Remove-DnsClientNrptRule `
@@ -317,7 +333,11 @@ Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
 
     Context 'NRPT Rule exists and should but has a different Namespace' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
+            Mock -CommandName Get-DnsClientNrptRule -MockWith {
+                @{
+                    Name = 'Contoso Dns Policy'
+                }
+            }
         }
 
         It 'Should return false' {
@@ -341,7 +361,11 @@ Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
 
     Context 'NRPT Rule exists and should but has a different NameServers' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
+            Mock -CommandName Get-DnsClientNrptRule -MockWith {
+                @{
+                    Name = 'Contoso Dns Policy'
+                }
+            }
         }
 
         It 'Should return false' {
@@ -365,7 +389,11 @@ Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
 
     Context 'NRPT Rule exists and should and all parameters match' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
+            Mock -CommandName Get-DnsClientNrptRule -MockWith {
+                @{
+                    Name = 'Contoso Dns Policy'
+                }
+            }
         }
 
         It 'Should return true' {
@@ -388,7 +416,11 @@ Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
 
     Context 'NRPT Rule exists but should not' {
         BeforeAll {
-            Mock -CommandName Get-DnsClientNrptRule -Name 'Contoso Dns Policy'
+            Mock -CommandName Get-DnsClientNrptRule -MockWith {
+                @{
+                    Name = 'Contoso Dns Policy'
+                }
+            }
         }
 
         It 'Should return false' {
