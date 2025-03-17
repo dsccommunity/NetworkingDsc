@@ -86,16 +86,6 @@ Describe 'DSC_DnsClientNrptGlobal\Get-TargetResource' -Tag 'Get' {
 }
 
 Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
-    BeforeAll {
-        # Create the Mock Objects that will be used for running tests
-        $DnsClientNrptGlobalSplat = @{
-            IsSingleInstance        = 'Yes'
-            EnableDAForAllNetworks  = 'Disable'
-            QueryPolicy             = 'Disable'
-            SecureNameQueryFallback = 'Disable'
-        }
-    }
-
     BeforeEach {
         Mock -CommandName Get-DnsClientNrptGlobal -MockWith {
             @{
@@ -115,7 +105,12 @@ Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $setTargetResourceParameters = $DnsClientNrptGlobalSplat.Clone()
+                $setTargetResourceParameters = @{
+                    IsSingleInstance        = 'Yes'
+                    EnableDAForAllNetworks  = 'Disable'
+                    QueryPolicy             = 'Disable'
+                    SecureNameQueryFallback = 'Disable'
+                }
 
                 { Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
             }
@@ -136,7 +131,13 @@ Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $setTargetResourceParameters = $DnsClientNrptGlobalSplat.Clone()
+                $setTargetResourceParameters = @{
+                    IsSingleInstance        = 'Yes'
+                    EnableDAForAllNetworks  = 'Disable'
+                    QueryPolicy             = 'Disable'
+                    SecureNameQueryFallback = 'Disable'
+                }
+
                 $setTargetResourceParameters.EnableDAForAllNetworks = 'EnableAlways'
 
                 { Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
@@ -159,7 +160,13 @@ Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $setTargetResourceParameters = $DnsClientNrptGlobalSplat.Clone()
+                $setTargetResourceParameters = @{
+                    IsSingleInstance        = 'Yes'
+                    EnableDAForAllNetworks  = 'Disable'
+                    QueryPolicy             = 'Disable'
+                    SecureNameQueryFallback = 'Disable'
+                }
+
                 $setTargetResourceParameters.QueryPolicy = 'QueryBoth'
 
                 { Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
@@ -181,7 +188,13 @@ Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $setTargetResourceParameters = $DnsClientNrptGlobalSplat.Clone()
+                $setTargetResourceParameters = @{
+                    IsSingleInstance        = 'Yes'
+                    EnableDAForAllNetworks  = 'Disable'
+                    QueryPolicy             = 'Disable'
+                    SecureNameQueryFallback = 'Disable'
+                }
+
                 $setTargetResourceParameters.SecureNameQueryFallback = 'FallbackSecure'
 
                 { Set-TargetResource @setTargetResourceParameters } | Should -Not -Throw
@@ -196,16 +209,6 @@ Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
 }
 
 Describe 'DSC_DnsClientNrptGlobal\Test-TargetResource' -Tag 'Test' {
-    BeforeAll {
-        # Create the Mock Objects that will be used for running tests
-        $DnsClientNrptGlobalSplat = @{
-            IsSingleInstance        = 'Yes'
-            EnableDAForAllNetworks  = 'Disable'
-            QueryPolicy             = 'Disable'
-            SecureNameQueryFallback = 'Disable'
-        }
-    }
-
     BeforeEach {
         Mock -CommandName Get-DnsClientNrptGlobal -MockWith {
             @{
@@ -226,7 +229,12 @@ Describe 'DSC_DnsClientNrptGlobal\Test-TargetResource' -Tag 'Test' {
                 InModuleScope -ScriptBlock {
                     Set-StrictMode -Version 1.0
 
-                    $testTargetResourceParameters = $DnsClientNrptGlobalSplat.Clone()
+                    $testTargetResourceParameters = @{
+                        IsSingleInstance        = 'Yes'
+                        EnableDAForAllNetworks  = 'Disable'
+                        QueryPolicy             = 'Disable'
+                        SecureNameQueryFallback = 'Disable'
+                    }
 
                     Test-TargetResource @testTargetResourceParameters | Should -BeTrue
                 }
@@ -242,7 +250,13 @@ Describe 'DSC_DnsClientNrptGlobal\Test-TargetResource' -Tag 'Test' {
                 InModuleScope -ScriptBlock {
                     Set-StrictMode -Version 1.0
 
-                    $testTargetResourceParameters = $DnsClientNrptGlobalSplat.Clone()
+                    $testTargetResourceParameters = @{
+                        IsSingleInstance        = 'Yes'
+                        EnableDAForAllNetworks  = 'Disable'
+                        QueryPolicy             = 'Disable'
+                        SecureNameQueryFallback = 'Disable'
+                    }
+
                     $testTargetResourceParameters.EnableDAForAllNetworks = 'EnableAlways'
 
                     Test-TargetResource @testTargetResourceParameters | Should -BeFalse
@@ -259,7 +273,13 @@ Describe 'DSC_DnsClientNrptGlobal\Test-TargetResource' -Tag 'Test' {
                 InModuleScope -ScriptBlock {
                     Set-StrictMode -Version 1.0
 
-                    $testTargetResourceParameters = $DnsClientNrptGlobalSplat.Clone()
+                    $testTargetResourceParameters = @{
+                        IsSingleInstance        = 'Yes'
+                        EnableDAForAllNetworks  = 'Disable'
+                        QueryPolicy             = 'Disable'
+                        SecureNameQueryFallback = 'Disable'
+                    }
+
                     $testTargetResourceParameters.QueryPolicy = 'QueryBoth'
 
                     Test-TargetResource @testTargetResourceParameters | Should -BeFalse
@@ -276,7 +296,13 @@ Describe 'DSC_DnsClientNrptGlobal\Test-TargetResource' -Tag 'Test' {
                 InModuleScope -ScriptBlock {
                     Set-StrictMode -Version 1.0
 
-                    $testTargetResourceParameters = $DnsClientNrptGlobalSplat.Clone()
+                    $testTargetResourceParameters = @{
+                        IsSingleInstance        = 'Yes'
+                        EnableDAForAllNetworks  = 'Disable'
+                        QueryPolicy             = 'Disable'
+                        SecureNameQueryFallback = 'Disable'
+                    }
+
                     $testTargetResourceParameters.SecureNameQueryFallback = 'FallbackSecure'
 
                     Test-TargetResource @testTargetResourceParameters | Should -BeFalse
