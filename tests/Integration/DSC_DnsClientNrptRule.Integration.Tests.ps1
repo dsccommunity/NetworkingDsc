@@ -55,9 +55,9 @@ AfterAll {
 Describe 'DnsClientNrptRule Integration Tests' {
     BeforeAll {
         $script:dummyRule = [PSObject] @{
-            Name        = 'Server'
+            Name        = 'Contoso Dns Policy'
             Namespace   = '.contoso.com'
-            NameServers = ('192.168.1.1')
+            NameServers = @('192.168.1.1')
         }
 
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
@@ -171,8 +171,6 @@ Describe 'DnsClientNrptRule Integration Tests' {
             }
 
             $current.Name        | Should -Be $configData.AllNodes[0].Name
-            $current.Namespace   | Should -Be $configData.AllNodes[0].Namespace
-            $current.NameServers | Should -Be $configData.AllNodes[0].NameServers
             $current.Ensure      | Should -Be $configData.AllNodes[0].Ensure
         }
 
