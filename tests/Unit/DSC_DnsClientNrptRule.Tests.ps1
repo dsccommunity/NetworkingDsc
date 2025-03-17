@@ -57,6 +57,13 @@ AfterAll {
 
 Describe 'DSC_DnsClientNrptRule\Get-TargetResource' -Tag 'Get' {
     BeforeAll {
+        $mockNrptRule = @{
+            Name        = 'Contoso Dns Policy'
+            Namespace   = '.contoso.com'
+            NameServers = ('192.168.1.1')
+            Ensure      = 'Present'
+        }
+
         $testNrptRule = @{
             Name        = 'Contoso Dns Policy'
             Namespace   = '.contoso.com'
@@ -120,6 +127,13 @@ Describe 'DSC_DnsClientNrptRule\Get-TargetResource' -Tag 'Get' {
 
 Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
     BeforeAll {
+        $mockNrptRule = @{
+            Name        = 'Contoso Dns Policy'
+            Namespace   = '.contoso.com'
+            NameServers = ('192.168.1.1')
+            Ensure      = 'Present'
+        }
+
         $testNrptRule = @{
             Name        = 'Contoso Dns Policy'
             Namespace   = '.contoso.com'
@@ -295,6 +309,13 @@ Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
 
 Describe 'DSC_DnsClientNrptRule\Test-TargetResource' -Tag 'Test' {
     BeforeAll {
+        $mockNrptRule = @{
+            Name        = 'Contoso Dns Policy'
+            Namespace   = '.contoso.com'
+            NameServers = ('192.168.1.1')
+            Ensure      = 'Present'
+        }
+
         $testNrptRule = @{
             Name        = 'Contoso Dns Policy'
             Namespace   = '.contoso.com'
