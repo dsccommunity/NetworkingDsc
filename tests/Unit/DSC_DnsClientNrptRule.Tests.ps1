@@ -89,13 +89,7 @@ Describe 'DSC_DnsClientNrptRule\Get-TargetResource' -Tag 'Get' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $testNrptRuleKeys = @{
-                    Name        = 'Server'
-                    Namespace   = '.contoso.com'
-                    NameServers = ('192.168.1.1')
-                }
-
-                $result = Get-TargetResource @testNrptRuleKeys
+                $result = Get-TargetResource -Name 'Server'
                 $result.Ensure | Should -Be 'Absent'
             }
         }
@@ -114,13 +108,7 @@ Describe 'DSC_DnsClientNrptRule\Get-TargetResource' -Tag 'Get' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
-                $testNrptRuleKeys = @{
-                    Name        = 'Server'
-                    Namespace   = '.contoso.com'
-                    NameServers = ('192.168.1.1')
-                }
-
-                $result = Get-TargetResource @testNrptRuleKeys
+                $result = Get-TargetResource -Name 'Server'
                 $result.Ensure | Should -Be 'Present'
                 $result.Namespace | Should -Be $testNrptRule.Namespace
                 $result.NameServers | Should -Be $testNrptRule.NameServers
