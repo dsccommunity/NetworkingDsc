@@ -13,6 +13,7 @@ configuration DSC_DnsClientNrptRule_Config {
             Name         = $Node.Name
             Namespace    = $Node.Namespace
             NameServers  = $Node.NameServers
+            Ensure       = $Node.Ensure
         }
     }
 }
