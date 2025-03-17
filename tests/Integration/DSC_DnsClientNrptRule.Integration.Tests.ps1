@@ -66,9 +66,10 @@ Describe 'DnsClientNrptRule Integration Tests' {
 
     AfterAll {
         # Clean up any created rules just in case the integration tests fail
-        $null = Remove-DnsClientNrptRule -Name $script:dummyRule.Name `
-            -Force `
-            -ErrorAction SilentlyContinue
+        if (Get-DnsClientNrptRule -Name $script:dummyRule.Name -ErrorAction SilentlyContinue)
+        {
+            Remove-DnsClientNrptRule -Name $script:dummyRule.Name -Force -ErrorAction SilentlyContinue
+        }
     }
 
     Describe "$($script:dscResourceName)_Add_Integration" {
