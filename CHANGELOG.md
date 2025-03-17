@@ -10,11 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated CHANGELOG.md
   - Renamed NetworkingDSc to NetworkingDsc in CHANGELOG.md - fixes [Issue #513](https://github.com/dsccommunity/NetworkingDsc/issues/513).
 - CI Pipeline
-  - Updated pipeline files to match current DSC Community patterns - fixes [Issue #528](https://github.com/dsccommunity/NetworkingDsc/issues/528).
+  - Updated pipeline files to match current DSC Community patterns -
+  fixes [Issue #528](https://github.com/dsccommunity/NetworkingDsc/issues/528).
   - Updated HQRM and build steps to use windows-latest image.
   - Update build pipeline to pin GitVersion v5.
 - Tests
   - Update to use Pester 5.
+  - Fix integration tests on Server 2022. Fixes [Issue #510](https://github.com/dsccommunity/NetworkingDsc/issues/510).
 - `New-InvalidArgumentException` change to `New-ArgumentException` for HQRM.
 - `NetworkingDsc.Common`
   - Changed to a buildable module.
