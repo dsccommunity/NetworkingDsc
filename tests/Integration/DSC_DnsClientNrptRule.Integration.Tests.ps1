@@ -134,7 +134,7 @@ finally
 {
     # Clean up any created rules just in case the integration tests fail
     $null = Remove-DnsClientNrptRule $script:dummyRule.Name `
-        -Force`
+        -Force `
         -ErrorAction SilentlyContinue
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment

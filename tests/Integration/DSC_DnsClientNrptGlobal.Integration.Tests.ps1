@@ -92,9 +92,9 @@ finally
 {
     # Clean up
     Set-DnsClientNrptGlobal `
-        -SuffixSearchList $script:currentDnsClientNrptGlobal.EnableDAForAllNetworks `
-        -UseDevolution $script:currentDnsClientNrptGlobal.QueryPolicy `
-        -DevolutionLevel $script:currentDnsClientNrptGlobal.SecureNameQueryFallback
+        -EnableDAForAllNetworks $script:currentDnsClientNrptGlobal.EnableDAForAllNetworks `
+        -QueryPolicy $script:currentDnsClientNrptGlobal.QueryPolicy `
+        -SecureNameQueryFallback $script:currentDnsClientNrptGlobal.SecureNameQueryFallback
 
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }

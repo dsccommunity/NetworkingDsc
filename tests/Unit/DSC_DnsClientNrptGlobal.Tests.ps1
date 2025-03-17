@@ -92,6 +92,21 @@ Describe 'DSC_DnsClientNrptGlobal\Get-TargetResource' -Tag 'Get' {
 }
 
 Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
+    BeforeAll {
+        # Create the Mock Objects that will be used for running tests
+        $DnsClientNrptGlobal = [PSObject] @{
+            EnableDAForAllNetworks  = 'Disable'
+            QueryPolicy             = 'Disable'
+            SecureNameQueryFallback = 'Disable'
+        }
+    
+        $DnsClientNrptGlobalSplat = [PSObject]@{
+            IsSingleInstance = 'Yes'
+            EnableDAForAllNetworks  = $DnsClientNrptGlobal.EnableDAForAllNetworks
+            QueryPolicy             = $DnsClientNrptGlobal.QueryPolicy
+            SecureNameQueryFallback = $DnsClientNrptGlobal.SecureNameQueryFallback
+        }
+    }
     BeforeEach {
         Mock -CommandName Get-DnsClientNrptGlobal -MockWith { $DnsClientNrptGlobal }
     }
