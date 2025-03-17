@@ -46,6 +46,8 @@ BeforeAll {
 }
 
 AfterAll {
+    Wait-ForIdleLcm -Clear
+    
     # Remove module common test helper.
     Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
 
