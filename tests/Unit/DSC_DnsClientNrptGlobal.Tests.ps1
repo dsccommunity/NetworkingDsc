@@ -118,7 +118,7 @@ Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
 
         It 'Should call expected Mocks' {
             Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
-            Should -Invoke -CommandName Set-DnsClientNrptGlobal-Exactly -Times 0 -Scope Context
+            Should -Invoke -CommandName Set-DnsClientNrptGlobal -Exactly -Times 0 -Scope Context
         }
     }
 
@@ -146,7 +146,7 @@ Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
 
         It 'Should call expected Mocks' {
             Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
-            Should -Invoke -CommandName Set-DnsClientNrptGlobal-Exactly -Times 0 -Scope Context
+            Should -Invoke -CommandName Set-DnsClientNrptGlobal -Exactly -Times 0 -Scope Context
         }
     }
 
@@ -175,7 +175,7 @@ Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
 
         It 'Should call expected Mocks' {
             Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
-            Should -Invoke -CommandName Set-DnsClientNrptGlobal-Exactly -Times 0 -Scope Context
+            Should -Invoke -CommandName Set-DnsClientNrptGlobal -Exactly -Times 0 -Scope Context
         }
     }
 
@@ -203,7 +203,7 @@ Describe 'DSC_DnsClientNrptGlobal\Set-TargetResource' -Tag 'Set' {
 
         It 'Should call expected Mocks' {
             Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
-            Should -Invoke -CommandName Set-DnsClientNrptGlobal-Exactly -Times 0 -Scope Context
+            Should -Invoke -CommandName Set-DnsClientNrptGlobal -Exactly -Times 0 -Scope Context
         }
     }
 }
@@ -219,99 +219,93 @@ Describe 'DSC_DnsClientNrptGlobal\Test-TargetResource' -Tag 'Test' {
         }
     }
 
-    Context 'DNS Client NRPT Global Settings configuration' {
-        BeforeEach {
-            Mock -CommandName Get-DnsClientNrptGlobal -MockWith { $DnsClientNrptGlobal }
-        }
+    Context 'DNS Client NRPT Global Settings all parameters are the same' {
+        It 'Should return true' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-        Context 'DNS Client NRPT Global Settings all parameters are the same' {
-            It 'Should return true' {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
-
-                    $testTargetResourceParameters = @{
-                        IsSingleInstance        = 'Yes'
-                        EnableDAForAllNetworks  = 'Disable'
-                        QueryPolicy             = 'Disable'
-                        SecureNameQueryFallback = 'Disable'
-                    }
-
-                    Test-TargetResource @testTargetResourceParameters | Should -BeTrue
+                $testTargetResourceParameters = @{
+                    IsSingleInstance        = 'Yes'
+                    EnableDAForAllNetworks  = 'Disable'
+                    QueryPolicy             = 'Disable'
+                    SecureNameQueryFallback = 'Disable'
                 }
-            }
 
-            It 'Should call expected Mocks' {
-                Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
+                Test-TargetResource @testTargetResourceParameters | Should -BeTrue
             }
         }
 
-        Context 'DNS Client NRPT Global Settings EnableDAForAllNetworks is different' {
-            It 'Should return false' {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
+        }
+    }
 
-                    $testTargetResourceParameters = @{
-                        IsSingleInstance        = 'Yes'
-                        EnableDAForAllNetworks  = 'Disable'
-                        QueryPolicy             = 'Disable'
-                        SecureNameQueryFallback = 'Disable'
-                    }
+    Context 'DNS Client NRPT Global Settings EnableDAForAllNetworks is different' {
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-                    $testTargetResourceParameters.EnableDAForAllNetworks = 'EnableAlways'
-
-                    Test-TargetResource @testTargetResourceParameters | Should -BeFalse
+                $testTargetResourceParameters = @{
+                    IsSingleInstance        = 'Yes'
+                    EnableDAForAllNetworks  = 'Disable'
+                    QueryPolicy             = 'Disable'
+                    SecureNameQueryFallback = 'Disable'
                 }
-            }
 
-            It 'Should call expected Mocks' {
-                Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
+                $testTargetResourceParameters.EnableDAForAllNetworks = 'EnableAlways'
+
+                Test-TargetResource @testTargetResourceParameters | Should -BeFalse
             }
         }
 
-        Context 'DNS Client NRPT Global Settings QueryPolicy is different' {
-            It 'Should return false' {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
+        }
+    }
 
-                    $testTargetResourceParameters = @{
-                        IsSingleInstance        = 'Yes'
-                        EnableDAForAllNetworks  = 'Disable'
-                        QueryPolicy             = 'Disable'
-                        SecureNameQueryFallback = 'Disable'
-                    }
+    Context 'DNS Client NRPT Global Settings QueryPolicy is different' {
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-                    $testTargetResourceParameters.QueryPolicy = 'QueryBoth'
-
-                    Test-TargetResource @testTargetResourceParameters | Should -BeFalse
+                $testTargetResourceParameters = @{
+                    IsSingleInstance        = 'Yes'
+                    EnableDAForAllNetworks  = 'Disable'
+                    QueryPolicy             = 'Disable'
+                    SecureNameQueryFallback = 'Disable'
                 }
-            }
 
-            It 'Should call expected Mocks' {
-                Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
+                $testTargetResourceParameters.QueryPolicy = 'QueryBoth'
+
+                Test-TargetResource @testTargetResourceParameters | Should -BeFalse
             }
         }
 
-        Context 'DNS Client NRPT Global Settings UseDevolution is different' {
-            It 'Should return false' {
-                InModuleScope -ScriptBlock {
-                    Set-StrictMode -Version 1.0
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
+        }
+    }
 
-                    $testTargetResourceParameters = @{
-                        IsSingleInstance        = 'Yes'
-                        EnableDAForAllNetworks  = 'Disable'
-                        QueryPolicy             = 'Disable'
-                        SecureNameQueryFallback = 'Disable'
-                    }
+    Context 'DNS Client NRPT Global Settings UseDevolution is different' {
+        It 'Should return false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-                    $testTargetResourceParameters.SecureNameQueryFallback = 'FallbackSecure'
-
-                    Test-TargetResource @testTargetResourceParameters | Should -BeFalse
+                $testTargetResourceParameters = @{
+                    IsSingleInstance        = 'Yes'
+                    EnableDAForAllNetworks  = 'Disable'
+                    QueryPolicy             = 'Disable'
+                    SecureNameQueryFallback = 'Disable'
                 }
-            }
 
-            It 'Should call expected Mocks' {
-                Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
+                $testTargetResourceParameters.SecureNameQueryFallback = 'FallbackSecure'
+
+                Test-TargetResource @testTargetResourceParameters | Should -BeFalse
             }
+        }
+
+        It 'Should call expected Mocks' {
+            Should -Invoke -CommandName Get-DnsClientNrptGlobal -Exactly -Times 1 -Scope Context
         }
     }
 }
