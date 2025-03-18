@@ -19,7 +19,13 @@
 
 <#
     .DESCRIPTION
-    Add an NRPT rule to configure a server.
+        Sets a Dns Client NRPT rule to configure a conditional dns forwarder for a specific namespace.
+    .PARAMETER Name
+        Specifies the name which uniquely identifies a rule.
+    .PARAMETER NameServers
+        Specifies the DNS servers to which the DNS query is sent when DirectAccess is disabled.
+    .PARAMETER Namespace
+        Specifies the DNS namespace.
 #>
 Configuration DnsClientNrptRule_Server_Config
 {
@@ -29,7 +35,7 @@ Configuration DnsClientNrptRule_Server_Config
     {
         DnsClientNrptRule Server
         {
-            Name        = 'Server'
+            Name        = 'Contoso Dns Policy'
             Namespace   = '.contoso.com'
             NameServers = ('192.168.1.1')
         }

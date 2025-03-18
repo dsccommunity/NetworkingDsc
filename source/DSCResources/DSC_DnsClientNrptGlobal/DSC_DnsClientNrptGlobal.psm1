@@ -90,18 +90,18 @@ function Set-TargetResource
         $IsSingleInstance,
 
         [Parameter()]
-        [ValidateSet("EnableOnNetworkID", "EnableAlways", "Disable", "DisableDA")]
+        [ValidateSet('EnableOnNetworkID', 'EnableAlways', 'Disable', 'DisableDA')]
         [System.String]
         $EnableDAForAllNetworks,
 
         [Parameter()]
         [System.String]
-        [ValidateSet("Disable", "QueryIPv6Only", "QueryBoth")]
+        [ValidateSet('Disable', 'QueryIPv6Only', 'QueryBoth')]
         $QueryPolicy,
 
         [Parameter()]
         [System.String]
-        [ValidateSet("Disable", "FallbackSecure", "FallbackUnsecure", "FallbackPrivate")]
+        [ValidateSet('Disable', 'FallbackSecure', 'FallbackUnsecure', 'FallbackPrivate')]
         $SecureNameQueryFallback
     )
 
@@ -179,18 +179,18 @@ function Test-TargetResource
         $IsSingleInstance,
 
         [Parameter()]
-        [ValidateSet("EnableOnNetworkID", "EnableAlways", "Disable", "DisableDA")]
+        [ValidateSet('EnableOnNetworkID', 'EnableAlways', 'Disable', 'DisableDA')]
         [System.String]
         $EnableDAForAllNetworks,
 
         [Parameter()]
         [System.String]
-        [ValidateSet("Disable", "QueryIPv6Only", "QueryBoth")]
+        [ValidateSet('Disable', 'QueryIPv6Only', 'QueryBoth')]
         $QueryPolicy,
 
         [Parameter()]
         [System.String]
-        [ValidateSet("Disable", "FallbackSecure", "FallbackUnsecure", "FallbackPrivate")]
+        [ValidateSet('Disable', 'FallbackSecure', 'FallbackUnsecure', 'FallbackPrivate')]
         $SecureNameQueryFallback
     )
 

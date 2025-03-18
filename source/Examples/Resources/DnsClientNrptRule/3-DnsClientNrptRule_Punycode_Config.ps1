@@ -19,7 +19,15 @@
 
 <#
     .DESCRIPTION
-    Add an NRPT rule to send Punycode DNS queries.
+        Sets a Dns Client NRPT rule to send Punycode DNS queries using a conditional dns forwarder for a specific namespace.
+    .PARAMETER Name
+        Specifies the name which uniquely identifies a rule.
+    .PARAMETER NameEncoding
+        Specifies the encoding format for host names in the DNS query.
+    .PARAMETER NameServers
+        Specifies the DNS servers to which the DNS query is sent when DirectAccess is disabled.
+    .PARAMETER Namespace
+        Specifies the DNS namespace.
 #>
 Configuration DnsClientNrptRule_Punycode_Config
 {
