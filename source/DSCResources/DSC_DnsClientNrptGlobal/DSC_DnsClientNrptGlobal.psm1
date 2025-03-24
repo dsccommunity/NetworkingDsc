@@ -44,7 +44,7 @@ function Get-TargetResource
             $($script:localizedData.GettingDnsClientNrptGlobalMessage)
         ) -join '' )
 
-    # Get the current Dns Client Global Settings
+    # Get the current DNS Client Global Settings
     $DnsClientNrptGlobal = Get-DnsClientNrptGlobal `
         -ErrorAction Stop
 
@@ -110,7 +110,7 @@ function Set-TargetResource
             $($script:localizedData.SettingDnsClientNrptGlobalMessage)
         ) -join '' )
 
-    # Get the current Dns Client Nrpt Global Settings
+    # Get the current DNS Client Nrpt Global Settings
     $DnsClientNrptGlobal = Get-DnsClientNrptGlobal `
         -ErrorAction Stop
 
@@ -202,7 +202,7 @@ function Test-TargetResource
     # Flag to signal whether settings are correct
     $desiredConfigurationMatch = $true
 
-    # Get the current Dns Client Nrpt Global Settings
+    # Get the current DNS Client Nrpt Global Settings
     $DnsClientNrptGlobal = Get-DnsClientNrptGlobal `
         -ErrorAction Stop
 

@@ -10,9 +10,12 @@ Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common'
 # Import Localization Strings
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
+# This must be a script parameter so that it is accessible
+$script:dnsPolicyConfigRegistryPath = 'HKLM:\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters\DnsPolicyConfig'
+
 <#
     .SYNOPSIS
-        Returns the current state of a NRPT Rule.
+        Returns the current state of a DNS Client NRPT Rule.
 
     .PARAMETER Name
         Specifies the name which uniquely identifies a rule.
@@ -186,7 +189,7 @@ function Set-TargetResource
         [ValidateSet('NoProxy', 'UseDefault', 'UseProxyName')]
         [System.String]
         $DAProxyType,
-    
+
         [Parameter()]
         [System.String]
         $DisplayName,
@@ -260,20 +263,9 @@ function Set-TargetResource
         }
         else
         {
-            # Remove Name parameter as Add-DnsClientNrptRule cmdlet doesn't support it
-            $null = $PSBoundParameters.Remove("Name")
-            # The NrptRule does not exit - create it (PassThru to get the name of the rule created)
-            $NrptRuleName=(Add-DnsClientNrptRule @PSBoundParameters `
-            -PassThru `
-            -ErrorAction Stop).Name
-            
-            # If rule has been created, rename it by registry as Name cannot be provided in Add-DnsClientNrptRule cmdlet
-            if ($NrptRuleName -match "^\{[a-f0-9]{8}-([a-f0-9]{4}-){3}[a-f0-9]{12}\}$")
-            {
-                # Rename the registry key
-                Rename-Item -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters\DnsPolicyConfig\$($NrptRuleName)" -NewName $Name
-            }
-                
+            # The NrptRule does not exit - create it
+            Add-NrptRule @PSBoundParameters `
+            -ErrorAction Stop
 
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
@@ -521,7 +513,7 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-        This function looks up NRPT Rule using the parameters and returns
+        This function looks up DNS Client NRPT Rule using the parameters and returns
         it. If the rule is not found $null is returned.
 
     .PARAMETER Name
@@ -539,20 +531,196 @@ function Get-NrptRule
 
     try
     {
-        $NrptRule = Get-DnsClientNrptRule `
+        $nrptRule = Get-DnsClientNrptRule `
             -Name $Name `
             -ErrorAction SilentlyContinue
     }
     catch [Microsoft.PowerShell.Cmdletization.Cim.CimJobException]
     {
-        $NrptRule = $null
+        $nrptRule = $null
     }
     catch
     {
         throw $_
     }
 
-    return $NrptRule
+    return $nrptRule
 }
+
+<#
+    .SYNOPSIS
+        This function create a DNS Client NRPT Rule using the parameters
+
+    .PARAMETER Name
+        Specifies the name which uniquely identifies a rule.
+
+    .PARAMETER Comment
+        Stores administrator notes.
+
+    .PARAMETER DAEnable
+        Indicates the rule state for DirectAccess.
+
+    .PARAMETER DAIPsecEncryptionType
+        Specifies the Internet Protocol security (IPsec) encryption setting for DirectAccess.
+
+    .PARAMETER DAIPsecRequired
+        Indicates that IPsec is required for DirectAccess.
+
+    .PARAMETER DANameServers
+        Specifies an array of DNS servers to query when DirectAccess is enabled.
+
+    .PARAMETER DAProxyServerName
+        "Specifies the proxy server to use when connecting to the Internet.
+        This parameter is only applicable if the DAProxyType parameter is set to UseProxyName.
+
+    .PARAMETER DAProxyType
+        Specifies the proxy server type to be used when connecting to the Internet.
+
+    .PARAMETER DisplayName
+        Specifies an optional friendly name for the NRPT rule.
+
+    .PARAMETER DnsSecEnable
+        Enables Domain Name System Security Extensions (DNSSEC) on the rule.
+
+    .PARAMETER DnsSecIPsecEncryptionType
+        Specifies the IPsec tunnel encryption setting.
+
+    .PARAMETER DnsSecIPsecRequired
+        Indicates the DNS client must set up an IPsec connection to the DNS server.
+
+    .PARAMETER DnsSecValidationRequired
+        Indicates that DNSSEC validation is required.
+
+    .PARAMETER IPsecTrustAuthority
+        Specifies the certification authority to validate the IPsec channel.
+
+    .PARAMETER NameEncoding
+        Specifies the encoding format for host names in the DNS query.
+
+    .PARAMETER NameServers
+        Specifies the DNS servers to which the DNS query is sent when DirectAccess is disabled.
+
+    .PARAMETER Namespace
+        Specifies the DNS namespace.
+#>
+function Add-NrptRule
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Name,
+
+        [Parameter()]
+        [System.String]
+        $Comment,
+
+        [Parameter()]
+        [System.Boolean]
+        $DAEnable,
+
+        [Parameter()]
+        [ValidateSet('None', 'Low', 'Medium', 'High')]
+        [System.String]
+        $DAIPsecEncryptionType,
+
+        [Parameter()]
+        [System.Boolean]
+        $DAIPsecRequired,
+
+        [Parameter()]
+        [System.String[]]
+        $DANameServers,
+
+        [Parameter()]
+        [System.String]
+        $DAProxyServerName,
+
+        [Parameter()]
+        [ValidateSet('NoProxy', 'UseDefault', 'UseProxyName')]
+        [System.String]
+        $DAProxyType,
+
+        [Parameter()]
+        [System.String]
+        $DisplayName,
+
+        [Parameter()]
+        [System.Boolean]
+        $DnsSecEnable,
+
+        [Parameter()]
+        [ValidateSet('None', 'Low', 'Medium', 'High')]
+        [System.String]
+        $DnsSecIPsecEncryptionType,
+
+        [Parameter()]
+        [System.Boolean]
+        $DnsSecIPsecRequired,
+
+        [Parameter()]
+        [System.Boolean]
+        $DnsSecValidationRequired,
+
+        [Parameter()]
+        [System.String]
+        $IPsecTrustAuthority,
+
+        [Parameter()]
+        [ValidateSet('Disable', 'Utf8WithMapping', 'Utf8WithoutMapping', 'Punycode')]
+        [System.String]
+        $NameEncoding,
+
+        [Parameter()]
+        [System.String[]]
+        $NameServers,
+
+        [Parameter()]
+        [System.String]
+        $Namespace
+    )
+
+    # Remove Name parameter as Add-DnsClientNrptRule cmdlet doesn't support it
+    $null = $PSBoundParameters.Remove("Name")
+
+    # The NrptRule does not exit - create it (PassThru to get the name of the rule created)
+    $NrptRuleName=(Add-DnsClientNrptRule @PSBoundParameters `
+    -PassThru `
+    -ErrorAction Stop).Name
+    # If rule has been created, rename it by registry as Name cannot be provided in Add-DnsClientNrptRule cmdlet
+    if (Test-IsGuid -InputValue $NrptRuleName)
+    {
+        # Rename the registry key
+        Rename-Item -Path "$($script:dnsPolicyConfigRegistryPath)\$($NrptRuleName)" `
+        -NewName $Name `
+        -ErrorAction Stop
+    }
+}
+
+<#
+    .SYNOPSIS
+        This function check if the string provided is a GUID.
+
+    .PARAMETER InputValue
+        Specifies the value to test.
+#>
+function Test-IsGuid {
+    param (
+        [string]$InputValue
+    )
+
+    try {
+        # Attempt to parse the string as a GUID
+        [void][Guid]::Parse($InputValue)
+        # If successful, return true
+        return $true
+    } catch {
+        # If an exception is thrown, the string is not a valid GUID
+        return $false
+    }
+}
+
 
 Export-ModuleMember -Function *-TargetResource

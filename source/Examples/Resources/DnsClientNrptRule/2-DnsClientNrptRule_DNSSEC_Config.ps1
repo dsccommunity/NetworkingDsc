@@ -19,13 +19,7 @@
 
 <#
     .DESCRIPTION
-        Sets a Dns Client NRPT rule to enable DNSSEC queries for a specific namespace.
-    .PARAMETER Name
-        Specifies the name which uniquely identifies a rule.
-    .PARAMETER DnsSecEnable
-        Enables Domain Name System Security Extensions (DNSSEC) on the rule.
-    .PARAMETER Namespace
-        Specifies the DNS namespace.
+        Sets a DNS Client NRPT rule named 'DNSSEC' to enable DNSSEC queries for a specific namespace (contoso.com).
 #>
 Configuration DnsClientNrptRule_DNSSEC_Config
 {

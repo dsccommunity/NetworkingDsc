@@ -19,13 +19,7 @@
 
 <#
     .DESCRIPTION
-        Configure Dns Client NRPT global configuration.
-    .PARAMETER EnableDAForAllNetworks
-        Specifies DirectAccess (DA) settings. (Default: Disable)
-    .PARAMETER QueryPolicy.
-        Specifies the DNS client query policy. (Default: Disable)
-    .PARAMETER SecureNameQueryFallback
-        Specifies the DNS client name resolution fallback policy. (Default: Disable)
+        Configure DNS Client NRPT global configuration and set EnableDAForAllNetworks to 'EnableAlways', QueryPolicy to 'QueryBoth' and SecureNameQueryFallback to 'FallbackSecure'.
 #>
 Configuration DnsClientNrptGlobal_Config
 {

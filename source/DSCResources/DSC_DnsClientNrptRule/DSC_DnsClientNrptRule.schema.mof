@@ -1,7 +1,7 @@
 [ClassVersion("1.0.0.0"), FriendlyName("DnsClientNrptRule")]
 class DSC_DnsClientNrptRule : OMI_BaseResource
 {
-    [Key, Description("Specifies the NRPT rule name.")] string Name;
+    [Key, Description("Specifies the DNS Client NRPT rule name.")] string Name;
     [Write, Description("Specifies whether the NRPT rule should exist. Defaults to 'Present'."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
     [Write, Description("Stores administrator notes.")] string Comment;
     [Write, Description("Indicates the rule state for DirectAccess.")] Boolean DAEnable;

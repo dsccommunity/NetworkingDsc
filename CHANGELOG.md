@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Added the following resources:
-  - **DnsClientNrptGlobal**: Configure Dns Client global Name Resolution Policy Table (NRPT) settings.
-  - **DnsClientNrptRule**: Sets a Dns Client NRPT rule on a node.
+  - **DnsClientNrptGlobal**: Configure DNS Client global Name Resolution Policy Table (NRPT) settings.
+  - **DnsClientNrptRule**: Sets a DNS Client NRPT rule on a node.
 
 - Updated CHANGELOG.md
   - Renamed NetworkingDSc to NetworkingDsc in CHANGELOG.md - fixes [Issue #513](https://github.com/dsccommunity/NetworkingDsc/issues/513).
