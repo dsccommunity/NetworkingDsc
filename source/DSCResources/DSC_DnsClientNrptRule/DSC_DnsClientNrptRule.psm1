@@ -706,12 +706,13 @@ function Add-NrptRule
 #>
 function Test-IsGuid 
 {
-    [CmdletBinding()]
+    [OutputType([System.Boolean])]
     param
     (
-        [string]$InputValue
+        [Parameter()]
+        [System.String]
+        $InputValue
     )
-
     try 
     {
         # Attempt to parse the string as a GUID
