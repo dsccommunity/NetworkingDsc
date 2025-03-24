@@ -265,7 +265,7 @@ function Set-TargetResource
         {
             # The NrptRule does not exit - create it
             Add-NrptRule @PSBoundParameters `
-            -ErrorAction Stop
+                -ErrorAction Stop
 
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
@@ -686,9 +686,7 @@ function Add-NrptRule
     $null = $PSBoundParameters.Remove("Name")
 
     # The NrptRule does not exit - create it (PassThru to get the name of the rule created)
-    $NrptRuleName=(Add-DnsClientNrptRule @PSBoundParameters `
-    -PassThru `
-    -ErrorAction Stop).Name
+    $NrptRuleName=(Add-DnsClientNrptRule @PSBoundParameters -PassThru).Name
     # If rule has been created, rename it by registry as Name cannot be provided in Add-DnsClientNrptRule cmdlet
     if (Test-IsGuid -InputValue $NrptRuleName)
     {
@@ -706,17 +704,23 @@ function Add-NrptRule
     .PARAMETER InputValue
         Specifies the value to test.
 #>
-function Test-IsGuid {
-    param (
+function Test-IsGuid 
+{
+    [CmdletBinding()]
+    param
+    (
         [string]$InputValue
     )
 
-    try {
+    try 
+    {
         # Attempt to parse the string as a GUID
         [void][Guid]::Parse($InputValue)
         # If successful, return true
         return $true
-    } catch {
+    }
+    catch
+    {
         # If an exception is thrown, the string is not a valid GUID
         return $false
     }
