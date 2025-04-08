@@ -2,7 +2,7 @@
 class DSC_DnsClientNrptRule : OMI_BaseResource
 {
     [Key, Description("Specifies the DNS Client NRPT rule name.")] string Name;
-    [Write, Description("Specifies whether the NRPT rule should exist. Defaults to 'Present'."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+    [Write, Description("Specifies whether the DNS Client NRPT rule should exist. Defaults to 'Present'."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
     [Write, Description("Stores administrator notes.")] string Comment;
     [Write, Description("Indicates the rule state for DirectAccess.")] Boolean DAEnable;
     [Write, Description("Specifies the Internet Protocol security (IPsec) encryption setting for DirectAccess."), ValueMap{"None", "Low", "Medium", "High"},Values{"None", "Low", "Medium", "High"}] string DAIPsecEncryptionType;

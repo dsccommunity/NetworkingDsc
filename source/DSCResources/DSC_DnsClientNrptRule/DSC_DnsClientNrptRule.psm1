@@ -549,7 +549,9 @@ function Get-NrptRule
 
 <#
     .SYNOPSIS
-        This function create a DNS Client NRPT Rule using the parameters
+        This function create a DNS Client NRPT Rule using the parameters.
+        This is a dedicated function adding the Rule Name parameter as
+        the built-in Add-DnsClientNrptRule cmdlet does not support it.
 
     .PARAMETER Name
         Specifies the name which uniquely identifies a rule.
@@ -686,7 +688,7 @@ function Add-NrptRule
     $null = $PSBoundParameters.Remove("Name")
 
     # The NrptRule does not exit - create it (PassThru to get the name of the rule created)
-    $NrptRuleName=(Add-DnsClientNrptRule @PSBoundParameters -PassThru).Name
+    $NrptRuleName = (Add-DnsClientNrptRule @PSBoundParameters -PassThru).Name
     # If rule has been created, rename it by registry as Name cannot be provided in Add-DnsClientNrptRule cmdlet
     if (Test-IsGuid -InputValue $NrptRuleName)
     {
@@ -713,6 +715,7 @@ function Test-IsGuid
         [System.String]
         $InputValue
     )
+
     try 
     {
         # Attempt to parse the string as a GUID

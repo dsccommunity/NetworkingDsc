@@ -146,6 +146,7 @@ Describe 'DSC_DnsClientNrptRule\Set-TargetResource' -Tag 'Set' {
             }
         }
     }
+
     Context 'NRPT Rule does not exist but should' {
         BeforeAll {
             Mock -CommandName Get-DnsClientNrptRule
