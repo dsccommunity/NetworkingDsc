@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated pipeline files to match current DSC Community patterns - fixes [Issue #528](https://github.com/dsccommunity/NetworkingDsc/issues/528).
   - Updated HQRM and build steps to use windows-latest image.
   - Update build pipeline to pin GitVersion v5.
+  - Added server 2025 into testing.
 - Tests
   - Update to use Pester 5.
 - `New-InvalidArgumentException` change to `New-ArgumentException` for HQRM.
