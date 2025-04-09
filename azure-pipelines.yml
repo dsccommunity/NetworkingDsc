@@ -164,6 +164,7 @@ stages:
             displayName: 'Publish Code Coverage to Codecov.io'
 
   - stage: Integration_Test
+    displayName: 'Integration Test'
     dependsOn: Quality_Test_and_Unit_Test
     jobs:
       - job: Test_Integration
