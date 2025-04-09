@@ -128,8 +128,7 @@ stages:
             displayName: 'Publish Test Artifact'
             inputs:
               targetPath: '$(buildFolderName)/$(testResultFolderName)/'
-              artifactName: $(testArtifactName)
-              parallel: true
+              artifactName: '$(testArtifactName) $(vmImage)'
 
       - job: Code_Coverage
         displayName: 'Publish Code Coverage'
