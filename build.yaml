@@ -33,6 +33,9 @@ BuildWorkflow:
     - Convert_Pester_Coverage
     - Pester_If_Code_Coverage_Under_Threshold
 
+  merge:
+    - Merge_CodeCoverage_Files
+
   publish:
     - publish_module_to_gallery
     - Publish_Release_To_GitHub
@@ -101,7 +104,6 @@ Pester:
       CIFormat: Auto
     CodeCoverage:
       CoveragePercentTarget: 80
-      OutputPath: JaCoCo_coverage.xml
       OutputEncoding: ascii
       UseBreakpoints: false
     TestResult:
@@ -109,6 +111,17 @@ Pester:
       OutputEncoding: ascii
   ExcludeFromCodeCoverage:
     - Modules/DscResource.Common
+
+####################################################
+#           Code Coverage Configuration            #
+####################################################
+
+CodeCoverage:
+  # Filename of the file that will be outputted by the task Merge_CodeCoverage_Files.
+  CodeCoverageMergedOutputFile: JaCoCo_coverage.xml
+  # File pattern used to search for files under the ./output/testResults folder
+  # by task Merge_CodeCoverage_Files.
+  CodeCoverageFilePattern: Codecov*.xml
 
 ####################################################
 #      Pester Configuration (DscResource.Test)     #
