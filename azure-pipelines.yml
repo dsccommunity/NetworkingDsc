@@ -62,7 +62,7 @@ stages:
         displayName: 'HQRM'
         pool:
           vmImage: 'windows-latest'
-        timeoutInMinutes: 0
+        timeoutInMinutes: '0'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
@@ -99,7 +99,7 @@ stages:
               vmImage: 'windows-2025'
         pool:
           vmImage: $(vmImage)
-        timeoutInMinutes: 0
+        timeoutInMinutes: '0'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
@@ -128,14 +128,14 @@ stages:
             displayName: 'Publish Test Artifact'
             inputs:
               targetPath: '$(buildFolderName)/$(testResultFolderName)/'
-              artifactName: '$(testArtifactName) $(vmImage)'
+              artifactName: '$(testArtifactName)_$(vmImage)'
 
       - job: Code_Coverage
         displayName: 'Publish Code Coverage'
         dependsOn: Test_Unit
         pool:
           vmImage: 'ubuntu-latest'
-        timeoutInMinutes: 0
+        timeoutInMinutes: '0'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
@@ -148,7 +148,7 @@ stages:
             displayName: 'Download Test Artifact'
             inputs:
               buildType: 'current'
-              artifactName: $(testArtifactName)
+              # artifactName: $(testArtifactName)
               targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)'
 
           - task: PublishCodeCoverageResults@1
