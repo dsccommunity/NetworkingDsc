@@ -54,7 +54,8 @@ stages:
               publishLocation: 'pipeline'
               parallel: true
 
-  - stage: Test
+  - stage: Quality_Test_and_Unit_Test
+    displayName: 'Quality Test and Unit Test'
     dependsOn: Build
     jobs:
       - job: Test_HQRM
@@ -86,10 +87,18 @@ stages:
               testRunTitle: 'HQRM'
             condition: succeededOrFailed()
 
-      - job: Test_Unit_2019
-        displayName: 'Unit (Windows Server 2019)'
+      - job: Test_Unit
+        displayName: 'Unit'
+        strategy:
+          matrix:
+            Windows_2019:
+              vmImage: 'windows-2019'
+            Windows_2022:
+              vmImage: 'windows-2022'
+            Windows_2025:
+              vmImage: 'windows-2025'
         pool:
-          vmImage: 'windows-2019'
+          vmImage: $(vmImage)
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -112,7 +121,7 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Unit (Windows Server 2019)'
+              testRunTitle: 'Unit $(vmImage)'
             condition: succeededOrFailed()
 
           - task: PublishPipelineArtifact@1
@@ -124,7 +133,7 @@ stages:
 
       - job: Code_Coverage
         displayName: 'Publish Code Coverage'
-        dependsOn: Test_Unit_2019
+        dependsOn: Test_Unit
         pool:
           vmImage: 'ubuntu-latest'
         timeoutInMinutes: 0
@@ -154,10 +163,21 @@ stages:
               bash <(curl -s https://codecov.io/bash) -f "./$(buildFolderName)/$(testResultFolderName)/JaCoCo_coverage.xml"
             displayName: 'Publish Code Coverage to Codecov.io'
 
-      - job: Test_Integration_2019
-        displayName: 'Integration (Windows Server 2019)'
+  - stage: Integration_Test
+    dependsOn: Quality_Test_and_Unit_Test
+    jobs:
+      - job: Test_Integration
+        displayName: 'Integration'
+        strategy:
+          matrix:
+            Windows_2019:
+              vmImage: 'windows-2019'
+            Windows_2022:
+              vmImage: 'windows-2022'
+            Windows_2025:
+              vmImage: 'windows-2025'
         pool:
-          vmImage: 'windows-2019'
+          vmImage: $(vmImage)
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -188,73 +208,7 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Integration (Windows Server 2019)'
-            condition: succeededOrFailed()
-
-      - job: Test_Unit_2022
-        displayName: 'Unit (Windows Server 2022)'
-        pool:
-          vmImage: 'windows-2022'
-        timeoutInMinutes: 0
-        steps:
-          - task: DownloadPipelineArtifact@2
-            displayName: 'Download Pipeline Artifact'
-            inputs:
-              buildType: 'current'
-              artifactName: $(buildArtifactName)
-              targetPath: '$(Build.SourcesDirectory)/$(buildArtifactName)'
-
-          - task: PowerShell@2
-            name: test
-            displayName: 'Run Unit Test'
-            inputs:
-              filePath: './build.ps1'
-              arguments: "-Tasks test -PesterScript 'tests/Unit'"
-              pwsh: true
-
-          - task: PublishTestResults@2
-            displayName: 'Publish Test Results'
-            inputs:
-              testResultsFormat: 'NUnit'
-              testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Unit (Windows Server 2022)'
-            condition: succeededOrFailed()
-
-      - job: Test_Integration_2022
-        displayName: 'Integration (Windows Server 2022)'
-        pool:
-          vmImage: 'windows-2022'
-        timeoutInMinutes: 0
-        steps:
-          - task: DownloadPipelineArtifact@2
-            displayName: 'Download Pipeline Artifact'
-            inputs:
-              buildType: 'current'
-              artifactName: $(buildArtifactName)
-              targetPath: '$(Build.SourcesDirectory)/$(buildArtifactName)'
-
-          - task: PowerShell@2
-            name: configureWinRM
-            displayName: 'Configure WinRM'
-            inputs:
-              targetType: 'inline'
-              script: 'winrm quickconfig -quiet'
-              pwsh: false
-
-          - task: PowerShell@2
-            name: test
-            displayName: 'Run Integration Test'
-            inputs:
-              filePath: './build.ps1'
-              arguments: "-Tasks test -PesterScript 'tests/Integration' -CodeCoverageThreshold 0"
-              pwsh: false
-
-          - task: PublishTestResults@2
-            displayName: 'Publish Test Results'
-            inputs:
-              testResultsFormat: 'NUnit'
-              testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Integration (Windows Server 2022)'
+              testRunTitle: 'Integration $(vmImage)'
             condition: succeededOrFailed()
 
   - stage: Deploy
