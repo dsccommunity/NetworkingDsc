@@ -212,7 +212,9 @@ stages:
             condition: succeededOrFailed()
 
   - stage: Deploy
-    dependsOn: Test
+    dependsOn:
+    - Quality_Test_and_Unit_Test
+    - Integration_Test
     condition: |
       and(
         succeeded(),
