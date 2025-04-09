@@ -91,11 +91,11 @@ public enum NetBiosSetting
                 $testCases = @(
                     @{
                         InterfaceAlias = 'NetworkingDscLBA1'
-                        Setting        = 'Enable'
+                        Setting        = 'Disable'
                     }
                     @{
                         InterfaceAlias = 'NetworkingDscLBA1'
-                        Setting        = 'Disable'
+                        Setting        = 'Enable'
                     }
                     @{
                         InterfaceAlias = 'NetworkingDscLBA1'
@@ -156,11 +156,11 @@ public enum NetBiosSetting
                 $testCases = @(
                     @{
                         InterfaceAlias = 'NetworkingDscLBA*'
-                        Setting        = 'Enable'
+                        Setting        = 'Disable'
                     }
                     @{
                         InterfaceAlias = 'NetworkingDscLBA*'
-                        Setting        = 'Disable'
+                        Setting        = 'Enable'
                     }
                     @{
                         InterfaceAlias = 'NetworkingDscLBA*'
