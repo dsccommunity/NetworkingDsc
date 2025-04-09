@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated HQRM and build steps to use windows-latest image.
   - Update build pipeline to pin GitVersion v5.
   - Added server 2025 into testing.
+  - Remove duplicated pipeline steps and use matrix of VM images.
 - Tests
   - Update to use Pester 5.
 - `New-InvalidArgumentException` change to `New-ArgumentException` for HQRM.
@@ -28,7 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Remove `DisplayGroup` property when creating new firewall rule.
   - `Test-RuleProperties`
     - Fixed `Convert-CIDRToSubnetMask` function call typo.
-    -
 
 ### Removed
 
