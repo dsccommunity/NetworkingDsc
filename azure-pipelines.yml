@@ -91,22 +91,22 @@ stages:
         displayName: 'Unit'
         strategy:
           matrix:
-            Windows_2019_WPS:
+            Windows2019 WPS:
               vmImage: 'windows-2019'
               pwsh: false
-            Windows_2022_WPS:
+            Windows2022 WPS:
               vmImage: 'windows-2022'
               pwsh: false
-            Windows_2025_WPS:
+            Windows2025 WPS:
               vmImage: 'windows-2025'
               pwsh: false
-            Windows_2019_PS:
+            Windows2019 PS:
               vmImage: 'windows-2019'
               pwsh: true
-            Windows_2022_PS:
+            Windows2022 PS:
               vmImage: 'windows-2022'
               pwsh: true
-            Windows_2025_PS:
+            Windows2025 PS:
               vmImage: 'windows-2025'
               pwsh: true
         pool:
@@ -119,7 +119,7 @@ stages:
               buildType: 'current'
               artifactName: $(buildArtifactName)
               targetPath: '$(Build.SourcesDirectory)/$(buildArtifactName)'
-              
+
           # This is a workaround for the issue: https://github.com/PoshCode/ModuleBuilder/pull/136
           - task: PowerShell@2
             name: patch_module
@@ -152,7 +152,7 @@ stages:
             displayName: 'Publish Test Artifact'
             inputs:
               targetPath: '$(buildFolderName)/$(testResultFolderName)/'
-              artifactName: '$(testArtifactName)_$(vmImage)'
+              artifactName: '$(testArtifactName)_$(vmImage)_PS_$(pwsh)'
 
       - job: Code_Coverage
         displayName: 'Publish Code Coverage'
