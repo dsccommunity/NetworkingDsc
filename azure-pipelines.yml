@@ -91,12 +91,24 @@ stages:
         displayName: 'Unit'
         strategy:
           matrix:
-            Windows_2019:
+            Windows_2019_WPS:
               vmImage: 'windows-2019'
-            Windows_2022:
+              pwsh: false
+            Windows_2022_WPS:
               vmImage: 'windows-2022'
-            Windows_2025:
+              pwsh: false
+            Windows_2025_WPS:
               vmImage: 'windows-2025'
+              pwsh: false
+            Windows_2019_PS:
+              vmImage: 'windows-2019'
+              pwsh: true
+            Windows_2022_PS:
+              vmImage: 'windows-2022'
+              pwsh: true
+            Windows_2025_PS:
+              vmImage: 'windows-2025'
+              pwsh: true
         pool:
           vmImage: $(vmImage)
         timeoutInMinutes: '0'
@@ -107,6 +119,18 @@ stages:
               buildType: 'current'
               artifactName: $(buildArtifactName)
               targetPath: '$(Build.SourcesDirectory)/$(buildArtifactName)'
+              
+          # This is a workaround for the issue: https://github.com/PoshCode/ModuleBuilder/pull/136
+          - task: PowerShell@2
+            name: patch_module
+            displayName: 'Patch module ModuleBuilder'
+            inputs:
+              targetType: 'inline'
+              script: |
+                ./build.ps1 -Task noop
+                Install-PSResource -Name 'Viscalyx.Common' -Repository 'PSGallery' -TrustRepository -Quiet -Confirm:$false
+                Install-ModulePatch -Uri 'https://raw.githubusercontent.com/viscalyx/Viscalyx.Common/refs/heads/main/patches/ModuleBuilder_3.1.7_patch.json' -Force
+              pwsh: true
 
           - task: PowerShell@2
             name: test
@@ -114,7 +138,7 @@ stages:
             inputs:
               filePath: './build.ps1'
               arguments: "-Tasks test -PesterScript 'tests/Unit'"
-              pwsh: true
+              pwsh: $(pwsh)
 
           - task: PublishTestResults@2
             displayName: 'Publish Test Results'
@@ -185,7 +209,7 @@ stages:
               vmImage: 'windows-2025'
         pool:
           vmImage: $(vmImage)
-        timeoutInMinutes: 0
+        timeoutInMinutes: '0'
         steps:
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Pipeline Artifact'
