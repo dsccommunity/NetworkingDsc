@@ -1,0 +1,8 @@
+[ClassVersion("1.0.0.0"), FriendlyName("DnsClientNrptGlobal")]
+class DSC_DnsClientNrptGlobal : OMI_BaseResource
+{
+    [Key, Description("Specifies the resource is a single instance, the value must be 'Yes'."), ValueMap{"Yes"}, Values{"Yes"}] String IsSingleInstance;
+    [Write, Description("Specifies DirectAccess (DA) settings."), ValueMap{"EnableOnNetworkID", "EnableAlways", "Disable", "DisableDA"},Values{"EnableOnNetworkID", "EnableAlways", "Disable", "DisableDA"}] string EnableDAForAllNetworks;
+    [Write, Description("Specifies the DNS client query policy."), ValueMap{"Disable", "QueryIPv6Only", "QueryBoth"},Values{"Disable", "QueryIPv6Only", "QueryBoth"}] string QueryPolicy;
+    [Write, Description("SecureNameQueryFallback."), ValueMap{"Disable", "FallbackSecure", "FallbackUnsecure", "FallbackPrivate"},Values{"Disable", "FallbackSecure", "FallbackUnsecure", "FallbackPrivate"}] string SecureNameQueryFallback;
+};
