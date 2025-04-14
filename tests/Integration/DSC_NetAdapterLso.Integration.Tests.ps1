@@ -37,9 +37,11 @@ BeforeDiscovery {
         $_.NdisVersion -ge 6
     } | Select-Object -First 1
 
-    if (-not $script:netAdapter)
+    $script:skip = $true
+
+    if ($script:netAdapter)
     {
-        $script:skip = $true
+        $script:skip = $false
     }
 }
 
