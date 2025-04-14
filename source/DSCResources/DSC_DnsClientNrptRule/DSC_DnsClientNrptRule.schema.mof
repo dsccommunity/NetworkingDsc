@@ -1,0 +1,22 @@
+[ClassVersion("1.0.0.0"), FriendlyName("DnsClientNrptRule")]
+class DSC_DnsClientNrptRule : OMI_BaseResource
+{
+    [Key, Description("Specifies the DNS Client NRPT rule name.")] string Name;
+    [Write, Description("Specifies whether the DNS Client NRPT rule should exist. Defaults to 'Present'."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+    [Write, Description("Stores administrator notes.")] string Comment;
+    [Write, Description("Indicates the rule state for DirectAccess.")] Boolean DAEnable;
+    [Write, Description("Specifies the Internet Protocol security (IPsec) encryption setting for DirectAccess."), ValueMap{"None", "Low", "Medium", "High"},Values{"None", "Low", "Medium", "High"}] string DAIPsecEncryptionType;
+    [Write, Description("Indicates that IPsec is required for DirectAccess.")] Boolean DAIPsecRequired;
+    [Write, Description("Specifies an array of DNS servers to query when DirectAccess is enabled.")] string DANameServers[];
+    [Write, Description("Specifies the proxy server to use when connecting to the Internet. This parameter is only applicable if the DAProxyType parameter is set to UseProxyName.")] string DAProxyServerName;
+    [Write, Description("Specifies the proxy server type to be used when connecting to the Internet."), ValueMap{"NoProxy", "UseDefault", "UseProxyName"},Values{"NoProxy", "UseDefault", "UseProxyName"}] string DAProxyType;
+    [Write, Description("Specifies an optional friendly name for the NRPT rule.")] String DisplayName;
+    [Write, Description("Enables Domain Name System Security Extensions (DNSSEC) on the rule.")] Boolean DnsSecEnable;
+    [Write, Description("Specifies the IPsec tunnel encryption setting."), ValueMap{"None", "Low", "Medium", "High"},Values{"None", "Low", "Medium", "High"}] string DnsSecIPsecEncryptionType;
+    [Write, Description("Indicates the DNS client must set up an IPsec connection to the DNS server.")] Boolean DnsSecIPsecRequired;
+    [Write, Description("Indicates that DNSSEC validation is required.")] Boolean DnsSecValidationRequired;
+    [Write, Description("Specifies the certification authority to validate the IPsec channel.")] String IPsecTrustAuthority;
+    [Write, Description("Specifies the encoding format for host names in the DNS query."), ValueMap{"Disable", "Utf8WithMapping", "Utf8WithoutMapping", "Punycode"},Values{"Disable", "Utf8WithMapping", "Utf8WithoutMapping", "Punycode"}] string NameEncoding;
+    [Write, Description("Specifies the DNS servers to which the DNS query is sent when DirectAccess is disabled.")] string NameServers[];
+    [Write, Description("Specifies the DNS namespace.")] string Namespace;
+};
