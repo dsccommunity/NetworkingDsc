@@ -91,24 +91,12 @@ stages:
         displayName: 'Unit'
         strategy:
           matrix:
-            Windows2019 WPS:
+            Windows_Server_2019:
               vmImage: 'windows-2019'
-              pwsh: false
-            Windows2022 WPS:
+            Windows_Server_2022:
               vmImage: 'windows-2022'
-              pwsh: false
-            Windows2025 WPS:
+            Windows_Server_2025:
               vmImage: 'windows-2025'
-              pwsh: false
-            Windows2019 PS:
-              vmImage: 'windows-2019'
-              pwsh: true
-            Windows2022 PS:
-              vmImage: 'windows-2022'
-              pwsh: true
-            Windows2025 PS:
-              vmImage: 'windows-2025'
-              pwsh: true
         pool:
           vmImage: $(vmImage)
         timeoutInMinutes: '0'
@@ -120,25 +108,13 @@ stages:
               artifactName: $(buildArtifactName)
               targetPath: '$(Build.SourcesDirectory)/$(buildArtifactName)'
 
-          # This is a workaround for the issue: https://github.com/PoshCode/ModuleBuilder/pull/136
-          - task: PowerShell@2
-            name: patch_module
-            displayName: 'Patch module ModuleBuilder'
-            inputs:
-              targetType: 'inline'
-              script: |
-                ./build.ps1 -Task noop
-                Install-PSResource -Name 'Viscalyx.Common' -Repository 'PSGallery' -TrustRepository -Quiet -Confirm:$false
-                Install-ModulePatch -Uri 'https://raw.githubusercontent.com/viscalyx/Viscalyx.Common/refs/heads/main/patches/ModuleBuilder_3.1.7_patch.json' -Force
-              pwsh: true
-
           - task: PowerShell@2
             name: test
             displayName: 'Run Unit Test'
             inputs:
               filePath: './build.ps1'
               arguments: "-Tasks test -PesterScript 'tests/Unit'"
-              pwsh: $(pwsh)
+              pwsh: true
 
           - task: PublishTestResults@2
             displayName: 'Publish Test Results'
