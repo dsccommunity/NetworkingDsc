@@ -1,15 +1,15 @@
 @{
-    Gallery         = 'PSGallery'
-    AllowPrerelease = $false
-    WithYAML        = $true
+    Gallery                                    = 'PSGallery'
+    AllowPrerelease                            = $false
+    WithYAML                                   = $true
 
-    #UseModuleFast = $true
+    UseModuleFast                              = $true
     #ModuleFastVersion = '0.1.2'
     #ModuleFastBleedingEdge = $true
 
-    UsePSResourceGet = $true
+    UsePSResourceGet                           = $true
     #PSResourceGetVersion = '1.0.1'
 
-    UsePowerShellGetCompatibilityModule = $true
+    UsePowerShellGetCompatibilityModule        = $true
     UsePowerShellGetCompatibilityModuleVersion = '3.0.23-beta23'
 }
