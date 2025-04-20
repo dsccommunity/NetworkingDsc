@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added Server 2025 into Unit and Integration tests.
   - Remove duplicated pipeline steps and use matrix of VM images.
   - Use ModuleFast
+  - Merge Unit test CodeCoverage
 - Tests
   - Update to use Pester 5.
 - `New-InvalidArgumentException` change to `New-ArgumentException` for HQRM.
