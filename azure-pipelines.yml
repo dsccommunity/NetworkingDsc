@@ -93,10 +93,13 @@ stages:
           matrix:
             Windows_Server_2019:
               vmImage: 'windows-2019'
+              testRunTitle: 'Windows 2019'
             Windows_Server_2022:
               vmImage: 'windows-2022'
+              testRunTitle: 'Windows 2022'
             Windows_Server_2025:
               vmImage: 'windows-2025'
+              testRunTitle: 'Windows 2025'
         pool:
           vmImage: $(vmImage)
         timeoutInMinutes: '0'
@@ -121,7 +124,7 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Unit $(vmImage)'
+              testRunTitle: 'Unit $(testRunTitle)'
             condition: succeededOrFailed()
 
           - task: PublishPipelineArtifact@1
@@ -179,10 +182,13 @@ stages:
           matrix:
             Windows_2019:
               vmImage: 'windows-2019'
+              testRunTitle: 'Windows 2019'
             Windows_2022:
               vmImage: 'windows-2022'
+              testRunTitle: 'Windows 2022'
             Windows_2025:
               vmImage: 'windows-2025'
+              testRunTitle: 'Windows 2025'
         pool:
           vmImage: $(vmImage)
         timeoutInMinutes: '0'
@@ -215,13 +221,13 @@ stages:
             inputs:
               testResultsFormat: 'NUnit'
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: 'Integration $(vmImage)'
+              testRunTitle: 'Integration $(testRunTitle)'
             condition: succeededOrFailed()
 
   - stage: Deploy
     dependsOn:
-    - Quality_Test_and_Unit_Test
-    - Integration_Test
+      - Quality_Test_and_Unit_Test
+      - Integration_Test
     condition: |
       and(
         succeeded(),
