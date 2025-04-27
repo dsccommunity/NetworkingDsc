@@ -19,10 +19,13 @@ $script:parameterList = $resourceData.ParameterList
 
 <#
     .SYNOPSIS
-        Returns the current Firewall Profile.
+        Returns the current Firewall Profile of the selected Policy Store
 
     .PARAMETER Name
         The name of the firewall profile to configure.
+
+    .PARAMETER PolicyStore
+        Specifies the policy store from which to retrieve the rules to be created.
 #>
 function Get-TargetResource
 {
@@ -33,7 +36,12 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [ValidateSet('Domain', 'Public', 'Private')]
         [System.String]
-        $Name
+        $Name,
+
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore'
     )
 
     Write-Verbose -Message ( @(
@@ -45,11 +53,13 @@ function Get-TargetResource
     # Get the current Dns Client Global Settings
     $netFirewallProfile = Get-NetFirewallProfile `
         -Name $Name `
+        -PolicyStore $Policystore `
         -ErrorAction Stop
 
     # Generate the return object.
     $returnValue = @{
-        Name = $Name
+        Name        = $Name
+        PolicyStore = $PolicyStore
     }
 
     foreach ($parameter in $script:parameterList)
@@ -62,10 +72,9 @@ function Get-TargetResource
     return $returnValue
 } # Get-TargetResource
 
-
 <#
     .SYNOPSIS
-        Sets the Firewall Profile.
+        Sets the Firewall Profile of the selected Policy Store.
 
     .PARAMETER Name
         The name of the firewall profile to configure.
@@ -126,6 +135,9 @@ function Get-TargetResource
 
     .PARAMETER NotifyOnListen
         Allows the notification of listening for inbound connections by a service.
+
+    .PARAMETER PolicyStore
+        Specifies the policy store from which to retrieve the rules to be created.
 #>
 function Set-TargetResource
 {
@@ -219,7 +231,12 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('True', 'False', 'NotConfigured')]
         [System.String]
-        $NotifyOnListen
+        $NotifyOnListen,
+
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore'
     )
 
     Write-Verbose -Message ( @(
@@ -231,6 +248,7 @@ function Set-TargetResource
     # Get the current Firewall Profile Settings
     $netFirewallProfile = Get-NetFirewallProfile `
         -Name $Name `
+        -PolicyStore $PolicyStore `
         -ErrorAction Stop
 
     # Generate a list of parameters that will need to be changed.
@@ -259,7 +277,7 @@ function Set-TargetResource
     if ($changeParameters.Count -gt 0)
     {
         # Update any parameters that were identified as different
-        $null = Set-NetFirewallProfile -Name $Name `
+        $null = Set-NetFirewallProfile -Name $Name -PolicyStore $PolicyStore `
             @ChangeParameters `
             -ErrorAction Stop
 
@@ -273,7 +291,7 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-        Tests the state of Firewall Profile.
+        Tests the state of Firewall Profile of the selected Policy Store.
 
     .PARAMETER Name
         The name of the firewall profile to configure.
@@ -334,6 +352,9 @@ function Set-TargetResource
 
     .PARAMETER NotifyOnListen
         Allows the notification of listening for inbound connections by a service.
+
+    .PARAMETER PolicyStore
+        Specifies the policy store from which to retrieve the rules to be created.
 #>
 function Test-TargetResource
 {
@@ -428,7 +449,12 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('True', 'False', 'NotConfigured')]
         [System.String]
-        $NotifyOnListen
+        $NotifyOnListen,
+
+        [Parameter()]
+        [ValidateSet('PersistentStore', 'localhost')]
+        [String]
+        $PolicyStore = 'PersistentStore'
     )
 
     Write-Verbose -Message ( @(
@@ -443,6 +469,7 @@ function Test-TargetResource
     # Get the current Dns Client Global Settings
     $netFirewallProfile = Get-NetFirewallProfile `
         -Name $Name `
+        -PolicyStore $PolicyStore `
         -ErrorAction Stop
 
     # Check each parameter
