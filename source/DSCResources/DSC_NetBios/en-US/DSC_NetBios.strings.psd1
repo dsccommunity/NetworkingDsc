@@ -8,5 +8,5 @@ ConvertFrom-StringData @'
     TestingNetBiosSettingMessage = Testing NetBIOS configuration for Interface '{0}'.
     CurrentNetBiosSettingMessage = Current NetBIOS configuration for Interface '{0}' is '{1}'.
     InterfaceNotFoundError = Interface '{0}' was not found.
-    FailedUpdatingNetBiosError = An error result of '{1}' was returned when attemting to set NetBIOS for Interface '{0}' configuration to '{2}'.
+    FailedUpdatingNetBiosError = An error result of '{1}' was returned when attempting to set NetBIOS for Interface '{0}' configuration to '{2}'.
 '@
