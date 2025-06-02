@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `azure-pipelines.yml`
   - Remove windows 2019 image fixes [#540](https://github.com/dsccommunity/NetworkingDsc/issues/540).
 
+### Fixed
+
+- Fix integration tests on Server 2022. Fixes [Issue #510](https://github.com/dsccommunity/NetworkingDsc/issues/510).
+
 ## [9.1.0] - 2025-05-11
 
 ### Changed
@@ -31,7 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Merge Unit test CodeCoverage
 - Tests
   - Update to use Pester 5.
-  - Fix integration tests on Server 2022. Fixes [Issue #510](https://github.com/dsccommunity/NetworkingDsc/issues/510).
 - `New-InvalidArgumentException` change to `New-ArgumentException` for HQRM.
 - `NetworkingDsc.Common`
   - Changed to a buildable module.
