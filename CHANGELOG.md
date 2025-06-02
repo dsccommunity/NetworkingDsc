@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `azure-pipelines.yml`
+  - Remove windows 2019 image fixes [#540](https://github.com/dsccommunity/NetworkingDsc/issues/540).
+
 ## [9.1.0] - 2025-05-11
 
 ### Changed
