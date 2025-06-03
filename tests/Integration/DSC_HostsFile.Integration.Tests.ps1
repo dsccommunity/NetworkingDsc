@@ -192,5 +192,53 @@ Describe 'HostsFile Integration Tests' {
             $result.HostName               | Should -Be $configData.AllNodes[0].HostName
             $result.IPAddress              | Should -BeNullOrEmpty
         }
+
+        Describe "$($script:dscResourceName)_Integration - Update single line with leading space" {
+            $configData = @{
+                AllNodes = @(
+                    @{
+                        NodeName  = 'localhost'
+                        HostName  = 'Host01'
+                        IPAddress = ' 192.168.0.1'
+                        Ensure    = 'present'
+                    }
+                )
+            }
+
+            $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+            . $configFile -Verbose -ErrorAction Stop
+
+            It 'Should compile and apply the MOF without throwing' {
+                {
+                    & "$($script:dscResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
+                    Start-DscConfiguration `
+                        -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $result = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                }
+                $result.Ensure                 | Should -Be $configData.AllNodes[0].Ensure
+                $result.HostName               | Should -Be $configData.AllNodes[0].HostName
+                $result.IPAddress              | Should -Be $configData.AllNodes[0].IPAddress.Trim()
+            }
+
+            It 'Should include the extra whitespace' {
+                "${env:SystemRoot}\System32\Drivers\Etc\Hosts" | Should -FileContentMatch "$($configData.AllNodes[0].IPAddress)`t$($configData.AllNodes[0].HostName)"
+            }
+
+            It 'Should not fail subsiquent Test invocations' {
+                $result = Test-DscConfiguration -Path $TestDrive
+                $result | Should -BeTrue
+            }
+        }
     }
 }
