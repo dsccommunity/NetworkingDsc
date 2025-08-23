@@ -33,5 +33,7 @@ class DSC_Firewall : OMI_BaseResource
     [Write, Description("Indicates that matching firewall rules of the indicated value are created.")] Boolean LooseSourceMapping;
     [Write, Description("Indicates that matching network traffic that would otherwise be blocked are allowed.")] Boolean OverrideBlockRules;
     [Write, Description("Specifies that matching firewall rules of the indicated owner are created.")] String Owner;
+    [Write, Description("Specifies the policy store from which to retrieve the rules to be created."), ValueMap{"PersistentStore", "localhost"},Values{"PersistentStore", "localhost"}] String PolicyStore;
+    [Read, Description("Specifies that firewall rules that match the indicated policy store source type are retrieved.")] String PolicyStoreSourceType;
     [Read, Description("The current value of the Display Group of the Firewall Rule.")] string DisplayGroup;
 };
