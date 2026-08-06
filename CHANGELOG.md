@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `azure-pipelines.yml`
   - Remove windows 2019 image fixes [#540](https://github.com/dsccommunity/NetworkingDsc/issues/540).
+- Update to use Pester v6
 
 ### Fixed
 
