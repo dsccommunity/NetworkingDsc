@@ -9,10 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `azure-pipelines.yml`
   - Remove windows 2019 image fixes [#540](https://github.com/dsccommunity/NetworkingDsc/issues/540).
+- Update to use Pester v6
 
 ### Fixed
 
 - Fix integration tests on Server 2022. Fixes [Issue #510](https://github.com/dsccommunity/NetworkingDsc/issues/510).
+- IPAddress
+  - Mandatory was wrongly set to default value, default value which could never be used - resulted in Script Analyzer error.
 
 ## [9.1.0] - 2025-05-11
 
