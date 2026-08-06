@@ -29,11 +29,11 @@ Configuration NetworkTeamInterface_RemoveInterface_Config
     {
         NetworkTeam HostTeam
         {
-          Name = 'HostTeam'
-          TeamingMode = 'SwitchIndependent'
-          LoadBalancingAlgorithm = 'HyperVPort'
-          TeamMembers = 'NIC1','NIC2'
-          Ensure = 'Present'
+            Name = 'HostTeam'
+            TeamingMode = 'SwitchIndependent'
+            LoadBalancingAlgorithm = 'HyperVPort'
+            TeamMembers = 'NIC1','NIC2'
+            Ensure = 'Present'
         }
 
         NetworkTeamInterface NewInterface
