@@ -227,7 +227,7 @@ function Get-HostEntry
 
     foreach ($hosts in $allHosts)
     {
-        $data = $hosts -split '\s+'
+        $data = $hosts.Trim() -split '\s+'
 
         if ($data.Length -gt 2)
         {
